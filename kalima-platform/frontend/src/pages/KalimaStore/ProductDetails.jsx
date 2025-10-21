@@ -8,12 +8,12 @@ import { getBookById, getProductById, purchaseProduct, purchaseBook } from "../.
 import { validateCoupon } from "../../routes/marketCoupouns" // Assuming this is the correct path
 
 // Import components
-import ProductHeader from "./components/ProductHeader"
-import ProductGallery from "./components/ProductsGallery"
-import SampleDownload from "./components/SampleDownload"
-import ProductInfo from "./components/ProductInfo"
-import PaymentSection from "./components/PaymentSection"
-import PurchaseForm from "./components/PurchaseForm"
+import ProductHeader from "./Components/ProductHeader"
+import ProductGallery from "./Components/ProductsGallery"
+import SampleDownload from "./Components/SampleDownload"
+import ProductInfo from "./Components/ProductInfo"
+import PaymentSection from "./Components/PaymentSection"
+import PurchaseForm from "./Components/PurchaseForm"
 
 const ProductDetails = () => {
   const { t, i18n } = useTranslation("kalimaStore-ProductDetails")
