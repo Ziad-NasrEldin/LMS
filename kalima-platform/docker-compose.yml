@@ -1,42 +1,46 @@
 services:
-  frontend:
+  fekra-frontend:
     build: 
       context: ./frontend
       dockerfile: Dockerfile
     ports:
-      - "8081:80"
-      - "4445:443"
+      - "8090:80"
+      - "4450:443"
     environment:
-      - VITE_API_URL=${BACKEND_URL}
+      - VITE_API_URL=${VITE_API_URL}
     volumes:
       - /etc/letsencrypt:/etc/letsencrypt:ro
     depends_on:
-      - backend
+      - fekra-backend
     networks:
-      - app-network
+      - fekra-network
 
-  backend:
+  fekra-backend:
     build: 
       context: ./backend
       dockerfile: Dockerfile
     ports:
-      - "5033:5000"
+      - "5035:5000"
     environment:
       - NODE_ENV=development
       - DATABASE_URI=${DATABASE_URI}
       - PORT=${PORT}
       - REFRESH_TOKEN_SECRET=${REFRESH_TOKEN_SECRET} 
       - ACCESS_TOKEN_SECRET=${ACCESS_TOKEN_SECRET}
+      - CLOUDINARY_NAME=${CLOUDINARY_NAME}
+      - CLOUDINARY_KEY=${CLOUDINARY_KEY}
+      - CLOUDINARY_SECRET=${CLOUDINARY_SECRET}
+      - RESEND_API_KEY=${RESEND_API_KEY}
+      - EMAIL_FROM=${EMAIL_FROM}
+      - PAYMENT_SS_RETENTION_DAYS=30
     networks:
-      - app-network
+      - fekra-network
     volumes:
-      - uploads:/app/public/uploads
-      - signatures:/app/public/signatures
+      - fekra-uploads:/app/uploads
 
 networks:
-  app-network:
+  fekra-network:
     driver: bridge
 
 volumes:
-  uploads:
-  signatures:
+  fekra-uploads:
