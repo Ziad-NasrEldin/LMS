@@ -1,0 +1,176 @@
+{
+  "types": {
+      
+      "course": "Course",
+      "year": "Year",
+      "term": "Term",
+      "month": "Month",
+      "lecture": "Lecture"
+    },
+  "lecturesPage": {
+    "pageTitle": {
+      "manage": "Manage Lectures",
+      "purchased": "Purchased Lectures"
+    },
+    "pageDescription": "Details of all my lectures",
+    "buttons": {
+      "close": "Close",
+      "createNewLecture": "Create New Lecture",
+      "details": "Details"
+    },
+    "filters": {
+      "allSubjects": "All Subjects",
+      "allLevels": "All Levels"
+    },
+    "itemsPerPage": "{{count}} per page",
+    "tableHeaders": {
+      "name": "Name",
+      "lecturer": "Lecturer",
+      "subject": "Subject",
+      "level": "Level",
+      "type": "Type",
+      "price": "Price",
+      "purchaseDate": "Purchase Date",
+      "actions": "Actions"
+    },
+    "lectureType": {
+      "paid": "Paid",
+      "review": "Review"
+    },
+    "points": "points",
+    "unknown": "Unknown",
+    "notSpecified": "Not specified",
+    "emptyStates": {
+      "noLectures": "No lectures available",
+      "noPurchases": "You haven't purchased any lectures yet"
+    },
+    "pagination": {
+      "previous": "Previous",
+      "next": "Next"
+    }
+  },
+  "containerDetails": {
+    "buttons": {
+      "backToDashboard": "Back to Dashboard",
+      "viewDetails": "View Details",
+      "add": "Add"
+    },
+    "labels": {
+      "points": "Points"
+    },
+    "types": {
+      
+      "course": "Course",
+      "year": "Year",
+      "term": "Term",
+      "month": "Month",
+      "lecture": "Lecture"
+    },
+    "error": {
+      "title": "Oops! Something went wrong"
+    },
+    "emptyState": {
+      "noContent": "No content available in this container"
+    }
+  },
+  "containersPage": {
+    "headers": {
+      "lecturerCourses": "Your Courses",
+      "studentCourses": "Purchased Courses"
+    },
+    "descriptions": {
+      "lecturer": "Lectures you've published",
+      "student": "Lectures you've purchased"
+    },
+    "labels": {
+      "course": "Course",
+      "price": "Price: {{price}} points",
+      "lecturer": "Lecturer",
+      "purchaseDate": "Purchase Date",
+      "unknown": "Unknown"
+    },
+    "buttons": {
+      "viewDetails": "View Details"
+    },
+    "itemsPerPage": "{{count}} per page",
+    "emptyStates": {
+      "lecturer": "No courses currently available.",
+      "student": "You haven't purchased any courses yet."
+    },
+    "pagination": {
+      "previous": "Previous",
+      "next": "Next"
+    }
+  },
+   "mobileOnly": {
+    "title": "Mobile Only Content",
+    "message": "This content is only available on mobile devices.",
+    "backButton": "Back to Homepage"
+  },
+   "titles": {
+    "createNewLecture": "Create New Lecture"
+  },
+  "fields": {
+    "name": "Name",
+    "level": "Level",
+    "subject": "Subject",
+    "description": "Description",
+    "price": "Price",
+    "videoURL": "Video URL",
+    "numberOfViews": "Number of Views",
+    "lectureType": "Lecture Type",
+    "requiresExam": "Requires Exam",
+    "requiresHomework": "Requires Homework",
+    "homeworkConfiguration": "Homework Configuration",
+    "attachmentOptional": "Attachment (Optional)",
+    "selectedFile": "Selected file"
+  },
+  "placeholders": {
+    "enterLectureName": "Enter lecture name",
+    "selectLevel": "Select a level",
+    "selectSubject": "Select a subject",
+    "enterDescription": "Enter lecture description",
+    "enterPrice": "Enter price",
+    "enterVideoLink": "Enter video link",
+    "enterNumberOfViews": "Enter number of views"
+  },
+  "lectureTypes": {
+    "revision": "Revision",
+    "normal": "Normal"
+  },
+  "sections": {
+    "examSettings": "Exam Settings",
+    "homeworkSettings": "Homework Settings",
+    "attachments": "Attachments"
+  },
+  "attachmentTypes": {
+    "pdfsAndImages": "PDFs and Images",
+    "booklets": "Booklets",
+    "homeworks": "Homeworks",
+    "exams": "Exams"
+  },
+  "validation": {
+    "nameRequired": "Name is required",
+    "levelRequired": "Level is required",
+    "subjectRequired": "Subject is required",
+    "videoLinkRequired": "Video link is required for lectures",
+    "examConfigRequired": "Please select an exam configuration",
+    "homeworkConfigRequired": "Please select a homework configuration"
+  },
+  "buttons": {
+     "cancel": "Cancel",
+    "create": "Create",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "submit": "Submit",
+    "creating": "Creating..."
+  },
+  "defaults": {
+    "lectureDescription": "Lecture for"
+  },
+  "options": {
+    "yes": "Yes",
+    "no": "No"
+  }
+}

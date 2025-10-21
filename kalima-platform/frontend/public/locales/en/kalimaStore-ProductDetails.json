@@ -1,0 +1,150 @@
+{
+  "header": {
+    "purchaseDetails": "Purchase Details"
+  },
+  "navigation": {
+    "back": "Back",
+    "goBack": "Go Back"
+  },
+  "product": {
+    "details": "Details",
+    "name": "Product Name",
+    "category": "Category",
+    "serialNumber": "Serial Number",
+    "price": "Product Price",
+    "discount": "Discount",
+    "currency": "ج",
+    "types": {
+      "book": "Book",
+      "product": "Product"
+    },
+    "serial": "Serial Number",
+    "whatsapp": "Whatsapp Number (for any questions)",
+    "description": "Description",
+    "subject": "Subject",
+    "off": "OFF",
+    "save": "Save {{amount}} {{currency}}",
+    "instantAccess": "Instant Access",
+    "downloadImmediately": "Download immediately",
+    "securePayment": "Secure Payment",
+    "safeProtected": "Safe & protected"
+  },
+  "payment": {
+    "numberCopied": "Payment number copied!",
+    "sendAmount": "Send the specified amount to the above number"
+  },
+  "paymentSection": {
+    "title": "Payment Information",
+    "subtitle": "Follow these simple steps to complete your purchase",
+    "paymentNumber": "Payment Number",
+    "copied": "Copied to clipboard!",
+    "copyHint": "Click to copy the payment number",
+    "step1": {
+      "title": "Send Payment",
+      "desc": "Transfer the exact amount to the payment number above using your preferred payment method."
+    },
+    "step2": {
+      "title": "Upload Screenshot",
+      "desc": "Take a screenshot of your payment confirmation and upload it in the form below."
+    },
+    "noteTitle": "Important Note",
+    "noteDesc": "Please ensure you send the exact amount and include the payment screenshot. We will process your order within 1-2 hours during business hours."
+  },
+  "purchaseSteps": {
+    "title": "Purchase Steps",
+    "step1": "Send the amount via electronic wallet or instapay",
+    "step2": "Take a screenshot after completing the transfer process"
+  },
+  "upload": {
+    "title": "Upload Transfer Screenshot Here",
+    "dragDrop": "Drag and drop your screenshot here",
+    "maxFileSize": "Maximum file size: 1 GB",
+    "fileSuccess": "File uploaded successfully!",
+    "removeFile": "Remove file",
+    "addImage": "Add Image"
+  },
+  "response": {
+    "note": "Please note that we will respond after uploading the screenshot",
+    "timeframe": "Response will be within 1-2 hours during business hours"
+  },
+  "buttons": {
+    "done": "Done"
+  },
+  "errors": {
+    "invalidProductInfo": "Invalid product information.",
+    "fetchFailed": "Failed to fetch product details.",
+    "fetchErrorLog": "Error fetching product details:",
+    "noFileSelected": "Please select a payment screenshot.",
+    "noTransferNumber": "Please enter the transfer number.",
+    "fillBookFields": "Please fill in all book fields.",
+    "purchaseSubmissionFailed": "Purchase submission failed: ",
+    "title": "Error!",
+    "productNotFound": "Product not found.",
+    "noCouponCode": "Please enter a coupon code.",
+    "invalidCoupon": "Invalid or expired coupon.",
+    "invalidDiscountValue": "Invalid discount value received from server.",
+    "productDataNotLoaded": "Product data not loaded.",
+    "unknownError": "Unknown error occurred"
+  },
+  "success": {
+    "purchaseSubmitted": "Purchase submitted successfully!",
+    "couponApplied": "Coupon applied successfully!"
+  },
+  "logs": {
+    "submittingPurchase": "Submitting purchase with file:"
+  },
+  "gallery": {
+    "noImages": "No Gallery Images",
+    "noImagesDesc": "No gallery images available for this product.",
+    "title": "Product Gallery",
+    "imageCounter": "{{current}} of {{total}}"
+  },
+  "purchaseForm": {
+    "title": "Complete Your Purchase",
+    "subtitle": "Fill in the details below to finalize your order",
+    "transferNumber": "Transfer Number *",
+    "transferNumberPlaceholder": "Enter the number you transferred from",
+    "transferNumberHint": "The phone number or account you sent payment from",
+    "bookPersonalization": "Book Personalization",
+    "nameOnBook": "Name on Book *",
+    "nameOnBookPlaceholder": "Enter name to appear on the book",
+    "numberOnBook": "Number on Book *",
+    "numberOnBookPlaceholder": "Enter number to appear on the book",
+    "seriesName": "Series Name *",
+    "seriesNamePlaceholder": "Enter series name",
+    "paymentScreenshot": "Payment Screenshot *",
+    "fileUploaded": "File uploaded successfully!",
+    "removeFile": "Remove file",
+    "dragDrop": "Drag and drop your payment screenshot here",
+    "orBrowse": "or click to browse files",
+    "maxFileSize": "Maximum file size: 10MB • Supported: JPG, PNG, PDF",
+    "chooseFile": "Choose File",
+    "submit": "Submit Purchase",
+    "processingTimeTitle": "Processing Time",
+    "processingTimeDesc": "After submitting your purchase request, our team will review and process your order. You can expect a response within ",
+    "hours": "hours during business hours",
+    "couponCode": "Coupon Code",
+    "couponCodePlaceholder": "Enter coupon",
+    "applyCoupon": "Apply",
+    "priceSummary": "Price Summary",
+    "originalPrice": "Original Price",
+    "discountedPrice": "Discounted Price",
+    "discount": "Discount",
+    "total": "Total",
+    "notes": "Notes",
+    "notesPlaceholder": "Enter notes"
+  },
+  "sample": {
+    "noSample": "No Sample Available",
+    "noSampleDesc": "This {{type}} doesn't have a sample available for download.",
+    "available": "Sample Available",
+    "pdf": "PDF Sample",
+    "downloadDesc": "Download a sample of this {{type}} to preview the content before purchasing.",
+    "downloadButton": "Download Sample PDF",
+    "downloading": "Downloading...",
+    "fileWillBeDownloadedAs": "File will be downloaded as: {{filename}}"
+  },
+  "loading": {
+    "productDetails": "Loading product details..."
+  }
+}

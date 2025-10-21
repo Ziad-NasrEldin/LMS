@@ -1,0 +1,125 @@
+{
+  "title": "Lectures",
+  "generalPoints": "General Points",
+  "points": "Points",
+   "welcome": "Welcome to the Fekra Platform Lectures Section",
+  "discover": "Discover Our Latest Lectures",
+  "showLectures": "Show Lectures",
+  "noLectures": "No lectures found matching the selected filters.",
+  "free": "Free",
+  "paid": "Paid",
+  "enroll": "Enroll",
+  "purchased": "Purchased",
+  "purchase": "Purchase",
+  "available : ": " Available",
+  "noPointsBalances": "No points available",
+  "filters": {
+    "reset": "Reset Filters",
+    "stage": "Instructor Role",
+    "grade": "Grade",
+    "subject": "Subject",
+    "status": "Status",
+    "stages": {
+      "lecturer": "Lecturer",
+      "professor": "Professor"
+    },
+    "statuses": {
+      "free": "Free",
+      "paid": "Paid"
+    }
+  },
+  "search": {
+    "options": "Search Options"
+  },
+  "levels": {
+  "Primary": "Primary",
+  "Middle": "Middle",
+  "Upper Primary": "Upper Primary",
+  "Higher Secondary": "Higher Secondary",
+  "Fourth Elementary": "Fourth Elementary",
+  "First Primary": "First Primary",
+  "Second Primary": "Second Primary",
+  "Third Primary": "Third Primary",
+  "First Secondary": "First Secondary",
+  "Second Secondary": "Second Secondary",
+  "Third Secondary": "Third Secondary",
+  "2nd Primary": "2nd Primary",
+  "2nd Secondary": "2nd Secondary",
+  "3rd Primary": "3rd Primary",
+  "3rd Secondary": "3rd Secondary",
+  "4th Primary": "4th Primary",
+  "4th Secondary": "4th Secondary",
+  "5th Primary": "5th Primary",
+  "1st Preparatory": "1st Preparatory",
+  "2nd Preparatory": "2nd Preparatory",
+  "3rd Preparatory": "3rd Preparatory",
+  "4th Preparatory": "4th Preparatory",
+  "5th Preparatory": "5th Preparatory",
+  "6th Preparatory": "6th Preparatory",
+  "7th Preparatory": "7th Preparatory"
+},
+ "common": {
+    "loading": "Loading..."
+  },
+  "errors": {
+    "fetchStudents": "Failed to fetch students"
+  },
+  "lesson": {
+    "detailsTitle": "Lesson Details",
+    "centerUnknown": "Unknown Center"
+  },
+  "attendance": {
+    "success": "Attendance recorded successfully",
+    "error": "Failed to record attendance",
+    "successTitle": "Success!",
+    "errorTitle": "Error!",
+    "studentId": "Student ID",
+    "formTitle": "Record Attendance",
+    "studentIdLabel": "Student Sequential ID",
+    "studentIdPlaceholder": "Enter student ID",
+    "scanButton": "Scan ID",
+    "paymentTypeLabel": "Select Payment Type",
+    "paymentType": {
+      "daily": "Daily",
+      "lesson": "Lesson",
+      "month": "Month",
+      "year": "Year",
+      "multiSession": "Multi Session",
+      "unpaid": "Unpaid"
+    },
+    "amountPaidLabel": "Amount Paid",
+    "amountPaidPlaceholder": "Enter amount",
+    "dateLabel": "Attendance Date (Optional)",
+    "bookletLabel": "Booklet Purchased",
+    "bookletYes": "Yes",
+    "bookletNo": "No",
+    "submitButton": "Record Attendance",
+    "studentListTitle": "Student List",
+    "studentTable": {
+      "id": "ID",
+      "name": "Name",
+      "status": "Status",
+      "active": "Active"
+    },
+    "noStudents": "No students found",
+    "moreStudents": "Showing 5 of {{count}} students"
+  },
+  "barCodeScanner": {
+    "title": "Student ID Scanner",
+    "initializing": "Initializing camera...",
+    "clickStart": "Click 'Start Scanning' to begin",
+    "scanInstructions": "Align student ID barcode in the frame...",
+    "resultLabel": "Student ID Detected:",
+    "startButton": "Start Scanning",
+    "stopButton": "Stop Scanning",
+    "resetButton": "Reset",
+    "permissionWarning": "Could not access camera. Please check permissions.",
+    "scanError": "Failed to initialize scanner"
+  },
+  "pagination": {
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page",
+    "of": "of"
+  }
+}

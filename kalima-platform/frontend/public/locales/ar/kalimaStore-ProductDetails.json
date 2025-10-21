@@ -1,0 +1,150 @@
+{
+  "header": {
+    "purchaseDetails": "تفاصيل الشراء"
+  },
+  "navigation": {
+    "back": "رجوع",
+    "goBack": "العودة "
+  },
+  "product": {
+    "details": "التفاصيل",
+    "name": "اسم المنتج",
+    "category": "الفئة",
+    "serialNumber": "الرقم التسلسلي",
+    "price": "سعر المنتج",
+    "discount": "خصم",
+    "currency": "ج",
+    "types": {
+      "book": "كتاب",
+      "product": "منتج"
+    },
+    "serial": "الرقم التسلسلي",
+    "whatsapp": "رقم الواتساب (للاستفسارات)",
+    "description": "الوصف",
+    "subject": "المادة",
+    "off": "خصم",
+    "save": "وفر {{amount}} {{currency}}",
+    "instantAccess": "وصول فوري",
+    "downloadImmediately": "تحميل فوري",
+    "securePayment": "دفع آمن",
+    "safeProtected": "آمن ومحمي"
+  },
+  "payment": {
+    "numberCopied": "تم نسخ رقم الدفع!",
+    "sendAmount": "أرسل المبلغ المحدد إلى الرقم أعلاه"
+  },
+  "paymentSection": {
+    "title": "معلومات الدفع",
+    "subtitle": "اتبع هذه الخطوات البسيطة لإكمال عملية الشراء",
+    "paymentNumber": "رقم الدفع",
+    "copied": "تم النسخ إلى الحافظة!",
+    "copyHint": "انقر لنسخ رقم الدفع",
+    "step1": {
+      "title": "إرسال الدفع",
+      "desc": "حوّل المبلغ المحدد إلى رقم الدفع أعلاه باستخدام طريقة الدفع المفضلة لديك."
+    },
+    "step2": {
+      "title": "رفع لقطة الشاشة",
+      "desc": "التقط لقطة شاشة لتأكيد الدفع وقم برفعها في النموذج أدناه."
+    },
+    "noteTitle": "ملاحظة هامة",
+    "noteDesc": "يرجى التأكد من إرسال المبلغ الصحيح وإرفاق لقطة الدفع. سنقوم بمعالجة طلبك خلال 1-2 ساعة في أوقات العمل."
+  },
+  "gallery": {
+    "noImages": "لا توجد صور معرض",
+    "noImagesDesc": "لا توجد صور معرض متاحة لهذا المنتج.",
+    "title": "معرض المنتج",
+    "imageCounter": "{{current}} من {{total}}"
+  },
+  "purchaseSteps": {
+    "title": "خطوات الشراء",
+    "step1": "أرسل المبلغ عبر المحفظة الإلكترونية أو انستاباي",
+    "step2": "التقط لقطة شاشة بعد إتمام عملية التحويل"
+  },
+  "upload": {
+    "title": "قم بتحميل لقطة شاشة التحويل هنا",
+    "dragDrop": "اسحب وأفلت لقطة الشاشة هنا",
+    "maxFileSize": "الحد الأقصى لحجم الملف: 1 جيجابايت",
+    "fileSuccess": "تم تحميل الملف بنجاح!",
+    "removeFile": "إزالة الملف",
+    "addImage": "إضافة صورة"
+  },
+  "response": {
+    "note": "يرجى ملاحظة أننا سنرد بعد تحميل لقطة الشاشة",
+    "timeframe": "سيكون الرد خلال 1-2 ساعة خلال ساعات العمل"
+  },
+  "buttons": {
+    "done": "تم"
+  },
+  "errors": {
+    "invalidProductInfo": "معلومات المنتج غير صالحة.",
+    "fetchFailed": "فشل في جلب تفاصيل المنتج.",
+    "fetchErrorLog": "خطأ في جلب تفاصيل المنتج:",
+    "noFileSelected": "يرجى اختيار صورة الدفع.",
+    "noTransferNumber": "يرجى إدخال رقم التحويل.",
+    "fillBookFields": "يرجى ملء جميع حقول الكتاب.",
+    "purchaseSubmissionFailed": "فشل في إرسال الشراء: ",
+    "title": "خطأ!",
+    "productNotFound": "لم يتم العثور على المنتج.",
+    "noCouponCode": "يرجى إدخال رمز الكوبون.",
+    "invalidCoupon": "كوبون غير صالح أو منتهي الصلاحية.",
+    "invalidDiscountValue": "قيمة الخصم المستلمة من الخادم غير صالحة.",
+    "productDataNotLoaded": "بيانات المنتج غير محملة.",
+    "unknownError": "حدث خطأ غير معروف"
+  },
+  "success": {
+    "purchaseSubmitted": "تم إرسال الشراء بنجاح!",
+    "couponApplied": "تم تطبيق الكوبون بنجاح!"
+  },
+  "logs": {
+    "submittingPurchase": "جاري إرسال الشراء مع الملف:"
+  },
+  "purchaseForm": {
+    "title": "أكمل عملية الشراء",
+    "subtitle": "املأ التفاصيل أدناه لإتمام الطلب",
+    "transferNumber": "رقم التحويل *",
+    "transferNumberPlaceholder": "أدخل الرقم الذي حولت منه",
+    "transferNumberHint": "رقم الهاتف أو الحساب الذي أرسلت منه الدفع",
+    "bookPersonalization": "تخصيص الكتاب",
+    "nameOnBook": "اسم المدرس الذي تريد وضعه علي الكتاب*",
+    "nameOnBookPlaceholder": "أدخل الاسم الذي سيظهر على الكتاب",
+    "numberOnBook": "رقم الهاتف المراد وضعه علي الكتاب *",
+    "numberOnBookPlaceholder": "أدخل الرقم الذي سيظهر على الكتاب",
+    "seriesName": "اسم السلسلة المراد وضعه علي الكتاب*",
+    "seriesNamePlaceholder": "أدخل اسم السلسلة",
+    "paymentScreenshot": "لقطة شاشة الدفع *",
+    "fileUploaded": "تم رفع الملف بنجاح!",
+    "removeFile": "إزالة الملف",
+    "dragDrop": "اسحب وأفلت لقطة شاشة الدفع هنا",
+    "orBrowse": "أو انقر لتصفح الملفات",
+    "maxFileSize": "الحد الأقصى لحجم الملف: 10 ميجابايت • المدعوم: JPG, PNG, PDF",
+    "chooseFile": "اختر ملفًا",
+    "submit": "إرسال الشراء",
+    "processingTimeTitle": "مدة المعالجة",
+    "processingTimeDesc": "بعد إرسال طلب الشراء الخاص بك، سيقوم فريقنا بمراجعة ومعالجة طلبك. يمكنك توقع الرد خلال ",
+    "hours": "ساعة في أوقات العمل",
+    "couponCode": "رمز الكوبون",
+    "couponCodePlaceholder": "أدخل الكوبون",
+    "applyCoupon": "تطبيق",
+    "priceSummary": "ملخص السعر",
+    "originalPrice": "السعر الأصلي",
+    "discountedPrice": "السعر بعد الخصم",
+    "discount": "الخصم",
+    "total": "المجموع",
+    "notes": "ملاحظات",
+    "notesPlaceholder": "يمكنك كتابه كل ما تريده هنا قبل اجراء عمليه الشراء"
+  },
+  "sample": {
+    "noSample": "لا يوجد ملف عينة",
+    "noSampleDesc": "هذا الـ{{type}} لا يحتوي على عينة متاحة للتحميل.",
+    "available": "عينة متاحة",
+    "pdf": "عينة PDF",
+    "downloadDesc": "قم بتحميل عينة من هذا الـ{{type}} لمعاينة المحتوى قبل الشراء.",
+    "downloadButton": "تحميل عينة PDF",
+    "downloading": "جاري التحميل...",
+    "fileWillBeDownloadedAs": "سيتم تحميل الملف باسم: {{filename}}"
+  },
+  "loading": {
+    "productDetails": "جاري تحميل تفاصيل المنتج..."
+  }
+}

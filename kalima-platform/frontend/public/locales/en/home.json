@@ -1,0 +1,154 @@
+{
+  "welcome": {
+    "title": "Welcome to {{highlight}}Fekra{{/highlight}} Platform",
+    "description": "Fekra Platform is an e-learning platform providing resources for students from 4th grade through 12th grade.",
+    "Fekra": "Fekra",
+    "maleStudentAlt": "Male student",
+    "femaleStudentAlt": "Female student"
+  },
+  "signIn": "Sign In",
+"hero": {
+      "title": "The shortest path to brilliant success",
+      "heading": "Welcome to the Fekra Platform",
+      "description": "Kelma Platform is an e-learning platform that provides resources for students from fourth grade primary to third grade secondary.",
+      "cta": "Login"
+    },
+    "about": {
+      "title": "About Us",
+      "heading": "Learn Smart, Score High ",
+      "description": "Kelma provides an effective e-learning platform for students from 4th grade primary to 12th grade secondary. We offer the best solutions to ensure student excellence.",
+      "features": {
+        "teachers": "Professional Teachers",
+        "tests": "Lesson-wise Tests",
+        "curriculum": "Comprehensive Curriculum Coverage"
+      }
+    },
+    "appDownload": {
+      "title": "Download Our App ",
+      "content1": "Best free learning app - get it ",
+      "content2": " on your mobile to learn ",
+      "now": "Now",
+      "everywhere": "Everywhere"
+    },
+    "teacherCount": {
+    "title": "Teachers",
+    "counter": "Teacher ",
+    "add": "Add Teacher"
+  },
+  "services": {
+    "title": "Our Services",
+    "subtitle": "Our goal is to simplify information to ensure your academic excellence",
+    "learnAnytime": {
+      "title": "Learn Anytime",
+      "subtitle": "Complete Flexibility",
+      "description": "24/7 access to lessons with replay options whenever it suits you"
+    },
+    "teachers": {
+      "title": "Certified Expert Teachers",
+      "subtitle": "High Expertise",
+      "description": "Team of qualified teachers with extensive experience in educational curricula"
+    },
+    "curriculum": {
+      "title": "Premium Curriculum",
+      "subtitle": "Outstanding Content",
+      "description": "Carefully designed curriculum covering all student needs with guaranteed high quality"
+    },
+    "certificates": {
+      "title": "Certified Certificates",
+      "subtitle": "Official Recognition",
+      "description": "Students receive certified certificates upon completion of each educational level"
+    }
+  
+  },
+  "teachers": {
+    "title": "Our Teachers",
+    "heading": "View All Teachers from Our ",
+    "platform": "Platform",
+    "loadMore": "Show More Teachers",
+    "viewProfile": "View Profile",
+    "errors": {
+      "loading": "Loading...",
+      "failed": "Failed to load teachers",
+      "retry": "Retry",
+      "noneFound": "No teachers available currently"
+    },
+    "labels": {
+      "expertise": "Expertise",
+      "experience": "Years Experience",
+      "gradeLevels": "All Grade Levels"
+    },
+    "subjects": {
+      "artificial intelligence": "Artificial Intelligence",  
+      "math": "Mathematics",
+      "science": "Science",
+      "english": "English",
+      "arabic": "Arabic",
+      "history": "History",
+      "geography": "Geography",
+      "physics": "Physics",
+      "chemistry": "Chemistry",
+      "biology": "Biology"
+    }
+    
+  },
+  "courses": {
+    "title": "Educational Courses",
+    "heading": "Discover All Courses on ",
+    "platform": "Our Platform",
+    "grades": {
+      "default": "First Grade",
+      "primary": "First Primary Grade",
+      "middle": "First Preparatory Grade",
+      "upperPrimary": "Fourth Primary Grade",
+      "higherSecondary": "First Secondary Grade"
+    },
+    "status": {
+      "paid": "Paid",
+      "free": "Free"
+    },
+    "currency": "EGP",
+    "containsContent": "Contains {{count}} sub-content",
+    "roles": {
+      "lecturer": "Lecturer"
+    },
+    "types": {
+      "explanation": "Explanation",
+      "year": "Year",
+      "month": "Month",
+      "term": "Term"
+    },
+    "teacherFallback": "Teacher {{name}}",
+    "errors": {
+      "failed": "Failed to load courses",
+      "loading": "Loading...",
+      "retry": "Retry"
+    },
+    "viewAll": "View All"
+  },
+  "titleFallback": "Course Title",
+  "teacherFallback": "Unknown Teacher",
+  "roleFallback": "Lecturer",
+  "free": "Free",
+  "paid": "Paid",
+  "currency": "EGP",
+  "lessonsCount": "Contains {{count}} lessons",
+  "duration": "{{count}} {{unit}}",
+  "units": {
+    "month": "month",
+    "year": "year",
+    "term": "term"
+  },
+  "types": {
+    "course": "Course",
+    "explanation": "Explanation",
+    "monthly": "Monthly",
+    "yearly": "Yearly"
+  },
+  "Experienced lecturer in computer science.": "Experienced lecturer in computer science.",
+  "buttons":{
+    "viewAll":  "View All",
+    "viewDetails":  "View Details"
+  },
+  "priceUnavailable": "N/A" 
+  
+}

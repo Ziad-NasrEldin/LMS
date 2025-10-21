@@ -1,0 +1,83 @@
+{
+  "createNew": "Create New",
+  "common": {
+    "actions": "Actions",
+    "createdOn": "Created On",
+    "created": "Created"
+  },
+  "actions": {
+    "delete": "Delete",
+    "dismiss": "Dismiss",
+    "remove": "Remove"
+  },
+  "errors": {
+    "verifyPermissions": "Failed to verify user permissions",
+    "fetchLecturers": "Failed to fetch lecturers",
+    "fetchSubjects": "Failed to fetch subjects",
+    "fetchPackages": "Failed to fetch packages",
+    "fetchLevels": "Failed to fetch levels",
+    "createSubject": "Failed to create subject",
+    "createPackage": "Failed to create package",
+    "createLevel": "Failed to create level",
+    "deleteSubject": "Failed to delete subject",
+    "deletePackage": "Failed to delete package",
+    "deleteLevel": "Failed to delete level"
+  },
+  "success": {
+    "subjectCreated": "Subject created successfully",
+    "packageCreated": "Package created successfully",
+    "levelCreated": "Level created successfully",
+    "subjectDeleted": "Subject deleted successfully",
+    "packageDeleted": "Package deleted successfully",
+    "levelDeleted": "Level deleted successfully"
+  },
+  "confirmations": {
+    "deleteSubject": "Are you sure you want to delete this subject?",
+    "deletePackage": "Are you sure you want to delete this package?",
+    "deleteLevel": "Are you sure you want to delete this level?"
+  },
+  "forms": {
+    "subject": {
+      "title": "Subject",
+      "createNew": "Create New Subject",
+      "name": "Subject Name",
+      "namePlaceholder": "e.g., Geography",
+      "create": "Create Subject",
+      "existing": "Existing Subjects",
+      "nameColumn": "Subject Name",
+      "noSubjects": "No subjects available."
+    },
+    "package": {
+      "title": "Package",
+      "createNew": "Create New Package",
+      "name": "Package Name",
+      "namePlaceholder": "e.g., Premium Monthly",
+      "price": "Package Price",
+      "priceLabel": "Price",
+      "pricePlaceholder": "e.g., 300",
+      "type": "Package Type",
+      "typeLabel": "Type",
+      "monthly": "Monthly",
+      "month": "Monthly",
+      "points": "Points",
+      "pointsPlaceholder": "e.g., 200",
+      "pointsUnit": "points",
+      "pointsDistribution": "Points Distribution",
+      "selectLecturer": "Select Lecturers",
+      "addPoints": "Add Points",
+      "create": "Create Package",
+      "existing": "Existing Packages",
+      "noPackages": "No packages available."
+    },
+    "level": {
+      "title": "Level",
+      "createNew": "Create New Level",
+      "name": "Level Name",
+      "namePlaceholder": "e.g., Higher Secondary",
+      "create": "Create Level",
+      "existing": "Existing Levels",
+      "nameColumn": "Level Name",
+      "noLevels": "No levels available."
+    }
+  }
+}

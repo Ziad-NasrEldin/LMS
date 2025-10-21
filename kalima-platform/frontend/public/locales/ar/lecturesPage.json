@@ -1,0 +1,177 @@
+{
+  "types": {
+      "course": "دورة",
+      "year": "سنة",
+      "term": "فصل",
+      "month": "شهر",
+      "lecture": "محاضرة"
+      
+    },
+  "lecturesPage": {
+    "pageTitle": {
+      "manage": "إدارة المحاضرات",
+      "purchased": "المحاضرات المشتراة"
+    },
+    "pageDescription": "تفاصيل كل محاضراتي",
+    "buttons": {
+      "close": "إغلاق",
+      "createNewLecture": "إنشاء محاضرة جديدة",
+      "details": "التفاصيل"
+    },
+    "filters": {
+      "allSubjects": "كل المواد",
+      "allLevels": "كل المستويات"
+    },
+    "itemsPerPage": "{{count}} لكل صفحة",
+    "tableHeaders": {
+      "name": "الاسم",
+      "lecturer": "المحاضر",
+      "subject": "المادة",
+      "level": "المستوى",
+      "type": "النوع",
+      "price": "السعر",
+      "purchaseDate": "تاريخ الشراء",
+      "actions": "الإجراءات"
+    },
+    "lectureType": {
+      "paid": "مدفوعة",
+      "review": "مراجعة"
+    },
+    "points": "نقطة",
+    "unknown": "غير معروف",
+    "notSpecified": "غير محدد",
+    "emptyStates": {
+      "noLectures": "لا توجد محاضرات متاحة",
+      "noPurchases": "لم تقم بشراء أي محاضرات بعد"
+    },
+    "pagination": {
+      "previous": "السابق",
+      "next": "التالي"
+    }
+  },
+  "containerDetails": {
+    "buttons": {
+      "backToDashboard": "العودة إلى لوحة التحكم",
+      "viewDetails": "عرض التفاصيل",
+      "add": "إضافة"
+    },
+    "labels": {
+      "points": "نقطة"
+    },
+    "types": {
+      "course": "دورة",
+      "year": "سنة",
+      "term": "فصل",
+      "month": "شهر",
+      "lecture": "محاضرة"
+      
+    },
+    "error": {
+      "title": "حدث خطأ ما!"
+    },
+    "emptyState": {
+      "noContent": "لا يوجد محتوى متاح في هذا الحاوية"
+    }
+  },
+  "containersPage": {
+    "headers": {
+      "lecturerCourses": "الدورات الخاصة بك",
+      "studentCourses": "الدورات المشتراة"
+    },
+    "descriptions": {
+      "lecturer": "المحاضرات التي قمت بنشرها",
+      "student": "المحاضرات التي قمت بشرائها"
+    },
+    "labels": {
+      "course": "دورة",
+      "price": "السعر: {{price}} نقطة",
+      "lecturer": "المحاضر",
+      "purchaseDate": "تاريخ الشراء",
+      "unknown": "غير معروف"
+    },
+    "buttons": {
+      "viewDetails": "عرض التفاصيل"
+    },
+    "itemsPerPage": "{{count}} لكل صفحة",
+    "emptyStates": {
+      "lecturer": "لا توجد دورات متاحة حالياً.",
+      "student": "لم تقم بشراء أي دورات بعد."
+    },
+    "pagination": {
+      "previous": "السابق",
+      "next": "التالي"
+    }
+  },
+   "mobileOnly": {
+    "title": "محتوى للهاتف المحمول فقط",
+    "message": "هذا المحتوى متاح فقط على الأجهزة المحمولة.",
+    "backButton": "العودة إلى الصفحة الرئيسية"
+  },
+  "titles": {
+    "createNewLecture": "إنشاء محاضرة جديدة"
+  },
+  "fields": {
+    "name": "الاسم",
+    "level": "المستوى",
+    "subject": "المادة",
+    "description": "الوصف",
+    "price": "السعر",
+    "videoURL": "رابط الفيديو",
+    "numberOfViews": "عدد المشاهدات",
+    "lectureType": "نوع المحاضرة",
+    "requiresExam": "يتطلب اختبار",
+    "requiresHomework": "يتطلب واجب منزلي",
+    "homeworkConfiguration": "إعدادات الواجب المنزلي",
+    "attachmentOptional": "مرفق (اختياري)",
+    "selectedFile": "الملف المحدد"
+  },
+  "placeholders": {
+    "enterLectureName": "أدخل اسم المحاضرة",
+    "selectLevel": "اختر مستوى",
+    "selectSubject": "اختر مادة",
+    "enterDescription": "أدخل وصف المحاضرة",
+    "enterPrice": "أدخل السعر",
+    "enterVideoLink": "أدخل رابط الفيديو",
+    "enterNumberOfViews": "أدخل عدد المشاهدات"
+  },
+  "lectureTypes": {
+    "revision": "مراجعة",
+    "normal": "عادي"
+  },
+  "sections": {
+    "examSettings": "إعدادات الاختبار",
+    "homeworkSettings": "إعدادات الواجب المنزلي",
+    "attachments": "المرفقات"
+  },
+  "attachmentTypes": {
+    "pdfsAndImages": "ملفات PDF وصور",
+    "booklets": "كتيبات",
+    "homeworks": "واجبات منزلية",
+    "exams": "اختبارات"
+  },
+  "validation": {
+    "nameRequired": "الاسم مطلوب",
+    "levelRequired": "المستوى مطلوب",
+    "subjectRequired": "المادة مطلوبة",
+    "videoLinkRequired": "رابط الفيديو مطلوب للمحاضرات",
+    "examConfigRequired": "الرجاء اختيار إعدادات الاختبار",
+    "homeworkConfigRequired": "الرجاء اختيار إعدادات الواجب المنزلي"
+  },
+  "buttons": {
+    "creating": "جاري الإنشاء...",
+    "cancel": "إلغاء",
+    "create": "إنشاء",
+    "save": "حفظ",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "submit": "إرسال"
+  },
+  "defaults": {
+    "lectureDescription": "محاضرة لـ"
+  },
+  
+   "options": {
+    "yes": "نعم",
+    "no": "لا"
+  }
+}

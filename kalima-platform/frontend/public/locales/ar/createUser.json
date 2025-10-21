@@ -1,0 +1,138 @@
+{
+  "titles": {
+    "createNewUser": "إنشاء مستخدم جديد",
+    "bulkCreate": "إنشاء مستخدمين بالجملة",
+    "csvGuidelines": "توصيات CSV"
+  },
+  "tabs": {
+    "createSingleUser": "إنشاء مستخدم واحد",
+    "bulkCreate": "إنشاء بالجملة"
+  },
+  "fields": {
+    "accountType": "نوع الحساب",
+    "gender": "الجنس",
+    "name": "الاسم",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "confirmPassword": "تأكيد كلمة المرور",
+    "level": "المستوى الدراسي",
+    "phoneNumber": "رقم الهاتف",
+    "parentPhoneNumber": "رقم هاتف ولي الأمر",
+    "sequencedId": "الرقم التسلسلي",
+    "school": "المدرسة",
+    "subjects": "المواد الدراسية",
+    "expertise": "التخصص",
+    "bio": "السيرة الذاتية",
+    "assignedLecturer": "المحاضر المسؤول",
+    "sequencedIdOptional": "الرقم التسلسلي (اختياري)",
+    "parentPhoneNumberOptional": "رقم هاتف ولي الأمر (اختياري)",
+    "hobbies": "الاهتمامات",
+    "hobbiesOptional": "الاهتمامات (اختياري)",
+    "uploadCSV" :"تحميل ملف CSV",
+    "government" : "المحافظه",
+    "administrationZone" : "المناطق الادارية",
+    "selectGovernment" :"اختر المحافظه",
+    "selectAdministrationZone" :"اختر المناطق الادارية",
+    "profilePic": "صورة الملف الشخصي",
+    "referralSerial": "رقم التسلسل المرجعي",
+    "phoneNumber2": "رقم الهاتف (اختياري)",
+    "subject": "المادة",
+    "levels": "المستويات",
+    "teachesAtType": "أين تدرس؟",
+    "socialMedia": "وسائل التواصل الاجتماعي"
+  },
+  "placeholders": {
+    "selectAccountType": "اختر نوع الحساب",
+    "selectLevel": "اختر المستوى الدراسي",
+    "phoneNumber": "أدخل رقم الهاتف",
+    "parentPhoneNumber": "أدخل رقم هاتف ولي الأمر",
+    "sequencedId": "أدخل الرقم التسلسلي",
+    "school": "أدخل اسم المدرسة",
+    "expertise": "أدخل التخصص",
+    "bio": "أدخل السيرة الذاتية",
+    "selectLecturer": "اختر المحاضر",
+    "selectSubject": "اختر المواد الدراسية",
+    "selectHobbies": "اختر الاهتمامات",
+    "addHobby": "اضافة اهتمام",
+    "selectTeachesAt": "اختر مكان التدريس",
+    "selectPlatform": "اختر المنصة",
+    "accountName": "لينك الحساب",
+    "socialLink": "لينك الحساب",
+    "facebook": "فيسبوك",
+    "twitter": "تويتر",
+    "instagram": "إنستاغرام",
+    "phoneNumber2": "رقم الهاتف (اختياري)"
+  },
+  "roles": {
+    "subadmin": "مدير فرعي",
+    "moderator": "مشرف",
+    "assistant": "مساعد",
+    "student": "طالب",
+    "parent": "ولي أمر",
+    "lecturer": "محاضر",
+    "teacher" : "مدرس"
+  },
+  "gender": {
+    "male": "ذكر",
+    "female": "أنثى"
+  },
+  "buttons": {
+    "cancel": "إلغاء",
+    "create": "إنشاء",
+    "save": "حفظ",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "submit": "إرسال",
+    "back": "رجوع",
+    "next": "التالي",
+    "previous": "السابق",
+    "close": "إغلاق",
+    "add": "اضافة",
+    "createUsers": "انشاء مستخدمين",
+    "uploading": "جاري التحميل..."
+  },
+  "messages": {
+    "loading": "جاري التحميل...",
+    "success": "تم بنجاح!",
+    "error": "خطأ!",
+    "warning": "تحذير!",
+    "info": "معلومات"
+  },
+  "validation": {
+    "invalidEmail": "البريد الإلكتروني غير صالح",
+    "passwordsDoNotMatch": "كلمات المرور غير متطابقة",
+    "passwordTooShort": "كلمة المرور يجب أن تكون 6 أحرف على الأقل",
+    "levelRequired": "الرجاء تحديد المستوى الدراسي",
+    "invalidPhoneNumber": "رقم الهاتف غير صالح (10-15 أرقام)",
+    "subjectsRequired": "الرجاء إدخال المواد الدراسية",
+    "lecturerRequired": "الرجاء تحديد المحاضر المسؤول",
+    "required": "هذا الحقل مطلوب",
+    "minLength": "يجب أن يكون على الأقل {{count}} أحرف",
+    "maxLength": "يجب أن يكون على الأكثر {{count}} أحرف",
+    "email": "يجب أن يكون بريد إلكتروني صالح",
+    "match": "الحقول غير متطابقة",
+    "number": "يجب أن يكون رقم",
+    "positive": "يجب أن يكون رقم موجب",
+    "integer": "يجب أن يكون عدد صحيح"
+  },
+  "errors": {
+    "failedToLoadDropdowns": "فشل في تحميل بيانات القوائم المنسدلة",
+    "failedToCreateUser": "فشل في إنشاء المستخدم",
+    "failedToCreateUsers": "فشل في إنشاء المستخدمين. يرجى المحاولة مجددا.",
+    "unexpectedError": "حدث خطاء غير متوقع. يرجى المحاولة مجددا."
+  },
+  "success": {
+    "usersCreated": "تم انشاء المستخدمين بنجاح!"
+  },
+  "help": {
+    "holdCtrlToSelectMultiple": "اضغط Ctrl (أو Cmd) لتحديد خيارات متعددة",
+    "selectAccountType": "حدد نوع الحسابات المراد انشاؤها",
+    "csvRequiredFields": "الملف CSV يجب ان يحتوي على الحقول المطلوبة لنوع الحساب المحدد",
+    "uploadCSV": "تحميل ملف CSV",
+    "csvFormat": "يجب ان يحتوي الملف CSV على الحقول التالية:"
+  },
+  "csvFields" :{
+    "name":"الاسم",
+    "phone":"الرقم"
+  }
+}

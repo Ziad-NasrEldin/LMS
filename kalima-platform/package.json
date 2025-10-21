@@ -1,0 +1,56 @@
+{
+  "name": "kalima-platform",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@capacitor/android": "^7.2.0",
+    "@capacitor/cli": "^7.2.0",
+    "@capacitor/core": "^7.2.0",
+    "axios": "^1.8.2",
+    "chart.js": "^4.4.8",
+    "daisyui": "^4.12.23",
+    "framer-motion": "^12.5.0",
+    "i18next": "^24.2.2",
+    "i18next-browser-languagedetector": "^8.0.4",
+    "i18next-http-backend": "^3.0.2",
+    "jwt-decode": "^4.0.0",
+    "lucide-react": "^0.479.0",
+    "react": "^18.2.0",
+    "react-chartjs-2": "^5.3.0",
+    "react-daisyui": "^5.0.5",
+    "react-dom": "^18.2.0",
+    "react-feather": "^2.0.10",
+    "react-i18next": "^15.4.1",
+    "react-icons": "^5.5.0",
+    "react-router-dom": "^7.2.0"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "build:android": "env-cmd -f .env.android react-scripts build && npx cap copy android"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "env-cmd": "^10.1.0",
+    "typescript": "^5.8.2"
+  }
+}

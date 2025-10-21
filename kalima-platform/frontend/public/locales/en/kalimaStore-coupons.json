@@ -1,0 +1,83 @@
+{
+  "title": "Coupon Management",
+  "loading": "Loading coupons...",
+  "errorLoadingCoupons": "Error Loading Coupons",
+  "retry": "Retry",
+  "stats": {
+    "total": "Total Coupons",
+    "active": "Active",
+    "used": "Used",
+    "expired": "Expired"
+  },
+  "activeFilters": "Active Filters",
+  "clearFilters": "Clear All",
+  "searchPlaceholder": "Search by code, creator, or value...",
+  "filters": {
+    "all": "All Coupons",
+    "active": "Active",
+    "used": "Used",
+    "expired": "Expired"
+  },
+  "createCoupon": "Create Coupon",
+  "table": {
+    "code": "Coupon Code",
+    "value": "Value",
+    "status": "Status",
+    "expiration": "Expiration",
+    "createdBy": "Created By",
+    "usedBy": "Used By",
+    "actions": "Actions",
+    "noCoupons": "No Coupons Found",
+    "tryAdjustingFilters": "Try adjusting your filters"
+  },
+  "status": {
+    "active": "Active",
+    "used": "Used",
+    "expired": "Expired",
+    "inactive": "Inactive"
+  },
+  "copyCode": "Copy code",
+  "viewDetails": "View details",
+  "deleteCoupon": "Delete coupon",
+  "pagination": {
+    "previous": "Previous",
+    "next": "Next",
+    "showing": "Showing",
+    "of": "of",
+    "coupons": "coupons"
+  },
+  "alerts": {
+    "fillAllFields": "Please fill all fields",
+    "couponCreated": "Coupon created successfully!",
+    "createFailed": "Failed to create coupon: ",
+    "couponDeleted": "Coupon deleted successfully!",
+    "deleteFailed": "Failed to delete coupon: ",
+    "codeCopied": "Coupon code copied to clipboard!"
+  },
+  "form": {
+    "value": "Coupon Value",
+    "valueHint": "Discount amount",
+    "expirationDays": "Expiration Days",
+    "daysHint": "Days until expiration"
+  },
+  "cancel": "Cancel",
+  "create": "Create",
+  "deleteConfirmation": "Are you sure you want to delete this coupon?",
+  "delete": "Delete",
+  "couponDetails": "Coupon Details",
+  "details": {
+    "code": "Coupon Code",
+    "value": "Value",
+    "status": "Status",
+    "created": "Created",
+    "expiration": "Expiration",
+    "createdBy": "Created By",
+    "name": "Name",
+    "email": "Email",
+    "role": "Role",
+    "usageInfo": "Usage Information",
+    "usedAt": "Used At",
+    "appliedTo": "Applied to Purchase"
+  },
+  "close": "Close"
+} 

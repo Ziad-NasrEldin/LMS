@@ -1,0 +1,83 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# Diagnostic reports
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Dependency directories
+node_modules/
+frontend/node_modules/
+jspm_packages/
+bower_components/
+backend/upload/
+# Build output
+build/
+**/build/
+dist/
+frontend/dist/
+
+# Capacitor
+android/
+frontend/android/
+
+# Vite
+frontend/.vite/
+
+# Cache and temp folders
+.cache/
+frontend/.cache/
+.parcel-cache/
+.temp/
+.nyc_output/
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+.docusaurus/
+.serverless/
+.fusebox/
+.dynamodb/
+
+# Config files
+.env
+.env.*
+.pnpm-debug.log*
+.lock-wscript
+.eslintcache
+.stylelintcache
+.node_repl_history
+.yarn-integrity
+.yarn/cache/
+.yarn/unplugged/
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+.pnp.js
+
+# Framework specific
+.next/
+out/
+.nuxt/
+.vuepress/dist/
+.docusaurus/
+.serverless/
+public/ # (only if needed)
+
+# Testing
+coverage/
+
+# Other
+.vscode-test
+.DS_Store
+*.tgz

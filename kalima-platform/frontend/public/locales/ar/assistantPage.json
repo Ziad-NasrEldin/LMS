@@ -1,0 +1,168 @@
+{   "assistantPageTitle": "صفحة المساعد",
+    "course": "الدورات",
+    "rating": "التقييم: {{rating}}",
+    "signUp": "اشتراك",
+    "like": "إعجاب",
+    "dislike": "عدم إعجاب",
+    "share": "مشاركة",
+
+    "homeworks": "واجبات",
+    "exams": "اختبارات",
+    "settings": "الإعدادات",
+    "watchOnApp": "المشاهدة عبر التطبيق",
+    "allowAll": "السماح للجميع بالمشاهدة",
+    "onlyParents": "الأهالي فقط",
+    "onlyTeachersStudents": "المعلمين/الطلاب فقط",
+    "courseVideos": "فيديوهات الدورة",
+    "videoPlayer": "مشغل الفيديو",
+    "introReact": "مقدمة في React",
+    "componentsBasics": "أساسيات المكونات",
+    "stateManagement": "إدارة الحالة",
+    "hooksDeepDive": "الغطس العميق في Hooks",
+    "importantCourses": "الدورات المهمة",
+    "exploreCourses": "استكشف الدورات الشائعة",
+    "viewAll": "عرض الكل",
+    "coursesAlt": "رسم توضيحي للدورات",
+    "coursesCount": "{{count}} دورة",
+    "math": "الرياضيات",
+    "physics": "الفيزياء",
+    "chemistry": "الكيمياء",
+    "biology": "الأحياء",
+    "art": "الفنون",
+    "programming": "البرمجة",
+    "revisionCourses": "دورات المراجعة",
+  "exploreFinalCourses": "استكشف دورات الامتحانات النهائية",
+  "addCourse": "إضافة دورة",
+  "courseAlt": "صورة الدورة",
+  "studentsCount": "{{count}} طالب",
+  "showMore": "عرض المزيد",
+  "price": "{{amount}} دولار",
+  "teachers": {
+    "sarah": "د. سارة جونسون",
+    "michael": "بروفيسور مايكل تشين",
+    "emma": "السيدة إيما ويلسون"
+  },
+  "courses": {
+    "advancedCalculus": "حساب متقدم",
+    "organicChemistry": "كيمياء عضوية",
+    "modernPhysics": "فيزياء حديثة"
+  },
+  "duration": {
+    "6weeks": "٦ أسابيع",
+    "8weeks": "٨ أسابيع",
+    "10weeks": "١٠ أسابيع"
+  },
+    "eliteAssistants": {
+      "title": "نخبة من المساعدين",
+      "viewAll": "مشاهدة الجميع" 
+    },
+    "assistants": [
+      {
+        "name": "إيهاب طارق",
+        "bio": "مساعد في الكيمياء، يشرح التفاعلات والمعادلات والحسابات الكيميائية"
+      },
+      {
+        "name": "ادم محمد",
+        "bio": "مساعد في الرياضيات، يشرح الجبر والهندسة والتفاضل والتكامل بأسلوب مبسط"
+      },
+      {
+        "name": "علي مصطفى",
+        "bio": "مساعد في اللغة العربية، متخصص في النحو والبلاغة وتحليل النصوص"
+      },
+      {
+        "name": "خالد حسن",
+        "bio": "مساعد في الدراسات الاجتماعية، متخصص في التاريخ والجغرافيا بطريقة تحليلية"
+      },
+      {
+        "name": "حسام حسن",
+        "bio": "مساعد في اللغة الإنجليزية، يساعد في تطوير مهارات القراءة والكتابة والاستماع"
+      },
+      {
+        "name": "مني يحيى",
+        "bio": "مساعدة في اللغة الألمانية، تركز على القواعد والمحادثة وتحضير الطلاب للاختبارات"
+      }
+    ],
+    
+  "common": {
+    "name": "الاسم",
+    "type": "النوع",
+    "subject": "المادة",
+    "level": "المستوى",
+    "price": "السعر",
+    "actions": "الإجراءات",
+    "details": "التفاصيل",
+    "notAvailable": "غير متوفر",
+    "pricePoints": "{{price}} نقطة",
+    "free": "مجاني",
+    "noDescription": "لا يوجد وصف",
+    "noSubject": "لا توجد مادة",
+    "view": "عرض",
+    "student": "الطالب",
+    "lecture": "المحاضرة",
+    "score": "الدرجة",
+    "status": "الحالة",
+    "submittedAt": "تم التقديم في",
+    "unknown": "غير معروف",
+    "scoreFormat": "{{score}}/{{maxScore}} ({{percentage}}%)",
+    "passed": "ناجح",
+    "failed": "راسب",
+    "loading": "جاري تحميل بيانات لوحة التحكم...",
+    "search": "بحث...",
+    "expertise": "التخصص"
+  },
+  "errors": {
+    "fetchFailed": "فشل في جلب بيانات لوحة التحكم",
+    "occurred": "حدث خطأ أثناء جلب البيانات",
+    "noData": "لا توجد بيانات متاحة"
+  },
+  "containers": {
+    "title": "الحاويات",
+    "notFound": "لم يتم العثور على حاويات"
+  },
+  "lectures": {
+    "title": "المحاضرات",
+    "views": "{{count}} مشاهدة",
+    "hasExam": "يحتوي على امتحان",
+    "viewData": "عرض بيانات المحاضرة",
+    "goToLecture": "الذهاب إلى المحاضرة",
+    "notFound": "لم يتم العثور على محاضرات"
+  },
+  "attachments": {
+    "title": "المرفقات",
+    "fileName": "اسم الملف",
+    "uploadedOn": "تم الرفع في",
+    "notFound": "لم يتم العثور على مرفقات"
+  },
+  "examSubmissions": {
+    "title": "تسليمات الامتحانات",
+    "notFound": "لم يتم العثور على تسليمات امتحانات"
+  },
+  "homeworkSubmissions": {
+    "title": "تسليمات الواجبات",
+    "notFound": "لم يتم العثور على تسليمات واجبات"
+  },
+  "stats": {
+    "title": "الإحصائيات",
+    "totalLectures": "إجمالي المحاضرات",
+    "lectureViews": "مشاهدات المحاضرات",
+    "examSubmissions": "تسليمات الامتحانات",
+    "homeworkSubmissions": "تسليمات الواجبات",
+    "attachments": "المرفقات"
+  },
+  "tabs": {
+    "containers": "الحاويات",
+    "lectures": "المحاضرات",
+    "attachments": "المرفقات",
+    "examSubmissions": "تسليمات الامتحانات",
+    "homeworkSubmissions": "تسليمات الواجبات"
+  },
+  "roles": {
+    "admin": "مدير",
+    "lecturer": "محاضر",
+    "student": "طالب",
+    "assistant": "مساعد"
+  }
+}
+
+  
+  

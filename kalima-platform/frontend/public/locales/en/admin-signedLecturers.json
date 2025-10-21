@@ -1,0 +1,46 @@
+{
+  "lecturers": {
+    "title": "Signed Lecturers",
+    "subtitle": "Manage and view all registered lecturers",
+    "total": "Total",
+    "searchPlaceholder": "Search by name, email, expertise, or phone...",
+    "name": "Name",
+    "nameTooltip": "Lecturer's full name",
+    "expertise": "Expertise",
+    "expertiseTooltip": "Subject expertise",
+    "contact": "Contact",
+    "contactTooltip": "Contact information",
+    "location": "Location",
+    "locationTooltip": "Government and location",
+    "joined": "Joined",
+    "joinedTooltip": "Registration date",
+    "noLecturers": "No lecturers found",
+    "noLecturersFiltered": "No lecturers match your current filters. Try adjusting your search or filters.",
+    "noLecturersYet": "No lecturers have signed up yet. Check back later."
+  },
+  "filters": {
+    "allExpertise": "All Expertise",
+    "allGovernments": "All Governments",
+    "allStatuses": "All Status",
+    "active": "Active",
+    "inactive": "Inactive",
+    "clear": "Clear",
+    "clearAll": "Clear All Filters"
+  },
+  "actions": {
+    "refresh": "Refresh",
+    "actions": "Actions",
+    "copyEmail": "Copy Email",
+    "copyPhone": "Copy Phone",
+    "dismiss": "Dismiss"
+  },
+  "loading": "Loading lecturers...",
+  "pagination": {
+    "showing": "Showing",
+    "of": "of"
+  },
+  "errors": {
+    "failedToFetchLecturers": "Failed to fetch lecturers.",
+    "unexpectedError": "An unexpected error occurred."
+  }
+} 

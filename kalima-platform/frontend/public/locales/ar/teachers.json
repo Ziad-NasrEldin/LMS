@@ -1,0 +1,43 @@
+{
+    "pageTitle": "معلمينا",
+    "discoverTeachers": "اكتشف مدرسيك المفضلين الآن!",
+    "defaultSubject": "مدرس",
+    "defaultExperience": "خبرة واسعة في التدريس",
+    "allGrades": "كل المراحل الدراسية",
+    "filters": {
+      "stage": "المرحلة الدراسية",
+      "subject": "المادة"
+    },
+    "stages": {
+      "primary": "المرحلة الابتدائية",
+      "preparatory": "المرحلة الإعدادية",
+      "secondary": "المرحلة الثانوية"
+    },
+    "subjects": {
+      "math": "رياضيات",
+      "physics": "فيزياء",
+      "chemistry": "كيمياء",
+      "teacher": "مدرس"
+    },
+    "buttons": {
+      "resetFilters": "إعادة ضبط الفلاتر",
+      "searchOptions": "اختيارات البحث",
+      "showTeachers": "لعرض المدرسين",
+      "tryAgain": "حاول مرة أخرى",
+      "loadMore": "عرض المزيد من المدرسين",
+      "viewDetails": "عرض التفاصيل"
+    },
+    "placeholders": {
+      "searchName": "ابحث بالاسم"
+    },
+    "alts": {
+      "background": "نمط خلفية زخرفي",
+      "underline": "خط زينة تحت النص",
+      "teacherProfile": "صورة البروفيل لـ"
+    },
+    "noTeachers": "لا يوجد مدرسين متاحين حالياً",
+    "errors": {
+      "loadTeachers": "تعذر تحميل بيانات المدرسين",
+      "generic": "حدث خطأ ما"
+    }
+  }

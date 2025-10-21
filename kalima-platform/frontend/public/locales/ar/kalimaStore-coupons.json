@@ -1,0 +1,83 @@
+{
+  "title": "إدارة الكوبونات",
+  "loading": "جاري تحميل الكوبونات...",
+  "errorLoadingCoupons": "خطأ في تحميل الكوبونات",
+  "retry": "إعادة المحاولة",
+  "stats": {
+    "total": "إجمالي الكوبونات",
+    "active": "نشط",
+    "used": "مستخدم",
+    "expired": "منتهي الصلاحية"
+  },
+  "activeFilters": "المرشحات النشطة",
+  "clearFilters": "مسح الكل",
+  "searchPlaceholder": "البحث بالكود أو المنشئ أو القيمة...",
+  "filters": {
+    "all": "جميع الكوبونات",
+    "active": "نشط",
+    "used": "مستخدم",
+    "expired": "منتهي الصلاحية"
+  },
+  "createCoupon": "إنشاء كوبون",
+  "table": {
+    "code": "كود الكوبون",
+    "value": "القيمة",
+    "status": "الحالة",
+    "expiration": "تاريخ الانتهاء",
+    "createdBy": "أنشئ بواسطة",
+    "usedBy": "استخدم بواسطة",
+    "actions": "الإجراءات",
+    "noCoupons": "لم يتم العثور على كوبونات",
+    "tryAdjustingFilters": "جرب تعديل المرشحات"
+  },
+  "status": {
+    "active": "نشط",
+    "used": "مستخدم",
+    "expired": "منتهي الصلاحية",
+    "inactive": "غير نشط"
+  },
+  "copyCode": "نسخ الكود",
+  "viewDetails": "عرض التفاصيل",
+  "deleteCoupon": "حذف الكوبون",
+  "pagination": {
+    "previous": "السابق",
+    "next": "التالي",
+    "showing": "عرض",
+    "of": "من",
+    "coupons": "كوبونات"
+  },
+  "alerts": {
+    "fillAllFields": "يرجى ملء جميع الحقول",
+    "couponCreated": "تم إنشاء الكوبون بنجاح!",
+    "createFailed": "فشل في إنشاء الكوبون: ",
+    "couponDeleted": "تم حذف الكوبون بنجاح!",
+    "deleteFailed": "فشل في حذف الكوبون: ",
+    "codeCopied": "تم نسخ كود الكوبون إلى الحافظة!"
+  },
+  "form": {
+    "value": "قيمة الكوبون",
+    "valueHint": "مقدار الخصم",
+    "expirationDays": "أيام الانتهاء",
+    "daysHint": "الأيام حتى انتهاء الصلاحية"
+  },
+  "cancel": "إلغاء",
+  "create": "إنشاء",
+  "deleteConfirmation": "هل أنت متأكد من رغبتك في حذف هذا الكوبون؟",
+  "delete": "حذف",
+  "couponDetails": "تفاصيل الكوبون",
+  "details": {
+    "code": "كود الكوبون",
+    "value": "القيمة",
+    "status": "الحالة",
+    "created": "تاريخ الإنشاء",
+    "expiration": "تاريخ الانتهاء",
+    "createdBy": "أنشئ بواسطة",
+    "name": "الاسم",
+    "email": "البريد الإلكتروني",
+    "role": "الدور",
+    "usageInfo": "معلومات الاستخدام",
+    "usedAt": "تاريخ الاستخدام",
+    "appliedTo": "مطبق على الشراء"
+  },
+  "close": "إغلاق"
+} 

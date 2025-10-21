@@ -1,0 +1,144 @@
+{
+    "sectionTitle": "نخبه من المساعدين",
+    "viewAll": "مشاهده الجميع",
+    "assistants": {
+      "1": {
+        "name": "أحمد محمد",
+        "description": "متخصص في الرياضيات والفيزياء مع أكثر من 10 سنوات خبرة",
+        "specialty": "الرياضيات والفيزياء"
+      },
+      "2": {
+        "name": "سارة عبدالله",
+        "description": "خبيرة في اللغة الإنجليزية وتحضير اختبارات الآيلتس",
+        "specialty": "اللغة الإنجليزية"
+      },
+      "3": {
+        "name": "خالد علي",
+        "description": "مدرس كيمياء معتمد وحاصل على جوائز في التدريس",
+        "specialty": "الكيمياء"
+      },
+      "4": {
+        "name": "نورا سعد",
+        "description": "متخصصة في علم الأحياء والعلوم الطبية",
+        "specialty": "علم الأحياء"
+      },
+      "5": {
+        "name": "فيصل عبدالرحمن",
+        "description": "خبير في البرمجة وتطوير الويب والذكاء الاصطناعي",
+        "specialty": "البرمجة"
+      },
+      "6": {
+        "name": "لمى أحمد",
+        "description": "مدرسة لغة عربية ومحاضرة في الأدب العربي",
+        "specialty": "اللغة العربية"
+      }
+    },
+    "courseManagement": {
+        "sectionTitle": "إدارة الكورسات",
+        "createButton": "إنشاء كورس جديد",
+        "loading": "جاري تحميل البيانات...",
+        "error": "فشل تحميل الكورسات",
+        "tryAgain": "حاول مرة أخرى",
+        "courses": {
+          "1": {
+            "title": "اللغة العربية",
+            "subject": "اللغة العربية",
+            "teacher": "أ/ كامل عادل",
+            "instructor": "أ/ كامل عادل",
+            "grade": "الصف الأول",
+            "level": "المرحلة الإعدادية",
+            "stage": "المرحلة الإعدادية",
+            "durationText": "12 ساعة تدريبية"
+          },
+          "2": {
+            "title": "اللغة الإنجليزية",
+            "subject": "اللغة الإنجليزية",
+            "teacher": "أ/ أسلمي أحمد",
+            "instructor": "أ/ أسلمي أحمد",
+            "grade": "الصف الثالث",
+            "level": "المرحلة الإعدادية",
+            "stage": "المرحلة الإعدادية",
+            "durationText": "12 ساعة تدريبية"
+          },
+          "3": {
+            "title": "الرياضيات",
+            "subject": "الرياضيات",
+            "teacher": "أ/ محمد عبدالله",
+            "instructor": "أ/ محمد عبدالله",
+            "grade": "الصف الخامس",
+            "level": "المرحلة الابتدائية",
+            "stage": "المرحلة الابتدائية",
+            "durationText": "12 ساعة تدريبية"
+          }
+        }
+      },
+      "courseSection": {
+        "sectionTitle": "أهم الكورسات",
+        "sectionSubtitle": "استكشف كورساتنا الشائعة",
+        "courseCount": "كورس",
+        "categories": {
+          "1": "الكيمياء",
+          "2": "الرعاية الصحية",
+          "3": "علم النفس",
+          "4": "اللغة العربية",
+          "5": "الفيزياء",
+          "6": "اللغات",
+          "7": "الفلسفة",
+          "8": "التاريخ",
+          "9": "الاقتصاد",
+          "10": "الرياضيات"
+        }
+      },
+      "reviewCourses": {
+        "sectionTitle": "Review Courses",
+        "sectionSubtitle": "Discover top final review courses",
+        "addButton": "Add Course",
+        "students": "Students",
+        "freeWithCourse": "Free with course",
+        "viewMore": "View More",
+        "courses": {
+          "1": {
+            "subject": "Biology",
+            "title": "Final Biology Review for 12th Grade",
+            "instructor": "Ehab Ahmed",
+            "duration": "3 Weeks",
+            "price": "300 EGP"
+          },
+          "2": {
+            "subject": "Math",
+            "title": "Comprehensive Applied Math Review",
+            "instructor": "Sara Mohamed",
+            "duration": "4 Weeks",
+            "price": "350 EGP"
+          },
+          "3": {
+            "subject": "Philosophy",
+            "title": "Final Philosophy & Logic Review",
+            "instructor": "Amr Khaled",
+            "duration": "2 Weeks",
+            "price": "250 EGP"
+          },
+          "4": {
+            "subject": "Chemistry",
+            "title": "Final Organic Chemistry Review",
+            "instructor": "Nora Saeed",
+            "duration": "5 Weeks",
+            "price": "400 EGP"
+          },
+          "5": {
+            "subject": "Physics",
+            "title": "Comprehensive Modern Physics Review",
+            "instructor": "Khaled Waleed",
+            "duration": "6 Weeks",
+            "price": "450 EGP"
+          },
+          "6": {
+            "subject": "Arabic",
+            "title": "Literary Texts Review for High School",
+            "instructor": "Mona Ali",
+            "duration": "3 Weeks",
+            "price": "300 EGP"
+          }
+        }
+      }
+  }

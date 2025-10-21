@@ -1,0 +1,15 @@
+{
+    "teacherInfo": "Teacher Information",
+    "rating": "Rating: ",
+    "bioHeader": "Biography",
+    "coursesHeader": "Teacher Courses",
+    "subject": " Teacher",
+    "viewDetails": "View Details",
+    "duration": " training hours",
+    "error": {
+      "loading": "Loading teacher data...",
+      "failed": "Failed to load teacher data",
+      "notFound": "Teacher not found"
+    },
+    "bioTemplate": "\"Dear students, I'm pleased to introduce myself, {expertise} teacher {name}. I'm here to guide you through the world of numbers and equations. I have extensive experience teaching {expertise} and always strive to simplify complex concepts. I'm passionate about teaching and developing your skills, and I promise to do my best to help you deeply understand the subject and apply it in daily life. I'm here to support and guide you toward success.\""
+  }

@@ -1,0 +1,48 @@
+{
+  "hero": {
+    "booksIllustration": "رسم توضيحي للكتب",
+    "tagline": "اكتشف واشترِ المنتجات والكتب من جميع الأقسام."
+  },
+  "categories": {
+    "allSections": "جميع الأقسام",
+    "allSubSections": "جميع الأقسام الفرعية"
+  },
+  "search": {
+    "placeholder": "ابحث عن المنتجات..."
+  },
+  "product": {
+    "discounts": "خصم",
+    "currency": "ج",
+    "viewDetails": "عرض التفاصيل"
+  },
+  "sections": {
+    "Designs": "تصاميم",
+    "Books": "كتب",
+    "default": "القسم",
+    "Courses": "دورات",
+    "Gifts": "هدايا",
+    "Printing": "طباعة",
+    "Software": "برمجيات"
+  },
+  "emptyState": {
+    "title": "لم يتم العثور على عناصر",
+    "description": "حاول تعديل معايير البحث أو التصفية"
+  },
+  "pagination": {
+    "previous": "السابق",
+    "next": "التالي",
+    "page": "صفحة",
+    "of": "من"
+  },
+  "errors": {
+    "loadingError": "خطأ في تحميل البيانات",
+    "fetchErrorLog": "خطأ في جلب البيانات:"
+  },
+  "empty": {
+    "noProducts": "لم يتم العثور على منتجات.",
+    "tryDifferentSearch": "جرب مصطلح بحث مختلف."
+  },
+  "navigation": {
+    "goBack": "العودة"
+  }
+}

@@ -1,0 +1,139 @@
+{
+  "titles": {
+    "createNewUser": "Create New User",
+    "bulkCreate": "Bulk Create Users",
+    "csvGuidelines": "CSV Format Guidelines"
+  },
+  "tabs": {
+    "createSingleUser": "Create Single User",
+    "bulkCreate": "Bulk Create"
+  },
+  "fields": {
+    "accountType": "Account Type",
+    "gender": "Gender",
+    "name": "Name",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "level": "Level",
+    "phoneNumber": "Phone Number",
+    "parentPhoneNumber": "Parent Phone Number",
+    "parentPhoneNumberOptional": "Parent Phone Number (Optional)",
+    "sequencedId": "Sequenced ID",
+    "sequencedIdOptional": "Sequenced ID (Optional)",
+    "school": "School",
+    "subjects": "Subjects",
+    "expertise": "Expertise",
+    "bio": "Bio",
+    "assignedLecturer": "Assigned Lecturer",
+    "hobbies": "Hobbies",
+    "hobbiesOptional": "Hobbies (Optional)",
+    "uploadCSV": "Upload CSV File",
+    "government": "Government",
+    "administrationZone": "Administration Zone",
+    "selectGovernment": "Select Government",
+    "selectAdministrationZone": "Select Administration Zone",
+    "profilePic": "Profile Picture",
+    "referralSerial": "Referral Serial",
+    "phoneNumber2": "Phone Number (Optional)",
+    "subject": "Subject",
+    "levels": "Levels",
+    "teachesAtType": "Where do you teach?",
+    "socialMedia": "Social Media"
+  },
+  "placeholders": {
+    "selectAccountType": "Select Account Type",
+    "selectLevel": "Select Level",
+    "phoneNumber": "Enter phone number",
+    "parentPhoneNumber": "Enter parent phone number",
+    "sequencedId": "Enter sequenced ID",
+    "school": "Enter school name",
+    "expertise": "Enter expertise",
+    "bio": "Enter bio",
+    "selectLecturer": "Select Lecturer",
+    "addHobby": "Add a hobby",
+    "selectSubject": "Select subject",
+    "selectTeachesAt": "Select teaches at",
+    "selectPlatform": "Select platform",
+    "accountName": "Account name/handle",
+    "socialLink": "Social Link",
+    "facebook": "Facebook",
+    "twitter": "Twitter",
+    "instagram": "Instagram",
+    "phoneNumber2": "Phone Number (Optional)"
+  },
+  "roles": {
+    "subadmin": "Sub Admin",
+    "moderator": "Moderator",
+    "assistant": "Assistant",
+    "student": "Student",
+    "parent": "Parent",
+    "lecturer": "Lecturer",
+    "teacher": "Teacher"
+  },
+  "gender": {
+    "male": "Male",
+    "female": "Female"
+  },
+  "buttons": {
+    "add": "Add",
+    "uploading": "Uploading...",
+    "createUsers": "Create Users",
+    "cancel": "Cancel",
+    "create": "Create",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "submit": "Submit",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "close": "Close"
+  },
+  "messages": {
+    "loading": "Loading...",
+    "success": "Success!",
+    "error": "Error!",
+    "warning": "Warning!",
+    "info": "Information"
+  },
+  "validation": {
+    "invalidEmail": "Invalid email address",
+    "passwordsDoNotMatch": "Passwords do not match",
+    "passwordTooShort": "Password must be at least 6 characters",
+    "levelRequired": "Please select a level",
+    "invalidPhoneNumber": "Invalid phone number (10-15 digits)",
+    "subjectsRequired": "Please enter subjects",
+    "lecturerRequired": "Please select a lecturer",
+    "invalidFileType": "Please upload a valid CSV file",
+    "fileRequired": "Please upload a CSV file",
+    "required": "This field is required",
+    "minLength": "Must be at least {{count}} characters",
+    "maxLength": "Must be at most {{count}} characters",
+    "email": "Must be a valid email address",
+    "match": "Fields do not match",
+    "number": "Must be a number",
+    "positive": "Must be a positive number",
+    "integer": "Must be an integer"
+  },
+  "errors": {
+    "failedToLoadDropdowns": "Failed to load dropdown data",
+    "failedToCreateUser": "Failed to create user",
+    "failedToCreateUsers": "Failed to create users. Please try again.",
+    "unexpectedError": "An unexpected error occurred. Please try again."
+  },
+  "success": {
+    "usersCreated": "Users created successfully!"
+  },
+  "help": {
+    "holdCtrlToSelectMultiple": "Hold Ctrl (or Cmd) to select multiple options",
+    "selectAccountType": "Select the type of accounts to create",
+    "csvRequiredFields": "CSV file should include required fields for the selected account type",
+    "csvFormat": "Your CSV file should include the following columns:"
+  },
+  
+  "csvFields": {
+    "name": "Name - Full name of the user",
+    "phone": "Phone - Full correct Phone number"
+  }
+}

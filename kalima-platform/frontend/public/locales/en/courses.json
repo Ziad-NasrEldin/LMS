@@ -1,0 +1,88 @@
+{
+    "title": "My Courses",
+    "discover": "Discover your favorite courses now!",
+    "noCourses": "No courses available currently",
+    "showCourses": "Show Courses",
+    "showing": "Showing",
+    "of": "of",
+    "courses": "courses",
+    "unknownTeacher": "Unknown Teacher",
+    "lecturer": "Lecturer",
+    "filters": {
+      "reset": "Reset Filters",
+      "stage": "Academic Stage",
+      "grade": "Grade",
+      "term": "Term",
+      "type": "Course Type",
+      "status": "Course Status",
+      "subject": "Subject",
+      "price": "Course Price",
+      "select" : "Select",
+      "all" : "All"
+    },
+    "pagination": {
+      "previous": "Previous",
+      "next": "Next"
+    },
+    "stages": {
+      "primary": "Primary Stage",
+      "middle": "Middle Stage",
+      "secondary": "Secondary Stage"
+    },
+    "levels": {
+      "Primary": "Primary Stage",
+      "Middle": "Middle Stage", 
+      "Upper Primary": "Upper Primary Stage",
+      "Higher Secondary": "Higher Secondary Stage",
+      "Fourth Elementary": "4th Primary",
+      "First Primary": "1st Primary",
+      "Second Primary": "2nd Primary", 
+      "Third Primary": "3rd Primary",
+      "First Secondary": "1st Secondary",
+      "Second Secondary": "2nd Secondary",
+      "Third Secondary": "3rd Secondary",
+      "1st Primary": "1st Primary",
+      "2nd Primary": "2nd Primary",
+      "3rd Primary": "3rd Primary", 
+      "4th Primary": "4th Primary",
+      "5th Primary": "5th Primary",
+      "6th Primary": "6th Primary",
+      "1st Preparatory": "1st Preparatory",
+      "2nd Preparatory": "2nd Preparatory", 
+      "3rd Preparatory": "3rd Preparatory",
+      "1st Secondary": "1st Secondary",
+      "2nd Secondary": "2nd Secondary",
+      "3rd Secondary": "3rd Secondary"
+    },
+    "grades": {
+      "first": "First Grade",
+      "second": "Second Grade",
+      "third": "Third Grade"
+    },
+    "terms": {
+      "first": "First Term",
+      "second": "Second Term"
+    },
+    "types": {
+      "explanation": "Explanation",
+      "review": "Review",
+      "exercises": "Exercises",
+      "course": "Course",
+      "year": "Full Year",
+      "term": "Semester",
+      "month": "Month"
+    },
+    "status": {
+      "free": "Free",
+      "paid": "Paid"
+    },
+    "search": {
+      "options": "Search Options"
+    },
+    "priceRanges": {
+      "free": "Free",
+      "under500": "Under 500 EGP",
+      "500to1000": "500-1000 EGP",
+      "over1000": "Over 1000 EGP"
+    }
+  }

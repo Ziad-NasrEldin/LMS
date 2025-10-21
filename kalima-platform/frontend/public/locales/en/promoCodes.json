@@ -1,0 +1,117 @@
+{
+  "title": "Promo Codes",
+  "subtitle": "Manage your promo codes and points balance",
+  "balance": {
+    "title": "Balance",
+    "currency": "EGP",
+    "description": "Total points available to use"
+  },
+  "redeem": {
+    "title": "Redeem Code",
+    "button": "Redeem Code",
+    "modalTitle": "Redeem Code",
+    "placeholder": "Enter your promo code",
+    "rulesTitle": "Redemption Rules",
+    "rules": {
+      "1": "Each code can only be redeemed once",
+      "2": "You can only use points with the teacher who issued the card"
+    },
+    "success": "Code redeemed successfully!",
+    "errors": {
+      "emptyCode": "Please enter a code",
+      "generic": "Failed to redeem code",
+      "invalidCode": "Invalid code"
+    }
+  },
+  "referral": {
+    "title": "Referral Code",
+    "completedTitle": "Referral Applied",
+    "used": "Used",
+    "oneTime": "One-time use",
+    "infoTitle": "Have a referral code?",
+    "infoDescription": "If someone referred you to our platform, enter their referral serial below to get bonus points and help them earn rewards too!",
+    "label": "Referral Serial",
+    "required": "Required",
+    "placeholder": "Enter referral serial (e.g., REF123456)",
+    "button": "Apply",
+    "alreadyApplied": "You have successfully applied a referral code!",
+    "referredBy": "Referred by:",
+    "benefitsTitle": "Referral Benefits",
+    "benefit1": "Get bonus points when you apply a valid referral code",
+    "benefit2": "Help your friend earn rewards for referring you",
+    "benefit3": "One-time use ensures fair distribution of rewards",
+    "success": "Referral code applied successfully! You may receive bonus points.",
+    "errors": {
+      "emptySerial": "Please enter a referral serial",
+      "alreadyUsed": "You have already used a referral code",
+      "generic": "Failed to apply referral code"
+    }
+  },
+  "transactions": {
+    "title": "Transaction History",
+    "types": {
+      "codeRedemption": "Code Redemption",
+      "coursePurchase": "Course Purchase"
+    }
+  },
+  "lectures": {
+    "title": "Lecture Access"
+  },
+  "actions": {
+    "title": "Quick Actions"
+  },
+  "lecturerPoints": {
+    "title": "Points by Lecturer",
+    "description": "Total points available for each lecturer"
+  },
+  "scanner": {
+    "title": "Scan QR Code",
+    "button": "Scan QR",
+    "instructions": "Point your camera at the QR code",
+    "switchCamera": "Switch Camera",
+    "initializing": "Starting camera...",
+    "errors": {
+      "cameraPermission": "Camera permission denied",
+      "initFailed": "Failed to initialize scanner",
+      "invalidCode": "Invalid QR code"
+    }
+  },
+  "sort": {
+    "label": "Sort by",
+    "newest": "Newest first",
+    "oldest": "Oldest first"
+  },
+  "table": {
+    "date": "Date",
+    "type": "Type",
+    "amount": "Amount",
+    "teacher": "Teacher",
+    "actions": "Actions",
+    "created": "Created",
+    "code": "Code",
+    "id": "ID"
+  },
+  "noData": "No data available",
+  "noLecturerPoints": "No lecturer points available",
+  "noLectures": "No lectures available",
+  "noLecturesDescription": "You haven't accessed any lectures yet",
+  "user": "User",
+  "student": "Student",
+  "generalPoints": "General",
+  "notAvailable": "N/A",
+  "views": "views",
+  "totalViews": "total views",
+  "copy": "Copy to clipboard",
+  "details": "View details",
+  "retry": "Retry",
+  "errors": {
+    "fetchFailed": "Failed to fetch data"
+  },
+   "profile" :{
+    "email" : "Email",
+    "sequenceId" : "Sequence ID",
+    "sequenceIdTooltip" : "Your sequence ID",
+    "parentLinkTitle" :  "Parent Link",
+    "parentLinkDescription" : "Use this link to access your parent account"
+  }
+}

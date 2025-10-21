@@ -1,0 +1,350 @@
+{
+  "adminPanel": {
+    "title": "لوحة الإدارة",
+    "subtitle": "إدارة المنتجات والكتب والأقسام"
+  },
+  "stats": {
+    "totalSales": "إجمالي المبيعات",
+    "pendingApplications": "الطلبات المعلقة",
+    "numberOfProducts": "عدد المنتجات",
+    "numberOfSections": "عدد الأقسام",
+    "numberOfSubSections": "عدد الأقسام الفرعية"
+  },
+  "categories": {
+    "designsSection": "قسم التصاميم",
+    "designsDescription": "قوالب التصميم والموارد",
+    "coursesSection": "قسم الدورات",
+    "coursesDescription": "الدورات التعليمية والمواد",
+    "giftsSection": "قسم الهدايا",
+    "giftsDescription": "عناصر الهدايا والحزم",
+    "printingSection": "قسم الطباعة",
+    "printingDescription": "خدمات ومواد الطباعة "
+  },
+  "sectionsManagement": {
+    "title": "إدارة الأقسام",
+    "searchPlaceholder": "البحث في الأقسام...",
+    "totalSections": "إجمالي الأقسام",
+    "filtered": "مفلتر",
+    "search": "البحث",
+    "table": {
+      "name": "الاسم",
+      "sectionNumber": "رقم القسم",
+      "numberOfProducts": "عدد المنتجات",
+      "actions": "الإجراءات",
+      "edit": "تعديل",
+      "delete": "حذف"
+    },
+    "noSectionsAvailable": "لا توجد أقسام متاحة",
+    "noSections": "لم يتم العثور على أقسام",
+    "tryDifferentSearch": "جرب مصطلح بحث مختلف"
+  },
+  "subSectionsManagement": {
+    "title": "إدارة الأقسام الفرعية",
+    "searchPlaceholder": "البحث في الأقسام الفرعية...",
+    "totalSubSections": "إجمالي الأقسام الفرعية",
+    "filtered": "مفلتر",
+    "search": "البحث",
+    "filterBySection": "تصفية حسب القسم",
+    "allSections": "جميع الأقسام",
+    "table": {
+      "name": "الاسم",
+      "section": "القسم الأساسي",
+      "numberOfProducts": "عدد المنتجات",
+      "actions": "الإجراءات",
+      "edit": "تعديل",
+      "delete": "حذف"
+    },
+    "noSubSectionsAvailable": "لا توجد أقسام فرعية متاحة",
+    "noSubSections": "لم يتم العثور على أقسام فرعية",
+    "tryDifferentSearch": "جرب مصطلح بحث مختلف"
+  },
+  "forms": {
+    "createProduct": {
+      "title": "إنشاء منتج جديد",
+      "submitButton": "إنشاء منتج",
+      "fields": {
+        "title": "عنوان المنتج",
+        "serial": "الرقم التسلسلي",
+        "section": "القسم",
+        "subSection": "القسم الفرعي",
+        "price": "السعر",
+        "discountPercentage": "نسبة الخصم",
+        "priceAfterDiscount": "السعر بعد الخصم",
+        "paymentNumber": "رقم الدفع",
+        "whatsAppNumber": "رقم الواتساب",
+        "thumbnail": "صورة المنتج المصغرة",
+        "sampleFile": "ملف العينة",
+        "description": "الوصف",
+        "gallery": "صور المعرض"
+      },
+      "placeholders": {
+        "title": "أدخل عنوان المنتج",
+        "serial": "أدخل الرقم التسلسلي",
+        "section": "اختر القسم",
+        "subSection": "اختر القسم الفرعي",
+        "paymentNumber": "أدخل رقم الدفع",
+        "whatsAppNumber": "أدخل رقم الواتساب",
+        "description": "أدخل وصف المنتج..."
+      },
+      "hints": {
+        "thumbnail": "رفع صورة المنتج المصغرة (الحد الأقصى 5 ميجابايت)",
+        "sampleFile": "رفع ملف العينة (PDF, DOC, DOCX)",
+        "gallery": "رفع صور متعددة لمعرض المنتج",
+        "whatsAppNumber": "أدخل رقم الواتساب للتواصل مع العملاء",
+        "description": "قدم وصفاً مفصلاً للمنتج"
+      }
+    },
+    "createBook": {
+      "title": "إنشاء كتاب",
+      "submitButton": "إنشاء كتاب",
+      "fields": {
+        "title": "عنوان الكتاب",
+        "serial": "الرقم التسلسلي",
+        "section": "القسم",
+        "subSection": "القسم الفرعي",
+        "subject": "المادة",
+        "price": "السعر",
+        "discountPercentage": "نسبة الخصم",
+        "paymentNumber": "رقم الدفع",
+        "whatsAppNumber": "رقم الواتساب",
+        "thumbnail": "صورة الكتاب المصغرة",
+        "sampleFile": "ملف العينة",
+        "description": "الوصف"
+      },
+      "placeholders": {
+        "title": "أدخل عنوان الكتاب",
+        "serial": "أدخل الرقم التسلسلي",
+        "section": "اختر القسم",
+        "subSection": "اختر القسم الفرعي",
+        "subject": "اختر المادة",
+        "paymentNumber": "أدخل رقم الدفع",
+        "whatsAppNumber": "أدخل رقم الواتساب",
+        "description": "أدخل وصف الكتاب..."
+      },
+      "hints": {
+        "thumbnail": "رفع صورة الكتاب المصغرة (الحد الأقصى 5 ميجابايت)",
+        "sampleFile": "رفع ملف العينة (PDF, DOC, DOCX)",
+        "whatsAppNumber": "أدخل رقم الواتساب للتواصل مع العملاء",
+        "description": "قدم وصفاً مفصلاً للكتاب"
+      }
+    },
+    "createSection": {
+      "title": "إنشاء قسم",
+      "submitButton": "إنشاء قسم",
+      "fields": {
+        "name": "اسم القسم",
+        "number": "رقم القسم",
+        "description": "الوصف",
+        "thumbnail": "الصورة المصغرة",
+        "allowedRoles": "الأدوار المسموحة"
+      },
+      "placeholders": {
+        "name": "أدخل اسم القسم",
+        "number": "أدخل رقم القسم",
+        "description": "أدخل وصف القسم",
+        "thumbnail": "أدخل اسم الصورة المصغرة"
+      }
+    },
+    "createSubSection": {
+      "title": "إنشاء قسم فرعي",
+      "submitButton": "إنشاء قسم فرعي",
+      "fields": {
+        "name": "اسم القسم الفرعي",
+        "section": "القسم الأساسي"
+      },
+      "placeholders": {
+        "name": "أدخل اسم القسم الفرعي",
+        "section": "اختر القسم الأساسي"
+      }
+    }
+  },
+  "common": {
+    "cancel" : "الغاء",
+    "update": "نحديث"
+  },
+  "fileUpload": {
+    "uploaded": "تم الرفع",
+    "upload": "رفع",
+    "uploadAll": "رفع الكل",
+    "uploading": "جاري الرفع...",
+    "uploadingFiles": "جاري رفع الملفات...",
+    "complete": "مكتمل",
+    "allFilesUploaded": "تم رفع جميع الملفات",
+    "filesSelected": "ملفات محددة",
+    "total": "المجموع:"
+  },
+  "progressSteps": {
+    "validatingFormData": "التحقق من بيانات النموذج",
+    "checkingRequiredFields": "التحقق من جميع الحقول المطلوبة",
+    "preparingFiles": "تحضير الملفات",
+    "processingUploadedFiles": "معالجة الملفات المرفوعة",
+    "uploadingFiles": "رفع الملفات",
+    "sendingFilesToServer": "إرسال الملفات إلى الخادم",
+    "creatingProduct": "إنشاء المنتج",
+    "creatingBook": "إنشاء الكتاب",
+    "creatingSection": "إنشاء القسم",
+    "submittingProductData": "إرسال بيانات المنتج",
+    "submittingBookData": "إرسال بيانات الكتاب",
+    "submittingSectionData": "إرسال بيانات القسم",
+    "finalizing": "إنهاء",
+    "completingProcess": "إكمال العملية",
+    "errorDuringSubmission": "حدث خطأ أثناء الإرسال"
+  },
+  "progressBar": {
+    "overallProgress": "التقدم العام",
+    "uploadFailed": "فشل الرفع",
+    "uploadCompletedSuccessfully": "تم الرفع بنجاح!"
+  },
+  "modals": {
+    "editSection": {
+      "title": "تعديل القسم",
+      "cancelButton": "إلغاء",
+      "updateButton": "تحديث القسم"
+    },
+    "deleteSection": {
+      "title": "تأكيد الحذف",
+      "message": "هل أنت متأكد من أنك تريد حذف القسم \"{{sectionName}}\"؟ لا يمكن التراجع عن هذا الإجراء.",
+      "cancelButton": "إلغاء",
+      "deleteButton": "حذف"
+    },
+    "editProduct": {
+      "title": "تعديل المنتج",
+      "cancelButton": "إلغاء",
+      "updateButton": "تحديث المنتج",
+      "leaveEmptyToKeep": "اتركه فارغًا للاحتفاظ بالقيمة الحالية"
+    },
+    "deleteProduct": {
+      "title": "تأكيد الحذف",
+      "message": "هل أنت متأكد أنك تريد حذف المنتج \"{{productName}}\"؟ لا يمكن التراجع عن هذا الإجراء.",
+      "cancelButton": "إلغاء",
+      "deleteButton": "حذف"
+    },
+    "editSubSection": {
+      "title": "تعديل القسم الفرعي",
+      "cancelButton": "إلغاء",
+      "updateButton": "تحديث القسم الفرعي"
+    },
+    "deleteSubSection": {
+      "title": "تأكيد الحذف",
+      "message": "هل أنت متأكد من أنك تريد حذف القسم الفرعي \"{{subSectionName}}\"؟ لا يمكن التراجع عن هذا الإجراء.",
+      "cancelButton": "إلغاء",
+      "deleteButton": "حذف"
+    }
+  },
+  "alerts": {
+    "fillRequiredFields": "يرجى ملء جميع الحقول المطلوبة",
+    "subSectionRequired": "يرجى اختيار قسم فرعي",
+    "productCreatedSuccess": "تم إنشاء المنتج بنجاح!",
+    "productCreateError": "خطأ في إنشاء المنتج: ",
+    "productUpdatedSuccess": "تم تحديث المنتج بنجاح!",
+    "productUpdateError": "خطأ في تحديث المنتج: ",
+    "productDeletedSuccess": "تم حذف المنتج بنجاح!",
+    "productDeleteError": "خطأ في حذف المنتج: ",
+    "productFetchError": "خطأ في جلب المنتج: ",
+    "bookCreatedSuccess": "تم إنشاء الكتاب بنجاح!",
+    "bookCreateError": "خطأ في إنشاء الكتاب: ",
+    "sectionCreatedSuccess": "تم إنشاء القسم بنجاح!",
+    "sectionCreateError": "خطأ في إنشاء القسم: ",
+    "sectionUpdatedSuccess": "تم تحديث القسم بنجاح!",
+    "sectionUpdateError": "خطأ في تحديث القسم: ",
+    "sectionDeletedSuccess": "تم حذف القسم بنجاح!",
+    "sectionDeleteError": "خطأ في حذف القسم: ",
+    "subSectionCreatedSuccess": "تم إنشاء القسم الفرعي بنجاح!",
+    "subSectionCreateError": "خطأ في إنشاء القسم الفرعي: ",
+    "subSectionUpdatedSuccess": "تم تحديث القسم الفرعي بنجاح!",
+    "subSectionUpdateError": "خطأ في تحديث القسم الفرعي: ",
+    "subSectionDeletedSuccess": "تم حذف القسم الفرعي بنجاح!",
+    "subSectionDeleteError": "خطأ في حذف القسم الفرعي: "
+  },
+  "error": {
+    "title": "خطأ!",
+    "retry": "إعادة المحاولة"
+  },
+  "productsManagement": {
+    "title": "إدارة المنتجات",
+    "searchPlaceholder": "ابحث في المنتجات...",
+    "table": {
+      "thumbnail": "صورة مصغرة",
+      "title": "العنوان",
+      "serial": "الرقم التسلسلي",
+      "section": "القسم",
+      "price": "السعر",
+      "discount": "الخصم",
+      "finalPrice": "السعر النهائي",
+      "actions": "الإجراءات",
+      "edit": "تعديل",
+      "delete": "حذف",
+      "view": "عرض"
+    },
+    "noProductsAvailable": "لا توجد منتجات متاحة",
+    "noProducts": "لم يتم العثور على منتجات",
+    "tryDifferentSearch": "جرب مصطلح بحث مختلف"
+  },
+  "export": {
+    "title": "العنوان",
+    "serial": "الرقم التسلسلي",
+    "section": "القسم",
+    "subject": "المادة",
+    "price": "السعر",
+    "discount": "نسبة الخصم %",
+    "finalPrice": "السعر النهائي",
+    "paymentNumber": "رقم الدفع",
+    "type": "النوع",
+    "createdDate": "تاريخ الإنشاء",
+    "name": "الاسم",
+    "number": "الرقم",
+    "description": "الوصف",
+    "productCount": "عدد المنتجات",
+    "thumbnail": "الصورة المصغرة",
+    "error": "فشل في تصدير البيانات. يرجى المحاولة مرة أخرى.",
+    "totalProducts": "إجمالي المنتجات",
+    "totalBooks": "إجمالي الكتب",
+    "totalSections": "إجمالي الأقسام",
+    "totalItems": "إجمالي العناصر",
+    "successMessage": "تم تصدير {{count}} {{type}} بنجاح",
+    "export": "تصدير البيانات",
+    "exporting": "جاري التصدير...",
+    "csvFormat": "تنسيق CSV",
+    "jsonFormat": "تنسيق JSON"
+  },
+  "products": {
+    "unknownSection": "قسم غير معروف"
+  },
+  "validation": {
+    "invalidProductSelected": "تم تحديد منتج غير صالح",
+    "invalidSectionSelected": "تم تحديد قسم غير صالح"
+  },
+  "pagination": {
+    "showing": "عرض",
+    "of": "من",
+    "perPage": "في الصفحة",
+    "next": "التالي",
+    "previous": "السابق",
+    "first": "الأول",
+    "last": "الأخير",
+    "page": "الصفحة",
+    "goToPage": "اذهب إلى الصفحة",
+    "itemsPerPage": "{{count}} في الصفحة"
+  },
+  "subject": "المادة",
+  "unknownSubject": "مادة غير معروفة",
+  "nA": "غير متوفر",
+  "dash": "-",
+  "zeroPercent": "٠٪",
+  "decorativeDots": "نقاط زخرفية",
+  "decorativeCircle": "دائرة زخرفية",
+  "decorativeZigzag": "خط متعرج زخرفي",
+  "galleryImages": "صور المعرض",
+  "unknown": "غير معروف",
+  "roles": {
+    "Student": "طالب",
+    "Parent": "ولي أمر",
+    "Teacher": "معلم"
+  },
+  "fileSize": {
+    "bytes": "بايت",
+    "kb": "ك.ب",
+    "mb": "م.ب",
+    "gb": "ج.ب"
+  }
+}

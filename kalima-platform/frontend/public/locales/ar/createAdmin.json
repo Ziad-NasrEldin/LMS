@@ -1,0 +1,83 @@
+{
+  "createNew": "إنشاء جديد",
+  "common": {
+    "actions": "إجراءات",
+    "createdOn": "تم الإنشاء في",
+    "created": "تم الإنشاء"
+  },
+  "actions": {
+    "delete": "حذف",
+    "dismiss": "إغلاق",
+    "remove": "إزالة"
+  },
+  "errors": {
+    "verifyPermissions": "فشل في التحقق من صلاحيات المستخدم",
+    "fetchLecturers": "فشل في جلب المحاضرين",
+    "fetchSubjects": "فشل في جلب المواد",
+    "fetchPackages": "فشل في جلب الباقات",
+    "fetchLevels": "فشل في جلب المستويات",
+    "createSubject": "فشل في إنشاء المادة",
+    "createPackage": "فشل في إنشاء الباقة",
+    "createLevel": "فشل في إنشاء المستوى",
+    "deleteSubject": "فشل في حذف المادة",
+    "deletePackage": "فشل في حذف الباقة",
+    "deleteLevel": "فشل في حذف المستوى"
+  },
+  "success": {
+    "subjectCreated": "تم إنشاء المادة بنجاح",
+    "packageCreated": "تم إنشاء الباقة بنجاح",
+    "levelCreated": "تم إنشاء المستوى بنجاح",
+    "subjectDeleted": "تم حذف المادة بنجاح",
+    "packageDeleted": "تم حذف الباقة بنجاح",
+    "levelDeleted": "تم حذف المستوى بنجاح"
+  },
+  "confirmations": {
+    "deleteSubject": "هل أنت متأكد من رغبتك في حذف هذه المادة؟",
+    "deletePackage": "هل أنت متأكد من رغبتك في حذف هذه الباقة؟",
+    "deleteLevel": "هل أنت متأكد من رغبتك في حذف هذا المستوى؟"
+  },
+  "forms": {
+    "subject": {
+      "title": "المادة",
+      "createNew": "إنشاء مادة جديدة",
+      "name": "اسم المادة",
+      "namePlaceholder": "مثال: الجغرافيا",
+      "create": "إنشاء مادة",
+      "existing": "المواد الموجودة",
+      "nameColumn": "اسم المادة",
+      "noSubjects": "لا توجد مواد متاحة."
+    },
+    "package": {
+      "title": "الباقة",
+      "createNew": "إنشاء باقة جديدة",
+      "name": "اسم الباقة",
+      "namePlaceholder": "مثال: الباقة الشهرية المميزة",
+      "price": "سعر الباقة",
+      "priceLabel": "السعر",
+      "pricePlaceholder": "مثال: 300",
+      "type": "نوع الباقة",
+      "typeLabel": "النوع",
+      "monthly": "شهري",
+      "month": "شهري",
+      "points": "النقاط",
+      "pointsPlaceholder": "مثال: 200",
+      "pointsUnit": "نقطة",
+      "pointsDistribution": "توزيع النقاط",
+      "selectLecturer": "اختر المحاضرين",
+      "addPoints": "إضافة نقاط",
+      "create": "إنشاء باقة",
+      "existing": "الباقات الموجودة",
+      "noPackages": "لا توجد باقات متاحة."
+    },
+    "level": {
+      "title": "المستوى",
+      "createNew": "إنشاء مستوى جديد",
+      "name": "اسم المستوى",
+      "namePlaceholder": "مثال: الثانوية العليا",
+      "create": "إنشاء مستوى",
+      "existing": "المستويات الموجودة",
+      "nameColumn": "اسم المستوى",
+      "noLevels": "لا توجد مستويات متاحة."
+    }
+  }
+}

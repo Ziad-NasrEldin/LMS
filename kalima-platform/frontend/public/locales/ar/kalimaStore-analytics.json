@@ -1,0 +1,57 @@
+{
+  "title": "تحليلات المتجر",
+  "loading": "جاري تحميل التحليلات...",
+  "errorLoadingAnalytics": "خطأ في تحميل التحليلات",
+  "retry": "إعادة المحاولة",
+  "filters": {
+    "title": "المرشحات",
+    "allMonths": "جميع الأشهر",
+    "allRevenue": "جميع الإيرادات",
+    "highRevenue": "إيرادات عالية",
+    "mediumRevenue": "إيرادات متوسطة",
+    "lowRevenue": "إيرادات منخفضة"
+  },
+  "searchProducts": "البحث في المنتجات...",
+  "clearFilters": "مسح",
+  "activeFilters": "المرشحات النشطة",
+  "stats": {
+    "totalPurchases": "إجمالي المشتريات",
+    "confirmed": "مؤكد",
+    "pending": "في الانتظار",
+    "totalRevenue": "إجمالي الإيرادات",
+    "confirmedRevenue": "الإيرادات المؤكدة",
+    "averagePrice": "متوسط السعر"
+  },
+  "insights": {
+    "topProduct": "أفضل منتج",
+    "totalProducts": "إجمالي المنتجات",
+    "avgPerProduct": "المتوسط لكل منتج"
+  },
+  "productPerformance": "أداء المنتجات",
+  "monthlyTrends": "الاتجاهات الشهرية",
+  "table": {
+    "rank": "الترتيب",
+    "productName": "اسم المنتج",
+    "totalPurchases": "إجمالي المشتريات",
+    "totalValue": "القيمة الإجمالية",
+    "avgValue": "متوسط القيمة",
+    "performance": "الأداء",
+    "month": "الشهر",
+    "confirmed": "مؤكد",
+    "revenue": "الإيرادات",
+    "confirmedRevenue": "الإيرادات المؤكدة",
+    "noData": "لا توجد بيانات",
+    "tryAdjustingFilters": "جرب تعديل المرشحات",
+    "totalCouponValue": "قيمة الكوبون الإجمالية"
+  }
+  ,
+  "exportCSV": "تصدير CSV",
+  "exporting": "جارٍ التصدير...",
+  "exportXLSX": "تصدير XLSX",
+  "csv": {
+    "overview": "نظرة عامة",
+    "dailyStats": "إحصاءات يومية",
+    "monthlyStats": "إحصاءات شهرية",
+    "productStats": "إحصاءات المنتجات"
+  }
+} 

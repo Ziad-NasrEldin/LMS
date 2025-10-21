@@ -1,0 +1,57 @@
+{
+  "title": "Store Analytics",
+  "loading": "Loading analytics...",
+  "errorLoadingAnalytics": "Error Loading Analytics",
+  "retry": "Retry",
+  "filters": {
+    "title": "Filters",
+    "allMonths": "All Months",
+    "allRevenue": "All Revenue",
+    "highRevenue": "High Revenue",
+    "mediumRevenue": "Medium Revenue",
+    "lowRevenue": "Low Revenue"
+  },
+  "searchProducts": "Search products...",
+  "clearFilters": "Clear",
+  "activeFilters": "Active Filters",
+  "stats": {
+    "totalPurchases": "Total Purchases",
+    "confirmed": "Confirmed",
+    "pending": "Pending",
+    "totalRevenue": "Total Revenue",
+    "confirmedRevenue": "Confirmed Revenue",
+    "averagePrice": "Average Price"
+  },
+  "insights": {
+    "topProduct": "Top Product",
+    "totalProducts": "Total Products",
+    "avgPerProduct": "Avg per Product"
+  },
+  "productPerformance": "Product Performance",
+  "monthlyTrends": "Monthly Trends",
+  "table": {
+    "rank": "Rank",
+    "productName": "Product Name",
+    "totalPurchases": "Total Purchases",
+    "totalValue": "Total Value",
+    "avgValue": "Avg Value",
+    "performance": "Performance",
+    "month": "Month",
+    "confirmed": "Confirmed",
+    "revenue": "Revenue",
+    "confirmedRevenue": "Confirmed Revenue",
+    "noData": "No Data Found",
+    "tryAdjustingFilters": "Try adjusting your filters",
+    "totalCouponValue": "Total Coupon Value"
+  }
+  ,
+  "exportCSV": "Export CSV",
+  "exporting": "Exporting...",
+  "exportXLSX": "Export XLSX",
+  "csv": {
+    "overview": "Overview",
+    "dailyStats": "Daily Statistics",
+    "monthlyStats": "Monthly Statistics",
+    "productStats": "Product Statistics"
+  }
+} 

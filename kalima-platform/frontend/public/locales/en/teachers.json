@@ -1,0 +1,43 @@
+{
+    "pageTitle": "Our Teachers",
+    "discoverTeachers": "Discover Your Favorite Teachers Now!",
+    "defaultSubject": "Teacher",
+    "defaultExperience": "Extensive teaching experience",
+    "allGrades": "All Grade Levels",
+    "filters": {
+      "stage": "Educational Stage",
+      "subject": "Subject"
+    },
+    "stages": {
+      "primary": "Primary Stage",
+      "preparatory": "Preparatory Stage",
+      "secondary": "Secondary Stage"
+    },
+    "subjects": {
+      "math": "Mathematics",
+      "physics": "Physics",
+      "chemistry": "Chemistry",
+      "مدرس": "Teacher"
+    },
+    "buttons": {
+      "resetFilters": "Reset Filters",
+      "searchOptions": "Search Options",
+      "showTeachers": "Show Teachers",
+      "tryAgain": "Try Again",
+      "loadMore": "Load More Teachers",
+      "viewDetails": "View Details"
+    },
+    "placeholders": {
+      "searchName": "Search by name"
+    },
+    "alts": {
+      "background": "Decorative background pattern",
+      "underline": "Decoration underline",
+      "teacherProfile": "Profile picture of"
+    },
+    "noTeachers": "No teachers currently available",
+    "errors": {
+      "loadTeachers": "Failed to load teacher data",
+      "generic": "An error occurred"
+    }
+  }

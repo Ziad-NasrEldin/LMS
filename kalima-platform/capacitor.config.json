@@ -1,0 +1,6 @@
+{
+  "appId": "com.kalimatest.mavoid",
+  "appName": "Kalima Platform",
+  "webDir": "frontend/dist", 
+  "bundledWebRuntime": false
+}

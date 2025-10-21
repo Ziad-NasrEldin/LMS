@@ -1,0 +1,341 @@
+{
+    "centerSelector": {
+      "selectCenter": "Select Center",
+        "selectPlaceholder": "Select a center",
+        "noCenters": "No centers available"
+    },
+    "centerOverview": {
+        "title": "Center Overview",
+        "lecturers": "Lecturers",
+        "students": "Students",
+        "courses": "Lessons",
+        "created": "Created",
+        "editCenter": "Edit Center",
+        "addLecturer": "Add Lecturer"
+    },
+    "lecturersList": {
+        "title": "Lecturers",
+      "searchPlaceholder": "Search lecturers...",
+      "addLecturer": "Add Lecturer",
+      "noLecturers": "No lecturers found",
+      "subjects": "Subjects",
+      "noSubjects": "No subjects assigned",
+      "viewDetails": "View Details",
+      
+      "lecturerAddedSuccess": "Lecturer added successfully",
+      "lecturerAddedError": "Failed to add lecturer",
+      "subjectAddedSuccess": "Subject added successfully",
+      "subjectAddedError": "Failed to add subject",
+      
+      "lecturerName": "Lecturer Name",
+      "lecturerNamePlaceholder": "Enter lecturer name",
+      "lecturerPhone": "Phone Number",
+      "lecturerPhonePlaceholder": "Enter phone number",
+      "lecturerSubjects": "Subjects",
+      "selectSubject": "Select a subject",
+      
+      "addNewSubject": "Add New Subject",
+      "newSubjectPlaceholder": "Enter subject name",
+      "addSubjectButton": "Add Subject",
+      
+      "submitLecturer": "Add Lecturer",
+      "cancel": "Cancel"
+    },
+    "courseList": {
+     "title": "Lectures Schedule",
+      "addLecture": "Add Lecture",
+      "noLessons": "No lessons found",
+      "filters": {
+        "allLevels": "All Levels",
+        "allLecturers": "All Lecturers"
+      },
+      "pagination": {
+        "previous": "Previous",
+        "next": "Next"
+      },
+      "na": "N/A"
+    },
+    "barCodeScanner": {
+      "title": "QR Code Scanner",
+      "instructions": "Scan student QR codes to mark attendance"
+    },
+    "activityTracker": {
+      "title": "Student Activity",
+      "columns": {
+        "student": "Student",
+        "lastActivity": "Last Activity",
+        "status": "Status",
+        "studentName": "Name",
+        "passFail": "Status",
+        "score": "Score",
+        "grade": "Grade",
+        "timeSpent": "Time Spent",
+        "submissionTime": "Submission Time",
+        "showDetails": "Details"
+      },
+      "header": {
+        "title": "Student Activity Tracker"
+      },
+      "buttons": {
+        "sendNotifications": "Send Notifications",
+        "publishResults": "Publish Results",
+        "viewDetails": "View"
+      },
+      "statusCounts": {
+        "present": "Present: {{count}}",
+        "absent": "Absent: {{count}}"
+      },
+      "search": {
+        "placeholder": "Search students..."
+      },
+      "filters": {
+        "status": {
+          "label": "Status",
+          "options": {
+            "present": "Present",
+            "absent": "Absent"
+          }
+        },
+        "grade": {
+          "label": "Grade",
+          "options": {
+            "excellent": "Excellent",
+            "average": "Average",
+            "poor": "Poor"
+          }
+        },
+        "time": {
+          "label": "Time Spent",
+          "options": {
+            "short": "<30 min",
+            "medium": "30-60 min",
+            "long": ">60 min"
+          }
+        },
+        "date": {
+          "label": "Date",
+          "options": {
+            "today": "Today",
+            "week": "This Week",
+            "month": "This Month"
+          }
+        }
+      },
+      "status": {
+        "pass": "Present",
+        "fail": "Absent"
+      },
+      "grade": {
+        "excellent": "Excellent",
+        "average": "Average",
+        "poor": "Needs Improvement"
+      },
+      "time": {
+        "minutes": "minutes"
+      },
+      "noResults": "No matching records found"
+    },
+    "addCourseForm": {
+      "title": "Add New Course",
+      "labels": {
+        "subject": "Subject",
+        "lecturer": "Lecturer",
+        "level": "Level",
+        "startDate": "Start Date",
+        "duration": "Duration (minutes)"
+      },
+      "selectPlaceholder": {
+        "subject": "Select Subject",
+        "lecturer": "Select Lecturer",
+        "level": "Select Level"
+      },
+      "submitButton": "Create Course",
+      "saving": "Saving...",
+      "successMessage": "Course added successfully!",
+      "errors": {
+        "general": "Failed to add course. Please try again.",
+        "courseNameRequired": "Course name is required",
+        "lecturerRequired": "Lecturer selection is required"
+      },
+      "cancel": "Cancel",
+      "validation": {
+        "courseNameRequired": "Course name is required",
+        "lecturerRequired": "Please select a lecturer"
+      }
+    },
+    "errors": {
+      "fetchCentersFailed": "Failed to load centers",
+      "fetchLecturersFailed": "Failed to load lecturers",
+      "fetchStudentsFailed": "Failed to load students",
+      "fetchLessonsFailed": "Failed to load courses"
+    },
+    "contactForm": {
+    "category": "Category",
+    "content": "Content",
+    "grade": "Grade",
+    "level": "Level",
+    "description": "Request Description",
+    "selectPlaceholder": "Select",
+    "categories": {
+        "inquiry": "Inquiry",
+        "complaint": "Complaint",
+        "suggestion": "Suggestion"
+    },
+    "contentTypes": {
+        "material": "Learning Material",
+        "teacher": "Teacher",
+        "platform": "Platform"
+    },
+    "grades": {
+        "first": "First",
+        "second": "Second",
+        "third": "Third"
+    },
+    "placeholders": {
+        "level": "Level",
+        "subLevel": "Sub-level",
+        "details": "Details",
+        "description": "Please write your request or inquiry details here..."
+    },
+    "buttons": {
+        "cancel": "Cancel",
+        "submit": "Submit Request"
+    }
+},
+"courseCard": {
+  "session": "Session {{session}}",
+  "showDetails" : "Show Details",
+  "types": {
+    "lecture": "Lecture",
+    "tutorial": "Tutorial",
+    "lab": "Lab"
+  },
+  "lecturer": "Lecturer",
+  "level": "Level"
+},
+"schedule": {
+  "title": "Class Schedule"
+},
+"filters": {
+  "department": "Department",
+  "group": "Group",
+  "semester": "Semester",
+  "teacher": "Teacher",
+  "section": "Section",
+  "select_section": "Select Section",
+  "select_group": "Select Group",
+  "group_label": "Group {{group}}",
+  "semesters": ["First Semester", "Second Semester", "Summer Semester"],
+  "allLevels": "All Levels",
+  "allLecturers": "All Lecturers"
+},
+"subjects": {
+  "math": "Mathematics",
+  "science": "Science",
+  "arabic": "Arabic"
+},
+"teacher": {
+  "name_format": "{{name}}"
+},
+"promoBanner": {
+  "title": "Do you have questions or found an error in the schedule?",
+  "contactText": "Contact us at 256 258",
+  "altText": "Contact us"
+},
+"barcodeScanner": {
+  "showAll": "Show All",
+  "qrScanner": "QR Scanner",
+  "scanInstruction": "Click here to scan code",
+  "studentName": "Student: Mahmoud Mohamed",
+  "payment": "Paid {{amount}} EGP",
+  "entryTime": "Entry time {{time}}",
+  "registerEntry": "Register Entry",
+  "revenueSummary": "Revenue Summary",
+  "mathLesson": "Math Lesson - Grade 5",
+  "studentsCount": "{{count}} students",
+  "amount": "{{amount}} EGP",
+  "totalRevenue": "Total revenue: {{amount}} EGP",
+  "downloadReport": "Download Report"
+},
+"recommendedCourses": {
+  "title": "Send Student Reports via WhatsApp",
+  "selectGrade": "Select Grade",
+  "selectSection": "Select Section",
+  "reportTitle": "Weekly Student Report",
+  "sendButton": "Send via WhatsApp",
+  "noReports": "No matching reports found",
+  "gradeOptions": [
+    { "value": "grade11", "label": "Grade 11" },
+    { "value": "grade10", "label": "Grade 10" },
+    { "value": "grade12", "label": "Grade 12" }
+  ],
+  "sectionOptions": [
+    { "value": "science_math", "label": "Science - Math" },
+    { "value": "science_bio", "label": "Science - Biology" },
+    { "value": "literature", "label": "Literature" }
+  ],
+  "reports": [
+    {
+      "id": 1,
+      "name": "Hoda Ahmed",
+      "class": "Grade 11",
+      "section": "Section: Science - Math",
+      "improvements": [
+        {
+          "type": "improvement",
+          "textKey": "improvements.math",
+          "params": { "subject": "Math", "percentage": 12 }
+        },
+        {
+          "type": "behavior",
+          "textKey": "improvements.behavior"
+        },
+        {
+          "type": "support",
+          "textKey": "improvements.support",
+          "params": { "subject": "Reading" }
+        }
+      ]
+    }
+  ],
+  "improvements": {
+    "math": "Improved in {{subject}} by {{percentage}}%!",
+    "behavior": "Excellent behavior in last lecture",
+    "support": "Needs support in {{subject}}"
+  }
+},
+"statistics": {
+    "examResults": "Exam Results",
+    "avgGrades": "Average Grades",
+    "testsCompleted": "Tests Completed",
+    "attendanceRate": "Attendance Rate",
+    "gradeSummary": "Grade Summary",
+    "finalExam": "Final Exam:",
+    "midtermExam": "Midterm Exam:",
+    "homework": "Homework:",
+    "total": "Total:",
+    "viewReport": "View Report"
+  },
+"revenue": {
+    "loading": "Loading...",
+    "error": "Failed to load revenue data.",
+    "summary": {
+      "totalRevenue": "Total Revenue",
+      "lessonRevenue": "Lesson Revenue",
+      "bookletRevenue": "Booklet Revenue",
+      "attendancesPaid": "Attendances Paid"
+    },
+    "paymentTypes": {
+      "cash": "Cash",
+      "card": "Card",
+      "transfer": "Transfer"
+    },
+    "withBookletSuffix": "(with booklet)",
+    "labels": {
+      "count": "Count",
+      "lessonRev": "Lesson Rev",
+      "bookletRev": "Booklet Rev",
+      "totalRev": "Total Rev"
+    }
+  }
+  }

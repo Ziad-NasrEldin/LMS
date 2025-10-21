@@ -1,0 +1,23 @@
+{
+  "title": "Notifications",
+  "buttons": {
+    "toggleNotifications": "Toggle notifications",
+    "refresh": "Refresh notifications",
+    "close": "Close notifications",
+    "markAllAsRead": "Mark all as read"
+  },
+  "status": {
+    "disconnected": "Disconnected",
+    "loading": "Loading notifications..."
+  },
+  "emptyState": {
+    "title": "No notifications yet",
+    "description": "You'll see notifications here when they arrive"
+  },
+  "errors": {
+    "noUserId": "Cannot fetch notifications: No user ID",
+    "fetchNotifications": "Error fetching notifications:",
+    "socketInitFailed": "Failed to initialize socket in NotificationCenter",
+    "markAsRead": "Error marking notification as read:"
+  }
+}

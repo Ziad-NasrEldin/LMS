@@ -1,0 +1,146 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Failed to load packages. Please try again later.",
+    "tryAgain": "Try Again",
+    "backToPackages": "Back to Packages",
+    "packageNotFound": "Package not found",
+    "points": "Points",
+    "cancel": "Cancel",
+    "details": "Details",
+    "purchase": "Purchase",
+    "purchased": "Purchased",
+    "insufficientPoints": "Insufficient Points"
+  },
+  "errors": {
+    "fetchStudents": "Failed to fetch students"
+  },
+  "lesson": {
+    "detailsTitle": "Lesson Details",
+    "centerUnknown": "Unknown Center"
+  },
+  "attendance": {
+    "success": "Attendance recorded successfully",
+    "error": "Failed to record attendance",
+    "successTitle": "Success!",
+    "errorTitle": "Error!",
+    "studentId": "Student ID",
+    "formTitle": "Record Attendance",
+    "studentIdLabel": "Student Sequential ID",
+    "studentIdPlaceholder": "Enter student ID",
+    "scanButton": "Scan ID",
+    "paymentTypeLabel": "Select Payment Type",
+    "paymentType": {
+      "daily": "Daily",
+      "lesson": "Lesson",
+      "month": "Month",
+      "year": "Year",
+      "multiSession": "Multi Session",
+      "unpaid": "Unpaid"
+    },
+    "amountPaidLabel": "Amount Paid",
+    "amountPaidPlaceholder": "Enter amount",
+    "dateLabel": "Attendance Date (Optional)",
+    "bookletLabel": "Booklet Purchased",
+    "bookletYes": "Yes",
+    "bookletNo": "No",
+    "submitButton": "Record Attendance",
+    "studentListTitle": "Student List",
+    "studentTable": {
+      "id": "ID",
+      "name": "Name",
+      "status": "Status",
+      "active": "Active"
+    },
+    "noStudents": "No students found",
+    "moreStudents": "Showing 5 of {{count}} students"
+  },
+  "barCodeScanner": {
+    "title": "Student ID Scanner",
+    "initializing": "Initializing camera...",
+    "clickStart": "Click 'Start Scanning' to begin",
+    "scanInstructions": "Align student ID barcode in the frame...",
+    "resultLabel": "Student ID Detected:",
+    "startButton": "Start Scanning",
+    "stopButton": "Stop Scanning",
+    "resetButton": "Reset",
+    "permissionWarning": "Could not access camera. Please check permissions.",
+    "scanError": "Failed to initialize scanner"
+  },
+  "packageList": {
+    "title": "Learning Packages",
+    "subtitle": "Explore our curated packages to enhance your learning journey",
+    "welcome": "Welcome",
+    "filterTitle": "Filter Packages",
+    "priceRange": "Price Range",
+    "teacher": "Teacher",
+    "allPrices": "All Prices",
+    "allTeachers": "All Teachers",
+    "priceRanges": {
+      "0-200": "0 - 200 Points",
+      "200-500": "200 - 500 Points",
+      "500-1000": "500 - 1000 Points",
+      "1000+": "1000+ Points"
+    },
+    "resetFilters": "Reset Filters",
+    "showing": "Showing {{current}} of {{total}} packages",
+    "noPackagesFound": "No packages found",
+    "adjustFilters": "Try adjusting your filters to find more packages",
+    "packageCard": {
+      "monthly": "Monthly",
+      "teachers": "Teachers",
+      "includes": "Includes",
+      "enoughPoints": "You have enough points",
+      "notEnoughPoints": "Not enough points",
+      "alreadyPurchased": "Already purchased"
+    }
+  },
+  "packageDetails": {
+    "overview": "Package Overview",
+    "duration": "Duration",
+    "teachers": "Teachers",
+    "expertInstructors": "expert instructors",
+    "totalPoints": "Total Points",
+    "pointsDistributed": "points distributed",
+    "created": "Created",
+    "packagePrice": "Package Price",
+    "alreadyPurchased": "Already Purchased",
+    "youAlreadyOwn": "You already own this package",
+    "yourBalance": "Your Balance",
+    "afterPurchase": "After Purchase",
+    "purchaseNow": "Purchase Now",
+    "insufficientPoints": "Insufficient Points",
+    "needMorePoints": "You need {{points}} more points to purchase this package",
+    "loginToPurchase": "Please log in to purchase this package",
+    "loginButton": "Log In to Purchase",
+    "generalPointsOnly": "* This package can only be purchased using general points",
+    "teachersIncluded": "Teachers Included",
+    "packageBenefits": "Package Benefits",
+    "benefits": {
+      "accessToContent": "Access to content from {{count}} expert teachers",
+      "durationAccess": "{{duration}} to all included materials",
+      "totalPoints": "Total of {{points}} points distributed across teachers",
+      "flexibleLearning": "Flexible learning at your own pace",
+      "comprehensiveCurriculum": "Comprehensive curriculum covering multiple subjects"
+    }
+  },
+  "purchaseModal": {
+    "title": "Confirm Purchase",
+    "confirmMessage": "Are you sure you want to purchase this package?",
+    "type": "Type",
+    "price": "Price",
+    "teachers": "Teachers",
+    "yourBalance": "Your Balance",
+    "afterPurchase": "After Purchase",
+    "confirmButton": "Confirm Purchase",
+    "successMessage": "Package purchased successfully!",
+    "remainingPoints": "Remaining points: {{points}}",
+    "failureMessage": "Failed to purchase package",
+    "errorMessage": "An error occurred while purchasing the package"
+  },
+  "duration": {
+    "month": "1 Month Access",
+    "year": "1 Year Access",
+    "week": "1 Week Access"
+  }
+}

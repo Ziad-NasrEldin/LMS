@@ -1,0 +1,46 @@
+{
+  "lecturers": {
+    "title": "المحاضرون المسجلون",
+    "subtitle": "إدارة وعرض جميع المحاضرين المسجلين",
+    "total": "الإجمالي",
+    "searchPlaceholder": "ابحث بالاسم أو البريد الإلكتروني أو التخصص أو الهاتف...",
+    "name": "الاسم",
+    "nameTooltip": "الاسم الكامل للمحاضر",
+    "expertise": "التخصص",
+    "expertiseTooltip": "تخصص المادة",
+    "contact": "التواصل",
+    "contactTooltip": "معلومات التواصل",
+    "location": "الموقع",
+    "locationTooltip": "المحافظة والموقع",
+    "joined": "تاريخ التسجيل",
+    "joinedTooltip": "تاريخ التسجيل",
+    "noLecturers": "لا يوجد محاضرون",
+    "noLecturersFiltered": "لا يوجد محاضرون يطابقون الفلاتر الحالية. جرب تعديل البحث أو الفلاتر.",
+    "noLecturersYet": "لم يقم أي محاضر بالتسجيل بعد. يرجى العودة لاحقًا."
+  },
+  "filters": {
+    "allExpertise": "كل التخصصات",
+    "allGovernments": "كل المحافظات",
+    "allStatuses": "كل الحالات",
+    "active": "نشط",
+    "inactive": "غير نشط",
+    "clear": "مسح",
+    "clearAll": "مسح جميع الفلاتر"
+  },
+  "actions": {
+    "refresh": "تحديث",
+    "actions": "إجراءات",
+    "copyEmail": "نسخ البريد الإلكتروني",
+    "copyPhone": "نسخ رقم الهاتف",
+    "dismiss": "إغلاق"
+  },
+  "loading": "جاري تحميل المحاضرين...",
+  "pagination": {
+    "showing": "عرض",
+    "of": "من"
+  },
+  "errors": {
+    "failedToFetchLecturers": "فشل في جلب بيانات المحاضرين.",
+    "unexpectedError": "حدث خطأ غير متوقع."
+  }
+} 

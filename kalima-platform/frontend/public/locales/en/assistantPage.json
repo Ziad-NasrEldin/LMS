@@ -1,0 +1,165 @@
+{   "assistantPageTitle": "Assistant Page",
+    "course": "Courses",
+    "rating": "Rating: {{rating}}",
+    "signUp": "Sign Up",
+    "like": "Like",
+    "dislike": "Dislike",
+    "share": "Share",
+
+    "homeworks": "Homeworks",
+    "exams": "Exams",
+    "settings": "Settings",
+    "watchOnApp": "Watch on app and platform",
+    "allowAll": "Allow all to watch",
+    "onlyParents": "Only parents",
+    "onlyTeachersStudents": "Only teachers/students",
+    "courseVideos": "Course Videos",
+    "videoPlayer": "Video Player",
+    "introReact": "Introduction to React",
+    "componentsBasics": "Components Basics",
+    "stateManagement": "State Management",
+    "hooksDeepDive": "Hooks Deep Dive",
+    "importantCourses": "Important Courses",
+    "exploreCourses": "Explore trending courses",
+    "viewAll": "View All",
+    "coursesAlt": "Courses illustration",
+    "coursesCount": "{{count}} courses",
+    "math": "Math",
+    "physics": "Physics",
+    "chemistry": "Chemistry",
+    "biology": "Biology",
+    "art": "Art",
+    "programming": "Programming",
+    "revisionCourses": "Revision Courses",
+    "exploreFinalCourses": "Explore Final Exam Courses",
+    "addCourse": "Add Course",
+    "courseAlt": "Course image",
+    "studentsCount": "{{count}} Students",
+    "showMore": "Show More",
+    "price": "${{amount}}",
+    "teachers": {
+      "sarah": "Dr. Sarah Johnson",
+      "michael": "Prof. Michael Chen",
+      "emma": "Ms. Emma Wilson"
+    },
+    "courses": {
+      "advancedCalculus": "Advanced Calculus",
+      "organicChemistry": "Organic Chemistry",
+      "modernPhysics": "Modern Physics"
+    },
+    "duration": {
+      "6weeks": "6 Weeks",
+      "8weeks": "8 Weeks",
+      "10weeks": "10 Weeks"
+    },
+    "eliteAssistants": {
+      "title": "Elite Assistants",
+      "viewAll": "View All"
+    },
+    "assistants": [
+      {
+        "name": "Ehab Tarek",
+        "bio": "Chemistry assistant explaining reactions, equations, and calculations."
+      },
+      {
+        "name": "Adam Mohamed",
+        "bio": "Math assistant explaining algebra, geometry, and calculus in a simple way."
+      },
+      {
+        "name": "Ali Mostafa",
+        "bio": "Arabic language assistant specialized in grammar, rhetoric, and text analysis."
+      },
+      {
+        "name": "Khaled Hassan",
+        "bio": "Social studies assistant with focus on history and geography analysis."
+      },
+      {
+        "name": "Hossam Hassan",
+        "bio": "English language assistant helping with reading, writing, and listening skills."
+      },
+      {
+        "name": "Mona Yehia",
+        "bio": "German language assistant focused on grammar, conversation, and test prep."
+      }
+    ],
+    "common": {
+    "name": "Name",
+    "type": "Type",
+    "subject": "Subject",
+    "level": "Level",
+    "price": "Price",
+    "actions": "Actions",
+    "details": "Details",
+    "notAvailable": "N/A",
+    "pricePoints": "{{price}} points",
+    "free": "Free",
+    "noDescription": "No description",
+    "noSubject": "No subject",
+    "view": "View",
+    "student": "Student",
+    "lecture": "Lecture",
+    "score": "Score",
+    "status": "Status",
+    "submittedAt": "Submitted At",
+    "unknown": "Unknown",
+    "scoreFormat": "{{score}}/{{maxScore}} ({{percentage}}%)",
+    "passed": "Passed",
+    "failed": "Failed",
+    "loading": "Loading dashboard data...",
+    "search": "Search...",
+    "expertise": "Expertise"
+  },
+  "errors": {
+    "fetchFailed": "Failed to fetch dashboard data",
+    "occurred": "An error occurred while fetching data",
+    "noData": "No data available"
+  },
+  "containers": {
+    "title": "Containers",
+    "notFound": "No containers found"
+  },
+  "lectures": {
+    "title": "Lectures",
+    "views": "{{count}} views",
+    "hasExam": "Has Exam",
+    "viewData": "View Lecture Data",
+    "goToLecture": "Go To Lecture",
+    "notFound": "No lectures found"
+  },
+  "attachments": {
+    "title": "Attachments",
+    "fileName": "File Name",
+    "uploadedOn": "Uploaded On",
+    "notFound": "No attachments found"
+  },
+  "examSubmissions": {
+    "title": "Exam Submissions",
+    "notFound": "No exam submissions found"
+  },
+  "homeworkSubmissions": {
+    "title": "Homework Submissions",
+    "notFound": "No homework submissions found"
+  },
+  "stats": {
+    "title": "Statistics",
+    "totalLectures": "Total Lectures",
+    "lectureViews": "Lecture Views",
+    "examSubmissions": "Exam Submissions",
+    "homeworkSubmissions": "Homework Submissions",
+    "attachments": "Attachments"
+  },
+  "tabs": {
+    "containers": "Containers",
+    "lectures": "Lectures",
+    "attachments": "Attachments",
+    "examSubmissions": "Exam Submissions",
+    "homeworkSubmissions": "Homework Submissions"
+  },
+  "roles": {
+    "admin": "Admin",
+    "lecturer": "Lecturer",
+    "student": "Student",
+    "assistant": "Assistant"
+  }
+  }
+  

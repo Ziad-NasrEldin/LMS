@@ -1,0 +1,48 @@
+{
+  "hero": {
+    "booksIllustration": "Books Illustration",
+    "tagline": "Discover and purchase products and books from all sections."
+  },
+  "categories": {
+    "allSections": "All Sections",
+    "allSubSections": "All SubSections"
+  },
+  "search": {
+    "placeholder": "Search for products..."
+  },
+  "sections": {
+    "Designs": "Designs",
+    "Books": "Books",
+    "default": "Section",
+    "Courses": "Courses",
+    "Gifts": "Gifts",
+    "Printing": "Printing",
+    "Software": "Software"
+  },
+  "product": {
+    "discounts": "Discount",
+    "currency": "ج",
+    "viewDetails": "View Details"
+  },
+  "emptyState": {
+    "title": "No items found",
+    "description": "Try adjusting your search or filter criteria"
+  },
+  "pagination": {
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page",
+    "of": "of"
+  },
+  "errors": {
+    "loadingError": "Error loading data",
+    "fetchErrorLog": "Error fetching data:"
+  },
+  "empty": {
+    "noProducts": "No products found.",
+    "tryDifferentSearch": "Try a different search term."
+  },
+  "navigation": {
+    "goBack": "Go Back"
+  }
+}

@@ -1,0 +1,86 @@
+{
+    "title": "Settings",
+    "toggleSidebar": "Toggle Sidebar",
+    "General Points": "General Points",
+    "Total Points": "Total Points",
+
+    "personalInfo": {
+        "title": "Personal Information",
+        "subtitle": "Personal Details",
+        "labels": {
+          "fullName": "Full Name",
+          "phoneNumber": "Mobile Number",
+          "email": "Email Address",
+          "idNumber": "ID Number"
+        },
+        "placeholders": {
+          "fullName": "Example: John Doe",
+          "phoneNumber": "123-456-7890",  
+          "email": "example@domain.com", 
+          "idNumber": "Enter ID number"
+        },
+        "buttons": {
+          "edit": "Edit",
+          "add": "Add"
+        }
+      },
+    "languageAppearance": {
+    "title": "Language & Appearance",
+    "showThemes": "Show themes",
+    "hideThemes": "Hide themes",
+    "options": {
+      "language": "Language",
+      "theme": "Theme"
+    },
+    "languages": {
+      "ar": "Arabic",
+      "en": "English"
+    },
+    "theme": {
+      "select": "Select",
+      "selected": "Selected"
+    }
+  },
+    "security": {
+      "title": "Security",
+      "labels": {
+        "currentPassword": "Current Password",
+        "newPassword": "New Password",
+        "confirmPassword": "Confirm Password"
+      },
+      "errors": {
+          "mismatch": "Passwords do not match",
+          "length": "Password must be at least 8 characters",
+          "general": "Error updating password"
+        },
+        "success": "Password updated successfully",
+        "changePassword": "Change Password",
+        "showPassword": "Show password",
+        "hidePassword": "Hide password",
+        "passwordRequirement": "Password must be at least 8 characters",
+        "updateButton": "Update Password",
+        "placeholders": {
+          "currentPassword": "Enter current password",
+          "newPassword": "New password",
+          "confirmPassword": "Confirm new password"
+        }
+    },
+    "notifications": {
+    "title": "Notifications",
+    "studentType": "Student Notifications",
+    "teacherType": "Teacher Notifications",
+    "types": {
+      "newAssignment": "New assignment added",
+      "assignmentCorrection": "Assignment corrected",
+      "newLesson": "New lesson available",
+      "examDate": "Upcoming exam date",
+      "notificationUpdate": "Notifications updated",
+      "teacherMessage": "Message from teacher",
+      "assignmentSubmission": "Assignment submitted by student",
+      "studentMessage": "Student message or inquiry",
+      "gradePosted": "Results published",
+      "deadlineReminder": "Deadline reminder"
+    }
+  }
+    
+  }

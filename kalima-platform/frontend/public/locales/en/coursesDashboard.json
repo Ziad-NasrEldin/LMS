@@ -1,0 +1,144 @@
+{
+    "sectionTitle": "Elite Assistants",
+    "viewAll": "View All",
+    "assistants": {
+      "1": {
+        "name": "Ahmed Mohamed",
+        "description": "Specialist in Mathematics and Physics with over 10 years of experience",
+        "specialty": "Mathematics & Physics"
+      },
+      "2": {
+        "name": "Sarah Abdullah",
+        "description": "Expert in English language and IELTS test preparation",
+        "specialty": "English Language"
+      },
+      "3": {
+        "name": "Khaled Ali",
+        "description": "Certified chemistry teacher and award-winning instructor",
+        "specialty": "Chemistry"
+      },
+      "4": {
+        "name": "Nora Saad",
+        "description": "Specialist in Biology and Medical Sciences",
+        "specialty": "Biology"
+      },
+      "5": {
+        "name": "Faisal Abdulrahman",
+        "description": "Expert in Programming, Web Development and Artificial Intelligence",
+        "specialty": "Programming"
+      },
+      "6": {
+        "name": "Lama Ahmed",
+        "description": "Arabic language teacher and lecturer in Arabic literature",
+        "specialty": "Arabic Language"
+      }
+    },
+    "courseManagement": {
+    "sectionTitle": "Course Management",
+    "createButton": "Create New Course",
+    "loading": "Loading data...",
+    "error": "Failed to load courses",
+    "tryAgain": "Try again",
+    "courses": {
+      "1": {
+        "title": "Arabic Language",
+        "subject": "Arabic Language",
+        "teacher": "Mr. Kamil Adel",
+        "instructor": "Mr. Kamil Adel",
+        "grade": "First Grade",
+        "level": "Preparatory Stage",
+        "stage": "Preparatory Stage",
+        "durationText": "12 training hours"
+      },
+      "2": {
+        "title": "English Language",
+        "subject": "English Language",
+        "teacher": "Mr. Aslami Ahmed",
+        "instructor": "Mr. Aslami Ahmed",
+        "grade": "Third Grade",
+        "level": "Preparatory Stage",
+        "stage": "Preparatory Stage",
+        "durationText": "12 training hours"
+      },
+      "3": {
+        "title": "Mathematics",
+        "subject": "Mathematics",
+        "teacher": "Mr. Mohammed Abdullah",
+        "instructor": "Mr. Mohammed Abdullah",
+        "grade": "Fifth Grade",
+        "level": "Primary Stage",
+        "stage": "Primary Stage",
+        "durationText": "12 training hours"
+      }
+    }
+  },
+  "courseSection": {
+    "sectionTitle": "Featured Courses",
+    "sectionSubtitle": "Explore our popular courses",
+    "courseCount": "Courses",
+    "categories": {
+      "1": "Chemistry",
+      "2": "Healthcare",
+      "3": "Psychology",
+      "4": "Arabic",
+      "5": "Physics",
+      "6": "Languages",
+      "7": "Philosophy",
+      "8": "History",
+      "9": "Economics",
+      "10": "Mathematics"
+    }
+  },
+  "reviewCourses": {
+    "sectionTitle": "Review Courses",
+    "sectionSubtitle": "Discover top final review courses",
+    "addButton": "Add Course",
+    "students": "Students",
+    "freeWithCourse": "Free with course",
+    "viewMore": "View More",
+    "courses": {
+      "1": {
+        "subject": "Biology",
+        "title": "Final Biology Review for 12th Grade",
+        "instructor": "Ehab Ahmed",
+        "duration": "3 Weeks",
+        "price": "300 EGP"
+      },
+      "2": {
+        "subject": "Math",
+        "title": "Comprehensive Applied Math Review",
+        "instructor": "Sara Mohamed",
+        "duration": "4 Weeks",
+        "price": "350 EGP"
+      },
+      "3": {
+        "subject": "Philosophy",
+        "title": "Final Philosophy & Logic Review",
+        "instructor": "Amr Khaled",
+        "duration": "2 Weeks",
+        "price": "250 EGP"
+      },
+      "4": {
+        "subject": "Chemistry",
+        "title": "Final Organic Chemistry Review",
+        "instructor": "Nora Saeed",
+        "duration": "5 Weeks",
+        "price": "400 EGP"
+      },
+      "5": {
+        "subject": "Physics",
+        "title": "Comprehensive Modern Physics Review",
+        "instructor": "Khaled Waleed",
+        "duration": "6 Weeks",
+        "price": "450 EGP"
+      },
+      "6": {
+        "subject": "Arabic",
+        "title": "Literary Texts Review for High School",
+        "instructor": "Mona Ali",
+        "duration": "3 Weeks",
+        "price": "300 EGP"
+      }
+    }
+  }
+  }

@@ -1,0 +1,133 @@
+{ 
+  "generalPoints": "نقاط عامة",
+  "points": "نقاط",
+  "welcome": "مرحبا بك في موقع ",
+  "title": "المحاضرات",
+  "discover": "اكتشف أحدث المحاضرات",
+  "showLectures": "عرض المحاضرات",
+  "noLectures": "لا توجد محاضرات مطابقة للفلاتر المحددة.",
+  "free": "مجاني",
+  "paid": "مدفوع",
+  "enroll": "التسجيل",
+  "purchased": "مشترك",
+  "purchase": "شراء",
+  "available : ": " المتاحة",
+  "noPointsBalances": "لا يوجد نقاط متاحة",
+  "filters": {
+    "reset": "إعادة تعيين الفلاتر",
+    "stage": "دور المحاضر",
+    "grade": "الصف",
+    "subject": "المادة",
+    "status": "الحالة",
+    "stages": {
+      "lecturer": "محاضر",
+      "professor": "أستاذ"
+    },
+    "statuses": {
+      "free": "مجاني",
+      "paid": "مدفوع"
+    }
+  },
+  "search": {
+    "options": "خيارات البحث"
+  },
+  "levels": {
+  "Primary": "الابتدائية",
+  "Middle": "المتوسطة",
+  "Upper Primary": "الابتدائية العليا",
+  "Higher Secondary": "الثانوية العليا",
+  "Fourth Elementary": "الابتدائي الرابع",
+  "First Primary": "الأول الابتدائي",
+  "Second Primary": "الثاني الابتدائي",
+  "Third Primary": "الثالث الابتدائي",
+  "First Secondary": "الأول الثانوي",
+  "Second Secondary": "الثاني الثانوي",
+  "Third Secondary": "الثالث الثانوي",
+  "2nd Primary": "الثاني الابتدائي",
+  "2nd Secondary": "الثاني الثانوي",
+  "3rd Primary": "الثالث الابتدائي",
+  "3rd Secondary": "الثالث الثانوي",
+  "4th Primary": "الرابع الابتدائي",
+  "4th Secondary": "الرابع الثانوي",
+  "5th Primary": "الخامس الابتدائي",
+  "1st Primary": "الأول الابتدائي",
+  "1st Secondary": "الأول الثانوي",
+  "1st Preparatory": "الأول الثانوي",
+  "2nd Preparatory": "الثاني الثانوي",
+  "3rd Preparatory": "الثالث الثانوي",
+  "4th Preparatory": "الرابع الثانوي",
+  "5th Preparatory": "الخامس الثانوي",
+  "6th Preparatory": "السادس الثانوي",
+  "7th Preparatory": "السابع الثانوي",
+  "8th Preparatory": "الثامن الثانوي",
+  "9th Preparatory": "التاسع الثانوي"
+},
+
+  "common": {
+    "loading": "جاري التحميل..."
+  },
+  "errors": {
+    "fetchStudents": "فشل في جلب بيانات الطلاب"
+  },
+  "lesson": {
+    "detailsTitle": "تفاصيل الدرس",
+    "centerUnknown": "مركز غير معروف"
+  },
+  "attendance": {
+    "success": "تم تسجيل الحضور بنجاح",
+    "error": "فشل في تسجيل الحضور",
+    "successTitle": "تم بنجاح!",
+    "errorTitle": "خطأ!",
+    "studentId": "رقم الطالب",
+    "formTitle": "تسجيل الحضور",
+    "studentIdLabel": "الرقم التسلسلي للطالب",
+    "studentIdPlaceholder": "أدخل رقم الطالب",
+    "scanButton": "مسح الرمز",
+    "paymentTypeLabel": "اختر نوع الدفع",
+    "paymentType": {
+      "daily": "يومي",
+      "lesson": "درس",
+      "month": "شهري",
+      "year": "سنوي",
+      "multiSession": "جلسات متعددة",
+      "unpaid": "غير مدفوع"
+    },
+    "amountPaidLabel": "المبلغ المدفوع",
+    "amountPaidPlaceholder": "أدخل المبلغ",
+    "dateLabel": "تاريخ الحضور (اختياري)",
+    "bookletLabel": "تم شراء الكتيب",
+    "bookletYes": "نعم",
+    "bookletNo": "لا",
+    "submitButton": "تسجيل الحضور",
+    "studentListTitle": "قائمة الطلاب",
+    "studentTable": {
+      "id": "الرقم",
+      "name": "الاسم",
+      "status": "الحالة",
+      "active": "نشط"
+    },
+    "noStudents": "لم يتم العثور على طلاب",
+    "moreStudents": "عرض 5 من {{count}} طالب"
+  },
+  "barCodeScanner": {
+    "title": "ماسح رمز الطالب",
+    "initializing": "جاري تهيئة الكاميرا...",
+    "clickStart": "انقر على 'بدء المسح' للبدء",
+    "scanInstructions": "قم بمحاذاة رمز الطالب في الإطار...",
+    "resultLabel": "تم اكتشاف رقم الطالب:",
+    "startButton": "بدء المسح",
+    "stopButton": "إيقاف المسح",
+    "resetButton": "إعادة ضبط",
+    "permissionWarning": "تعذر الوصول إلى الكاميرا. يرجى التحقق من الأذونات.",
+    "scanError": "فشل في تهيئة الماسح"
+  },
+  "pagination": {
+    "previous": "السابق",
+    "next": "التالي",
+    "page": "الصفحة",
+    "of": "من"
+  }
+
+
+
+}

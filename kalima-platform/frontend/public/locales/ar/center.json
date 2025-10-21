@@ -1,0 +1,16 @@
+{
+    "filters": {
+        "department": "حسب القسم",
+        "group": "حسب المجموعة",
+        "semester": "حسب الفصل",
+        "teacher": "حسب المعلم",
+        "select_section": "حدد القسم",
+        "select_group": "حدد المجموعة",
+        "section": "حسب القسم"
+      },
+      "subjects": {
+        "math": "رياضيات",
+        "science": "علوم",
+        "arabic": "عربية"
+      }
+}

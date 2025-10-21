@@ -1,0 +1,146 @@
+{
+  "common": {
+    "loading": "جاري التحميل...",
+    "error": "فشل في تحميل الباقات. يرجى المحاولة مرة أخرى لاحقًا.",
+    "tryAgain": "حاول مرة أخرى",
+    "backToPackages": "العودة إلى الباقات",
+    "packageNotFound": "الباقة غير موجودة",
+    "points": "نقاط",
+    "cancel": "إلغاء",
+    "details": "التفاصيل",
+    "purchase": "شراء",
+    "purchased": "تم الشراء",
+    "insufficientPoints": "نقاط غير كافية"
+  },
+  "errors": {
+    "fetchStudents": "فشل في جلب بيانات الطلاب"
+  },
+  "lesson": {
+    "detailsTitle": "تفاصيل الدرس",
+    "centerUnknown": "مركز غير معروف"
+  },
+  "attendance": {
+    "success": "تم تسجيل الحضور بنجاح",
+    "error": "فشل في تسجيل الحضور",
+    "successTitle": "تم بنجاح!",
+    "errorTitle": "خطأ!",
+    "studentId": "رقم الطالب",
+    "formTitle": "تسجيل الحضور",
+    "studentIdLabel": "الرقم التسلسلي للطالب",
+    "studentIdPlaceholder": "أدخل رقم الطالب",
+    "scanButton": "مسح الرمز",
+    "paymentTypeLabel": "اختر نوع الدفع",
+    "paymentType": {
+      "daily": "يومي",
+      "lesson": "درس",
+      "month": "شهري",
+      "year": "سنوي",
+      "multiSession": "جلسات متعددة",
+      "unpaid": "غير مدفوع"
+    },
+    "amountPaidLabel": "المبلغ المدفوع",
+    "amountPaidPlaceholder": "أدخل المبلغ",
+    "dateLabel": "تاريخ الحضور (اختياري)",
+    "bookletLabel": "تم شراء الكتيب",
+    "bookletYes": "نعم",
+    "bookletNo": "لا",
+    "submitButton": "تسجيل الحضور",
+    "studentListTitle": "قائمة الطلاب",
+    "studentTable": {
+      "id": "الرقم",
+      "name": "الاسم",
+      "status": "الحالة",
+      "active": "نشط"
+    },
+    "noStudents": "لم يتم العثور على طلاب",
+    "moreStudents": "عرض 5 من {{count}} طالب"
+  },
+  "barCodeScanner": {
+    "title": "ماسح رمز الطالب",
+    "initializing": "جاري تهيئة الكاميرا...",
+    "clickStart": "انقر على 'بدء المسح' للبدء",
+    "scanInstructions": "قم بمحاذاة رمز الطالب في الإطار...",
+    "resultLabel": "تم اكتشاف رقم الطالب:",
+    "startButton": "بدء المسح",
+    "stopButton": "إيقاف المسح",
+    "resetButton": "إعادة ضبط",
+    "permissionWarning": "تعذر الوصول إلى الكاميرا. يرجى التحقق من الأذونات.",
+    "scanError": "فشل في تهيئة الماسح"
+  },
+  "packageList": {
+    "title": "باقات التعلم",
+    "subtitle": "استكشف باقاتنا المختارة لتعزيز رحلة التعلم الخاصة بك",
+    "welcome": "مرحبًا",
+    "filterTitle": "تصفية الباقات",
+    "priceRange": "نطاق السعر",
+    "teacher": "المعلم",
+    "allPrices": "جميع الأسعار",
+    "allTeachers": "جميع المعلمين",
+    "priceRanges": {
+      "0-200": "0 - 200 نقطة",
+      "200-500": "200 - 500 نقطة",
+      "500-1000": "500 - 1000 نقطة",
+      "1000+": "1000+ نقطة"
+    },
+    "resetFilters": "إعادة تعيين التصفية",
+    "showing": "عرض {{current}} من {{total}} باقة",
+    "noPackagesFound": "لم يتم العثور على باقات",
+    "adjustFilters": "حاول تعديل التصفية للعثور على المزيد من الباقات",
+    "packageCard": {
+      "monthly": "شهري",
+      "teachers": "المعلمون",
+      "includes": "يتضمن",
+      "enoughPoints": "لديك نقاط كافية",
+      "notEnoughPoints": "نقاط غير كافية",
+      "alreadyPurchased": "تم الشراء بالفعل"
+    }
+  },
+  "packageDetails": {
+    "overview": "نظرة عامة على الباقة",
+    "duration": "المدة",
+    "teachers": "المعلمون",
+    "expertInstructors": "معلم خبير",
+    "totalPoints": "إجمالي النقاط",
+    "pointsDistributed": "نقاط موزعة",
+    "created": "تم الإنشاء",
+    "packagePrice": "سعر الباقة",
+    "alreadyPurchased": "تم الشراء بالفعل",
+    "youAlreadyOwn": "أنت تملك هذه الباقة بالفعل",
+    "yourBalance": "رصيدك",
+    "afterPurchase": "بعد الشراء",
+    "purchaseNow": "اشتر الآن",
+    "insufficientPoints": "نقاط غير كافية",
+    "needMorePoints": "تحتاج إلى {{points}} نقطة إضافية لشراء هذه الباقة",
+    "loginToPurchase": "يرجى تسجيل الدخول لشراء هذه الباقة",
+    "loginButton": "تسجيل الدخول للشراء",
+    "generalPointsOnly": "* يمكن شراء هذه الباقة فقط باستخدام النقاط العامة",
+    "teachersIncluded": "المعلمون المشمولون",
+    "packageBenefits": "مزايا الباقة",
+    "benefits": {
+      "accessToContent": "الوصول إلى محتوى من {{count}} معلم خبير",
+      "durationAccess": "{{duration}} للوصول إلى جميع المواد المضمنة",
+      "totalPoints": "إجمالي {{points}} نقطة موزعة على المعلمين",
+      "flexibleLearning": "تعلم مرن بالوتيرة الخاصة بك",
+      "comprehensiveCurriculum": "منهج شامل يغطي مواضيع متعددة"
+    }
+  },
+  "purchaseModal": {
+    "title": "تأكيد الشراء",
+    "confirmMessage": "هل أنت متأكد من رغبتك في شراء هذه الباقة؟",
+    "type": "النوع",
+    "price": "السعر",
+    "teachers": "المعلمون",
+    "yourBalance": "رصيدك",
+    "afterPurchase": "بعد الشراء",
+    "confirmButton": "تأكيد الشراء",
+    "successMessage": "تم شراء الباقة بنجاح!",
+    "remainingPoints": "النقاط المتبقية: {{points}}",
+    "failureMessage": "فشل في شراء الباقة",
+    "errorMessage": "حدث خطأ أثناء شراء الباقة"
+  },
+  "duration": {
+    "month": "وصول لمدة شهر واحد",
+    "year": "وصول لمدة سنة واحدة",
+    "week": "وصول لمدة أسبوع واحد"
+  }
+}
