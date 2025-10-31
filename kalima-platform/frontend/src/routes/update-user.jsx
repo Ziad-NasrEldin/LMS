@@ -10,7 +10,7 @@ export const updateCurrentUser = async (updateData) => {
     const isFormData = updateData instanceof FormData
 
     const response = await axios.patch(
-      `${API_URL}/users/me/update`,
+      `/users/me/update`,
       updateData,
       {
         headers: {
@@ -43,7 +43,7 @@ export const updateCurrentUser = async (updateData) => {
 export const updateUserPassword = async (passwordData) => {
   try {
     const response = await axios.patch(
-      `${API_URL}/users/update/password`,
+      `/users/update/password`,
       passwordData,
       {
         headers: {
@@ -71,7 +71,7 @@ export const updateUserPassword = async (passwordData) => {
 export const updateUser = async (userId, updateData) => {
   try {
     const response = await axios.patch(
-      `${API_URL}/users/${userId}`,
+      `/users/${userId}`,
       updateData,
       {
         headers: {

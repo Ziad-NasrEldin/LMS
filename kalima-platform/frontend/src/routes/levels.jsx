@@ -9,7 +9,7 @@ const getAuthHeader = () => {
 
 export const getAllLevels = async () => {
   try {
-    const response = await axios.get(`${API_URL}/levels/`, {
+    const response = await axios.get(`/levels/`, {
       headers: getAuthHeader(),
       withCredentials: true,
     });
@@ -39,7 +39,7 @@ export const getAllLevels = async () => {
 
 export const createLevel = async (levelData) => {
   try {
-    const response = await axios.post(`${API_URL}/levels/`, levelData, {
+    const response = await axios.post(`/levels/`, levelData, {
       headers: getAuthHeader(),
       withCredentials: true,
     });
@@ -58,7 +58,7 @@ export const createLevel = async (levelData) => {
 
 export const deleteLevel = async (levelId) => {
   try {
-    const response = await axios.delete(`${API_URL}/levels/${levelId}`, {
+    const response = await axios.delete(`/levels/${levelId}`, {
       headers: getAuthHeader(),
       withCredentials: true,
     });
