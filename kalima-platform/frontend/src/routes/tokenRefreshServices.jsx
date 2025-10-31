@@ -37,7 +37,7 @@ refreshAxiosInstance.interceptors.response.use(
     if (
       error.response?.status === 401 &&
       !originalRequest._retry &&
-      originalRequest.url === `/auth/refresh`
+      originalRequest.url === `${API_URL}/auth/refresh`
     ) {
       clearAuthData()
       processQueue(new Error("Token refresh failed"))
@@ -104,7 +104,7 @@ export const refreshToken = async () => {
     }
 
     const response = await refreshAxiosInstance.post(
-      `/auth/refresh`,
+      `${API_URL}/auth/refresh`,
       {},
       {
         headers: {

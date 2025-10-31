@@ -6,7 +6,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 export const getExamConfigs = async () => {
     try {
-      const response = await axios.get(`/exam-configs`, {
+      const response = await axios.get(`${API_URL}/exam-configs`, {
         headers: getAuthHeader(),
         withCredentials: true,
         Authorization: `Bearer ${getToken()}`,
@@ -26,7 +26,7 @@ export const getExamConfigs = async () => {
   
   export const createExamConfig = async (configData) => {
     try {
-      const response = await axios.post(`/exam-configs`, configData, {
+      const response = await axios.post(`${API_URL}/exam-configs`, configData, {
         headers: getAuthHeader(),
         withCredentials: true,
         Authorization: `Bearer ${getToken()}`,

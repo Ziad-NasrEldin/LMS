@@ -6,7 +6,7 @@ const API_URL = import.meta.env.VITE_API_URL
 // Function to get all sections (categories)
 export const getAllSections = async (queryParams = {}) => {
   try {
-    const response = await axios.get(`/ec/sections`, {
+    const response = await axios.get(`${API_URL}/ec/sections`, {
       params: queryParams,
       withCredentials: true,
       headers: {
@@ -23,7 +23,7 @@ export const getAllSections = async (queryParams = {}) => {
 // Function to get all books with pagination support
 export const getAllBooks = async (queryParams = {}) => {
   try {
-    const response = await axios.get(`/ec/books`, {
+    const response = await axios.get(`${API_URL}/ec/books`, {
       params: queryParams,
       withCredentials: true,
       headers: {
@@ -40,7 +40,7 @@ export const getAllBooks = async (queryParams = {}) => {
 // Function to get all products with pagination support
 export const getAllProducts = async (queryParams = {}) => {
   try {
-    const response = await axios.get(`/ec/products`, {
+    const response = await axios.get(`${API_URL}/ec/products`, {
       params: queryParams,
       withCredentials: true,
       headers: {
@@ -57,7 +57,7 @@ export const getAllProducts = async (queryParams = {}) => {
 // Function to get a book by ID
 export const getBookById = async (bookId) => {
   try {
-    const response = await axios.get(`/ec/books/${bookId}`, {
+    const response = await axios.get(`${API_URL}/ec/books/${bookId}`, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -73,7 +73,7 @@ export const getBookById = async (bookId) => {
 // Function to get a product by ID
 export const getProductById = async (productId) => {
   try {
-    const response = await axios.get(`/ec/products/${productId}`, {
+    const response = await axios.get(`${API_URL}/ec/products/${productId}`, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -89,7 +89,7 @@ export const getProductById = async (productId) => {
 // Function to get books by section
 export const getBooksBySection = async (sectionId, queryParams = {}) => {
   try {
-    const response = await axios.get(`/ec/books`, {
+    const response = await axios.get(`${API_URL}/ec/books`, {
       params: { section: sectionId, ...queryParams },
       withCredentials: true,
       headers: {
@@ -105,7 +105,7 @@ export const getBooksBySection = async (sectionId, queryParams = {}) => {
 
 export const getProductsBySection = async (sectionId, queryParams = {}) => {
   try {
-    const response = await axios.get(`/ec/sections/${sectionId}/products`, {
+    const response = await axios.get(`${API_URL}/ec/sections/${sectionId}/products`, {
       params: queryParams,
       withCredentials: true,
       headers: {
@@ -121,7 +121,7 @@ export const getProductsBySection = async (sectionId, queryParams = {}) => {
 
 export const createSection = async (sectionData) => {
   try {
-    const response = await axios.post(`/ec/sections`, sectionData, {
+    const response = await axios.post(`${API_URL}/ec/sections`, sectionData, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -138,7 +138,7 @@ export const createSection = async (sectionData) => {
 // Function to update a section
 export const updateSection = async (sectionId, updateData) => {
   try {
-    const response = await axios.patch(`/ec/sections/${sectionId}`, updateData, {
+    const response = await axios.patch(`${API_URL}/ec/sections/${sectionId}`, updateData, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -155,7 +155,7 @@ export const updateSection = async (sectionId, updateData) => {
 // Function to delete a section
 export const deleteSection = async (sectionId) => {
   try {
-    const response = await axios.delete(`/ec/sections/${sectionId}`, {
+    const response = await axios.delete(`${API_URL}/ec/sections/${sectionId}`, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -212,7 +212,7 @@ export const createProduct = async (productData) => {
     }
     
     
-    const response = await axios.post(`/ec/products`, formData, {
+    const response = await axios.post(`${API_URL}/ec/products`, formData, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -267,7 +267,7 @@ export const createBook = async (bookData) => {
     }
 
 
-    const response = await axios.post(`/ec/books`, formData, {
+    const response = await axios.post(`${API_URL}/ec/books`, formData, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -306,7 +306,7 @@ export const updateProduct = async (productId, productData) => {
     }
 
     const response = await axios.patch(
-      `/ec/products/${productId}`,
+      `${API_URL}/ec/products/${productId}`,
       formData,
       {
         withCredentials: true,
@@ -326,7 +326,7 @@ export const updateProduct = async (productId, productData) => {
 // Function to delete a product
 export const deleteProduct = async (productId) => {
   try {
-    const response = await axios.delete(`/ec/products/${productId}`, {
+    const response = await axios.delete(`${API_URL}/ec/products/${productId}`, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -357,7 +357,7 @@ export const purchaseProduct = async (purchaseData) => {
       formData.append("couponCode", purchaseData.couponCode)
     }
 
-    const response = await axios.post(`/ec/purchases/`, formData, {
+    const response = await axios.post(`${API_URL}/ec/purchases/`, formData, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -393,7 +393,7 @@ export const purchaseBook = async (purchaseData) => {
       formData.append("couponCode", purchaseData.couponCode)
     }
 
-    const response = await axios.post(`/ec/book-purchases/`, formData, {
+    const response = await axios.post(`${API_URL}/ec/book-purchases/`, formData, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -410,7 +410,7 @@ export const purchaseBook = async (purchaseData) => {
 export const RecalculateInvites = async () => {
   try {
     const response = await axios.post(
-      `/ec/referrals/recalculate`,
+      `${API_URL}/ec/referrals/recalculate`,
       {},
       {
         withCredentials: true,
@@ -432,7 +432,7 @@ export const RecalculateInvites = async () => {
 // Function to get all subsections
 export const getAllSubSections = async (queryParams = {}) => {
   try {
-    const response = await axios.get(`/ec/subsections`, {
+    const response = await axios.get(`${API_URL}/ec/subsections`, {
       params: queryParams,
       withCredentials: true,
       headers: {
@@ -449,7 +449,7 @@ export const getAllSubSections = async (queryParams = {}) => {
 // Function to get subsections by section ID
 export const getSubSectionsBySection = async (sectionId, queryParams = {}) => {
   try {
-    const response = await axios.get(`/ec/sections/${sectionId}/subsections`, {
+    const response = await axios.get(`${API_URL}/ec/sections/${sectionId}/subsections`, {
       params: queryParams,
       withCredentials: true,
       headers: {
@@ -466,7 +466,7 @@ export const getSubSectionsBySection = async (sectionId, queryParams = {}) => {
 // Function to get a single subsection with its products
 export const getSubSectionById = async (subSectionId) => {
   try {
-    const response = await axios.get(`/ec/subsections/${subSectionId}`, {
+    const response = await axios.get(`${API_URL}/ec/subsections/${subSectionId}`, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -482,7 +482,7 @@ export const getSubSectionById = async (subSectionId) => {
 // Function to create a new subsection
 export const createSubSection = async (subSectionData) => {
   try {
-    const response = await axios.post(`/ec/subsections`, subSectionData, {
+    const response = await axios.post(`${API_URL}/ec/subsections`, subSectionData, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -499,7 +499,7 @@ export const createSubSection = async (subSectionData) => {
 // Function to update a subsection
 export const updateSubSection = async (subSectionId, updateData) => {
   try {
-    const response = await axios.patch(`/ec/subsections/${subSectionId}`, updateData, {
+    const response = await axios.patch(`${API_URL}/ec/subsections/${subSectionId}`, updateData, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -516,7 +516,7 @@ export const updateSubSection = async (subSectionId, updateData) => {
 // Function to delete a subsection
 export const deleteSubSection = async (subSectionId) => {
   try {
-    const response = await axios.delete(`/ec/subsections/${subSectionId}`, {
+    const response = await axios.delete(`${API_URL}/ec/subsections/${subSectionId}`, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
