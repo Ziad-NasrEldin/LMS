@@ -6,7 +6,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 export const fetchPackages = async () => {
   try {
-      const response = await axios.get(`${API_URL}/packages/`, {
+      const response = await axios.get(`/packages/`, {
           headers: {
               Authorization: `Bearer ${getToken()}`,
               'Content-Type': 'application/json',
@@ -52,7 +52,7 @@ export const createPackage = async (packageData) => {
 
   export const fetchPackageById = async (packageId) => {
     try {
-        const response = await axios.get(`${API_URL}/packages/${packageId}`, {
+        const response = await axios.get(`/packages/${packageId}`, {
             headers: {
                 Authorization: `Bearer ${getToken()}`,
                 'Content-Type': 'application/json',
@@ -68,7 +68,7 @@ export const createPackage = async (packageData) => {
 
 export const deletePackage = async (packageId) => {
   try {
-      const response = await axios.delete(`${API_URL}/packages/${packageId}`, {
+      const response = await axios.delete(`/packages/${packageId}`, {
           headers: {
               Authorization: `Bearer ${getToken()}`,
               'Content-Type': 'application/json',
@@ -88,7 +88,7 @@ export const deletePackage = async (packageId) => {
 
 export const purchasePackage = async (packageId) => {
   try {
-    const response = await axios.post(`${API_URL}/purchases/package`, {
+    const response = await axios.post(`/purchases/package`, {
       packageId: packageId,
     }, {
       withCredentials: true,

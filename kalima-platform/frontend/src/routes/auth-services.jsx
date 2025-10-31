@@ -126,7 +126,7 @@ initializeTokenHelpers({
 
 export const registerUser = async (userData) => {
   try {
-    const response = await api.post(`${API_URL}/register`, userData, {
+    const response = await api.post(`/register`, userData, {
       headers: {
         "Content-Type": "application/json",
       },
@@ -145,7 +145,7 @@ export const registerUser = async (userData) => {
 
 export const loginUser = async (credentials) => {
   try {
-    const response = await api.post(`${API_URL}/auth`, credentials, {
+    const response = await api.post(`/auth`, credentials, {
       headers: { "Content-Type": "application/json" },
     });
 
@@ -182,7 +182,7 @@ export const loginUser = async (credentials) => {
 export const requestPasswordReset = async (email) => {
   try {
     const response = await axios.post(
-      `${API_URL}/password-reset/request`,
+      `/password-reset/request`,
       { email },
       {
         headers: {
@@ -199,7 +199,7 @@ export const requestPasswordReset = async (email) => {
 export const verifyOtp = async (email, otp) => {
   try {
     const response = await axios.post(
-      `${API_URL}/password-reset/verify-otp`,
+      `/password-reset/verify-otp`,
       { email, otp },
       {
         headers: {
@@ -216,7 +216,7 @@ export const verifyOtp = async (email, otp) => {
 export const resetPassword = async (resetToken, password, confirmPassword) => {
   try {
     const response = await axios.post(
-      `${API_URL}/password-reset/reset`,
+      `/password-reset/reset`,
       { resetToken, password, confirmPassword },
       {
         headers: {
@@ -236,7 +236,7 @@ export const logoutUser = async () => {
 
     if (token) {
       await api.post(
-        `${API_URL}/auth/logout`,
+        `/auth/logout`,
         {},
         {
           headers: {
@@ -276,7 +276,7 @@ export const getUserDashboard = async ({ params = {} } = {}) => {
 
     const token = getToken()
 
-    const response = await api.get(`${API_URL}/users/me/dashboard`, {
+    const response = await api.get(`/users/me/dashboard`, {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
@@ -300,7 +300,7 @@ export const getUserDashboard = async ({ params = {} } = {}) => {
         })
           .then((newToken) => {
             return axios
-              .get(`${API_URL}/users/me/dashboard`, {
+              .get(`/users/me/dashboard`, {
                 headers: {
                   "Content-Type": "application/json",
                   Authorization: `Bearer ${newToken}`,
@@ -326,7 +326,7 @@ export const getUserDashboard = async ({ params = {} } = {}) => {
         if (refreshResult.success && refreshResult.data.accessToken) {
           processQueue(null, refreshResult.data.accessToken)
 
-          const response = await axios.get(`${API_URL}/users/me/dashboard`, {
+          const response = await axios.get(`/users/me/dashboard`, {
             headers: {
               "Content-Type": "application/json",
               Authorization: `Bearer ${refreshResult.data.accessToken}`,
@@ -381,7 +381,7 @@ export const getUserDashboard = async ({ params = {} } = {}) => {
 const handleAuthenticatedRequest = async (requestFn, url, ...args) => {
   try {
     const token = getToken()
-    const fullUrl = `${API_URL}${url}`
+    const fullUrl = `${url}`
 
     const response = await requestFn(fullUrl, ...args, {
       headers: {
@@ -406,7 +406,7 @@ const handleAuthenticatedRequest = async (requestFn, url, ...args) => {
           failedQueue.push({ resolve, reject })
         })
           .then((newToken) => {
-            return requestFn(`${API_URL}${url}`, ...args, {
+            return requestFn(`${url}`, ...args, {
               headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${newToken}`,
@@ -431,7 +431,7 @@ const handleAuthenticatedRequest = async (requestFn, url, ...args) => {
         if (refreshResult.success && refreshResult.data.accessToken) {
           processQueue(null, refreshResult.data.accessToken)
 
-          const response = await requestFn(`${API_URL}${url}`, ...args, {
+          const response = await requestFn(`${url}`, ...args, {
             headers: {
               "Content-Type": "application/json",
               Authorization: `Bearer ${refreshResult.data.accessToken}`,
