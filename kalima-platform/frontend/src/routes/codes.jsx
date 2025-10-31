@@ -15,7 +15,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 export const redeemPromoCode = async (code) => {
   try {
     const response = await axios.post(
-      `${API_URL}/api/v1/codes/redeem`,
+      `${API_URL}/codes/redeem`,
       { code },
       {
         headers: {
@@ -86,7 +86,7 @@ export const generatePromoCodes = async (data) => {
     }
 
     const response = await axios.post(
-      `${API_URL}/api/v1/codes`,
+      `${API_URL}/codes`,
       payload,
       {
         headers: {
@@ -118,7 +118,7 @@ export const generatePromoCodes = async (data) => {
 };
 export const getPromoCodes = async ({ params = {} } = {}) => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/codes/`, {
+    const response = await axios.get(`${API_URL}/codes/`, {
       params,
       headers: {
         ...getAuthHeader(),
@@ -143,7 +143,7 @@ export const getPromoCodes = async ({ params = {} } = {}) => {
 export const deletePromoCode = async (code) => {
   try {
     const response = await axios.delete(
-      `${API_URL}/api/v1/codes/`,
+      `${API_URL}/codes/`,
       {
         headers: {
           ...getAuthHeader(),
@@ -186,7 +186,7 @@ export const deleteBulkPromoCodes = async (codes) => {
     }
 
     const response = await axios.delete(
-      `${API_URL}/api/v1/codes/multiple`,
+      `${API_URL}/codes/multiple`,
       {
         headers: {
           ...getAuthHeader(),

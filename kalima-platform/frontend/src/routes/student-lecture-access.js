@@ -13,7 +13,7 @@ export const getAllStudentLectureAccess = async (lectureId, limit = 100) => {
       throw new Error("Lecture ID is required")
     }
 
-    const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/v1/student-lecture-access`, {
+    const response = await axios.get(`${import.meta.env.VITE_API_URL}/student-lecture-access`, {
       params: {
         lecture: lectureId,
         limit,
@@ -51,7 +51,7 @@ export const getStudentLectureAccessByLectureId = async (lectureId) => {
     }
 
     const response = await axios.get(
-      `${import.meta.env.VITE_API_URL}/api/v1/student-lecture-access/lecture/${lectureId}`,
+      `${import.meta.env.VITE_API_URL}/student-lecture-access/lecture/${lectureId}`,
       {
         headers: {
           Authorization: `Bearer ${getToken()}`,
@@ -83,7 +83,7 @@ export const updateStudentLectureAccess = async (accessId, data) => {
     }
 
     const response = await axios.patch(
-      `${import.meta.env.VITE_API_URL}/api/v1/student-lecture-access/${accessId}`,
+      `${import.meta.env.VITE_API_URL}/student-lecture-access/${accessId}`,
       data,
       {
         headers: {
@@ -122,10 +122,10 @@ export const checkStudentLectureAccess = async (studentId, lectureId, purchaseId
     let apiUrl;
     if (isStandaloneLecture) {
       // Use standalone lecture endpoint
-      apiUrl = `${import.meta.env.VITE_API_URL}/api/v1/lectures/student/${studentId}/lecture/${lectureId}/purchase/${purchaseId}`;
+      apiUrl = `${import.meta.env.VITE_API_URL}/lectures/student/${studentId}/lecture/${lectureId}/purchase/${purchaseId}`;
     } else {
       // Use container-based lecture endpoint
-      apiUrl = `${import.meta.env.VITE_API_URL}/api/v1/containers/student/${studentId}/container/${lectureId}/purchase/${purchaseId}`;
+      apiUrl = `${import.meta.env.VITE_API_URL}/containers/student/${studentId}/container/${lectureId}/purchase/${purchaseId}`;
     }
 
     const response = await axios.get(apiUrl, {

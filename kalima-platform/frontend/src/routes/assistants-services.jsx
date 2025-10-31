@@ -6,7 +6,7 @@ export const AssistantService = {
     // Fetch all assistants
     getAssistants: async () => {
       try {
-        const response = await axios.get(`${API_URL}/api/v1/assistants/`)
+        const response = await axios.get(`${API_URL}/assistants/`)
   
         if (response.data.status === "success") {
           return {
@@ -28,7 +28,7 @@ export const AssistantService = {
       try {
         if (!isLoggedIn()) throw new Error("User not authenticated");
         
-        const response = await axios.get(`${API_URL}/api/v1/users/me/dashboard`, {
+        const response = await axios.get(`${API_URL}/users/me/dashboard`, {
           headers: {
             Authorization: `Bearer ${getToken()}`,
           },
@@ -48,7 +48,7 @@ export const AssistantService = {
         if (!isLoggedIn()) throw new Error("User not authenticated");
   
         const response = await axios.get(
-          `${API_URL}/api/v1/assistants/lecturer/${lecturerId}`,
+          `${API_URL}/assistants/lecturer/${lecturerId}`,
           {
             headers: {
               Authorization: `Bearer ${getToken()}`,
@@ -70,7 +70,7 @@ export const AssistantService = {
     try {
       if (!isLoggedIn()) throw new Error("User not authenticated");
 
-      const response = await axios.post(`${API_URL}/api/v1/assistants`, data, {
+      const response = await axios.post(`${API_URL}/assistants`, data, {
         headers: {
           Authorization: `Bearer ${getToken()}`,
         },
@@ -89,7 +89,7 @@ export const AssistantService = {
     try {
       if (!isLoggedIn()) throw new Error("User not authenticated");
   
-      const response = await axios.delete(`${API_URL}/api/v1/assistants/${assistantId}`, {
+      const response = await axios.delete(`${API_URL}/assistants/${assistantId}`, {
         headers: {
           Authorization: `Bearer ${getToken()}`,
         },
@@ -112,7 +112,7 @@ export const AssistantService = {
     try {
       if (!isLoggedIn()) throw new Error("User not authenticated");
   
-      const response = await axios.patch(`${API_URL}/api/v1/assistants/${assistantId}`, data, {
+      const response = await axios.patch(`${API_URL}/assistants/${assistantId}`, data, {
         headers: {
           Authorization: `Bearer ${getToken()}`,
         },

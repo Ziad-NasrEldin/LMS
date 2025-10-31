@@ -27,7 +27,7 @@ const NotificationCenter = ({ userId }) => {
     setIsLoading(true)
     try {
       const token = getToken()
-      const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/v1/notifications/unsent`, {
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/notifications/unsent`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -155,7 +155,7 @@ const NotificationCenter = ({ userId }) => {
     try {
       const token = getToken()
       axios.patch(
-        `${import.meta.env.VITE_API_URL}/api/v1/notifications/${notificationId}/read`,
+        `${import.meta.env.VITE_API_URL}/notifications/${notificationId}/read`,
         {},
         {
           headers: {

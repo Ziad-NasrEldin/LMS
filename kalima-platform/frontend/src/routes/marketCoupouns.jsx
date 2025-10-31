@@ -10,7 +10,7 @@ export const getAllCoupons = async () => {
       throw new Error("Not authenticated")
     }
 
-    const response = await axios.get(`${API_URL}/api/v1/ec/coupons`, {
+    const response = await axios.get(`${API_URL}/ec/coupons`, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -36,7 +36,7 @@ export const getActiveCoupons = async () => {
       throw new Error("Not authenticated")
     }
 
-    const response = await axios.get(`${API_URL}/api/v1/ec/coupons/active`, {
+    const response = await axios.get(`${API_URL}/ec/coupons/active`, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -62,7 +62,7 @@ export const getUsedCoupons = async () => {
       throw new Error("Not authenticated")
     }
 
-    const response = await axios.get(`${API_URL}/api/v1/ec/coupons/used`, {
+    const response = await axios.get(`${API_URL}/ec/coupons/used`, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -88,7 +88,7 @@ export const getCouponById = async (couponId) => {
       throw new Error("Not authenticated")
     }
 
-    const response = await axios.get(`${API_URL}/api/v1/ec/coupons/${couponId}`, {
+    const response = await axios.get(`${API_URL}/ec/coupons/${couponId}`, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -114,7 +114,7 @@ export const createCoupon = async (couponData) => {
       throw new Error("Not authenticated")
     }
 
-    const response = await axios.post(`${API_URL}/api/v1/ec/coupons`, couponData, {
+    const response = await axios.post(`${API_URL}/ec/coupons`, couponData, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -141,7 +141,7 @@ export const deleteCoupon = async (couponId) => {
       throw new Error("Not authenticated")
     }
 
-    const response = await axios.delete(`${API_URL}/api/v1/ec/coupons/${couponId}`, {
+    const response = await axios.delete(`${API_URL}/ec/coupons/${couponId}`, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -167,7 +167,7 @@ export const useCoupon = async (couponCode, purchaseId) => {
     }
 
     const response = await axios.post(
-      `${API_URL}/api/v1/ec/coupons/use`,
+      `${API_URL}/ec/coupons/use`,
       {
         couponCode: couponCode,
         purchaseId: purchaseId,
@@ -201,7 +201,7 @@ export const validateCoupon = async (couponCode) => {
     }
 
     const response = await axios.post(
-      `${API_URL}/api/v1/ec/coupons/validate/`,
+      `${API_URL}/ec/coupons/validate/`,
       {
         couponCode: couponCode,
       },

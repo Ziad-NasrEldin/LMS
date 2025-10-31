@@ -22,7 +22,7 @@ export const getStudentSubmissionsByLectureId = async (lectureId) => {
       };
     }
 
-    const response = await axios.get(`${API_URL}/api/v1/assistant-homework/lecture/${lectureId}`, {
+    const response = await axios.get(`${API_URL}/assistant-homework/lecture/${lectureId}`, {
       headers: {
         ...getAuthHeader(),
         "Content-Type": "application/json",
@@ -51,7 +51,7 @@ export const verifyExamSubmission = async (lectureId) => {
     }
 
     const response = await axios.post(
-      `${import.meta.env.VITE_API_URL}/api/v1/exam-submissions/verify/${lectureId}`,
+      `${import.meta.env.VITE_API_URL}/exam-submissions/verify/${lectureId}`,
       {}, // Empty object as request body
       {
         headers: {
@@ -89,7 +89,7 @@ export const checkLectureAccess = async (lectureId) => {
     }
 
     const response = await axios.get(
-      `${import.meta.env.VITE_API_URL}/api/v1/student-lecture-access/check/${lectureId}`,
+      `${import.meta.env.VITE_API_URL}/student-lecture-access/check/${lectureId}`,
       {
         headers: {
           Authorization: `Bearer ${getToken()}`,

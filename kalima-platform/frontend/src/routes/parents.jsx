@@ -10,7 +10,7 @@ import { getToken } from "../routes/auth-services";
 const API_URL = import.meta.env.VITE_API_URL;
 export const getChildrenData = async () => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/users/me/children`, {
+    const response = await axios.get(`${API_URL}/users/me/children`, {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${getToken()}`,

@@ -26,7 +26,7 @@ export const uploadHomework = async (lectureId, homeworkData) => {
     const response = await axios.post(
       `${
         import.meta.env.VITE_API_URL
-      }/api/v1/attachments/upload-homework/${lectureId}`,
+      }/attachments/upload-homework/${lectureId}`,
       formData,
       {
         headers: {
@@ -86,7 +86,7 @@ export const getLectureHomeworks = async (
     const response = await axios.get(
       `${
         import.meta.env.VITE_API_URL
-      }/api/v1/lectures/${lectureId}/homework?limit=${limit}&page=${page}`,
+      }/lectures/${lectureId}/homework?limit=${limit}&page=${page}`,
       {
         headers: {
           Authorization: `Bearer ${getToken()}`,

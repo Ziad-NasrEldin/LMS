@@ -10,7 +10,7 @@ export const getAllSubjects = async () => {
     if (!isLoggedIn()) {
       throw new Error('Not authenticated');
     }
-    const response = await axios.get(`${API_URL}/api/v1/subjects/`, {
+    const response = await axios.get(`${API_URL}/subjects/`, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -35,7 +35,7 @@ export const getSubjectById = async (subjectId) => {
     if (!isLoggedIn()) {
       throw new Error('Not authenticated');
     }
-    const response = await axios.get(`${API_URL}/api/v1/subjects/${subjectId}`, {
+    const response = await axios.get(`${API_URL}/subjects/${subjectId}`, {
       headers: {
         Authorization: `Bearer ${getToken()}`,
       },
@@ -59,7 +59,7 @@ export const getLecturesBySubject = async (subjectId) => {
     if (!isLoggedIn()) {
       throw new Error('Not authenticated');
     }
-    const response = await axios.get(`${API_URL}/api/v1/lectures?subject=${subjectId}`, {
+    const response = await axios.get(`${API_URL}/lectures?subject=${subjectId}`, {
       headers: {
         Authorization: `Bearer ${getToken()}`,
       },
@@ -82,7 +82,7 @@ export const createSubject = async (subjectData) => {
     if (!isLoggedIn()) {
       throw new Error('Not authenticated');
     }
-    const response = await axios.post(`${API_URL}/api/v1/subjects/`, subjectData, {
+    const response = await axios.post(`${API_URL}/subjects/`, subjectData, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -108,7 +108,7 @@ export const deleteSubject = async (subjectId) => {
     if (!isLoggedIn()) {
       throw new Error('Not authenticated');
     }
-    const response = await axios.delete(`${API_URL}/api/v1/subjects/${subjectId}`, {
+    const response = await axios.delete(`${API_URL}/subjects/${subjectId}`, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,

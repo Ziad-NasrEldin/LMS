@@ -12,7 +12,7 @@ export const getAllCenters = async () => {
       throw new Error("Authentication token is required");
     }
 
-    const response = await axios.get(`${API_URL}/api/v1/centers/`, {
+    const response = await axios.get(`${API_URL}/centers/`, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${token}`,
@@ -54,7 +54,7 @@ export const getCenterDataByType = async (centerId, type) => {
       throw new Error("Authentication token is required");
     }
 
-    const response = await axios.get(`${API_URL}/api/v1/centers/${centerId}/${type}`, {
+    const response = await axios.get(`${API_URL}/centers/${centerId}/${type}`, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${token}`,
@@ -92,7 +92,7 @@ export const getCenterTimetable = async (centerId) => {
       throw new Error("Authentication token is required");
     }
 
-    const response = await axios.get(`${API_URL}/api/v1/centers/${centerId}/timetable`, {
+    const response = await axios.get(`${API_URL}/centers/${centerId}/timetable`, {
         withCredentials: true,
         headers: {
           Authorization: `Bearer ${token}`,
@@ -147,7 +147,7 @@ export const addNewLesson = async (lessonData) => {
     formattedData.duration = parseInt(formattedData.duration);
 
     const response = await axios.post(
-      `${API_URL}/api/v1/centers/lessons`,
+      `${API_URL}/centers/lessons`,
       formattedData,
       {
         withCredentials: true,
@@ -183,7 +183,7 @@ export const getAllParents = async () => {
       throw new Error("Authentication token is required");
     }
 
-    const response = await axios.get(`${API_URL}/api/v1/parents`, {
+    const response = await axios.get(`${API_URL}/parents`, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${token}`,
@@ -217,7 +217,7 @@ export const sendLessonReport = async (reportData) => {
     }
 
     const response = await axios.post(
-      `${API_URL}/api/v1/reports/lesson`,
+      `${API_URL}/reports/lesson`,
       reportData,
       {
         withCredentials: true,
@@ -254,7 +254,7 @@ export const sendMonthReport = async (reportData) => {
     }
 
     const response = await axios.post(
-      `${API_URL}/api/v1/reports/month`,
+      `${API_URL}/reports/month`,
       reportData,
       {
         withCredentials: true,
@@ -291,7 +291,7 @@ export const sendCourseReport = async (reportData) => {
     }
 
     const response = await axios.post(
-      `${API_URL}/api/v1/reports/course`,
+      `${API_URL}/reports/course`,
       reportData,
       {
         withCredentials: true,
@@ -326,7 +326,7 @@ export const getAllAttendance = async () => {
       throw new Error("Authentication token is required");
     }
 
-    const response = await axios.get(`${API_URL}/api/v1/attendance`, {
+    const response = await axios.get(`${API_URL}/attendance`, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${token}`,
@@ -362,7 +362,7 @@ export const getLessonById = async (lessonId) => {
       throw new Error("Authentication token is required");
     }
 
-    const response = await axios.get(`${API_URL}/api/v1/lessons/${lessonId}`, {
+    const response = await axios.get(`${API_URL}/lessons/${lessonId}`, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${token}`,
@@ -396,7 +396,7 @@ export const recordAttendance = async (attendanceData) => {
       throw new Error('Not authenticated');
     }
     const token = getToken();
-    const response = await axios.post(`${API_URL}/api/v1/attendance`, attendanceData, {
+    const response = await axios.post(`${API_URL}/attendance`, attendanceData, {
       headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
@@ -421,7 +421,7 @@ export const createLecturer = async (lecturerData) => {
     if (!isLoggedIn()) {
       throw new Error('Not authenticated');
     }
-    const response = await axios.post(`${API_URL}/api/v1/center-lecturer/`, lecturerData, {
+    const response = await axios.post(`${API_URL}/center-lecturer/`, lecturerData, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
