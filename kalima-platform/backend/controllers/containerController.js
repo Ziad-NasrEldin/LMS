@@ -69,7 +69,7 @@ exports.getAccessibleChildContainers = catchAsync(async (req, res, next) => {
       if (!purchase) {
         throw new AppError("Purchase not found or unauthorized", 403);
       }
-      
+
       // Handle both container purchases and lecture purchases
       if (purchase.type === "containerPurchase" && purchase.container) {
         purchasedContainerId = purchase.container.toString();
@@ -114,64 +114,61 @@ exports.getAccessibleChildContainers = catchAsync(async (req, res, next) => {
     ]).session(session);
 
     if (!containerChainResult || containerChainResult.length === 0) {
+      // Try to find in Lecture model
+      const Lecture = require("../models/LectureModel");
+      const lectureDoc = await Lecture.findById(containerId).session(session);
+
+      if (lectureDoc) {
+        // If found in Lecture model, we need to build the chain from its parent
+        if (lectureDoc.parent) {
+          const parentChainResult = await Container.aggregate([
+            {
+              $match: { _id: new mongoose.Types.ObjectId(lectureDoc.parent) },
+            },
+            {
+              $graphLookup: {
+                from: "containers",
+                startWith: "$parent",
+                connectFromField: "parent",
+                connectToField: "_id",
+                as: "parentChain",
+              },
+            },
+          ]).session(session);
+
+          if (parentChainResult && parentChainResult.length > 0) {
+            const parentDoc = parentChainResult[0];
+            // Construct a container-like object for the lecture
+            const containerDoc = {
+              ...lectureDoc.toObject(),
+              kind: "Lecture", // Simulate kind for consistency
+              parentChain: [parentDoc, ...parentDoc.parentChain]
+            };
+
+            // Continue with this constructed doc
+            // We need to wrap this in a way that matches the flow
+            // But since the flow below expects containerChainResult[0] to be the doc
+            // We can just assign it to a variable and skip the error
+
+            // Let's restructure the code slightly to handle both cases
+            return handleAccessCheck(containerDoc, purchasedContainerId, studentId, session, res);
+          }
+        } else {
+          // Lecture has no parent, so it's a root item (unlikely but possible)
+          const containerDoc = {
+            ...lectureDoc.toObject(),
+            kind: "Lecture",
+            parentChain: []
+          };
+          return handleAccessCheck(containerDoc, purchasedContainerId, studentId, session, res);
+        }
+      }
+
       throw new AppError("Container not found", 404);
     }
     const containerDoc = containerChainResult[0];
+    return handleAccessCheck(containerDoc, purchasedContainerId, studentId, session, res);
 
-    // Build set of container IDs from the container upward.
-    const accessibleChainIds = new Set();
-    accessibleChainIds.add(containerDoc._id.toString());
-    containerDoc.parentChain.forEach((doc) => {
-      accessibleChainIds.add(doc._id.toString());
-    });
-
-    // Check if the purchased container is in the chain.
-    if (!accessibleChainIds.has(purchasedContainerId)) {
-      throw new AppError("You do not have access to this container", 403);
-    }
-
-    delete containerDoc.parentChain;
-    let access;
-    if (containerDoc.kind === "Lecture") {
-      access = await StudentLectureAccess.findOne({
-        student: studentId,
-        lecture: containerDoc._id,
-      }).session(session);
-
-      if (!access) {
-        const remainingViews = containerDoc.numberOfViews !== undefined && containerDoc.numberOfViews !== null 
-          ? containerDoc.numberOfViews 
-          : 3; // Default to 3 if not set
-        
-        const accessRecords = await StudentLectureAccess.create(
-          [
-            {
-              student: studentId,
-              lecture: containerDoc._id,
-              remainingViews: remainingViews,
-            },
-          ],
-          { session }
-        );
-        access = accessRecords[0];
-        if (!access) {
-          throw new AppError("Failed to grant access", 500);
-        }
-      } else {
-        if (access.remainingViews > 0) {
-          // access.remainingViews -= 1;
-          access.lastAccessed = Date.now();
-          await access.save({ session });
-        } else {
-          delete containerDoc.videoLink;
-        }
-      }
-    }
-
-    await session.commitTransaction();
-    res
-      .status(200)
-      .json({ status: "success", data: { container: containerDoc, access } });
   } catch (error) {
     await session.abortTransaction();
     return next(error);
@@ -179,6 +176,66 @@ exports.getAccessibleChildContainers = catchAsync(async (req, res, next) => {
     session.endSession();
   }
 });
+
+const handleAccessCheck = async (containerDoc, purchasedContainerId, studentId, session, res) => {
+  // Build set of container IDs from the container upward.
+  const accessibleChainIds = new Set();
+  accessibleChainIds.add(containerDoc._id.toString());
+  if (containerDoc.parentChain) {
+    containerDoc.parentChain.forEach((doc) => {
+      accessibleChainIds.add(doc._id.toString());
+    });
+  }
+
+  // Check if the purchased container is in the chain.
+  if (!accessibleChainIds.has(purchasedContainerId)) {
+    throw new AppError("You do not have access to this container", 403);
+  }
+
+  delete containerDoc.parentChain;
+  let access;
+  // Check if it's a lecture (either from Lecture model or Container model with kind='Lecture')
+  if (containerDoc.kind === "Lecture" || containerDoc.type === "lecture") {
+    access = await StudentLectureAccess.findOne({
+      student: studentId,
+      lecture: containerDoc._id,
+    }).session(session);
+
+    if (!access) {
+      const remainingViews = containerDoc.numberOfViews !== undefined && containerDoc.numberOfViews !== null
+        ? containerDoc.numberOfViews
+        : 3; // Default to 3 if not set
+
+      const accessRecords = await StudentLectureAccess.create(
+        [
+          {
+            student: studentId,
+            lecture: containerDoc._id,
+            remainingViews: remainingViews,
+          },
+        ],
+        { session }
+      );
+      access = accessRecords[0];
+      if (!access) {
+        throw new AppError("Failed to grant access", 500);
+      }
+    } else {
+      if (access.remainingViews > 0) {
+        // access.remainingViews -= 1;
+        access.lastAccessed = Date.now();
+        await access.save({ session });
+      } else {
+        delete containerDoc.videoLink;
+      }
+    }
+  }
+
+  await session.commitTransaction();
+  res
+    .status(200)
+    .json({ status: "success", data: { container: containerDoc, access } });
+};
 
 exports.getAllContainerPurchaseCounts = catchAsync(async (req, res, next) => {
   // Aggregate purchase counts for all containers
@@ -474,6 +531,37 @@ exports.getContainerById = catchAsync(async (req, res, next) => {
   ]);
 
   if (!container) {
+    // Try to find in Lecture model
+    const Lecture = require("../models/LectureModel");
+    const lecture = await Lecture.findById(containerId).populate([
+      { path: "createdBy", select: "name" },
+      { path: "subject", select: "name" },
+      { path: "level", select: "name" },
+    ]);
+
+    if (lecture) {
+      // Role-specific logic for authenticated users
+      if (req.user && req.user.role?.toLowerCase() === "teacher") {
+        if (!lecture.teacherAllowed) {
+          return res.status(200).json({
+            status: "restricted",
+            data: {
+              id: lecture._id,
+              name: lecture.name,
+              owner: lecture.createdBy.name || lecture.createdBy._id,
+              subject: lecture.subject?.name || lecture.subject?._id,
+              type: lecture.type,
+            },
+          });
+        }
+      }
+
+      return res.status(200).json({
+        status: "success",
+        data: lecture,
+      });
+    }
+
     return next(new AppError("Container not found.", 404));
   }
 
@@ -1055,9 +1143,9 @@ exports.getLecturerRevenueByMonth = catchAsync(async (req, res, next) => {
     data: {
       lecturer: lecturer
         ? {
-            id: lecturer._id,
-            name: lecturer.name,
-          }
+          id: lecturer._id,
+          name: lecturer.name,
+        }
         : "Unknown lecturer",
       monthlyRevenue,
       summary: {
