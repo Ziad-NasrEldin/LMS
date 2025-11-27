@@ -103,8 +103,8 @@ exports.createLecture = catchAsync(async (req, res, next) => {
       const parsedRequiresExam = requiresExam !== undefined ? parseBoolean(requiresExam) : false
       const parsedRequiresHomework = requiresHomework !== undefined ? parseBoolean(requiresHomework) : false
       const parsedTeacherAllowed = teacherAllowed !== undefined ? parseBoolean(teacherAllowed) : true
-      const parsedNumberOfViews = numberOfViews !== undefined && numberOfViews !== null && numberOfViews !== "" 
-        ? Number(numberOfViews) 
+      const parsedNumberOfViews = numberOfViews !== undefined && numberOfViews !== null && numberOfViews !== ""
+        ? Number(numberOfViews)
         : 0
 
       console.log("[v0] Parsed requiresExam:", parsedRequiresExam)
@@ -319,7 +319,16 @@ exports.createLecture = catchAsync(async (req, res, next) => {
 // Get Lecture by ID
 exports.getLectureById = catchAsync(async (req, res, next) => {
   const Role = req.user.role?.toLowerCase()
-  const container = await Lecture.findById(req.params.lectureId).populate([{ path: "createdBy", select: "name" }])
+  let container = await Lecture.findById(req.params.lectureId).populate([{ path: "createdBy", select: "name" }])
+
+  if (!container) {
+    // Check in Container model for backward compatibility
+    container = await Container.findOne({ _id: req.params.lectureId, type: "lecture" }).populate([
+      { path: "createdBy", select: "name" },
+      { path: "subject", select: "name" },
+      { path: "level", select: "name" },
+    ]);
+  }
 
   if (!container) return next(new AppError("Lecture not found", 404))
 
@@ -364,17 +373,31 @@ exports.getAllLecturesPublic = catchAsync(async (req, res, next) => {
 
   const features = new QueryFeatures(query, req.query).filter().sort().paginate()
 
-  const containers = await features.query.lean()
+  const lectures = await features.query.lean()
 
-  if (!containers || containers.length === 0) {
+  // Also fetch from Container model
+  let containerQuery = Container.find({ type: "lecture" });
+  containerQuery = containerQuery.populate([
+    { path: "createdBy", select: "name" },
+    { path: "subject", select: "name" },
+    { path: "level", select: "name" },
+  ]);
+  containerQuery = containerQuery.select("name type subject level createdBy price description teacherAllowed image");
+
+  const containerFeatures = new QueryFeatures(containerQuery, req.query).filter().sort().paginate();
+  const containerLectures = await containerFeatures.query.lean();
+
+  const allLectures = [...lectures, ...containerLectures];
+
+  if (!allLectures || allLectures.length === 0) {
     return next(new AppError("Lectures not found", 404))
   }
 
   res.status(200).json({
     status: "success",
-    results: containers.length,
+    results: allLectures.length,
     data: {
-      containers,
+      containers: allLectures,
     },
   })
 })
@@ -393,9 +416,21 @@ exports.getAllLectures = catchAsync(async (req, res, next) => {
 
   const features = new QueryFeatures(query, req.query).filter().sort().paginate()
 
-  const containers = await features.query.lean()
+  const lectures = await features.query.lean()
 
-  if (!containers || containers.length === 0) {
+  // Also fetch from Container model
+  const containerQuery = Container.find({ type: "lecture" }).populate([
+    { path: "createdBy", select: "name" },
+    { path: "subject", select: "name" },
+    { path: "level", select: "name" },
+  ]);
+
+  const containerFeatures = new QueryFeatures(containerQuery, req.query).filter().sort().paginate();
+  const containerLectures = await containerFeatures.query.lean();
+
+  const allLectures = [...lectures, ...containerLectures];
+
+  if (!allLectures || allLectures.length === 0) {
     // Check length for lean() results
     return next(new AppError("Lectures not found", 404))
   }
@@ -405,9 +440,9 @@ exports.getAllLectures = catchAsync(async (req, res, next) => {
 
   res.status(200).json({
     status: "success",
-    results: containers.length,
+    results: allLectures.length,
     data: {
-      containers,
+      containers: allLectures,
     },
   })
 })
@@ -419,19 +454,30 @@ exports.getLecturerLectures = catchAsync(async (req, res, next) => {
     return next(new AppError("Lecturer ID is required", 400))
   }
 
-  const containers = await Lecture.find({
+  const lectures = await Lecture.find({
     createdBy: lecturerId,
   }).populate([
     { path: "createdBy", select: "name" },
     { path: "subject", select: "name" },
     { path: "level", select: "name" },
-  ])
+  ]).lean();
+
+  const containerLectures = await Container.find({
+    createdBy: lecturerId,
+    type: "lecture"
+  }).populate([
+    { path: "createdBy", select: "name" },
+    { path: "subject", select: "name" },
+    { path: "level", select: "name" },
+  ]).lean();
+
+  const allLectures = [...lectures, ...containerLectures];
 
   res.status(200).json({
     status: "success",
-    results: containers.length,
+    results: allLectures.length,
     data: {
-      containers,
+      containers: allLectures,
     },
   })
 })
@@ -834,7 +880,7 @@ exports.deleteLectureThumbnail = catchAsync(async (req, res, next) => {
 exports.checkStudentLectureAccess = catchAsync(async (req, res, next) => {
   const session = await mongoose.startSession();
   session.startTransaction();
-  
+
   try {
     const { studentId, lectureId, purchaseId } = req.params;
 
@@ -851,19 +897,19 @@ exports.checkStudentLectureAccess = catchAsync(async (req, res, next) => {
     const purchase = await Purchase.findById(purchaseId)
       .select("lecture type student")
       .session(session);
-      
+
     if (!purchase) {
       throw new AppError("Purchase not found", 403);
     }
-    
+
     if (purchase.type !== "lecturePurchase") {
       throw new AppError("Invalid purchase type for lecture access", 403);
     }
-    
+
     if (purchase.lecture.toString() !== lectureId) {
       throw new AppError("Purchase does not match the requested lecture", 403);
     }
-    
+
     if (purchase.student.toString() !== studentId) {
       throw new AppError("Purchase does not belong to this student", 403);
     }
@@ -886,15 +932,15 @@ exports.checkStudentLectureAccess = catchAsync(async (req, res, next) => {
           {
             student: studentId,
             lecture: lectureId,
-            remainingViews: lecture.numberOfViews !== undefined && lecture.numberOfViews !== null 
-              ? lecture.numberOfViews 
+            remainingViews: lecture.numberOfViews !== undefined && lecture.numberOfViews !== null
+              ? lecture.numberOfViews
               : 3, // Only default to 3 if numberOfViews is not set
           },
         ],
         { session }
       );
       access = accessRecords[0];
-      
+
       if (!access) {
         throw new AppError("Failed to grant access", 500);
       }

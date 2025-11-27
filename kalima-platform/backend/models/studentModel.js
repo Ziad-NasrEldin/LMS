@@ -42,7 +42,6 @@ const studentSchema = new mongoose.Schema(
     level: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Level",
-      required: true,
     },
     hobbies: {
       required: false,
@@ -50,7 +49,7 @@ const studentSchema = new mongoose.Schema(
     },
     parentPhoneNumber: String,
     faction: String,
-    phoneNumber: { type: String, required: true },
+    phoneNumber: { type: String },
     school: { type: mongoose.Schema.Types.ObjectId, ref: "School" },
     parent: { type: mongoose.Schema.Types.ObjectId, ref: "Parent" },
     // Array of lecturer-specific point balances
@@ -79,8 +78,8 @@ const studentSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-    government: { type: String, required: true },
-    administrationZone: { type: String, required: true },
+    government: { type: String },
+    administrationZone: { type: String },
     userSerial: {
       type: String,
       unique: true,

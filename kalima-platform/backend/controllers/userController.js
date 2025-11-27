@@ -520,7 +520,15 @@ const getMyData = catchAsync(async (req, res, next) => {
         .populate("subject", "name")
         .populate("level", "name")
         .lean();
-      responseData.lectures = lectures;
+
+      // Also fetch lectures from Container model
+      const containerLectures = await Container.find({ createdBy: userId, type: "lecture" })
+        .select("name type price subject level createdAt teacherAllowed image")
+        .populate("subject", "name")
+        .populate("level", "name")
+        .lean();
+
+      responseData.lectures = [...lectures, ...containerLectures];
 
       // Only fetch point purchases if no specific fields were requested or if pointPurchases field was included
       if (!fields || fields.includes("pointPurchases")) {
@@ -651,7 +659,14 @@ const getMyData = catchAsync(async (req, res, next) => {
           .select("name description videoLink numberOfViews requiresExam requiresHomework lecture_type")
           .lean();
 
-        responseData.lectures = lectures;
+        // Also fetch from Container model
+        const containerLectures = await Container.find({ createdBy: assistant.assignedLecturer._id, type: "lecture" })
+          .populate("subject", "name")
+          .populate("level", "name")
+          .select("name description videoLink numberOfViews type")
+          .lean();
+
+        responseData.lectures = [...lectures, ...containerLectures];
       }
 
       if (!fields || fields.includes("attachments")) {
@@ -844,29 +859,42 @@ const getStudentParentAdditionalData = async (
       ])
       .lean();
 
-    // For students, attach lecture info for purchases of lectures (from LectureModel)
-    if (responseData.userInfo && responseData.userInfo.role === "Student") {
-      // If lecture is not populated, but container is type lecture, try to populate lecture
-      const lectureIdsToPopulate = purchaseHistory
-        .filter(p => !p.lecture && p.container && p.container.type === "lecture")
-        .map(p => p.container?._id)
-        .filter(Boolean);
-      let lecturesMap = {};
-      if (lectureIdsToPopulate.length > 0) {
-        const lectures = await Lecture.find({ _id: { $in: lectureIdsToPopulate } });
-        lecturesMap = lectures.reduce((acc, lec) => { acc[lec._id.toString()] = lec; return acc; }, {});
-      }
-      responseData.purchaseHistory = purchaseHistory
-        .map(p => {
-          if (p.lecture) return { ...p, lecture: p.lecture };
-          if (p.container && p.container.type === "lecture" && lecturesMap[p.container._id?.toString()]) {
-            return { ...p, lecture: lecturesMap[p.container._id.toString()] };
-          }
-          return p;
-        });
-    } else {
-      responseData.purchaseHistory = purchaseHistory;
+    // Enhance purchase history with lecture data from the new LectureModel
+    // This handles cases where:
+    // 1. User purchased a lecture directly (lecture field is populated)
+    // 2. User purchased a container of type "lecture" (need to fetch from LectureModel)
+    const lectureIdsToPopulate = purchaseHistory
+      .filter(p => !p.lecture && p.container && p.container.type === "lecture")
+      .map(p => p.container?._id)
+      .filter(Boolean);
+
+    let lecturesMap = {};
+    if (lectureIdsToPopulate.length > 0) {
+      const lectures = await Lecture.find({ _id: { $in: lectureIdsToPopulate } })
+        .populate("subject", "name")
+        .populate("level", "name")
+        .lean();
+      lecturesMap = lectures.reduce((acc, lec) => {
+        acc[lec._id.toString()] = lec;
+        return acc;
+      }, {});
     }
+
+    // Map purchase history to include lecture data from LectureModel when applicable
+    responseData.purchaseHistory = purchaseHistory.map(p => {
+      // If lecture field is already populated, use it
+      if (p.lecture) return p;
+
+      // If container is of type lecture, try to get lecture data from LectureModel
+      if (p.container && p.container.type === "lecture") {
+        const lectureData = lecturesMap[p.container._id?.toString()];
+        if (lectureData) {
+          return { ...p, lecture: lectureData };
+        }
+      }
+
+      return p;
+    });
 
     // Get total count of purchases for pagination info
     const totalPurchases = await Purchase.countDocuments({ student: userId });
@@ -950,8 +978,6 @@ const getStudentParentAdditionalData = async (
       })
       .lean();
 
-    responseData.lectureAccess = lectureAccess;
-
     // Get total count of lecture access entries for pagination info
     const totalLectureAccess = await StudentLectureAccess.countDocuments({
       student: userId,
@@ -980,21 +1006,30 @@ const getStudentParentAdditionalData = async (
     // If we have purchase history, use it to determine purchased features
     if (responseData.purchaseHistory) {
       responseData.purchaseHistory.forEach((purchase) => {
-        if (purchase.container && purchase.container.type === "lecture") {
+        // Check for direct lecture purchases or container-based lecture purchases
+        if (purchase.lecture || (purchase.container && purchase.container.type === "lecture")) {
           purchasedLectureTypes.add("lecture");
         }
       });
     }
     // Otherwise we need to query just to determine feature flags
     else {
-      const purchaseTypes = await Purchase.find({
+      // Check for both direct lecture purchases and container-based lecture purchases
+      const directLecturePurchases = await Purchase.find({
+        student: userId,
+        lecture: { $exists: true, $ne: null },
+      })
+        .limit(1)
+        .lean();
+
+      const containerLecturePurchases = await Purchase.find({
         student: userId,
         "container.type": "lecture",
       })
         .limit(1)
         .lean();
 
-      if (purchaseTypes.length > 0) {
+      if (directLecturePurchases.length > 0 || containerLecturePurchases.length > 0) {
         purchasedLectureTypes.add("lecture");
       }
     }
@@ -1044,7 +1079,7 @@ const getParentChildrenData = catchAsync(async (req, res, next) => {
   // For each child, get additional data like purchase history
   const childrenWithData = await Promise.all(
     children.map(async (child) => {
-      // Get purchase history
+      // Get purchase history with both container and lecture data
       const purchaseHistory = await Purchase.find({ student: child._id })
         .populate({
           path: "container",
@@ -1054,8 +1089,44 @@ const getParentChildrenData = catchAsync(async (req, res, next) => {
             { path: "level", select: "name" }
           ]
         })
+        .populate({
+          path: "lecture",
+          select: "name price subject level videoLink lecture_type requiresExam examConfig createdBy thumbnail",
+          populate: [
+            { path: "subject", select: "name" },
+            { path: "level", select: "name" }
+          ]
+        })
         .sort({ createdAt: -1 })
         .lean();
+
+      // For containers of type "lecture", also fetch from LectureModel for backward compatibility
+      const lectureIdsToPopulate = purchaseHistory
+        .filter(p => !p.lecture && p.container && p.container.type === "lecture")
+        .map(p => p.container?._id)
+        .filter(Boolean);
+
+      if (lectureIdsToPopulate.length > 0) {
+        const lectures = await Lecture.find({ _id: { $in: lectureIdsToPopulate } })
+          .populate("subject", "name")
+          .populate("level", "name")
+          .lean();
+
+        const lecturesMap = lectures.reduce((acc, lec) => {
+          acc[lec._id.toString()] = lec;
+          return acc;
+        }, {});
+
+        // Enhance purchase history with lecture data from LectureModel
+        purchaseHistory.forEach((p, index) => {
+          if (!p.lecture && p.container && p.container.type === "lecture") {
+            const lectureData = lecturesMap[p.container._id?.toString()];
+            if (lectureData) {
+              purchaseHistory[index] = { ...p, lecture: lectureData };
+            }
+          }
+        });
+      }
 
       // Get lecture access
       const lectureAccess = await StudentLectureAccess.find({ student: child._id })

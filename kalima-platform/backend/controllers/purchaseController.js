@@ -104,11 +104,11 @@ exports.purchaseLecturerPoints = catchAsync(async (req, res, next) => {
     currentUser.totalPoints -= lecturePrice;
 
     await studentLectureAccess.create(
-      [{ 
-        student: req.user._id, 
+      [{
+        student: req.user._id,
         lecture: lecture._id,
-        remainingViews: lecture.numberOfViews !== undefined && lecture.numberOfViews !== null 
-          ? lecture.numberOfViews 
+        remainingViews: lecture.numberOfViews !== undefined && lecture.numberOfViews !== null
+          ? lecture.numberOfViews
           : 3 // Only default to 3 if numberOfViews is not set
       }],
       { session }
@@ -372,21 +372,21 @@ exports.purchaseContainerWithPoints = catchAsync(async (req, res, next) => {
     const purchase = await Purchase.create([
       isLecture
         ? {
-            student: userId,
-            lecturer: lecturerId,
-            points: isPromoCodePurchase ? 0 : pointsRequired,
-            lecture: containerId,
-            type: isPromoCodePurchase ? "promoCodePurchase" : "lecturePurchase",
-            description: `Purchased lecture ${item.name} ${isPromoCodePurchase ? "using promotional code" : `for ${pointsRequired} points using ${purchaseType}`}`,
-          }
+          student: userId,
+          lecturer: lecturerId,
+          points: isPromoCodePurchase ? 0 : pointsRequired,
+          lecture: containerId,
+          type: isPromoCodePurchase ? "promoCodePurchase" : "lecturePurchase",
+          description: `Purchased lecture ${item.name} ${isPromoCodePurchase ? "using promotional code" : `for ${pointsRequired} points using ${purchaseType}`}`,
+        }
         : {
-            student: userId,
-            lecturer: lecturerId,
-            points: isPromoCodePurchase ? 0 : pointsRequired,
-            container: containerId,
-            type: isPromoCodePurchase ? "promoCodePurchase" : "containerPurchase",
-            description: `Purchased container ${item.name} ${isPromoCodePurchase ? "using promotional code" : `for ${pointsRequired} points using ${purchaseType}`}`,
-          },
+          student: userId,
+          lecturer: lecturerId,
+          points: isPromoCodePurchase ? 0 : pointsRequired,
+          container: containerId,
+          type: isPromoCodePurchase ? "promoCodePurchase" : "containerPurchase",
+          description: `Purchased container ${item.name} ${isPromoCodePurchase ? "using promotional code" : `for ${pointsRequired} points using ${purchaseType}`}`,
+        },
     ], { session });
     // Grant access if it's a lecture
     let lectureInfo = null;
@@ -395,8 +395,8 @@ exports.purchaseContainerWithPoints = catchAsync(async (req, res, next) => {
         {
           student: userId,
           lecture: containerId,
-          remainingViews: item.numberOfViews !== undefined && item.numberOfViews !== null 
-            ? item.numberOfViews 
+          remainingViews: item.numberOfViews !== undefined && item.numberOfViews !== null
+            ? item.numberOfViews
             : 3, // Only default to 3 if numberOfViews is not set
         },
       ], { session });
@@ -435,7 +435,7 @@ exports.getAllPurchases = catchAsync(async (req, res, next) => {
     .sort()
     .paginate();
   query = features.query;
-  const purchases = await query.populate(["container", "lecturer", "student"]);
+  const purchases = await query.populate(["container", "lecture", "lecturer", "student"]);
 
   res.status(200).json({
     status: "success",
@@ -527,7 +527,7 @@ exports.getLecturerPointsBalance = catchAsync(async (req, res, next) => {
     lecturer: lecturerId,
   })
     .sort({ purchasedAt: -1 })
-    .populate("container");
+    .populate(["container", "lecture"]);
 
   res.status(200).json({
     status: "success",
@@ -651,7 +651,7 @@ exports.getPurchasesByUser = catchAsync(async (req, res, next) => {
   const purchases = await Purchase.find({
     student: userId,
   })
-    .populate(["container", "lecturer"])
+    .populate(["container", "lecture", "lecturer"])
     .sort({ purchasedAt: -1 });
 
   res.status(200).json({
@@ -671,6 +671,7 @@ exports.getPurchaseById = catchAsync(async (req, res, next) => {
 
   const purchase = await Purchase.findById(id).populate([
     "container",
+    "lecture",
     "lecturer",
     "student",
   ]);
