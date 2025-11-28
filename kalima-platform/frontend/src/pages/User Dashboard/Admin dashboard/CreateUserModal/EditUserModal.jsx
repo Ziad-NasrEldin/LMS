@@ -59,6 +59,9 @@ const EditUserModal = ({ isOpen, onClose, user, onUserUpdated }) => {
     updateData.role = formData.role
 
     try {
+      if (!user?._id) {
+        throw new Error("User ID is missing")
+      }
       const result = await updateUser(user._id, updateData)
 
       if (result.success) {
@@ -93,10 +96,10 @@ const EditUserModal = ({ isOpen, onClose, user, onUserUpdated }) => {
 
         <form onSubmit={handleSubmit}>
           <div className="form-control mb-4">
-         <label className="label flex flex-col items-start">
-        <span className="label-text mb-1">
-          {t("admin.editUser.name")}</span>
-            </label>  
+            <label className="label flex flex-col items-start">
+              <span className="label-text mb-1">
+                {t("admin.editUser.name")}</span>
+            </label>
             <input
               type="text"
               name="name"
@@ -108,8 +111,8 @@ const EditUserModal = ({ isOpen, onClose, user, onUserUpdated }) => {
           </div>
 
           <div className="form-control mb-4">
-          <label className="label flex flex-col items-start">
-        <span className="label-text mb-1">{t("admin.editUser.email")}</span>
+            <label className="label flex flex-col items-start">
+              <span className="label-text mb-1">{t("admin.editUser.email")}</span>
             </label>
             <input
               type="email"
@@ -122,8 +125,8 @@ const EditUserModal = ({ isOpen, onClose, user, onUserUpdated }) => {
           </div>
 
           <div className="form-control mb-4">
-             <label className="label flex flex-col items-start">
-        <span className="label-text mb-1">{t("admin.editUser.phone")}</span>
+            <label className="label flex flex-col items-start">
+              <span className="label-text mb-1">{t("admin.editUser.phone")}</span>
             </label>
             <input
               type="text"
@@ -137,7 +140,7 @@ const EditUserModal = ({ isOpen, onClose, user, onUserUpdated }) => {
 
           <div className="form-control mb-6">
             <label className="label flex flex-col items-start">
-        <span className="label-text mb-1">{t("admin.editUser.password")}</span>
+              <span className="label-text mb-1">{t("admin.editUser.password")}</span>
             </label>
             <div className="relative">
               <input

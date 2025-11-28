@@ -52,7 +52,7 @@ const AuditLog = () => {
         const response = await getAuditLogs(params.page, params.limit, params)
 
         if (response.status === "success") {
-          setLogs(response.data.logs || [])
+          setLogs(response.data?.logs || [])
           setError(null)
         } else {
           setError(response.error)
@@ -76,7 +76,7 @@ const AuditLog = () => {
       const response = await getAuditLogsByEmail(filters.email.trim())
 
       if (response.status === "success") {
-        setLogs(response.data.logs || [])
+        setLogs(response.data?.logs || [])
         setPage(1)
         setError(null)
       } else {
@@ -99,7 +99,7 @@ const AuditLog = () => {
       const params = { ...Object.fromEntries(Object.entries(filters).filter(([, v]) => v !== "")) }
       const response = await getAuditLogs(1, 10000, params) // Large limit to get all logs
       if (response.status === "success") {
-        return response.data.logs || []
+        return response.data?.logs || []
       }
       return []
     } catch (e) {
@@ -118,7 +118,7 @@ const AuditLog = () => {
     const fetch = async () => {
       const params = { page, limit, ...Object.fromEntries(Object.entries(filters).filter(([, v]) => v)) }
       const res = await getAuditLogs(page, limit, params)
-      if (res.status === "success") setLogs(res.data.logs)
+      if (res.status === "success") setLogs(res.data?.logs || [])
     }
     fetch()
   }, [page, filters, limit])

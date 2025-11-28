@@ -59,7 +59,7 @@ const UserManagementTable = () => {
         const result = await getUserDashboard()
         if (result.success && result.data?.data?.userInfo) {
           // Case-insensitive comparison for "admin" role
-          const userRole = result.data.data.userInfo.role
+          const userRole = result.data?.data?.userInfo?.role || ""
           setIsAdmin(userRole.toLowerCase() === "admin")
           setIsSubAdmin(userRole.toLowerCase() === "subadmin")
         }
@@ -133,9 +133,9 @@ const UserManagementTable = () => {
   const applyFilters = () => {
     const filtered = users.filter(
       (user) =>
-        (!filters.name || user.name.toLowerCase().includes(filters.name.toLowerCase())) &&
-        (!filters.phone || user.phoneNumber?.includes(filters.phone)) &&
-        (!filters.role || user.role.toLowerCase() === filters.role.toLowerCase()) &&
+        (!filters.name || (user.name && user.name.toLowerCase().includes(filters.name.toLowerCase()))) &&
+        (!filters.phone || (user.phoneNumber && user.phoneNumber.includes(filters.phone))) &&
+        (!filters.role || (user.role && user.role.toLowerCase() === filters.role.toLowerCase())) &&
         (!filters.status || getStatus(user) === filters.status) &&
         (filters.successfulInvites === "" ||
           (user.successfulInvites || 0) === Number.parseInt(filters.successfulInvites, 10)),
@@ -143,7 +143,7 @@ const UserManagementTable = () => {
     setFilteredUsers(filtered)
   }
 
-  const getRoleLabel = (role) => t(`admin.roles.${role.toLowerCase()}`)
+  const getRoleLabel = (role) => role ? t(`admin.roles.${role.toLowerCase()}`) : t("admin.NA")
 
   const getStatus = (user) => {
     if (!user.phoneNumber) return t("admin.status.missingData")
@@ -251,7 +251,7 @@ const UserManagementTable = () => {
           `"${user.name || ""}"`,
           `"${user.email || ""}"`,
           `"${user.phoneNumber || ""}"`,
-          `"${getRoleLabel(user.role)}"`,
+          `"${getRoleLabel(user.role || "")}"`,
           `"${getStatus(user)}"`,
           `"${user.government || ""}"`,
           `"${user.administrationZone || ""}"`,
@@ -418,7 +418,8 @@ const UserManagementTable = () => {
     )
 
     const roleSpecificFields = () => {
-      switch (user.role.toLowerCase()) {
+      const role = user.role ? user.role.toLowerCase() : "";
+      switch (role) {
         case "student":
           return (
             <div className="border-t pt-4">
@@ -842,7 +843,7 @@ const UserManagementTable = () => {
           <tbody>
             {currentUsers.map((user) => (
               <tr key={user._id} className={`${isRTL ? "text-right" : "text-left"} border-t`}>
-                <td className="py-4 whitespace-nowrap">{user.name}</td>
+                <td className="py-4 whitespace-nowrap">{user.name || t("admin.NA")}</td>
                 <td className="py-4 whitespace-nowrap">{user.phoneNumber || t("admin.NA")}</td>
                 <td className="py-4 whitespace-nowrap">{getRoleLabel(user.role)}</td>
                 <td className="py-4 whitespace-nowrap">{getStatus(user)}</td>
@@ -909,7 +910,7 @@ const UserManagementTable = () => {
             <p className="text-sm opacity-70 max-w-md">
               {filters.name || filters.phone || filters.role || filters.status
                 ? t("admin.noUsersFiltered") ||
-                  "No users match your current filters. Try adjusting your search criteria."
+                "No users match your current filters. Try adjusting your search criteria."
                 : t("admin.noUsersYet") || "No users have registered yet. Check back later."}
             </p>
           </div>
