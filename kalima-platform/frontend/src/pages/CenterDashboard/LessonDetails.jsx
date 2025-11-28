@@ -41,7 +41,7 @@ export default function LessonDetailsSection() {
       try {
         const response = await getCenterDataByType(lesson.center?._id, "students")
         if (response.status === "success") {
-          setStudents(response.data)
+          setStudents(response.data || [])
         } else {
           throw new Error(response.message || t("errors.fetchStudents", "Failed to fetch students"))
         }
@@ -193,7 +193,7 @@ export default function LessonDetailsSection() {
         <div className="flex flex-wrap gap-4 text-sm">
           {lesson.center && (
             <div className="badge badge-outline p-3">
-              {lesson.center.name || t("lesson.centerUnknown", "Unknown Center")}
+              {lesson.center?.name || t("lesson.centerUnknown", "Unknown Center")}
             </div>
           )}
           {lesson.date && (
@@ -214,9 +214,8 @@ export default function LessonDetailsSection() {
       {/* Display attendance result if available */}
       {attendanceResult && (
         <div
-          className={`alert ${
-            attendanceResult.success ? "alert-success" : "alert-error"
-          } shadow-lg transition-all duration-300 ease-in-out`}
+          className={`alert ${attendanceResult.success ? "alert-success" : "alert-error"
+            } shadow-lg transition-all duration-300 ease-in-out`}
         >
           <div className="flex items-center">
             {attendanceResult.success ? (
@@ -421,8 +420,8 @@ export default function LessonDetailsSection() {
                     </tr>
                   </thead>
                   <tbody>
-                    {students.length > 0 ? (
-                      students.slice(0, 5).map((student) => (
+                    {students?.length > 0 ? (
+                      students?.slice(0, 5).map((student) => (
                         <tr key={student._id}>
                           <td className="font-mono text-sm">{student.sequencedId || student._id}</td>
                           <td>{student.name}</td>
@@ -442,7 +441,7 @@ export default function LessonDetailsSection() {
                     )}
                   </tbody>
                 </table>
-                {students.length > 5 && (
+                {students?.length > 5 && (
                   <div className="text-center text-sm text-base-content/60 mt-2">
                     {t("attendance.moreStudents", "Showing 5 of {{count}} students", { count: students.length })}
                   </div>

@@ -43,9 +43,9 @@ const CenterDashboard = () => {
         setLoading(prev => ({ ...prev, centers: true }));
         const response = await getAllCenters();
         if (response.status === "success") {
-          setCenters(response.data.data.centers);
-          if (response.data.data.centers.length > 0) {
-            setSelectedCenter(response.data.data.centers[0]);
+          setCenters(response.data?.data?.centers || []);
+          if (response.data?.data?.centers?.length > 0) {
+            setSelectedCenter(response.data?.data?.centers?.[0]);
           }
           setError(prev => ({ ...prev, centers: null }));
         } else {
@@ -80,7 +80,7 @@ const CenterDashboard = () => {
       try {
         const lecturersResponse = await getCenterDataByType(selectedCenter._id, "lecturers");
         if (lecturersResponse.status === "success") {
-          setLecturers(lecturersResponse.data);
+          setLecturers(lecturersResponse.data || []);
           setError(prev => ({ ...prev, lecturers: null }));
         } else {
           throw new Error(lecturersResponse.message || t('errors.fetchLecturersFailed'));
@@ -97,7 +97,7 @@ const CenterDashboard = () => {
       try {
         const studentsResponse = await getCenterDataByType(selectedCenter._id, "students");
         if (studentsResponse.status === "success") {
-          setStudents(studentsResponse.data);
+          setStudents(studentsResponse.data || []);
           setError(prev => ({ ...prev, students: null }));
         } else {
           throw new Error(studentsResponse.message || t('errors.fetchStudentsFailed'));
@@ -114,7 +114,7 @@ const CenterDashboard = () => {
       try {
         const lessonsResponse = await getCenterDataByType(selectedCenter._id, "lessons");
         if (lessonsResponse.status === "success") {
-          setLessons(lessonsResponse.data);
+          setLessons(lessonsResponse.data || []);
           setError(prev => ({ ...prev, lessons: null }));
         } else {
           throw new Error(lessonsResponse.message || t('errors.fetchLessonsFailed'));
@@ -147,7 +147,7 @@ const CenterDashboard = () => {
           setLoading(prev => ({ ...prev, lessons: true }));
           const lessonsResponse = await getCenterDataByType(selectedCenter._id, "lessons");
           if (lessonsResponse.status === "success") {
-            setLessons(lessonsResponse.data);
+            setLessons(lessonsResponse.data || []);
             setError(prev => ({ ...prev, lessons: null }));
           } else {
             throw new Error(lessonsResponse.message || t('errors.fetchLessonsFailed'));
@@ -166,7 +166,7 @@ const CenterDashboard = () => {
   };
 
   // You might want to add a handler here for when a barcode is scanned by either component
- 
+
 
 
   if (loading.centers && !selectedCenter) {
@@ -206,9 +206,9 @@ const CenterDashboard = () => {
           <div className="mb-8">
             <CenterOverview
               center={selectedCenter}
-              lecturersCount={lecturers.length}
-              studentsCount={students.length}
-              lessonsCount={lessons.length}
+              lecturersCount={lecturers?.length || 0}
+              studentsCount={students?.length || 0}
+              lessonsCount={lessons?.length || 0}
               translations={{
                 title: t('centerOverview.title'),
                 lecturers: t('centerOverview.lecturers'),
@@ -218,7 +218,7 @@ const CenterDashboard = () => {
             />
           </div>
           <div className="mb-8">
-              <RevenueGenerator />
+            <RevenueGenerator />
           </div>
 
 
