@@ -36,7 +36,7 @@ const SignedLecturers = () => {
       try {
         const result = await getUserDashboard()
         if (result.success) {
-          const role = result.data.data.userInfo.role
+          const role = result.data?.data?.userInfo?.role
           setUserRole(role)
 
           if (role !== "Admin" && role !== "moderator") {
@@ -102,10 +102,10 @@ const SignedLecturers = () => {
     if (searchTerm.trim()) {
       filtered = filtered.filter(
         (lecturer) =>
-          lecturer.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          lecturer.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          lecturer.expertise?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          lecturer.phoneNumber?.includes(searchTerm),
+          (lecturer.name && lecturer.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+          (lecturer.email && lecturer.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
+          (lecturer.expertise && lecturer.expertise.toLowerCase().includes(searchTerm.toLowerCase())) ||
+          (lecturer.phoneNumber && lecturer.phoneNumber.includes(searchTerm)),
       )
     }
 
@@ -498,7 +498,7 @@ const SignedLecturers = () => {
                     <p className="text-sm opacity-70 max-w-md">
                       {searchTerm || Object.values(filters).some((f) => f)
                         ? t("lecturers.noLecturersFiltered") ||
-                          "No lecturers match your current filters. Try adjusting your search or filters."
+                        "No lecturers match your current filters. Try adjusting your search or filters."
                         : t("lecturers.noLecturersYet") || "No lecturers have signed up yet. Check back later."}
                     </p>
                     {(searchTerm || Object.values(filters).some((f) => f)) && (

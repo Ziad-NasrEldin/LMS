@@ -22,8 +22,8 @@ export default function LecturerRevenue() {
       try {
         const result = await getAllLecturers()
         if (result.success) {
-          setLecturers(result.data)
-          if (result.data.length > 0) {
+          setLecturers(result.data || [])
+          if (result.data && result.data.length > 0) {
             setSelectedLecturer(result.data[0]._id)
           }
         } else {
@@ -109,13 +109,13 @@ export default function LecturerRevenue() {
               <div>
                 <h3 className="text-2xl font-extrabold">{t("revenue.revenueSummary")}</h3>
                 <p className="text-lg font-bold mt-2">
-                  {t("revenue.totalRevenue")}: {revenueData.summary.totalRevenue} {t("revenue.currency")}
+                  {t("revenue.totalRevenue")}: {revenueData.summary?.totalRevenue || 0} {t("revenue.currency")}
                 </p>
                 <p className="text-lg font-bold">
-                  {t("revenue.totalPurchases")}: {revenueData.summary.totalPurchases}
+                  {t("revenue.totalPurchases")}: {revenueData.summary?.totalPurchases || 0}
                 </p>
                 <p className="text-lg font-bold">
-                  {t("revenue.monthsWithRevenue")}: {revenueData.summary.monthsWithRevenue}
+                  {t("revenue.monthsWithRevenue")}: {revenueData.summary?.monthsWithRevenue || 0}
                 </p>
               </div>
             </div>
@@ -123,7 +123,7 @@ export default function LecturerRevenue() {
 
           {/* Monthly Revenue Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {revenueData.monthlyRevenue.map((month) => (
+            {revenueData.monthlyRevenue?.map((month) => (
               <div
                 key={`${month.year}-${month.month}`}
                 className="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow duration-300 border border-primary"
@@ -151,7 +151,7 @@ export default function LecturerRevenue() {
         </div>
       )}
 
-      {revenueData && revenueData.monthlyRevenue.length === 0 && (
+      {revenueData && (!revenueData.monthlyRevenue || revenueData.monthlyRevenue.length === 0) && (
         <div className="text-center py-12">
           <p className="text-lg font-bold text-gray-500">{t("revenue.noRevenueData")}</p>
         </div>

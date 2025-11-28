@@ -42,7 +42,7 @@ export default function AdminCreate() {
       try {
         const result = await getUserDashboard()
         if (result.success) {
-          setUserRole(result.data.data.userInfo.role)
+          setUserRole(result.data?.data?.userInfo?.role)
         } else {
           navigate("/")
         }
