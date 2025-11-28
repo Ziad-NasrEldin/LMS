@@ -10,24 +10,24 @@ import { getToken } from "../routes/auth-services";
 const API_URL = import.meta.env.VITE_API_URL;
 export const getChildrenData = async () => {
   try {
-    const response = await axios.get(`/users/me/children`, {
+    const response = await axios.get(`${API_URL}/users/me/children`, {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${getToken()}`,
       },
     });
 
-    return { 
-      success: true, 
-      data: response.data 
+    return {
+      success: true,
+      data: response.data
     };
 
   } catch (error) {
     return {
       success: false,
-      error: error.response?.data?.message || 
-            error.message || 
-            "Failed to fetch children data"
+      error: error.response?.data?.message ||
+        error.message ||
+        "Failed to fetch children data"
     };
   }
 };

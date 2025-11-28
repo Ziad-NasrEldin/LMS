@@ -182,7 +182,7 @@ export const loginUser = async (credentials) => {
 export const requestPasswordReset = async (email) => {
   try {
     const response = await axios.post(
-      `/password-reset/request`,
+      `${API_URL}/password-reset/request`,
       { email },
       {
         headers: {
@@ -199,7 +199,7 @@ export const requestPasswordReset = async (email) => {
 export const verifyOtp = async (email, otp) => {
   try {
     const response = await axios.post(
-      `/password-reset/verify-otp`,
+      `${API_URL}/password-reset/verify-otp`,
       { email, otp },
       {
         headers: {
@@ -216,7 +216,7 @@ export const verifyOtp = async (email, otp) => {
 export const resetPassword = async (resetToken, password, confirmPassword) => {
   try {
     const response = await axios.post(
-      `/password-reset/reset`,
+      `${API_URL}/password-reset/reset`,
       { resetToken, password, confirmPassword },
       {
         headers: {
@@ -300,7 +300,7 @@ export const getUserDashboard = async ({ params = {} } = {}) => {
         })
           .then((newToken) => {
             return axios
-              .get(`/users/me/dashboard`, {
+              .get(`${API_URL}/users/me/dashboard`, {
                 headers: {
                   "Content-Type": "application/json",
                   Authorization: `Bearer ${newToken}`,
@@ -326,7 +326,7 @@ export const getUserDashboard = async ({ params = {} } = {}) => {
         if (refreshResult.success && refreshResult.data.accessToken) {
           processQueue(null, refreshResult.data.accessToken)
 
-          const response = await axios.get(`/users/me/dashboard`, {
+          const response = await axios.get(`${API_URL}/users/me/dashboard`, {
             headers: {
               "Content-Type": "application/json",
               Authorization: `Bearer ${refreshResult.data.accessToken}`,

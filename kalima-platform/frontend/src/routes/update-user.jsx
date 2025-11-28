@@ -10,7 +10,7 @@ export const updateCurrentUser = async (updateData) => {
     const isFormData = updateData instanceof FormData
 
     const response = await axios.patch(
-      `/users/me/update`,
+      `${API_URL}/users/me/update`,
       updateData,
       {
         headers: {
@@ -29,8 +29,8 @@ export const updateCurrentUser = async (updateData) => {
     return {
       success: false,
       error: error.response?.data?.message ||
-             error.message ||
-             "Failed to update user data",
+        error.message ||
+        "Failed to update user data",
     }
   }
 }
@@ -43,7 +43,7 @@ export const updateCurrentUser = async (updateData) => {
 export const updateUserPassword = async (passwordData) => {
   try {
     const response = await axios.patch(
-      `/users/update/password`,
+      `${API_URL}/users/update/password`,
       passwordData,
       {
         headers: {
@@ -53,17 +53,17 @@ export const updateUserPassword = async (passwordData) => {
       }
     );
 
-    return { 
-      success: true, 
-      data: response.data 
+    return {
+      success: true,
+      data: response.data
     };
 
   } catch (error) {
     return {
       success: false,
-      error: error.response?.data?.message || 
-            error.message || 
-            "Failed to update password"
+      error: error.response?.data?.message ||
+        error.message ||
+        "Failed to update password"
     };
   }
 };
@@ -71,7 +71,7 @@ export const updateUserPassword = async (passwordData) => {
 export const updateUser = async (userId, updateData) => {
   try {
     const response = await axios.patch(
-      `/users/${userId}`,
+      `${API_URL}/users/${userId}`,
       updateData,
       {
         headers: {
@@ -91,9 +91,9 @@ export const updateUser = async (userId, updateData) => {
     console.error("Update user error:", error)
     return {
       success: false,
-      error: error.response?.data?.message || 
-           error.message || 
-           "Failed to update user"
+      error: error.response?.data?.message ||
+        error.message ||
+        "Failed to update user"
     }
   }
 }
