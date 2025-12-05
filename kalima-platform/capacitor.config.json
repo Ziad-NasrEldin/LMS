@@ -1,6 +1,6 @@
 {
-  "appId": "com.kalimatest.mavoid",
-  "appName": "Kalima Platform",
-  "webDir": "frontend/dist", 
+  "appId": "com.fekra.mavoid",
+  "appName": "Fekra Platform",
+  "webDir": "frontend/dist",
   "bundledWebRuntime": false
 }
