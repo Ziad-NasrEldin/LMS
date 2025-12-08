@@ -42,7 +42,7 @@ export default function InstructorsList() {
         const assistantsRes = await AssistantService.getAssistantsByLecturer(myData.data.id)
 
         if (assistantsRes.success) {
-          setAssistants(assistantsRes.data)
+          setAssistants(assistantsRes.data || [])
         } else {
           throw new Error(assistantsRes.error)
         }
@@ -100,7 +100,7 @@ export default function InstructorsList() {
         // Refresh the assistant list
         const assistantsRes = await AssistantService.getAssistantsByLecturer(lecturerId)
         if (assistantsRes.success) {
-          setAssistants(assistantsRes.data)
+          setAssistants(assistantsRes.data || [])
         }
         setShowAddModal(false)
         resetForm()
@@ -141,7 +141,7 @@ export default function InstructorsList() {
         // Refresh the assistant list
         const assistantsRes = await AssistantService.getAssistantsByLecturer(lecturerId)
         if (assistantsRes.success) {
-          setAssistants(assistantsRes.data)
+          setAssistants(assistantsRes.data || [])
         }
         setShowDeleteModal(false)
       } else {
@@ -175,7 +175,7 @@ export default function InstructorsList() {
         // Refresh the assistant list
         const assistantsRes = await AssistantService.getAssistantsByLecturer(lecturerId)
         if (assistantsRes.success) {
-          setAssistants(assistantsRes.data)
+          setAssistants(assistantsRes.data || [])
         }
         setShowAddModal(false)
         setEditingAssistant(null)
@@ -239,7 +239,7 @@ export default function InstructorsList() {
         </button>
       </div>
 
-      {assistants.length === 0 ? (
+      {assistants?.length === 0 ? (
         <div className="card bg-base-100 shadow-sm">
           <div className="card-body items-center text-center py-12">
             <BookOpen className="text-primary" size={48} />
@@ -252,7 +252,7 @@ export default function InstructorsList() {
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" dir={isRTL ? "rtl" : "ltr"}>
-          {assistants.map((assistant) => (
+          {assistants?.map((assistant) => (
             <div key={assistant._id} className="card bg-base-100 shadow-sm hover:shadow-md transition-shadow">
               <div className="absolute top-2 right-2 flex gap-2">
                 <button

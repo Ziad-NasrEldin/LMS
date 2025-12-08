@@ -29,7 +29,7 @@ const LecturersList = ({ lecturers, isLoading, error, centerId }) => {
       setLoadingSubjects(true)
       const response = await getAllSubjects()
       if (response.success) {
-        setSubjects(response.data)
+        setSubjects(response.data || [])
       } else {
         setFormError(response.error)
       }
@@ -39,8 +39,8 @@ const LecturersList = ({ lecturers, isLoading, error, centerId }) => {
   }, [])
 
   // Filter lecturers based on search term
-  const filteredLecturers = lecturers.filter((lecturer) =>
-    lecturer.name.toLowerCase().includes(searchTerm.toLowerCase()),
+  const filteredLecturers = (lecturers || []).filter((lecturer) =>
+    (lecturer.name || "").toLowerCase().includes(searchTerm.toLowerCase()),
   )
 
   // Handle input changes for lecturer form
@@ -94,7 +94,7 @@ const LecturersList = ({ lecturers, isLoading, error, centerId }) => {
       const response = await createSubject({ name: newSubjectName })
       if (response.success) {
         // Assuming the createSubject returns the new subject in the same format as getAllSubjects
-        setSubjects((prev) => [...prev, response.data])
+        setSubjects((prev) => [...prev, response.data || {}])
         setNewSubjectName("")
         setFormSuccess(t("lecturersList.subjectAddedSuccess", "Subject added successfully"))
       } else {
@@ -153,9 +153,9 @@ const LecturersList = ({ lecturers, isLoading, error, centerId }) => {
         <div className="alert alert-error">
           <span>{error}</span>
         </div>
-      ) : filteredLecturers.length > 0 ? (
+      ) : filteredLecturers?.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredLecturers.map((lecturer) => (
+          {filteredLecturers?.map((lecturer) => (
             <div key={lecturer._id} className="card bg-base-200">
               <div className="card-body">
                 <h3 className="card-title">{lecturer.name}</h3>
@@ -168,8 +168,8 @@ const LecturersList = ({ lecturers, isLoading, error, centerId }) => {
                 <div className="mt-2">
                   <div className="text-sm font-medium mb-1">{t("lecturersList.subjects")}:</div>
                   <div className="flex flex-wrap gap-2">
-                    {lecturer.subjects && lecturer.subjects.length > 0 ? (
-                      lecturer.subjects.map((subjectId) => {
+                    {lecturer.subjects?.length > 0 ? (
+                      lecturer.subjects?.map((subjectId) => {
                         const subject = subjects.find((s) => s._id === subjectId)
                         return (
                           <div key={subjectId} className="badge badge-primary gap-1">
@@ -242,7 +242,7 @@ const LecturersList = ({ lecturers, isLoading, error, centerId }) => {
                   <div className="flex justify-center">
                     <div className="loading loading-spinner loading-md"></div>
                   </div>
-                ) : subjects.length > 0 ? (
+                ) : subjects?.length > 0 ? (
                   <div>
                     <div className="dropdown">
                       <label tabIndex={0} className="btn btn-bordered w-full text-left">
@@ -252,7 +252,7 @@ const LecturersList = ({ lecturers, isLoading, error, centerId }) => {
                         tabIndex={0}
                         className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-full max-h-60 overflow-y-auto"
                       >
-                        {subjects.map((subject) => (
+                        {subjects?.map((subject) => (
                           <li key={subject._id}>
                             <button type="button" onClick={() => handleSubjectSelect(subject._id)}>
                               {subject.name}
@@ -262,7 +262,7 @@ const LecturersList = ({ lecturers, isLoading, error, centerId }) => {
                       </ul>
                     </div>
                     <div className="flex flex-wrap gap-2 mt-2">
-                      {formData.subjects.map((subjectId) => {
+                      {formData.subjects?.map((subjectId) => {
                         const subject = subjects.find((s) => s._id === subjectId)
                         return (
                           <div key={subjectId} className="badge badge-primary badge-lg gap-2">

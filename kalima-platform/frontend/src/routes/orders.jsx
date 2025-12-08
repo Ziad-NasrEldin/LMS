@@ -14,7 +14,7 @@ export const getAllProductPurchases = async (queryParams = {}) => {
     if (!isLoggedIn()) {
       throw new Error("Not authenticated")
     }
-    const response = await axios.get(`/ec/purchases/`, {
+    const response = await axios.get(`${API_URL}/ec/purchases/`, {
       params: {
         limit: 6, // Fixed limit as requested
         ...queryParams,
@@ -46,7 +46,7 @@ export const confirmProductPurchase = async (purchaseId) => {
     }
 
     const response = await axios.patch(
-      `/ec/purchases/${purchaseId}/confirm`,
+      `${API_URL}/ec/purchases/${purchaseId}/confirm`,
       {},
       {
         withCredentials: true,
@@ -77,7 +77,7 @@ export const confirmBookPurchase = async (purchaseId) => {
     }
 
     const response = await axios.patch(
-      `/ec/book-purchases/${purchaseId}/confirm`,
+      `${API_URL}/ec/book-purchases/${purchaseId}/confirm`,
       {},
       {
         withCredentials: true,
@@ -106,7 +106,7 @@ export const getAllStats = async () => {
       throw new Error("Not authenticated")
     }
 
-    const response = await axios.get(`/ec/purchases/stats`, {
+    const response = await axios.get(`${API_URL}/ec/purchases/stats`, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -131,11 +131,11 @@ export const getProductStats = async (date = null) => {
       throw new Error("Not authenticated")
     }
 
-    let url = `/ec/purchases/product-purchase-stats`
+    let url = `${API_URL}/ec/purchases/product-purchase-stats`
 
     // If date is provided, use the stats endpoint with date parameter
     if (date) {
-      url = `/ec/purchases/stats?date=${date}`
+      url = `${API_URL}/ec/purchases/stats?date=${date}`
     }
 
     const response = await axios.get(url, {
@@ -157,14 +157,14 @@ export const getProductStats = async (date = null) => {
   }
 }
 
-export const updatePurchase = async(purchaseId, updateData) => {
+export const updatePurchase = async (purchaseId, updateData) => {
   try {
     if (!isLoggedIn()) {
       throw new Error("Not authenticated")
     }
 
     const response = await axios.patch(
-      `/ec/purchases/${purchaseId}`,
+      `${API_URL}/ec/purchases/${purchaseId}`,
       updateData,
       {
         withCredentials: true,

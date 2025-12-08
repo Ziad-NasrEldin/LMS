@@ -125,7 +125,7 @@ export default function CourseGrid() {
       const result = await getMyContainers()
 
       if (result.status === "success") {
-        setContainers(result.data.containers)
+        setContainers(result.data?.containers || [])
       } else {
         setError(result.message || "Failed to fetch containers")
       }
@@ -232,7 +232,7 @@ export default function CourseGrid() {
   }
 
   // Empty state
-  if (filteredContainers.length === 0) {
+  if (filteredContainers?.length === 0) {
     return (
       <div className="text-center py-12">
         <p className="text-lg text-gray-500">{t("noCourses")}</p>
@@ -255,7 +255,7 @@ export default function CourseGrid() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 lg:gap-12">
-        {paginationData.currentItems.map((container, index) => {
+        {paginationData.currentItems?.map((container, index) => {
           const stats = getContainerStats(container)
           return (
             <CourseCard

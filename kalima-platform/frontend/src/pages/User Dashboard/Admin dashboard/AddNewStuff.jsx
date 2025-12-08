@@ -42,7 +42,7 @@ export default function AdminCreate() {
       try {
         const result = await getUserDashboard()
         if (result.success) {
-          setUserRole(result.data.data.userInfo.role)
+          setUserRole(result.data?.data?.userInfo?.role)
         } else {
           navigate("/")
         }
@@ -58,7 +58,7 @@ export default function AdminCreate() {
       try {
         const response = await getAllLecturers()
         if (response.success) {
-          setLecturers(response.data)
+          setLecturers(response.data || [])
         } else {
           setError(response.error || t("errors.fetchLecturers"))
         }
@@ -71,7 +71,7 @@ export default function AdminCreate() {
       try {
         const response = await getAllSubjects()
         if (response.success) {
-          setSubjects(response.data)
+          setSubjects(response.data || [])
         } else {
           setError(response.error || t("errors.fetchSubjects"))
         }
@@ -84,7 +84,7 @@ export default function AdminCreate() {
       try {
         const response = await fetchPackages()
         if (response.success) {
-          setPackages(response.data)
+          setPackages(response.data || [])
         } else {
           setError(response.error || t("errors.fetchPackages"))
         }
@@ -97,7 +97,7 @@ export default function AdminCreate() {
       try {
         const response = await getAllLevels()
         if (response.success) {
-          setLevels(response.data)
+          setLevels(response.data || [])
         } else {
           setError(response.error || t("errors.fetchLevels"))
         }
@@ -125,7 +125,7 @@ export default function AdminCreate() {
         setSubjectData({ name: "", nameAR: "" })
         const updatedSubjects = await getAllSubjects()
         if (updatedSubjects.success) {
-          setSubjects(updatedSubjects.data)
+          setSubjects(updatedSubjects.data || [])
         }
       } else {
         setError(response.error)
@@ -157,7 +157,7 @@ export default function AdminCreate() {
         })
         const updatedPackages = await fetchPackages()
         if (updatedPackages.success) {
-          setPackages(updatedPackages.data)
+          setPackages(updatedPackages.data || [])
         }
       } else {
         setError(response.error)
@@ -179,7 +179,7 @@ export default function AdminCreate() {
         setLevelData({ name: "" })
         const updatedLevels = await getAllLevels()
         if (updatedLevels.success) {
-          setLevels(updatedLevels.data)
+          setLevels(updatedLevels.data || [])
         }
       } else {
         setError(response.error)
@@ -219,7 +219,7 @@ export default function AdminCreate() {
           setSuccess(t("success.subjectDeleted"))
           const updatedSubjects = await getAllSubjects()
           if (updatedSubjects.success) {
-            setSubjects(updatedSubjects.data)
+            setSubjects(updatedSubjects.data || [])
           }
         } else {
           setError(response.error || t("errors.deleteSubject"))
@@ -238,7 +238,7 @@ export default function AdminCreate() {
           setSuccess(t("success.packageDeleted"))
           const updatedPackages = await fetchPackages()
           if (updatedPackages.success) {
-            setPackages(updatedPackages.data)
+            setPackages(updatedPackages.data || [])
           }
         } else {
           setError(response.error || t("errors.deletePackage"))
@@ -257,7 +257,7 @@ export default function AdminCreate() {
           setSuccess(t("success.levelDeleted"))
           const updatedLevels = await getAllLevels()
           if (updatedLevels.success) {
-            setLevels(updatedLevels.data)
+            setLevels(updatedLevels.data || [])
           }
         } else {
           setError(response.error || t("errors.deleteLevel"))
@@ -358,7 +358,7 @@ export default function AdminCreate() {
           {/* Subject Table */}
           <div className="mt-6">
             <h2 className="text-2xl font-semibold mb-4">{t("forms.subject.existing")}</h2>
-            {subjects.length > 0 ? (
+            {subjects?.length > 0 ? (
               <div className="overflow-x-auto">
                 <div className="bg-base-100 shadow-md rounded-lg">
                   <div className="grid grid-cols-3 gap-4 p-4 bg-base-200 rounded-t-lg font-semibold text-sm">
@@ -366,7 +366,7 @@ export default function AdminCreate() {
                     <div>{t("common.createdOn")}</div>
                     <div>{t("common.actions")}</div>
                   </div>
-                  {subjects.map((subject) => (
+                  {subjects?.map((subject) => (
                     <div
                       key={subject._id}
                       className="grid grid-cols-3 gap-4 p-4 border-b border-base-200 hover:bg-base-200/50 transition-colors"
@@ -454,7 +454,7 @@ export default function AdminCreate() {
                     required
                   >
                     <option value="">{t("forms.package.selectLecturer")}</option>
-                    {lecturers.map((lecturer) => (
+                    {lecturers?.map((lecturer) => (
                       <option key={lecturer._id} value={lecturer._id}>
                         {lecturer.name} ({lecturer.expertise})
                       </option>
@@ -489,9 +489,9 @@ export default function AdminCreate() {
           {/* Package List */}
           <div className="mt-6">
             <h2 className="text-2xl font-semibold mb-4">{t("forms.package.existing")}</h2>
-            {packages.length > 0 ? (
+            {packages?.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {packages.map((pkg) => (
+                {packages?.map((pkg) => (
                   <div key={pkg._id} className="card bg-base-100 shadow-md p-4">
                     <div className="card-body">
                       <h3 className="card-title">{pkg.name}</h3>
@@ -507,7 +507,7 @@ export default function AdminCreate() {
                       <div className="mt-2">
                         <h4 className="text-sm font-medium">{t("forms.package.pointsDistribution")}:</h4>
                         <ul className="list-disc list-inside text-sm text-gray-600">
-                          {pkg.points.map((point, index) => (
+                          {pkg.points?.map((point, index) => (
                             <li key={index}>
                               {point.lecturer?.name}: {point.points} {t("forms.package.pointsUnit")}
                             </li>
@@ -555,7 +555,7 @@ export default function AdminCreate() {
           {/* Level Table */}
           <div className="mt-6">
             <h2 className="text-2xl font-semibold mb-4">{t("forms.level.existing")}</h2>
-            {levels.length > 0 ? (
+            {levels?.length > 0 ? (
               <div className="overflow-x-auto">
                 <div className="bg-base-100 shadow-md rounded-lg">
                   <div className="grid grid-cols-3 gap-4 p-4 bg-base-200 rounded-t-lg font-semibold text-sm">
@@ -563,7 +563,7 @@ export default function AdminCreate() {
                     <div>{t("common.createdOn")}</div>
                     <div>{t("common.actions")}</div>
                   </div>
-                  {levels.map((level) => (
+                  {levels?.map((level) => (
                     <div
                       key={level._id}
                       className="grid grid-cols-3 gap-4 p-4 border-b border-base-200 hover:bg-base-200/50 transition-colors"

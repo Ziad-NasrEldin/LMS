@@ -36,7 +36,7 @@ const SignedLecturers = () => {
       try {
         const result = await getUserDashboard()
         if (result.success) {
-          const role = result.data.data.userInfo.role
+          const role = result.data?.data?.userInfo?.role
           setUserRole(role)
 
           if (role !== "Admin" && role !== "moderator") {
@@ -65,7 +65,7 @@ const SignedLecturers = () => {
       const result = await getAllLecturers()
 
       if (result.success && Array.isArray(result.data)) {
-        const lecturers = result.data
+        const lecturers = result.data || []
         const totalPages = Math.ceil(lecturers.length / state.itemsPerPage)
 
         setState((prev) => ({
@@ -102,16 +102,16 @@ const SignedLecturers = () => {
     if (searchTerm.trim()) {
       filtered = filtered.filter(
         (lecturer) =>
-          lecturer.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          lecturer.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          lecturer.expertise?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          lecturer.phoneNumber?.includes(searchTerm),
+        ((lecturer.name || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+          (lecturer.email || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+          (lecturer.expertise || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+          (lecturer.phoneNumber || "").includes(searchTerm)),
       )
     }
 
     // Apply expertise filter
     if (filters.expertise) {
-      filtered = filtered.filter((lecturer) => lecturer.expertise?.toLowerCase() === filters.expertise.toLowerCase())
+      filtered = filtered.filter((lecturer) => (lecturer.expertise || "").toLowerCase() === filters.expertise.toLowerCase())
     }
 
     const totalPages = Math.ceil(filtered.length / state.itemsPerPage)
@@ -197,7 +197,7 @@ const SignedLecturers = () => {
 
             <div className="flex items-center gap-2">
               <div className="badge badge-primary">
-                {state.filteredLecturers.length} {t("lecturers.total") || "Total"}
+                {state.filteredLecturers?.length || 0} {t("lecturers.total") || "Total"}
               </div>
               <button onClick={fetchLecturers} className="btn btn-outline btn-sm" disabled={state.isLoading}>
                 {state.isLoading ? (
@@ -264,7 +264,7 @@ const SignedLecturers = () => {
                 onChange={(e) => setFilters((prev) => ({ ...prev, expertise: e.target.value }))}
               >
                 <option value="">{t("filters.allExpertise") || "All Expertise"}</option>
-                {uniqueExpertise.map((expertise) => (
+                {uniqueExpertise?.map((expertise) => (
                   <option key={expertise} value={expertise}>
                     {expertise}
                   </option>
@@ -334,7 +334,7 @@ const SignedLecturers = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {paginatedLecturers.map((lecturer, index) => (
+                    {paginatedLecturers?.map((lecturer, index) => (
                       <tr
                         key={lecturer._id}
                         className={`hover:bg-base-200 ${index % 2 === 0 ? "bg-base-100" : "bg-base-100/50"}`}
@@ -344,7 +344,7 @@ const SignedLecturers = () => {
                             <div className="avatar avatar-placeholder">
                               <div className="bg-primary/10 text-primary rounded-full w-10">
                                 <span className="text-sm font-medium">
-                                  {lecturer.name?.charAt(0)?.toUpperCase() || "L"}
+                                  {(lecturer.name || "L").charAt(0)?.toUpperCase()}
                                 </span>
                               </div>
                             </div>
@@ -413,14 +413,14 @@ const SignedLecturers = () => {
 
               {/* Mobile Card View */}
               <div className="grid grid-cols-1 gap-4 lg:hidden">
-                {paginatedLecturers.map((lecturer) => (
+                {paginatedLecturers?.map((lecturer) => (
                   <div key={lecturer._id} className="card bg-base-200/30 shadow-sm">
                     <div className="card-body p-4">
                       <div className="flex items-start gap-3 mb-3">
                         <div className="avatar avatar-placeholder">
                           <div className="bg-primary/10 text-primary rounded-full w-12">
                             <span className="text-lg font-medium">
-                              {lecturer.name?.charAt(0)?.toUpperCase() || "L"}
+                              {(lecturer.name || "L").charAt(0)?.toUpperCase()}
                             </span>
                           </div>
                         </div>
@@ -498,7 +498,7 @@ const SignedLecturers = () => {
                     <p className="text-sm opacity-70 max-w-md">
                       {searchTerm || Object.values(filters).some((f) => f)
                         ? t("lecturers.noLecturersFiltered") ||
-                          "No lecturers match your current filters. Try adjusting your search or filters."
+                        "No lecturers match your current filters. Try adjusting your search or filters."
                         : t("lecturers.noLecturersYet") || "No lecturers have signed up yet. Check back later."}
                     </p>
                     {(searchTerm || Object.values(filters).some((f) => f)) && (

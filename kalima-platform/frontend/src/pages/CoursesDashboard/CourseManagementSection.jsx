@@ -35,7 +35,7 @@ export default function CourseManagementSection() {
     try {
       const result = await getAllSubjects();
       if (result.success && result.data?.data?.subjects?.length > 0) {
-        const subjectsData = result.data.data.subjects;
+        const subjectsData = result.data?.data?.subjects || [];
         setCourses(
           subjectsData.map((subject, index) => {
             const courseData = t(`courseManagement.courses.${(index % 3) + 1}`, {
@@ -88,9 +88,8 @@ export default function CourseManagementSection() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => navigate('/coursesform')}
-              className={`flex items-center gap-1 md:gap-2 text-primary px-3 py-1 md:px-4 md:py-2 rounded-full text-sm md:text-base shadow-sm hover:shadow-md transition-all border border-primary ${
-                isRTL ? 'mr-auto' : 'ml-auto'
-              }`}
+              className={`flex items-center gap-1 md:gap-2 text-primary px-3 py-1 md:px-4 md:py-2 rounded-full text-sm md:text-base shadow-sm hover:shadow-md transition-all border border-primary ${isRTL ? 'mr-auto' : 'ml-auto'
+                }`}
             >
               <Plus className="w-4 h-4 md:w-5 md:h-5" />
               <span>{t("courseManagement.createButton")}</span>
@@ -121,30 +120,30 @@ export default function CourseManagementSection() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             <AnimatePresence>
-              {courses.slice(0, 9).map((course) => (
+              {courses?.slice(0, 9).map((course) => (
                 <motion.div
                   key={course.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    transition={{ duration: 0.3 }}
-                    whileHover={{ y: -5 }}
-                    className="bg-white rounded-xl shadow-sm hover:shadow-md overflow-hidden border border-base-200/50 transition-all duration-300"
-                    >
-                    <Link href={`/courses/${course.id}`} passHref>
-                      <div className="relative">
-                        <CourseCard
-                          {...course}
-                          durationText={course.durationText}
-                        />
-                      </div>
-                    </Link>
-                  </motion.div>
-                ))}
-              </AnimatePresence>
-            </div>
-          )}
-        </div>
-      </section>
-    );
-  }
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.3 }}
+                  whileHover={{ y: -5 }}
+                  className="bg-white rounded-xl shadow-sm hover:shadow-md overflow-hidden border border-base-200/50 transition-all duration-300"
+                >
+                  <Link href={`/courses/${course.id}`} passHref>
+                    <div className="relative">
+                      <CourseCard
+                        {...course}
+                        durationText={course.durationText}
+                      />
+                    </div>
+                  </Link>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}

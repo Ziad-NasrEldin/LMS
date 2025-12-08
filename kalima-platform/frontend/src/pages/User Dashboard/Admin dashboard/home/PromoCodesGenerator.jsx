@@ -157,7 +157,7 @@ const PromoCodeGenerator = () => {
 
       if (response.status === "success") {
         setSuccess(t("admin.success.codesGenerated"))
-        setGeneratedCodes(response.data.codes || [])
+        setGeneratedCodes(response.data?.codes || [])
       } else {
         setError(response.message || t("admin.errors.generationFailed"))
       }
@@ -208,15 +208,15 @@ const PromoCodeGenerator = () => {
   // Print QR codes
   const printQRCodes = () => {
     if (!generatedCodes.length) return
-  
+
     const printWindow = window.open("", "_blank")
     if (!printWindow) {
       alert("Please allow pop-ups to print QR codes")
       return
     }
-  
+
     const templateImage = "/promocodes/promocode-template.png"
-  
+
     const printContent = `
     <!DOCTYPE html>
     <html>
@@ -306,10 +306,10 @@ const PromoCodeGenerator = () => {
               <img src="${qrCodeUrls[index]}" alt="QR Code">
             </div>
             <div class="code-value">
-              ${formData.type === 'promo' 
-                ? t('admin.discount') 
-                : `${code.pointsAmount || formData.pointsAmount}`
-              }
+              ${formData.type === 'promo'
+        ? t('admin.discount')
+        : `${code.pointsAmount || formData.pointsAmount}`
+      }
             </div>
             <div class="promo-code">${code.code}</div>
           </div>
@@ -343,9 +343,9 @@ const PromoCodeGenerator = () => {
     </html>
   `;
 
-  printWindow.document.write(printContent);
-  printWindow.document.close();
-}
+    printWindow.document.write(printContent);
+    printWindow.document.close();
+  }
   return (
     <div className="rounded-lg shadow-md p-6 mb-8" dir={dir}>
       <div className="flex items-center gap-2 mb-6">

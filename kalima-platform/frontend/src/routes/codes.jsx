@@ -15,7 +15,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 export const redeemPromoCode = async (code) => {
   try {
     const response = await axios.post(
-      `/codes/redeem`,
+      `${API_URL}/codes/redeem`,
       { code },
       {
         headers: {
@@ -86,7 +86,7 @@ export const generatePromoCodes = async (data) => {
     }
 
     const response = await axios.post(
-      `/codes`,
+      `${API_URL}/codes`,
       payload,
       {
         headers: {
@@ -118,7 +118,7 @@ export const generatePromoCodes = async (data) => {
 };
 export const getPromoCodes = async ({ params = {} } = {}) => {
   try {
-    const response = await axios.get(`/codes/`, {
+    const response = await axios.get(`${API_URL}/codes/`, {
       params,
       headers: {
         ...getAuthHeader(),
@@ -143,7 +143,7 @@ export const getPromoCodes = async ({ params = {} } = {}) => {
 export const deletePromoCode = async (code) => {
   try {
     const response = await axios.delete(
-      `/codes/`,
+      `${API_URL}/codes/`,
       {
         headers: {
           ...getAuthHeader(),
@@ -166,9 +166,9 @@ export const deletePromoCode = async (code) => {
       };
     }
   } catch (error) {
-    return { 
-      success: false, 
-      error: error.response?.data?.message || error.message || 'Failed to delete promo code' 
+    return {
+      success: false,
+      error: error.response?.data?.message || error.message || 'Failed to delete promo code'
     };
   }
 };
@@ -186,7 +186,7 @@ export const deleteBulkPromoCodes = async (codes) => {
     }
 
     const response = await axios.delete(
-      `/codes/multiple`,
+      `${API_URL}/codes/multiple`,
       {
         headers: {
           ...getAuthHeader(),
@@ -209,9 +209,9 @@ export const deleteBulkPromoCodes = async (codes) => {
       };
     }
   } catch (error) {
-    return { 
-      success: false, 
-      error: error.response?.data?.message || error.message || 'Failed to delete promo codes' 
+    return {
+      success: false,
+      error: error.response?.data?.message || error.message || 'Failed to delete promo codes'
     };
   }
 };

@@ -52,7 +52,7 @@ const AuditLog = () => {
         const response = await getAuditLogs(params.page, params.limit, params)
 
         if (response.status === "success") {
-          setLogs(response.data.logs || [])
+          setLogs(response.data?.logs || [])
           setError(null)
         } else {
           setError(response.error)
@@ -76,7 +76,7 @@ const AuditLog = () => {
       const response = await getAuditLogsByEmail(filters.email.trim())
 
       if (response.status === "success") {
-        setLogs(response.data.logs || [])
+        setLogs(response.data?.logs || [])
         setPage(1)
         setError(null)
       } else {
@@ -99,7 +99,7 @@ const AuditLog = () => {
       const params = { ...Object.fromEntries(Object.entries(filters).filter(([, v]) => v !== "")) }
       const response = await getAuditLogs(1, 10000, params) // Large limit to get all logs
       if (response.status === "success") {
-        return response.data.logs || []
+        return response.data?.logs || []
       }
       return []
     } catch (e) {
@@ -109,16 +109,16 @@ const AuditLog = () => {
   }
 
   const translate = (category, key) => t(`admin.auditlog.${category}.${key}`)
-  const translateStatus = (status) => translate("status", status.toLowerCase())
-  const translateAction = (action) => translate("actions", action.toLowerCase())
-  const translateResource = (resource) => translate("resources", resource.toLowerCase())
-  const translateRole = (role) => translate("roles", role.toLowerCase())
+  const translateStatus = (status) => translate("status", (status || "").toLowerCase())
+  const translateAction = (action) => translate("actions", (action || "").toLowerCase())
+  const translateResource = (resource) => translate("resources", (resource || "").toLowerCase())
+  const translateRole = (role) => translate("roles", (role || "").toLowerCase())
 
   useEffect(() => {
     const fetch = async () => {
       const params = { page, limit, ...Object.fromEntries(Object.entries(filters).filter(([, v]) => v)) }
       const res = await getAuditLogs(page, limit, params)
-      if (res.status === "success") setLogs(res.data.logs)
+      if (res.status === "success") setLogs(res.data?.logs || [])
     }
     fetch()
   }, [page, filters, limit])
@@ -290,10 +290,10 @@ const AuditLog = () => {
   }
 
   // Prepare label text based on current selection
-  const userNameMap = logs.reduce((m, log) => {
+  const userNameMap = logs?.reduce((m, log) => {
     if (log.user?.userId) m[log.user.userId] = log.user.name
     return m
-  }, {})
+  }, {}) || {}
   const selectedUserLabel = filters.userId ? userNameMap[filters.userId] || "مستخدم غير معروف" : "المستخدم"
   const selectedRoleLabel = filters.role
     ? filters.role === "Admin"
@@ -563,7 +563,7 @@ const AuditLog = () => {
               </tr>
             </thead>
             <tbody>
-              {logs.length === 0 ? (
+              {logs?.length === 0 ? (
                 <tr>
                   <td colSpan="6" className="text-center py-8 text-sm">
                     <div className="flex flex-col items-center justify-center text-base-content/60">
@@ -582,7 +582,7 @@ const AuditLog = () => {
                   </td>
                 </tr>
               ) : (
-                logs.map((log) => (
+                logs?.map((log) => (
                   <tr key={log._id} className="hover">
                     <td className="text-sm py-2">{log.user?.name || t("admin.auditlog.status.unknown")}</td>
                     <td className="text-sm py-2">{log.user?.email || t("admin.auditlog.status.unknown")} </td>
@@ -598,7 +598,7 @@ const AuditLog = () => {
                         <span className="text-xs opacity-70">{formatTime(log.timestamp)}</span>
                       </div>
                     </td>
-                    <td className="text-sm py-2 hidden sm:table-cell">{translateRole(log.user?.role)}</td>
+                    <td className="text-sm py-2 hidden sm:table-cell">{translateRole(log.user?.role || "")}</td>
                     <td className="text-sm py-2 hidden sm:table-cell">
                       {log.resource?.type ? (
                         <div className="flex items-center gap-2">
@@ -631,7 +631,7 @@ const AuditLog = () => {
       )}
 
       {/* Pagination */}
-      {!loading && !error && logs.length > 0 && (
+      {!loading && !error && logs?.length > 0 && (
         <div className="flex justify-center mt-8">
           <div className="btn-group">
             <button
@@ -642,7 +642,7 @@ const AuditLog = () => {
               {t("admin.auditlog.pagination.previous")}
             </button>
             <button className="btn btn-outline">{page}</button>
-            <button className="btn btn-outline" onClick={() => setPage((p) => p + 1)} disabled={logs.length < limit}>
+            <button className="btn btn-outline" onClick={() => setPage((p) => p + 1)} disabled={logs?.length < limit}>
               {t("admin.auditlog.pagination.next")}
             </button>
           </div>

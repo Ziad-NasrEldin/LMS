@@ -1,5 +1,4 @@
 import axios from "axios";
-import api from "../services/errorHandling";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -10,7 +9,7 @@ export const getAuthHeader = () => {
 // --------START FETCHING USERS--------
 export const getAllStudents = async () => {
   try {
-    const response = await axios.get(`/users/role/student`, {
+    const response = await axios.get(`${API_URL}/users/role/student`, {
       headers: getAuthHeader(),
     });
     console.log("Fetched students:", response);
@@ -27,7 +26,7 @@ export const getAllStudents = async () => {
 
 export const getAllParents = async () => {
   try {
-    const response = await axios.get(`/users/role/parent`, {
+    const response = await axios.get(`${API_URL}/users/role/parent`, {
       headers: getAuthHeader(),
     });
     console.log("Fetched parents:", response);
@@ -44,7 +43,7 @@ export const getAllParents = async () => {
 
 export const getAllAssistants = async () => {
   try {
-    const response = await axios.get(`/users/role/assistant`, {
+    const response = await axios.get(`${API_URL}/users/role/assistant`, {
       headers: getAuthHeader(),
     });
     console.log("Fetched assistants:", response);
@@ -61,7 +60,7 @@ export const getAllAssistants = async () => {
 
 export const getAllLecturers = async () => {
   try {
-    const response = await axios.get(`/lecturers`, {
+    const response = await axios.get(`${API_URL}/lecturers`, {
       headers: getAuthHeader(),
     });
     console.log("Fetched lecturers:", response);
@@ -77,7 +76,7 @@ export const getAllLecturers = async () => {
 
 export const getUserById = async (userId) => {
   try {
-    const response = await axios.get(`/users/${userId}`, {
+    const response = await axios.get(`${API_URL}/users/${userId}`, {
       headers: getAuthHeader(),
     });
 
@@ -93,7 +92,7 @@ export const getUserById = async (userId) => {
 
 export const getAllUsers = async () => {
   try {
-    const response = await axios.get(`/users/`, {
+    const response = await axios.get(`${API_URL}/users/`, {
       headers: getAuthHeader(),
     });
 
@@ -111,7 +110,7 @@ export const getAllUsers = async () => {
 // --------START CREATE USER--------
 export const createUser = async (userData) => {
   try {
-    const response = await axios.post(`/users/`, userData, {
+    const response = await axios.post(`${API_URL}/users/`, userData, {
       headers: getAuthHeader(),
     });
     return { success: true, data: response.data };
@@ -131,7 +130,7 @@ export const createUser = async (userData) => {
 
 export const bulkCreateUsers = async (formData) => {
   try {
-    const response = await axios.post(`/users/accounts/bulk-create`, formData, {
+    const response = await axios.post(`${API_URL}/users/accounts/bulk-create`, formData, {
       headers: {
         ...getAuthHeader(),
         "Content-Type": "multipart/form-data",
@@ -162,7 +161,7 @@ export const bulkCreateUsers = async (formData) => {
 // --------START DELETE USER--------
 export const deleteUser = async (userId) => {
   try {
-    const response = await axios.delete(`/users/${userId}`, {
+    const response = await axios.delete(`${API_URL}/users/${userId}`, {
       headers: getAuthHeader(),
     });
     return { success: true, data: response.data };

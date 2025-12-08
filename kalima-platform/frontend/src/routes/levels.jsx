@@ -9,16 +9,16 @@ const getAuthHeader = () => {
 
 export const getAllLevels = async () => {
   try {
-    const response = await axios.get(`/levels/`, {
+    const response = await axios.get(`${API_URL}/levels/`, {
       headers: getAuthHeader(),
       withCredentials: true,
     });
 
-    
+
     const levels = response.data.data.levels;
 
-    const order = ["3rd Secondary","2nd Secondary","1st Secondary","3rd Preparatory","2nd Preparatory","1st Preparatory","6th Primary","5th Primary","4th Primary","3rd Primary","2nd Primary","1st Primary",
- 
+    const order = ["3rd Secondary", "2nd Secondary", "1st Secondary", "3rd Preparatory", "2nd Preparatory", "1st Preparatory", "6th Primary", "5th Primary", "4th Primary", "3rd Primary", "2nd Primary", "1st Primary",
+
     ];
 
     const sortedLevels = levels.sort(
@@ -39,7 +39,7 @@ export const getAllLevels = async () => {
 
 export const createLevel = async (levelData) => {
   try {
-    const response = await axios.post(`/levels/`, levelData, {
+    const response = await axios.post(`${API_URL}/levels/`, levelData, {
       headers: getAuthHeader(),
       withCredentials: true,
     });
@@ -58,7 +58,7 @@ export const createLevel = async (levelData) => {
 
 export const deleteLevel = async (levelId) => {
   try {
-    const response = await axios.delete(`/levels/${levelId}`, {
+    const response = await axios.delete(`${API_URL}/levels/${levelId}`, {
       headers: getAuthHeader(),
       withCredentials: true,
     });
