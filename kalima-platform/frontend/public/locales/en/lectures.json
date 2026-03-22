@@ -43,6 +43,8 @@
   "First Secondary": "First Secondary",
   "Second Secondary": "Second Secondary",
   "Third Secondary": "Third Secondary",
+  "1st Primary": "1st Primary",
+  "1st Secondary": "1st Secondary",
   "2nd Primary": "2nd Primary",
   "2nd Secondary": "2nd Secondary",
   "3rd Primary": "3rd Primary",
@@ -57,6 +59,8 @@
   "5th Preparatory": "5th Preparatory",
   "6th Preparatory": "6th Preparatory",
   "7th Preparatory": "7th Preparatory"
+  ,"8th Preparatory": "8th Preparatory",
+  "9th Preparatory": "9th Preparatory"
 },
  "common": {
     "loading": "Loading..."

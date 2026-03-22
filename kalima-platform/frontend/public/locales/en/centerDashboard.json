@@ -328,7 +328,9 @@
     "paymentTypes": {
       "cash": "Cash",
       "card": "Card",
-      "transfer": "Transfer"
+      "transfer": "Transfer",
+      "daily": "Daily",
+      "multi-session": "Multi Session"
     },
     "withBookletSuffix": "(with booklet)",
     "labels": {

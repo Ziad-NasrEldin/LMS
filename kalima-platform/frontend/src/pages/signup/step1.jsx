@@ -17,6 +17,37 @@ export default function Step1({ formData, handleInputChange, t, errors, role, gr
     handleInputChange({ target: { name, value: cleaned } });
   };
 
+  const translateGradeLevel = (rawLabel) => {
+    if (!rawLabel) return "-";
+
+    const normalized = String(rawLabel).trim();
+    const lower = normalized.toLowerCase();
+    const levelMap = {
+      "first primary": "1st Primary",
+      "second primary": "2nd Primary",
+      "third primary": "3rd Primary",
+      "fourth primary": "4th Primary",
+      "fifth primary": "5th Primary",
+      "sixth primary": "6th Primary",
+      "first preparatory": "1st Preparatory",
+      "second preparatory": "2nd Preparatory",
+      "third preparatory": "3rd Preparatory",
+      "first secondary": "1st Secondary",
+      "second secondary": "2nd Secondary",
+      "third secondary": "3rd Secondary",
+    };
+
+    const candidateKeys = [normalized, levelMap[lower]].filter(Boolean);
+    for (const key of candidateKeys) {
+      const translated = t(`gradeLevels.${key}`);
+      if (translated !== `gradeLevels.${key}`) {
+        return translated;
+      }
+    }
+
+    return normalized;
+  };
+
   // Fetch governments on component mount
   useEffect(() => {
     const loadGovernments = async () => {
@@ -91,7 +122,7 @@ export default function Step1({ formData, handleInputChange, t, errors, role, gr
         <p className="text-2xl font-semibold">{t('form.personalDetails')}</p>
         <div className="flex items-center justify-center py-8">
           <div className="loading loading-spinner loading-lg"></div>
-          <span className="ml-2">{t('common.loading') || 'Loading...'}</span>
+          <span className="ml-2">{t('loading', { ns: 'common', defaultValue: 'Loading...' })}</span>
         </div>
       </div>
     );
@@ -330,7 +361,7 @@ export default function Step1({ formData, handleInputChange, t, errors, role, gr
                 <option value="">{t('form.selectGrade')}</option>
                 {gradeLevels.map(level => (
                   <option key={level.value} value={level.value}>
-                    {t(`gradeLevels.${level.label}`)}
+                    {translateGradeLevel(level.label)}
                   </option>
                 ))}
               </select>

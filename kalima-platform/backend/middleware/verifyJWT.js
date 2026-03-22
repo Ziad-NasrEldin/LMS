@@ -60,7 +60,6 @@ const verifyJWT = async (req, res, next) => {
   email: 'abmawogud@example.com',
   role: 'Student',
   level: 'first secondary',
-  hobbies: [],
   phoneNumber: '01205215565',
   teacherPoints: [],
   createdAt: 2025-03-27T01:57:24.078Z,

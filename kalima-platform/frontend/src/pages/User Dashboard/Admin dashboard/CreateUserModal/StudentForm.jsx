@@ -1,7 +1,5 @@
 "use client"
 
-import { useState } from "react"
-
 const StudentForm = ({
   userData,
   handleChange,
@@ -13,18 +11,6 @@ const StudentForm = ({
   t,
   isRTL,
 }) => {
-  const [hobby, setHobby] = useState("")
-
-  const addHobby = () => {
-    if (hobby.trim()) {
-      userData.hobbies = [...(userData.hobbies || []), hobby.trim()]
-      setHobby("")
-    }
-  }
-
-  const removeHobby = (index) => {
-    userData.hobbies = userData.hobbies.filter((_, i) => i !== index)
-  }
 
   const toEnglishDigits = (str) => str.replace(/[٠-٩]/g, (d) => "٠١٢٣٤٥٦٧٨٩".indexOf(d)).replace(/[^\d]/g, "")
 
@@ -172,35 +158,6 @@ const StudentForm = ({
         </div>
       </div>
 
-      <div className="form-control">
-        <label className="label">
-          <span className="label-text">{t("fields.hobbiesOptional")}</span>
-        </label>
-        <div className="flex gap-2">
-          <input
-            type="text"
-            className="input input-bordered flex-1"
-            value={hobby}
-            onChange={(e) => setHobby(e.target.value)}
-            placeholder={t("placeholders.addHobby")}
-          />
-          <button type="button" className="btn btn-secondary" onClick={addHobby}>
-            {t("buttons.add")}
-          </button>
-        </div>
-        {userData.hobbies && userData.hobbies.length > 0 && (
-          <div className="flex flex-wrap gap-2 mt-2">
-            {userData.hobbies.map((h, index) => (
-              <div key={index} className="badge badge-secondary gap-1">
-                {h}
-                <button type="button" className="btn btn-ghost btn-xs" onClick={() => removeHobby(index)}>
-                  ×
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
     </>
   )
 }

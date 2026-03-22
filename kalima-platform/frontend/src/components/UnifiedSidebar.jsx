@@ -12,13 +12,11 @@ import {
   FaUserAlt,
   FaUserTie,
   FaUserGraduate,
-  FaUserShield,
-  FaCalendar,
-  FaStore
+  FaUserShield
 } from 'react-icons/fa';
-import { MdAnalytics, MdDashboard, MdNumbers } from 'react-icons/md';
 import { getUserDashboard, logoutUser } from '../routes/auth-services';
 import { Edit, Lightbulb } from 'lucide-react';
+import { resolveProfileImageUrl } from '../utils/profileImage';
 
 const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
   const { t, i18n } = useTranslation('common');
@@ -115,18 +113,6 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
         path: '/dashboard/admin-dashboard'
       },
       {
-        id: 'center-dashboard',
-        title: t('centerDashboard') || 'Center Dashboard',
-        icon: <FaCalendar className="w-5 h-5" />,
-        path: '/dashboard/center-dashboard'
-      },
-      {
-        id: 'audit-log',
-        title: t('auditLog') || 'Audit Log',
-        icon: <MdDashboard className="w-5 h-5" />,
-        path: '/dashboard/admin-dashboard/audit-log'
-      },
-      {
         id: 'create',
         title: t('Create') || 'Create',
         icon: <Edit className="w-5 h-5" />,
@@ -139,22 +125,10 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
         path: '/dashboard/admin-dashboard/lectures-page'
       },
       {
-        id: 'store-dashboard',
-        title: t('storeDashboard') || 'Store Dashboard',
-        icon: <FaStore className="w-5 h-5" />,
-        path: '/dashboard/admin-dashboard/store-dashboard'
-      },
-      {
         id: 'signed-lecturers',
         title: t('signedLecturers') || 'Signed Lecturers',
         icon: <Lightbulb className="w-5 h-5" />,
         path: '/dashboard/admin-dashboard/signed-lecturers'
-      },
-      {
-        id: 'store-analytics',
-        title: t('Analytics') || 'Analytics',
-        icon: <MdAnalytics className="w-5 h-5" />,
-        path: '/dashboard/admin-dashboard/store-analytics'
       },
     ];
 
@@ -295,14 +269,13 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
                 <div className="avatar">
                   <div className="w-10 h-10 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
                     <img
-                      src={
-                        userData?.profilePic
-                          ? `${import.meta.env.VITE_API_URL}/${userData.profilePic.replace(/\\/g, "/")}`
-                          : "/default-avatar.png"
-                      }
+                      src={resolveProfileImageUrl(userData?.profilePic)}
                       alt={userData?.name || "User Avatar"}
                       className="object-cover"
                       style={{ objectFit: "cover" }}
+                      onError={(event) => {
+                        event.currentTarget.src = '/person.png';
+                      }}
                     />
                   </div>
                 </div>

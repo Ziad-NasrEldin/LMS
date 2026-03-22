@@ -113,5 +113,8 @@
     "sequenceIdTooltip" : "Your sequence ID",
     "parentLinkTitle" :  "Parent Link",
     "parentLinkDescription" : "Use this link to access your parent account"
-  }
+  },
+  "arrowAlt": "Arrow between cards",
+  "decorativeAlt": "Decorative dots",
+  "toggleSidebar": "Toggle sidebar"
 }

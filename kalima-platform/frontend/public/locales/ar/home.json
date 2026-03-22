@@ -130,6 +130,18 @@
   "paid": "مدفوع",
   "currency": "جنيه",
   "lessonsCount": "  يحتوي علي عدد {{count}} دروس ",
+  "duration": "{{count}} {{unit}}",
+  "units": {
+    "month": "شهر",
+    "year": "سنة",
+    "term": "ترم"
+  },
+  "types": {
+    "course": "كورس",
+    "explanation": "شرح",
+    "monthly": "شهري",
+    "yearly": "سنوي"
+  },
   "Experienced lecturer in computer science.": "محاضرين ذو خبرة في علوم الحاسوب.",
   "buttons":{
     "viewAll": "عرض الكل",

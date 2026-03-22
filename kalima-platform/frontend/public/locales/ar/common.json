@@ -31,6 +31,18 @@
       "1st Secondary": "الصف الأول الثانوي",
       "2nd Secondary": "الصف الثاني الثانوي",
       "3rd Secondary": "الصف الثالث الثانوي",
+      "first primary": "الصف الأول الابتدائي",
+      "second primary": "الصف الثاني الابتدائي",
+      "third primary": "الصف الثالث الابتدائي",
+      "fourth primary": "الصف الرابع الابتدائي",
+      "fifth primary": "الصف الخامس الابتدائي",
+      "sixth primary": "الصف السادس الابتدائي",
+      "first preparatory": "الصف الأول الإعدادي",
+      "second preparatory": "الصف الثاني الإعدادي",
+      "third preparatory": "الصف الثالث الإعدادي",
+      "first secondary": "الصف الأول الثانوي",
+      "second secondary": "الصف الثاني الثانوي",
+      "third secondary": "الصف الثالث الثانوي",
       "undefined": "غير محدد"
 },
   "role" :{

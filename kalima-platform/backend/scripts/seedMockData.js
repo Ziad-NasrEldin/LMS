@@ -10,6 +10,7 @@ const Government = require("../models/governmentModel");
 const AdministrationZone = require("../models/administrationZonesModel");
 const Container = require("../models/containerModel");
 const Lecture = require("../models/LectureModel");
+const { governmentsData } = require("../utils/seeds/seedGovernments");
 
 const MOCK_LECTURERS = [
   {
@@ -46,25 +47,6 @@ const MOCK_SUBJECTS = [
   {
     name: "Arabic",
     levels: ["first secondary", "second secondary"],
-  },
-];
-
-const MOCK_GOVERNMENTS = [
-  {
-    name: "Cairo",
-    administrationZone: ["Nasr City", "Heliopolis", "Maadi"],
-  },
-  {
-    name: "Giza",
-    administrationZone: ["Dokki", "Mohandessin", "6th of October"],
-  },
-  {
-    name: "Alexandria",
-    administrationZone: ["Montaza", "Sidi Gaber", "Smouha"],
-  },
-  {
-    name: "Dakahlia",
-    administrationZone: ["Mansoura East", "Mansoura West", "Talkha"],
   },
 ];
 
@@ -158,7 +140,6 @@ async function upsertMockStudent({ levelId, defaultPasswordHash, governmentName,
     phoneNumber: "01012345678",
     parentPhoneNumber: "01011112222",
     faction: "Science",
-    hobbies: ["Reading", "Math puzzles"],
     isEmailVerified: true,
   });
 }
@@ -217,7 +198,7 @@ async function runSeedMockData() {
     const hashedPassword = await bcrypt.hash(defaultPassword, 12);
 
     const governments = [];
-    for (const governmentInput of MOCK_GOVERNMENTS) {
+    for (const governmentInput of governmentsData) {
       const government = await upsertGovernment(governmentInput);
       governments.push(government);
     }

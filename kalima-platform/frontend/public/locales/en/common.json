@@ -31,6 +31,18 @@
   "1st Secondary": "First Secondary",
   "2nd Secondary": "Second Secondary",
   "3rd Secondary": "Third Secondary",
+  "first primary": "First Primary",
+  "second primary": "Second Primary",
+  "third primary": "Third Primary",
+  "fourth primary": "4th Primary",
+  "fifth primary": "Fifth Primary",
+  "sixth primary": "sixth Primary",
+  "first preparatory": "First Preparatory",
+  "second preparatory": "Second Preparatory",
+  "third preparatory": "Third Preparatory",
+  "first secondary": "First Secondary",
+  "second secondary": "Second Secondary",
+  "third secondary": "Third Secondary",
   "undefined": "Undefined"
 },
  "role" :{

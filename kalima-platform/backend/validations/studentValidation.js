@@ -10,7 +10,6 @@ const studentValidation = userValidation.concat(
       .messages({
         "string.pattern.base": "level must be a valid MongoDB ObjectId.",
       }),
-    hobbies: Joi.array().items(Joi.string()).optional(),
     parentPhoneNumber: Joi.string().optional(),
     phoneNumber: Joi.string().required(),
     faction: Joi.string().optional(),

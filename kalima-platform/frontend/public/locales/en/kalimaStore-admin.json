@@ -158,6 +158,10 @@
       }
     }
   },
+  "common": {
+    "cancel": "Cancel",
+    "update": "Update"
+  },
   "fileUpload": {
     "uploaded": "Uploaded",
     "upload": "Upload",

@@ -43,10 +43,6 @@ const studentSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Level",
     },
-    hobbies: {
-      required: false,
-      type: [String]
-    },
     parentPhoneNumber: String,
     faction: String,
     phoneNumber: { type: String },

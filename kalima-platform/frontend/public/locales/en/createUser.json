@@ -52,6 +52,7 @@
     "bio": "Enter bio",
     "selectLecturer": "Select Lecturer",
     "addHobby": "Add a hobby",
+    "selectHobbies": "Select hobbies",
     "selectSubject": "Select subject",
     "selectTeachesAt": "Select teaches at",
     "selectPlatform": "Select platform",
@@ -129,6 +130,7 @@
     "holdCtrlToSelectMultiple": "Hold Ctrl (or Cmd) to select multiple options",
     "selectAccountType": "Select the type of accounts to create",
     "csvRequiredFields": "CSV file should include required fields for the selected account type",
+    "uploadCSV": "Upload CSV File",
     "csvFormat": "Your CSV file should include the following columns:"
   },
   

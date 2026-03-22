@@ -8,17 +8,48 @@ const ReviewItem = ({ label, value }) => (
   </div>
 )
 
-export default function Step4({ formData, t, hobbiesList, gradeLevels }) {
+export default function Step4({ formData, t, gradeLevels }) {
+  const translateGradeLevel = (rawLabel) => {
+    if (!rawLabel) return "-"
+
+    const normalized = String(rawLabel).trim()
+    const lower = normalized.toLowerCase()
+    const levelMap = {
+      "first primary": "1st Primary",
+      "second primary": "2nd Primary",
+      "third primary": "3rd Primary",
+      "fourth primary": "4th Primary",
+      "fifth primary": "5th Primary",
+      "sixth primary": "6th Primary",
+      "first preparatory": "1st Preparatory",
+      "second preparatory": "2nd Preparatory",
+      "third preparatory": "3rd Preparatory",
+      "first secondary": "1st Secondary",
+      "second secondary": "2nd Secondary",
+      "third secondary": "3rd Secondary",
+    }
+
+    const candidateKeys = [normalized, levelMap[lower]].filter(Boolean)
+    for (const key of candidateKeys) {
+      const translated = t(`gradeLevels.${key}`)
+      if (translated !== `gradeLevels.${key}`) {
+        return translated
+      }
+    }
+
+    return normalized
+  }
+
   // Function to find and translate level name
   const getLevelName = (levelId) => {
     const level = gradeLevels?.find((level) => level.value === levelId)
-    return level ? t(`gradeLevels.${level.label}`) : "-"
+    return level ? translateGradeLevel(level.label) : "-"
   }
 
   // Function to format teacher levels
   const formatTeacherLevels = (levels) => {
     if (!levels || !Array.isArray(levels) || levels.length === 0) return "-"
-    return levels.map((level) => t(`gradeLevels.${level}`)).join(", ")
+    return levels.map((level) => translateGradeLevel(level)).join(", ")
   }
 
   // Function to format social media accounts
@@ -54,12 +85,6 @@ export default function Step4({ formData, t, hobbiesList, gradeLevels }) {
             <>
               <ReviewItem label={t("form.grade")} value={getLevelName(formData.level)} />
               <ReviewItem label={t("form.parentPhone")} value={formData.parentPhoneNumber} />
-              <ReviewItem
-                label={t("form.hobbies")}
-                value={formData.hobbies
-                  .map((id) => t(`hobbies.${hobbiesList.find((hobby) => hobby.id === id)?.name}`))
-                  .join(", ")}
-              />
             </>
           )}
 

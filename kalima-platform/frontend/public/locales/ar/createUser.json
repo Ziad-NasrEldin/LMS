@@ -106,6 +106,8 @@
     "invalidPhoneNumber": "رقم الهاتف غير صالح (10-15 أرقام)",
     "subjectsRequired": "الرجاء إدخال المواد الدراسية",
     "lecturerRequired": "الرجاء تحديد المحاضر المسؤول",
+    "invalidFileType": "يرجى تحميل ملف CSV صالح",
+    "fileRequired": "يرجى تحميل ملف CSV",
     "required": "هذا الحقل مطلوب",
     "minLength": "يجب أن يكون على الأقل {{count}} أحرف",
     "maxLength": "يجب أن يكون على الأكثر {{count}} أحرف",

@@ -4,7 +4,6 @@ import { useState, useEffect } from "react"
 import { useTranslation } from "react-i18next"
 import Step1 from "./step1"
 import Step2 from "./Step2"
-import Step3 from "./Step3"
 import StepParent from "./StepParent"
 import StepTeacher from "./StepTeacher"
 import Step4 from "./Step4"
@@ -15,20 +14,9 @@ import axios from "axios"
 import RoleSelectionModal from "./RoleSelctionModal"
 import { getAllLevels } from "../../routes/levels"
 const apiUrl = import.meta.env.VITE_API_URL
-const hobbiesList = [
-  { id: 1, name: "reading", img: "/hobbies/reading.jpg" },
-  { id: 2, name: "sports", img: "/hobbies/sports.jpg" },
-  { id: 3, name: "music", img: "/hobbies/music.jpg" },
-  { id: 4, name: "art", img: "/hobbies/art.jpg" },
-  { id: 5, name: "gaming", img: "/hobbies/gaming.jpg" },
-  { id: 6, name: "cooking", img: "/hobbies/cooking.jpg" },
-  { id: 7, name: "photography", img: "/hobbies/photography.jpg" },
-  { id: 8, name: "bicycling", img: "/hobbies/bicycle.jpg" },
-  { id: 9, name: "technology", img: "/hobbies/technology.jpg" },
-]
 
 const totalSteps = {
-  student: 4,
+  student: 3,
   parent: 3,
   teacher: 3,
 }
@@ -51,7 +39,6 @@ export default function StudentRegistration() {
     gender: "",
     faction: "Alpha",
     level: [],
-    hobbies: [],
     parentPhoneNumber: "",
     children: [""],
     subject: "",
@@ -169,10 +156,6 @@ export default function StudentRegistration() {
       }
     }
 
-    if (step === 3 && role === "student" && formData.hobbies.length === 0) {
-      errors.hobbies = "hobbiesRequired"
-    }
-
     return errors
   }
 
@@ -194,21 +177,6 @@ export default function StudentRegistration() {
 
     fetchLevels()
   }, [])
-
-  const toggleHobby = (hobbyId) => {
-    try {
-      setFormData((prev) => ({
-        ...prev,
-        hobbies: prev.hobbies.includes(hobbyId)
-          ? prev.hobbies.filter((id) => id !== hobbyId)
-          : [...prev.hobbies, hobbyId],
-      }))
-      setErrors((prev) => ({ ...prev, hobbies: undefined }))
-    } catch (error) {
-      console.error("Error toggling hobby:", error)
-      setApiError("Failed to update hobby selection")
-    }
-  }
 
   const handleNext = () => {
     const stepErrors = getStepErrors(currentStep)
@@ -301,13 +269,6 @@ export default function StudentRegistration() {
           }
           data.append("faction", formData.faction || "Alpha");
           data.append("parentPhoneNumber", formData.parentPhoneNumber);
-
-          formData.hobbies
-            .map((id) => hobbiesList.find((hobby) => hobby.id === id)?.name)
-            .filter(Boolean)
-            .forEach((hobby, index) => {
-              data.append(`hobbies[${index}]`, hobby);
-            });
           break;
 
         case "parent":
@@ -442,11 +403,7 @@ export default function StudentRegistration() {
             case 2:
               return <Step2 formData={formData} handleInputChange={handleInputChange} t={t} errors={errors} />
             case 3:
-              return (
-                <Step3 formData={formData} toggleHobby={toggleHobby} t={t} hobbiesList={hobbiesList} errors={errors} />
-              )
-            case 4:
-              return <Step4 formData={formData} t={t} hobbiesList={hobbiesList} gradeLevels={gradeLevels} />
+              return <Step4 formData={formData} t={t} gradeLevels={gradeLevels} />
             default:
               return null
           }

@@ -68,10 +68,12 @@ const NotificationCenter = ({ userId }) => {
       setSocketConnected(true)
     }
 
+    socket.off("connect")
     socket.on("connect", () => {
       setSocketConnected(true)
     })
 
+    socket.off("disconnect")
     socket.on("disconnect", () => {
       setSocketConnected(false)
     })
@@ -135,8 +137,6 @@ const NotificationCenter = ({ userId }) => {
       const socket = getSocket()
       if (socket?.connected) {
         socket.emit("ping")
-      } else if (socket) {
-        handleReconnect()
       }
     }, 30000) // Every 30 seconds
 

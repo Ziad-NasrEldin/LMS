@@ -409,7 +409,6 @@ const getMyData = catchAsync(async (req, res, next) => {
         level: student.level,
         generalPoints: student.generalPoints || 0,
         totalPoints: student.totalPoints || 0,
-        hobbies: student.hobbies,
         faction: student.faction,
         sequencedId: student.sequencedId,
         profilePic: student.profilePic || responseData.userInfo.profilePic || null,
@@ -1073,7 +1072,7 @@ const getParentChildrenData = catchAsync(async (req, res, next) => {
   }  // Find all children with detailed information
   const children = await Student.find({ _id: { $in: parent.children } })
     .populate("level", "name")
-    .select("name level sequencedId hobbies faction generalPoints totalPoints")
+    .select("name level sequencedId faction generalPoints totalPoints")
     .lean();
 
   // For each child, get additional data like purchase history

@@ -459,20 +459,6 @@ const UserManagementTable = () => {
                     <p className="text-sm text-gray-900 bg-blue-50 p-2 rounded">{user.faction}</p>
                   </div>
                 )}
-                {user.hobbies && user.hobbies.length > 0 && (
-                  <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      {t("admin.userDetails.hobbies")}
-                    </label>
-                    <div className="flex flex-wrap gap-2">
-                      {user.hobbies.map((hobby, index) => (
-                        <span key={index} className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
-                          {hobby}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
                 {user.generalPoints !== undefined && (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">

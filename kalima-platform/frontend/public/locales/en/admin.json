@@ -126,6 +126,7 @@
       "phoneLabel": "Phone Number",
       "phonePlaceholder": "Enter phone number",
       "messageLabel": "Message (optional)",
+      "placeholder": "Type your message here...",
       "messagePlaceholder": "Type your message here...",
       "cancel": "Cancel",
       "send": "Send"
@@ -230,7 +231,8 @@
         "create": "Create",
         "read": "Read",
         "update": "Update",
-        "delete": "Delete"
+        "delete": "Delete",
+        "cancel": "Cancel"
       },
       
       "resources": {
@@ -275,11 +277,23 @@
         "jsonFormat": "JSON Format",
         "exportFiltered": "Export Filtered",
         "exportAll": "Export All",
+        "noData": "No data available for export",
         "successAll": "Successfully exported {{count}} users",
         "successFiltered": "Successfully exported {{count}} filtered users",
         "error": "Failed to export users. Please try again.",
         "filterInfo": "Filters applied:",
+        "showing": "Showing",
+        "logs": "audit logs",
         "of": "of",
+        "totalLogs": "Total displayed logs",
+        "user": "User",
+        "action": "Action",
+        "resource": "Resource",
+        "resourceDetails": "Resource Details",
+        "timestamp": "Timestamp",
+        "ipAddress": "IP Address",
+        "userAgent": "User Agent",
+        "description": "Description",
         "usersShown": "users shown",
         "name": "Name",
         "email": "Email",

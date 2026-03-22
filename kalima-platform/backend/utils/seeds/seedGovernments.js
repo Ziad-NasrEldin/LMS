@@ -1,6 +1,7 @@
 require('dotenv').config();
 const mongoose = require("mongoose");
 const government = require("../../models/governmentModel");
+const AdministrationZone = require("../../models/administrationZonesModel");
 
 const governmentsData =
     [
@@ -219,8 +220,17 @@ async function seedGovernments() {
         console.log("Connected to MongoDB.");
         console.log("Clearing existing governments...");
         await government.deleteMany({});
+        console.log("Clearing existing administration zones...");
+        await AdministrationZone.deleteMany({});
         console.log("Inserting new governments...");
         await government.insertMany(governmentsData);
+        const zones = Array.from(
+            new Set(
+                governmentsData.flatMap((g) => (g.administrationZone || []).map((z) => z.trim()))
+            )
+        );
+        console.log("Inserting administration zones...");
+        await AdministrationZone.insertMany(zones.map((name) => ({ name })));
         console.log("Governments seeded!");
     } catch (err) {
         console.error("Error seeding governments:", err);
@@ -230,4 +240,8 @@ async function seedGovernments() {
     }
 }
 
-seedGovernments();
+if (require.main === module) {
+    seedGovernments();
+}
+
+module.exports = { governmentsData, seedGovernments };

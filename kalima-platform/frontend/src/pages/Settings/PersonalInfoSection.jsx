@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next"
 import { getUserDashboard } from "../../routes/auth-services"
 import { updateCurrentUser } from "../../routes/update-user"
 import { Check, X, Camera, Upload } from "lucide-react"
+import { resolveProfileImageUrl } from "../../utils/profileImage"
 
 function PersonalInfoSection() {
   const { t, i18n } = useTranslation("settings")
@@ -327,9 +328,7 @@ function PersonalInfoSection() {
   }
 
   const hasProfilePic = userData?.profilePic
-  const currentProfilePicUrl = hasProfilePic
-    ? `${import.meta.env.VITE_API_URL}/${userData.profilePic.replace(/\\/g, "/")}`
-    : "/default-avatar.png"
+  const currentProfilePicUrl = resolveProfileImageUrl(userData?.profilePic)
 
   return (
     <div className="mb-8">
@@ -350,6 +349,9 @@ function PersonalInfoSection() {
                     alt={userData?.name || "User Avatar"}
                     className="object-cover"
                     style={{ objectFit: "cover" }}
+                    onError={(event) => {
+                      event.currentTarget.src = "/person.png"
+                    }}
                   />
                 </div>
               </div>

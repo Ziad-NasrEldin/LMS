@@ -22,8 +22,23 @@
     "buttons": {
       "edit": "تعديل",
       "add": "إضافة"
+    },
+    "uploadProfilePic": "رفع صورة الملف الشخصي",
+    "selectedFile": "الملف المحدد:",
+    "uploadButton": "رفع",
+    "cancelButton": "إلغاء",
+    "profilePicUpdated": "تم تحديث صورة الملف الشخصي بنجاح",
+    "noProfilePicHint": "اضغط على أيقونة الكاميرا لرفع صورة الملف الشخصي",
+    "messages": {
+      "updateSuccess": "تم التحديث بنجاح"
     }
   },
+    "validation": {
+      "invalidImageType": "يرجى اختيار صورة صحيحة (JPEG, PNG, GIF)",
+      "fileTooLarge": "يجب أن يكون حجم الملف أقل من 5 ميجابايت",
+      "invalidEmail": "صيغة البريد الإلكتروني غير صحيحة"
+    },
+    "retry": "إعادة المحاولة",
     "languageAppearance": {
     "title": "اللغة والمظهر",
     "showThemes": "اظهار السمات",

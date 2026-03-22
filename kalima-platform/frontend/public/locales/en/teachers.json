@@ -17,7 +17,8 @@
       "math": "Mathematics",
       "physics": "Physics",
       "chemistry": "Chemistry",
-      "مدرس": "Teacher"
+      "مدرس": "Teacher",
+      "teacher": "Teacher"
     },
     "buttons": {
       "resetFilters": "Reset Filters",
