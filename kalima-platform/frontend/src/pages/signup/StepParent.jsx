@@ -137,7 +137,7 @@ export default function StepParent({ formData, handleChildrenChange, t, errors, 
                          <option value="">{t('form.selectGrade')}</option>
               {gradeLevels.map(level => (
                 <option key={level.value} value={level.value}>
-                  {t(`gradeLevels.${level.label}`)}
+                                    {level.label}
                 </option>
               ))}
                            

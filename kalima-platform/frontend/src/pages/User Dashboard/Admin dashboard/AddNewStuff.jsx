@@ -35,7 +35,7 @@ export default function AdminCreate() {
   })
 
   // Level form state
-  const [levelData, setLevelData] = useState({ name: "" })
+  const [levelData, setLevelData] = useState({ name: "", nameAr: "" })
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -176,7 +176,7 @@ export default function AdminCreate() {
       const response = await createLevel(levelData)
       if (response.success) {
         setSuccess(t("success.levelCreated"))
-        setLevelData({ name: "" })
+        setLevelData({ name: "", nameAr: "" })
         const updatedLevels = await getAllLevels()
         if (updatedLevels.success) {
           setLevels(updatedLevels.data || [])
@@ -536,13 +536,27 @@ export default function AdminCreate() {
           <form onSubmit={handleLevelSubmit} className="space-y-4">
             <div className="form-control">
               <label className="label">
-                <span className="label-text">{t("forms.level.name")}</span>
+                <span className="label-text">{t("forms.level.nameEn")}</span>
               </label>
               <input
                 type="text"
                 value={levelData.name}
-                onChange={(e) => setLevelData({ name: e.target.value })}
-                placeholder={t("forms.level.namePlaceholder")}
+                onChange={(e) => setLevelData((prev) => ({ ...prev, name: e.target.value }))}
+                placeholder={t("forms.level.namePlaceholderEn")}
+                className="input input-bordered w-full"
+                required
+              />
+            </div>
+
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text">{t("forms.level.nameAr")}</span>
+              </label>
+              <input
+                type="text"
+                value={levelData.nameAr}
+                onChange={(e) => setLevelData((prev) => ({ ...prev, nameAr: e.target.value }))}
+                placeholder={t("forms.level.namePlaceholderAr")}
                 className="input input-bordered w-full"
                 required
               />
@@ -568,7 +582,7 @@ export default function AdminCreate() {
                       key={level._id}
                       className="grid grid-cols-3 gap-4 p-4 border-b border-base-200 hover:bg-base-200/50 transition-colors"
                     >
-                      <div className="text-sm font-medium">{level.name}</div>
+                      <div className="text-sm font-medium">{level.displayName || level.name}</div>
                       <div className="text-sm text-gray-600">
                         {new Date(level.createdAt).toLocaleDateString(i18n.language)}
                       </div>

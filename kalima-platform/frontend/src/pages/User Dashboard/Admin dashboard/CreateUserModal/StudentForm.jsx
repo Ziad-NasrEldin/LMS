@@ -43,7 +43,7 @@ const StudentForm = ({
               <option value="">{t("placeholders.selectLevel")}</option>
               {levels.map((level) => (
                 <option key={level._id} value={level._id}>
-                  {level.name}
+                  {level.displayName || level.name}
                 </option>
               ))}
             </select>

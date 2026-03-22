@@ -4,7 +4,17 @@ const AppError = require("../utils/appError");
 
 // Create a new level
 exports.createLevel = catchAsync(async (req, res, next) => {
-  const level = await Level.create(req.body);
+  const { name, nameAr } = req.body;
+
+  if (!name || !nameAr) {
+    return next(new AppError("Both English and Arabic level names are required", 400));
+  }
+
+  const level = await Level.create({
+    name: String(name).trim(),
+    nameAr: String(nameAr).trim(),
+  });
+
   if (!level) {
     return next(new AppError("Level could not be created", 400));
   }
@@ -43,7 +53,17 @@ exports.getLevelById = catchAsync(async (req, res, next) => {
 
 // Update a level by ID
 exports.updateLevelById = catchAsync(async (req, res, next) => {
-  const level = await Level.findByIdAndUpdate(req.params.id, req.body, {
+  const payload = { ...req.body };
+
+  if (typeof payload.name === "string") {
+    payload.name = payload.name.trim();
+  }
+
+  if (typeof payload.nameAr === "string") {
+    payload.nameAr = payload.nameAr.trim();
+  }
+
+  const level = await Level.findByIdAndUpdate(req.params.id, payload, {
     new: true,
     runValidators: true,
   });

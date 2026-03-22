@@ -53,7 +53,7 @@ const MOCK_SUBJECTS = [
 async function upsertLevel(name) {
   const existing = await Level.findOne({ name });
   if (existing) return existing;
-  return Level.create({ name });
+  return Level.create({ name, nameAr: name });
 }
 
 async function upsertLecturer(lecturerInput, defaultPasswordHash) {

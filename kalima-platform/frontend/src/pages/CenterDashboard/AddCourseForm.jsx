@@ -221,7 +221,7 @@ const AddCourseForm = ({ isOpen, onClose, selectedCenter, lecturers, onCourseAdd
                   <option value="">{t('addCourseForm.selectPlaceholder.level')}</option>
                   {levels.map((level) => (
                     <option key={level._id} value={level._id}>
-                      {level.name}
+                      {level.displayName || level.name}
                     </option>
                   ))}
                 </select>

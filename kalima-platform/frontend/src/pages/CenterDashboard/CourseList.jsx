@@ -49,7 +49,7 @@ const CourseList = ({ lessons, isLoading, error, onAddCourse, lecturers }) => {
     if (!lessons || dataLoading || isLoading) return;
     
     const subjectMap = new Map(subjects.map(subject => [subject._id, subject.name]));
-    const levelMap = new Map(levels.map(level => [level._id, level.name]));
+    const levelMap = new Map(levels.map(level => [level._id, level.displayName || level.name]));
     const lecturerMap = new Map(lecturers.map(lecturer => [lecturer._id, lecturer.name]));
     
     const mapped = lessons.map((lesson, index) => {
@@ -123,7 +123,7 @@ const CourseList = ({ lessons, isLoading, error, onAddCourse, lecturers }) => {
           <option value="">{t('filters.allLevels')}</option>
           {levels.map(level => (
             <option key={level._id} value={level._id}>
-              {t(`gradeLevels.${level.name}`, { ns: 'common' })}
+              {level.displayName || level.name}
             </option>
           ))}
         </select>

@@ -10,8 +10,12 @@ const getAuthHeader = () => {
 
 export const getAllLevels = async () => {
   try {
+    const currentLang = (localStorage.getItem("i18nextLng") || "en").toLowerCase();
+    const isArabic = currentLang.startsWith("ar");
+
     const response = await axios.get(`${API_URL}/levels/`, {
       headers: getAuthHeader(),
+      params: { lang: isArabic ? "ar" : "en" },
       withCredentials: true,
     });
 
@@ -22,9 +26,21 @@ export const getAllLevels = async () => {
 
     ];
 
-    const sortedLevels = levels.sort(
-      (a, b) => order.indexOf(a.name) - order.indexOf(b.name)
-    );
+    const sortedLevels = levels
+      .slice()
+      .sort((a, b) => {
+        const ai = order.indexOf(a.name);
+        const bi = order.indexOf(b.name);
+
+        if (ai === -1 && bi === -1) return a.name.localeCompare(b.name);
+        if (ai === -1) return 1;
+        if (bi === -1) return -1;
+        return ai - bi;
+      })
+      .map((level) => ({
+        ...level,
+        displayName: isArabic ? (level.nameAr || level.name) : (level.name || level.nameAr),
+      }));
 
     return {
       success: true,

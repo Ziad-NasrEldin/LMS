@@ -166,7 +166,7 @@ export default function StudentRegistration() {
         if (response.success) {
           const levels = response.data.map((level) => ({
             value: level._id,
-            label: level.name
+            label: level.displayName || level.name
           }));
           setGradeLevels(levels);
         }
