@@ -651,10 +651,6 @@ exports.getAllContainers = catchAsync(async (req, res, next) => {
     { path: "parent", select: "name" },
   ]);
 
-  if (!containers || containers.length === 0) {
-    return next(new AppError("No containers found.", 404));
-  }
-
   // Role-specific logic for authenticated users
   if (req.user && req.user.role?.toLowerCase() === "teacher") {
     // Filter containers based on `teacherAllowed` property

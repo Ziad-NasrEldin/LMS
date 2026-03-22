@@ -83,13 +83,18 @@ module.exports = (err, req, res, next) => {
   if (process.env.NODE_ENV === "development") {
     sendDevError(err, req, res);
   } else if (process.env.NODE_ENV === "production") {
-    // Proper error cloning
-    let error = Object.create(Object.getPrototypeOf(err));
-    error.message = err.message;
-    error.name = err.name;
-    error.code = err.code;
-    error.errors = err.errors;
-    error.stack = err.stack;
+    // Preserve AppError metadata so operational errors keep their real HTTP status.
+    let error = {
+      ...err,
+      message: err.message,
+      name: err.name,
+      code: err.code,
+      errors: err.errors,
+      stack: err.stack,
+      statusCode: err.statusCode,
+      status: err.status,
+      isOperational: err.isOperational,
+    };
 
     if (error.name === "CastError") error = handleCastErrorDB(error);
     if (error.code === 11000) error = handleDuplicateFieldsDB(error);

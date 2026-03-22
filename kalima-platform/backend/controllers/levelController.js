@@ -19,9 +19,6 @@ exports.createLevel = catchAsync(async (req, res, next) => {
 // Get all levels
 exports.getAllLevels = catchAsync(async (req, res, next) => {
   const levels = await Level.find();
-  if (levels.length === 0) {
-    return next(new AppError("No levels found", 404));
-  }
   res.status(200).json({
     status: "success",
     data: {

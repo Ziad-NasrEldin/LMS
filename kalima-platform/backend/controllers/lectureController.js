@@ -389,10 +389,6 @@ exports.getAllLecturesPublic = catchAsync(async (req, res, next) => {
 
   const allLectures = [...lectures, ...containerLectures];
 
-  if (!allLectures || allLectures.length === 0) {
-    return next(new AppError("Lectures not found", 404))
-  }
-
   res.status(200).json({
     status: "success",
     results: allLectures.length,

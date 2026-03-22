@@ -26,9 +26,6 @@ exports.getAllSubjects = catchAsync(async (req, res, next) => {
     path: "level",
     select: "name",
   });
-  if (subjects.length === 0) {
-    return next(new AppError("No subjects found", 404));
-  }
   res.status(200).json({
     status: "success",
     data: {
