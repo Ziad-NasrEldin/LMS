@@ -6,7 +6,7 @@ const Level = require("../models/levelModel");
 const Subject = require("../models/subjectModel");
 const Lecturer = require("../models/lecturerModel");
 const Container = require("../models/containerModel");
-const Lecture = require("../models/lectureModel");
+const Lecture = require("../models/LectureModel");
 
 const MOCK_LECTURERS = [
   {
