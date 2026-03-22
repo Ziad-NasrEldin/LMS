@@ -41,7 +41,7 @@
     "start": "vite",
     "build": "vite build",
     "serve": "vite preview",
-    "build:android": "env-cmd -f .env.android react-scripts build && npx cap copy android"
+    "build:android": "env-cmd -f .env.android vite build && cd .. && npx cap copy android"
   },
   "eslintConfig": {
     "extends": [
