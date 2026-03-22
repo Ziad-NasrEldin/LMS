@@ -54,7 +54,11 @@ const login = catchAsync(async (req, res, next) => {
 });
 
 const refresh = catchAsync(async (req, res, next) => {
-  const token = req.headers.authorization.split(" ")[1];
+  const authHeader = req.headers.authorization || req.headers.Authorization;
+  const token = authHeader?.startsWith("Bearer ")
+    ? authHeader.split(" ")[1]
+    : null;
+
   if (!token) {
     return next(new AppError("Access token required", 401));
   }
@@ -67,6 +71,10 @@ const refresh = catchAsync(async (req, res, next) => {
   const refreshToken = await RefreshToken.findOne({
     user: userId,
   });
+
+  if (!refreshToken?.token) {
+    return next(new AppError("Refresh token not found, please login again", 401));
+  }
 
   const currentUserRefreshToken = refreshToken.token;
 

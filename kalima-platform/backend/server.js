@@ -13,7 +13,6 @@ const corsOptions = require("./config/corsOptions.js");
 const cookieParser = require("cookie-parser");
 const auditLogger = require("./middleware/auditLogger");
 const path = require("path");
-const multer = require("multer");
 
 const containerRouter = require("./routes/containerRoutes");
 const lectureRouter = require("./routes/lectureRoutes");
@@ -66,22 +65,6 @@ const ecReferralRoutes = require("./routes/ec.referralRoutes");
 
 
 connectDB();
-
-// After connecting to the database, check for admin user
-mongoose.connection.once("open", async () => {
-  console.log("Connected to MongoDB");
-  try {
-    // Attempt to create an initial admin user if none exists
-    // using the direct approach that bypasses validation
-    await seedInitialAdminDirect();
-    console.log("Admin user check completed");
-
-    // Seed notification templates
-    await seedNotificationTemplates();
-  } catch (err) {
-    console.error("Error during initialization:", err);
-  }
-});
 
 app.use(cors(corsOptions));
 app.use(express.json({ limit: '120mb' }));
@@ -142,8 +125,17 @@ app.use("/api/v1/ec/subsections", auditLogger, ECSubSectionRouter);
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-mongoose.connection.once("open", () => {
+mongoose.connection.once("open", async () => {
   console.log("Connected to MongoDB.");
+
+  try {
+    // Seed required data before handling requests.
+    await seedInitialAdminDirect();
+    await seedNotificationTemplates();
+    console.log("Initial seed checks completed.");
+  } catch (err) {
+    console.error("Error during initialization:", err);
+  }
 
   const httpServer = createServer(app);
   const io = new Server(httpServer, {

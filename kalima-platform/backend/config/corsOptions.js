@@ -13,7 +13,7 @@ const corsOptions = {
   },
 
   credentials: true,
-  optionSuccessStatus: 200,
+  optionsSuccessStatus: 200,
 };
 
 module.exports = corsOptions;

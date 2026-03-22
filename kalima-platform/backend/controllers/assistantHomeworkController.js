@@ -25,23 +25,40 @@ exports.getLecturesWithHomework = catchAsync(async (req, res, next) => {
     .populate('subject', 'name')
     .populate('level', 'name')
     .lean();
+
+  const lectureIds = lectures.map((lecture) => lecture._id);
+  const submissionCounts = lectureIds.length
+    ? await Attachment.aggregate([
+      {
+        $match: {
+          lectureId: { $in: lectureIds },
+          type: 'homeworks',
+          studentId: { $ne: null }
+        }
+      },
+      {
+        $group: {
+          _id: '$lectureId',
+          submissionCount: { $sum: 1 }
+        }
+      }
+    ])
+    : [];
+
+  const submissionCountByLectureId = new Map(
+    submissionCounts.map((row) => [row._id.toString(), row.submissionCount])
+  );
   
   // For each lecture, check if it has any homework submissions
-  const lecturesWithSubmissions = await Promise.all(
-    lectures.map(async (lecture) => {
-      const submissionCount = await Attachment.countDocuments({
-        lectureId: lecture._id,
-        type: 'homeworks',
-        studentId: { $ne: null }
-      });
-      
-      return {
-        ...lecture,
-        hasSubmissions: submissionCount > 0,
-        submissionCount
-      };
-    })
-  );
+  const lecturesWithSubmissions = lectures.map((lecture) => {
+    const submissionCount = submissionCountByLectureId.get(lecture._id.toString()) || 0;
+
+    return {
+      ...lecture,
+      hasSubmissions: submissionCount > 0,
+      submissionCount
+    };
+  });
   
   // Filter out lectures with no submissions if requested
   const filteredLectures = req.query.onlyWithSubmissions === 'true' 
@@ -70,29 +87,68 @@ exports.getHomeworkHierarchy = catchAsync(async (req, res, next) => {
   
   const lecturerId = assistant.assignedLecturer;
   
-  // Find all top-level containers created by this lecturer
-  const topLevelContainers = await Container.find({ 
+  // Load all lecturer containers once to avoid per-node DB calls.
+  const allContainers = await Container.find({ createdBy: lecturerId }).lean();
+  const topLevelContainers = allContainers.filter(
+    (container) => !container.parent && container.kind !== 'Lecture'
+  );
+
+  const childrenByParentId = new Map();
+  allContainers.forEach((container) => {
+    if (!container.parent) {
+      return;
+    }
+
+    const parentId = container.parent.toString();
+    const siblings = childrenByParentId.get(parentId) || [];
+    siblings.push(container);
+    childrenByParentId.set(parentId, siblings);
+  });
+
+  // Also get top-level lectures (not in any container)
+  const topLevelLectures = await Lecture.find({
     createdBy: lecturerId,
-    parent: null,
-    kind: { $ne: 'Lecture' } // Exclude lectures from top level query
+    parent: null
   }).lean();
-  
+
+  const lectureIdsFromContainers = allContainers
+    .filter((container) => container.kind === 'Lecture')
+    .map((lectureContainer) => lectureContainer._id);
+  const topLevelLectureIds = topLevelLectures.map((lecture) => lecture._id);
+  const uniqueLectureIds = Array.from(
+    new Set([...lectureIdsFromContainers, ...topLevelLectureIds].map((id) => id.toString()))
+  ).map((id) => new mongoose.Types.ObjectId(id));
+
+  const submissionCounts = uniqueLectureIds.length
+    ? await Attachment.aggregate([
+      {
+        $match: {
+          lectureId: { $in: uniqueLectureIds },
+          type: 'homeworks',
+          studentId: { $ne: null }
+        }
+      },
+      {
+        $group: {
+          _id: '$lectureId',
+          submissionCount: { $sum: 1 }
+        }
+      }
+    ])
+    : [];
+
+  const submissionCountByLectureId = new Map(
+    submissionCounts.map((row) => [row._id.toString(), row.submissionCount])
+  );
+
   // Function to recursively get container hierarchy with homework counts
   const getContainerWithChildren = async (container) => {
-    // Get all child containers
-    const children = await Container.find({ 
-      parent: container._id 
-    }).lean();
+    const children = childrenByParentId.get(container._id.toString()) || [];
     
     // Process each child (container or lecture)
     const processedChildren = await Promise.all(children.map(async (child) => {
       if (child.kind === 'Lecture') {
-        // For lectures, count homework submissions
-        const submissionCount = await Attachment.countDocuments({
-          lectureId: child._id,
-          type: 'homeworks',
-          studentId: { $ne: null }
-        });
+        const submissionCount = submissionCountByLectureId.get(child._id.toString()) || 0;
         
         return {
           ...child,
@@ -123,28 +179,16 @@ exports.getHomeworkHierarchy = catchAsync(async (req, res, next) => {
   const hierarchy = await Promise.all(
     topLevelContainers.map(container => getContainerWithChildren(container))
   );
-  
-  // Also get top-level lectures (not in any container)
-  const topLevelLectures = await Lecture.find({ 
-    createdBy: lecturerId,
-    parent: null
-  }).lean();
-  
-  const processedTopLevelLectures = await Promise.all(
-    topLevelLectures.map(async (lecture) => {
-      const submissionCount = await Attachment.countDocuments({
-        lectureId: lecture._id,
-        type: 'homeworks',
-        studentId: { $ne: null }
-      });
-      
-      return {
-        ...lecture,
-        hasSubmissions: submissionCount > 0,
-        submissionCount
-      };
-    })
-  );
+
+  const processedTopLevelLectures = topLevelLectures.map((lecture) => {
+    const submissionCount = submissionCountByLectureId.get(lecture._id.toString()) || 0;
+
+    return {
+      ...lecture,
+      hasSubmissions: submissionCount > 0,
+      submissionCount
+    };
+  });
   
   res.status(200).json({
     status: 'success',

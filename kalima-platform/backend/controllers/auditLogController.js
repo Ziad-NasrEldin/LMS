@@ -21,211 +21,239 @@ const ECPurchase = require("../models/ec.purchaseModel");
 
 // Helper function to enrich audit logs with readable resource data
 const enrichAuditLogs = async (logs) => {
-  const enrichedLogs = [];
   const User = require("../models/userModel");
+  const userCache = new Map();
+  const resourceCache = new Map();
 
-  for (const log of logs) {
-    const enrichedLog = log.toObject();
+  const getUserById = async (userId) => {
+    const key = userId.toString();
 
-    // Populate user info if userId exists
-    if (enrichedLog.user && enrichedLog.user.userId) {
-      try {
-        const userDoc = await User.findById(enrichedLog.user.userId).lean();
+    if (!userCache.has(key)) {
+      userCache.set(
+        key,
+        User.findById(userId)
+          .lean()
+          .catch(() => null)
+      );
+    }
+
+    return userCache.get(key);
+  };
+
+  const getResourceDetails = async (resourceType, resourceId) => {
+    const cacheKey = `${resourceType}:${resourceId}`;
+
+    if (resourceCache.has(cacheKey)) {
+      return resourceCache.get(cacheKey);
+    }
+
+    const detailsPromise = (async () => {
+      switch (resourceType) {
+        case "center": {
+          const center = await Center.findById(resourceId).lean();
+          return center
+            ? {
+              name: center.name,
+              location: center.location
+            }
+            : null;
+        }
+
+        case "code": {
+          const code = await Code.findById(resourceId).lean();
+          return code
+            ? {
+              code: code.code,
+              type: code.type,
+              isRedeemed: code.isRedeemed
+            }
+            : null;
+        }
+
+        case "container": {
+          const container = await Container.findById(resourceId)
+            .populate("subject", "name")
+            .populate("level", "name")
+            .lean();
+          return container
+            ? {
+              name: container.name,
+              type: container.type,
+              subject: container.subject?.name || "Unknown",
+              level: container.level?.name || "Unknown"
+            }
+            : null;
+        }
+
+        case "moderator": {
+          const moderator = await Moderator.findById(resourceId).lean();
+          return moderator
+            ? {
+              name: moderator.name,
+              email: moderator.email
+            }
+            : null;
+        }
+
+        case "subAdmin": {
+          const subAdmin = await SubAdmin.findById(resourceId).lean();
+          return subAdmin
+            ? {
+              name: subAdmin.name,
+              email: subAdmin.email
+            }
+            : null;
+        }
+
+        case "assistant": {
+          const assistant = await Assistant.findById(resourceId)
+            .populate("assignedLecturer", "name")
+            .lean();
+          return assistant
+            ? {
+              name: assistant.name,
+              email: assistant.email,
+              assignedTo: assistant.assignedLecturer?.name || "Unknown"
+            }
+            : null;
+        }
+
+        case "admin": {
+          const admin = await Admin.findById(resourceId).lean();
+          return admin
+            ? {
+              name: admin.name,
+              email: admin.email
+            }
+            : null;
+        }
+
+        case "lecturer": {
+          const lecturer = await Lecturer.findById(resourceId).lean();
+          return lecturer
+            ? {
+              name: lecturer.name,
+              email: lecturer.email,
+              expertise: lecturer.expertise
+            }
+            : null;
+        }
+
+        case "package": {
+          const packageItem = await Package.findById(resourceId).lean();
+          return packageItem
+            ? {
+              name: packageItem.name,
+              type: packageItem.type,
+              price: packageItem.price
+            }
+            : null;
+        }
+
+        case "lesson": {
+          const lesson = await Lesson.findById(resourceId)
+            .populate("subject", "name")
+            .populate("level", "name")
+            .populate("lecturer", "name")
+            .lean();
+          return lesson
+            ? {
+              subject: lesson.subject?.name || "Unknown",
+              level: lesson.level?.name || "Unknown",
+              lecturer: lesson.lecturer?.name || "Unknown",
+              startTime: lesson.startTime
+            }
+            : null;
+        }
+
+        case "ec.section": {
+          const ecSection = await ECSection.findById(resourceId).lean();
+          return ecSection
+            ? {
+              name: ecSection.name,
+              description: ecSection.description,
+              isActive: ecSection.isActive,
+              allowedRoles: ecSection.allowedRoles
+            }
+            : null;
+        }
+
+        case "ec.product": {
+          const ecProduct = await ECProduct.findById(resourceId)
+            .populate("section", "name")
+            .lean();
+          return ecProduct
+            ? {
+              title: ecProduct.title,
+              description: ecProduct.description,
+              price: ecProduct.price,
+              section: ecProduct.section?.name || "Unknown",
+              isActive: ecProduct.isActive
+            }
+            : null;
+        }
+
+        case "ec.purchase": {
+          const ecPurchase = await ECPurchase.findById(resourceId)
+            .populate("productId", "title")
+            .populate("createdBy", "name email")
+            .populate("confirmedBy", "name email")
+            .lean();
+          return ecPurchase
+            ? {
+              purchaseSerial: ecPurchase.purchaseSerial,
+              productName: ecPurchase.productName || ecPurchase.productId?.title,
+              price: ecPurchase.price,
+              userName: ecPurchase.userName,
+              confirmed: ecPurchase.confirmed,
+              confirmedBy: ecPurchase.confirmedBy?.name || null,
+              createdBy: ecPurchase.createdBy?.name || "Unknown"
+            }
+            : null;
+        }
+
+        default:
+          return null;
+      }
+    })().catch((error) => {
+      console.error(`Error enriching ${resourceType} with ID ${resourceId}:`, error);
+      return null;
+    });
+
+    resourceCache.set(cacheKey, detailsPromise);
+    return detailsPromise;
+  };
+
+  const enrichedLogs = await Promise.all(
+    logs.map(async (log) => {
+      const enrichedLog = typeof log.toObject === "function" ? log.toObject() : { ...log };
+
+      // Populate user info if userId exists
+      if (enrichedLog.user && enrichedLog.user.userId) {
+        const userDoc = await getUserById(enrichedLog.user.userId);
         if (userDoc) {
           enrichedLog.user = {
             userId: userDoc._id,
             name: userDoc.name,
             email: userDoc.email,
-            role: userDoc.role,
-            // add more fields if needed
+            role: userDoc.role
           };
         }
-      } catch (err) {
-        // If user not found or error, leave as is
       }
-    }
 
-    if (enrichedLog.resource && enrichedLog.resource.id) {
-      const resourceId = enrichedLog.resource.id;
-      const resourceType = enrichedLog.resource.type;
+      if (enrichedLog.resource && enrichedLog.resource.id) {
+        const resourceId = enrichedLog.resource.id;
+        const resourceType = enrichedLog.resource.type;
 
-      try {
-        switch (resourceType) {
-          case "center":
-            const center = await Center.findById(resourceId).lean();
-            if (center) {
-              enrichedLog.resource.details = {
-                name: center.name,
-                location: center.location
-              };
-            }
-            break;
-
-          case "code":
-            const code = await Code.findById(resourceId).lean();
-            if (code) {
-              enrichedLog.resource.details = {
-                code: code.code,
-                type: code.type,
-                isRedeemed: code.isRedeemed
-              };
-            }
-            break;
-
-          case "container":
-            const container = await Container.findById(resourceId)
-              .populate("subject", "name")
-              .populate("level", "name")
-              .lean();
-            if (container) {
-              enrichedLog.resource.details = {
-                name: container.name,
-                type: container.type,
-                subject: container.subject?.name || "Unknown",
-                level: container.level?.name || "Unknown"
-              };
-            }
-            break;
-
-          case "moderator":
-            const moderator = await Moderator.findById(resourceId).lean();
-            if (moderator) {
-              enrichedLog.resource.details = {
-                name: moderator.name,
-                email: moderator.email
-              };
-            }
-            break;
-
-          case "subAdmin":
-            const subAdmin = await SubAdmin.findById(resourceId).lean();
-            if (subAdmin) {
-              enrichedLog.resource.details = {
-                name: subAdmin.name,
-                email: subAdmin.email
-              };
-            }
-            break;
-
-          case "assistant":
-            const assistant = await Assistant.findById(resourceId)
-              .populate("assignedLecturer", "name")
-              .lean();
-            if (assistant) {
-              enrichedLog.resource.details = {
-                name: assistant.name,
-                email: assistant.email,
-                assignedTo: assistant.assignedLecturer?.name || "Unknown"
-              };
-            }
-            break;
-
-          case "admin":
-            const admin = await Admin.findById(resourceId).lean();
-            if (admin) {
-              enrichedLog.resource.details = {
-                name: admin.name,
-                email: admin.email
-              };
-            }
-            break;
-
-          case "lecturer":
-            const lecturer = await Lecturer.findById(resourceId).lean();
-            if (lecturer) {
-              enrichedLog.resource.details = {
-                name: lecturer.name,
-                email: lecturer.email,
-                expertise: lecturer.expertise
-              };
-            }
-            break;
-
-          case "package":
-            const packageItem = await Package.findById(resourceId).lean();
-            if (packageItem) {
-              enrichedLog.resource.details = {
-                name: packageItem.name,
-                type: packageItem.type,
-                price: packageItem.price
-              };
-            }
-            break;
-
-          case "lesson":
-            const lesson = await Lesson.findById(resourceId)
-              .populate("subject", "name")
-              .populate("level", "name")
-              .populate("lecturer", "name")
-              .lean();
-            if (lesson) {
-              enrichedLog.resource.details = {
-                subject: lesson.subject?.name || "Unknown",
-                level: lesson.level?.name || "Unknown",
-                lecturer: lesson.lecturer?.name || "Unknown",
-                startTime: lesson.startTime
-              };
-            }
-            break;
-
-          case "ec.section":
-            const ecSection = await ECSection.findById(resourceId).lean();
-            if (ecSection) {
-              enrichedLog.resource.details = {
-                name: ecSection.name,
-                description: ecSection.description,
-                isActive: ecSection.isActive,
-                allowedRoles: ecSection.allowedRoles
-              };
-            }
-            break;
-
-          case "ec.product":
-            const ecProduct = await ECProduct.findById(resourceId)
-              .populate("section", "name")
-              .lean();
-            if (ecProduct) {
-              enrichedLog.resource.details = {
-                title: ecProduct.title,
-                description: ecProduct.description,
-                price: ecProduct.price,
-                section: ecProduct.section?.name || "Unknown",
-                isActive: ecProduct.isActive
-              };
-            }
-            break;
-
-          case "ec.purchase":
-            const ecPurchase = await ECPurchase.findById(resourceId)
-              .populate("productId", "title")
-              .populate("createdBy", "name email")
-              .populate("confirmedBy", "name email")
-              .lean();
-            if (ecPurchase) {
-              enrichedLog.resource.details = {
-                purchaseSerial: ecPurchase.purchaseSerial,
-                productName: ecPurchase.productName || ecPurchase.productId?.title,
-                price: ecPurchase.price,
-                userName: ecPurchase.userName,
-                confirmed: ecPurchase.confirmed,
-                confirmedBy: ecPurchase.confirmedBy?.name || null,
-                createdBy: ecPurchase.createdBy?.name || "Unknown"
-              };
-            }
-            break;
-
-          default:
-            // No additional details for unhandled resource types
-            break;
+        const details = await getResourceDetails(resourceType, resourceId);
+        if (details) {
+          enrichedLog.resource.details = details;
         }
-      } catch (error) {
-        console.error(`Error enriching ${resourceType} with ID ${resourceId}:`, error);
-        // Continue processing other logs even if one fails
       }
-    }
 
-    enrichedLogs.push(enrichedLog);
-  }
+      return enrichedLog;
+    })
+  );
 
   return enrichedLogs;
 };

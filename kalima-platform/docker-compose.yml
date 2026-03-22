@@ -22,9 +22,9 @@ services:
     ports:
       - "5035:5000"
     environment:
-      - NODE_ENV=development
+      - NODE_ENV=production
       - DATABASE_URI=${DATABASE_URI}
-      - PORT=${PORT}
+      - PORT=5000
       - REFRESH_TOKEN_SECRET=${REFRESH_TOKEN_SECRET} 
       - ACCESS_TOKEN_SECRET=${ACCESS_TOKEN_SECRET}
       - CLOUDINARY_NAME=${CLOUDINARY_NAME}

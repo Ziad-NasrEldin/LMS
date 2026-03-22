@@ -25,11 +25,10 @@
     "react-router-dom": "^7.2.0"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "build:android": "env-cmd -f .env.android react-scripts build && npx cap copy android"
+    "start": "npm --prefix frontend start",
+    "build": "npm --prefix frontend run build",
+    "test": "echo No root test script configured",
+    "build:android": "npm --prefix frontend run build:android"
   },
   "eslintConfig": {
     "extends": [

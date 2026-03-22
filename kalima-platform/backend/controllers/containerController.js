@@ -423,50 +423,50 @@ exports.createContainer = catchAsync(async (req, res, next) => {
 
       if (template && students.length > 0) {
         const io = req.app.get("io");
-        const notificationsToCreate = [];
 
-        await Promise.all(
-          students.map(async (student) => {
-            // Prepare notification data
-            const notificationData = {
-              title: template.title,
-              message: template.message
-                .replace("{container}", name)
-                .replace("{subject}", subjectDoc.name),
-              type: "new_container",
-              relatedId: container[0]._id,
-            };
+        const preparedNotifications = students.map((student) => {
+          const notificationData = {
+            title: template.title,
+            message: template.message
+              .replace("{container}", name)
+              .replace("{subject}", subjectDoc.name),
+            type: "new_container",
+            relatedId: container[0]._id,
+          };
 
-            // Check if student is online
-            const isOnline = io.sockets.adapter.rooms.has(
-              student._id.toString()
-            );
-            const isSent = isOnline;
+          const roomId = student._id.toString();
+          const isOnline = io.sockets.adapter.rooms.has(roomId);
 
-            // Create notification
-            const notification = await Notification.create(
-              [
-                {
-                  userId: student._id,
-                  ...notificationData,
-                  isSent,
-                },
-              ],
-              { session }
-            );
+          return {
+            roomId,
+            isOnline,
+            notificationData,
+            doc: {
+              userId: student._id,
+              ...notificationData,
+              isSent: isOnline,
+            },
+          };
+        });
 
-            notificationsToCreate.push(notification[0]);
-
-            // Send immediately if online
-            if (isOnline) {
-              studentsNotified++;
-              io.to(student._id.toString()).emit("newContainer", {
-                ...notificationData,
-                notificationId: notification[0]._id,
-              });
-            }
-          })
+        const createdNotifications = await Notification.insertMany(
+          preparedNotifications.map((item) => item.doc),
+          { session }
         );
+
+        createdNotifications.forEach((notification, index) => {
+          const { roomId, isOnline, notificationData } = preparedNotifications[index];
+
+          if (!isOnline) {
+            return;
+          }
+
+          studentsNotified++;
+          io.to(roomId).emit("newContainer", {
+            ...notificationData,
+            notificationId: notification._id,
+          });
+        });
       }
     }
 

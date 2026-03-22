@@ -12,6 +12,65 @@ const studentLectureAccess = require("../models/studentLectureAccessModel");
 const Package = require("../models/packageModel");
 const QueryFeatures = require("../utils/queryFeatures");
 
+const ROLE_MODEL_MAP = {
+  Student,
+  Parent,
+  Teacher,
+};
+
+const resolvePointsUserModel = async ({ userId, session, roleHint, populate }) => {
+  const applyQueryOptions = (query) => {
+    let nextQuery = query;
+
+    if (session) {
+      nextQuery = nextQuery.session(session);
+    }
+
+    if (populate) {
+      nextQuery = nextQuery.populate(populate);
+    }
+
+    return nextQuery;
+  };
+
+  const findByModel = async (Model) => {
+    if (!Model) {
+      return null;
+    }
+
+    return applyQueryOptions(Model.findById(userId));
+  };
+
+  if (roleHint && ROLE_MODEL_MAP[roleHint]) {
+    const hintedUser = await findByModel(ROLE_MODEL_MAP[roleHint]);
+    if (hintedUser) {
+      return hintedUser;
+    }
+  }
+
+  let baseUserQuery = User.findById(userId).select("role");
+  if (session) {
+    baseUserQuery = baseUserQuery.session(session);
+  }
+
+  const baseUser = await baseUserQuery;
+  if (baseUser?.role && ROLE_MODEL_MAP[baseUser.role]) {
+    const userFromRole = await findByModel(ROLE_MODEL_MAP[baseUser.role]);
+    if (userFromRole) {
+      return userFromRole;
+    }
+  }
+
+  for (const Model of [Student, Parent, Teacher]) {
+    const fallbackUser = await findByModel(Model);
+    if (fallbackUser) {
+      return fallbackUser;
+    }
+  }
+
+  return null;
+};
+
 const findAllChildContainers = async (containerId, session) => {
   try {
     // Find the container and all its nested children using GraphLookup
@@ -314,27 +373,15 @@ exports.purchaseContainerWithPoints = catchAsync(async (req, res, next) => {
     const pointsRequired = item.price || 0;
 
     // Find user model
-    let userModel;
     if (req.user.role === "Teacher" && item.teacherAllowed === false) {
       return next(new AppError("You are not allowed to purchase this item", 400));
     }
-    userModel = await Student.findById(userId).session(session);
-    if (!userModel) {
-      userModel = await Parent.findById(userId).session(session);
-    }
-    if (!userModel) {
-      userModel = await Teacher.findById(userId).session(session);
-    }
-    if (!userModel) {
-      const baseUser = await User.findById(userId).session(session);
-      if (baseUser) {
-        if (baseUser.role === "Student") {
-          userModel = await Student.findById(userId).session(session);
-        } else if (baseUser.role === "Parent") {
-          userModel = await Parent.findById(userId).session(session);
-        }
-      }
-    }
+    const userModel = await resolvePointsUserModel({
+      userId,
+      session,
+      roleHint: req.user.role,
+    });
+
     if (!userModel) {
       return next(new AppError(`User not found with ID: ${userId}`, 404));
     }
@@ -470,48 +517,14 @@ exports.getLecturerPointsBalance = catchAsync(async (req, res, next) => {
     return next(new AppError("User ID is required", 400));
   }
 
-  // Find user directly based on role first
-  let userModel;
-  let pointsBalance = 0;
-
-  // Try finding as Student
-  userModel = await Student.findById(userId).populate({
-    path: "lecturerPoints.lecturer",
-    select: "name",
+  const userModel = await resolvePointsUserModel({
+    userId,
+    roleHint: req.user?.role,
+    populate: {
+      path: "lecturerPoints.lecturer",
+      select: "name",
+    },
   });
-
-  // If not found, try as Parent
-  if (!userModel) {
-    userModel = await Parent.findById(userId).populate({
-      path: "lecturerPoints.lecturer",
-      select: "name",
-    });
-  }
-  if (!userModel) {
-    userModel = await Teacher.findById(userId).populate({
-      path: "lecturerPoints.lecturer",
-      select: "name",
-    });
-  }
-
-  // If still not found, check standard User model
-  if (!userModel) {
-    const baseUser = await User.findById(userId);
-
-    if (baseUser) {
-      if (baseUser.role === "Student") {
-        userModel = await Student.findById(userId).populate({
-          path: "lecturerPoints.lecturer",
-          select: "name",
-        });
-      } else if (baseUser.role === "Parent") {
-        userModel = await Parent.findById(userId).populate({
-          path: "lecturerPoints.lecturer",
-          select: "name",
-        });
-      }
-    }
-  }
 
   // Final check if we found a valid user model
   if (!userModel) {
@@ -519,7 +532,7 @@ exports.getLecturerPointsBalance = catchAsync(async (req, res, next) => {
   }
 
   // Get points balance
-  pointsBalance = userModel.getLecturerPointsBalance(lecturerId);
+  const pointsBalance = userModel.getLecturerPointsBalance(lecturerId);
 
   // Get purchase history for this user-lecturer combination
   const purchases = await Purchase.find({
@@ -558,48 +571,14 @@ exports.getAllUserPointBalances = catchAsync(async (req, res, next) => {
     return next(new AppError("User ID is required", 400));
   }
 
-  // Find user directly based on role first
-  let userModel;
-  let pointsBalances = [];
-
-  // Try finding as Student
-  userModel = await Student.findById(userId).populate({
-    path: "lecturerPoints.lecturer",
-    select: "name subject",
+  const userModel = await resolvePointsUserModel({
+    userId,
+    roleHint: req.user?.role,
+    populate: {
+      path: "lecturerPoints.lecturer",
+      select: "name subject",
+    },
   });
-
-  // If not found, try as Parent
-  if (!userModel) {
-    userModel = await Parent.findById(userId).populate({
-      path: "lecturerPoints.lecturer",
-      select: "name subject",
-    });
-  }
-  if (!userModel) {
-    userModel = await Teacher.findById(userId).populate({
-      path: "lecturerPoints.lecturer",
-      select: "name subject",
-    });
-  }
-
-  // If still not found, check standard User model
-  if (!userModel) {
-    const baseUser = await User.findById(userId);
-
-    if (baseUser) {
-      if (baseUser.role === "Student") {
-        userModel = await Student.findById(userId).populate({
-          path: "lecturerPoints.lecturer",
-          select: "name subject",
-        });
-      } else if (baseUser.role === "Parent") {
-        userModel = await Parent.findById(userId).populate({
-          path: "lecturerPoints.lecturer",
-          select: "name subject",
-        });
-      }
-    }
-  }
 
   // Final check if we found a valid user model
   if (!userModel) {
@@ -607,7 +586,7 @@ exports.getAllUserPointBalances = catchAsync(async (req, res, next) => {
   }
 
   // Get points balances
-  pointsBalances = userModel.lecturerPoints || [];
+  const pointsBalances = userModel.lecturerPoints || [];
   const generalPoints = userModel.generalPoints || 0;
   const promoPoints = userModel.promoPoints || 0;
   const hasPromoCode = userModel.hasPromoCode || false;

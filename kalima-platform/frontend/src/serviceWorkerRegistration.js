@@ -4,17 +4,20 @@ const isLocalhost = Boolean(
     window.location.hostname.match(/^127(?:\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}$/)
 );
 
+const isProd = import.meta.env.PROD;
+const baseUrl = import.meta.env.BASE_URL || '/';
+
 export function register(config) {
-  if (process.env.NODE_ENV === 'production' && 'serviceWorker' in navigator) {
+  if (isProd && 'serviceWorker' in navigator) {
     // The URL constructor is available in all browsers that support SW.
-    const publicUrl = new URL(process.env.PUBLIC_URL, window.location.href);
-    if (publicUrl.origin !== window.location.origin) {
+    const resolvedBaseUrl = new URL(baseUrl, window.location.href);
+    if (resolvedBaseUrl.origin !== window.location.origin) {
       // Our service worker won't work if PUBLIC_URL is on a different origin
       return;
     }
 
     window.addEventListener('load', () => {
-      const swUrl = `${process.env.PUBLIC_URL}/service-worker.js`;
+      const swUrl = new URL('service-worker.js', resolvedBaseUrl).toString();
 
       if (isLocalhost) {
         // This is running on localhost. Check if a service worker exists.
