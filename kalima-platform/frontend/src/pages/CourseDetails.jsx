@@ -283,7 +283,7 @@ export default function CourseDetails() {
           refreshPurchaseHistory()
         }
       } else {
-        setPurchaseError(t("purchase.purchaseError"))
+        setPurchaseError(response?.error || response?.data?.message || t("purchase.purchaseError"))
       }
     } catch (err) {
       console.error("Purchase error:", err)

@@ -1,6 +1,6 @@
 import axios from "axios";
 import { getToken, isLoggedIn } from "./auth-services";
-import api from "../services/errorHandling";
+import { normalizeApiError } from "../utils/apiError";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -22,10 +22,7 @@ export const getAllSubjects = async () => {
       data: response.data.data.subjects, // Extract the subjects array
     };
   } catch (error) {
-    return {
-      success: false,
-      error: `Failed to fetch subjects: ${error.message}`,
-    };
+    return normalizeApiError(error, "Failed to fetch subjects");
   }
 };
 
@@ -46,10 +43,7 @@ export const getSubjectById = async (subjectId) => {
       data: response.data.data,
     };
   } catch (error) {
-    return {
-      success: false,
-      error: `Failed to fetch subject: ${error.message}`,
-    };
+    return normalizeApiError(error, "Failed to fetch subject");
   }
 };
 
@@ -69,10 +63,7 @@ export const getLecturesBySubject = async (subjectId) => {
       data: response.data.data.lectures,
     };
   } catch (error) {
-    return {
-      success: false,
-      error: `Failed to fetch lectures: ${error.message}`,
-    };
+    return normalizeApiError(error, "Failed to fetch lectures");
   }
 };
 
@@ -96,10 +87,7 @@ export const createSubject = async (subjectData) => {
       message: response.data.message || 'Subject created successfully',
     };
   } catch (error) {
-    return {
-      success: false,
-      error: error.response?.data?.message || error.message || 'Failed to create subject',
-    };
+    return normalizeApiError(error, "Failed to create subject");
   }
 };
 
@@ -120,9 +108,6 @@ export const deleteSubject = async (subjectId) => {
       data: response.data,
     };
   } catch (error) {
-    return {
-      success: false,
-      error: `Failed to delete subject: ${error.message}`,
-    };
+    return normalizeApiError(error, "Failed to delete subject");
   }
 };

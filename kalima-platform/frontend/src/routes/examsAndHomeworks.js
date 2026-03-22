@@ -1,6 +1,7 @@
 import axios from "axios";
 import { getToken } from "./auth-services"; // Adjust the path based on your project structure
 import { getAuthHeader } from "./fetch-users"; // Adjust the path based on your project structure
+import { normalizeApiError } from "../utils/apiError";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -32,10 +33,7 @@ export const getStudentSubmissionsByLectureId = async (lectureId) => {
     return { success: true, data: response.data.data };
   } catch (error) {
     console.error("Error fetching student submissions:", error);
-    return {
-      success: false,
-      error: error.response?.data?.message || error.message || "Failed to fetch student submissions",
-    };
+    return normalizeApiError(error, "Failed to fetch student submissions");
   }
 };
 
@@ -69,10 +67,11 @@ export const verifyExamSubmission = async (lectureId) => {
     }
   } catch (error) {
     console.error("Error verifying exam submission:", error)
+    const normalizedError = normalizeApiError(error, "Failed to verify exam submission");
     return {
       success: false,
       status: "fail",
-      error: error.response?.data?.message || error.message || "Failed to verify exam submission",
+      error: normalizedError.message,
     }
   }
 }

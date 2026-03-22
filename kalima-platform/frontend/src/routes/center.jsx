@@ -1,6 +1,6 @@
 import axios from "axios";
 import { getToken, isLoggedIn } from "./auth-services";
-import api from "../services/errorHandling";
+import { normalizeApiError } from "../utils/apiError";
 
 // Use the correct API URL format
 const API_URL = import.meta.env.VITE_API_URL;
@@ -34,7 +34,7 @@ export const getAllCenters = async () => {
       };
     }
   } catch (error) {
-    return `Failed to fetch centers: ${error.message}`
+    return normalizeApiError(error, "Failed to fetch centers");
   }
 };
 
@@ -76,7 +76,10 @@ export const getCenterDataByType = async (centerId, type) => {
       };
     }
   } catch (error) {
-    return `Failed to fetch ${type} : ${error.message}`
+    return {
+      ...normalizeApiError(error, `Failed to fetch ${type}`),
+      data: [],
+    };
   }
 };
 
@@ -114,7 +117,7 @@ export const getCenterTimetable = async (centerId) => {
       };
     }
   } catch (error) {
-    return `Failed to fetch timetable:${error.message}`
+    return normalizeApiError(error, "Failed to fetch timetable");
   }
 };
 
@@ -172,7 +175,7 @@ export const addNewLesson = async (lessonData) => {
       };
     }
   } catch (error) {
-    return `Failed to add new lesson:${error.message}`
+    return normalizeApiError(error, "Failed to add new lesson");
   }
 };
 
@@ -204,7 +207,10 @@ export const getAllParents = async () => {
       };
     }
   } catch (error) {
-    return `Failed to fetch parents: ${error.message}`;
+    return {
+      ...normalizeApiError(error, "Failed to fetch parents"),
+      data: [],
+    };
   }
 };
 
@@ -241,7 +247,7 @@ export const sendLessonReport = async (reportData) => {
       };
     }
   } catch (error) {
-    return `Failed to send lesson report: ${error.message}`;
+    return normalizeApiError(error, "Failed to send lesson report");
   }
 };
 
@@ -278,7 +284,7 @@ export const sendMonthReport = async (reportData) => {
       };
     }
   } catch (error) {
-    return `Failed to send month report: ${error.message}`;
+    return normalizeApiError(error, "Failed to send month report");
   }
 };
 
@@ -315,7 +321,7 @@ export const sendCourseReport = async (reportData) => {
       };
     }
   } catch (error) {
-    return `Failed to send course report: ${error.message}`;
+    return normalizeApiError(error, "Failed to send course report");
   }
 };
 
@@ -409,10 +415,7 @@ export const recordAttendance = async (attendanceData) => {
     };
   } catch (error) {
     console.error('Error recording attendance:', error);
-    return {
-      success: false,
-      error: error.response?.data?.message || error.message || 'Failed to record attendance',
-    };
+    return normalizeApiError(error, "Failed to record attendance");
   }
 };
 
@@ -435,9 +438,6 @@ export const createLecturer = async (lecturerData) => {
       message: response.data.message || 'Lecturer created successfully',
     };
   } catch (error) {
-    return {
-      success: false,
-      error: error.response?.data?.message || error.message || 'Failed to create lecturer',
-    };
+    return normalizeApiError(error, "Failed to create lecturer");
   }
 };

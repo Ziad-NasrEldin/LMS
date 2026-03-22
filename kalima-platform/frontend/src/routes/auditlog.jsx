@@ -68,7 +68,10 @@ export const getAuditLogById = async (logId) => {
       data: response.data
     };
   } catch (error) {
-    return `Error fetching audit log ${logId}: ${error.message}`
+    return {
+      status: "error",
+      error: error?.response?.data?.message || `Error fetching audit log ${logId}: ${error.message}`,
+    };
   }
 };
 

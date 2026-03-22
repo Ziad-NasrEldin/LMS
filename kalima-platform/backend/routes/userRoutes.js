@@ -12,6 +12,8 @@ router
   .post(uploadProfilePicToDisk,
     validateUser, userController.createUser);
 
+router.route("/role/:role").get(userController.getAllUsersByRole);
+
 router
   .route("/:userId")
   .get(userController.getUser)
@@ -26,8 +28,6 @@ router
     authController.verifyRoles("Admin", "SubAdmin"),
     userController.deleteUser
   );
-
-router.route("/role/:role").get(userController.getAllUsersByRole);
 
 router
   .route("/update/password")

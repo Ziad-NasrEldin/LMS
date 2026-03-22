@@ -1,5 +1,6 @@
 import axios from "axios"
 import { getToken, isLoggedIn } from "./auth-services"
+import { normalizeApiError } from "../utils/apiError"
 
 const API_URL = import.meta.env.VITE_API_URL
 
@@ -22,10 +23,7 @@ export const getAllCoupons = async () => {
       data: response.data,
     }
   } catch (error) {
-    return {
-      success: false,
-      error: `Failed to fetch coupons: ${error.message}`,
-    }
+    return normalizeApiError(error, "Failed to fetch coupons")
   }
 }
 
@@ -48,10 +46,7 @@ export const getActiveCoupons = async () => {
       data: response.data,
     }
   } catch (error) {
-    return {
-      success: false,
-      error: `Failed to fetch active coupons: ${error.message}`,
-    }
+    return normalizeApiError(error, "Failed to fetch active coupons")
   }
 }
 
@@ -74,10 +69,7 @@ export const getUsedCoupons = async () => {
       data: response.data,
     }
   } catch (error) {
-    return {
-      success: false,
-      error: `Failed to fetch used coupons: ${error.message}`,
-    }
+    return normalizeApiError(error, "Failed to fetch used coupons")
   }
 }
 
@@ -100,10 +92,7 @@ export const getCouponById = async (couponId) => {
       data: response.data,
     }
   } catch (error) {
-    return {
-      success: false,
-      error: `Failed to fetch coupon: ${error.message}`,
-    }
+    return normalizeApiError(error, "Failed to fetch coupon")
   }
 }
 
@@ -127,10 +116,7 @@ export const createCoupon = async (couponData) => {
       data: response.data,
     }
   } catch (error) {
-    return {
-      success: false,
-      error: `Failed to create coupon: ${error.response?.data?.message || error.message}`,
-    }
+    return normalizeApiError(error, "Failed to create coupon")
   }
 }
 
@@ -153,10 +139,7 @@ export const deleteCoupon = async (couponId) => {
       data: response.data,
     }
   } catch (error) {
-    return {
-      success: false,
-      error: `Failed to delete coupon: ${error.response?.data?.message || error.message}`,
-    }
+    return normalizeApiError(error, "Failed to delete coupon")
   }
 }
 
@@ -186,10 +169,7 @@ export const useCoupon = async (couponCode, purchaseId) => {
       data: response.data,
     }
   } catch (error) {
-    return {
-      success: false,
-      error: `Failed to apply coupon: ${error.response?.data?.message || error.message}`,
-    }
+    return normalizeApiError(error, "Failed to apply coupon")
   }
 }
 
@@ -219,9 +199,6 @@ export const validateCoupon = async (couponCode) => {
       data: response.data,
     }
   } catch (error) {
-    return {
-      success: false,
-      error: `Failed to validate coupon: ${error.response?.data?.message || error.message}`,
-    }
+    return normalizeApiError(error, "Failed to validate coupon")
   }
 }

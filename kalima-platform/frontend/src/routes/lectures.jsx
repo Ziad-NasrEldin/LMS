@@ -1,5 +1,6 @@
 import axios from "axios"
 import { getToken, isLoggedIn } from "./auth-services"
+import { normalizeApiError } from "../utils/apiError"
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -15,7 +16,7 @@ export const getAllContainers = async (queryParams = {}) => {
     });
     return response.data;
   } catch (error) {
-    return `Error fetching containers: ${error.message}`;
+    return normalizeApiError(error, "Error fetching containers");
   }
 };
 
@@ -29,7 +30,7 @@ export const getAllLecturesPublic = async (queryParams = {}) => {
     return response.data
   }
   catch (error) {
-    return `Error fetching lectures: ${error.message}`
+    return normalizeApiError(error, "Error fetching lectures")
   }
 }
 
@@ -43,7 +44,7 @@ export const getAllContainersPublic = async () => {
 
     return response.data
   } catch (error) {
-    return `Error fetching containers: ${error.message}`
+    return normalizeApiError(error, "Error fetching containers")
   }
 }
 //Function to purchase a container
@@ -62,7 +63,12 @@ export const purchaseContainer = async (containerId) => {
     return response;
 
   } catch (error) {
-    return `Error purchasing container : ${error.message}`
+    return {
+      success: false,
+      status: error.response?.status,
+      error: error.response?.data?.message || `Error purchasing container: ${error.message}`,
+      data: error.response?.data,
+    };
   }
 }
 // Function to get a container by ID
@@ -90,7 +96,7 @@ export const getContainerById = async (containerId) => {
     return response.data;
 
   } catch (error) {
-    return `Error fetching container : ${error.message}`
+    return normalizeApiError(error, "Error fetching container")
   }
 };
 
@@ -116,7 +122,7 @@ export const getLectureAttachments = async (lectureId) => {
       data: response.data,
     };
   } catch (error) {
-    return `Failed to fetch lecture attachments. Please try again later : ${error.message}`;
+    return normalizeApiError(error, "Failed to fetch lecture attachments. Please try again later");
   }
 };
 
@@ -249,7 +255,7 @@ export const getMyContainers = async () => {
     }
   } catch (error) {
     console.error("Error fetching my containers:", error)
-    return `Failed to fetch containers : ${error.message}`
+    return normalizeApiError(error, "Failed to fetch containers")
   }
 }
 
@@ -266,7 +272,7 @@ export const getAllLectures = async (queryParams = {}) => {
     return response.data;
   } catch (error) {
     console.error("Error fetching lectures:", error);
-    return `Failed to fetch lectures : ${error.message}`
+    return normalizeApiError(error, "Failed to fetch lectures")
   }
 };
 
@@ -280,7 +286,7 @@ export const getContainersByLecturerId = async (lecturerId) => {
     });
     return response.data;
   } catch (error) {
-    return `Error fetching containers for lecturer ${lecturerId}: ${error.message}`;
+    return normalizeApiError(error, `Error fetching containers for lecturer ${lecturerId}`);
   }
 };
 
@@ -292,6 +298,10 @@ export const getLecturesByContainerId = async (containerId) => {
     }
 
     const containerResponse = await getContainerById(containerId)
+    if (containerResponse?.status === "error") {
+      return containerResponse
+    }
+
     const containerData = containerResponse.data
     const childrenArray = containerData?.children || containerData?.container?.children || []
 
@@ -312,7 +322,7 @@ export const getLecturesByContainerId = async (containerId) => {
 
     return { data: { lectures } }
   } catch (error) {
-    return `Error fetching lectures for container ${containerId}: ${error.message}`;
+    return normalizeApiError(error, `Error fetching lectures for container ${containerId}`);
   }
 }
 
@@ -331,7 +341,13 @@ export const getLectureById = async (lectureId) => {
       data: response.data.data, // Access the data property from the response
     }
   } catch (error) {
-    return error.message;
+    const normalizedError = normalizeApiError(error, "Failed to fetch lecture");
+    return {
+      success: false,
+      error: normalizedError.message,
+      status: error.response?.status,
+      data: error.response?.data,
+    };
   }
 }
 
@@ -348,7 +364,7 @@ export const deleteContainerById = async (containerId) => {
     }
     return response.data
   } catch (error) {
-    return `Error deleting container ${containerId}: ${error.message}`;
+    return normalizeApiError(error, `Error deleting container ${containerId}`);
   }
 }
 

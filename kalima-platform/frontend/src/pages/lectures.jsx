@@ -150,15 +150,12 @@ export default function LecturesPage() {
         // Refresh points and merge backend purchases, never reset
         fetchUserData()
       } else {
-        const errorMessage =
-          typeof response === "string"
-            ? response
-            : response.data?.message || t("purchase.failed")
+        const errorMessage = response?.error || response?.data?.message || t("purchase.failed")
         toast.error(errorMessage)
       }
     } catch (err) {
       console.error("Error purchasing lecture:", err)
-      toast.error(t("purchase.failed"))
+      toast.error(err.response?.data?.message || t("purchase.failed"))
     }
   }
 

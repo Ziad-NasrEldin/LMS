@@ -1,7 +1,7 @@
 // src/routes/revenue.js
 import axios from "axios";
 import { getToken } from "./auth-services";
-import api from "../services/errorHandling";
+import { normalizeApiError } from "../utils/apiError";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -21,7 +21,7 @@ export const getRevenueSummary = async () => {
     return response.data.data;
   } catch (error) {
     console.error("Error fetching revenue summary:", error);
-    throw error;
+    throw new Error(normalizeApiError(error, "Error fetching revenue summary").message);
   }
 };
 
@@ -41,7 +41,7 @@ export const getRevenueBreakdown = async () => {
     return response.data.data.breakdown;
   } catch (error) {
     console.error("Error fetching revenue breakdown:", error);
-    throw error;
+    throw new Error(normalizeApiError(error, "Error fetching revenue breakdown").message);
   }
 };
 
@@ -57,6 +57,6 @@ export const getLecturerMonthlyRevenue = async (lecturerId) => {
     return response.data.data;
   } catch (error) {
     console.error("Error fetching lecturer monthly revenue:", error);
-    throw error;
+    throw new Error(normalizeApiError(error, "Error fetching lecturer monthly revenue").message);
   }
 };

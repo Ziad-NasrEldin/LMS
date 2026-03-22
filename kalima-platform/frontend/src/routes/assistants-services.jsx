@@ -1,5 +1,6 @@
 import axios from "axios";
 import { getToken, isLoggedIn } from "./auth-services";
+import { normalizeApiError, normalizeApiErrorWithEmpty404 } from "../utils/apiError";
 const API_URL = import.meta.env.VITE_API_URL
 export const AssistantService = {
   // Fetch all assistants
@@ -19,7 +20,7 @@ export const AssistantService = {
         }
       }
     } catch (error) {
-      return `An error occurred while fetching assistants: ${error.message}`
+      return normalizeApiError(error, "An error occurred while fetching assistants");
     }
   },
 
@@ -38,7 +39,7 @@ export const AssistantService = {
         data: response.data.data.userInfo
       };
     } catch (error) {
-      return `Failed to fetch user data: ${error.message}`
+      return normalizeApiError(error, "Failed to fetch user data");
     }
   },
 
@@ -60,7 +61,7 @@ export const AssistantService = {
         data: response.data.data.assistants
       };
     } catch (error) {
-      return `Failed to fetch assistants: ${error.message}`
+      return normalizeApiErrorWithEmpty404(error, "Failed to fetch assistants");
     }
   }
 };
@@ -80,7 +81,7 @@ export const CreateAssistant = async (data) => {
       data: response.data.data.assistant
     };
   } catch (error) {
-    return `Failed to create assistant: ${error.message}`
+    return normalizeApiError(error, "Failed to create assistant");
   }
 }
 
@@ -99,10 +100,7 @@ export const deleteAssistant = async (assistantId) => {
       data: response.data
     };
   } catch (error) {
-    return {
-      success: false,
-      error: error.message
-    };
+    return normalizeApiError(error, "Failed to delete assistant");
   }
 };
 
@@ -122,9 +120,6 @@ export const updateAssistant = async (assistantId, data) => {
       data: response.data.data.assistant
     };
   } catch (error) {
-    return {
-      success: false,
-      error: error.message
-    };
+    return normalizeApiError(error, "Failed to update assistant");
   }
 };

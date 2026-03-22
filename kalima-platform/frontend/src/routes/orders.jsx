@@ -1,5 +1,6 @@
 import axios from "axios"
 import { getToken } from "./auth-services"
+import { normalizeApiError } from "../utils/apiError"
 
 const API_URL = import.meta.env.VITE_API_URL
 
@@ -29,10 +30,7 @@ export const getAllProductPurchases = async (queryParams = {}) => {
       data: response.data,
     }
   } catch (error) {
-    return {
-      success: false,
-      error: `Failed to fetch product purchases: ${error.message}`,
-    }
+    return normalizeApiError(error, "Failed to fetch product purchases")
   }
 }
 
@@ -62,10 +60,7 @@ export const confirmProductPurchase = async (purchaseId) => {
       data: response.data,
     }
   } catch (error) {
-    return {
-      success: false,
-      error: `Failed to confirm product purchase: ${error.message}`,
-    }
+    return normalizeApiError(error, "Failed to confirm product purchase")
   }
 }
 
@@ -93,10 +88,7 @@ export const confirmBookPurchase = async (purchaseId) => {
       data: response.data,
     }
   } catch (error) {
-    return {
-      success: false,
-      error: `Failed to confirm book purchase: ${error.message}`,
-    }
+    return normalizeApiError(error, "Failed to confirm book purchase")
   }
 }
 
@@ -118,10 +110,7 @@ export const getAllStats = async () => {
       data: response.data,
     }
   } catch (error) {
-    return {
-      success: false,
-      error: `Failed to fetch stats: ${error.message}`,
-    }
+    return normalizeApiError(error, "Failed to fetch stats")
   }
 }
 
@@ -150,10 +139,7 @@ export const getProductStats = async (date = null) => {
       data: response.data,
     }
   } catch (error) {
-    return {
-      success: false,
-      error: `Failed to fetch product stats: ${error.message}`,
-    }
+    return normalizeApiError(error, "Failed to fetch product stats")
   }
 }
 
@@ -180,9 +166,6 @@ export const updatePurchase = async (purchaseId, updateData) => {
       data: response.data,
     }
   } catch (error) {
-    return {
-      success: false,
-      error: `Failed to update purchase: ${error.message}`,
-    }
+    return normalizeApiError(error, "Failed to update purchase")
   }
 }

@@ -1,5 +1,6 @@
 // src/routes/governments.js
 import axios from "axios";
+import { normalizeApiError } from "../utils/apiError";
 const API_URL = import.meta.env.VITE_API_URL;
 
 // Helper function to get auth headers
@@ -24,10 +25,7 @@ export const getAllGovernments = async () => {
       data: response.data,
     };
   } catch (error) {
-    return {
-      success: false,
-      error: `Error fetching governments: ${error.message}`,
-    };
+    return normalizeApiError(error, "Error fetching governments");
   }
 };
 
@@ -55,9 +53,6 @@ export const getGovernmentZones = async (governmentName) => {
       data: response.data.zones || [],
     };
   } catch (error) {
-    return {
-      success: false,
-      error: `Error fetching zones for ${governmentName}: ${error.message}`,
-    };
+    return normalizeApiError(error, `Error fetching zones for ${governmentName}`);
   }
 };

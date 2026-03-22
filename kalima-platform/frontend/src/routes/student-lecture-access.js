@@ -1,5 +1,6 @@
 import axios from "axios"
 import { getToken } from "./auth-services"
+import { normalizeApiError } from "../utils/apiError"
 
 /**
  * Get all student lecture accesses for a specific lecture
@@ -32,10 +33,7 @@ export const getAllStudentLectureAccess = async (lectureId, limit = 100) => {
     }
   } catch (error) {
     console.error("Error fetching student lecture access:", error)
-    return {
-      success: false,
-      error: error.response?.data?.message || error.message || "Failed to fetch student lecture access",
-    }
+    return normalizeApiError(error, "Failed to fetch student lecture access")
   }
 }
 
@@ -68,10 +66,7 @@ export const getStudentLectureAccessByLectureId = async (lectureId) => {
     }
   } catch (error) {
     console.error("Error fetching student lecture access by lecture ID:", error)
-    return {
-      success: false,
-      error: error.response?.data?.message || error.message || "Failed to fetch student lecture access",
-    }
+    return normalizeApiError(error, "Failed to fetch student lecture access")
   }
 }
 
@@ -99,10 +94,7 @@ export const updateStudentLectureAccess = async (accessId, data) => {
     }
   } catch (error) {
     console.error("Error updating student lecture access:", error)
-    return {
-      success: false,
-      error: error.response?.data?.message || error.message || "Failed to update student lecture access",
-    }
+    return normalizeApiError(error, "Failed to update student lecture access")
   }
 }
 
@@ -142,9 +134,6 @@ export const checkStudentLectureAccess = async (studentId, lectureId, purchaseId
     }
   } catch (error) {
     console.error("Error checking student lecture access:", error)
-    return {
-      success: false,
-      error: error.response?.data?.message || error.message || "Failed to check student lecture access",
-    }
+    return normalizeApiError(error, "Failed to check student lecture access")
   }
 }

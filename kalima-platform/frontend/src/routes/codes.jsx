@@ -1,6 +1,7 @@
 import axios from "axios";
 import { getToken } from "./auth-services"; // Adjust the path based on your project structure
 import { getAuthHeader } from "./fetch-users"; // Adjust the path based on your project structure
+import { normalizeApiError, normalizeApiErrorWithEmpty404 } from "../utils/apiError";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -26,17 +27,7 @@ export const redeemPromoCode = async (code) => {
     );
     return { success: true, data: response.data };
   } catch (error) {
-    // if (error.response) {
-    //   // Server responded with a status outside 2xx
-    //   return { success: false, error: error.response.data.message || 'Redemption failed' };
-    // } else if (error.request) {
-    //   // No response received from server
-    //   return { success: false, error: 'No response from server' };
-    // } else {
-    //   // Error in request setup
-    //   return { success: false, error: 'Request setup error' };
-    // }
-    return `Redemption failed:${error.message}`
+    return normalizeApiError(error, "Redemption failed");
   }
 };
 
@@ -130,7 +121,7 @@ export const getPromoCodes = async ({ params = {} } = {}) => {
     const promoCodes = response.data?.data?.codes || [];
     return { success: true, data: promoCodes };
   } catch (error) {
-    return { success: false, error: error.message || 'Failed to fetch promo codes' };
+    return normalizeApiErrorWithEmpty404(error, "Failed to fetch promo codes");
   }
 };
 
@@ -166,10 +157,7 @@ export const deletePromoCode = async (code) => {
       };
     }
   } catch (error) {
-    return {
-      success: false,
-      error: error.response?.data?.message || error.message || 'Failed to delete promo code'
-    };
+    return normalizeApiError(error, "Failed to delete promo code");
   }
 };
 
@@ -209,9 +197,6 @@ export const deleteBulkPromoCodes = async (codes) => {
       };
     }
   } catch (error) {
-    return {
-      success: false,
-      error: error.response?.data?.message || error.message || 'Failed to delete promo codes'
-    };
+    return normalizeApiError(error, "Failed to delete promo codes");
   }
 };

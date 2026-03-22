@@ -5,6 +5,9 @@ const bcrypt = require("bcrypt");
 const Level = require("../models/levelModel");
 const Subject = require("../models/subjectModel");
 const Lecturer = require("../models/lecturerModel");
+const Student = require("../models/studentModel");
+const Government = require("../models/governmentModel");
+const AdministrationZone = require("../models/administrationZonesModel");
 const Container = require("../models/containerModel");
 const Lecture = require("../models/LectureModel");
 
@@ -46,6 +49,25 @@ const MOCK_SUBJECTS = [
   },
 ];
 
+const MOCK_GOVERNMENTS = [
+  {
+    name: "Cairo",
+    administrationZone: ["Nasr City", "Heliopolis", "Maadi"],
+  },
+  {
+    name: "Giza",
+    administrationZone: ["Dokki", "Mohandessin", "6th of October"],
+  },
+  {
+    name: "Alexandria",
+    administrationZone: ["Montaza", "Sidi Gaber", "Smouha"],
+  },
+  {
+    name: "Dakahlia",
+    administrationZone: ["Mansoura East", "Mansoura West", "Talkha"],
+  },
+];
+
 async function upsertLevel(name) {
   const existing = await Level.findOne({ name });
   if (existing) return existing;
@@ -80,6 +102,65 @@ async function upsertSubject(name, levelIds) {
   existing.level = mergedLevels;
   await existing.save();
   return existing;
+}
+
+async function upsertGovernment(governmentInput) {
+  const existing = await Government.findOne({ name: governmentInput.name });
+  if (!existing) {
+    return Government.create(governmentInput);
+  }
+
+  const mergedZones = Array.from(
+    new Set([
+      ...(existing.administrationZone || []).map((zone) => zone.trim()),
+      ...governmentInput.administrationZone.map((zone) => zone.trim()),
+    ])
+  );
+
+  existing.administrationZone = mergedZones;
+  await existing.save();
+  return existing;
+}
+
+async function syncAdministrationZones(governments) {
+  const uniqueZones = Array.from(
+    new Set(
+      governments.flatMap((gov) =>
+        (gov.administrationZone || []).map((zone) => zone.trim())
+      )
+    )
+  );
+
+  for (const zoneName of uniqueZones) {
+    const exists = await AdministrationZone.findOne({ name: zoneName });
+    if (!exists) {
+      await AdministrationZone.create({ name: zoneName });
+    }
+  }
+
+  return uniqueZones.length;
+}
+
+async function upsertMockStudent({ levelId, defaultPasswordHash, governmentName, administrationZone }) {
+  const studentEmail = "mock.student1@fekra-edu.com";
+
+  const existing = await Student.findOne({ email: studentEmail });
+  if (existing) return existing;
+
+  return Student.create({
+    name: "Omar Khaled",
+    email: studentEmail,
+    password: defaultPasswordHash,
+    gender: "male",
+    level: levelId,
+    government: governmentName,
+    administrationZone,
+    phoneNumber: "01012345678",
+    parentPhoneNumber: "01011112222",
+    faction: "Science",
+    hobbies: ["Reading", "Math puzzles"],
+    isEmailVerified: true,
+  });
 }
 
 async function upsertCourseContainer({ name, subjectId, levelId, lecturerId, description }) {
@@ -135,6 +216,15 @@ async function runSeedMockData() {
     const defaultPassword = process.env.MOCK_PASSWORD || "Password123";
     const hashedPassword = await bcrypt.hash(defaultPassword, 12);
 
+    const governments = [];
+    for (const governmentInput of MOCK_GOVERNMENTS) {
+      const government = await upsertGovernment(governmentInput);
+      governments.push(government);
+    }
+    const zoneCount = await syncAdministrationZones(governments);
+    console.log(`Governments ready: ${governments.length}`);
+    console.log(`Administration zones ready: ${zoneCount}`);
+
     const levelByName = {};
     for (const levelName of MOCK_LEVELS) {
       levelByName[levelName] = await upsertLevel(levelName);
@@ -157,6 +247,18 @@ async function runSeedMockData() {
       lecturers.push(lecturer);
     }
     console.log(`Lecturers ready: ${lecturers.length}`);
+
+    const studentLevel = levelByName["first secondary"];
+    const defaultGovernment = governments[0];
+    const defaultZone = defaultGovernment.administrationZone[0];
+
+    await upsertMockStudent({
+      levelId: studentLevel._id,
+      defaultPasswordHash: hashedPassword,
+      governmentName: defaultGovernment.name,
+      administrationZone: defaultZone,
+    });
+    console.log("Student mock account ready: 1");
 
     const courseA = await upsertCourseContainer({
       name: "Physics Basics Course",
@@ -216,6 +318,8 @@ async function runSeedMockData() {
     console.log("Mock lecturer credentials:");
     console.log("- mock.lecturer1@fekra-edu.com / " + defaultPassword);
     console.log("- mock.lecturer2@fekra-edu.com / " + defaultPassword);
+    console.log("Mock student credentials:");
+    console.log("- mock.student1@fekra-edu.com / " + defaultPassword);
   } catch (error) {
     console.error("Mock seeding failed:", error);
     process.exitCode = 1;

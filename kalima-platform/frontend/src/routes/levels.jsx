@@ -1,4 +1,5 @@
 import axios from "axios";
+import { normalizeApiError } from "../utils/apiError";
 const API_URL = import.meta.env.VITE_API_URL;
 
 // Helper function to get auth headers
@@ -30,10 +31,7 @@ export const getAllLevels = async () => {
       data: sortedLevels,
     };
   } catch (error) {
-    return {
-      success: false,
-      error: `Error fetching levels: ${error.message}`,
-    };
+    return normalizeApiError(error, "Error fetching levels");
   }
 };
 
@@ -49,10 +47,7 @@ export const createLevel = async (levelData) => {
       data: response.data,
     };
   } catch (error) {
-    return {
-      success: false,
-      error: `Error creating level: ${error.message}`,
-    };
+    return normalizeApiError(error, "Error creating level");
   }
 };
 
@@ -68,9 +63,6 @@ export const deleteLevel = async (levelId) => {
       data: response.data,
     };
   } catch (error) {
-    return {
-      success: false,
-      error: `Error deleting level: ${error.message}`,
-    };
+    return normalizeApiError(error, "Error deleting level");
   }
 };

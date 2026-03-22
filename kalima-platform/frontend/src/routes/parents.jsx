@@ -1,5 +1,6 @@
 import axios from "axios";
 import { getToken } from "../routes/auth-services";
+import { normalizeApiError } from "../utils/apiError";
 
 /**
  * Fetches the children data for the logged-in parent user
@@ -23,11 +24,6 @@ export const getChildrenData = async () => {
     };
 
   } catch (error) {
-    return {
-      success: false,
-      error: error.response?.data?.message ||
-        error.message ||
-        "Failed to fetch children data"
-    };
+    return normalizeApiError(error, "Failed to fetch children data");
   }
 };

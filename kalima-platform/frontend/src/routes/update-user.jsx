@@ -1,5 +1,6 @@
 import axios from "axios"
-import { getToken, isLoggedIn } from "./auth-services"
+import { getToken } from "./auth-services"
+import { normalizeApiError } from "../utils/apiError"
 
 const API_URL = import.meta.env.VITE_API_URL
 
@@ -26,12 +27,7 @@ export const updateCurrentUser = async (updateData) => {
     }
 
   } catch (error) {
-    return {
-      success: false,
-      error: error.response?.data?.message ||
-        error.message ||
-        "Failed to update user data",
-    }
+    return normalizeApiError(error, "Failed to update user data")
   }
 }
 
@@ -59,12 +55,7 @@ export const updateUserPassword = async (passwordData) => {
     };
 
   } catch (error) {
-    return {
-      success: false,
-      error: error.response?.data?.message ||
-        error.message ||
-        "Failed to update password"
-    };
+    return normalizeApiError(error, "Failed to update password");
   }
 };
 
@@ -89,11 +80,6 @@ export const updateUser = async (userId, updateData) => {
 
   } catch (error) {
     console.error("Update user error:", error)
-    return {
-      success: false,
-      error: error.response?.data?.message ||
-        error.message ||
-        "Failed to update user"
-    }
+    return normalizeApiError(error, "Failed to update user")
   }
 }

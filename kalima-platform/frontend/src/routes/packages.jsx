@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { getToken } from "./auth-services";
 import { isLoggedIn } from "./auth-services";
+import { normalizeApiError } from "../utils/apiError";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -17,10 +18,7 @@ export const fetchPackages = async () => {
       data: response.data.data.packages,
     };
   } catch (error) {
-    return {
-      success: false,
-      error: error.response?.data?.message || error.message || 'Failed to fetch packages',
-    };
+    return normalizeApiError(error, "Failed to fetch packages");
   }
 };
 
@@ -43,10 +41,7 @@ export const createPackage = async (packageData) => {
       message: response.data.message || 'Package created successfully',
     };
   } catch (error) {
-    return {
-      success: false,
-      error: error.response?.data?.message || error.message || 'Failed to create package',
-    };
+    return normalizeApiError(error, "Failed to create package");
   }
 };
 
@@ -61,7 +56,7 @@ export const fetchPackageById = async (packageId) => {
     return response.data.data.package;
   } catch (error) {
     console.error('Error fetching package by ID:', error);
-    const errorMessage = error.response?.data?.message || error.message || 'Failed to fetch package';
+    const errorMessage = normalizeApiError(error, "Failed to fetch package").message;
     throw new Error(errorMessage);
   }
 };
@@ -79,10 +74,7 @@ export const deletePackage = async (packageId) => {
       data: response.data,
     };
   } catch (error) {
-    return {
-      success: false,
-      error: error.response?.data?.message || error.message || 'Failed to delete package',
-    };
+    return normalizeApiError(error, "Failed to delete package");
   }
 };
 
@@ -104,10 +96,6 @@ export const purchasePackage = async (packageId) => {
     }
   } catch (error) {
     console.error("Error purchasing package:", error)
-    return {
-      success: false,
-      error: error,
-      message: error.response?.data?.message || "Failed to purchase package"
-    }
+    return normalizeApiError(error, "Failed to purchase package")
   }
 }

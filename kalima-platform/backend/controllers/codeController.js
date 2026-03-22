@@ -67,10 +67,8 @@ const getAllCodes = catchAsync(async (req, res, next) => {
   const codes = await features.query
     .populate({ path: "lecturerId", select: "name" })
     .lean();
-  if (codes.length === 0) {
-    return next(new AppError("No codes yet", 404));
-  }
-  res.status(201).json({
+
+  res.status(200).json({
     status: "success",
     results: codes.length,
     data: {

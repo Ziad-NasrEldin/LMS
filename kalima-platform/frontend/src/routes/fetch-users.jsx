@@ -1,4 +1,5 @@
 import axios from "axios";
+import { normalizeApiError, normalizeApiErrorWithEmpty404 } from "../utils/apiError";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -20,7 +21,7 @@ export const getAllStudents = async () => {
     };
   } catch (error) {
     console.error("API Error:", error);
-    return `Failed to fetch students: ${error.message}`
+    return normalizeApiErrorWithEmpty404(error, "Failed to fetch students");
   }
 };
 
@@ -37,7 +38,7 @@ export const getAllParents = async () => {
     };
   } catch (error) {
     console.error("API Error:", error);
-    return `Failed to fetch parents : ${error.message}`
+    return normalizeApiErrorWithEmpty404(error, "Failed to fetch parents");
   }
 };
 
@@ -54,7 +55,7 @@ export const getAllAssistants = async () => {
     };
   } catch (error) {
     console.error("API Error:", error);
-    return `Failed to fetch assistants: ${error.message}`
+    return normalizeApiErrorWithEmpty404(error, "Failed to fetch assistants");
   }
 };
 
@@ -70,7 +71,7 @@ export const getAllLecturers = async () => {
     };
   } catch (error) {
     console.error("API Error:", error);
-    return `Failed to fetch lecturers: ${error.message}`
+    return normalizeApiError(error, "Failed to fetch lecturers");
   }
 };
 
@@ -86,7 +87,7 @@ export const getUserById = async (userId) => {
     };
   } catch (error) {
     console.error("API Error:", error);
-    return `Failed to fetch user : ${error.message}`
+    return normalizeApiError(error, "Failed to fetch user");
   }
 };
 
@@ -102,7 +103,7 @@ export const getAllUsers = async () => {
     };
   } catch (error) {
     console.error("API Error:", error);
-    return `Failed to fetch users: ${error.message}`
+    return normalizeApiErrorWithEmpty404(error, "Failed to fetch users");
   }
 };
 // --------END FETCHING USERS--------
@@ -115,16 +116,7 @@ export const createUser = async (userData) => {
     });
     return { success: true, data: response.data };
   } catch (error) {
-    if (error.response && error.response.data) {
-      return {
-        success: false,
-        error: error.response.data.message || error.response.data.error || `Failed to create user: ${error.message}`,
-      };
-    }
-    return {
-      success: false,
-      error: `Failed to create user: ${error.message}`,
-    };
+    return normalizeApiError(error, "Failed to create user");
   }
 };
 
@@ -139,20 +131,7 @@ export const bulkCreateUsers = async (formData) => {
     return { success: true, data: response.data }
   } catch (error) {
     console.error("Bulk create users error:", error)
-
-    // Handle different error scenarios
-    if (error.response) {
-      // The server responded with a status code outside the 2xx range
-      const errorMessage =
-        error.response.data?.message || error.response.data?.error || `Server error: ${error.response.status}`
-      return { success: false, error: errorMessage }
-    } else if (error.request) {
-      // The request was made but no response was received
-      return { success: false, error: "No response from server. Please check your connection." }
-    } else {
-      // Something happened in setting up the request
-      return { success: false, error: `Failed to send request: ${error.message}` }
-    }
+    return normalizeApiError(error, "Failed to send request")
   }
 }
 
@@ -166,7 +145,7 @@ export const deleteUser = async (userId) => {
     });
     return { success: true, data: response.data };
   } catch (error) {
-    return `Failed to delete user: ${error.message}`
+    return normalizeApiError(error, "Failed to delete user");
   }
 };
 // --------END DELETE USER--------
