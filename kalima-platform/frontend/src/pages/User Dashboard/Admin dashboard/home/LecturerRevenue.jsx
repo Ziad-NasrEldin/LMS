@@ -5,6 +5,7 @@ import { useEffect, useState } from "react"
 import { getAllLecturers } from "../../../../routes/fetch-users"
 import { getLecturerMonthlyRevenue } from "../../../../routes/revenue"
 import { BookOpen, Trophy } from "lucide-react"
+import { designTokens } from "../../../../constants/designTokens"
 
 export default function LecturerRevenue() {
   const { t, i18n } = useTranslation("admin")
@@ -14,6 +15,10 @@ export default function LecturerRevenue() {
   const [revenueData, setRevenueData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+
+  const TOKENS = designTokens.colors;
+  const SHADOWS = designTokens.shadows;
+  const GRADIENTS = designTokens.gradients;
 
   // Fetch lecturers on mount
   useEffect(() => {
@@ -84,11 +89,16 @@ export default function LecturerRevenue() {
   }
 
   return (
-    <div className="space-y-8" dir={isRTL ? "rtl" : "ltr"}>
+    <div className="space-y-6 md:space-y-8" dir={isRTL ? "rtl" : "ltr"}>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <h2 className="text-3xl font-extrabold text-primary">{t("revenue.lecturerRevenue")}</h2>
+        <h2 className="text-2xl font-bold md:text-3xl" style={{ color: TOKENS.deepTeal }}>{t("revenue.lecturerRevenue")}</h2>
         <select
-          className="select select-bordered select-primary w-full sm:w-64 font-bold"
+          className="select select-bordered w-full sm:w-64 font-bold bg-white"
+          style={{ 
+            color: TOKENS.inkText,
+            borderColor: "rgba(17,24,39,0.1)",
+            boxShadow: SHADOWS.level1, 
+          }}
           value={selectedLecturer}
           onChange={handleLecturerChange}
         >
@@ -103,20 +113,32 @@ export default function LecturerRevenue() {
       {revenueData && (
         <div className="space-y-6">
           {/* Summary Card */}
-          <div className="card bg-gradient-to-r from-primary to-secondary text-white shadow-2xl p-8 rounded-xl">
-            <div className="flex items-center gap-6">
-              <Trophy className="h-12 w-12" />
+          <div 
+            className="p-8 rounded-[2rem] text-white shadow-lg border relative overflow-hidden"
+            style={{ 
+              background: GRADIENTS.hero, 
+              borderColor: "rgba(255,255,255,0.15)",
+              boxShadow: SHADOWS.level2 
+            }}
+          >
+            <div className="pointer-events-none absolute -left-10 -top-10 h-40 w-40 rounded-full opacity-60 mix-blend-overlay" style={{ background: "rgba(77,179,194,0.4)" }} />
+            <div className="flex items-center gap-6 relative z-10">
+              <div className="flex items-center justify-center p-4 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20">
+                <Trophy className="h-10 w-10 text-white drop-shadow-sm" />
+              </div>
               <div>
-                <h3 className="text-2xl font-extrabold">{t("revenue.revenueSummary")}</h3>
-                <p className="text-lg font-bold mt-2">
-                  {t("revenue.totalRevenue")}: {revenueData.summary?.totalRevenue || 0} {t("revenue.currency")}
+                <h3 className="text-2xl font-extrabold text-[#F8FCFF]">{t("revenue.revenueSummary")}</h3>
+                <p className="text-lg font-bold mt-2 text-[#DDF6FB]">
+                  {t("revenue.totalRevenue")}: <span className="text-white drop-shadow-md">{revenueData.summary?.totalRevenue || 0} {t("revenue.currency")}</span>
                 </p>
-                <p className="text-lg font-bold">
-                  {t("revenue.totalPurchases")}: {revenueData.summary?.totalPurchases || 0}
-                </p>
-                <p className="text-lg font-bold">
-                  {t("revenue.monthsWithRevenue")}: {revenueData.summary?.monthsWithRevenue || 0}
-                </p>
+                <div className="flex flex-wrap gap-4 mt-2">
+                  <span className="inline-flex items-center rounded-full bg-white/15 px-3 py-1 text-sm font-semibold border border-white/20">
+                    {t("revenue.totalPurchases")}: {revenueData.summary?.totalPurchases || 0}
+                  </span>
+                  <span className="inline-flex items-center rounded-full bg-white/15 px-3 py-1 text-sm font-semibold border border-white/20">
+                    {t("revenue.monthsWithRevenue")}: {revenueData.summary?.monthsWithRevenue || 0}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
@@ -126,22 +148,23 @@ export default function LecturerRevenue() {
             {revenueData.monthlyRevenue?.map((month) => (
               <div
                 key={`${month.year}-${month.month}`}
-                className="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow duration-300 border border-primary"
+                className="rounded-[1.4rem] border transition-transform duration-300 hover:-translate-y-1"
+                style={{ background: TOKENS.neutralCloud, borderColor: "rgba(17,24,39,0.08)", boxShadow: SHADOWS.level1 }}
               >
-                <div className="card-body p-6">
-                  <h3 className="text-xl font-extrabold text-primary">
+                <div className="p-6">
+                  <h3 className="text-xl font-extrabold" style={{ color: TOKENS.deepTeal }}>
                     {month.monthName} {month.year}
                   </h3>
                   <div className="space-y-3 mt-4">
-                    <p className="text-lg font-bold">
+                    <p className="text-lg font-bold" style={{ color: TOKENS.slateText }}>
                       {t("revenue.totalRevenue")}:{" "}
-                      <span className="text-success">
+                      <span className="font-extrabold" style={{ color: TOKENS.richTeal }}>
                         {month.totalRevenue} {t("revenue.currency")}
                       </span>
                     </p>
-                    <p className="text-lg font-bold">
+                    <p className="text-lg font-bold" style={{ color: TOKENS.slateText }}>
                       {t("revenue.purchaseCount")}:{" "}
-                      <span className="text-accent">{month.purchaseCount}</span>
+                      <span className="font-extrabold" style={{ color: TOKENS.warmMango }}>{month.purchaseCount}</span>
                     </p>
                   </div>
                 </div>
@@ -152,8 +175,8 @@ export default function LecturerRevenue() {
       )}
 
       {revenueData && (!revenueData.monthlyRevenue || revenueData.monthlyRevenue.length === 0) && (
-        <div className="text-center py-12">
-          <p className="text-lg font-bold text-gray-500">{t("revenue.noRevenueData")}</p>
+        <div className="text-center py-12 rounded-[2rem] border" style={{ background: TOKENS.neutralCloud, borderColor: "rgba(17,24,39,0.08)" }}>
+          <p className="text-lg font-bold" style={{ color: TOKENS.slateText }}>{t("revenue.noRevenueData")}</p>
         </div>
       )}
     </div>

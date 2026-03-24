@@ -1,8 +1,10 @@
 {
-    "title": "My Courses",
-    "discover": "Discover your favorite courses now!",
+    "title": "Platform Courses",
+    "subtitle": "Browse all courses available across the full Kalima platform.",
+    "discover": "Discover courses that match your level and goals.",
+    "catalogTitle": "Available Courses",
     "noCourses": "No courses available currently",
-    "showCourses": "Show Courses",
+    "showCourses": "Apply Filters",
     "showing": "Showing",
     "of": "of",
     "courses": "courses",

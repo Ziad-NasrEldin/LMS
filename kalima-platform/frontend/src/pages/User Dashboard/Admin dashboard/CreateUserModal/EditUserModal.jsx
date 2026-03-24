@@ -105,7 +105,8 @@ const EditUserModal = ({ isOpen, onClose, user, onUserUpdated }) => {
               name="name"
               value={formData.name}
               onChange={handleChange}
-              className="input input-bordered"
+              className="input w-full rounded-xl"
+              style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
               placeholder={t("admin.editUser.namePlaceholder")}
             />
           </div>
@@ -119,7 +120,8 @@ const EditUserModal = ({ isOpen, onClose, user, onUserUpdated }) => {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              className="input input-bordered"
+              className="input w-full rounded-xl"
+              style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
               placeholder={t("admin.editUser.emailPlaceholder")}
             />
           </div>
@@ -133,7 +135,8 @@ const EditUserModal = ({ isOpen, onClose, user, onUserUpdated }) => {
               name="phoneNumber"
               value={formData.phoneNumber}
               onChange={handleChange}
-              className="input input-bordered"
+              className="input w-full rounded-xl"
+              style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
               placeholder={t("admin.editUser.phonePlaceholder")}
             />
           </div>
@@ -159,7 +162,7 @@ const EditUserModal = ({ isOpen, onClose, user, onUserUpdated }) => {
                 {showPassword ? <Eye /> : <EyeOff />}
               </button>
             </div>
-            <label className="label">
+            <label className="label py-0">
               <span className="label-text-alt">{t("admin.editUser.passwordHint")}</span>
             </label>
           </div>

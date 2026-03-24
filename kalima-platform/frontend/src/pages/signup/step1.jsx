@@ -119,7 +119,7 @@ export default function Step1({ formData, handleInputChange, t, errors, role, gr
   if (loading) {
     return (
       <div className="space-y-2">
-        <p className="text-2xl font-semibold">{t('form.personalDetails')}</p>
+        <p className="text-xl sm:text-2xl font-semibold mb-2">{t('form.personalDetails')}</p>
         <div className="flex items-center justify-center py-8">
           <div className="loading loading-spinner loading-lg"></div>
           <span className="ml-2">{t('loading', { ns: 'common', defaultValue: 'Loading...' })}</span>
@@ -131,7 +131,7 @@ export default function Step1({ formData, handleInputChange, t, errors, role, gr
   if (error) {
     return (
       <div className="space-y-2">
-        <p className="text-2xl font-semibold">{t('form.personalDetails')}</p>
+        <p className="text-xl sm:text-2xl font-semibold mb-2">{t('form.personalDetails')}</p>
         <div className="alert alert-error">
           <span>{t('errors.loadingFailed') || 'Failed to load data:'} {error}</span>
         </div>
@@ -141,18 +141,19 @@ export default function Step1({ formData, handleInputChange, t, errors, role, gr
 
   return (
     <div className="space-y-2">
-      <p className="text-2xl font-semibold">{t('form.personalDetails')}</p>
+      <p className="text-xl sm:text-2xl font-semibold mb-2">{t('form.personalDetails')}</p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1">
 
       {/* Common fields */}
-      <div className="form-control relative pb-5">
-        <div className="flex flex-col gap-2">
-          <label className="label">
-            <span className="label-text">{t('form.fullName')}</span>
+      <div className="form-control relative">
+        <div className="flex flex-col gap-1">
+          <label className="label py-1">
+            <span className="label-text text-xs">{t('form.fullName')}</span>
           </label>
           <input
             type="text"
             name="fullName"
-            className={`input input-bordered w-2/3 lg:w-1/2 ${errors.fullName ? 'input-error animate-shake' : ''}`}
+            className={`input input-bordered input-sm w-full ${errors.fullName ? 'input-error animate-shake' : ''}`}
             value={formData.fullName}
             onChange={handleInputChange}
             required
@@ -165,16 +166,16 @@ export default function Step1({ formData, handleInputChange, t, errors, role, gr
         </div>
       </div>
 
-      <div className="form-control relative pb-5">
-        <div className="flex flex-col gap-2">
-          <label className="label">
-            <span className="label-text">{t("form.profilePic") || "Profile Picture"}</span>
+      <div className="form-control relative">
+        <div className="flex flex-col gap-1">
+          <label className="label py-1">
+            <span className="label-text text-xs">{t("form.profilePic") || "Profile Picture"}</span>
           </label>
           <input
             type="file"
             name="profilePic"
             accept=".jpg,.jpeg,.png"
-            className="file-input file-input-bordered w-2/3 lg:w-1/2"
+            className="file-input file-input-bordered file-input-sm w-full"
             onChange={handleInputChange}
           />
           {formData.profilePic && (
@@ -191,14 +192,14 @@ export default function Step1({ formData, handleInputChange, t, errors, role, gr
       </div>
 
 
-      <div className="form-control relative pb-5">
-        <div className="flex flex-col gap-2">
-          <label className="label">
-            <span className="label-text">{t('form.gender')}</span>
+      <div className="form-control relative">
+        <div className="flex flex-col gap-1">
+          <label className="label py-1">
+            <span className="label-text text-xs">{t('form.gender')}</span>
           </label>
           <select
             name="gender"
-            className={`select select-bordered w-2/3 lg:w-1/2 ${errors.gender ? 'select-error animate-shake' : ''}`}
+            className={`select select-bordered select-sm w-full ${errors.gender ? 'select-error animate-shake' : ''}`}
             value={formData.gender}
             onChange={handleInputChange}
             required
@@ -210,10 +211,10 @@ export default function Step1({ formData, handleInputChange, t, errors, role, gr
         </div>
       </div>
 
-      <div className="form-control relative pb-5">
-        <div className="flex flex-col gap-2">
-          <label className="label">
-            <span className="label-text">{t('form.phoneNumber')}</span>
+      <div className="form-control relative">
+        <div className="flex flex-col gap-1">
+          <label className="label py-1">
+            <span className="label-text text-xs">{t('form.phoneNumber')}</span>
           </label>
           <input
             type="text"
@@ -221,7 +222,7 @@ export default function Step1({ formData, handleInputChange, t, errors, role, gr
             name="phoneNumber"
             value={formData.phoneNumber}
             onChange={handleNumberOnlyChange}
-            className={`input input-bordered w-2/3 lg:w-1/2 ${errors.phoneNumber ? 'input-error animate-shake' : ''}`}
+            className={`input input-bordered input-sm w-full ${errors.phoneNumber ? 'input-error animate-shake' : ''}`}
             required
           />
           {errors.phoneNumber && (
@@ -232,15 +233,15 @@ export default function Step1({ formData, handleInputChange, t, errors, role, gr
         </div>
       </div>
 
-      <div className="form-control relative pb-5">
-        <div className="flex flex-col gap-2">
-          <label className="label">
-            <span className="label-text">{t('form.referralSerial')}</span>
+      <div className="form-control relative">
+        <div className="flex flex-col gap-1">
+          <label className="label py-1">
+            <span className="label-text text-xs">{t('form.referralSerial')}</span>
           </label>
           <input
             type="text"
             name="referralSerial"
-            className={`input input-bordered w-2/3 lg:w-1/2 ${errors.referralSerial ? 'input-error animate-shake' : ''}`}
+            className={`input input-bordered input-sm w-full ${errors.referralSerial ? 'input-error animate-shake' : ''}`}
             value={formData.referralSerial}
             onChange={handleInputChange}
             required
@@ -255,10 +256,10 @@ export default function Step1({ formData, handleInputChange, t, errors, role, gr
 
       {role === 'teacher' && (
         <>
-          <div className="form-control relative pb-5">
-            <div className="flex flex-col gap-2">
-              <label className="label">
-                <span className="label-text">{t('form.phoneNumber2')}</span>
+          <div className="form-control relative">
+            <div className="flex flex-col gap-1">
+              <label className="label py-1">
+                <span className="label-text text-xs">{t('form.phoneNumber2')}</span>
               </label>
               <input
                 type="text"
@@ -266,11 +267,11 @@ export default function Step1({ formData, handleInputChange, t, errors, role, gr
                 name="phoneNumber2"
                 value={formData.phoneNumber2}
                 onChange={handleNumberOnlyChange}
-                className="input input-bordered w-2/3 lg:w-1/2"
+                className="input input-bordered input-sm w-full"
                 required
               />
-              <label className="label">
-                <span className="label-text">{t('form.optional')}</span>
+              <label className="label py-1">
+                <span className="label-text text-xs">{t('form.optional')}</span>
               </label>
               {errors.phoneNumber2 && (
                 <span className="absolute bottom-0  text-error text-sm mt-1">
@@ -283,19 +284,19 @@ export default function Step1({ formData, handleInputChange, t, errors, role, gr
       )}
 
       {/* Government Selection */}
-      <div className="form-control relative pb-5">
-        <div className="flex flex-col gap-2">
-          <label className="label">
-            <span className="label-text">{t("form.government") || "Government"}</span>
+      <div className="form-control relative">
+        <div className="flex flex-col gap-1">
+          <label className="label py-1">
+            <span className="label-text text-xs">{t("form.government") || "Government"}</span>
           </label>
           <select
             name="government"
-            className={`select select-bordered w-2/3 lg:w-1/2 ${errors.government ? "select-error animate-shake" : ""}`}
+            className={`select select-bordered select-sm w-full ${errors.government ? "select-error animate-shake" : ""}`}
             value={formData.government || ""}
             onChange={handleGovernmentChange}
           >
             <option value="">{t("form.selectGovernment") || "Select Government"}</option>
-            {governments.map((government) => (
+            {(Array.isArray(governments) ? governments : []).map((government) => (
               <option key={government._id} value={government.name}>
                 {government.name}
               </option>
@@ -311,15 +312,15 @@ export default function Step1({ formData, handleInputChange, t, errors, role, gr
 
       {/* Administration Zone Selection - Only show if government is selected */}
 
-      <div className="form-control relative pb-5">
-        <div className="flex flex-col gap-2">
-          <label className="label">
-            <span className="label-text">{t("form.administrationZone") || "Administration Zone"}</span>
+      <div className="form-control relative">
+        <div className="flex flex-col gap-1">
+          <label className="label py-1">
+            <span className="label-text text-xs">{t("form.administrationZone") || "Administration Zone"}</span>
           </label>
           <select
             disabled={!formData.government || zonesLoading}
             name="administrationZone"
-            className={`select select-bordered  w-2/3 lg:w-1/2 ${errors.administrationZone ? "select-error animate-shake" : ""}`}
+            className={`select select-bordered select-sm  w-full ${errors.administrationZone ? "select-error animate-shake" : ""}`}
             value={formData.administrationZone || ""}
             onChange={handleInputChange}
           >
@@ -329,7 +330,7 @@ export default function Step1({ formData, handleInputChange, t, errors, role, gr
                 : (t("form.selectAdministrationZone") || "Select Administration Zone")
               }
             </option>
-            {administrationZones.map((zone) => (
+            {(Array.isArray(administrationZones) ? administrationZones : []).map((zone) => (
               <option key={zone} value={zone}>
                 {zone}
               </option>
@@ -346,14 +347,14 @@ export default function Step1({ formData, handleInputChange, t, errors, role, gr
       {/* Student-specific fields */}
       {role === 'student' && (
         <>
-          <div className="form-control relative pb-5">
-            <div className="flex flex-col gap-2">
-              <label className="label">
-                <span className="label-text">{t('form.grade')}</span>
+          <div className="form-control relative">
+            <div className="flex flex-col gap-1">
+              <label className="label py-1">
+                <span className="label-text text-xs">{t('form.grade')}</span>
               </label>
               <select
                 name="level"
-                className={`select select-bordered w-2/3 lg:w-1/2 ${errors.level ? 'select-error animate-shake' : ''}`}
+                className={`select select-bordered select-sm w-full ${errors.level ? 'select-error animate-shake' : ''}`}
                 value={formData.level}
                 onChange={handleInputChange}
                 required
@@ -374,6 +375,8 @@ export default function Step1({ formData, handleInputChange, t, errors, role, gr
           </div>
         </>
       )}
+    
+      </div>
     </div>
   );
 }

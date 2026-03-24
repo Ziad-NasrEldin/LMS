@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { getAllLecturers, getAllAssistants, getAllParents, getAllStudents } from '../../../../routes/fetch-users';
 import { useTranslation } from 'react-i18next';
+import { designTokens } from "../../../../constants/designTokens";
 
 const Hero = () => {
   const { t, i18n } = useTranslation('admin');
+  // ... rest of state
   const [lecturers, setLecturers] = useState([]);
   const [assistants, setAssistants] = useState([]);
   const [parents, setParents] = useState([]);
@@ -56,23 +58,35 @@ const Hero = () => {
 }, []);
  // Empty dependency array means this runs once on mount
 
+  const TOKENS = designTokens.colors;
+  const SHADOWS = designTokens.shadows;
+  const GRADIENTS = designTokens.gradients;
+
   return (
-    <div className="mx-auto p-6 w-full font-[Cairo]">
-    <h1 className={`text-3xl font-bold mb-8 ${isRTL ? 'text-right' : 'text-left'} `}>{t('admin.pageTitle')}</h1>
+    <div className="mx-auto w-full font-[Cairo]">
+    <h1 className={`text-3xl font-extrabold mb-8 ${isRTL ? 'text-right' : 'text-left'} `} style={{ color: TOKENS.deepTeal }}>{t('admin.pageTitle')}</h1>
 
       {error && (
-        <div className="alert alert-error mb-6">
+        <div className="p-4 mb-6 rounded-2xl bg-red-50 text-red-600 border border-red-100 font-semibold shadow-sm">
           <span>{error}</span>
         </div>
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" dir={dir}>
         {/* Students Card */}
-        <div className="card bg-[#f3e8ff] shadow-lg hover:shadow-xl hover:scale-105 duration-500 transition-all rounded-2xl max-w-md">
-          <div className="card-body p-6 flex-row justify-between items-center">
-            <div className="text-right">
-              <h2 className="text-2xl font-bold text-purple-900">{t('admin.students')}</h2>
-              <p className="text-3xl font-bold text-purple-900">
+        <div 
+          className="relative overflow-hidden rounded-[2rem] border transition-transform duration-300 hover:-translate-y-1"
+          style={{
+            background: TOKENS.neutralCloud,
+            borderColor: "rgba(17,24,39,0.08)",
+            boxShadow: SHADOWS.level1,
+          }}
+        >
+          <div className="absolute top-0 right-0 w-32 h-32 bg-[#4DB3C2] opacity-10 rounded-bl-[100px] pointer-events-none" />
+          <div className="p-6 md:p-8 flex items-center justify-between relative z-10">
+            <div className={isRTL ? 'text-right' : 'text-left'}>
+              <h2 className="text-xl font-bold opacity-80" style={{ color: TOKENS.deepTeal }}>{t('admin.students')}</h2>
+              <p className="text-4xl font-extrabold mt-2" style={{ color: TOKENS.inkText }}>
                 {loading ? (
                   <span className="loading loading-dots loading-sm"></span>
                 ) : (
@@ -80,18 +94,29 @@ const Hero = () => {
                 )}
               </p>
             </div>
-            <div className="avatar p-3 rounded-full">
-              <img src="/admin2.png" alt="Students Icon" className="w-8 h-8" />
+            <div 
+              className="flex items-center justify-center w-14 h-14 rounded-[1.2rem] shadow-sm shrink-0"
+              style={{ background: TOKENS.lightAquaMist }}
+            >
+              <img src="/admin2.png" alt="Students Icon" className="w-8 h-8 object-contain" />
             </div>
           </div>
         </div>
 
         {/* Teachers Card */}
-        <div className="card bg-[#e8f4ff] rounded-2xl shadow-lg hover:shadow-xl hover:scale-105 duration-500 transition-all max-w-md">
-          <div className="card-body p-6 flex-row justify-between items-center">
-            <div className="text-right">
-              <h2 className="text-2xl font-bold text-blue-700">{t('admin.teachers')}</h2>
-              <p className="text-3xl font-bold text-blue-700">
+        <div 
+          className="relative overflow-hidden rounded-[2rem] border transition-transform duration-300 hover:-translate-y-1"
+          style={{
+            background: TOKENS.neutralCloud,
+            borderColor: "rgba(17,24,39,0.08)",
+            boxShadow: SHADOWS.level1,
+          }}
+        >
+          <div className="absolute top-0 right-0 w-32 h-32 bg-[#F39A3F] opacity-10 rounded-bl-[100px] pointer-events-none" />
+          <div className="p-6 md:p-8 flex items-center justify-between relative z-10">
+            <div className={isRTL ? 'text-right' : 'text-left'}>
+              <h2 className="text-xl font-bold opacity-80" style={{ color: TOKENS.deepTeal }}>{t('admin.teachers')}</h2>
+              <p className="text-4xl font-extrabold mt-2" style={{ color: TOKENS.inkText }}>
                 {loading ? (
                   <span className="loading loading-dots loading-sm"></span>
                 ) : (
@@ -99,18 +124,29 @@ const Hero = () => {
                 )}
               </p>
             </div>
-            <div className="avatar p-3 rounded-full">
-              <img src="/admin1.png" alt="Teachers Icon" className="w-8 h-8" />
+            <div 
+              className="flex items-center justify-center w-14 h-14 rounded-[1.2rem] shadow-sm shrink-0"
+              style={{ background: "rgba(243, 154, 63, 0.15)" }}
+            >
+              <img src="/admin1.png" alt="Teachers Icon" className="w-8 h-8 object-contain" />
             </div>
           </div>
         </div>
 
         {/* Assistants Card */}
-        <div className="card bg-[#ffece5] shadow-lg hover:shadow-xl hover:scale-105 duration-500 transition-all rounded-2xl max-w-md">
-          <div className="card-body p-6 flex-row justify-between items-center">
-            <div className="text-right">
-              <h2 className="text-2xl font-bold text-orange-700">{t('admin.assistants')}</h2>
-              <p className="text-3xl font-bold text-orange-700">
+        <div 
+          className="relative overflow-hidden rounded-[2rem] border transition-transform duration-300 hover:-translate-y-1"
+          style={{
+            background: TOKENS.neutralCloud,
+            borderColor: "rgba(17,24,39,0.08)",
+            boxShadow: SHADOWS.level1,
+          }}
+        >
+          <div className="absolute top-0 right-0 w-32 h-32 bg-[#EBC468] opacity-15 rounded-bl-[100px] pointer-events-none" />
+          <div className="p-6 md:p-8 flex items-center justify-between relative z-10">
+            <div className={isRTL ? 'text-right' : 'text-left'}>
+              <h2 className="text-xl font-bold opacity-80" style={{ color: TOKENS.deepTeal }}>{t('admin.assistants')}</h2>
+              <p className="text-4xl font-extrabold mt-2" style={{ color: TOKENS.inkText }}>
                 {loading ? (
                   <span className="loading loading-dots loading-sm"></span>
                 ) : (
@@ -118,18 +154,29 @@ const Hero = () => {
                 )}
               </p>
             </div>
-            <div className="avatar p-3 rounded-full">
-              <img src="/admin3.png" alt="Assistants Icon" className="w-8 h-8" />
+            <div 
+              className="flex items-center justify-center w-14 h-14 rounded-[1.2rem] shadow-sm shrink-0"
+              style={{ background: "rgba(235, 196, 104, 0.25)" }}
+            >
+              <img src="/admin3.png" alt="Assistants Icon" className="w-8 h-8 object-contain" />
             </div>
           </div>
         </div>
 
         {/* Parents Card */}
-        <div className="card bg-[#e8fce5] shadow-lg hover:shadow-xl hover:scale-105 duration-500 transition-all rounded-2xl max-w-md">
-          <div className="card-body p-6 flex-row justify-between items-center">
-            <div className="text-right">
-              <h2 className="text-2xl font-bold text-green-700">{t('admin.parents')}</h2>
-              <p className="text-3xl font-bold text-green-700">
+        <div 
+          className="relative overflow-hidden rounded-[2rem] border transition-transform duration-300 hover:-translate-y-1"
+          style={{
+            background: TOKENS.neutralCloud,
+            borderColor: "rgba(17,24,39,0.08)",
+            boxShadow: SHADOWS.level1,
+          }}
+        >
+          <div className="absolute top-0 right-0 w-32 h-32 bg-[#146A78] opacity-10 rounded-bl-[100px] pointer-events-none" />
+          <div className="p-6 md:p-8 flex items-center justify-between relative z-10">
+            <div className={isRTL ? 'text-right' : 'text-left'}>
+              <h2 className="text-xl font-bold opacity-80" style={{ color: TOKENS.deepTeal }}>{t('admin.parents')}</h2>
+              <p className="text-4xl font-extrabold mt-2" style={{ color: TOKENS.inkText }}>
                 {loading ? (
                   <span className="loading loading-dots loading-sm"></span>
                 ) : (
@@ -137,8 +184,11 @@ const Hero = () => {
                 )}
               </p>
             </div>
-            <div className="avatar p-3 rounded-full">
-              <img src="/admin4.png" alt="Parents Icon" className="w-8 h-8" />
+            <div 
+              className="flex items-center justify-center w-14 h-14 rounded-[1.2rem] shadow-sm shrink-0"
+              style={{ background: "rgba(20, 106, 120, 0.1)" }}
+            >
+              <img src="/admin4.png" alt="Parents Icon" className="w-8 h-8 object-contain" />
             </div>
           </div>
         </div>

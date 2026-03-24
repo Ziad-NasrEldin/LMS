@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap");
 @import "tailwindcss";
 @plugin "daisyui" {
   themes: all;
@@ -139,4 +140,54 @@
   left: 0;
   width: 100%;
   height: 100%;
+}
+
+html,
+body,
+#root {
+  font-family: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+html[lang="ar"],
+html[dir="rtl"],
+body[dir="rtl"],
+[dir="rtl"] {
+  font-family: "Cairo", "Noto Kufi Arabic", "Noto Sans Arabic", Tahoma, sans-serif;
+}
+
+:root {
+  --fekra-error-bg: linear-gradient(135deg, rgba(255, 235, 239, 0.95) 0%, rgba(255, 245, 246, 0.95) 100%);
+  --fekra-error-border: rgba(214, 64, 85, 0.28);
+  --fekra-error-text: #111827;
+  --fekra-error-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+  --fekra-error-button-bg: #0e5563;
+  --fekra-error-button-text: #f8fcff;
+}
+
+.alert.alert-error {
+  border-radius: 1rem;
+  border: 1px solid var(--fekra-error-border);
+  background: var(--fekra-error-bg);
+  color: var(--fekra-error-text);
+  box-shadow: var(--fekra-error-shadow);
+  font-family: inherit;
+  padding: 0.875rem 1rem;
+}
+
+.alert.alert-error p,
+.alert.alert-error span,
+.alert.alert-error div {
+  color: var(--fekra-error-text);
+}
+
+.alert.alert-error .btn,
+.alert.alert-error button {
+  border: 0;
+  border-radius: 9999px;
+  background: var(--fekra-error-button-bg);
+  color: var(--fekra-error-button-text);
+}
+
+.text-error {
+  color: #d64055 !important;
 }

@@ -7,12 +7,16 @@ import { ImSpinner8 } from "react-icons/im"
 import { FaEnvelope, FaPhone, FaGraduationCap, FaMapMarkerAlt, FaCalendarAlt } from "react-icons/fa"
 import { getAllLecturers } from "../../../routes/fetch-users"
 import { getUserDashboard } from "../../../routes/auth-services"
+import { designTokens } from "../../../constants/designTokens"
 
 const SignedLecturers = () => {
   const { t, i18n } = useTranslation("admin-signedLecturers")
   const isRTL = i18n.language === "ar"
   const dir = isRTL ? "rtl" : "ltr"
   const navigate = useNavigate()
+
+  const TOKENS = designTokens.colors;
+  const SHADOWS = designTokens.shadows;
 
   const [state, setState] = useState({
     lecturers: [],
@@ -183,23 +187,38 @@ const SignedLecturers = () => {
   }
 
   return (
-    <div className=" mx-auto p-4 sm:p-6 " dir={dir}>
-      <div className="card bg-base-100 border border-primary shadow-2xl">
-        <div className="card-body">
+    <div 
+      className="mx-auto p-6 md:p-8" 
+      dir={dir}
+    >
+      <div 
+        className="rounded-[2rem] border"
+        style={{ 
+          background: TOKENS.neutralCloud, 
+          boxShadow: SHADOWS.level1, 
+          borderColor: "rgba(17,24,39,0.05)"
+        }}
+      >
+        <div className="p-6 md:p-8">
           {/* Header */}
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 border-b pb-6" style={{ borderColor: "rgba(17,24,39,0.1)" }}>
             <div>
-              <h1 className="text-3xl font-bold mb-2">{t("lecturers.title") || "Signed Lecturers"}</h1>
-              <p className="text-base-content/70">
+              <h1 className="text-3xl font-extrabold mb-2" style={{ color: TOKENS.deepTeal }}>{t("lecturers.title") || "Signed Lecturers"}</h1>
+              <p className="font-medium" style={{ color: TOKENS.slateText }}>
                 {t("lecturers.subtitle") || "Manage and view all registered lecturers"}
               </p>
             </div>
 
             <div className="flex items-center gap-2">
-              <div className="badge badge-primary">
+              <div className="badge font-bold px-4 py-3 rounded-full" style={{ backgroundColor: "rgba(77,179,194,0.1)", color: TOKENS.deepTeal, border: "none" }}>
                 {state.filteredLecturers?.length || 0} {t("lecturers.total") || "Total"}
               </div>
-              <button onClick={fetchLecturers} className="btn btn-outline btn-sm" disabled={state.isLoading}>
+              <button 
+                onClick={fetchLecturers} 
+                className="btn btn-outline btn-sm rounded-full font-bold px-4" 
+                style={{ borderColor: TOKENS.deepTeal, color: TOKENS.deepTeal }}
+                disabled={state.isLoading}
+              >
                 {state.isLoading ? (
                   <ImSpinner8 className="animate-spin" />
                 ) : (
@@ -233,7 +252,8 @@ const SignedLecturers = () => {
                 <input
                   type="text"
                   placeholder={t("lecturers.searchPlaceholder") || "Search by name, email, expertise, or phone..."}
-                  className="input input-bordered w-full pr-10"
+                  className="input w-full pr-10 rounded-xl"
+                  style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: TOKENS.spaceDark }}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
@@ -257,9 +277,10 @@ const SignedLecturers = () => {
             </div>
 
             {/* Filter Dropdowns */}
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap gap-3 items-center">
               <select
-                className="select select-bordered select-sm"
+                className="select select-sm rounded-xl h-12 px-4"
+                style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: TOKENS.spaceDark }}
                 value={filters.expertise}
                 onChange={(e) => setFilters((prev) => ({ ...prev, expertise: e.target.value }))}
               >
@@ -271,7 +292,7 @@ const SignedLecturers = () => {
                 ))}
               </select>
 
-              <button className="btn btn-outline btn-sm" onClick={clearFilters}>
+              <button className="btn btn-sm rounded-xl h-12 px-6 font-bold" onClick={clearFilters} style={{ backgroundColor: TOKENS.coralAccent, color: "white", border: "none" }}>
                 {t("filters.clear") || "Clear"}
               </button>
             </div>
@@ -281,8 +302,8 @@ const SignedLecturers = () => {
           {state.isLoading ? (
             <div className="flex justify-center py-12">
               <div className="flex flex-col items-center">
-                <ImSpinner8 className="animate-spin text-4xl text-primary mb-4" />
-                <p className="text-base-content/70">{t("loading") || "Loading lecturers..."}</p>
+                <ImSpinner8 className="animate-spin text-4xl mb-4" style={{ color: TOKENS.deepTeal }} />
+                <p className="font-medium" style={{ color: TOKENS.slateText }}>{t("loading") || "Loading lecturers..."}</p>
               </div>
             </div>
           ) : (
@@ -314,76 +335,79 @@ const SignedLecturers = () => {
               )}
 
               {/* Desktop Table View */}
-              <div className="overflow-x-auto hidden lg:block">
+              <div className="overflow-x-auto hidden lg:block rounded-2xl" style={{ border: `1px solid rgba(17,24,39,0.05)` }}>
                 <table className="table w-full">
                   <thead>
-                    <tr className="bg-base-200/50">
-                      <th data-tip={t("lecturers.nameTooltip") || "Lecturer's full name"}>
+                    <tr style={{ backgroundColor: "rgba(17,24,39,0.02)", color: TOKENS.spaceDark, borderBottom: `2px solid rgba(17,24,39,0.05)` }}>
+                      <th className="font-bold py-4 px-6 text-sm uppercase tracking-wider" data-tip={t("lecturers.nameTooltip") || "Lecturer's full name"}>
                         {t("lecturers.name") || "Name"}
                       </th>
-                      <th data-tip={t("lecturers.expertiseTooltip") || "Subject expertise"}>
+                      <th className="font-bold py-4 px-6 text-sm uppercase tracking-wider" data-tip={t("lecturers.expertiseTooltip") || "Subject expertise"}>
                         {t("lecturers.expertise") || "Expertise"}
                       </th>
-                      <th data-tip={t("lecturers.contactTooltip") || "Contact information"}>
+                      <th className="font-bold py-4 px-6 text-sm uppercase tracking-wider" data-tip={t("lecturers.contactTooltip") || "Contact information"}>
                         {t("lecturers.contact") || "Contact"}
                       </th>
-                      <th data-tip={t("lecturers.joinedTooltip") || "Registration date"}>
+                      <th className="font-bold py-4 px-6 text-sm uppercase tracking-wider" data-tip={t("lecturers.joinedTooltip") || "Registration date"}>
                         {t("lecturers.joined") || "Joined"}
                       </th>
-                      <th>{t("actions.actions") || "Actions"}</th>
+                      <th className="font-bold py-4 px-6 text-sm uppercase tracking-wider">{t("actions.actions") || "Actions"}</th>
                     </tr>
                   </thead>
                   <tbody>
                     {paginatedLecturers?.map((lecturer, index) => (
                       <tr
                         key={lecturer._id}
-                        className={`hover:bg-base-200 ${index % 2 === 0 ? "bg-base-100" : "bg-base-100/50"}`}
+                        className="hover:bg-gray-50 transition-colors duration-200"
+                        style={{ borderBottom: index === paginatedLecturers.length - 1 ? 'none' : `1px solid rgba(17,24,39,0.05)` }}
                       >
-                        <td>
-                          <div className="flex items-center gap-3">
+                        <td className="py-4 px-6">
+                          <div className="flex items-center gap-4">
                             <div className="avatar avatar-placeholder">
-                              <div className="bg-primary/10 text-primary rounded-full w-10">
+                              <div className="rounded-full w-10 h-10 flex items-center justify-center font-bold text-white shadow-sm" style={{ backgroundColor: TOKENS.deepTeal }}>
                                 <span className="text-sm font-medium">
                                   {(lecturer.name || "L").charAt(0)?.toUpperCase()}
                                 </span>
                               </div>
                             </div>
                             <div>
-                              <div className="font-medium">{lecturer.name || "N/A"}</div>
-                              <div className="text-xs opacity-70">{lecturer.sequencedId || ""}</div>
+                              <div className="font-bold" style={{ color: TOKENS.spaceDark }}>{lecturer.name || "N/A"}</div>
+                              <div className="text-xs font-medium" style={{ color: TOKENS.slateText }}>{lecturer.sequencedId || ""}</div>
                             </div>
                           </div>
                         </td>
-                        <td>
-                          <span className="badge badge-primary badge-soft">{lecturer.expertise || "N/A"}</span>
+                        <td className="py-4 px-6">
+                          <span className="badge font-semibold px-3 py-3 rounded-xl" style={{ backgroundColor: "rgba(77,179,194,0.1)", color: TOKENS.deepTeal, border: "none" }}>{lecturer.expertise || "N/A"}</span>
                         </td>
-                        <td>
-                          <div className="text-sm">
-                            <div className="flex items-center gap-1 mb-1">
-                              <FaEnvelope className="w-3 h-3 opacity-60" />
+                        <td className="py-4 px-6">
+                          <div className="text-sm font-medium">
+                            <div className="flex items-center gap-2 mb-2" style={{ color: TOKENS.slateText }}>
+                              <FaEnvelope className="w-4 h-4 opacity-70" />
                               <span className="truncate max-w-[150px]">{lecturer.email || "N/A"}</span>
                             </div>
-                            <div className="flex items-center gap-1">
-                              <FaPhone className="w-3 h-3 opacity-60" />
+                            <div className="flex items-center gap-2" style={{ color: TOKENS.slateText }}>
+                              <FaPhone className="w-4 h-4 opacity-70" />
                               <span>{lecturer.phoneNumber || "N/A"}</span>
                             </div>
                           </div>
                         </td>
-                        <td>
-                          <div className="text-sm">
+                        <td className="py-4 px-6">
+                          <div className="text-sm font-medium flex items-center gap-2" style={{ color: TOKENS.slateText }}>
+                            <FaCalendarAlt className="w-4 h-4 opacity-70" />
                             {lecturer.createdAt ? new Date(lecturer.createdAt).toLocaleDateString() : "N/A"}
                           </div>
                         </td>
-                        <td>
-                          <div className="flex gap-1">
+                        <td className="py-4 px-6">
+                          <div className="flex gap-2">
                             <button
                               onClick={() => copyToClipboard(lecturer.email)}
-                              className="btn btn-ghost btn-xs"
+                              className="btn btn-ghost btn-sm rounded-xl"
+                              style={{ color: TOKENS.deepTeal }}
                               title={t("actions.copyEmail") || "Copy Email"}
                             >
                               <svg
                                 xmlns="http://www.w3.org/2000/svg"
-                                className="h-3 w-3"
+                                className="h-4 w-4"
                                 fill="none"
                                 viewBox="0 0 24 24"
                                 stroke="currentColor"
@@ -398,10 +422,11 @@ const SignedLecturers = () => {
                             </button>
                             <button
                               onClick={() => copyToClipboard(lecturer.phoneNumber)}
-                              className="btn btn-ghost btn-xs"
+                              className="btn btn-ghost btn-sm rounded-xl"
+                              style={{ color: TOKENS.deepTeal }}
                               title={t("actions.copyPhone") || "Copy Phone"}
                             >
-                              <FaPhone className="w-3 h-3" />
+                              <FaPhone className="w-4 h-4" />
                             </button>
                           </div>
                         </td>
@@ -414,36 +439,37 @@ const SignedLecturers = () => {
               {/* Mobile Card View */}
               <div className="grid grid-cols-1 gap-4 lg:hidden">
                 {paginatedLecturers?.map((lecturer) => (
-                  <div key={lecturer._id} className="card bg-base-200/30 shadow-sm">
-                    <div className="card-body p-4">
-                      <div className="flex items-start gap-3 mb-3">
+                  <div key={lecturer._id} className="rounded-2xl shadow-sm border" style={{ backgroundColor: TOKENS.neutralCloud, borderColor: "rgba(17,24,39,0.05)" }}>
+                    <div className="p-5">
+                      <div className="flex items-start gap-4 mb-4">
                         <div className="avatar avatar-placeholder">
-                          <div className="bg-primary/10 text-primary rounded-full w-12">
+                          <div className="rounded-full w-12 h-12 flex items-center justify-center font-bold text-white shadow-sm" style={{ backgroundColor: TOKENS.deepTeal }}>
                             <span className="text-lg font-medium">
                               {(lecturer.name || "L").charAt(0)?.toUpperCase()}
                             </span>
                           </div>
                         </div>
                         <div className="flex-1">
-                          <h3 className="font-bold text-lg">{lecturer.name || "N/A"}</h3>
-                          <div className="badge badge-outline badge-sm mb-2">{lecturer.expertise || "N/A"}</div>
-                          {lecturer.sequencedId && <div className="text-xs opacity-70">ID: {lecturer.sequencedId}</div>}
+                          <h3 className="font-bold text-lg" style={{ color: TOKENS.spaceDark }}>{lecturer.name || "N/A"}</h3>
+                          <div className="badge font-semibold px-3 py-1 mt-1 rounded-xl mb-2" style={{ backgroundColor: "rgba(77,179,194,0.1)", color: TOKENS.deepTeal, border: "none" }}>{lecturer.expertise || "N/A"}</div>
+                          {lecturer.sequencedId && <div className="text-xs font-medium" style={{ color: TOKENS.slateText }}>ID: {lecturer.sequencedId}</div>}
                         </div>
                       </div>
 
-                      <div className="divider my-2"></div>
+                      <div className="border-t my-4" style={{ borderColor: 'rgba(17,24,39,0.05)' }}></div>
 
-                      <div className="space-y-2 text-sm">
-                        <div className="flex items-center gap-2">
-                          <FaEnvelope className="w-4 h-4 text-primary" />
-                          <span className="truncate">{lecturer.email || "N/A"}</span>
+                      <div className="space-y-3 text-sm font-medium">
+                        <div className="flex items-center gap-3">
+                          <FaEnvelope className="w-4 h-4" style={{ color: TOKENS.deepTeal }} />
+                          <span className="truncate" style={{ color: TOKENS.slateText }}>{lecturer.email || "N/A"}</span>
                           <button
                             onClick={() => copyToClipboard(lecturer.email)}
-                            className="btn btn-ghost btn-xs ml-auto"
+                            className="btn btn-ghost btn-xs ml-auto rounded-xl"
+                            style={{ color: TOKENS.deepTeal }}
                           >
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
-                              className="h-3 w-3"
+                              className="h-4 w-4"
                               fill="none"
                               viewBox="0 0 24 24"
                               stroke="currentColor"
@@ -458,28 +484,29 @@ const SignedLecturers = () => {
                           </button>
                         </div>
 
-                        <div className="flex items-center gap-2">
-                          <FaPhone className="w-4 h-4 text-primary" />
-                          <span>{lecturer.phoneNumber || "N/A"}</span>
+                        <div className="flex items-center gap-3">
+                          <FaPhone className="w-4 h-4" style={{ color: TOKENS.deepTeal }} />
+                          <span style={{ color: TOKENS.slateText }}>{lecturer.phoneNumber || "N/A"}</span>
                           <button
                             onClick={() => copyToClipboard(lecturer.phoneNumber)}
-                            className="btn btn-ghost btn-xs ml-auto"
+                            className="btn btn-ghost btn-xs ml-auto rounded-xl"
+                            style={{ color: TOKENS.deepTeal }}
                           >
-                            <FaPhone className="w-3 h-3" />
+                            <FaPhone className="w-4 h-4" />
                           </button>
                         </div>
 
-                        <div className="flex items-center gap-2">
-                          <FaMapMarkerAlt className="w-4 h-4 text-primary" />
-                          <span>
+                        <div className="flex items-center gap-3">
+                          <FaMapMarkerAlt className="w-4 h-4" style={{ color: TOKENS.deepTeal }} />
+                          <span style={{ color: TOKENS.slateText }}>
                             {lecturer.government || "N/A"}
                             {lecturer.administrationZone && `, ${lecturer.administrationZone}`}
                           </span>
                         </div>
 
-                        <div className="flex items-center gap-2">
-                          <FaCalendarAlt className="w-4 h-4 text-primary" />
-                          <span>{lecturer.createdAt ? new Date(lecturer.createdAt).toLocaleDateString() : "N/A"}</span>
+                        <div className="flex items-center gap-3">
+                          <FaCalendarAlt className="w-4 h-4" style={{ color: TOKENS.deepTeal }} />
+                          <span style={{ color: TOKENS.slateText }}>{lecturer.createdAt ? new Date(lecturer.createdAt).toLocaleDateString() : "N/A"}</span>
                         </div>
                       </div>
                     </div>
@@ -489,20 +516,20 @@ const SignedLecturers = () => {
 
               {/* Empty State */}
               {paginatedLecturers.length === 0 && !state.isLoading && (
-                <div className="text-center py-12 bg-base-200/30 rounded-xl">
-                  <div className="flex flex-col items-center justify-center text-base-content/60">
-                    <div className="bg-base-200 p-4 rounded-full mb-4">
-                      <FaGraduationCap className="w-8 h-8 text-base-content/60" />
+                <div className="text-center py-16 rounded-2xl" style={{ backgroundColor: "rgba(17,24,39,0.02)" }}>
+                  <div className="flex flex-col items-center justify-center">
+                    <div className="p-5 rounded-full mb-4 shadow-sm" style={{ backgroundColor: TOKENS.neutralCloud }}>
+                      <FaGraduationCap className="w-10 h-10" style={{ color: TOKENS.slateText }} />
                     </div>
-                    <p className="text-lg font-medium mb-2">{t("lecturers.noLecturers") || "No lecturers found"}</p>
-                    <p className="text-sm opacity-70 max-w-md">
+                    <p className="text-xl font-bold mb-2" style={{ color: TOKENS.spaceDark }}>{t("lecturers.noLecturers") || "No lecturers found"}</p>
+                    <p className="font-medium max-w-md" style={{ color: TOKENS.slateText }}>
                       {searchTerm || Object.values(filters).some((f) => f)
                         ? t("lecturers.noLecturersFiltered") ||
                         "No lecturers match your current filters. Try adjusting your search or filters."
                         : t("lecturers.noLecturersYet") || "No lecturers have signed up yet. Check back later."}
                     </p>
                     {(searchTerm || Object.values(filters).some((f) => f)) && (
-                      <button className="btn btn-outline btn-sm mt-4" onClick={clearFilters}>
+                      <button className="btn btn-outline mt-6 rounded-xl font-bold px-6 border-2" onClick={clearFilters} style={{ borderColor: TOKENS.deepTeal, color: TOKENS.deepTeal }}>
                         {t("filters.clearAll") || "Clear All Filters"}
                       </button>
                     )}
@@ -512,15 +539,15 @@ const SignedLecturers = () => {
 
               {/* Pagination */}
               {state.totalPages > 1 && (
-                <div className="flex justify-between items-center mt-6 flex-wrap gap-4">
-                  <div className="text-sm opacity-70">
-                    {t("pagination.showing") || "Showing"} {paginatedLecturers.length} {t("pagination.of") || "of"}{" "}
-                    {state.filteredLecturers.length} {t("lecturers.title") || "lecturers"}
+                <div className="flex justify-between items-center mt-8 flex-wrap gap-4 pt-6 border-t" style={{ borderColor: "rgba(17,24,39,0.1)" }}>
+                  <div className="text-sm font-medium" style={{ color: TOKENS.slateText }}>
+                    {t("pagination.showing") || "Showing"} <span className="font-bold">{paginatedLecturers.length}</span> {t("pagination.of") || "of"}{" "}
+                    <span className="font-bold">{state.filteredLecturers.length}</span> {t("lecturers.title") || "lecturers"}
                   </div>
 
-                  <div className="join">
+                  <div className="join shadow-sm rounded-xl overflow-hidden">
                     <button
-                      className="join-item btn btn-sm"
+                      className="join-item btn bg-white hover:bg-gray-50 border-gray-200"
                       onClick={handlePreviousPage}
                       disabled={state.currentPage === 1}
                     >
@@ -547,12 +574,12 @@ const SignedLecturers = () => {
                       )}
                     </button>
 
-                    <button className="join-item btn btn-sm btn-disabled">
+                    <button className="join-item btn bg-white border-gray-200 pointer-events-none" style={{ color: TOKENS.spaceDark }}>
                       {state.currentPage} / {state.totalPages}
                     </button>
 
                     <button
-                      className="join-item btn btn-sm"
+                      className="join-item btn bg-white hover:bg-gray-50 border-gray-200"
                       onClick={handleNextPage}
                       disabled={state.currentPage >= state.totalPages}
                     >

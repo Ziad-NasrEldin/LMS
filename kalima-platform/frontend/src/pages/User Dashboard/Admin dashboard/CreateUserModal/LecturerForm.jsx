@@ -35,9 +35,9 @@ const LecturerForm = ({ userData, handleChange, subjects, t }) => {
     <>
       {/* Subjects Selection */}
       <div className="form-control">
-        <div className="flex flex-col gap-4">
-          <label className="label">
-            <span className="label-text">{t("fields.subjects")}</span>
+        <div className="flex flex-col gap-2">
+          <label className="label py-0">
+            <span className="label-text font-bold" style={{ color: "#1F2937" }}>{t("fields.subjects")}</span>
           </label>
           <div className="flex gap-2">
             <select
@@ -79,9 +79,9 @@ const LecturerForm = ({ userData, handleChange, subjects, t }) => {
 
       {/* Profile Picture Upload */}
       <div className="form-control">
-        <div className="flex flex-col gap-4">
-          <label className="label">
-            <span className="label-text">{t("fields.profilePicture")}</span>
+        <div className="flex flex-col gap-2">
+          <label className="label py-0">
+            <span className="label-text font-bold" style={{ color: "#1F2937" }}>{t("fields.profilePicture")}</span>
           </label>
           <input
             type="file"
@@ -109,13 +109,14 @@ const LecturerForm = ({ userData, handleChange, subjects, t }) => {
 
       {/* Bio */}
       <div className="form-control">
-        <div className="flex flex-col gap-4">
-          <label className="label">
-            <span className="label-text">{t("fields.bio")}</span>
+        <div className="flex flex-col gap-2">
+          <label className="label py-0">
+            <span className="label-text font-bold" style={{ color: "#1F2937" }}>{t("fields.bio")}</span>
           </label>
           <textarea
             name="bio"
-            className="textarea textarea-bordered"
+            className="textarea w-full rounded-xl"
+              style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
             value={userData.bio || ""}
             onChange={handleChange}
             rows="3"
@@ -126,14 +127,15 @@ const LecturerForm = ({ userData, handleChange, subjects, t }) => {
 
       {/* Expertise */}
       <div className="form-control">
-        <div className="flex flex-col gap-4">
-          <label className="label">
-            <span className="label-text">{t("fields.expertise")}</span>
+        <div className="flex flex-col gap-2">
+          <label className="label py-0">
+            <span className="label-text font-bold" style={{ color: "#1F2937" }}>{t("fields.expertise")}</span>
           </label>
           <input
             type="text"
             name="expertise"
-            className="input input-bordered"
+            className="input w-full rounded-xl"
+              style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
             value={userData.expertise || ""}
             onChange={handleChange}
             placeholder={t("placeholders.expertise")}

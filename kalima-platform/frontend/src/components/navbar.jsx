@@ -8,12 +8,12 @@ import {
   getUserDashboard,
   logoutUser,
 } from "../routes/auth-services";
-import { FaCartPlus, FaHome, FaBook, FaChalkboardTeacher, FaBox, FaVideo } from "react-icons/fa";
-import { Layout } from "lucide-react";
+import { Layout, Menu, Sparkles, X } from "lucide-react";
 
 const NavBar = () => {
   const { t, i18n } = useTranslation("common");
   const [menuOpen, setMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const [userRole, setUserRole] = useState(null);
   const [userId, setUserId] = useState(null);
   const isAr = i18n.language === "ar";
@@ -25,8 +25,9 @@ const NavBar = () => {
       try {
         const result = await getUserDashboard();
         if (result.success) {
-          setUserRole(result.data.data.userInfo.role);
-          setUserId(result.data.data.userInfo.id);
+          const userInfo = result?.data?.data?.userInfo || result?.data?.userInfo;
+          setUserRole(userInfo?.role || null);
+          setUserId(userInfo?.id || null);
         } else {
           setUserRole(null);
           setUserId(null);
@@ -83,6 +84,19 @@ const NavBar = () => {
     document.body.style.overflow = menuOpen ? "hidden" : "auto";
   }, [menuOpen]);
 
+  useEffect(() => {
+    const onScroll = () => {
+      setIsScrolled(window.scrollY > 14);
+    };
+
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, []);
+
   const handleLogout = async () => {
     try {
       await logoutUser();
@@ -115,230 +129,168 @@ const NavBar = () => {
   };
 
   const navItems = [
-    { key: "homepage", path: "/", icon: FaHome },
-    { key: "educationalCourses", path: "/courses", icon: FaBook },
-    { key: "teachers", path: "/teachers", icon: FaChalkboardTeacher },
-    { key: "lectures", path: "/lectures", icon: FaVideo },
-    { key: "market", path: "/market", icon: FaCartPlus },
-  ];
-
-  const authItems = [
-    { key: "signup", path: "/register" },
-    { key: "signin", path: "/login" },
+    { key: "homepage", path: "/" },
+    { key: "educationalCourses", path: "/courses" },
+    { key: "teachers", path: "/teachers" },
+    { key: "aboutPlatform", path: "/" },
   ];
 
   return (
-    <div
-      className="navbar top-0 left-0 right-0 z-50 bg-base-100 shadow-xl px-4 py-1 sticky"
-      dir={isAr ? "rtl" : "ltr"}
-    >
-      <div ref={navbarRef} className="flex-1 flex justify-between items-center">
-        {/* Left side - Logo and navigation items */}
-        <div className="flex items-center gap-4">
-          {/* Mobile menu button */}
-          <div></div>
-          <button
-            className="btn btn-ghost lg:hidden"
-            onClick={() => setMenuOpen(!menuOpen)}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
+    <>
+      <header
+        className="fixed inset-x-0 top-0 z-50 px-3 pt-4 sm:px-6"
+        dir={isAr ? "rtl" : "ltr"}
+      >
+        <div
+          ref={navbarRef}
+          className={`mx-auto flex max-w-[1220px] items-center justify-between gap-3 rounded-[999px] border px-3 py-2 backdrop-blur-xl transition-all duration-300 ${
+            isScrolled
+              ? "border-[#CFC8B7] bg-[#E7E2D6]/90 shadow-[0_16px_38px_rgba(0,0,0,0.14)]"
+              : "border-[#D6D0C4] bg-[#EFEAE0]/82 shadow-[0_10px_24px_rgba(0,0,0,0.10)]"
+          }`}
+        >
+          <div className="flex items-center gap-2 lg:min-w-[220px]">
+            <button
+              className="btn btn-ghost btn-circle lg:hidden"
+              onClick={() => setMenuOpen((prev) => !prev)}
+              aria-label="Toggle menu"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M4 6h16M4 12h16M4 18h7"
-              />
-            </svg>
-          </button>
+              {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
 
-          {/* Logo */}
-          <Link to="/" className="btn btn-ghost px-2 rounded-2xl">
-            <img
-              src="/Kalima.png"
-              alt="Logo"
-              className="w-10 h-10 rounded-full"
-            />
-            <span className="text-xl font-bold text-primary ml-2">
-              {t("logoText")}
-            </span>
-          </Link>
+            <div className="hidden lg:flex items-center gap-2">
+              <LanguageSwitcher />
+              {userId && <NotificationCenter userId={userId} />}
+              {userRole ? (
+                <>
+                  <Link to={getDashboardPath(userRole)} className="btn btn-sm border-none bg-[#CFE8ED] text-[#0F4F5B] hover:bg-[#BFDFE6] rounded-full">
+                    {t("dashboard")}
+                    <Layout className="h-4 w-4" />
+                  </Link>
+                  <button onClick={handleLogout} className="btn btn-sm btn-ghost rounded-full text-[#2F2F2F] hover:bg-white/70">
+                    {t("logout")}
+                  </button>
+                </>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <Link
+                    to="/login"
+                    className="btn btn-sm rounded-full bg-white/70 text-[#2F2F2F] hover:bg-white"
+                  >
+                    {t("login")}
+                  </Link>
+                  <Link
+                    to="/register"
+                    className="btn btn-sm rounded-full border-none bg-[linear-gradient(135deg,#E4C65F,#D4AD3F)] px-5 text-[#232323] hover:brightness-95"
+                  >
+                    {t("startNow")}
+                  </Link>
+                </div>
+              )}
+            </div>
+          </div>
 
-          {/* Desktop Navigation Items */}
-          <div className="hidden lg:flex xl:gap-4 ml-4 rounded-2xl">
+          <nav className="hidden lg:flex items-center gap-7 text-sm font-semibold text-[#2E3138]">
             {navItems.map((item) => (
               <Link
                 key={item.key}
                 to={item.path}
-                icon={item.icon}
-                className={`btn btn-ghost font-medium rounded-2xl transition-colors ${item.key === "market" ? "bg-primary/70" : ""}`}
+                className="rounded-full px-2 py-1 transition-all hover:bg-white/45 hover:text-[#0E5563]"
               >
                 {t(item.key)}
-                {item.icon && <item.icon className="inline-block ml-1" />}
               </Link>
             ))}
-            {userRole && (
-              <Link
-                to={getDashboardPath(userRole)}
-                className="btn btn-ghost rounded-2xl"
-              >
-                {t("dashboard")}
-                <Layout className="inline-block mr-1" />
-              </Link>
-            )}
-            <LanguageSwitcher />
+          </nav>
+
+          <div className="flex items-center justify-end lg:min-w-[220px]">
+            <Link
+              to="/"
+              className="inline-flex items-center gap-2 rounded-full bg-[linear-gradient(135deg,#BFE8EE,#A6DDE7)] px-4 py-2 text-sm font-bold text-[#0E5563] shadow-[0_6px_14px_rgba(14,85,99,0.15)]"
+            >
+              {t("logoText")}
+              <Sparkles className="h-4 w-4" />
+            </Link>
           </div>
         </div>
 
-        {/* Auth buttons - Desktop */}
-        <div className="flex-none hidden lg:flex items-center gap-2 ml-4">
-          {userId && <NotificationCenter userId={userId} />}
-          {userRole ? (
-            <button
-              onClick={handleLogout}
-              className="btn btn-outline rounded-2xl"
+        {menuOpen && (
+          <>
+            <div className="fixed inset-0 z-40 bg-black/30 backdrop-blur-[2px]" onClick={() => setMenuOpen(false)}></div>
+            <div
+              ref={menuRef}
+              className={`fixed top-20 z-50 w-[min(88vw,360px)] rounded-3xl border border-[#D9D2C5] bg-[#F2EEE6]/98 p-5 shadow-[0_24px_48px_rgba(0,0,0,0.2)] ${isAr ? "right-3" : "left-3"}`}
+              dir={isAr ? "rtl" : "ltr"}
             >
-              {t("logout")}
-            </button>
-          ) : (
-            authItems.map((item) => (
-              <Link
-                key={item.key}
-                to={item.path}
-                className={`btn ${
-                  item.key === "signup" ? "btn-primary" : "btn-outline"
-                } rounded-2xl`}
-              >
-                {t(item.key)}
-              </Link>
-            ))
-          )}
-        </div>
-      </div>
-
-      {/* Mobile menu - Drawer style */}
-      {menuOpen && (
-        <>
-          {/* Backdrop overlay */}
-          <div
-            className="fixed inset-0 bg-black/50 z-40"
-            onClick={() => setMenuOpen(false)}
-          ></div>
-
-          {/* Drawer */}
-          <div
-            ref={menuRef}
-            className={`lg:hidden w-1/2 sm:w-1/3 fixed ${
-              isAr ? "right-0" : "left-0"
-            } top-0 h-full bg-base-100 z-50 overflow-y-auto transition-transform duration-300 ease-in-out`}
-            dir={isAr ? "rtl" : "ltr"}
-          >
-            <div className="p-4 space-y-4 h-full">
-              {/* Mobile menu header */}
-              <div className="flex items-center justify-around mb-6">
-                <Link
-                  to="/"
-                  className="flex items-center gap-2"
-                  onClick={() => setMenuOpen(false)}
-                >
-                  <img
-                    src="/Kalima.png"
-                    alt="Logo"
-                    className="w-10 h-10 rounded-full"
-                  />
-                  <span className="text-xl font-bold text-primary">
-                    {t("logoText")}
-                  </span>
+              <div className="mb-6 flex items-center justify-between">
+                <Link to="/" className="text-lg font-bold text-[#1D376A]" onClick={() => setMenuOpen(false)}>
+                  {t("logoText")}
                 </Link>
-                <button
-                  className="btn btn-ghost btn-sm btn-circle"
-                  onClick={() => setMenuOpen(false)}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-6 w-6"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
+                <button className="btn btn-ghost btn-circle" onClick={() => setMenuOpen(false)} aria-label="Close menu">
+                  <X className="h-5 w-5" />
                 </button>
               </div>
 
-              {/* Mobile menu items */}
-              <ul className="menu menu-lg p-0 [&_li>*]:rounded-lg">
+              <div className="space-y-2">
                 {navItems.map((item) => (
-                  <li key={item.key}>
-                    <Link to={item.path} onClick={() => setMenuOpen(false)}>
-                      {t(item.key)}
-                    </Link>
-                  </li>
-                ))}
-
-                {userRole && (
-                  <li>
-                    <Link
-                      to={getDashboardPath(userRole)}
-                      onClick={() => setMenuOpen(false)}
-                    >
-                      {t("dashboard")}
-                    </Link>
-                  </li>
-                )}
-              </ul>
-
-              <div className="divider"></div>
-
-              <div className="flex flex-col gap-2">
-                <div className="mb-4">
-                  <LanguageSwitcher />
-                </div>
-
-                {userId && (
-                  <div className="flex py-2">
-                    <NotificationCenter userId={userId} />
-                    <span className="ml-2">{t("notifications")}</span>
-                  </div>
-                )}
-
-                {userRole ? (
-                  <button
-                    onClick={handleLogout}
-                    className="btn btn-outline w-full justify-start"
+                  <Link
+                    key={item.key}
+                    to={item.path}
+                    className="btn btn-ghost w-full justify-start rounded-xl text-base"
+                    onClick={() => setMenuOpen(false)}
                   >
+                    {t(item.key)}
+                  </Link>
+                ))}
+              </div>
+
+              <div className="my-5">
+                <LanguageSwitcher />
+              </div>
+
+              {userId && (
+                <div className="mb-4">
+                  <NotificationCenter userId={userId} />
+                </div>
+              )}
+
+              {userRole ? (
+                <div className="space-y-2">
+                  <Link
+                    to={getDashboardPath(userRole)}
+                    className="btn btn-outline w-full justify-start rounded-xl"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    {t("dashboard")}
+                  </Link>
+                  <button onClick={handleLogout} className="btn btn-outline w-full justify-start rounded-xl">
                     {t("logout")}
                   </button>
-                ) : (
-                  authItems.map((item) => (
-                    <Link
-                      key={item.key}
-                      to={item.path}
-                      className={`btn ${
-                        item.key === "signup" ? "btn-primary" : "btn-outline"
-                      } w-full justify-start`}
-                      onClick={() => setMenuOpen(false)}
-                    >
-                      {t(item.key)}
-                    </Link>
-                  ))
-                )}
-              </div>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <Link
+                    to="/login"
+                    className="btn btn-outline w-full rounded-xl"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    {t("login")}
+                  </Link>
+                  <Link
+                    to="/register"
+                    className="btn w-full rounded-xl border-none bg-[linear-gradient(135deg,#E4C65F,#D4AD3F)] text-[#232323] hover:brightness-95"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    {t("startNow")}
+                  </Link>
+                </div>
+              )}
             </div>
-          </div>
-        </>
-      )}
-    </div>
+          </>
+        )}
+      </header>
+
+      <div className="h-[92px]" aria-hidden="true" />
+    </>
   );
 };
 

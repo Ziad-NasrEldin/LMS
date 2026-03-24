@@ -8,11 +8,11 @@ export default function NavigationButtons({
   role 
 }) {
   return (
-    <div className="flex justify-between px-[10%] mt-8">
+    <div className="mt-6 flex items-center justify-between gap-3 px-0 sm:mt-8 sm:px-[10%]">
       <button 
         onClick={handlePrev} 
         disabled={currentStep === 1 || isLoading}
-        className="btn btn-outline" 
+        className="btn btn-outline btn-sm sm:btn-md" 
         type="button"
       >
         {t('buttons.previous')}
@@ -20,7 +20,7 @@ export default function NavigationButtons({
       
       <button 
         onClick={handleNext} 
-        className="btn btn-primary"
+        className="btn btn-primary btn-sm sm:btn-md"
         disabled={isLoading}
         type="button"
       >

@@ -53,6 +53,18 @@ function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { i18n } = useTranslation();
   const isRTL = i18n.language === "ar";
+  const authRoutes = [
+    "/login",
+    "/signin",
+    "/register",
+    "/signup",
+    "/sign-in",
+    "/sign-up",
+    "/forgot-password",
+    "/verify-otp",
+    "/reset-password",
+  ];
+  const isAuthRoute = authRoutes.includes(location.pathname);
 
   // useEffect(() => {
   //   const handleContextMenu = (e) => e.preventDefault();
@@ -93,7 +105,7 @@ function App() {
         onSidebarToggle={toggleSidebar}
         isSidebarOpen={sidebarOpen}
       />
-      {showSidebar && (
+      {!isAuthRoute && showSidebar && (
         <>
           <UnifiedSidebar
             isOpen={sidebarOpen}
@@ -129,7 +141,7 @@ function App() {
       )}
       <div
         className={`transition-all duration-300 ${
-          showSidebar && sidebarOpen
+          !isAuthRoute && showSidebar && sidebarOpen
             ? isRTL
               ? "md:mr-52"
               : "md:ml-52"
@@ -148,7 +160,11 @@ function App() {
 
             {/* Authentication Routes */}
             <Route path="/login" element={<TeacherLogin />} />
+            <Route path="/signin" element={<TeacherLogin />} />
+            <Route path="/sign-in" element={<TeacherLogin />} />
             <Route path="/register" element={<RegisterStudent />} />
+            <Route path="/signup" element={<RegisterStudent />} />
+            <Route path="/sign-up" element={<RegisterStudent />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/verify-otp" element={<VerifyOtp />} />
             <Route path="/reset-password" element={<ResetPassword />} />
@@ -278,10 +294,9 @@ function App() {
       </div>
       {/* Only show footer on public routes */}
       {!showSidebar && (
-        <footer className="bg-base-200 p-4">
-          {" "}
-          <Footer />{" "}
-        </footer>
+        <div className="px-4 pb-6 sm:px-6 lg:px-8">
+          <Footer />
+        </div>
       )}{" "}
     </div>
   );

@@ -12,10 +12,13 @@ import AssistantForm from "./AssistantForm"
 import BulkCreateUsers from "./BulkCreateUsers"
 import TeacherForm from "./TeacherForm"
 import { getAllGovernments, getGovernmentZones } from "../../../../routes/governments"
+import { designTokens } from "../../../../constants/designTokens"
 
 const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
   const { t, i18n } = useTranslation("createUser")
   const isRTL = i18n.language === "ar"
+  const TOKENS = designTokens.colors;
+  const SHADOWS = designTokens.shadows;
 
   const initialUserState = {
     role: "student",
@@ -315,21 +318,43 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
   if (!isOpen) return null
 
   return (
-    <div className="modal modal-open" dir={isRTL ? "rtl" : "ltr"}>
-      <div className="modal-box max-w-2xl">
-        <h3 className="font-bold text-xl mb-4">{isBulkMode ? t("titles.bulkCreate") : t("titles.createNewUser")}</h3>
+    <div className="modal modal-open" dir={isRTL ? "rtl" : "ltr"} style={{ backgroundColor: 'rgba(17,24,39,0.4)' }}>
+      <div 
+        className="modal-box max-w-2xl rounded-[2rem] p-6 sm:p-8" 
+        style={{ 
+          backgroundColor: TOKENS.neutralCloud, 
+          boxShadow: SHADOWS.level2 
+        }}
+      >
+        <h3 className="font-extrabold text-2xl mb-6" style={{ color: TOKENS.spaceDark }}>
+          {isBulkMode ? t("titles.bulkCreate") : t("titles.createNewUser")}
+        </h3>
 
-        <div className="tabs tabs-border mb-4">
-          <button className={`tab ${!isBulkMode ? "tab-active" : ""}`} onClick={() => setIsBulkMode(false)}>
+        <div className="flex bg-white rounded-xl p-1 mb-6 border" style={{ borderColor: 'rgba(17,24,39,0.05)' }}>
+          <button 
+            className={`flex-1 py-3 px-4 rounded-lg font-bold transition-all ${!isBulkMode ? "shadow-sm" : "hover:bg-gray-50"}`} 
+            style={{ 
+              backgroundColor: !isBulkMode ? TOKENS.deepTeal : "transparent",
+              color: !isBulkMode ? "white" : TOKENS.slateText
+            }}
+            onClick={() => setIsBulkMode(false)}
+          >
             {t("tabs.createSingleUser")}
           </button>
-          <button className={`tab ${isBulkMode ? "tab-active" : ""}`} onClick={() => setIsBulkMode(true)}>
+          <button 
+            className={`flex-1 py-3 px-4 rounded-lg font-bold transition-all ${isBulkMode ? "shadow-sm" : "hover:bg-gray-50"}`} 
+            style={{ 
+              backgroundColor: isBulkMode ? TOKENS.deepTeal : "transparent",
+              color: isBulkMode ? "white" : TOKENS.slateText
+            }}
+            onClick={() => setIsBulkMode(true)}
+          >
             {t("tabs.bulkCreate")}
           </button>
         </div>
 
         {formError && (
-          <div className="alert alert-error mb-4">
+          <div className="alert border-none rounded-xl mb-6 font-medium" style={{ backgroundColor: "rgba(224,36,36,0.1)", color: "#E02424" }}>
             <span>{formError}</span>
           </div>
         )}
@@ -337,20 +362,21 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
         {isBulkMode ? (
           <BulkCreateUsers />
         ) : loadingDropdowns ? (
-          <div className="flex justify-center my-8">
-            <span className="loading loading-spinner loading-lg"></span>
+          <div className="flex justify-center my-12">
+            <span className="loading loading-spinner loading-lg" style={{ color: TOKENS.deepTeal }}></span>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div className="form-control">
                 <div className="flex flex-col gap-2">
-                  <label className="label">
-                    <span className="label-text">{t("fields.accountType")}</span>
+                  <label className="label py-0">
+                    <span className="label-text font-bold" style={{ color: TOKENS.spaceDark }}>{t("fields.accountType")}</span>
                   </label>
                   <select
                     name="role"
-                    className="select select-bordered"
+                    className="select w-full rounded-xl"
+                    style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: TOKENS.spaceDark }}
                     value={userData.role}
                     onChange={handleChange}
                     required
@@ -371,12 +397,13 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
 
               <div className="form-control">
                 <div className="flex flex-col gap-2">
-                  <label className="label">
-                    <span className="label-text">{t("fields.gender")}</span>
+                  <label className="label py-0">
+                    <span className="label-text font-bold" style={{ color: TOKENS.spaceDark }}>{t("fields.gender")}</span>
                   </label>
                   <select
                     name="gender"
-                    className="select select-bordered"
+                    className="select w-full rounded-xl"
+                    style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: TOKENS.spaceDark }}
                     value={userData.gender}
                     onChange={handleChange}
                     required
@@ -390,13 +417,14 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
 
             <div className="form-control">
               <div className="flex flex-col gap-2">
-                <label className="label">
-                  <span className="label-text">{t("fields.name")}</span>
+                <label className="label py-0">
+                  <span className="label-text font-bold" style={{ color: TOKENS.spaceDark }}>{t("fields.name")}</span>
                 </label>
                 <input
                   type="text"
                   name="name"
-                  className="input input-bordered"
+                  className="input w-full rounded-xl"
+                  style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: TOKENS.spaceDark }}
                   value={userData.name}
                   onChange={handleChange}
                   required

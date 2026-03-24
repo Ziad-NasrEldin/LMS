@@ -24,7 +24,7 @@ export default function StepParent({ formData, handleChildrenChange, t, errors, 
     };
 
     return (
-        <div className="space-y-4">
+        <div className="space-y-2">
             {/* Global API Error Display */}
             {apiError && (
                 <div className="alert alert-error animate-fade-in">
@@ -36,14 +36,14 @@ export default function StepParent({ formData, handleChildrenChange, t, errors, 
 
             {/* Email Field */}
             <div className="form-control">
-                <div className="flex flex-col gap-2">
-                    <label className="label">
-                        <span className="label-text">{t('form.email')}</span>
+                <div className="flex flex-col gap-1">
+                    <label className="label py-1">
+                        <span className="label-text text-xs">{t('form.email')}</span>
                     </label>
                     <input
                         type="email"
                         name="email"
-                        className={`input input-bordered ${errors.email ? 'input-error animate-shake' : ''}`}
+                        className={`input input-bordered input-sm ${errors.email ? 'input-error animate-shake' : ''}`}
                         value={formData.email || ''}
                         onChange={handleInputChange}
                         placeholder="email@example.com"
@@ -59,15 +59,15 @@ export default function StepParent({ formData, handleChildrenChange, t, errors, 
 
             {/* Password Field */}
             <div className="form-control">
-                <div className="flex flex-col gap-2">
-                    <label className="label">
-                        <span className="label-text">{t('form.password')}</span>
+                <div className="flex flex-col gap-1">
+                    <label className="label py-1">
+                        <span className="label-text text-xs">{t('form.password')}</span>
                     </label>
                     <div className="relative">
                         <input
                             type={showPassword ? 'text' : 'password'}
                             name="password"
-                             className={`input input-bordered ${i18n.language === 'ar' ? 'pr-12' : 'pl-12'} ${errors.password ? 'input-error animate-shake' : ''}`}
+                             className={`input input-bordered input-sm ${i18n.language === 'ar' ? 'pr-12' : 'pl-12'} ${errors.password ? 'input-error animate-shake' : ''}`}
                             value={formData.password || ''}
                             onChange={handleInputChange}
                             required
@@ -91,15 +91,15 @@ export default function StepParent({ formData, handleChildrenChange, t, errors, 
 
             {/* Confirm Password */}
             <div className="form-control relative">
-                <div className="flex flex-col gap-2">
-                    <label className="label">
-                        <span className="label-text">{t('form.confirmPassword')}</span>
+                <div className="flex flex-col gap-1">
+                    <label className="label py-1">
+                        <span className="label-text text-xs">{t('form.confirmPassword')}</span>
                     </label>
                     <div className="relative">
                         <input
                             type={showConfirmPassword ? 'text' : 'password'}
                             name="confirmPassword"
-                            className={`input input-bordered ${i18n.language === 'ar' ? 'pr-12' : 'pl-12'} ${errors.confirmPassword ? 'input-error animate-shake' : ''}`}
+                            className={`input input-bordered input-sm ${i18n.language === 'ar' ? 'pr-12' : 'pl-12'} ${errors.confirmPassword ? 'input-error animate-shake' : ''}`}
                             value={formData.confirmPassword || ''}
                             onChange={handleInputChange}
                             required
@@ -123,13 +123,13 @@ export default function StepParent({ formData, handleChildrenChange, t, errors, 
 
             {/* Optional Level Field */}
             <div className="form-control">
-                <div className="flex flex-col gap-2">
-                    <label className="label">
-                        <span className="label-text">{t('form.level')} ({t('form.optional')})</span>
+                <div className="flex flex-col gap-1">
+                    <label className="label py-1">
+                        <span className="label-text text-xs">{t('form.level')} ({t('form.optional')})</span>
                     </label>
                     <select
                         name="level"
-                        className={`select select-bordered ${errors.level ? 'select-error animate-shake' : ''}`}
+                        className={`select select-bordered select-sm ${errors.level ? 'select-error animate-shake' : ''}`}
                         value={formData.level || ''}
                         onChange={handleInputChange}
                       
@@ -156,13 +156,13 @@ export default function StepParent({ formData, handleChildrenChange, t, errors, 
 
             {safeChildren.slice(0, childrenCount).map((child, i) => (
                 <div key={i} className="form-control">
-                    <div className="flex flex-col gap-2">
-                        <label className="label">
-                            <span className="label-text">{t('form.childSequenceId')} #{i + 1}</span>
+                    <div className="flex flex-col gap-1">
+                        <label className="label py-1">
+                            <span className="label-text text-xs">{t('form.childSequenceId')} #{i + 1}</span>
                         </label>
                                 <input
                                 type="text"
-                                className={`input input-bordered ${errors.children?.[i] ? 'input-error animate-shake' : ''}`}
+                                className={`input input-bordered input-sm ${errors.children?.[i] ? 'input-error animate-shake' : ''}`}
                                 value={child || ''}
                                 onChange={(e) => handleChildrenChange(i, e.target.value)}
                                 placeholder="5f7d8e3a1c9d440000d4a7b2"

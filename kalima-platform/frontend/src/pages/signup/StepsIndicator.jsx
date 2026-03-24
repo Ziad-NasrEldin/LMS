@@ -18,14 +18,14 @@ export default function StepsIndicator({ currentStep, t, role }) {
   };
 
   return (
-    <div className="mt-8 pt-8">
-      <div className="steps steps-horizontal w-full">
+    <div className="w-full">
+      <div className="steps steps-horizontal w-full text-[11px] sm:text-[13px]">
         {stepLabels[role].map((label, index) => {
           const stepNumber = index + 1;
           return (
             <div 
               key={stepNumber} 
-              className={`text-xs sm:text-lg step ${currentStep >= stepNumber ? 'step-primary' : ''}`}
+              className={`text-[11px] sm:text-[13px] step ${currentStep >= stepNumber ? 'step-primary' : ''}`}
             >
               {t(`${label}`)}
             </div>

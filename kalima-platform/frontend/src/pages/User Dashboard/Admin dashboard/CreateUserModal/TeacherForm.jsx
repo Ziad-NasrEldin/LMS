@@ -158,14 +158,15 @@ const TeacherForm = ({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="form-control">
           <div className="flex flex-col gap-2">
-            <label className="label">
-              <span className="label-text">{t("fields.phoneNumber") || "Phone Number"}</span>
+            <label className="label py-0">
+              <span className="label-text font-bold" style={{ color: "#1F2937" }}>{t("fields.phoneNumber") || "Phone Number"}</span>
             </label>
             <input
               type="text"
               inputMode="numeric"
               name="phoneNumber"
-              className="input input-bordered"
+              className="input w-full rounded-xl"
+              style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
               value={userData.phoneNumber || ""}
               onChange={handlePhoneInputChange}
               placeholder={t("placeholders.phoneNumber") || "Enter phone number"}
@@ -175,14 +176,15 @@ const TeacherForm = ({
         </div>
         <div className="form-control">
           <div className="flex flex-col gap-2">
-            <label className="label">
-              <span className="label-text">{t("fields.phoneNumber2") || "Phone Number 2 (Optional)"}</span>
+            <label className="label py-0">
+              <span className="label-text font-bold" style={{ color: "#1F2937" }}>{t("fields.phoneNumber2") || "Phone Number 2 (Optional)"}</span>
             </label>
             <input
               type="text"
               inputMode="numeric"
               name="phoneNumber2"
-              className="input input-bordered"
+              className="input w-full rounded-xl"
+              style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
               value={userData.phoneNumber2 || ""}
               onChange={handlePhoneInputChange}
               placeholder={t("placeholders.phoneNumber2") || "Enter second phone number"}
@@ -194,12 +196,13 @@ const TeacherForm = ({
       {/* Subject Selection */}
       <div className="form-control">
         <div className="flex flex-col gap-2">
-          <label className="label">
-            <span className="label-text">{t("fields.subject") || "Subject"}</span>
+          <label className="label py-0">
+            <span className="label-text font-bold" style={{ color: "#1F2937" }}>{t("fields.subject") || "Subject"}</span>
           </label>
           <select
             name="subject"
-            className="select select-bordered"
+            className="select w-full rounded-xl"
+              style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
             value={userData.subject || ""}
             onChange={handleChange}
             required
@@ -217,10 +220,11 @@ const TeacherForm = ({
       {/* Level Selection (Multiple) - Use predefined level values */}
       <div className="form-control">
         <div className="flex flex-col gap-2">
-          <label className="label">
-            <span className="label-text">{t("fields.levels") || "Teaching Levels"}</span>
+          <label className="label py-0">
+            <span className="label-text font-bold" style={{ color: "#1F2937" }}>{t("fields.levels") || "Teaching Levels"}</span>
           </label>
-          <select className="select select-bordered" onChange={handleLevelSelect} value="">
+          <select className="select w-full rounded-xl"
+              style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }} onChange={handleLevelSelect} value="">
             <option value="">{t("placeholders.selectLevel") || "Select Level"}</option>
             {allowedLevels.map((level) => (
               <option key={level.value} value={level.value} disabled={selectedLevels.includes(level.value)}>
@@ -246,12 +250,13 @@ const TeacherForm = ({
       {/* Teaches At Type */}
       <div className="form-control">
         <div className="flex flex-col gap-2">
-          <label className="label">
-            <span className="label-text">{t("fields.teachesAtType") || "Teaches At"}</span>
+          <label className="label py-0">
+            <span className="label-text font-bold" style={{ color: "#1F2937" }}>{t("fields.teachesAtType") || "Teaches At"}</span>
           </label>
           <select
             name="teachesAtType"
-            className="select select-bordered"
+            className="select w-full rounded-xl"
+              style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
             value={userData.teachesAtType || ""}
             onChange={handleChange}
             required
@@ -268,8 +273,8 @@ const TeacherForm = ({
       {shouldShowCenters && (
         <div className="form-control">
           <div className="flex flex-col gap-2">
-            <label className="label">
-              <span className="label-text">{t("fields.centers") || "Centers"}</span>
+            <label className="label py-0">
+              <span className="label-text font-bold" style={{ color: "#1F2937" }}>{t("fields.centers") || "Centers"}</span>
             </label>
             <div className="flex gap-2">
               <input
@@ -303,13 +308,14 @@ const TeacherForm = ({
       {shouldShowSchool && (
         <div className="form-control">
           <div className="flex flex-col gap-2">
-            <label className="label">
-              <span className="label-text">{t("fields.school") || "School"}</span>
+            <label className="label py-0">
+              <span className="label-text font-bold" style={{ color: "#1F2937" }}>{t("fields.school") || "School"}</span>
             </label>
             <input
               type="text"
               name="school"
-              className="input input-bordered"
+              className="input w-full rounded-xl"
+              style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
               value={userData.school || ""}
               onChange={handleChange}
               placeholder={t("placeholders.school") || "Enter school name"}
@@ -322,8 +328,8 @@ const TeacherForm = ({
       {/* Government Selection */}
       <div className="form-control">
         <div className="flex flex-col gap-2">
-          <label className="label">
-            <span className="label-text">{t("fields.government") || "Government"}</span>
+          <label className="label py-0">
+            <span className="label-text font-bold" style={{ color: "#1F2937" }}>{t("fields.government") || "Government"}</span>
           </label>
           <select
             name="government"
@@ -345,8 +351,8 @@ const TeacherForm = ({
       {/* Administration Zone Selection */}
       <div className="form-control">
         <div className="flex flex-col gap-2">
-          <label className="label">
-            <span className="label-text">{t("fields.administrationZone") || "Administration Zone"}</span>
+          <label className="label py-0">
+            <span className="label-text font-bold" style={{ color: "#1F2937" }}>{t("fields.administrationZone") || "Administration Zone"}</span>
           </label>
           <select
             disabled={!userData.government || loadingZones}
@@ -381,11 +387,12 @@ const TeacherForm = ({
       {/* Social Media (Optional) - Updated to use 'account' */}
       <div className="form-control">
         <div className="flex flex-col gap-2">
-          <label className="label">
-            <span className="label-text">{t("fields.socialMedia") || "Social Media (Optional)"}</span>
+          <label className="label py-0">
+            <span className="label-text font-bold" style={{ color: "#1F2937" }}>{t("fields.socialMedia") || "Social Media (Optional)"}</span>
           </label>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-            <select id="socialPlatform" className="select select-bordered">
+            <select id="socialPlatform" className="select w-full rounded-xl"
+              style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}>
               <option value="">{t("placeholders.selectPlatform") || "Select Platform"}</option>
               <option value="Facebook">Facebook</option>
               <option value="Instagram">Instagram</option>
@@ -397,7 +404,8 @@ const TeacherForm = ({
             <input
               type="text"
               id="socialAccount"
-              className="input input-bordered"
+              className="input w-full rounded-xl"
+              style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
               placeholder={t("placeholders.socialAccount") || "Enter account/username"}
             />
             <button type="button" className="btn btn-secondary" onClick={addSocialMedia}>

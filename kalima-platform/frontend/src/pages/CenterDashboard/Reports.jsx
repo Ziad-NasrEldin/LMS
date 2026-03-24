@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import jsPDF from 'jspdf';
 import { getAllParents, sendLessonReport, sendMonthReport, sendCourseReport, getCenterDataByType, getAllAttendance } from '../../routes/center';
+import { ErrorAlert } from '../../components/ErrorAlert';
 
 const Reports = ({ selectedCenter, lessonId }) => {
   const [students, setStudents] = useState([]);
@@ -148,7 +149,7 @@ const Reports = ({ selectedCenter, lessonId }) => {
   };
 
   if (loading) return <div className="text-center p-8">Loading...</div>;
-  if (error) return <div className="text-center p-8 text-red-500">{error}</div>;
+  if (error) return <ErrorAlert error={error} onRetry={() => window.location.reload()} />;
 
   return (
     <div className="container mx-auto px-4 py-8">

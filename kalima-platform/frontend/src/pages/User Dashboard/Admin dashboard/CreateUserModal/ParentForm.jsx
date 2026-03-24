@@ -28,14 +28,15 @@ const ParentForm = ({
       {/* Phone Number Field */}
       <div className="form-control">
         <div className="flex flex-col gap-2">
-          <label className="label">
-            <span className="label-text">{t("fields.phoneNumber")}</span>
+          <label className="label py-0">
+            <span className="label-text font-bold" style={{ color: "#1F2937" }}>{t("fields.phoneNumber")}</span>
           </label>
           <input
             type="text"
             inputMode="numeric"
             name="phoneNumber"
-            className="input input-bordered"
+            className="input w-full rounded-xl"
+              style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
             value={userData.phoneNumber || ""}
             onChange={handlePhoneInputChange}
             placeholder={t("placeholders.phoneNumber") || "Enter phone number"}
@@ -47,8 +48,8 @@ const ParentForm = ({
       {/* Government Selection */}
       <div className="form-control">
         <div className="flex flex-col gap-2">
-          <label className="label">
-            <span className="label-text">{t("fields.government") || "Government"}</span>
+          <label className="label py-0">
+            <span className="label-text font-bold" style={{ color: "#1F2937" }}>{t("fields.government") || "Government"}</span>
           </label>
           <select
             name="government"
@@ -69,8 +70,8 @@ const ParentForm = ({
       {/* Administration Zone Selection - Only show if government is selected */}
       <div className="form-control">
         <div className="flex flex-col gap-2">
-          <label className="label">
-            <span className="label-text">{t("fields.administrationZone") || "Administration Zone"}</span>
+          <label className="label py-0">
+            <span className="label-text font-bold" style={{ color: "#1F2937" }}>{t("fields.administrationZone") || "Administration Zone"}</span>
           </label>
           <select
             disabled={!userData.government || loadingZones}

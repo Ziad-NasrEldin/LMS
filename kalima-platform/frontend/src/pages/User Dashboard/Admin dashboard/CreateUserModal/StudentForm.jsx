@@ -29,13 +29,14 @@ const StudentForm = ({
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="form-control">
-          <div className="flex flex-col gap-4">
-            <label className="label">
-              <span className="label-text">{t("fields.level")}</span>
+          <div className="flex flex-col gap-2">
+            <label className="label py-0">
+              <span className="label-text font-bold" style={{ color: "#1F2937" }}>{t("fields.level")}</span>
             </label>
             <select
               name="level"
-              className="select select-bordered"
+              className="select w-full rounded-xl"
+              style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
               value={userData.level || ""}
               onChange={handleChange}
               required
@@ -50,15 +51,16 @@ const StudentForm = ({
           </div>
         </div>
         <div className="form-control">
-          <div className="flex flex-col gap-4">
-            <label className="label">
-              <span className="label-text">{t("fields.phoneNumber")}</span>
+          <div className="flex flex-col gap-2">
+            <label className="label py-0">
+              <span className="label-text font-bold" style={{ color: "#1F2937" }}>{t("fields.phoneNumber")}</span>
             </label>
             <input
               type="text"
               inputMode="numeric"
               name="phoneNumber"
-              className="input input-bordered"
+              className="input w-full rounded-xl"
+              style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
               value={userData.phoneNumber || ""}
               onChange={handlePhoneInputChange}
               placeholder={t("placeholders.phoneNumber") || "Enter phone number"}
@@ -70,14 +72,15 @@ const StudentForm = ({
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="form-control">
-          <div className="flex flex-col gap-4">
-            <label className="label">
-              <span className="label-text">{t("fields.sequencedIdOptional")}</span>
+          <div className="flex flex-col gap-2">
+            <label className="label py-0">
+              <span className="label-text font-bold" style={{ color: "#1F2937" }}>{t("fields.sequencedIdOptional")}</span>
             </label>
             <input
               type="text"
               name="sequencedId"
-              className="input input-bordered"
+              className="input w-full rounded-xl"
+              style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
               value={userData.sequencedId || ""}
               onChange={handleChange}
               placeholder={t("placeholders.sequencedId")}
@@ -85,14 +88,15 @@ const StudentForm = ({
           </div>
         </div>
         <div className="form-control">
-          <div className="flex flex-col gap-4">
-            <label className="label">
-              <span className="label-text">{t("fields.parentPhoneNumberOptional")}</span>
+          <div className="flex flex-col gap-2">
+            <label className="label py-0">
+              <span className="label-text font-bold" style={{ color: "#1F2937" }}>{t("fields.parentPhoneNumberOptional")}</span>
             </label>
             <input
               type="text"
               name="parentPhoneNumber"
-              className="input input-bordered"
+              className="input w-full rounded-xl"
+              style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
               value={userData.parentPhoneNumber || ""}
               onChange={handleChange}
               placeholder={t("placeholders.parentPhoneNumber")}
@@ -104,8 +108,8 @@ const StudentForm = ({
       {/* Government Selection */}
       <div className="form-control relative pb-5">
         <div className="flex flex-col gap-2">
-          <label className="label">
-            <span className="label-text">{t("fields.government") || "Government"}</span>
+          <label className="label py-0">
+            <span className="label-text font-bold" style={{ color: "#1F2937" }}>{t("fields.government") || "Government"}</span>
           </label>
           <select
             name="government"
@@ -126,8 +130,8 @@ const StudentForm = ({
       {/* Administration Zone Selection - Only show if government is selected */}
       <div className="form-control relative pb-5">
         <div className="flex flex-col gap-2">
-          <label className="label">
-            <span className="label-text">{t("fields.administrationZone") || "Administration Zone"}</span>
+          <label className="label py-0">
+            <span className="label-text font-bold" style={{ color: "#1F2937" }}>{t("fields.administrationZone") || "Administration Zone"}</span>
           </label>
           <select
             disabled={!userData.government || loadingZones}

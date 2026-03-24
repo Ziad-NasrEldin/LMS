@@ -6,6 +6,7 @@ import { FaCheckCircle, FaHourglassHalf, FaExclamationTriangle, FaDownload, FaFi
 import { getAuditLogs } from "../../../routes/auditlog"
 import { useTranslation } from "react-i18next"
 import { getAuditLogsByEmail } from "../../../routes/auditlog"
+import { designTokens } from "../../../constants/designTokens"
 
 const AuditLog = () => {
   const { t, i18n } = useTranslation("admin")
@@ -13,6 +14,9 @@ const AuditLog = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [isExporting, setIsExporting] = useState(false)
+  
+  const TOKENS = designTokens.colors;
+  const SHADOWS = designTokens.shadows;
   // NOTE: keys now match server-side param names
   const [filters, setFilters] = useState({
     user: "",
@@ -336,27 +340,27 @@ const AuditLog = () => {
     switch (action) {
       case "delete":
         return (
-          <div className="badge badge-error badge-sm p-3">
-            <FiX className="h-4 w-4 text-white" />
+          <div className="flex items-center justify-center w-8 h-8 rounded-full" style={{ backgroundColor: "rgba(224,36,36,0.1)", color: "#E02424" }}>
+            <FiX className="h-4 w-4" />
           </div>
         )
       case "update":
       case "edit":
         return (
-          <div className="badge badge-warning badge-sm p-3">
-            <FiEdit className="h-4 w-4 text-white" />
+          <div className="flex items-center justify-center w-8 h-8 rounded-full" style={{ backgroundColor: "rgba(245,158,11,0.1)", color: "#F59E0B" }}>
+            <FiEdit className="h-4 w-4" />
           </div>
         )
       case "read":
         return (
-          <div className="badge badge-neutral badge-sm p-3">
-            <FiFileText className="h-4 w-4 text-white" />
+          <div className="flex items-center justify-center w-8 h-8 rounded-full" style={{ backgroundColor: "rgba(107,114,128,0.1)", color: TOKENS.slateText }}>
+            <FiFileText className="h-4 w-4" />
           </div>
         )
       default:
         return (
-          <div className="badge badge-info badge-sm p-3">
-            <FiRotateCw className="h-4 w-4 text-white" />
+          <div className="flex items-center justify-center w-8 h-8 rounded-full" style={{ backgroundColor: "rgba(77,179,194,0.1)", color: TOKENS.deepTeal }}>
+            <FiRotateCw className="h-4 w-4" />
           </div>
         )
     }
@@ -377,17 +381,26 @@ const AuditLog = () => {
   }
 
   return (
-    <div className="mx-auto w-full max-w-full p-4 md:p-8 lg:p-20 bg-base-100 min-h-screen bg-gradient-to-br" dir={dir}>
+    <div className="mx-auto w-full p-4 md:p-8" dir={dir}>
+     <div 
+        className="rounded-[2rem] border"
+        style={{ 
+          background: TOKENS.neutralCloud, 
+          boxShadow: SHADOWS.level1, 
+          borderColor: "rgba(17,24,39,0.05)"
+        }}
+      >
+        <div className="p-6 md:p-8">
       {/* Header Section */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4 border-b pb-6" style={{ borderColor: "rgba(17,24,39,0.1)" }}>
         <div>
-          <h1 className="text-3xl font-bold">{t("admin.auditlog.title")}</h1>
-          <p className="text-gray-600 mt-2">{t("admin.auditlog.subtitle")}</p>
+          <h1 className="text-3xl font-extrabold" style={{ color: TOKENS.deepTeal }}>{t("admin.auditlog.title")}</h1>
+          <p className="mt-2 font-medium" style={{ color: TOKENS.slateText }}>{t("admin.auditlog.subtitle")}</p>
         </div>
 
         {/* Export Dropdown */}
-        <div className="dropdown dropdown-end">
-          <div tabIndex={0} role="button" className="btn btn-outline btn-primary" disabled={isExporting}>
+        <div className="dropdown md:dropdown-end">
+          <div tabIndex={0} role="button" className="btn btn-outline rounded-full font-bold px-6" style={{ borderColor: TOKENS.deepTeal, color: TOKENS.deepTeal }} disabled={isExporting}>
             {isExporting ? (
               <>
                 <span className="loading loading-spinner loading-sm"></span>
@@ -400,35 +413,35 @@ const AuditLog = () => {
               </>
             )}
           </div>
-          <ul tabIndex={0} className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-80">
-            <li className="menu-title">
-              <span>{t("admin.auditlog.export.csvFormat")}</span>
+          <ul tabIndex={0} className="dropdown-content z-[2] menu p-2 mt-2 shadow-lg rounded-2xl w-80" style={{ backgroundColor: TOKENS.neutralCloud, border: "1px solid rgba(17,24,39,0.05)" }}>
+            <li className="menu-title py-2 px-3">
+              <span className="font-bold text-xs uppercase" style={{ color: TOKENS.slateText }}>{t("admin.auditlog.export.csvFormat")}</span>
             </li>
             <li>
-              <button onClick={() => exportToCSV(false)} disabled={isExporting || logs.length === 0}>
-                <FaFileExport className="mr-2" />
+              <button className="py-3 px-4 font-medium hover:bg-gray-50 rounded-xl" onClick={() => exportToCSV(false)} disabled={isExporting || logs.length === 0} style={{ color: TOKENS.spaceDark }}>
+                <FaFileExport className="mr-3 text-lg" style={{ color: TOKENS.deepTeal }} />
                 {t("admin.auditlog.export.exportFiltered")} ({logs.length})
               </button>
             </li>
             <li>
-              <button onClick={() => exportToCSV(true)} disabled={isExporting}>
-                <FaFileExport className="mr-2" />
+              <button className="py-3 px-4 font-medium hover:bg-gray-50 rounded-xl" onClick={() => exportToCSV(true)} disabled={isExporting} style={{ color: TOKENS.spaceDark }}>
+                <FaFileExport className="mr-3 text-lg" style={{ color: TOKENS.deepTeal }} />
                 {t("admin.auditlog.export.exportAll")}
               </button>
             </li>
-            <div className="divider my-1"></div>
-            <li className="menu-title">
-              <span>{t("admin.auditlog.export.jsonFormat")}</span>
+            <div className="divider my-1 opacity-10"></div>
+            <li className="menu-title py-2 px-3">
+              <span className="font-bold text-xs uppercase" style={{ color: TOKENS.slateText }}>{t("admin.auditlog.export.jsonFormat")}</span>
             </li>
             <li>
-              <button onClick={() => exportToJSON(false)} disabled={isExporting || logs.length === 0}>
-                <FaFileExport className="mr-2" />
+              <button className="py-3 px-4 font-medium hover:bg-gray-50 rounded-xl" onClick={() => exportToJSON(false)} disabled={isExporting || logs.length === 0} style={{ color: TOKENS.spaceDark }}>
+                <FaFileExport className="mr-3 text-lg" style={{ color: TOKENS.deepTeal }} />
                 {t("admin.auditlog.export.exportFiltered")} ({logs.length})
               </button>
             </li>
             <li>
-              <button onClick={() => exportToJSON(true)} disabled={isExporting}>
-                <FaFileExport className="mr-2" />
+              <button className="py-3 px-4 font-medium hover:bg-gray-50 rounded-xl" onClick={() => exportToJSON(true)} disabled={isExporting} style={{ color: TOKENS.spaceDark }}>
+                <FaFileExport className="mr-3 text-lg" style={{ color: TOKENS.deepTeal }} />
                 {t("admin.auditlog.export.exportAll")}
               </button>
             </li>
@@ -438,7 +451,7 @@ const AuditLog = () => {
 
       {/* Export Summary */}
       {(Object.values(filters).some((v) => v !== "") || logs.length > 0) && (
-        <div className="alert alert-info mb-6">
+        <div className="alert mb-6 rounded-xl border-none shadow-sm" style={{ backgroundColor: "rgba(77,179,194,0.1)", color: TOKENS.deepTeal }}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -452,7 +465,7 @@ const AuditLog = () => {
               d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
             ></path>
           </svg>
-          <span>
+          <span className="font-medium">
             {Object.values(filters).some((v) => v !== "")
               ? `${t("admin.auditlog.export.filterInfo")} ${logs.length} ${t("admin.auditlog.export.of")} ${t("admin.auditlog.export.totalLogs")}`
               : `${t("admin.auditlog.export.showing")} ${logs.length} ${t("admin.auditlog.export.logs")}`}
@@ -461,117 +474,81 @@ const AuditLog = () => {
       )}
 
       {/* Filter Controls */}
-      <div className="flex flex-wrap gap-3 mb-6 justify-start bg-base-100">
-        <div className="flex gap-2 mb-4">
+      <div className="flex flex-wrap gap-4 mb-8 justify-start">
+        <div className="flex gap-3 w-full max-w-sm">
           <input
             type="text"
             placeholder={t("admin.auditlog.filters.email")}
-            className="input input-bordered w-full max-w-xs"
+            className="input w-full rounded-xl"
+            style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: TOKENS.spaceDark }}
             value={filters.email || ""}
             onChange={(e) => setFilters((prev) => ({ ...prev, email: e.target.value }))}
           />
-          <button className="btn btn-primary" onClick={() => handleSearchByEmail()}>
+          <button className="btn rounded-xl font-bold px-6" onClick={() => handleSearchByEmail()} style={{ backgroundColor: TOKENS.coralAccent, color: "white", border: "none" }}>
             <FiSearch className="mr-2" />
             {t("admin.auditlog.filters.search")}
           </button>
         </div>
 
 
-        {/* Role Filter */}
-        {/* <div className="dropdown dropdown-end bg-base-100">
-          <label tabIndex={1} className="btn btn-outline rounded-full min-w-[180px] flex justify-between">
-            <FiChevronDown className="h-5 w-5" />
-            <span>{filters.role || t("admin.auditlog.filters.role")}</span>
-          </label>
-          <ul tabIndex={1} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
-            <li>
-              <button onClick={() => handleFilterChange("role", "")}>{t("admin.auditlog.filters.all")}</button>
-            </li>
-            {["admin", "lecturer", "student", "Teacher", "moderator", "subAdmin"].map((role) => (
-              <li key={role}>
-                <button onClick={() => handleFilterChange("role", role)}>{translateRole(role)}</button>
-              </li>
-            ))}
-          </ul>
-        </div> */}
-
         {/* Action Filter */}
-        <div className="dropdown dropdown-end bg-base-100">
-          <label tabIndex={2} className="btn btn-outline rounded-full min-w-[180px] flex justify-between">
-            <FiChevronDown className="h-5 w-5" />
-            <span>{filters.action || t("admin.auditlog.filters.action")}</span>
+        <div className="dropdown">
+          <label tabIndex={2} className="btn bg-white border-gray-200 hover:bg-gray-50 rounded-xl min-w-[200px] flex justify-between px-6 font-medium shadow-sm h-12" style={{ color: TOKENS.spaceDark }}>
+            <FiChevronDown className="h-5 w-5 opacity-50" />
+            <span>{filters.action ? translateAction(filters.action) : t("admin.auditlog.filters.action")}</span>
           </label>
-          <ul tabIndex={2} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
+          <ul tabIndex={2} className="dropdown-content z-[2] menu p-2 mt-2 shadow-lg rounded-2xl w-full border" style={{ backgroundColor: TOKENS.neutralCloud, borderColor: "rgba(17,24,39,0.05)" }}>
             <li>
-              <button onClick={() => handleFilterChange("action", "")}>{t("admin.auditlog.filters.all")}</button>
+              <button className="py-3 font-medium hover:bg-gray-50 rounded-xl" onClick={() => handleFilterChange("action", "")}>{t("admin.auditlog.filters.all")}</button>
             </li>
             {["create", "read", "update", "delete"].map((action) => (
               <li key={action}>
-                <button onClick={() => handleFilterChange("action", action)}>{translateAction(action)}</button>
+                <button className="py-3 font-medium hover:bg-gray-50 rounded-xl" onClick={() => handleFilterChange("action", action)}>{translateAction(action)}</button>
               </li>
             ))}
           </ul>
         </div>
       </div>
 
-      {/* Date Filters */}
-      {/* <div className="flex items-center gap-2 mb-6">
-        <input
-          type="date"
-          className="input input-bordered"
-          onChange={(e) => handleFilterChange("startDate", e.target.value)}
-          placeholder={t("admin.auditlog.filters.date")}
-        />
-        <span>{t("admin.auditlog.filters.to")}</span>
-        <input
-          type="date"
-          className="input input-bordered"
-          onChange={(e) => handleFilterChange("endDate", e.target.value)}
-        />
-      </div> */}
-
       {/* Loading & Error States */}
       {loading && (
-        <div className="flex justify-center my-8">
-          <div className="loading loading-spinner loading-lg text-info"></div>
+        <div className="flex justify-center my-12">
+          <div className="loading loading-spinner loading-lg" style={{ color: TOKENS.deepTeal }}></div>
         </div>
       )}
 
       {error && (
-        <div className="alert alert-error mb-6">
+        <div className="alert alert-error mb-6 rounded-xl border-none">
           <FiX className="h-6 w-6" />
-          <span>{error}</span>
+          <span className="font-medium">{error}</span>
         </div>
       )}
 
       {/* Logs Table */}
       {!loading && !error && (
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto rounded-2xl border" style={{ borderColor: "rgba(17,24,39,0.05)" }}>
           <table className="table w-full">
             <thead>
-              <tr>
-                {["user", "email", "action", "datetime"].map((header) => (
-                  <th key={header} className={`${isRTL ? "text-right" : "text-left"} text-sm`}>
-                    {t(`admin.auditlog.columns.${header}`)}
-                  </th>
-                ))}
-                {["role", "resource", "status"].map((header) => (
-                  <th key={header} className={`${isRTL ? "text-right" : "text-left"} text-sm hidden sm:table-cell`}>
-                    {t(`admin.auditlog.columns.${header}`)}
-                  </th>
-                ))}
+              <tr style={{ backgroundColor: "rgba(17,24,39,0.02)", color: TOKENS.spaceDark, borderBottom: `2px solid rgba(17,24,39,0.05)` }}>
+                <th className="font-bold py-4 px-6 text-sm uppercase tracking-wider">{t("admin.auditlog.table.user")}</th>
+                <th className="font-bold py-4 px-6 text-sm uppercase tracking-wider">{t("admin.auditlog.table.email")}</th>
+                <th className="font-bold py-4 px-6 text-sm uppercase tracking-wider">{t("admin.auditlog.table.action")}</th>
+                <th className="font-bold py-4 px-6 text-sm uppercase tracking-wider">{t("admin.auditlog.table.timestamp")}</th>
+                <th className="font-bold py-4 px-6 text-sm uppercase tracking-wider hidden sm:table-cell">{t("admin.auditlog.table.role")}</th>
+                <th className="font-bold py-4 px-6 text-sm uppercase tracking-wider hidden sm:table-cell">{t("admin.auditlog.table.resource")}</th>
+                <th className="font-bold py-4 px-6 text-sm uppercase tracking-wider hidden sm:table-cell">{t("admin.auditlog.table.status")}</th>
               </tr>
             </thead>
             <tbody>
               {logs?.length === 0 ? (
                 <tr>
-                  <td colSpan="6" className="text-center py-8 text-sm">
-                    <div className="flex flex-col items-center justify-center text-base-content/60">
-                      <div className="bg-base-200 p-4 rounded-full mb-4">
-                        <FiFileText className="w-8 h-8 text-base-content/60" />
+                  <td colSpan="7" className="py-16 text-center">
+                    <div className="flex flex-col items-center justify-center">
+                      <div className="p-5 rounded-full mb-4 shadow-sm" style={{ backgroundColor: TOKENS.neutralCloud }}>
+                        <FiFileText className="w-10 h-10" style={{ color: TOKENS.slateText }} />
                       </div>
-                      <p className="text-lg font-medium mb-2">{t("admin.auditlog.noRecords")}</p>
-                      <p className="text-sm opacity-70 max-w-md">
+                      <p className="text-xl font-bold mb-2" style={{ color: TOKENS.spaceDark }}>{t("admin.auditlog.noRecords")}</p>
+                      <p className="font-medium max-w-md" style={{ color: TOKENS.slateText }}>
                         {Object.values(filters).some((v) => v !== "")
                           ? t("admin.auditlog.noRecordsFiltered") ||
                           "No audit logs match your current filters. Try adjusting your search criteria."
@@ -582,24 +559,28 @@ const AuditLog = () => {
                   </td>
                 </tr>
               ) : (
-                logs?.map((log) => (
-                  <tr key={log._id} className="hover">
-                    <td className="text-sm py-2">{log.user?.name || t("admin.auditlog.status.unknown")}</td>
-                    <td className="text-sm py-2">{log.user?.email || t("admin.auditlog.status.unknown")} </td>
-                    <td className="text-sm py-2">
-                      <div className="flex items-center gap-2">
+                logs?.map((log, index) => (
+                  <tr key={log._id} className="hover:bg-gray-50 transition-colors duration-200" style={{ borderBottom: index === logs.length - 1 ? 'none' : `1px solid rgba(17,24,39,0.05)` }}>
+                    <td className="py-4 px-6 text-sm font-bold" style={{ color: TOKENS.spaceDark }}>{log.user?.name || t("admin.auditlog.status.unknown")}</td>
+                    <td className="py-4 px-6 text-sm font-medium" style={{ color: TOKENS.slateText }}>{log.user?.email || t("admin.auditlog.status.unknown")} </td>
+                    <td className="py-4 px-6 text-sm font-medium">
+                      <div className="flex items-center gap-3">
                         {getActionIcon(log.action)}
-                        {translateAction(log.action)}
+                        <span style={{ color: TOKENS.spaceDark }}>{translateAction(log.action)}</span>
                       </div>
                     </td>
-                    <td className="text-sm py-2">
+                    <td className="py-4 px-6 text-sm">
                       <div className="flex flex-col">
-                        <span>{formatDate(log.timestamp)}</span>
-                        <span className="text-xs opacity-70">{formatTime(log.timestamp)}</span>
+                        <span className="font-bold" style={{ color: TOKENS.spaceDark }}>{formatDate(log.timestamp)}</span>
+                        <span className="text-xs font-medium" style={{ color: TOKENS.slateText }}>{formatTime(log.timestamp)}</span>
                       </div>
                     </td>
-                    <td className="text-sm py-2 hidden sm:table-cell">{translateRole(log.user?.role || "")}</td>
-                    <td className="text-sm py-2 hidden sm:table-cell">
+                    <td className="py-4 px-6 text-sm hidden sm:table-cell">
+                      <span className="badge font-semibold px-3 py-3 rounded-xl" style={{ backgroundColor: "rgba(17,24,39,0.05)", color: TOKENS.spaceDark, border: "none" }}>
+                        {translateRole(log.user?.role || "")}
+                      </span>
+                    </td>
+                    <td className="py-4 px-6 text-sm hidden sm:table-cell font-medium" style={{ color: TOKENS.slateText }}>
                       {log.resource?.type ? (
                         <div className="flex items-center gap-2">
                           <span>
@@ -616,10 +597,10 @@ const AuditLog = () => {
                         "-"
                       )}
                     </td>
-                    <td className="text-sm py-2 hidden sm:table-cell">
+                    <td className="py-4 px-6 text-sm hidden sm:table-cell font-medium">
                       <div className="flex items-center gap-2">
                         {getStatusIcon(log.status)}
-                        {translateStatus(log.status)}
+                        <span style={{ color: TOKENS.spaceDark }}>{translateStatus(log.status)}</span>
                       </div>
                     </td>
                   </tr>
@@ -632,22 +613,33 @@ const AuditLog = () => {
 
       {/* Pagination */}
       {!loading && !error && logs?.length > 0 && (
-        <div className="flex justify-center mt-8">
-          <div className="btn-group">
+        <div className="flex justify-between items-center mt-8 pt-6 border-t" style={{ borderColor: "rgba(17,24,39,0.1)" }}>
+          <div className="text-sm font-medium" style={{ color: TOKENS.slateText }}>
+            Page <span className="font-bold">{page}</span>
+          </div>
+          <div className="join shadow-sm rounded-xl overflow-hidden">
             <button
-              className="btn btn-outline"
+              className="join-item btn bg-white hover:bg-gray-50 border-gray-200 text-sm font-medium"
               onClick={() => setPage((p) => Math.max(p - 1, 1))}
               disabled={page === 1}
+              style={{ color: TOKENS.spaceDark }}
             >
               {t("admin.auditlog.pagination.previous")}
             </button>
-            <button className="btn btn-outline">{page}</button>
-            <button className="btn btn-outline" onClick={() => setPage((p) => p + 1)} disabled={logs?.length < limit}>
+            <button className="join-item btn bg-white border-gray-200 pointer-events-none font-bold" style={{ color: TOKENS.deepTeal }}>{page}</button>
+            <button 
+              className="join-item btn bg-white hover:bg-gray-50 border-gray-200 text-sm font-medium" 
+              onClick={() => setPage((p) => p + 1)} 
+              disabled={logs?.length < limit}
+              style={{ color: TOKENS.spaceDark }}
+            >
               {t("admin.auditlog.pagination.next")}
             </button>
           </div>
         </div>
       )}
+      </div>
+      </div>
     </div>
   )
 }

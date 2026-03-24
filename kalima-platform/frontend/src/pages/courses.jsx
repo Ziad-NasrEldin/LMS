@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useMemo, useCallback } from "react"
-import { Search } from "lucide-react"
+import { Search, ChevronDown, ChevronUp } from "lucide-react"
 import { Link } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import { motion, AnimatePresence } from "framer-motion"
@@ -14,8 +14,13 @@ import { LoadingSpinner } from "../components/LoadingSpinner"
 import { ErrorAlert } from "../components/ErrorAlert"
 import { CourseCard } from "../components/CourseCard"
 import { getAllLecturers } from "../routes/fetch-users"
+import { designTokens } from "../constants/designTokens"
 
 export default function CoursesPage() {
+  const TOKENS = designTokens.colors
+  const SHADOWS = designTokens.shadows
+  const GRADIENTS = designTokens.gradients
+
   const [containers, setContainers] = useState([])
   const [filteredContainers, setFilteredContainers] = useState([])
   const [loading, setLoading] = useState(true)
@@ -41,6 +46,7 @@ export default function CoursesPage() {
   const [selectedCourseType, setSelectedCourseType] = useState("")
   const [selectedCourseStatus, setSelectedCourseStatus] = useState("")
   const [selectedPrice, setSelectedPrice] = useState("")
+  const [showFilters, setShowFilters] = useState(false)
 
   // Fetch initial data: subjects, levels, and lecturers
   useEffect(() => {
@@ -81,6 +87,11 @@ export default function CoursesPage() {
   useEffect(() => {
     fetchContainers()
   }, [currentPage])
+
+  useEffect(() => {
+    // Keep filters open on desktop and collapsed by default on smaller screens.
+    setShowFilters(window.matchMedia("(min-width: 1024px)").matches)
+  }, [])
 
   const fetchContainers = async () => {
   setLoading(true);
@@ -265,6 +276,11 @@ export default function CoursesPage() {
     setFilteredContainers(paginatedContainers)
     setTotalResults(filtered.length)
     setTotalPages(Math.ceil(filtered.length / ITEMS_PER_PAGE))
+
+    // On mobile, collapse filter panel after apply to show results immediately.
+    if (window.matchMedia("(max-width: 1023px)").matches) {
+      setShowFilters(false)
+    }
   }, [
     containers,
     selectedStage,
@@ -274,6 +290,7 @@ export default function CoursesPage() {
     selectedCourseStatus,
     selectedPrice,
     levels,
+    setShowFilters,
   ])
 
   // Apply filters when filter selections change
@@ -411,68 +428,143 @@ export default function CoursesPage() {
     },
   ]
 
+  const activeFiltersCount = useMemo(() => {
+    return [selectedStage, selectedGrade, selectedSubject, selectedCourseType, selectedCourseStatus, selectedPrice].filter(Boolean).length
+  }, [selectedStage, selectedGrade, selectedSubject, selectedCourseType, selectedCourseStatus, selectedPrice])
+
   return (
-    <div className="relative min-h-screen w-full" dir={isRTL ? "rtl" : "ltr"}>
-      <div className={`absolute top-0 ${isRTL ? "left-0" : "right-0"} w-2/3 h-screen pointer-events-none z-0`}>
-        <div className="relative w-full h-full">
-          <img
-            src="/background-courses.png"
-            alt="background"
-            className="absolute top-0 left-0 w-full h-full object-top opacity-50"
-            style={{ maxWidth: "600px" }}
-          />
-        </div>
-      </div>
+    <main
+      className="relative min-h-screen w-full px-4 py-8 sm:px-6 lg:px-8"
+      dir={isRTL ? "rtl" : "ltr"}
+      style={{ background: TOKENS.creamSurface, color: TOKENS.inkText }}
+    >
+      <div className="pointer-events-none fixed inset-0 -z-10 opacity-50" style={{ background: GRADIENTS.pageAtmosphere }} />
 
-      <div className="relative z-10">
-        <div className={`container mx-auto px-4 pt-8 pb-4 ${isRTL ? "text-right" : "text-left"}`}>
-          <div className="relative inline-block">
-            <p className="text-3xl font-bold text-primary md:mx-40">{t("title")}</p>
-            <img src="/underline.png" alt="underline" className="object-contain" />
+      <div className="mx-auto max-w-[1160px] space-y-8 md:space-y-10">
+        <section
+          className="relative overflow-hidden rounded-[2rem] border p-6 md:p-10"
+          style={{
+            borderColor: "rgba(255,255,255,0.2)",
+            background: GRADIENTS.hero,
+            boxShadow: SHADOWS.level2,
+            color: "#F8FCFF",
+          }}
+        >
+          <div className="pointer-events-none absolute -left-10 -top-10 h-40 w-40 rounded-full opacity-70" style={{ background: "rgba(77,179,194,0.4)" }} />
+          <div className="pointer-events-none absolute -bottom-12 right-6 h-36 w-36 rounded-full opacity-75" style={{ background: "rgba(243,154,63,0.33)" }} />
+
+          <span
+            className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[11px] uppercase tracking-[0.08em]"
+            style={{
+              borderColor: "rgba(255,255,255,0.3)",
+              background: "rgba(255,255,255,0.14)",
+              color: "#ECFDFF",
+            }}
+          >
+            {t("courses")}
+          </span>
+
+          <h1 className="mt-4 text-4xl font-extrabold leading-[1.15] tracking-[-0.02em] md:text-6xl">{t("title")}</h1>
+          <p className="mt-3 max-w-[70ch] text-base leading-8 text-[#DDF6FB]">{t("subtitle", { defaultValue: t("discover") })}</p>
+
+          <div className="mt-6 inline-flex items-center rounded-full px-4 py-2 text-sm font-semibold" style={{ background: "rgba(255,255,255,0.15)" }}>
+            {totalResults} {t("courses")}
           </div>
-        </div>
+        </section>
 
-        <div className="container mx-auto px-4 py-4">
-          <div className={`flex justify-start`}>
-            <button className="btn btn-outline btn-sm rounded-md mx-2" onClick={resetFilters}>
+        <section
+          className="rounded-[2rem] border p-6 md:p-8"
+          style={{
+            borderColor: "rgba(17,24,39,0.08)",
+            background: TOKENS.neutralCloud,
+            boxShadow: SHADOWS.level1,
+          }}
+        >
+          <div className={`mb-4 flex flex-wrap items-center gap-3 ${isRTL ? "justify-end" : "justify-start"}`}>
+            <button
+              className={`inline-flex items-center gap-2 rounded-full px-5 py-2 text-sm font-bold transition-transform duration-200 hover:-translate-y-[1px] ${isRTL ? "flex-row-reverse" : ""}`}
+              style={{
+                background: "#FFFFFF",
+                border: "1px solid rgba(17,24,39,0.12)",
+                color: TOKENS.deepTeal,
+                boxShadow: SHADOWS.level1,
+              }}
+              onClick={() => setShowFilters((prev) => !prev)}
+              aria-expanded={showFilters}
+              aria-controls="courses-filters-panel"
+            >
+              {showFilters
+                ? (isRTL ? "إخفاء الفلاتر" : "Hide Filters")
+                : (isRTL ? "إظهار الفلاتر" : "Show Filters")}
+              {showFilters ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            </button>
+
+            <button
+              className="rounded-full px-5 py-2 text-sm font-semibold transition-transform duration-200 hover:-translate-y-[1px]"
+              style={{ background: "#FFFFFF", border: "1px solid rgba(17,24,39,0.1)", color: TOKENS.deepTeal }}
+              onClick={resetFilters}
+            >
               {t("filters.reset")}
             </button>
-            <div className={`flex items-center gap-2 ${isRTL ? "flex-row-reverse" : ""}`}>
-              <button className="btn btn-primary btn-sm rounded-md">{t("search.options")}</button>
-              <Search className="h-6 w-6" />
-            </div>
-          </div>
-
-          <div
-            className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-4xl ${isRTL ? "ml-auto" : "mr-auto"} mt-4`}
-          >
-            {filterOptions.map((filter) => (
-              <FilterDropdown
-                key={filter.label}
-                label={filter.label}
-                options={filter.options}
-                selectedValue={filter.value}
-                placeholder={t("filters.select")}
-                onSelect={filter.onSelect}
-                isRTL={isRTL}
-              />
-            ))}
-          </div>
-
-          <div className="flex justify-center mt-6">
-            <button
-              className={`btn btn-accent btn-md rounded-full px-8 ${isRTL ? "flex-row-reverse" : ""}`}
-              onClick={applyFilters}
+            <div
+              className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold ${isRTL ? "flex-row-reverse" : ""}`}
+              style={{ background: TOKENS.lightAquaMist, color: TOKENS.deepTeal }}
             >
-              <Search className="h-5 w-5 ml-2" />
-              {t("showCourses")}
-            </button>
+              <Search className="h-4 w-4" />
+              {t("search.options")}
+            </div>
+            {activeFiltersCount > 0 && (
+              <div
+                className="inline-flex items-center rounded-full px-4 py-2 text-xs font-bold"
+                style={{ background: "rgba(20,106,120,0.12)", color: TOKENS.deepTeal }}
+              >
+                {isRTL ? `${activeFiltersCount} فلاتر مفعلة` : `${activeFiltersCount} active filters`}
+              </div>
+            )}
           </div>
-        </div>
 
-        <div className="container mx-auto px-4 py-8">
-          <h2 className={`text-2xl font-bold text-center mb-8 ${isRTL ? "text-right" : "text-left"}`}>
-            {t("discover")}
+          <AnimatePresence initial={false}>
+            {showFilters && (
+              <motion.div
+                id="courses-filters-panel"
+                initial={{ opacity: 0, height: 0, y: -8 }}
+                animate={{ opacity: 1, height: "auto", y: 0 }}
+                exit={{ opacity: 0, height: 0, y: -8 }}
+                transition={{ duration: 0.25, ease: "easeInOut" }}
+                className="overflow-hidden"
+              >
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  {filterOptions.map((filter) => (
+                    <FilterDropdown
+                      key={filter.label}
+                      label={filter.label}
+                      options={filter.options}
+                      selectedValue={filter.value}
+                      placeholder={t("filters.select")}
+                      onSelect={filter.onSelect}
+                      isRTL={isRTL}
+                    />
+                  ))}
+                </div>
+
+                <div className={`mt-6 flex ${isRTL ? "justify-start" : "justify-end"}`}>
+                  <button
+                    className={`inline-flex items-center gap-2 rounded-full px-8 py-3 text-sm font-bold transition-transform duration-200 hover:-translate-y-[1px] ${isRTL ? "flex-row-reverse" : ""}`}
+                    style={{ background: TOKENS.goldenSand, color: TOKENS.inkText, boxShadow: SHADOWS.level1 }}
+                    onClick={applyFilters}
+                  >
+                    <Search className="h-5 w-5" />
+                    {t("showCourses")}
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </section>
+
+        <section className="space-y-6">
+          <h2 className={`text-2xl font-bold md:text-3xl ${isRTL ? "text-right" : "text-left"}`} style={{ color: TOKENS.deepTeal }}>
+            {t("catalogTitle", { defaultValue: t("discover") })}
           </h2>
 
           {loading ? (
@@ -480,23 +572,32 @@ export default function CoursesPage() {
           ) : error ? (
             <ErrorAlert error={error} onRetry={fetchContainers} />
           ) : memoizedFilteredCourses.length === 0 ? (
-            <div className={`text-center py-12 ${isRTL ? "text-right" : "text-left"}`}>
-              <p className="text-lg">{t("noCourses")}</p>
-              {(selectedStage ||
-                selectedGrade ||
-                selectedTerm ||
-                selectedSubject ||
-                selectedCourseType ||
-                selectedCourseStatus ||
-                selectedPrice) && (
-                <button className="btn btn-outline btn-sm mt-4" onClick={resetFilters}>
-                  {t("filters.reset")}
-                </button>
-              )}
+            <div
+              className={`rounded-[1.4rem] border bg-white py-12 ${isRTL ? "text-right" : "text-left"}`}
+              style={{ borderColor: "rgba(17,24,39,0.08)", boxShadow: SHADOWS.level1 }}
+            >
+              <div className="px-6">
+                <p className="text-lg">{t("noCourses")}</p>
+                {(selectedStage ||
+                  selectedGrade ||
+                  selectedTerm ||
+                  selectedSubject ||
+                  selectedCourseType ||
+                  selectedCourseStatus ||
+                  selectedPrice) && (
+                  <button
+                    className="mt-4 rounded-full px-5 py-2 text-sm font-semibold"
+                    style={{ border: "1px solid rgba(17,24,39,0.15)", color: TOKENS.deepTeal }}
+                    onClick={resetFilters}
+                  >
+                    {t("filters.reset")}
+                  </button>
+                )}
+              </div>
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
                 <AnimatePresence>
                   {memoizedFilteredCourses.map((course) => (
                     <motion.div
@@ -504,7 +605,7 @@ export default function CoursesPage() {
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -20 }}
-                      transition={{ duration: 0.5 }}
+                      transition={{ duration: 0.4 }}
                     >
                       <Link to={`/courses/${course.id}`}>
                         <CourseCard {...course} isRTL={isRTL} />
@@ -514,12 +615,12 @@ export default function CoursesPage() {
                 </AnimatePresence>
               </div>
 
-              {/* Pagination */}
               {totalPages > 1 && (
-                <div className="flex justify-center mt-8">
-                  <div className="join">
+                <div className="mt-8 flex justify-center">
+                  <div className="inline-flex items-center gap-2 rounded-full bg-white px-2 py-2" style={{ boxShadow: SHADOWS.level1 }}>
                     <button
-                      className="join-item btn"
+                      className="rounded-full px-4 py-2 text-sm font-semibold"
+                      style={{ color: TOKENS.deepTeal }}
                       onClick={() => handlePageChange(currentPage - 1)}
                       disabled={currentPage === 1}
                     >
@@ -529,23 +630,23 @@ export default function CoursesPage() {
                     {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
                       let pageNum
                       if (totalPages <= 5) {
-                        // If 5 or fewer pages, show all
                         pageNum = i + 1
                       } else if (currentPage <= 3) {
-                        // If near the start, show first 5 pages
                         pageNum = i + 1
                       } else if (currentPage >= totalPages - 2) {
-                        // If near the end, show last 5 pages
                         pageNum = totalPages - 4 + i
                       } else {
-                        // Otherwise show 2 before and 2 after current page
                         pageNum = currentPage - 2 + i
                       }
 
                       return (
                         <button
                           key={pageNum}
-                          className={`join-item btn ${currentPage === pageNum ? "btn-active" : ""}`}
+                          className="h-9 w-9 rounded-full text-sm font-bold"
+                          style={{
+                            background: currentPage === pageNum ? TOKENS.deepTeal : "transparent",
+                            color: currentPage === pageNum ? "#F8FCFF" : TOKENS.deepTeal,
+                          }}
                           onClick={() => handlePageChange(pageNum)}
                         >
                           {pageNum}
@@ -554,7 +655,8 @@ export default function CoursesPage() {
                     })}
 
                     <button
-                      className="join-item btn"
+                      className="rounded-full px-4 py-2 text-sm font-semibold"
+                      style={{ color: TOKENS.deepTeal }}
                       onClick={() => handlePageChange(currentPage + 1)}
                       disabled={currentPage === totalPages}
                     >
@@ -564,14 +666,13 @@ export default function CoursesPage() {
                 </div>
               )}
 
-              <div className="text-center mt-4 text-sm text-gray-600">
-                {t("showing")} {(currentPage - 1) * ITEMS_PER_PAGE + 1} -{" "}
-                {Math.min(currentPage * ITEMS_PER_PAGE, totalResults)} {t("of")} {totalResults} {t("courses")}
+              <div className="text-center text-sm" style={{ color: TOKENS.slateText }}>
+                {t("showing")} {(currentPage - 1) * ITEMS_PER_PAGE + 1} - {Math.min(currentPage * ITEMS_PER_PAGE, totalResults)} {t("of")} {totalResults} {t("courses")}
               </div>
             </>
           )}
-        </div>
+        </section>
       </div>
-    </div>
+    </main>
   )
 }

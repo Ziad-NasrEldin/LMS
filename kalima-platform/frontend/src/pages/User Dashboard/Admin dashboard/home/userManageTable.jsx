@@ -8,11 +8,15 @@ import CreateUserModal from "../CreateUserModal/CreateUserModal"
 import EditUserModal from "../CreateUserModal/EditUserModal"
 import { getUserDashboard } from "../../../../routes/auth-services"
 import { RecalculateInvites } from "../../../../routes/market"
+import { designTokens } from "../../../../constants/designTokens"
 
 const UserManagementTable = () => {
   const { t, i18n } = useTranslation("admin")
   const isRTL = i18n.language === "ar"
   const dir = isRTL ? "rtl" : "ltr"
+  
+  const TOKENS = designTokens.colors;
+  const SHADOWS = designTokens.shadows;
 
   const [users, setUsers] = useState([])
   const [filteredUsers, setFilteredUsers] = useState([])
@@ -662,13 +666,22 @@ const UserManagementTable = () => {
   }
 
   return (
-    <div className="rounded-xl font-sans w-full mx-auto p-4 my-14 border border-primary" dir={dir}>
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+    <div 
+      className="font-sans w-full mx-auto p-6 md:p-8 my-10" 
+      dir={dir}
+      style={{ 
+        background: TOKENS.neutralCloud, 
+        boxShadow: SHADOWS.level1, 
+        borderRadius: "2rem",
+        border: "1px solid rgba(17,24,39,0.05)"
+      }}
+    >
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4 border-b pb-6" style={{ borderColor: "rgba(17,24,39,0.1)" }}>
         <div>
-          <h1 className={`text-3xl font-bold mb-2 ${isRTL ? "text-right" : "text-left"}`}>
+          <h1 className={`text-3xl font-extrabold mb-2 ${isRTL ? "text-right" : "text-left"}`} style={{ color: TOKENS.deepTeal }}>
             {t("admin.userManagement.title")}
           </h1>
-          <p className="text-base-content/70">{t("admin.userManagement.subtitle") || "Manage and export user data"}</p>
+          <p className="text-base font-medium" style={{ color: TOKENS.slateText }}>{t("admin.userManagement.subtitle") || "Manage and export user data"}</p>
         </div>
         {/* Export Dropdown */}
         <div className="dropdown dropdown-end">
@@ -722,24 +735,24 @@ const UserManagementTable = () => {
       </div>
 
       {/* Filters and Actions */}
-      <div className="flex flex-wrap gap-4 mb-8 justify-between items-center">
-        <div className="flex gap-4 flex-wrap">
+      <div className="flex flex-wrap gap-4 mb-8 justify-between items-center bg-white p-4 rounded-[1.4rem] border" style={{ borderColor: "rgba(17,24,39,0.08)", boxShadow: SHADOWS.level1 }}>
+        <div className="flex gap-4 flex-wrap w-full md:w-auto">
           <input
             type="text"
             placeholder={t("admin.filters.name")}
-            className="input input-bordered"
+            className="input input-bordered flex-1 md:w-auto font-medium"
             value={filters.name}
             onChange={(e) => setFilters({ ...filters, name: e.target.value })}
           />
           <input
             type="text"
             placeholder={t("admin.filters.phone")}
-            className="input input-bordered"
+            className="input input-bordered flex-1 md:w-auto font-medium"
             value={filters.phone}
             onChange={(e) => setFilters({ ...filters, phone: e.target.value })}
           />
           <select
-            className="select select-bordered"
+            className="select select-bordered flex-1 md:w-auto font-medium"
             value={filters.role}
             onChange={(e) => setFilters({ ...filters, role: e.target.value })}
           >
@@ -751,7 +764,7 @@ const UserManagementTable = () => {
             ))}
           </select>
           <select
-            className="select select-bordered"
+            className="select select-bordered flex-1 md:w-auto font-medium"
             value={filters.status}
             onChange={(e) => setFilters({ ...filters, status: e.target.value })}
           >
@@ -763,19 +776,32 @@ const UserManagementTable = () => {
             type="number"
             min="0"
             placeholder={t("admin.filters.invites")}
-            className="input input-bordered"
+            className="input input-bordered flex-1 md:w-auto font-medium"
             value={filters.successfulInvites}
             onChange={(e) => setFilters({ ...filters, successfulInvites: e.target.value })}
           />
         </div>
-        <div className="flex gap-4">
-          <button className="btn btn-primary" onClick={() => setShowCreateModal(true)}>
+        <div className="flex gap-3 w-full md:w-auto justify-end">
+          <button 
+            className="btn border-none text-white font-bold rounded-full" 
+            style={{ background: TOKENS.warmMango, boxShadow: "0 4px 14px rgba(255, 171, 92, 0.4)" }}
+            onClick={() => setShowCreateModal(true)}
+          >
             {t("admin.userManagement.createUser")}
           </button>
-          <button className="btn btn-ghost" onClick={fetchUsers}>
+          <button 
+            className="btn btn-outline border-2 rounded-full font-bold" 
+            style={{ borderColor: TOKENS.deepTeal, color: TOKENS.deepTeal }}
+            onClick={fetchUsers}
+          >
             <FaSync />
           </button>
-          <button className="btn btn-secondary" onClick={handleRecalculateInvites} disabled={isRecalculating}>
+          <button 
+            className="btn border-none text-white font-bold rounded-full" 
+            style={{ background: TOKENS.richTeal, boxShadow: "0 4px 10px rgba(58, 142, 155, 0.3)" }}
+            onClick={handleRecalculateInvites} 
+            disabled={isRecalculating}
+          >
             {isRecalculating ? (
               <>
                 <span className="loading loading-spinner loading-sm"></span>
@@ -815,12 +841,12 @@ const UserManagementTable = () => {
       )}
 
       {/* Users Table */}
-      <div className="w-full overflow-x-auto">
-        <table className="table w-full">
-          <thead>
+      <div className="w-full overflow-x-auto bg-white rounded-[1.4rem] border" style={{ borderColor: "rgba(17,24,39,0.08)", boxShadow: SHADOWS.level1 }}>
+        <table className="table w-full border-collapse">
+          <thead style={{ background: "rgba(77, 179, 194, 0.05)" }}>
             <tr className={`${isRTL ? "text-right" : "text-left"}`}>
               {["name", "phone", "accountType", "status", "successfulInvites", "actions"].map((header) => (
-                <th key={header} className="pb-4 text-lg font-medium whitespace-nowrap">
+                <th key={header} className="p-4 text-sm md:text-base font-bold whitespace-nowrap" style={{ color: TOKENS.deepTeal, borderBottom: "2px solid rgba(17,24,39,0.05)" }}>
                   {t(`admin.table.${header}`)}
                 </th>
               ))}
@@ -828,41 +854,52 @@ const UserManagementTable = () => {
           </thead>
           <tbody>
             {currentUsers.map((user) => (
-              <tr key={user._id} className={`${isRTL ? "text-right" : "text-left"} border-t`}>
-                <td className="py-4 whitespace-nowrap">{user.name || t("admin.NA")}</td>
-                <td className="py-4 whitespace-nowrap">{user.phoneNumber || t("admin.NA")}</td>
-                <td className="py-4 whitespace-nowrap">{getRoleLabel(user.role)}</td>
-                <td className="py-4 whitespace-nowrap">{getStatus(user)}</td>
-                <td className="py-4 whitespace-nowrap">{user.successfulInvites || 0}</td>
-                <td className="py-4 whitespace-nowrap">
+              <tr key={user._id} className={`${isRTL ? "text-right" : "text-left"} transition-colors hover:bg-gray-50`} style={{ borderBottom: "1px solid rgba(17,24,39,0.05)" }}>
+                <td className="p-4 whitespace-nowrap font-medium" style={{ color: TOKENS.inkText }}>{user.name || t("admin.NA")}</td>
+                <td className="p-4 whitespace-nowrap font-medium font-mono" style={{ color: TOKENS.slateText }}>{user.phoneNumber || t("admin.NA")}</td>
+                <td className="p-4 whitespace-nowrap">
+                  <span className="inline-flex items-center rounded-full px-3 py-1 text-xs font-bold" style={{ backgroundColor: "rgba(77,179,194,0.1)", color: TOKENS.deepTeal }}>
+                    {getRoleLabel(user.role)}
+                  </span>
+                </td>
+                <td className="p-4 whitespace-nowrap font-medium" style={{ color: getStatus(user) === t("admin.status.valid") ? "#10B981" : TOKENS.vibrantCoral }}>{getStatus(user)}</td>
+                <td className="p-4 whitespace-nowrap font-bold" style={{ color: TOKENS.slateText }}>{user.successfulInvites || 0}</td>
+                <td className="p-4 whitespace-nowrap">
                   <div className={`flex items-center gap-2 ${isRTL ? "text-right" : "text-left"}`}>
                     <button
-                      className="btn btn-primary btn-xs"
+                      className="btn btn-sm btn-circle btn-ghost"
+                      style={{ color: TOKENS.deepTeal }}
                       onClick={() => openUserDetailsModal(user)}
                       title={t("admin.actions.viewDetails")}
                     >
-                      <FaEye />
+                      <FaEye size={16} />
                     </button>
                     {isAdmin | isSubAdmin && (
                       <button
-                        className="btn btn-info btn-xs"
+                        className="btn btn-sm btn-circle btn-ghost"
+                        style={{ color: TOKENS.richTeal }}
                         onClick={() => openEditModal(user)}
                         title={t("admin.actions.edit")}
                       >
-                        <FaEdit />
+                        <FaEdit size={16} />
                       </button>
                     )}
                     {user.phoneNumber && (
                       <button
-                        className="btn btn-success btn-xs"
+                        className="btn btn-sm btn-circle btn-ghost text-green-500"
                         onClick={() => openWhatsappModal(user.phoneNumber, user.name)}
                         title={t("admin.actions.whatsapp")}
                       >
-                        <FaWhatsapp />
+                        <FaWhatsapp size={18} />
                       </button>
                     )}
-                    <button className="btn btn-error btn-xs" onClick={() => handleDelete(user._id)}>
-                      {t("admin.actions.delete")}
+                    <button 
+                      className="btn btn-sm btn-circle btn-ghost" 
+                      style={{ color: TOKENS.vibrantCoral }} 
+                      onClick={() => handleDelete(user._id)}
+                      title={t("admin.actions.delete")}
+                    >
+                      <FaTimes size={16} />
                     </button>
                   </div>
                 </td>

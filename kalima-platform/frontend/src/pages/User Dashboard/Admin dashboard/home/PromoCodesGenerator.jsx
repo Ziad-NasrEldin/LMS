@@ -6,11 +6,15 @@ import { Ticket, Copy, Check, AlertCircle, Download, Printer } from 'lucide-reac
 import { generatePromoCodes } from "../../../../routes/codes"
 import { getAllLecturers } from "../../../../routes/fetch-users"
 import QRCode from "qrcode"
+import { designTokens } from "../../../../constants/designTokens"
 
 const PromoCodeGenerator = () => {
   const { t, i18n } = useTranslation("admin")
   const isRTL = i18n.language === "ar"
   const dir = isRTL ? "rtl" : "ltr"
+
+  const TOKENS = designTokens.colors;
+  const SHADOWS = designTokens.shadows;
 
   const [lecturers, setLecturers] = useState([])
   const [loading, setLoading] = useState(false)
@@ -347,10 +351,21 @@ const PromoCodeGenerator = () => {
     printWindow.document.close();
   }
   return (
-    <div className="rounded-lg shadow-md p-6 mb-8" dir={dir}>
-      <div className="flex items-center gap-2 mb-6">
-        <Ticket className="text-primary w-6 h-6" />
-        <h2 className="text-xl font-bold">{t("admin.generatePromoCodes")}</h2>
+    <div 
+      className="p-6 md:p-8 mb-10 w-full" 
+      dir={dir}
+      style={{ 
+        background: TOKENS.neutralCloud, 
+        boxShadow: SHADOWS.level1, 
+        borderRadius: "2rem",
+        border: "1px solid rgba(17,24,39,0.05)"
+      }}
+    >
+      <div className="flex items-center gap-3 mb-8 border-b pb-4" style={{ borderColor: "rgba(17,24,39,0.1)" }}>
+        <div className="p-3 rounded-2xl" style={{ background: "rgba(77,179,194,0.1)" }}>
+          <Ticket className="w-8 h-8" style={{ color: TOKENS.deepTeal }} />
+        </div>
+        <h2 className="text-2xl font-extrabold" style={{ color: TOKENS.deepTeal }}>{t("admin.generatePromoCodes")}</h2>
       </div>
 
       {error && (
@@ -477,10 +492,10 @@ const PromoCodeGenerator = () => {
           </div>
         )}
 
-        <button type="submit" className="btn btn-primary" disabled={loading}>
+        <button type="submit" className="btn border-none text-white w-full sm:w-auto px-8 text-lg rounded-full" style={{ background: designTokens.gradients.primary, boxShadow: "0 4px 14px rgba(77, 179, 194, 0.4)" }} disabled={loading}>
           {loading ? (
             <>
-              <span className="loading loading-spinner loading-sm"></span>
+              <span className="loading loading-spinner text-white w-5 h-5 mr-2"></span>
               {t("admin.generating")}
             </>
           ) : (

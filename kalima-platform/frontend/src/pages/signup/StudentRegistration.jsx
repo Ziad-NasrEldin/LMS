@@ -9,11 +9,14 @@ import StepTeacher from "./StepTeacher"
 import Step4 from "./Step4"
 import StepsIndicator from "./StepsIndicator"
 import NavigationButtons from "./NavigationButtons"
-import { useNavigate } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import axios from "axios"
-import RoleSelectionModal from "./RoleSelctionModal"
 import { getAllLevels } from "../../routes/levels"
+import { designTokens } from "../../constants/designTokens"
 const apiUrl = import.meta.env.VITE_API_URL
+const TOKENS = designTokens.colors
+const SHADOWS = designTokens.shadows
+const GRADIENTS = designTokens.gradients
 
 const totalSteps = {
   student: 3,
@@ -22,9 +25,8 @@ const totalSteps = {
 }
 
 export default function StudentRegistration() {
-  const [showRoleModal, setShowRoleModal] = useState(true)
-  const [roleLocked, setRoleLocked] = useState(false)
   const { t, i18n } = useTranslation("register")
+  const isRTL = i18n.language === "ar"
   const [currentStep, setCurrentStep] = useState(1)
   const navigate = useNavigate()
   const [role, setRole] = useState("student")
@@ -460,132 +462,170 @@ export default function StudentRegistration() {
     }
   }
 
+  const handleRoleSelect = (selectedRole) => {
+    setRole(selectedRole)
+    setCurrentStep(1)
+    setErrors({})
+    setApiError(null)
+    setFormData((prev) => ({ ...prev, role: selectedRole }))
+  }
+
   return (
-    <div className="flex bg-primary" dir={i18n.language === "ar" ? "ltr" : "rtl"}>
-      <div className="sm:hidden absolute inset-0 overflow-hidden z-0">
-        <img
-          src="/registration-image.png"
-          alt="Background"
-          className="absolute bottom-0 right-0 object-bottom opacity-50"
-        />
+    <div
+      className="min-h-screen pt-24 px-3 pb-8 sm:px-6 lg:px-8"
+      dir={isRTL ? "rtl" : "ltr"}
+      style={{ background: TOKENS.creamSurface }}
+    >
+      <div className="pointer-events-none fixed inset-0 -z-10 opacity-45" style={{ background: GRADIENTS.pageAtmosphere }} />
+      <div className="mx-auto mb-6 flex w-full max-w-6xl items-center justify-between">
+        <h1 className="text-xl font-extrabold sm:text-2xl" style={{ color: TOKENS.deepTeal }}>Fekra</h1>
+        <p className="text-sm text-base-content/70">
+          {t("alreadyHaveAccount", "Already have an account?")} {" "}
+          <Link to="/login" className="btn btn-sm btn-ghost rounded-full font-bold text-primary">
+            {t("login", "Login")}
+          </Link>
+        </p>
       </div>
 
-      <div className="w-1/3  2xl:w-1/2 relative sm:block hidden">
-        <img
-          src="/registration-image.png"
-          alt="Background"
-          className="absolute bottom-20 object-cover object-bottom h-[500px] w-[500px]"
-        />
-      </div>
+      <div
+        className="mx-auto w-full max-w-6xl overflow-hidden rounded-[1.5rem] border bg-base-100"
+        style={{
+          borderColor: "rgba(17,24,39,0.08)",
+          boxShadow: SHADOWS.level2,
+        }}
+      >
+        <div className="grid min-h-[auto] lg:min-h-[760px] lg:grid-cols-[1.1fr_1fr]">
+          <section className="relative hidden overflow-hidden p-10 lg:block" style={{ background: GRADIENTS.appPanel }}>
+            <div className="absolute -left-12 top-6 h-48 w-48 rounded-full bg-secondary/20 blur-3xl" />
+            <div className="absolute bottom-12 right-8 h-44 w-44 rounded-full bg-primary/15 blur-3xl" />
 
-      <div className={`sm:w-2/3  py-2 2xl:w-1/2 `} dir={i18n.language === "ar" ? "rtl" : "ltr"}>
-        <div
-          className="mx-auto bg-base-100 rounded-tr-[50px] rounded-bl-[50px] w-full p-10 relative shadow-xl"
-          style={{
-            borderTopRightRadius: i18n.language === "ar" ? 0 : "50px",
-            borderBottomRightRadius: i18n.language === "ar" ? 0 : "50px",
-            borderTopLeftRadius: i18n.language === "ar" ? "50px" : 0,
-            borderBottomLeftRadius: i18n.language === "ar" ? "50px" : 0,
-          }}
-        >
-          <h1 className="text-4xl lg:text-6xl font-bold mb-8 relative">
-            {t(`${role}Register`)}
-            <div
-              className="top-full right-0 w-64 lg:w-[400px] h-4 mt-4"
-              style={{
-                backgroundImage: `url("data:image/svg+xml,%3Csvg width='600' height='20' viewBox='0 0 600 20' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M596 12.5C577.5 3.5 453 -4 354 9.5C255 23 70 16.5 4 11.5' stroke='%23F7DC6F' strokeWidth='10' strokeLinecap='round' strokeLinejoin='round'/%3E%3C/svg%3E")`,
-                backgroundRepeat: "no-repeat",
-                backgroundSize: "contain",
-                backgroundPosition: "right",
-              }}
-            />
-          </h1>
-
-          {showRoleModal && (
-            <RoleSelectionModal
-              onSelectRole={(selectedRole) => {
-                try {
-                  setRole(selectedRole)
-                  setFormData((prev) => ({ ...prev, role: selectedRole }))
-                  setShowRoleModal(false)
-                  setRoleLocked(true)
-                } catch (error) {
-                  console.error("Error selecting role:", error)
-                  setApiError("Failed to select role")
-                }
-              }}
-              t={t}
-            />
-          )}
-          {apiError && (
-            <div className="alert alert-error mb-4 animate-fade-in w-1/2" dir={i18n.language === "ar" ? "rtl" : "ltr"}>
-              <div className="flex-1">
-                <div className="flex items-center gap-2">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-6 w-6 flex-shrink-0"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                    />
-                  </svg>
-                  <div>
-                    <h3 className="font-bold">{t("errors.errorTitle")}</h3>
-                    <p className="text-sm">{t(apiError)}</p>
-                  </div>
-                </div>
-
-                {Object.keys(errors).length > 0 && (
-                  <div className="mt-4 pl-8">
-                    <ul className="list-disc space-y-1">
-                      {Object.entries(errors).map(
-                        ([field, message]) =>
-                          typeof message === "string" && (
-                            <li
-                              key={field}
-                              className="flex gap-2 items-start"
-                              dir={i18n.language === "ar" ? "rtl" : "ltr"}
-                            >
-                              <span className="font-medium">{t(`form.${field}`)}:</span>
-                              <span className="text-opacity-80">{t(`validation.${message}`)}</span>
-                            </li>
-                          ),
-                      )}
-                    </ul>
-                    <div className="flex items-center justify-center mt-4">
-                      <button
-                        className="btn btn-sm btn-ghost hover:bg-error-content/10 mx-auto"
-                        onClick={() => {
-                          setApiError(null)
-                          setErrors({})
-                        }}
-                      >
-                        {t("dismiss")}
-                      </button>
-                    </div>
-                  </div>
+            <div className="relative z-10 mt-10 max-w-xl">
+              <h2 className="text-5xl font-black leading-[1.04] text-base-content xl:text-6xl">
+                {t("signupHeroStart", "Start your")}
+                <br />
+                <span style={{ color: TOKENS.deepTeal }}>{t("signupHeroMiddle", "learning")}</span>{" "}
+                {t("signupHeroEnd", "journey today.")}
+              </h2>
+              <p className="mt-6 text-lg xl:text-xl" style={{ color: TOKENS.slateText }}>
+                {t(
+                  "signupHeroSub",
+                  "Join thousands of students and educators in a playful, structured learning environment designed for growth.",
                 )}
+              </p>
+
+              <div className="mt-12 w-full max-w-md rounded-[1.75rem] border border-base-300 bg-base-100 p-6 shadow-xl">
+                <p className="text-base font-semibold text-base-content">Interactive Lessons</p>
+                <div className="mt-4 h-3 rounded-full bg-base-200">
+                  <div className="h-full w-3/4 rounded-full bg-primary" />
+                </div>
+                <p className="mt-3 text-sm text-base-content/60">Progress</p>
+              </div>
+
+              <div className="relative left-64 -top-10 hidden w-fit rounded-3xl px-6 py-4 text-base font-bold text-info-content shadow-lg xl:block" style={{ background: TOKENS.softCyanTeal }}>
+                Earn badges while you learn!
               </div>
             </div>
-          )}
-          {renderStepContent()}
+          </section>
 
-          <NavigationButtons
-            currentStep={currentStep}
-            handlePrev={() => setCurrentStep((prev) => prev - 1)}
-            handleNext={handleNext}
-            t={t}
-            totalSteps={totalSteps}
-            role={formData.role}
-          />
+          <section className="flex items-center justify-center p-3 sm:p-6 lg:p-10">
+            <div className="w-full max-w-xl rounded-[1.25rem] border bg-base-100 p-4 shadow-xl sm:rounded-[1.75rem] sm:p-8" style={{ borderColor: "rgba(17,24,39,0.08)" }}>
+              <h3 className="text-2xl font-extrabold text-base-content sm:text-4xl">
+                {t("createAccount", "Create Account")}
+              </h3>
+              <p className="mt-2 text-base-content/65">
+                {t("createAccountSub", "Choose your role and fill in your details.")}
+              </p>
 
-          <StepsIndicator currentStep={currentStep} t={t} role={formData.role} />
+              <div className="mt-6 space-y-3">
+                <p className="text-xs font-bold uppercase tracking-widest text-base-content/60">
+                  {t("iAmA", "I am a")}
+                </p>
+                <div className="grid grid-cols-3 gap-2 sm:gap-3">
+                  {["student", "parent", "teacher"].map((itemRole) => (
+                    <button
+                      key={itemRole}
+                      type="button"
+                      onClick={() => handleRoleSelect(itemRole)}
+                      className={`btn h-14 rounded-xl border text-xs transition-all sm:h-16 sm:rounded-2xl sm:text-sm ${
+                        formData.role === itemRole
+                          ? "text-primary-content"
+                          : "btn-ghost border-base-300 text-base-content/70"
+                      }`}
+                      style={
+                        formData.role === itemRole
+                          ? { background: TOKENS.deepTeal, borderColor: TOKENS.deepTeal }
+                          : undefined
+                      }
+                    >
+                      {t(itemRole)}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {apiError && (
+                <div className="alert alert-error mt-5 animate-fade-in" dir={isRTL ? "rtl" : "ltr"}>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-6 w-6 flex-shrink-0"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                        />
+                      </svg>
+                      <div>
+                        <h3 className="font-bold">{t("errors.errorTitle")}</h3>
+                        <p className="text-sm">{t(apiError)}</p>
+                      </div>
+                    </div>
+
+                    {Object.keys(errors).length > 0 && (
+                      <div className="mt-4">
+                        <ul className="list-disc space-y-1 ps-5">
+                          {Object.entries(errors).map(
+                            ([field, message]) =>
+                              typeof message === "string" && (
+                                <li key={field} className="text-sm">
+                                  <span className="font-medium">{t(`form.${field}`)}:</span>{" "}
+                                  <span className="text-opacity-80">{t(`validation.${message}`)}</span>
+                                </li>
+                              ),
+                          )}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              <div className="mt-5 max-h-none overflow-visible pe-0 lg:mt-6 lg:max-h-[46vh] lg:overflow-y-auto lg:pe-1 scrollbar-hide">
+                {renderStepContent()}
+              </div>
+
+              <div className="mt-6">
+                <NavigationButtons
+                  currentStep={currentStep}
+                  handlePrev={() => setCurrentStep((prev) => prev - 1)}
+                  handleNext={handleNext}
+                  t={t}
+                  totalSteps={totalSteps}
+                  role={formData.role}
+                />
+              </div>
+
+              <div className="mt-4">
+                <StepsIndicator currentStep={currentStep} t={t} role={formData.role} />
+              </div>
+            </div>
+          </section>
         </div>
       </div>
     </div>

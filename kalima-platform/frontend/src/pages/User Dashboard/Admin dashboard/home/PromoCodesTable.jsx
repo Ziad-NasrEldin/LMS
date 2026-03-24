@@ -6,11 +6,15 @@ import { ImSpinner8 } from "react-icons/im"
 import { FaTrash } from "react-icons/fa"
 import { getPromoCodes, deletePromoCode, deleteBulkPromoCodes } from "../../../../routes/codes"
 import { getAllStudents } from "../../../../routes/fetch-users"
+import { designTokens } from "../../../../constants/designTokens"
 
 const PromoCodesTable = () => {
   const { t, i18n } = useTranslation("admin")
   const isRTL = i18n.language === "ar"
   const dir = isRTL ? "rtl" : "ltr"
+
+  const TOKENS = designTokens.colors;
+  const SHADOWS = designTokens.shadows;
   const [filters, setFilters] = useState({
     isRedeemed: "", // 'true' | 'false' | ''
     type: "general", //general | specific | false
@@ -198,10 +202,18 @@ const PromoCodesTable = () => {
   const hasUnredeemedCodes = paginatedCodes.some((code) => !code.isRedeemed)
 
   return (
-    <div className="card bg-base-100 border border-primary shadow-2xl my-6" dir={dir}>
-      <div className="card-body">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="card-title text-2xl">{t("promoCodes.title")}</h2>
+    <div 
+      className="p-6 md:p-8 my-10" 
+      dir={dir}
+      style={{ 
+        background: TOKENS.neutralCloud, 
+        boxShadow: SHADOWS.level1, 
+        borderRadius: "2rem",
+        border: "1px solid rgba(17,24,39,0.05)"
+      }}
+    >
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 border-b pb-4" style={{ borderColor: "rgba(17,24,39,0.1)" }}>
+        <h2 className="text-2xl font-extrabold" style={{ color: TOKENS.deepTeal }}>{t("promoCodes.title")}</h2>
 
           {hasUnredeemedCodes && (
             <div className="flex gap-2">
@@ -351,7 +363,6 @@ const PromoCodesTable = () => {
             </div>
           </>
         )}
-      </div>
 
       {/* Single Delete Confirmation Modal */}
       {showDeleteConfirm && (

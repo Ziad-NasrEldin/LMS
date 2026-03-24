@@ -113,12 +113,13 @@ const BulkCreateUsers = () => {
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="form-control">
-              <label className="label">
+              <label className="label py-0">
                 <span className="label-text font-medium">{t("fields.accountType")}</span>
               </label>
               <select
                 name="accountType"
-                className="select select-bordered w-full"
+                className="select w-full rounded-xl"
+              style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
                 value={accountType}
                 onChange={handleAccountTypeChange}
                 required
@@ -131,13 +132,13 @@ const BulkCreateUsers = () => {
                 <option value="moderator">{t("roles.moderator")}</option>
                 <option value="subadmin">{t("roles.subadmin")}</option>
               </select>
-              <label className="label">
+              <label className="label py-0">
                 <span className="label-text-alt text-info">{t("help.selectAccountType")}</span>
               </label>
             </div>
 
             <div className="form-control">
-              <label className="label">
+              <label className="label py-0">
                 <span className="label-text font-medium">{t("fields.uploadCSV")}</span>
               </label>
               <input
@@ -148,7 +149,7 @@ const BulkCreateUsers = () => {
                 onChange={handleFileChange}
                 required
               />
-              <label className="label">
+              <label className="label py-0">
                 <span className="label-text-alt text-info">{t("help.csvRequiredFields")}</span>
               </label>
             </div>

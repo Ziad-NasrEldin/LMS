@@ -7,6 +7,7 @@ import { getUserDashboard } from "../../routes/auth-services"
 import { toast } from "react-hot-toast"
 import { ArrowLeft, Calendar, Users, Book, Award, Check, X } from 'lucide-react'
 import { useTranslation } from "react-i18next"
+import { ErrorAlert } from "../../components/ErrorAlert"
 
 const PackageDetails = () => {
   const navigate = useNavigate()
@@ -136,10 +137,7 @@ const PackageDetails = () => {
   if (error)
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] p-8">
-        <div className="text-error mb-4 text-xl">{error}</div>
-        <button className="btn btn-primary" onClick={() => navigate("/packages")}>
-          {t("common.backToPackages")}
-        </button>
+        <ErrorAlert error={error} onRetry={() => navigate("/packages")} retryLabel={t("common.backToPackages")} />
       </div>
     )
 
