@@ -98,7 +98,9 @@ function App() {
   };
 
   const getDashboardFallbackByRole = (role) => {
-    const normalizedRole = String(role || "").toLowerCase();
+    const normalizedRole = String(role || "")
+      .toLowerCase()
+      .replace(/[^a-z]/g, "");
 
     switch (normalizedRole) {
       case "admin":
@@ -117,14 +119,39 @@ function App() {
     }
   };
 
+  const getCurrentUserRole = () => {
+    const tokenUser = getUserFromToken();
+
+    if (tokenUser && typeof tokenUser === "object") {
+      const tokenRole = tokenUser.role || tokenUser?.UserInfo?.role;
+      if (tokenRole) {
+        return String(tokenRole)
+          .toLowerCase()
+          .replace(/[^a-z]/g, "");
+      }
+    }
+
+    try {
+      const localUserRaw = localStorage.getItem("user");
+      if (!localUserRaw) return "";
+
+      const localUser = JSON.parse(localUserRaw);
+      return String(localUser?.role || "")
+        .toLowerCase()
+        .replace(/[^a-z]/g, "");
+    } catch (_error) {
+      return "";
+    }
+  };
+
   const renderAdminRoute = (element) => {
     const user = getUserFromToken();
+    const role = getCurrentUserRole();
 
-    if (!user) {
+    if (!user || typeof user !== "object") {
       return <Navigate to="/login" replace />;
     }
 
-    const role = String(user.role || "").toLowerCase();
     if (role !== "admin" && role !== "subadmin") {
       return <Navigate to={getDashboardFallbackByRole(role)} replace />;
     }
@@ -150,8 +177,8 @@ function App() {
         className={`transition-all duration-300 ${
           !isAuthRoute && showSidebar && sidebarOpen
             ? isRTL
-              ? "md:mr-52"
-              : "md:ml-52"
+              ? "md:mr-[20rem]"
+              : "md:ml-[20rem]"
             : "ml-0"
         }`}
       >

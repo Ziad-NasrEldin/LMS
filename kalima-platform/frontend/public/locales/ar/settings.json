@@ -1,5 +1,7 @@
 {
     "title": "الإعدادات",
+    "save": "حفظ",
+    "cancel": "إلغاء",
     "toggleSidebar": "تبديل القائمة الجانبية",
     "General Points": "نقاط عامة",
     "Total Points": "نقاط كلية",

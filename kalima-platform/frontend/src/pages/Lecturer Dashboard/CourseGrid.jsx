@@ -40,9 +40,9 @@ const CourseCard = memo(function CourseCard({
       </figure>
 
       <div className="card-body p-4 flex-grow flex flex-col">
-        <div className="flex items-center justify-between">
+        <div className="flex items-start justify-between gap-2">
           <h3 className="card-title text-lg font-bold line-clamp-1">{container.name}</h3>
-          <div className="badge badge-outline">{getContainerTypeTranslation(container.type)}</div>
+          <div className="badge badge-outline whitespace-nowrap">{getContainerTypeTranslation(container.type)}</div>
         </div>
 
         <div className="space-y-1 mt-2">
@@ -83,9 +83,9 @@ const CourseCard = memo(function CourseCard({
           </div>
         </div>
 
-        <div className="card-actions justify-end mt-3">
-          <Link to={`container-details/${container._id}`}>
-            <button className="btn btn-sm btn-ghost">
+        <div className="card-actions mt-3 flex flex-col sm:flex-row sm:justify-end gap-2">
+          <Link to={`container-details/${container._id}`} className="w-full sm:w-auto">
+            <button className="btn btn-sm btn-ghost w-full sm:w-auto">
               <Eye
                 className="h-4 w-4"
                 style={{ marginRight: isRTL ? 0 : "0.25rem", marginLeft: isRTL ? "0.25rem" : 0 }}
@@ -93,7 +93,7 @@ const CourseCard = memo(function CourseCard({
               {t("view")}
             </button>
           </Link>
-          <button className="btn btn-error btn-sm" onClick={() => onDelete(container._id)} disabled={loading}>
+          <button className="btn btn-error btn-sm w-full sm:w-auto" onClick={() => onDelete(container._id)} disabled={loading}>
             {t("delete")}
           </button>
         </div>

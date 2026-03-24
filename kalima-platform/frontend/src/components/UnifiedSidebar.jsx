@@ -247,7 +247,8 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
       {/* Mobile overlay */}
       {isOpen && isMobile && (
         <div
-          className="md:hidden fixed text-white bg-opacity-50 z-51"
+          className="md:hidden fixed inset-0 z-30 bg-black/30 backdrop-blur-[2px]"
+          style={{ top: `${NAVBAR_HEIGHT}px` }}
           onClick={toggleSidebar}
         />
       )}
@@ -255,19 +256,26 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
       {/* Sidebar */}
       <div
         id="user-sidebar"
-        className={`fixed ${isRTL ? 'right-0' : 'left-0'
-          } w-64 bg-base-100 text-base-content shadow-xl z-40 transform transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : isRTL ? 'translate-x-full' : '-translate-x-full'
+        className={`fixed z-40 flex w-[17.5rem] flex-col overflow-hidden rounded-[1.75rem] border border-white/50 text-base-content shadow-[0_24px_55px_rgba(14,33,38,0.20)] backdrop-blur-xl transform transition-all duration-300 ease-out ${isOpen ? 'translate-x-0 opacity-100 scale-100' : isRTL ? 'translate-x-[120%] opacity-0 scale-[0.98]' : '-translate-x-[120%] opacity-0 scale-[0.98]'
           }`}
         style={{
-          top: `${NAVBAR_HEIGHT}px`,
-          height: `calc(100dvh - ${NAVBAR_HEIGHT}px)`,
+          top: `${NAVBAR_HEIGHT + 14}px`,
+          bottom: '14px',
+          [isRTL ? 'right' : 'left']: '16px',
+          background:
+            'linear-gradient(168deg, rgba(255,255,255,0.94) 0%, rgba(241,243,246,0.93) 48%, rgba(188,231,236,0.72) 100%)',
         }}
         dir={isRTL ? 'rtl' : 'ltr'}
       >
-        <div className="p-4 border-b border-base-300 flex items-center justify-between">
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute -top-16 left-8 h-32 w-32 rounded-full bg-primary/15 blur-2xl" />
+          <div className="absolute bottom-10 -right-8 h-28 w-28 rounded-full bg-info/25 blur-2xl" />
+        </div>
+
+        <div className="relative p-4 border-b border-base-300/70 flex items-center justify-between">
           <div className={`flex gap-3 items-center ${isRTL ? 'flex-row-reverse' : ''} mx-auto`}>
-            <span className="font-bold text-primary">{t('dashboardTitle') || 'Dashboard'}</span>
-            <div className="bg-primary text-primary-content rounded-full p-2">
+            <span className="font-extrabold tracking-tight text-primary">{t('dashboardTitle') || 'Dashboard'}</span>
+            <div className="rounded-full p-2 bg-primary text-primary-content shadow-md shadow-primary/25">
               <FaUser className="w-2 h-2" />
             </div>
           </div>
@@ -275,11 +283,11 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
 
         {/* User info section */}
         {userData && (
-          <div className="p-4 border-b border-base-300">
+          <div className="relative mx-3 mt-3 rounded-2xl border border-white/70 bg-white/65 px-3 py-3 shadow-sm">
             <div className="flex items-center gap-3">
-              <div className="mb-4 flex justify-center">
+              <div className="flex justify-center">
                 <div className="avatar">
-                  <div className="w-10 h-10 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
+                  <div className="w-11 h-11 rounded-full ring ring-primary/70 ring-offset-base-100 ring-offset-2">
                     <img
                       src={resolveProfileImageUrl(userData?.profilePic)}
                       alt={userData?.name || "User Avatar"}
@@ -293,8 +301,8 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
                 </div>
               </div>
               <div>
-                <p className="font-medium text-sm">{userData.name}</p>
-                <p className="text-xs text-base-content text-opacity-70">{userData.role}</p>
+                <p className="font-semibold text-sm leading-5">{userData.name}</p>
+                <p className="text-xs text-base-content/70">{userData.role}</p>
               </div>
             </div>
           </div>
@@ -322,14 +330,14 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
 
         {/* Menu items */}
         {!loading && !error && (
-          <div className="flex flex-col h-full overflow-y-auto">
-            {menuItems.map((item, index) => (
+          <div className="relative mt-3 flex-1 overflow-y-auto px-2 pb-4">
+            {menuItems.map((item) => (
               <React.Fragment key={item.id}>
                 <Link
                   to={item.path}
-                  className={`flex items-center justify-between py-3 px-4 hover:bg-base-200 transition-colors ${location.pathname === item.path
-                      ? `text-primary ${isRTL ? 'border-r-4' : 'border-l-4'} border-primary bg-primary/20 bg-opacity-10`
-                      : 'text-base-content'
+                  className={`group mb-1 flex items-center justify-between gap-2 rounded-xl px-3 py-2.5 text-sm transition-all duration-200 ${location.pathname === item.path
+                      ? 'bg-primary text-primary-content shadow-[0_10px_25px_rgba(14,85,99,0.22)]'
+                      : 'text-base-content hover:bg-white/70 hover:text-primary'
                     }`}
                   onClick={(e) => {
                     if (item.onClick) {
@@ -339,10 +347,10 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
                     if (isMobile) toggleSidebar();
                   }}
                 >
-                  <div className={`${isRTL ? 'ml-3' : 'mr-3'} text-primary`}>
+                  <div className={`grid h-8 w-8 place-items-center rounded-lg transition-colors ${location.pathname === item.path ? 'bg-primary-content/15 text-primary-content' : 'bg-primary/10 text-primary group-hover:bg-primary/15'} ${isRTL ? 'ml-1' : 'mr-1'}`}>
                     {item.icon}
                   </div>
-                  <span className="text-sm mx-auto">{item.title}</span>
+                  <span className="mx-auto font-semibold tracking-tight">{item.title}</span>
 
                   {/* Add a comment indicator for items with comments */}
                   {item.comment && (
@@ -351,7 +359,7 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
                     </div>
                   )}
                 </Link>
-                {item.divider && <div className="divider my-1"></div>}
+                {item.divider && <div className="my-2 border-t border-base-300/70"></div>}
               </React.Fragment>
             ))}
           </div>
@@ -362,19 +370,16 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
       <button
         id="sidebar-toggle"
         onClick={toggleSidebar}
-        className={`fixed ${isRTL ? 'right-0' : 'left-0'
-          } z-30 transform -translate-y-1/2 transition-all duration-300 
-          ${isOpen && isRTL
-              ? 'translate-x-64'
-              : isOpen && !isRTL
-                ? 'translate-x-64'
+        className={`fixed ${isRTL ? 'right-1' : 'left-1'} z-50 transform -translate-y-1/2 rounded-2xl border border-white/60 p-2 text-primary-content shadow-[0_12px_28px_rgba(14,85,99,0.35)] transition-all duration-300 hover:scale-105 ${
+          isOpen && isRTL
+                ? '-translate-x-[18.5rem]'
+                : isOpen && !isRTL
+                ? 'translate-x-[18.5rem]'
                 : ''
             } 
-          bg-primary text-primary-content rounded-r-full p-2 shadow-lg`}
+          bg-[linear-gradient(140deg,#0E5563_0%,#146A78_100%)]`}
         style={{
-          top: `calc(50% + ${NAVBAR_HEIGHT / 2}px)`,
-          [isRTL ? 'borderTopLeftRadius' : 'borderTopRightRadius']: '9999px',
-          [isRTL ? 'borderBottomLeftRadius' : 'borderBottomRightRadius']: '9999px',
+          top: `calc(${NAVBAR_HEIGHT}px + 42%)`,
         }}
       >
         {isRTL ? (

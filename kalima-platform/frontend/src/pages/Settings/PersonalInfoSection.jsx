@@ -5,7 +5,7 @@ import SectionHeader from "./SectionHeader"
 import { useTranslation } from "react-i18next"
 import { getUserDashboard } from "../../routes/auth-services"
 import { updateCurrentUser } from "../../routes/update-user"
-import { Check, X, Camera, Upload } from "lucide-react"
+import { Check, X, Camera, Upload, Pencil } from "lucide-react"
 import { resolveProfileImageUrl } from "../../utils/profileImage"
 import { designTokens } from "../../constants/designTokens"
 
@@ -20,12 +20,8 @@ function PersonalInfoSection() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
-  // States for editing
-  const [isEditing, setIsEditing] = useState({
-    fullName: false,
-    phoneNumber: false,
-    email: false,
-  })
+  // Single edit mode for compact UX
+  const [isEditing, setIsEditing] = useState(false)
 
   // Form data for editing
   const [formData, setFormData] = useState({
@@ -47,7 +43,6 @@ function PersonalInfoSection() {
     loading: false,
     success: false,
     error: null,
-    field: null,
   })
 
   const handleProfilePicChange = (e) => {
@@ -83,7 +78,6 @@ function PersonalInfoSection() {
       loading: true,
       success: false,
       error: null,
-      field: "profilePic",
     })
 
     try {
@@ -109,7 +103,6 @@ function PersonalInfoSection() {
           loading: false,
           success: true,
           error: null,
-          field: "profilePic",
         })
 
         // Clear success message after 3 seconds
@@ -117,7 +110,6 @@ function PersonalInfoSection() {
           setUpdateStatus((prev) => ({
             ...prev,
             success: false,
-            field: null,
           }))
         }, 3000)
       } else {
@@ -125,7 +117,6 @@ function PersonalInfoSection() {
           loading: false,
           success: false,
           error: result.error || "Failed to upload profile picture",
-          field: "profilePic",
         })
       }
     } catch (error) {
@@ -134,7 +125,6 @@ function PersonalInfoSection() {
         loading: false,
         success: false,
         error: "An unexpected error occurred while uploading",
-        field: "profilePic",
       })
     } finally {
       setProfilePicUploading(false)
@@ -208,81 +198,73 @@ function PersonalInfoSection() {
     }))
   }
 
-  // Toggle edit mode for a field
-  const toggleEdit = (field) => {
-    setIsEditing((prev) => ({
+  const startEditing = () => {
+    setFormData((prev) => ({
       ...prev,
-      [field]: !prev[field],
+      fullName: userData?.name || "",
+      phoneNumber: userData?.phoneNumber || "",
+      email: userData?.email || "",
     }))
-
-    // Reset form data to current user data if canceling edit
-    if (isEditing[field]) {
-      setFormData((prev) => ({
-        ...prev,
-        [field === "fullName" ? "fullName" : field]: field === "fullName" ? userData?.name : userData?.[field] || "",
-      }))
-    }
+    setIsEditing(true)
   }
 
-  // Handle save changes
-  const handleSave = async (field) => {
+  const cancelEditing = () => {
+    setFormData((prev) => ({
+      ...prev,
+      fullName: userData?.name || "",
+      phoneNumber: userData?.phoneNumber || "",
+      email: userData?.email || "",
+    }))
+    setEmailError("")
+    setIsEditing(false)
+    setUpdateStatus({ loading: false, success: false, error: null })
+  }
+
+  const handleSaveAll = async () => {
+    if (emailError) return
+
     // Set update status to loading
     setUpdateStatus({
       loading: true,
       success: false,
       error: null,
-      field,
     })
 
     try {
-      // Map form field names to API field names
-      const fieldMapping = {
-        fullName: "name",
-        phoneNumber: "phoneNumber",
-        email: "email",
-      }
-
-      // Create update data object with the correct field name
       const updateData = {
-        [fieldMapping[field]]: formData[field],
+        name: formData.fullName,
+        phoneNumber: formData.phoneNumber,
+        email: formData.email,
       }
 
-      // Call the update API using the new service
       const result = await updateCurrentUser(updateData)
 
       if (result.success) {
-        // Update local userData state
         setUserData((prev) => ({
           ...prev,
-          [fieldMapping[field]]: formData[field],
+          name: formData.fullName,
+          phoneNumber: formData.phoneNumber,
+          email: formData.email,
         }))
 
-        // Set success status
         setUpdateStatus({
           loading: false,
           success: true,
           error: null,
-          field,
         })
+        setIsEditing(false)
 
-        // Exit edit mode
-        toggleEdit(field)
-
-        // Clear success message after 3 seconds
         setTimeout(() => {
           setUpdateStatus((prev) => ({
             ...prev,
             success: false,
-            field: null,
           }))
         }, 3000)
       } else {
-        // Set error status
         setUpdateStatus({
           loading: false,
           success: false,
           error: result.error || "Failed to update",
-          field,
         })
       }
     } catch (error) {
@@ -291,7 +273,6 @@ function PersonalInfoSection() {
         loading: false,
         success: false,
         error: "An unexpected error occurred",
-        field,
       })
     }
   }
@@ -429,10 +410,10 @@ function PersonalInfoSection() {
             )}
 
             {/* Upload status messages */}
-            {updateStatus.field === "profilePic" && updateStatus.error && (
+            {updateStatus.error && !isEditing && (
               <div className="mt-2 text-error text-sm text-center">{updateStatus.error}</div>
             )}
-            {updateStatus.field === "profilePic" && updateStatus.success && (
+            {updateStatus.success && !isEditing && (
               <div className="mt-2 text-success text-sm text-center">
                 {t("personalInfo.profilePicUpdated") || "Profile picture updated successfully!"}
               </div>
@@ -453,161 +434,98 @@ function PersonalInfoSection() {
             </div>
           </div>
 
+          <div className={`mb-4 flex gap-2 ${isRTL ? "justify-start" : "justify-end"}`}>
+            {!isEditing ? (
+              <button className="btn btn-sm btn-outline" onClick={startEditing}>
+                <Pencil className="h-4 w-4" />
+                {personalInfo.buttons.edit}
+              </button>
+            ) : (
+              <>
+                <button
+                  className={`btn btn-sm btn-primary ${updateStatus.loading ? "loading" : ""}`}
+                  onClick={handleSaveAll}
+                  disabled={updateStatus.loading || !!emailError}
+                >
+                  {!updateStatus.loading && <Check className="h-4 w-4" />}
+                  {t("save") || "Save"}
+                </button>
+                <button className="btn btn-sm btn-outline" onClick={cancelEditing} disabled={updateStatus.loading}>
+                  <X className="h-4 w-4" />
+                  {t("cancel") || "Cancel"}
+                </button>
+              </>
+            )}
+          </div>
+
+          {updateStatus.error && isEditing && <div className="mb-3 text-sm text-error">{updateStatus.error}</div>}
+          {updateStatus.success && <div className="mb-3 text-sm text-success">{personalInfo.messages?.updateSuccess || "Updated successfully"}</div>}
+
           {/* Full Name Field */}
           <div className="form-control mb-4">
-            <label className={`label justify-end`}>
+            <label className={`label pb-1 ${isRTL ? "justify-end" : "justify-start"}`}>
               <span className="label-text">
                 {personalInfo.labels.fullName}
                 <span className="text-error">*</span>
               </span>
             </label>
-            <div className={`flex gap-4 ${isRTL ? "flex-row" : "flex-row-reverse"}`}>
-              {isEditing.fullName ? (
-                <div className={`flex gap-2 ${isRTL ? "" : "order-last"}`}>
-                  <button
-                    className={`btn btn-sm btn-primary ${updateStatus.loading && updateStatus.field === "fullName" ? "loading" : ""}`}
-                    onClick={() => handleSave("fullName")}
-                    disabled={updateStatus.loading}
-                  >
-                    <Check className="w-4 h-4" />
-                  </button>
-                  <button
-                    className="btn btn-sm btn-outline"
-                    onClick={() => toggleEdit("fullName")}
-                    disabled={updateStatus.loading && updateStatus.field === "fullName"}
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-              ) : (
-                <button className={`btn btn-sm ${isRTL ? "" : "order-last"}`} onClick={() => toggleEdit("fullName")}>
-                  {personalInfo.buttons.edit}
-                </button>
-              )}
+            <div className="w-full">
               <input
                 type="text"
                 name="fullName"
-                value={isEditing.fullName ? formData.fullName : userData?.name || ""}
+                value={isEditing ? formData.fullName : userData?.name || ""}
                 onChange={handleInputChange}
                 placeholder={personalInfo.placeholders.fullName}
                 className={`input input-bordered w-full max-w-2xl ${isRTL ? "text-right" : "text-left"}`}
                 dir={isRTL ? "rtl" : "ltr"}
-                readOnly={!isEditing.fullName}
+                readOnly={!isEditing}
               />
             </div>
-            {updateStatus.field === "fullName" && updateStatus.error && (
-              <div className="mt-2 text-error text-sm">{updateStatus.error}</div>
-            )}
-            {updateStatus.field === "fullName" && updateStatus.success && (
-              <div className="mt-2 text-success text-sm">
-                {personalInfo.messages?.updateSuccess || "Updated successfully"}
-              </div>
-            )}
           </div>
 
           {/* Phone Number Field */}
           <div className="form-control mb-4">
-            <label className={`label justify-end`}>
+            <label className={`label pb-1 ${isRTL ? "justify-end" : "justify-start"}`}>
               <span className="label-text">
                 {personalInfo.labels.phoneNumber}
                 <span className="text-error">*</span>
               </span>
             </label>
-            <div className={`flex gap-4 ${isRTL ? "flex-row" : "flex-row-reverse"}`}>
-              {isEditing.phoneNumber ? (
-                <div className={`flex gap-2 ${isRTL ? "" : "order-last"}`}>
-                  <button
-                    className={`btn btn-sm btn-primary ${updateStatus.loading && updateStatus.field === "phoneNumber" ? "loading" : ""}`}
-                    onClick={() => handleSave("phoneNumber")}
-                    disabled={updateStatus.loading}
-                  >
-                    <Check className="w-4 h-4" />
-                  </button>
-                  <button
-                    className="btn btn-sm btn-outline"
-                    onClick={() => toggleEdit("phoneNumber")}
-                    disabled={updateStatus.loading && updateStatus.field === "phoneNumber"}
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-              ) : (
-                <button className={`btn btn-sm ${isRTL ? "" : "order-last"}`} onClick={() => toggleEdit("phoneNumber")}>
-                  {personalInfo.buttons.edit}
-                </button>
-              )}
+            <div className="w-full">
               <input
                 type="text"
                 name="phoneNumber"
-                value={isEditing.phoneNumber ? formData.phoneNumber : userData?.phoneNumber || ""}
+                value={isEditing ? formData.phoneNumber : userData?.phoneNumber || ""}
                 onChange={handleInputChange}
                 placeholder={personalInfo.placeholders.phoneNumber}
                 className={`input input-bordered w-full max-w-2xl ${isRTL ? "text-right" : "text-left"}`}
                 dir={isRTL ? "rtl" : "ltr"}
-                readOnly={!isEditing.phoneNumber}
+                readOnly={!isEditing}
               />
             </div>
-            {updateStatus.field === "phoneNumber" && updateStatus.error && (
-              <div className="mt-2 text-error text-sm">{updateStatus.error}</div>
-            )}
-            {updateStatus.field === "phoneNumber" && updateStatus.success && (
-              <div className="mt-2 text-success text-sm">
-                {personalInfo.messages?.updateSuccess || "Updated successfully"}
-              </div>
-            )}
           </div>
 
           {/* Email Field */}
           <div className="form-control mb-4">
-            <label className={`label justify-end`}>
+            <label className={`label pb-1 ${isRTL ? "justify-end" : "justify-start"}`}>
               <span className="label-text">
                 {personalInfo.labels.email}
                 <span className="text-error">*</span>
               </span>
             </label>
-            <div className={`flex gap-4 ${isRTL ? "flex-row" : "flex-row-reverse"}`}>
-              {isEditing.email ? (
-                <div className={`flex gap-2 ${isRTL ? "" : "order-last"}`}>
-                  <button
-                    className={`btn btn-sm btn-primary ${updateStatus.loading && updateStatus.field === "email" ? "loading" : ""}`}
-                    onClick={() => handleSave("email")}
-                    disabled={updateStatus.loading || !!emailError}
-                  >
-                    <Check className="w-4 h-4" />
-                  </button>
-                  <button
-                    className="btn btn-sm btn-outline"
-                    onClick={() => toggleEdit("email")}
-                    disabled={updateStatus.loading && updateStatus.field === "email"}
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-              ) : (
-                <button className={`btn btn-sm ${isRTL ? "" : "order-last"}`} onClick={() => toggleEdit("email")}>
-                  {personalInfo.buttons.edit}
-                </button>
-              )}
+            <div className="w-full">
               <input
                 type="email"
                 name="email"
-                value={isEditing.email ? formData.email : userData?.email || ""}
+                value={isEditing ? formData.email : userData?.email || ""}
                 onChange={handleInputChange}
                 placeholder={personalInfo.placeholders.email}
-                className={`input input-bordered w-full max-w-2xl ${isRTL ? "text-right" : "text-left"} ${emailError && isEditing.email ? "input-error animate-shake" : ""}`}
+                className={`input input-bordered w-full max-w-2xl ${isRTL ? "text-right" : "text-left"} ${emailError && isEditing ? "input-error animate-shake" : ""}`}
                 dir={isRTL ? "rtl" : "ltr"}
-                readOnly={!isEditing.email}
+                readOnly={!isEditing}
               />
             </div>
-            {updateStatus.field === "email" && updateStatus.error && (
-              <div className="mt-2 text-error text-sm">{updateStatus.error}</div>
-            )}
-            {updateStatus.field === "email" && updateStatus.success && (
-              <div className="mt-2 text-success text-sm">
-                {personalInfo.messages?.updateSuccess || "Updated successfully"}
-              </div>
-            )}
-            {emailError && isEditing.email && <div className="mt-2 text-error text-sm">{emailError}</div>}
+            {emailError && isEditing && <div className="mt-2 text-error text-sm">{emailError}</div>}
           </div>
 
           {/* Student-specific fields */}

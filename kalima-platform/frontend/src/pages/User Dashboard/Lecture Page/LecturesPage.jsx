@@ -9,10 +9,13 @@ import { getAllLevels } from "../../../routes/levels"
 import { createLecture, createLectureAttachment } from "../../../routes/lectures"
 import { getAllLectures } from "../../../routes/lectures"
 import LectureCreationModal from "../../../components/LectureCreationModal"
+import { designTokens } from "../../../constants/designTokens"
 
 const MyLecturesPage = () => {
   const { t, i18n } = useTranslation("lecturesPage")
   const isRTL = i18n.language === "ar"
+  const TOKENS = designTokens.colors
+  const SHADOWS = designTokens.shadows
   const [lectures, setLectures] = useState([])
   const [allLectures, setAllLectures] = useState([]) // Store all lectures before pagination
   const [subjects, setSubjects] = useState([])
@@ -31,14 +34,22 @@ const MyLecturesPage = () => {
   const [itemsPerPage, setItemsPerPage] = useState(10)
   const [totalPages, setTotalPages] = useState(0)
 
-  const convertPathToUrl = (filePath, folder = "product_thumbnails") => {
+  const convertPathToUrl = (filePath) => {
     if (!filePath) return null
     if (filePath.startsWith("http")) return filePath
 
     const normalizedPath = filePath.replace(/\\/g, "/")
     const API_URL = import.meta.env.VITE_API_URL || window.location.origin
     const baseUrl = API_URL.replace(/\/$/, "")
+    const uploadsIndex = normalizedPath.indexOf("uploads/")
+
+    if (uploadsIndex !== -1) {
+      const uploadsPath = normalizedPath.slice(uploadsIndex)
+      return `${baseUrl}/${uploadsPath}`
+    }
+
     const filename = normalizedPath.split("/").pop()
+    const folder = "lecture_thumbnails"
 
     return `${baseUrl}/uploads/${folder}/${filename}`
   }
@@ -418,13 +429,13 @@ const MyLecturesPage = () => {
 
   try {
     return (
-      <div className="container mx-auto p-4" dir={isRTL ? "rtl" : "ltr"}>
-        <h1 className="text-2xl font-bold mb-2">
+      <div className="container mx-auto p-4 sm:p-6" dir={isRTL ? "rtl" : "ltr"}>
+        <h1 className="text-2xl font-bold mb-2" style={{ color: TOKENS.inkText }}>
           {["Lecturer", "Admin", "Subadmin", "Moderator"].includes(userRole)
             ? t("lecturesPage.pageTitle.manage")
             : t("lecturesPage.pageTitle.purchased")}
         </h1>
-        <p className="text-sm opacity-80 mt-2 mb-5">{t("lecturesPage.pageDescription")}</p>
+        <p className="text-sm opacity-80 mt-2 mb-5" style={{ color: TOKENS.slateText }}>{t("lecturesPage.pageDescription")}</p>
 
         {successMessage && (
           <div className="alert alert-success mb-4">
@@ -491,9 +502,8 @@ const MyLecturesPage = () => {
               ))}
             </select>
           </div>
-
           {["Lecturer", "Admin"].includes(userRole) && (
-            <button onClick={() => setShowCreateModal(true)} className="btn btn-primary">
+            <button onClick={() => setShowCreateModal(true)} className="btn btn-primary w-full md:w-auto">
               {t("lecturesPage.buttons.createNewLecture")}
             </button>
           )}
@@ -520,7 +530,46 @@ const MyLecturesPage = () => {
           containerType="month"
         />
 
-        <div className="overflow-x-auto">
+        <div className="md:hidden space-y-3">
+          {lectures?.map((lecture) => (
+            <div key={lecture.id} className="rounded-2xl border border-base-300 bg-base-100 p-4 shadow-sm">
+              <div className="flex items-start gap-3">
+                {lecture.thumbnail ? (
+                  <img
+                    src={convertPathToUrl(lecture.thumbnail) || "/placeholder.svg"}
+                    alt={lecture.name}
+                    className="h-14 w-14 rounded-xl object-cover flex-shrink-0"
+                  />
+                ) : (
+                  <div className="h-14 w-14 rounded-xl bg-base-200 text-xs flex items-center justify-center flex-shrink-0">N/A</div>
+                )}
+
+                <div className="min-w-0 flex-1">
+                  <h3 className="font-semibold leading-5 break-words">{lecture.name}</h3>
+                  <div className="mt-2 text-xs opacity-80 space-y-1">
+                    {(userRole === "Student" || ["Admin", "Subadmin", "Moderator"].includes(userRole)) && (
+                      <p className="break-words"><span className="font-medium">{t("lecturesPage.tableHeaders.lecturer")}: </span>{lecture.lecturer?.name || t("lecturesPage.unknown")}</p>
+                    )}
+                    <p className="break-words"><span className="font-medium">{t("lecturesPage.tableHeaders.subject")}: </span>{lecture.subject?.name || t("lecturesPage.notSpecified")}</p>
+                    <p><span className="font-medium">{t("lecturesPage.tableHeaders.level")}: </span>{t(`gradeLevels.${lecture.level?.name}`, { ns: "common" }) || lecture.level?.name || t("lecturesPage.notSpecified")}</p>
+                    <p><span className="font-medium">{t("lecturesPage.tableHeaders.price")}: </span>{lecture.price || 0} {t("lecturesPage.points")}</p>
+                    {userRole === "Student" && <p><span className="font-medium">{t("lecturesPage.tableHeaders.purchaseDate")}: </span>{lecture.purchasedAt}</p>}
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-3">
+                <Link
+                  to={`/dashboard/${userRole === "Student" ? "student" : "lecturer"}-dashboard/${userRole === "Student" ? "lecture-display" : "detailed-lecture-view"}/${lecture.id}`}
+                >
+                  <button className="btn btn-primary btn-sm w-full">{t("lecturesPage.buttons.details")}</button>
+                </Link>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="hidden md:block overflow-x-auto">
           <table className="table table-zebra w-full">
             <thead>
               <tr>
@@ -604,7 +653,7 @@ const MyLecturesPage = () => {
         )}
 
         {totalPages > 1 && (
-          <div className="join flex justify-center mt-4">
+          <div className="join flex justify-center mt-4 flex-wrap gap-2">
             <button
               className="join-item btn"
               onClick={() => handlePageChange(currentPage - 1)}

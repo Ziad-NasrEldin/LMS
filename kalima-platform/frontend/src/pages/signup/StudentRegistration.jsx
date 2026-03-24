@@ -521,9 +521,12 @@ export default function StudentRegistration() {
                   <p className="mt-3 text-sm text-base-content/60">{t("progress", "Progress")}</p>
                 </div>
 
-                <div className="relative left-64 -top-10 hidden w-fit rounded-3xl px-6 py-4 text-base font-bold text-info-content shadow-lg xl:block" style={{ background: TOKENS.softCyanTeal }}>
+                <div
+                  className={`mt-4 hidden w-fit rounded-3xl px-6 py-4 text-base font-bold text-info-content shadow-lg xl:inline-flex ${isRTL ? "me-4" : "ms-4"}`}
+                  style={{ background: TOKENS.softCyanTeal }}
+                >
                   {t("earnBadges", "Earn badges while you learn!")}
-              </div>
+                </div>
             </div>
           </section>
 
@@ -557,7 +560,7 @@ export default function StudentRegistration() {
                           : undefined
                       }
                     >
-                      {t(itemRole)}
+                      {t(`role.${itemRole}`, itemRole)}
                     </button>
                   ))}
                 </div>

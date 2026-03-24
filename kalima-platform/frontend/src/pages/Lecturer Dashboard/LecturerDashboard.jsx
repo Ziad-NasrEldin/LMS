@@ -13,8 +13,8 @@ export default function LecturerDashboard() {
   return (
     <div className="flex flex-col min-h-screen" dir={isRTL ? "rtl" : "ltr"}>
       <div className={`transition-all duration-300 ease-in-out pt-14`}>
-        <div className="mx-auto p-6 md:p-10 lg:p-14">
-          <h1 className="text-3xl md:text-4xl text-center mb-8 text-primary font-semibold">{t("courseManagement")}</h1>
+        <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 md:px-8 lg:px-10">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl text-center mb-8 text-primary font-semibold">{t("courseManagement")}</h1>
 
           <LecturerOverviewPanel />
 

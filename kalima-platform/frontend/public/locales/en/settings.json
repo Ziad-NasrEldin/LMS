@@ -1,5 +1,7 @@
 {
     "title": "Settings",
+    "save": "Save",
+    "cancel": "Cancel",
     "toggleSidebar": "Toggle Sidebar",
     "General Points": "General Points",
     "Total Points": "Total Points",
