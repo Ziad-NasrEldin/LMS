@@ -14,12 +14,9 @@ const TeacherLogin = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { t, i18n } = useTranslation("login");
-  const isRTL = i18n.language === "ar";
+  const isRTL = i18n.dir() === "rtl";
   const [activeTab, setActiveTab] = useState("email_tab");
   const [showPassword, setShowPassword] = useState(false);
-  const [heroImageSrc, setHeroImageSrc] = useState(
-    "/education-banner.png",
-  );
   const [formData, setFormData] = useState({
     email: "",
     phoneNumber: "",
@@ -118,12 +115,95 @@ const TeacherLogin = () => {
     }
   };
 
-  const handleHeroImageError = () => {
-    // Use a local asset fallback to avoid blank states if remote image fails.
-    if (heroImageSrc !== "/registration-image.png") {
-      setHeroImageSrc("/registration-image.png");
-    }
-  };
+
+  const HeroIllustration = () => (
+    <svg
+      viewBox="0 0 900 520"
+      className="h-72 w-full"
+      role="img"
+      aria-label={t("loginHeroImageAlt", "Learning journey with connected ideas and growth")}
+      preserveAspectRatio="xMidYMid slice"
+    >
+      <defs>
+        <linearGradient id="fekra-bg" x1="0" x2="1" y1="0" y2="1">
+          <stop offset="0%" stopColor="#EAF4F4" />
+          <stop offset="55%" stopColor="#CFE7EA" />
+          <stop offset="100%" stopColor="#E6F1EA" />
+        </linearGradient>
+        <linearGradient id="fekra-accent" x1="0" x2="1" y1="0" y2="0">
+          <stop offset="0%" stopColor="#0E5563" />
+          <stop offset="100%" stopColor="#F39A3F" />
+        </linearGradient>
+        <filter id="soft-shadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="12" stdDeviation="16" floodColor="#0E5563" floodOpacity="0.18" />
+        </filter>
+      </defs>
+
+      <rect width="900" height="520" rx="40" fill="url(#fekra-bg)" />
+      <circle cx="120" cy="90" r="70" fill="#F39A3F" opacity="0.15" />
+      <circle cx="780" cy="430" r="90" fill="#0E5563" opacity="0.12" />
+
+      <g filter="url(#soft-shadow)">
+        <rect x="110" y="120" width="680" height="310" rx="28" fill="#FFFFFF" opacity="0.9" />
+      </g>
+
+      <g>
+        <rect x="170" y="180" width="250" height="32" rx="16" fill="#0E5563" opacity="0.12" />
+        <rect x="170" y="230" width="320" height="26" rx="13" fill="#0E5563" opacity="0.08" />
+        <rect x="170" y="270" width="280" height="26" rx="13" fill="#0E5563" opacity="0.08" />
+      </g>
+
+      <g transform="translate(520 170)">
+        <rect x="0" y="0" width="220" height="180" rx="20" fill="#F7FBFB" stroke="#CDE4E7" strokeWidth="2" />
+        <rect x="26" y="30" width="168" height="10" rx="5" fill="#0E5563" opacity="0.18" />
+        <rect x="26" y="55" width="130" height="10" rx="5" fill="#0E5563" opacity="0.12" />
+        <rect x="26" y="80" width="150" height="10" rx="5" fill="#0E5563" opacity="0.12" />
+        <circle cx="70" cy="135" r="18" fill="#F39A3F" opacity="0.35" />
+        <rect x="110" y="125" width="70" height="18" rx="9" fill="url(#fekra-accent)" opacity="0.75" />
+      </g>
+
+      <g transform="translate(190 340)">
+        <rect x="0" y="0" width="420" height="70" rx="20" fill="#FFFFFF" stroke="#DCE8EA" strokeWidth="2" />
+        <rect x="24" y="20" width="120" height="12" rx="6" fill="#0E5563" opacity="0.2" />
+        <rect x="24" y="40" width="180" height="10" rx="5" fill="#0E5563" opacity="0.12" />
+        <circle cx="360" cy="35" r="20" fill="#0E5563" opacity="0.15" />
+      </g>
+
+      <g>
+        <circle cx="230" cy="150" r="8" fill="#0E5563" />
+        <circle cx="350" cy="120" r="10" fill="#F39A3F" />
+        <circle cx="430" cy="160" r="6" fill="#0E5563" />
+        <path
+          d="M230 150C280 120 320 110 350 120C390 135 410 150 430 160"
+          fill="none"
+          stroke="url(#fekra-accent)"
+          strokeWidth="3"
+          strokeLinecap="round"
+        />
+      </g>
+
+      <g>
+        <circle cx="680" cy="95" r="6" fill="#0E5563" opacity="0.5" />
+        <circle cx="720" cy="115" r="4" fill="#F39A3F" opacity="0.6" />
+        <circle cx="760" cy="95" r="5" fill="#0E5563" opacity="0.4" />
+        <path
+          d="M680 95C700 85 720 85 760 95"
+          fill="none"
+          stroke="#0E5563"
+          strokeWidth="2"
+          strokeLinecap="round"
+          opacity="0.35"
+        />
+      </g>
+
+      <g>
+        <animateTransform attributeName="transform" type="translate" values="0 0; 0 -8; 0 0" dur="7s" repeatCount="indefinite" />
+        <rect x="640" y="350" width="160" height="70" rx="18" fill="#0E5563" opacity="0.12" />
+        <rect x="660" y="370" width="120" height="12" rx="6" fill="#0E5563" opacity="0.25" />
+        <rect x="660" y="390" width="80" height="10" rx="5" fill="#0E5563" opacity="0.2" />
+      </g>
+    </svg>
+  );
 
   return (
     <div
@@ -167,15 +247,8 @@ const TeacherLogin = () => {
               </h2>
             </div>
 
-            <div className="relative z-10 my-6 overflow-hidden rounded-[1.75rem] border-8 border-base-100 shadow-xl">
-              <img
-                src={heroImageSrc}
-                alt={t("loginHeroImageAlt", "Students collaborating and learning together")}
-                className="h-72 w-full object-cover"
-                loading="lazy"
-                decoding="async"
-                onError={handleHeroImageError}
-              />
+            <div className="relative z-10 my-6 overflow-hidden rounded-[1.75rem] border-8 border-base-100 shadow-xl bg-white/70">
+              <HeroIllustration />
             </div>
 
             <div className="relative z-10">

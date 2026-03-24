@@ -17,7 +17,7 @@ const NavBar = () => {
   const [isHiddenOnScroll, setIsHiddenOnScroll] = useState(false);
   const [userRole, setUserRole] = useState(null);
   const [userId, setUserId] = useState(null);
-  const isAr = i18n.language === "ar";
+  const isAr = i18n.dir() === "rtl";
   const navbarRef = useRef(null);
   const menuRef = useRef(null);
   const lastScrollYRef = useRef(0);

@@ -110,7 +110,9 @@
       "photography": "تصوير"
     },
     "review": {
-      "title": "مراجعة المعلومات"
+      "title": "مراجعة المعلومات",
+      "privacyAgreementPrefix": "بالتسجيل، فإنك توافق على",
+      "privacyPolicy": "سياسة الخصوصية"
     },
     "buttons": {
       "previous": "السابق",

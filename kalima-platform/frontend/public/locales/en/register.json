@@ -109,7 +109,9 @@
     "photography": "Photography"
   },
   "review": {
-    "title": "Review Information"
+    "title": "Review Information",
+    "privacyAgreementPrefix": "By signing up, you agree to our",
+    "privacyPolicy": "Privacy Policy"
   },
   "buttons": {
     "previous": "Previous",

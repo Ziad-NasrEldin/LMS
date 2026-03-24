@@ -619,6 +619,7 @@ export default function StudentRegistration() {
                   handlePrev={() => setCurrentStep((prev) => prev - 1)}
                   handleNext={handleNext}
                   t={t}
+                  isRTL={isRTL}
                   totalSteps={totalSteps}
                   role={formData.role}
                 />

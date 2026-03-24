@@ -51,7 +51,7 @@ function App() {
   const [showSidebar, setShowSidebar] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { i18n } = useTranslation();
-  const isRTL = i18n.language === "ar";
+  const isRTL = i18n.dir() === "rtl";
   const authRoutes = [
     "/login",
     "/signin",

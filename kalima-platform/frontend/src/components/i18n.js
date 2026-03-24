@@ -6,8 +6,15 @@ i18n
   .use(Backend) 
   .use(initReactI18next) 
   .init({
+    lng:
+      typeof window !== "undefined"
+        ? localStorage.getItem("lng") || localStorage.getItem("i18nextLng") || "ar"
+        : "ar",
+    supportedLngs: ["ar", "en"],
+    load: "languageOnly",
     fallbackLng: 'ar', 
     debug: false, 
+    defaultNS: "common",
     interpolation: {
       escapeValue: false, 
     },

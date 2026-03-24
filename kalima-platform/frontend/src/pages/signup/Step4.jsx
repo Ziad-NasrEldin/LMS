@@ -117,7 +117,12 @@ export default function Step4({ formData, t, gradeLevels }) {
 
           {formData.role === "parent" && <ReviewItem label={t("form.children")} value={formData.children.join(", ")} />}
         </div>
-                  <p className="font-bold mt-10">by signing up, you agree to our <span className="underline text-blue-600"><Link to={"/privacy-policy"}>privacy Policy</Link></span></p>
+                  <p className="font-bold mt-10">
+                    {t("review.privacyAgreementPrefix", "By signing up, you agree to our")} {" "}
+                    <span className="underline text-blue-600">
+                      <Link to={"/privacy-policy"}>{t("review.privacyPolicy", "Privacy Policy")}</Link>
+                    </span>
+                  </p>
       </div>
     </div>
   )

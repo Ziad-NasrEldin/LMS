@@ -8,6 +8,7 @@ import { getUserDashboard } from "../routes/auth-services"
 import { LoadingSpinner } from "../components/LoadingSpinner"
 import { ErrorAlert } from "../components/ErrorAlert"
 import { FaChalkboardTeacher, FaBook, FaGraduationCap, FaMoneyBillWave, FaUnlock, FaPlayCircle, FaChevronDown } from "react-icons/fa"
+import { designTokens } from "../constants/designTokens"
 
 const normalizeId = (value) => {
   if (!value) return null
@@ -23,13 +24,16 @@ const normalizeId = (value) => {
 
 const getPurchaseContainerId = (purchase) => normalizeId(purchase?.container) || normalizeId(purchase?.lecture)
 
-const DetailItem = ({ label, value, icon }) => (
-  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 py-3 border-b border-base-200 last:border-b-0">
-    <div className="flex items-center gap-2">
+const DetailItem = ({ label, value, icon, tokens }) => (
+  <div
+    className="flex flex-col gap-2 border-b py-3 last:border-b-0 sm:flex-row sm:items-center sm:justify-between"
+    style={{ borderColor: "rgba(17,24,39,0.08)" }}
+  >
+    <div className="flex items-center gap-2" style={{ color: tokens.slateText }}>
       {icon}
       <span className="text-sm font-medium">{label}</span>
     </div>
-    <span className="text-sm font-semibold text-right">{value}</span>
+    <span className="text-sm font-semibold text-right" style={{ color: tokens.inkText }}>{value}</span>
   </div>
 )
 
@@ -165,7 +169,7 @@ const ContainerItem = ({ container, isPurchased, onPurchase, purchaseInProgress,
             <div className="relative pl-4 sm:pl-6 border-r-2 border-primary/30">
               {isExpanded && (
                 <span
-                  className="pointer-events-none absolute right-[-2px] top-2 h-[calc(100%_-_16px)] w-[3px] rounded-full animate-pulse"
+                  className="pointer-events-none absolute right-0 top-2 h-[calc(100%_-_16px)] w-[2px] rounded-full animate-pulse"
                   style={{
                     backgroundImage: "linear-gradient(180deg, rgba(243,154,63,0.95) 0%, rgba(14,85,99,0.95) 100%)",
                     boxShadow: "0 0 14px rgba(243,154,63,0.55)",
@@ -202,8 +206,12 @@ const ContainerItem = ({ container, isPurchased, onPurchase, purchaseInProgress,
 export default function CourseDetails() {
   const { courseId } = useParams()
   const navigate = useNavigate()
-  const { t } = useTranslation("courseDetails")
+  const { t, i18n } = useTranslation("courseDetails")
   const { t: tCommon } = useTranslation("common")
+  const isRTL = i18n.language === "ar"
+  const TOKENS = designTokens.colors
+  const SHADOWS = designTokens.shadows
+  const GRADIENTS = designTokens.gradients
   const [courseData, setCourseData] = useState(null)
   const [purchaseHistory, setPurchaseHistory] = useState([])
   const [loading, setLoading] = useState(true)
@@ -390,40 +398,66 @@ export default function CourseDetails() {
   if (!courseData) return <ErrorAlert message={t("errors.courseNotFound")} />
 
   return (
-    <div className="min-h-screen bg-base-100">
-      <div className="container mx-auto px-4 py-8 md:py-12">
-        <div className="flex flex-col lg:flex-row gap-8">
+    <div
+      className="min-h-screen"
+      dir={isRTL ? "rtl" : "ltr"}
+      style={{ background: `${GRADIENTS.pageAtmosphere}, ${TOKENS.creamSurface}` }}
+    >
+      <div className="mx-auto w-full max-w-7xl px-4 pb-10 pt-8 sm:px-6 lg:px-8">
+        <div
+          className="rounded-[2rem] border p-4 sm:p-6 lg:p-8"
+          style={{
+            background: TOKENS.neutralCloud,
+            borderColor: "rgba(17,24,39,0.08)",
+            boxShadow: SHADOWS.level1,
+          }}
+        >
+          <div className="flex flex-col gap-8 lg:flex-row">
           {/* Sidebar with Course Details */}
-          <div className="lg:w-1/3 order-1 lg:order-none">
-            <div className="card bg-base-100 shadow-xl sticky top-6">
+          <div className="order-1 lg:order-none lg:w-1/3">
+            <div
+              className="card sticky top-6 border"
+              style={{
+                background: "#FFFFFF",
+                borderColor: "rgba(17,24,39,0.08)",
+                boxShadow: SHADOWS.level1,
+                borderRadius: "1.4rem",
+              }}
+            >
               <div className="card-body">
-                <h2 className="card-title justify-center text-2xl mb-4">{t("details.title")}</h2>
-                <div className="space-y-2">
+                <h2 className="card-title mb-4 justify-center text-2xl" style={{ color: TOKENS.inkText }}>
+                  {t("details.title")}
+                </h2>
+                <div className="space-y-1">
                   <DetailItem
                     icon={<FaMoneyBillWave className="text-accent" />}
                     label={t("courseInfo.price")}
                     value={courseData?.price > 0 ? `${courseData.price} ${t("pricing.points")}` : t("pricing.free")}
+                    tokens={TOKENS}
                   />
                   <DetailItem
                     icon={<FaGraduationCap className="text-primary" />}
                     label={t("courseInfo.level")}
                     value={courseData?.level?.name ? tCommon(`gradeLevels.${courseData.level.name}`) : t("purchase.notDetermined")}
+                    tokens={TOKENS}
                   />
                   <DetailItem
                     icon={<FaBook className="text-secondary" />}
                     label={t("courseInfo.subject")}
                     value={courseData?.subject?.name || t("purchase.notDetermined")}
+                    tokens={TOKENS}
                   />
                   <DetailItem
                     icon={<FaChalkboardTeacher className="text-accent" />}
                     label={t("purchase.purchaseStatus")}
                     value={isContainerPurchased(courseId) ? t("purchase.purchased") : t("purchase.notPurchased")}
+                    tokens={TOKENS}
                   />
                 </div>
 
                 <div className="card-actions mt-6">
                   {isContainerPurchased(courseId) ? (
-                    <button className="btn btn-success w-full" disabled>
+                    <button className="btn w-full" style={{ background: "#0E5563", color: "#F8FCFF", borderColor: "#0E5563" }} disabled>
                       ✓ {t("purchase.purchased")}
                     </button>
                   ) : (
@@ -439,7 +473,8 @@ export default function CourseDetails() {
                         </div>
                       )}
                       <button
-                        className={`btn btn-primary w-full ${purchaseInProgress === courseId ? "loading" : ""}`}
+                        className={`btn w-full ${purchaseInProgress === courseId ? "loading" : ""}`}
+                        style={{ background: TOKENS.deepTeal, color: "#F8FCFF", borderColor: TOKENS.deepTeal }}
                         onClick={() => handlePurchase(courseId)}
                         disabled={purchaseInProgress !== null}
                       >
@@ -457,23 +492,39 @@ export default function CourseDetails() {
           </div>
 
           {/* Main Content Area */}
-          <div className="lg:w-2/3 space-y-8">
+          <div className="space-y-6 lg:w-2/3">
             {/* Course Header */}
-            <div className="card bg-base-100 shadow-lg">
+            <div
+              className="card border"
+              style={{
+                background: "#FFFFFF",
+                borderColor: "rgba(17,24,39,0.08)",
+                boxShadow: SHADOWS.level1,
+                borderRadius: "1.4rem",
+              }}
+            >
               <div className="card-body">
                 <div className="flex justify-between items-start">
-                  <h1 className="card-title text-2xl md:text-3xl mb-4">{courseData?.name}</h1>
+                  <h1 className="card-title text-2xl md:text-3xl mb-4" style={{ color: TOKENS.inkText }}>{courseData?.name}</h1>
                   {isContainerPurchased(courseId) && <span className="badge badge-success badge-lg">{t("purchase.purchased")}</span>}
                 </div>
-                {courseData?.description && <p className="text-base-content/80">{courseData.description}</p>}
+                {courseData?.description && <p className="text-base-content/80" style={{ color: TOKENS.slateText }}>{courseData.description}</p>}
               </div>
             </div>
 
             {/* Objectives Section */}
             {courseData?.goal?.length > 0 && (
-              <div className="card bg-base-100 shadow-lg">
+              <div
+                className="card border"
+                style={{
+                  background: "#FFFFFF",
+                  borderColor: "rgba(17,24,39,0.08)",
+                  boxShadow: SHADOWS.level1,
+                  borderRadius: "1.4rem",
+                }}
+              >
                 <div className="card-body">
-                  <h2 className="card-title text-xl mb-4">{t("courseInfo.courseObjectives")}</h2>
+                  <h2 className="card-title text-xl mb-4" style={{ color: TOKENS.inkText }}>{t("courseInfo.courseObjectives")}</h2>
                   <ul className="space-y-3">
                     {courseData.goal.map((obj, i) => (
                       <li key={i} className="flex gap-3">
@@ -487,9 +538,17 @@ export default function CourseDetails() {
             )}
 
             {/* Course Content Section */}
-            <div className="card bg-base-100 shadow-lg">
+            <div
+              className="card border"
+              style={{
+                background: "#FFFFFF",
+                borderColor: "rgba(17,24,39,0.08)",
+                boxShadow: SHADOWS.level1,
+                borderRadius: "1.4rem",
+              }}
+            >
               <div className="card-body">
-                <h2 className="card-title text-xl mb-4">{t("courseInfo.courseContents")}</h2>
+                <h2 className="card-title text-xl mb-4" style={{ color: TOKENS.inkText }}>{t("courseInfo.courseContents")}</h2>
 
                 {/* Main container */}
                 <ContainerItem
@@ -501,6 +560,7 @@ export default function CourseDetails() {
                 />
               </div>
             </div>
+          </div>
           </div>
         </div>
       </div>
