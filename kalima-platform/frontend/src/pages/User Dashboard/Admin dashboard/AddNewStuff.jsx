@@ -293,9 +293,12 @@ export default function AdminCreate() {
           borderColor: "rgba(17,24,39,0.05)"
         }}
       >
-      <h1 className="text-3xl font-extrabold mb-8" style={{ color: TOKENS.deepTeal }}>
-        {t("createNew")} {t(`forms.${activeForm}.title`)}
+      <h1 className="text-3xl font-extrabold mb-2" style={{ color: TOKENS.deepTeal }}>
+        {t("pageTitle")}
       </h1>
+      <p className="mb-8 text-sm md:text-base font-medium" style={{ color: TOKENS.slateText }}>
+        {t("pageSubtitle")}
+      </p>
 
       {error && (
         <div className="alert alert-error mb-6 rounded-xl border-none font-medium">

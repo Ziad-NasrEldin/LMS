@@ -45,7 +45,6 @@ const PrivacyPolicy = lazy(() => import("./pages/privacyPolicy"));
 const Market = lazy(() => import("./pages/KalimaStore/Market"));
 const ProductDetails = lazy(() => import("./pages/KalimaStore/ProductDetails"));
 const SignedLecturers = lazy(() => import("./pages/User Dashboard/Admin dashboard/signed-lecturers"));
-const PromoCodesManagement = lazy(() => import("./pages/User Dashboard/Admin dashboard/promo-codes-management"));
 
 function App() {
   const location = useLocation();
@@ -92,6 +91,10 @@ function App() {
     } else {
       setSidebarOpen(true); // Start open on desktop
     }
+  }, [location.pathname]);
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
   }, [location.pathname]);
 
   const toggleSidebar = () => {
@@ -278,10 +281,6 @@ function App() {
             <Route
               path="/dashboard/admin-dashboard/financial-dashboard"
               element={renderAdminRoute(<FinancialDashboard />)}
-            />
-            <Route
-              path="/dashboard/admin-dashboard/promo-codes-management"
-              element={renderAdminRoute(<PromoCodesManagement />)}
             />
               <Route
                 path="/dashboard/admin-dashboard/store-dashboard"

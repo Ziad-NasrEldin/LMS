@@ -71,6 +71,9 @@
   "toggleSidebar": "تبديل القائمة الجانبية",
   "myPage": "صفحتي",
   "adminDashboard"  : "إدارة المستخدمين",
+  "adminUserAccounts": "حسابات المستخدمين",
+  "adminAssignedLecturers": "المحاضرون المعينون",
+  "adminUserInsights": "رؤى المستخدمين",
   "centerDashboard"  : "لوحة تحكم المركز",
   "auditLog": "سجل التدقيق",
   "myDashboard": "لوحة التحكم",
@@ -82,6 +85,8 @@
   "market": "المتجر",
   "signedLecturers": "المحاضرين الموقعين",
   "promoCodesManagement": "إدارة أكواد الشحن",
-  "Analytics": "التحليلات"
-
-  }
+  "Analytics": "التحليلات",
+  "courseData": "بيانات المقررات",
+  "manageLecturers": "إدارة المحاضرين",
+  "revenueDashboard": "لوحة الإيرادات"
+}

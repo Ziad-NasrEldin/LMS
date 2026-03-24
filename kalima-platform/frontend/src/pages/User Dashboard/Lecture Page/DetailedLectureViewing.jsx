@@ -574,7 +574,7 @@ const DetailedLectureView = () => {
               </div>
             </div>
 
-            <div className="bg-base-300 rounded-lg overflow-hidden h-[calc(100%-8rem)] flex items-center justify-center">
+            <div className="bg-base-300 rounded-lg overflow-hidden h-[calc(100%_-_8rem)] flex items-center justify-center">
               {/* File preview based on file type */}
               {viewingSubmission.fileType.includes("image") ? (
                 <div className="w-full h-full flex items-center justify-center p-4">

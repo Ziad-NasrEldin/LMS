@@ -18,7 +18,7 @@ const TeacherLogin = () => {
   const [activeTab, setActiveTab] = useState("email_tab");
   const [showPassword, setShowPassword] = useState(false);
   const [heroImageSrc, setHeroImageSrc] = useState(
-    "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1471&q=80",
+    "/education-banner.png",
   );
   const [formData, setFormData] = useState({
     email: "",
@@ -253,7 +253,7 @@ const TeacherLogin = () => {
                         name="email"
                         value={formData.email}
                         onChange={handleInputChange}
-                        placeholder="youremail@example.com"
+                        placeholder={t("emailPlaceholder", "youremail@example.com")}
                         className={`input input-bordered input-sm w-full bg-base-200/70 ${
                           isRTL ? "pr-12" : "pl-12"
                         }`}
@@ -279,7 +279,7 @@ const TeacherLogin = () => {
                         name="phoneNumber"
                         value={formData.phoneNumber}
                         onChange={handleInputChange}
-                        placeholder="01234567890"
+                        placeholder={t("phonePlaceholder", "01234567890")}
                         className={`input input-bordered input-sm w-full bg-base-200/70 ${
                           isRTL ? "pr-12" : "pl-12"
                         }`}
@@ -314,7 +314,7 @@ const TeacherLogin = () => {
                       name="password"
                       value={formData.password}
                       onChange={handleInputChange}
-                      placeholder="••••••••"
+                      placeholder={t("passwordPlaceholder", "••••••••")}
                       className={`input input-bordered input-sm w-full bg-base-200/70 ${
                         isRTL ? "pr-24" : "pl-12"
                       } ${isRTL ? "pl-12" : "pr-24"}`}
@@ -363,10 +363,10 @@ const TeacherLogin = () => {
 
                 <div className="grid grid-cols-2 gap-3">
                   <button type="button" className="btn btn-outline rounded-full">
-                    Google
+                    {t("googleLogin", "Google")}
                   </button>
                   <button type="button" className="btn btn-outline rounded-full">
-                    Apple
+                    {t("appleLogin", "Apple")}
                   </button>
                 </div>
 

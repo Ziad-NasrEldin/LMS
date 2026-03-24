@@ -71,6 +71,9 @@
   "toggleSidebar": "Toggle Sidebar",
   "myPage": "My Page",
   "adminDashboard"  : "User Management",
+  "adminUserAccounts": "User Accounts",
+  "adminAssignedLecturers": "Assigned Lecturers",
+  "adminUserInsights": "User Insights",
   "centerDashboard"  : "Center Dashboard",
   "auditLog": "Audit Log",
   "myDashboard": "My Dashboard",
@@ -82,5 +85,8 @@
   "market": "Market",
   "signedLecturers": "Signed Lecturers",
   "promoCodesManagement": "Promo Codes Management",
-  "Analytics": "Analytics"
+  "Analytics": "Analytics",
+  "courseData": "Course Data",
+  "manageLecturers": "Manage Lecturers",
+  "revenueDashboard": "Revenue Dashboard"
 }

@@ -8,7 +8,6 @@ import {
   FaGraduationCap,
   FaMoneyBillWave,
   FaSignOutAlt,
-  FaTicketAlt,
   FaUser,
   FaUserAlt,
   FaUserGraduate,
@@ -111,29 +110,21 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
       },
       {
         id: 'create',
-        title: t('Create') || 'Create',
+        title: t('courseData') || 'Course Data',
         icon: <Edit className="h-5 w-5" />,
         path: '/dashboard/admin-dashboard/create',
       },
       {
         id: 'signed-lecturers',
-        title: t('signedLecturers') || 'Signed Lecturers',
+        title: t('manageLecturers') || 'Manage Lecturers',
         icon: <Lightbulb className="h-5 w-5" />,
         path: '/dashboard/admin-dashboard/signed-lecturers',
       },
       {
         id: 'financial-dashboard',
-        title: isRTL ? 'اللوحة المالية' : 'Financial Dashboard',
+        title: t('revenueDashboard') || 'Revenue Dashboard',
         icon: <FaMoneyBillWave className="h-5 w-5" />,
         path: '/dashboard/admin-dashboard/financial-dashboard',
-      },
-      {
-        id: 'promo-codes-management',
-        title:
-          t('promoCodesManagement') ||
-          (isRTL ? 'إدارة أكواد الشحن' : 'Promo Codes Management'),
-        icon: <FaTicketAlt className="h-5 w-5" />,
-        path: '/dashboard/admin-dashboard/promo-codes-management',
       },
     ];
 

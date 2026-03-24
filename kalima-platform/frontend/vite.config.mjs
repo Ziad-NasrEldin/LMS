@@ -12,6 +12,7 @@ export default defineConfig({
     outDir: 'dist', // <- Important! Output outside frontend
     emptyOutDir: true,
     base: './',
+    cssMinify: 'lightningcss',
   },
   optimizeDeps: {
     exclude: ['dynamsoft-barcode-reader-bundle']
