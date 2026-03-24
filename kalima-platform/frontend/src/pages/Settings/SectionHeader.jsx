@@ -7,12 +7,12 @@ function SectionHeader({ title, icon }) {
   const TOKENS = designTokens.colors
 
   return (
-    <div className={`mb-3 flex items-center justify-between gap-3 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-      <h2 className={`text-lg font-bold md:text-xl ${isRTL ? 'text-right' : 'text-left'}`} style={{ color: TOKENS.deepTeal }}>
+    <div className={`mb-3 flex flex-wrap items-center justify-between gap-3 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+      <h2 className={`text-lg font-bold md:text-xl break-words ${isRTL ? 'text-right' : 'text-left'}`} style={{ color: TOKENS.deepTeal }}>
         {title}
       </h2>
       <div
-        className="inline-flex h-8 w-8 items-center justify-center rounded-full"
+        className="inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full"
         style={{
           background: "rgba(14,85,99,0.1)",
           color: TOKENS.deepTeal,

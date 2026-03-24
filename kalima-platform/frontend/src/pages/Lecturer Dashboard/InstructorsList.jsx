@@ -231,9 +231,9 @@ export default function InstructorsList() {
 
   return (
     <div className="p-4 space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">{t("assistants")}</h2>
-        <button onClick={() => setShowAddModal(true)} className="btn btn-primary gap-2">
+      <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center">
+        <h2 className="text-2xl font-bold break-words">{t("assistants")}</h2>
+        <button onClick={() => setShowAddModal(true)} className="btn btn-primary gap-2 w-full sm:w-auto">
           <Plus size={18} />
           {t("addAssistant")}
         </button>
@@ -244,7 +244,7 @@ export default function InstructorsList() {
           <div className="card-body items-center text-center py-12">
             <BookOpen className="text-primary" size={48} />
             <p className="text-lg">{t("noAssistants")}</p>
-            <button onClick={() => setShowAddModal(true)} className="btn btn-primary mt-4 gap-2">
+            <button onClick={() => setShowAddModal(true)} className="btn btn-primary mt-4 gap-2 w-full sm:w-auto">
               <Plus size={18} />
               {t("addYourFirstAssistant")}
             </button>
@@ -254,7 +254,7 @@ export default function InstructorsList() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" dir={isRTL ? "rtl" : "ltr"}>
           {assistants?.map((assistant) => (
             <div key={assistant._id} className="card bg-base-100 shadow-sm hover:shadow-md transition-shadow">
-              <div className="absolute top-2 right-2 flex gap-2">
+              <div className={`absolute top-2 z-10 flex gap-2 ${isRTL ? "left-2" : "right-2"}`}>
                 <button
                   onClick={() => startEdit(assistant)}
                   className="btn btn-sm btn-circle btn-ghost"
@@ -270,7 +270,7 @@ export default function InstructorsList() {
                   <Trash2 size={16} />
                 </button>
               </div>
-              <div className="card-body items-center text-center p-6">
+              <div className="card-body items-center text-center p-5 sm:p-6">
                 <div className="avatar mb-3">
                   <div className="w-20 rounded-full bg-base-200">
                     {assistant.image ? (
@@ -298,14 +298,14 @@ export default function InstructorsList() {
       {/* Add Delete Confirmation Modal */}
       {showDeleteModal && (
         <div className="modal modal-open">
-          <div className="modal-box">
+          <div className="modal-box w-[92vw] max-w-md">
             <h3 className="font-bold text-lg">{t("confirmDeletion")}</h3>
             <p className="py-4">{t("areYouSureDelete")}</p>
-            <div className="modal-action">
-              <button onClick={() => setShowDeleteModal(false)} className="btn btn-ghost" disabled={isDeleting}>
+            <div className="modal-action flex-col sm:flex-row">
+              <button onClick={() => setShowDeleteModal(false)} className="btn btn-ghost w-full sm:w-auto" disabled={isDeleting}>
                 {t("cancel")}
               </button>
-              <button onClick={handleDelete} className="btn btn-error" disabled={isDeleting}>
+              <button onClick={handleDelete} className="btn btn-error w-full sm:w-auto" disabled={isDeleting}>
                 {isDeleting ? <span className="loading loading-spinner"></span> : t("delete")}
               </button>
             </div>
@@ -316,8 +316,8 @@ export default function InstructorsList() {
       {/* Add Assistant Modal */}
       {showAddModal && (
         <div className="modal modal-open">
-          <div className="modal-box relative max-w-md">
-            <button onClick={closeModal} className="btn btn-sm btn-circle absolute right-2 top-2">
+          <div className="modal-box relative w-[92vw] max-w-md max-h-[88vh] overflow-y-auto">
+            <button onClick={closeModal} className={`btn btn-sm btn-circle absolute top-2 ${isRTL ? "left-2" : "right-2"}`}>
               <X size={18} />
             </button>
 

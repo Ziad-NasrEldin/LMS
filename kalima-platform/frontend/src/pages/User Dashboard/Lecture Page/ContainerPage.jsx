@@ -5,11 +5,15 @@ import { Link, useLocation } from "react-router-dom"
 import { useTranslation } from 'react-i18next';
 import { getMyPurchasedCourseContainers, getUserDashboard } from "../../../routes/auth-services"
 import { FiArrowLeft, FiArrowRight } from "react-icons/fi"
+import { designTokens } from "../../../constants/designTokens"
 
 const ContainersPage = () => {
   const { t, i18n } = useTranslation('lecturesPage');
   const location = useLocation();
   const isRTL = i18n.language === "ar";
+  const TOKENS = designTokens.colors
+  const SHADOWS = designTokens.shadows
+  const GRADIENTS = designTokens.gradients
   const [containers, setContainers] = useState([])
   const [allContainers, setAllContainers] = useState([])
   const [loading, setLoading] = useState(true)
@@ -117,19 +121,44 @@ const ContainersPage = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="loading loading-spinner loading-lg text-primary"></div>
+      <div
+        className="flex min-h-screen items-center justify-center"
+        style={{ background: `${GRADIENTS.pageAtmosphere}, ${TOKENS.creamSurface}` }}
+      >
+        <div
+          className="rounded-2xl border px-6 py-5"
+          style={{
+            background: TOKENS.neutralCloud,
+            borderColor: "rgba(17,24,39,0.08)",
+            boxShadow: SHADOWS.level1,
+            color: TOKENS.slateText,
+          }}
+        >
+          <div className="loading loading-spinner loading-lg" style={{ color: TOKENS.deepTeal }}></div>
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex justify-center items-center min-h-screen p-4">
-        <div className="alert alert-error">
+      <div
+        className="flex min-h-screen items-center justify-center p-4"
+        style={{ background: `${GRADIENTS.pageAtmosphere}, ${TOKENS.creamSurface}` }}
+      >
+        <div
+          className="w-full max-w-2xl rounded-2xl border p-4"
+          style={{
+            background: "#FFF1F2",
+            borderColor: "#FCA5A5",
+            boxShadow: SHADOWS.level1,
+            color: TOKENS.inkText,
+          }}
+        >
+          <div className="flex items-center gap-3">
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            className="stroke-current shrink-0 h-6 w-6"
+            className="h-6 w-6 shrink-0"
             fill="none"
             viewBox="0 0 24 24"
           >
@@ -141,153 +170,224 @@ const ContainersPage = () => {
             />
           </svg>
           <span>{error}</span>
+          </div>
         </div>
       </div>
     );
   }
 
    return (
-    <div className="container mx-auto p-4 sm:p-6" dir={isRTL ? "rtl" : "ltr"}>
-      <h1 className="mb-4 text-2xl font-bold sm:mb-6 sm:text-3xl">
-        {userRole === 'Lecturer' ? t('containersPage.headers.lecturerCourses') : t('containersPage.headers.studentCourses')}
-      </h1>
-      <p className="text-sm leading-6 opacity-80 sm:text-base">
-        {userRole === 'Lecturer' ? t('containersPage.descriptions.lecturer') : t('containersPage.descriptions.student')}
-      </p>
-
-      {/* Items per page selector */}
-      <div className={`mb-4 mt-4 flex flex-col gap-2 sm:mt-6 sm:flex-row ${isRTL ? "sm:justify-start" : "sm:justify-end"}`}>
-        <select 
-          className="select select-bordered select-sm w-full sm:w-auto" 
-          value={itemsPerPage} 
-          onChange={handleItemsPerPageChange}
+    <div
+      className="min-h-screen"
+      dir={isRTL ? "rtl" : "ltr"}
+      style={{ background: `${GRADIENTS.pageAtmosphere}, ${TOKENS.creamSurface}` }}
+    >
+      <div className="mx-auto w-full max-w-7xl px-4 pb-10 pt-8 sm:px-6">
+        <div
+          className="rounded-[2rem] border p-4 sm:p-6 lg:p-8"
+          style={{
+            background: TOKENS.neutralCloud,
+            borderColor: "rgba(17,24,39,0.08)",
+            boxShadow: SHADOWS.level1,
+          }}
         >
-          <option value={5}>{t('containersPage.itemsPerPage', { count: 5 })}</option>
-          <option value={10}>{t('containersPage.itemsPerPage', { count: 10 })}</option>
-          <option value={20}>{t('containersPage.itemsPerPage', { count: 20 })}</option>
-        </select>
-      </div>
+          <h1 className="mb-2 text-2xl font-bold sm:text-3xl" style={{ color: TOKENS.inkText }}>
+            {userRole === 'Lecturer' ? t('containersPage.headers.lecturerCourses') : t('containersPage.headers.studentCourses')}
+          </h1>
+          <p className="mb-5 text-sm leading-6 sm:mb-6 sm:text-base" style={{ color: TOKENS.slateText }}>
+            {userRole === 'Lecturer' ? t('containersPage.descriptions.lecturer') : t('containersPage.descriptions.student')}
+          </p>
 
-      <div className="grid grid-cols-1 gap-5 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {containers.map(container => (
-          <div key={container._id} className="card bg-base-100 shadow-xl">
-            <div className="card-body h-full">
-              <h2 className="card-title">{container.name}</h2>
-              
-              <div className="flex flex-wrap gap-2 my-2">
-                {container.subject?.name && (
-                  <div className="badge badge-primary">{container.subject.name}</div>
-                )}
-                {container.level?.name && (
-                  <div className="badge badge-secondary">{container.level.name}</div>
-                )}
-                <div className="badge badge-accent">{t('containersPage.labels.course')}</div>
+          {/* Items per page selector */}
+          <div className={`mb-4 mt-4 flex flex-col gap-2 sm:mt-0 sm:flex-row ${isRTL ? "sm:justify-start" : "sm:justify-end"}`}>
+            <select
+              className="select select-bordered select-sm w-full rounded-xl sm:w-auto"
+              style={{
+                borderColor: "rgba(17,24,39,0.16)",
+                background: "#FFFFFF",
+                color: TOKENS.inkText,
+              }}
+              value={itemsPerPage}
+              onChange={handleItemsPerPageChange}
+            >
+              <option value={5}>{t('containersPage.itemsPerPage', { count: 5 })}</option>
+              <option value={10}>{t('containersPage.itemsPerPage', { count: 10 })}</option>
+              <option value={20}>{t('containersPage.itemsPerPage', { count: 20 })}</option>
+            </select>
+          </div>
+
+          <div className="grid grid-cols-1 gap-5 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {containers.map(container => (
+              <div
+                key={container._id}
+                className="card border transition-all duration-200 hover:-translate-y-1"
+                style={{
+                  background: "#FFFFFF",
+                  borderColor: "rgba(17,24,39,0.08)",
+                  boxShadow: SHADOWS.level1,
+                }}
+              >
+                <div className="card-body h-full">
+                  <h2 className="card-title line-clamp-2" style={{ color: TOKENS.inkText }}>{container.name}</h2>
+
+                  <div className="my-2 flex flex-wrap gap-2">
+                    {container.subject?.name && (
+                      <div
+                        className="badge border"
+                        style={{ background: TOKENS.lightAquaMist, color: TOKENS.deepTeal, borderColor: "rgba(15,118,110,0.22)" }}
+                      >
+                        {container.subject.name}
+                      </div>
+                    )}
+                    {container.level?.name && (
+                      <div
+                        className="badge border"
+                        style={{ background: "#ECFEFF", color: TOKENS.slateText, borderColor: "rgba(17,24,39,0.16)" }}
+                      >
+                        {container.level.name}
+                      </div>
+                    )}
+                    <div
+                      className="badge border"
+                      style={{ background: "#F0FDFA", color: TOKENS.deepTeal, borderColor: "rgba(15,118,110,0.18)" }}
+                    >
+                      {t('containersPage.labels.course')}
+                    </div>
+                  </div>
+
+                  {userRole === 'Lecturer' && (
+                    <p className="text-sm" style={{ color: TOKENS.slateText }}>
+                      {t('containersPage.labels.price', { price: container.price })}
+                    </p>
+                  )}
+
+                  {userRole === 'Student' && container.lecturer && (
+                    <p className="text-sm" style={{ color: TOKENS.slateText }}>
+                      {t('containersPage.labels.lecturer')}: {typeof container.lecturer === 'string'
+                        ? container.lecturer
+                        : container.lecturer.name || t('containersPage.unknown')}
+                    </p>
+                  )}
+
+                  {userRole === 'Student' && container.purchasedAt && (
+                    <p className="text-sm" style={{ color: TOKENS.slateText }}>
+                      {t('containersPage.labels.purchaseDate')}: {new Date(container.purchasedAt).toLocaleDateString(i18n.language)}
+                    </p>
+                  )}
+
+                  <div className={`card-actions mt-4 ${isRTL ? "justify-start" : "justify-end"}`}>
+                    {userRole === 'Lecturer' ? (
+                      <Link
+                        to={`/dashboard/lecturer-dashboard/container-details/${container._id}`}
+                        className={`inline-flex w-full items-center justify-center gap-2 rounded-full border px-5 py-2 text-sm font-semibold transition-all duration-200 hover:-translate-y-[1px] sm:w-auto ${isRTL ? "flex-row-reverse" : ""}`}
+                        style={{
+                          background: TOKENS.deepTeal,
+                          color: "#F8FCFF",
+                          borderColor: TOKENS.deepTeal,
+                        }}
+                        state={{ userRole: 'Lecturer' }}
+                      >
+                        {t('containersPage.buttons.viewDetails')}
+                        {isRTL ? <FiArrowLeft className="h-4 w-4" /> : <FiArrowRight className="h-4 w-4" />}
+                      </Link>
+                    ) : (
+                      <Link
+                        to={`/dashboard/student-dashboard/container-details/${container._id}`}
+                        className={`inline-flex w-full items-center justify-center gap-2 rounded-full border px-5 py-2 text-sm font-semibold transition-all duration-200 hover:-translate-y-[1px] sm:w-auto ${isRTL ? "flex-row-reverse" : ""}`}
+                        style={{
+                          background: TOKENS.deepTeal,
+                          color: "#F8FCFF",
+                          borderColor: TOKENS.deepTeal,
+                        }}
+                        state={{ userRole: 'Student' }}
+                      >
+                        {t('containersPage.buttons.viewDetails')}
+                        {isRTL ? <FiArrowLeft className="h-4 w-4" /> : <FiArrowRight className="h-4 w-4" />}
+                      </Link>
+                    )}
+                  </div>
+                </div>
               </div>
-              
-              {userRole === 'Lecturer' && (
-                <p className="text-sm">
-                  {t('containersPage.labels.price', { price: container.price })}
-                </p>
-              )}
-              
-              {userRole === 'Student' && container.lecturer && (
-                <p className="text-sm">
-                  {t('containersPage.labels.lecturer')}: {typeof container.lecturer === 'string' 
-                    ? container.lecturer 
-                    : container.lecturer.name || t('containersPage.unknown')}
-                </p>
-              )}
-              
-              {userRole === 'Student' && container.purchasedAt && (
-                <p className="text-sm opacity-75">
-                  {t('containersPage.labels.purchaseDate')}: {new Date(container.purchasedAt).toLocaleDateString(i18n.language)}
-                </p>
-              )}
+            ))}
+          </div>
 
-              <div className={`card-actions mt-4 ${isRTL ? "justify-start" : "justify-end"}`}>
-                  {userRole === 'Lecturer' ? (
-                  <Link 
-                    to={`/dashboard/lecturer-dashboard/container-details/${container._id}`} 
-                    className={`inline-flex w-full items-center justify-center gap-2 rounded-full border px-5 py-2 text-sm font-semibold transition-all duration-200 hover:-translate-y-[1px] sm:w-auto ${isRTL ? "flex-row-reverse" : ""}`}
-                    style={{
-                      background: "var(--color-primary)",
-                      color: "var(--color-primary-content)",
-                      borderColor: "transparent",
-                    }}
-                    state={{ userRole: 'Lecturer' }}
+          {containers.length === 0 && (
+            <div
+              className="mt-4 rounded-2xl border px-4 py-3"
+              style={{
+                background: "#ECFEFF",
+                borderColor: "rgba(8,145,178,0.25)",
+                color: TOKENS.slateText,
+              }}
+            >
+              <span>
+                {userRole === 'Lecturer'
+                  ? t('containersPage.emptyStates.lecturer')
+                  : t('containersPage.emptyStates.student')}
+              </span>
+            </div>
+          )}
+
+          {totalPages > 1 && (
+            <div className="mt-8 flex justify-center">
+              <div className="flex w-full max-w-xl flex-wrap items-center justify-center gap-2">
+                <button
+                  className="btn btn-sm rounded-xl"
+                  style={{
+                    background: "#FFFFFF",
+                    borderColor: "rgba(17,24,39,0.16)",
+                    color: TOKENS.inkText,
+                  }}
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                >
+                  {t('containersPage.pagination.previous')}
+                </button>
+
+                {getVisiblePages().map((pageNum) => (
+                  <button
+                    key={pageNum}
+                    className="btn btn-sm min-w-10 rounded-xl"
+                    style={
+                      currentPage === pageNum
+                        ? {
+                          background: TOKENS.deepTeal,
+                          borderColor: TOKENS.deepTeal,
+                          color: "#F8FCFF",
+                        }
+                        : {
+                          background: "#FFFFFF",
+                          borderColor: "rgba(17,24,39,0.16)",
+                          color: TOKENS.inkText,
+                        }
+                    }
+                    onClick={() => handlePageChange(pageNum)}
                   >
-                    {t('containersPage.buttons.viewDetails')}
-                    {isRTL ? <FiArrowLeft className="h-4 w-4" /> : <FiArrowRight className="h-4 w-4" />}
-                  </Link>
-                ) : (
-                  <Link 
-                    to={`/dashboard/student-dashboard/container-details/${container._id}`} 
-                    className={`inline-flex w-full items-center justify-center gap-2 rounded-full border px-5 py-2 text-sm font-semibold transition-all duration-200 hover:-translate-y-[1px] sm:w-auto ${isRTL ? "flex-row-reverse" : ""}`}
-                    style={{
-                      background: "var(--color-primary)",
-                      color: "var(--color-primary-content)",
-                      borderColor: "transparent",
-                    }}
-                    state={{ userRole: 'Student' }}
-                  >
-                    {t('containersPage.buttons.viewDetails')}
-                    {isRTL ? <FiArrowLeft className="h-4 w-4" /> : <FiArrowRight className="h-4 w-4" />}
-                  </Link>
-                )}
+                    {pageNum}
+                  </button>
+                ))}
+
+                <span className="mx-1 text-xs sm:text-sm" style={{ color: TOKENS.slateText }}>
+                  {currentPage} / {totalPages}
+                </span>
+
+                <button
+                  className="btn btn-sm rounded-xl"
+                  style={{
+                    background: "#FFFFFF",
+                    borderColor: "rgba(17,24,39,0.16)",
+                    color: TOKENS.inkText,
+                  }}
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                >
+                  {t('containersPage.pagination.next')}
+                </button>
               </div>
             </div>
-          </div>
-        ))}
+          )}
+        </div>
       </div>
-
-      {containers.length === 0 && (
-        <div className="alert alert-info">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="stroke-current shrink-0 w-6 h-6">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-          </svg>
-          <span>
-            {userRole === 'Lecturer' 
-              ? t('containersPage.emptyStates.lecturer')
-              : t('containersPage.emptyStates.student')}
-          </span>
-        </div>
-      )}
-
-      {totalPages > 1 && (
-        <div className="mt-8 flex justify-center">
-          <div className="flex w-full max-w-xl flex-wrap items-center justify-center gap-2">
-            <button 
-              className="btn btn-sm"
-              onClick={() => handlePageChange(currentPage - 1)}
-              disabled={currentPage === 1}
-            >
-              {t('containersPage.pagination.previous')}
-            </button>
-            
-            {getVisiblePages().map((pageNum) => (
-              <button
-                key={pageNum}
-                className={`btn btn-sm min-w-10 ${currentPage === pageNum ? 'btn-active' : ''}`}
-                onClick={() => handlePageChange(pageNum)}
-              >
-                {pageNum}
-              </button>
-            ))}
-
-            <span className="mx-1 text-xs opacity-70 sm:text-sm">
-              {currentPage} / {totalPages}
-            </span>
-            
-            <button 
-              className="btn btn-sm"
-              onClick={() => handlePageChange(currentPage + 1)}
-              disabled={currentPage === totalPages}
-            >
-              {t('containersPage.pagination.next')}
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

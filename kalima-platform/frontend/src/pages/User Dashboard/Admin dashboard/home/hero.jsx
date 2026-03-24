@@ -64,7 +64,10 @@ const Hero = () => {
 
   return (
     <div className="mx-auto w-full font-[Cairo]">
-    <h1 className={`text-3xl font-extrabold mb-8 ${isRTL ? 'text-right' : 'text-left'} `} style={{ color: TOKENS.deepTeal }}>{t('admin.pageTitle')}</h1>
+    <h1 className={`text-3xl font-extrabold mb-2 ${isRTL ? 'text-right' : 'text-left'} `} style={{ color: TOKENS.deepTeal }}>{t('admin.pageTitle')}</h1>
+    <p className={`mb-8 text-base font-medium ${isRTL ? 'text-right' : 'text-left'}`} style={{ color: TOKENS.slateText }}>
+      {t('admin.quickAnalyticsSubtitle')}
+    </p>
 
       {error && (
         <div className="p-4 mb-6 rounded-2xl bg-red-50 text-red-600 border border-red-100 font-semibold shadow-sm">
@@ -103,7 +106,7 @@ const Hero = () => {
           </div>
         </div>
 
-        {/* Teachers Card */}
+        {/* Assigned Lecturers Card */}
         <div 
           className="relative overflow-hidden rounded-[2rem] border transition-transform duration-300 hover:-translate-y-1"
           style={{
@@ -115,7 +118,7 @@ const Hero = () => {
           <div className="absolute top-0 right-0 w-32 h-32 bg-[#F39A3F] opacity-10 rounded-bl-[100px] pointer-events-none" />
           <div className="p-6 md:p-8 flex items-center justify-between relative z-10">
             <div className={isRTL ? 'text-right' : 'text-left'}>
-              <h2 className="text-xl font-bold opacity-80" style={{ color: TOKENS.deepTeal }}>{t('admin.teachers')}</h2>
+              <h2 className="text-xl font-bold opacity-80" style={{ color: TOKENS.deepTeal }}>{t('admin.assignedLecturers')}</h2>
               <p className="text-4xl font-extrabold mt-2" style={{ color: TOKENS.inkText }}>
                 {loading ? (
                   <span className="loading loading-dots loading-sm"></span>

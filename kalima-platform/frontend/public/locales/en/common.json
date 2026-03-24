@@ -70,7 +70,7 @@
   "dashboardTitle": "Control Panel",
   "toggleSidebar": "Toggle Sidebar",
   "myPage": "My Page",
-  "adminDashboard"  : "Admin Dashboard",
+  "adminDashboard"  : "User Management",
   "centerDashboard"  : "Center Dashboard",
   "auditLog": "Audit Log",
   "myDashboard": "My Dashboard",
@@ -81,5 +81,6 @@
   "storeDashboard": "Store Dashboard",
   "market": "Market",
   "signedLecturers": "Signed Lecturers",
+  "promoCodesManagement": "Promo Codes Management",
   "Analytics": "Analytics"
 }

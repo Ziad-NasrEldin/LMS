@@ -14,8 +14,8 @@ function PageHeader({ title }) {
         borderColor: "rgba(17,24,39,0.08)",
       }}
     >
-      <div className={`flex items-center justify-between gap-3 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-        <div>
+      <div className={`flex flex-col gap-3 sm:items-center sm:justify-between ${isRTL ? "sm:flex-row-reverse" : "sm:flex-row"}`}>
+        <div className="min-w-0">
           <h1 className="text-2xl font-bold md:text-3xl" style={{ color: TOKENS.deepTeal }}>
             {title}
           </h1>
@@ -24,7 +24,7 @@ function PageHeader({ title }) {
           </p>
         </div>
         <span
-          className="rounded-full px-3 py-1 text-xs font-semibold"
+          className="self-start sm:self-auto rounded-full px-3 py-1 text-xs font-semibold whitespace-nowrap"
           style={{
             background: "rgba(14,85,99,0.1)",
             color: TOKENS.deepTeal,

@@ -8,24 +8,25 @@ import {
   FaSignOutAlt,
   FaTimes,
   FaChevronRight,
-  FaChevronLeft,
+        title: t('adminUserAccounts') || 'User Accounts',
   FaUserAlt,
   FaUserTie,
   FaUserGraduate,
   FaUserShield,
-  FaMoneyBillWave
+  FaMoneyBillWave,
+        title: t('adminManagedLectures') || 'Managed Lectures',
 } from 'react-icons/fa';
 import { getUserDashboard, logoutUser } from '../routes/auth-services';
 import { Edit, Lightbulb } from 'lucide-react';
 import { resolveProfileImageUrl } from '../utils/profileImage';
 
-const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
+        title: t('adminAssignedLecturers') || 'Assigned Lecturers',
   const NAVBAR_HEIGHT = 92;
   const { t, i18n } = useTranslation('common');
   const isRTL = i18n.language === 'ar';
   const location = useLocation();
   const navigate = useNavigate();
-  const [isMobile, setIsMobile] = useState(false);
+        title: t('adminUserInsights') || 'User Insights',
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -121,12 +122,6 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
         path: '/dashboard/admin-dashboard/create'
       },
       {
-        id: 'lectures',
-        title: t('MyLectures') || 'My Lectures',
-        icon: <FaGraduationCap className="w-5 h-5" />,
-        path: '/dashboard/admin-dashboard/lectures-page'
-      },
-      {
         id: 'signed-lecturers',
         title: t('signedLecturers') || 'Signed Lecturers',
         icon: <Lightbulb className="w-5 h-5" />,
@@ -137,6 +132,12 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
         title: isRTL ? 'اللوحة المالية' : 'Financial Dashboard',
         icon: <FaMoneyBillWave className="w-5 h-5" />,
         path: '/dashboard/admin-dashboard/financial-dashboard'
+      },
+      {
+        id: 'promo-codes-management',
+        title: t('promoCodesManagement') || (isRTL ? 'إدارة أكواد الشحن' : 'Promo Codes Management'),
+        icon: <FaTicketAlt className="w-5 h-5" />,
+        path: '/dashboard/admin-dashboard/promo-codes-management'
       },
     ];
 

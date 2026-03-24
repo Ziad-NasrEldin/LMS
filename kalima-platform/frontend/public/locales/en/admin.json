@@ -1,8 +1,10 @@
 {
     "admin": {
-      "pageTitle": "Admin Page",
+      "pageTitle": "User Management",
+      "quickAnalyticsSubtitle": "Quick analytics for managed users",
       "students": "Students",
       "teachers": "Teachers",
+      "assignedLecturers": "Assigned Lecturers",
       "assistants": "Assistants",
       "parents": "Parents",
       "sendOffer": "Send Your Offer Now!",
@@ -120,6 +122,9 @@
         "createUser": "Create New User",
         "delete": "Delete",
         "edit": "Edit"
+      },
+      "metrics": {
+        "totalFiltered": "Filtered Users"
       },
       "whatsappModal": {
       "title": "Send Offer via WhatsApp",

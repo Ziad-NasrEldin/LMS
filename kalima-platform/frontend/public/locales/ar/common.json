@@ -70,7 +70,7 @@
   "dashboardTitle": "لوحة القيادة",
   "toggleSidebar": "تبديل القائمة الجانبية",
   "myPage": "صفحتي",
-  "adminDashboard"  : "لوحة تحكم المسؤول",
+  "adminDashboard"  : "إدارة المستخدمين",
   "centerDashboard"  : "لوحة تحكم المركز",
   "auditLog": "سجل التدقيق",
   "myDashboard": "لوحة التحكم",
@@ -81,6 +81,7 @@
   "MyLectures": "محاضراتي",
   "market": "المتجر",
   "signedLecturers": "المحاضرين الموقعين",
+  "promoCodesManagement": "إدارة أكواد الشحن",
   "Analytics": "التحليلات"
 
   }

@@ -16,115 +16,171 @@ const MyLecturesPage = () => {
   const isRTL = i18n.language === "ar"
   const TOKENS = designTokens.colors
   const SHADOWS = designTokens.shadows
+  const GRADIENTS = designTokens.gradients
   const [lectures, setLectures] = useState([])
   const [allLectures, setAllLectures] = useState([]) // Store all lectures before pagination
   const [subjects, setSubjects] = useState([])
   const [levels, setLevels] = useState([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-  const [renderError, setRenderError] = useState(null)
+      <div
+        className="flex min-h-screen items-center justify-center"
+        style={{ background: `${GRADIENTS.pageAtmosphere}, ${TOKENS.creamSurface}` }}
+      >
+        <div
+          className="rounded-2xl border px-6 py-5"
+          style={{
+            background: TOKENS.neutralCloud,
+            borderColor: "rgba(17,24,39,0.08)",
+            boxShadow: SHADOWS.level1,
+            color: TOKENS.slateText,
+          }}
+        >
+          <div className="loading loading-spinner loading-lg" style={{ color: TOKENS.deepTeal }}></div>
+        </div>
   const [userRole, setUserRole] = useState(null)
   const [userId, setUserId] = useState(null)
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [creationLoading, setCreationLoading] = useState(false)
   const [successMessage, setSuccessMessage] = useState("")
-  const [selectedSubjectFilter, setSelectedSubjectFilter] = useState("")
-  const [selectedLevelFilter, setSelectedLevelFilter] = useState("")
-  const [currentPage, setCurrentPage] = useState(1)
-  const [itemsPerPage, setItemsPerPage] = useState(10)
-  const [totalPages, setTotalPages] = useState(0)
-
-  const convertPathToUrl = (filePath) => {
-    if (!filePath) return null
+      <div
+        className="min-h-screen"
+        dir={isRTL ? "rtl" : "ltr"}
+        style={{ background: `${GRADIENTS.pageAtmosphere}, ${TOKENS.creamSurface}` }}
+      >
+        <div className="mx-auto w-full max-w-7xl px-4 pb-10 pt-8 sm:px-6">
+          <div
+            className="rounded-[2rem] border p-4 sm:p-6 lg:p-8"
+            style={{
+              background: TOKENS.neutralCloud,
+              borderColor: "rgba(17,24,39,0.08)",
+              boxShadow: SHADOWS.level1,
+            }}
+          >
+            <h1 className="mb-2 text-2xl font-bold" style={{ color: TOKENS.inkText }}>
+              {[
+                "Lecturer", "Admin", "Subadmin", "Moderator"].includes(userRole)
+                ? t("lecturesPage.pageTitle.manage")
+                : t("lecturesPage.pageTitle.purchased")}
+            </h1>
+            <p className="mb-5 mt-2 text-sm sm:text-base" style={{ color: TOKENS.slateText }}>{t("lecturesPage.pageDescription")}</p>
     if (filePath.startsWith("http")) return filePath
-
-    const normalizedPath = filePath.replace(/\\/g, "/")
-    const API_URL = import.meta.env.VITE_API_URL || window.location.origin
-    const baseUrl = API_URL.replace(/\/$/, "")
-    const uploadsIndex = normalizedPath.indexOf("uploads/")
-
-    if (uploadsIndex !== -1) {
-      const uploadsPath = normalizedPath.slice(uploadsIndex)
-      return `${baseUrl}/${uploadsPath}`
-    }
-
-    const filename = normalizedPath.split("/").pop()
-    const folder = "lecture_thumbnails"
-
-    return `${baseUrl}/uploads/${folder}/${filename}`
-  }
-
-  useEffect(() => {
-    const fetchInitialData = async () => {
-      try {
-        setLoading(true);
+            {successMessage && (
+              <div
+                className="mb-4 rounded-2xl border px-4 py-3"
+                style={{
+                  background: "#ECFDF5",
+                  borderColor: "#86EFAC",
+                  color: TOKENS.inkText,
+                }}
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-6 w-6 shrink-0"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                    <span>{successMessage}</span>
+                  </div>
+                  <button
+                    className="btn btn-sm rounded-xl"
+                    style={{ background: "#FFFFFF", borderColor: "rgba(17,24,39,0.16)", color: TOKENS.inkText }}
+                    onClick={() => setSuccessMessage("")}
+                  >
+                    {t("lecturesPage.buttons.close")}
+                  </button>
+                </div>
+              </div>
+            )}
         setError(null);
-
-        // First get subjects and levels (common for all roles)
-        const subjectsRes = await getAllSubjects();
-        const levelsRes = await getAllLevels();
-
-        if (subjectsRes.success) {
-          setSubjects(subjectsRes.data || []);
-        } else {
+            {error && (
+              <div
+                className="mb-4 rounded-2xl border px-4 py-3"
+                style={{
+                  background: "#FFF1F2",
+                  borderColor: "#FCA5A5",
+                  color: TOKENS.inkText,
+                }}
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <span>{error}</span>
+                  <button
+                    className="btn btn-sm rounded-xl"
+                    style={{ background: "#FFFFFF", borderColor: "rgba(17,24,39,0.16)", color: TOKENS.inkText }}
+                    onClick={() => setError(null)}
+                  >
+                    {t("lecturesPage.buttons.close")}
+                  </button>
+                </div>
+              </div>
+            )}
           console.error("Failed to fetch subjects:", subjectsRes.error);
-          setSubjects([]);
-          setError("Failed to load subjects, but you can continue.");
-        }
-
-        if (levelsRes.success) {
-          setLevels(levelsRes.data || []);
-        } else {
-          console.error("Failed to fetch levels:", levelsRes.error);
-          setLevels([]);
-          setError(prev => prev ? `${prev}` : "Failed to load levels, but you can continue.");
-        }
-
-        // Then determine user role and fetch appropriate data
-        const userInfoResult = await getUserDashboard({
-          params: { fields: "userInfo", limit: 1 }
-        });
-
-        if (!userInfoResult.success) {
+            <div className="mb-4 grid grid-cols-1 gap-3 md:grid-cols-[1fr_auto] md:items-start">
+              <div className="flex flex-col gap-3 md:flex-row md:flex-wrap">
+                <select
+                  className="select select-bordered w-full rounded-xl md:w-64"
+                  style={{ borderColor: "rgba(17,24,39,0.16)", background: "#FFFFFF", color: TOKENS.inkText }}
+                  value={selectedSubjectFilter}
+                  onChange={(e) => {
+                    setSelectedSubjectFilter(e.target.value)
+                    setCurrentPage(1)
+                  }}
+                >
+                  <option value="">{t("lecturesPage.filters.allSubjects")}</option>
+                  {subjects?.map((subject) => (
+                    <option key={subject._id} value={subject._id}>
+                      {subject.name}
+                    </option>
+                  ))}
+                </select>
           throw new Error("Failed to fetch user info");
-        }
+                <select
+                  className="select select-bordered w-full rounded-xl md:w-64"
+                  style={{ borderColor: "rgba(17,24,39,0.16)", background: "#FFFFFF", color: TOKENS.inkText }}
+                  value={selectedLevelFilter}
+                  onChange={(e) => {
+                    setSelectedLevelFilter(e.target.value)
+                    setCurrentPage(1)
+                  }}
+                >
+                  <option value="">{t("lecturesPage.filters.allLevels")}</option>
+                  {levels?.map((level) => (
+                    <option key={level._id} value={level._id}>
+                      {t(`gradeLevels.${level.name}`, { ns: "common" })}
+                    </option>
+                  ))}
+                </select>
 
-        const userRole = userInfoResult.data.data.userInfo.role;
-        setUserRole(userRole);
-        setUserId(userInfoResult.data.data.userInfo.id);
-
-        // Role-specific data fetching
-        if (["Admin", "Subadmin", "Moderator"].includes(userRole)) {
-          // Use getAllLectures for admin roles
-          const allLecturesResult = await getAllLectures({ limit: 200 });
-
-          if (allLecturesResult.status === "success") {
-            const lecturesData = allLecturesResult.data.containers.map((lecture) => ({
-              id: lecture._id,
-              name: lecture.name,
-              subject: lecture.subject,
-              level: lecture.level,
-              price: lecture.price,
-              videoLink: lecture.videoLink,
-              lecture_type: lecture.lecture_type,
-              requiresExam: lecture.requiresExam,
-              examConfig: lecture.examConfig,
-              lecturer: lecture.createdBy,
-              thumbnail: lecture.thumbnail,
-              createdAt: lecture.createdAt,
-            }));
+                <select
+                  className="select select-bordered w-full rounded-xl md:w-48"
+                  style={{ borderColor: "rgba(17,24,39,0.16)", background: "#FFFFFF", color: TOKENS.inkText }}
+                  value={itemsPerPage}
+                  onChange={handleItemsPerPageChange}
+                >
+                  <option value={10}>{t("lecturesPage.itemsPerPage", { count: 10 })}</option>
+                  <option value={20}>{t("lecturesPage.itemsPerPage", { count: 20 })}</option>
+                  <option value={50}>{t("lecturesPage.itemsPerPage", { count: 50 })}</option>
+                </select>
+              </div>
             setAllLectures(lecturesData);
-          } else {
-            throw new Error(allLecturesResult.message || "Failed to fetch lectures");
-          }
-        } else if (userRole === "Lecturer") {
-          // Use getUserDashboard with specific fields for lecturers
-          const result = await getUserDashboard({
-            params: { fields: "userInfo,lectures,containers", limit: 500 },
-          });
-
-          if (result.success) {
-            const { containers, lectures } = result.data.data;
+              {["Lecturer", "Admin"].includes(userRole) && (
+                <button
+                  onClick={() => setShowCreateModal(true)}
+                  className="btn w-full rounded-xl md:w-auto"
+                  style={{ background: TOKENS.deepTeal, borderColor: TOKENS.deepTeal, color: "#F8FCFF" }}
+                >
+                  {t("lecturesPage.buttons.createNewLecture")}
+                </button>
+              )}
+            </div>
 
             const containerLectures = containers
               ?.filter(c => c.type === "lecture")
@@ -537,23 +593,32 @@ const MyLecturesPage = () => {
           containerType="month"
         />
 
-        <div className="md:hidden space-y-3">
+            <div className="space-y-3 md:hidden">
           {lectures?.map((lecture) => (
-            <div key={lecture.id} className="rounded-2xl border border-base-300 bg-base-100 p-4 shadow-sm">
+                <div
+                  key={lecture.id}
+                  className="rounded-2xl border p-4"
+                  style={{ background: "#FFFFFF", borderColor: "rgba(17,24,39,0.08)", boxShadow: SHADOWS.level1 }}
+                >
               <div className="flex items-start gap-3">
                 {lecture.thumbnail ? (
                   <img
                     src={convertPathToUrl(lecture.thumbnail) || "/placeholder.svg"}
                     alt={lecture.name}
-                    className="h-14 w-14 rounded-xl object-cover flex-shrink-0"
+                    className="h-14 w-14 flex-shrink-0 rounded-xl object-cover"
                   />
                 ) : (
-                  <div className="h-14 w-14 rounded-xl bg-base-200 text-xs flex items-center justify-center flex-shrink-0">N/A</div>
+                      <div
+                        className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-xl text-xs font-semibold"
+                        style={{ background: TOKENS.lightAquaMist, color: TOKENS.deepTeal }}
+                      >
+                        IMG
+                      </div>
                 )}
 
                 <div className="min-w-0 flex-1">
-                  <h3 className="font-semibold leading-5 break-words">{lecture.name}</h3>
-                  <div className="mt-2 text-xs opacity-80 space-y-1">
+                      <h3 className="break-words font-semibold leading-5" style={{ color: TOKENS.inkText }}>{lecture.name}</h3>
+                      <div className="mt-2 space-y-1 text-xs" style={{ color: TOKENS.slateText }}>
                     {(userRole === "Student" || ["Admin", "Subadmin", "Moderator"].includes(userRole)) && (
                       <p className="break-words"><span className="font-medium">{t("lecturesPage.tableHeaders.lecturer")}: </span>{lecture.lecturer?.name || t("lecturesPage.unknown")}</p>
                     )}
@@ -569,19 +634,24 @@ const MyLecturesPage = () => {
                 <Link
                   to={`/dashboard/${userRole === "Student" ? "student" : "lecturer"}-dashboard/${userRole === "Student" ? "lecture-display" : "detailed-lecture-view"}/${lecture.id}`}
                 >
-                  <button className="btn btn-primary btn-sm w-full">{t("lecturesPage.buttons.details")}</button>
+                      <button
+                        className="btn btn-sm w-full rounded-xl"
+                        style={{ background: TOKENS.deepTeal, borderColor: TOKENS.deepTeal, color: "#F8FCFF" }}
+                      >
+                        {t("lecturesPage.buttons.details")}
+                      </button>
                 </Link>
               </div>
             </div>
           ))}
-        </div>
+            </div>
 
-        <div
-          className="hidden md:block overflow-x-auto rounded-2xl border bg-base-100"
-          style={{ borderColor: "rgba(17,24,39,0.08)", boxShadow: SHADOWS.level1 }}
-        >
+            <div
+              className="hidden overflow-x-auto rounded-2xl border md:block"
+              style={{ background: "#FFFFFF", borderColor: "rgba(17,24,39,0.08)", boxShadow: SHADOWS.level1 }}
+            >
           <table className="table table-zebra w-full">
-            <thead>
+            <thead style={{ color: TOKENS.slateText }}>
               <tr>
                 <th className="w-24">{t("lecturesPage.tableHeaders.thumbnail")}</th>
                 <th>{t("lecturesPage.tableHeaders.name")}</th>
@@ -596,7 +666,7 @@ const MyLecturesPage = () => {
                 {userRole !== "Student" && <th>{t("lecturesPage.tableHeaders.actions")}</th>}
               </tr>
             </thead>
-            <tbody>
+            <tbody style={{ color: TOKENS.inkText }}>
               {lectures?.map((lecture) => (
                 <tr key={lecture.id}>
                   <td>
@@ -649,10 +719,10 @@ const MyLecturesPage = () => {
                       to={`/dashboard/${userRole === "Student" ? "student" : "lecturer"}-dashboard/${userRole === "Student" ? "lecture-display" : "detailed-lecture-view"
                         }/${lecture.id}`}
                     >
-                      <button
-                        className="btn btn-sm"
-                        style={{ background: TOKENS.deepTeal, borderColor: TOKENS.deepTeal, color: "#F8FCFF" }}
-                      >
+                          <button
+                            className="btn btn-sm rounded-xl"
+                            style={{ background: TOKENS.deepTeal, borderColor: TOKENS.deepTeal, color: "#F8FCFF" }}
+                          >
                         {t("lecturesPage.buttons.details")}
                       </button>
                     </Link>
@@ -661,58 +731,76 @@ const MyLecturesPage = () => {
               ))}
             </tbody>
           </table>
+            </div>
+
+            {lectures.length === 0 && (
+              <div
+                className="mt-4 rounded-2xl border px-4 py-3"
+                style={{
+                  background: "#ECFEFF",
+                  borderColor: "rgba(8,145,178,0.25)",
+                  color: TOKENS.slateText,
+                }}
+              >
+                <span>
+                  {["Lecturer", "Admin", "Subadmin", "Moderator"].includes(userRole)
+                    ? t("lecturesPage.emptyStates.noLectures")
+                    : t("lecturesPage.emptyStates.noPurchases")}
+                </span>
+              </div>
+            )}
+
+            {totalPages > 1 && (
+              <div className="mt-5 flex justify-center">
+                <div className="flex flex-wrap items-center justify-center gap-2">
+                  <button
+                    className="btn rounded-xl"
+                    style={{ background: "#FFFFFF", borderColor: "rgba(17,24,39,0.16)", color: TOKENS.inkText }}
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                  >
+                    {t("lecturesPage.pagination.previous")}
+                  </button>
+                  {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+                    let pageNum
+                    if (totalPages <= 5) {
+                      pageNum = i + 1
+                    } else if (currentPage <= 3) {
+                      pageNum = i + 1
+                    } else if (currentPage >= totalPages - 2) {
+                      pageNum = totalPages - 4 + i
+                    } else {
+                      pageNum = currentPage - 2 + i
+                    }
+
+                    return (
+                      <button
+                        key={i}
+                        className="btn min-w-10 rounded-xl"
+                        style={
+                          currentPage === pageNum
+                            ? { background: TOKENS.deepTeal, borderColor: TOKENS.deepTeal, color: "#F8FCFF" }
+                            : { background: "#FFFFFF", borderColor: "rgba(17,24,39,0.16)", color: TOKENS.inkText }
+                        }
+                        onClick={() => handlePageChange(pageNum)}
+                      >
+                        {pageNum}
+                      </button>
+                    )
+                  })}
+                  <button
+                    className="btn rounded-xl"
+                    style={{ background: "#FFFFFF", borderColor: "rgba(17,24,39,0.16)", color: TOKENS.inkText }}
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                  >
+                    {t("lecturesPage.pagination.next")}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
-
-        {lectures.length === 0 && (
-          <div className="alert alert-info mt-4">
-            <span>
-              {["Lecturer", "Admin", "Subadmin", "Moderator"].includes(userRole)
-                ? t("lecturesPage.emptyStates.noLectures")
-                : t("lecturesPage.emptyStates.noPurchases")}
-            </span>
-          </div>
-        )}
-
-        {totalPages > 1 && (
-          <div className="join flex justify-center mt-4 flex-wrap gap-2">
-            <button
-              className="join-item btn"
-              onClick={() => handlePageChange(currentPage - 1)}
-              disabled={currentPage === 1}
-            >
-              {t("lecturesPage.pagination.previous")}
-            </button>
-            {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
-              let pageNum
-              if (totalPages <= 5) {
-                pageNum = i + 1
-              } else if (currentPage <= 3) {
-                pageNum = i + 1
-              } else if (currentPage >= totalPages - 2) {
-                pageNum = totalPages - 4 + i
-              } else {
-                pageNum = currentPage - 2 + i
-              }
-
-              return (
-                <button
-                  key={i}
-                  className={`join-item btn ${currentPage === pageNum ? "btn-active" : ""}`}
-                  onClick={() => handlePageChange(pageNum)}
-                >
-                  {pageNum}
-                </button>
-              )
-            })}
-            <button
-              className="join-item btn"
-              onClick={() => handlePageChange(currentPage + 1)}
-              disabled={currentPage === totalPages}
-            >
-              {t("lecturesPage.pagination.next")}
-            </button>
-          </div>
-        )}
       </div>
     )
   } catch (err) {

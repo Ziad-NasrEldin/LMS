@@ -1,8 +1,10 @@
 {
     "admin": { 
-      "pageTitle": "صفحة الأدمن",
+      "pageTitle": "إدارة المستخدمين",
+      "quickAnalyticsSubtitle": "تحليلات سريعة للمستخدمين المُدارين",
       "students": "الطلاب",
       "teachers": "المعلمين",
+      "assignedLecturers": "المحاضرون المعينون",
       "assistants": "المساعدين",
       "parents": "أولياء الأمور",
       "generatePromoCodes": "إنشاء أكواد ترويجية",
@@ -121,6 +123,9 @@
         "createUser": "إنشاء مستخدم جديد",
         "delete": "حذف",
         "edit": "تعديل"
+      },
+      "metrics": {
+        "totalFiltered": "المستخدمون بعد التصفية"
       },
       "whatsappModal": {
         "title": "إرسال عرض عبر واتساب",

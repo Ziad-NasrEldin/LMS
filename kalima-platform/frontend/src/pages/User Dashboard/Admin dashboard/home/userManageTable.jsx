@@ -645,6 +645,9 @@ const UserManagementTable = () => {
   const indexOfLastUser = currentPage * usersPerPage
   const indexOfFirstUser = indexOfLastUser - usersPerPage
   const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser)
+  const filteredLecturers = filteredUsers.filter((user) => String(user.role || "").toLowerCase() === "lecturer").length
+  const filteredAssistants = filteredUsers.filter((user) => String(user.role || "").toLowerCase() === "assistant").length
+  const filteredStudents = filteredUsers.filter((user) => String(user.role || "").toLowerCase() === "student").length
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber)
@@ -732,6 +735,25 @@ const UserManagementTable = () => {
               </button>
             </li>
           </ul>
+        </div>
+      </div>
+
+      <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-4">
+        <div className="rounded-2xl border bg-white p-3" style={{ borderColor: "rgba(17,24,39,0.08)" }}>
+          <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: TOKENS.slateText }}>{t("admin.metrics.totalFiltered")}</p>
+          <p className="mt-1 text-2xl font-extrabold" style={{ color: TOKENS.deepTeal }}>{filteredUsers.length}</p>
+        </div>
+        <div className="rounded-2xl border bg-white p-3" style={{ borderColor: "rgba(17,24,39,0.08)" }}>
+          <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: TOKENS.slateText }}>{t("admin.assignedLecturers")}</p>
+          <p className="mt-1 text-2xl font-extrabold" style={{ color: TOKENS.deepTeal }}>{filteredLecturers}</p>
+        </div>
+        <div className="rounded-2xl border bg-white p-3" style={{ borderColor: "rgba(17,24,39,0.08)" }}>
+          <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: TOKENS.slateText }}>{t("admin.assistants")}</p>
+          <p className="mt-1 text-2xl font-extrabold" style={{ color: TOKENS.deepTeal }}>{filteredAssistants}</p>
+        </div>
+        <div className="rounded-2xl border bg-white p-3" style={{ borderColor: "rgba(17,24,39,0.08)" }}>
+          <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: TOKENS.slateText }}>{t("admin.students")}</p>
+          <p className="mt-1 text-2xl font-extrabold" style={{ color: TOKENS.deepTeal }}>{filteredStudents}</p>
         </div>
       </div>
 
