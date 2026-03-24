@@ -14,11 +14,13 @@ const NavBar = () => {
   const { t, i18n } = useTranslation("common");
   const [menuOpen, setMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isHiddenOnScroll, setIsHiddenOnScroll] = useState(false);
   const [userRole, setUserRole] = useState(null);
   const [userId, setUserId] = useState(null);
   const isAr = i18n.language === "ar";
   const navbarRef = useRef(null);
   const menuRef = useRef(null);
+  const lastScrollYRef = useRef(0);
   const navigate = useNavigate();
   const fetchUserRole = async () => {
     if (isLoggedIn()) {
@@ -86,16 +88,34 @@ const NavBar = () => {
 
   useEffect(() => {
     const onScroll = () => {
-      setIsScrolled(window.scrollY > 14);
+      const currentY = window.scrollY;
+      const previousY = lastScrollYRef.current;
+      const delta = currentY - previousY;
+
+      setIsScrolled(currentY > 14);
+
+      // Keep navbar visible near top and while menu is open.
+      if (currentY < 24 || menuOpen) {
+        setIsHiddenOnScroll(false);
+      } else if (delta > 8) {
+        // Hide when user scrolls down with intent.
+        setIsHiddenOnScroll(true);
+      } else if (delta < -8) {
+        // Show when user scrolls up with intent.
+        setIsHiddenOnScroll(false);
+      }
+
+      lastScrollYRef.current = currentY;
     };
 
+    lastScrollYRef.current = window.scrollY;
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
 
     return () => {
       window.removeEventListener("scroll", onScroll);
     };
-  }, []);
+  }, [menuOpen]);
 
   const handleLogout = async () => {
     try {
@@ -138,7 +158,9 @@ const NavBar = () => {
   return (
     <>
       <header
-        className="fixed inset-x-0 top-0 z-50 px-3 pt-4 sm:px-6"
+        className={`fixed inset-x-0 top-0 z-50 px-3 pt-4 sm:px-6 transition-transform duration-400 ease-out will-change-transform ${
+          isHiddenOnScroll ? "-translate-y-[120%]" : "translate-y-0"
+        }`}
         dir={isAr ? "rtl" : "ltr"}
       >
         <div
