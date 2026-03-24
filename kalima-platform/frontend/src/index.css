@@ -9,24 +9,24 @@
   default: true;
   prefersdark: false;
   color-scheme: "light";
-  --color-base-100: oklch(98% 0 0);
-  --color-base-200: oklch(94% 0 0);
-  --color-base-300: oklch(88% 0 0);
-  --color-base-content: oklch(18% 0 0);
-  --color-primary: oklch(32% 0.08 264.5);
-  --color-primary-content: oklch(98% 0 0);
-  --color-secondary: oklch(72% 0.15 70.5);
-  --color-secondary-content: oklch(18% 0 0);
-  --color-accent: oklch(58% 0.12 180);
-  --color-accent-content: oklch(98% 0 0);
-  --color-neutral: oklch(42% 0 0);
-  --color-neutral-content: oklch(98% 0 0);
-  --color-info: oklch(54% 0.245 262.881);
-  --color-info-content: oklch(97% 0.014 254.604);
+  --color-base-100: #F8F3E9; /* creamSurface */
+  --color-base-200: #F1F3F6; /* neutralCloud */
+  --color-base-300: #EBC468; /* goldenSand - for accents on base */
+  --color-base-content: #111827; /* inkText */
+  --color-primary: #0E5563; /* deepTeal */
+  --color-primary-content: #FFFFFF;
+  --color-secondary: #146A78; /* richTeal */
+  --color-secondary-content: #FFFFFF;
+  --color-accent: #F39A3F; /* warmMango */
+  --color-accent-content: #FFFFFF;
+  --color-neutral: #374151; /* slateText */
+  --color-neutral-content: #FFFFFF;
+  --color-info: #4DB3C2; /* softCyanTeal */
+  --color-info-content: #111827; /* inkText */
   --color-success: oklch(62% 0.194 149.214);
   --color-success-content: oklch(98% 0.018 155.826);
-  --color-warning: oklch(64% 0.222 41.116);
-  --color-warning-content: oklch(98% 0.016 73.684);
+  --color-warning: #F39A3F; /* warmMango */
+  --color-warning-content: #111827; /* inkText */
   --color-error: oklch(58% 0.253 17.585);
   --color-error-content: oklch(96% 0.015 12.422);
   --radius-selector: 0.5rem;

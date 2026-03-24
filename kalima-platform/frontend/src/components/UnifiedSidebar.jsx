@@ -247,8 +247,8 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
       {/* Sidebar */}
       <div
         id="user-sidebar"
-        className={`fixed top-14 bottom-0 ${isRTL ? 'right-0 border-l' : 'left-0 border-r'
-          } w-52 bg-base-100 border-base-300 shadow-md z-30 transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : isRTL ? 'translate-x-full' : '-translate-x-full'
+        className={`fixed top-0 ${isRTL ? 'right-0' : 'left-0'
+          } h-full w-64 bg-base-100 text-base-content shadow-xl z-40 transform transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : isRTL ? 'translate-x-full' : '-translate-x-full'
           }`}
         dir={isRTL ? 'rtl' : 'ltr'}
       >
@@ -349,21 +349,25 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
       {/* Desktop Toggle Button */}
       <button
         id="sidebar-toggle"
-        className={`hidden md:flex fixed top-20 ${isRTL ? 'right-0' : 'left-0'
-          } z-40 bg-primary text-primary-content p-2 ${isRTL ? 'rounded-r-md' : 'rounded-l-md'
-          } shadow-md transition-transform duration-300 ease-in-out`}
-        style={{
-          transform: isOpen
-            ? `translateX(${isRTL ? '-13rem' : '13rem'})`  // Adjusted to match sidebar width
-            : 'translateX(0)',
-        }}
         onClick={toggleSidebar}
-        aria-label="Toggle Sidebar"
+        className={`fixed top-1/2 ${isRTL ? 'right-0' : 'left-0'
+          } z-30 transform -translate-y-1/2 transition-all duration-300 
+          ${isOpen && isRTL
+              ? 'translate-x-64'
+              : isOpen && !isRTL
+                ? 'translate-x-64'
+                : ''
+            } 
+          bg-primary text-primary-content rounded-r-full p-2 shadow-lg`}
+        style={{
+          [isRTL ? 'borderTopLeftRadius' : 'borderTopRightRadius']: '9999px',
+          [isRTL ? 'borderBottomLeftRadius' : 'borderBottomRightRadius']: '9999px',
+        }}
       >
-        {isOpen ? (
-          <FaChevronRight className={`w-4 h-4 ${!isRTL && 'rotate-180'}`} />
+        {isRTL ? (
+          isOpen ? <FaChevronRight /> : <FaChevronLeft />
         ) : (
-          <FaChevronLeft className={`w-4 h-4 ${!isRTL && 'rotate-180'}`} />
+          isOpen ? <FaChevronLeft /> : <FaChevronRight />
         )}
       </button>
     </>
