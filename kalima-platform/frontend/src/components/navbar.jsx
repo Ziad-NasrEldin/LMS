@@ -206,7 +206,7 @@ const NavBar = () => {
                     to="/register"
                     className="btn btn-sm rounded-full border-none bg-[linear-gradient(135deg,#E4C65F,#D4AD3F)] px-5 text-[#232323] hover:brightness-95"
                   >
-                    {t("startNow")}
+                    {t("startNow", { defaultValue: isAr ? "ابدأ الآن" : "Start Now" })}
                   </Link>
                 </div>
               )}
@@ -307,7 +307,7 @@ const NavBar = () => {
                     className="btn w-full rounded-xl border-none bg-[linear-gradient(135deg,#E4C65F,#D4AD3F)] text-[#232323] hover:brightness-95"
                     onClick={() => setMenuOpen(false)}
                   >
-                    {t("startNow")}
+                    {t("startNow", { defaultValue: isAr ? "ابدأ الآن" : "Start Now" })}
                   </Link>
                 </div>
               )}

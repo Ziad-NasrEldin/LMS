@@ -1089,19 +1089,19 @@ const LectureDisplay = () => {
   const requirementType = isHomeworkBlock ? "homework" : "exam";
 
   return (
-    <div className="container mx-auto p-4" dir={isRTL ? "rtl" : "ltr"}>
+    <div className="mx-auto w-full max-w-5xl px-3 py-3 sm:px-4" dir={isRTL ? "rtl" : "ltr"}>
       <button
         onClick={() => navigate(-1)}
-        className="btn btn-outline btn-primary mb-4"
+        className="btn btn-outline btn-primary btn-sm mb-3"
       >
         {t("back")}
       </button>
-      <h1 className="text-3xl font-bold mb-6 text-center md:text-right">
+      <h1 className="text-2xl font-bold mb-4 text-center md:text-right md:text-4xl leading-tight">
         {lecture?.name || t("loadingLecture")}
       </h1>
 
-      <div className="card bg-base-100 shadow-xl mb-6">
-        <div className="card-body">
+      <div className="card bg-base-100 shadow-lg mb-4 border border-base-300/60 rounded-2xl">
+        <div className="card-body p-4 md:p-5">
           <h2 className="card-title flex items-center gap-2">
             <FiAlertTriangle className="text-warning" />
             {requirementType === "homework"
@@ -1116,7 +1116,7 @@ const LectureDisplay = () => {
           </p>
 
           {requirementData && (
-            <div className="bg-base-200 p-4 rounded-lg my-4">
+            <div className="bg-base-200 p-3 rounded-lg my-3">
               <h3 className="font-semibold mb-2">
                 {requirementType === "homework" 
                   ? t("homeworkInfo") || "Homework Information" 
@@ -1132,7 +1132,7 @@ const LectureDisplay = () => {
                 </ul>
               )}
 
-              <div className="mt-6">
+              <div className="mt-4">
                 <a
                   href={requirementType === "homework" 
                     ? requirementData.homeworkUrl 
@@ -1150,7 +1150,7 @@ const LectureDisplay = () => {
             </div>
           )}
 
-          <div className="alert alert-info mt-4">
+          <div className="alert alert-info mt-3">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -1224,19 +1224,19 @@ const LectureDisplay = () => {
     };
 
     return (
-      <div className="container mx-auto p-4" dir={isRTL ? "rtl" : "ltr"}>
+      <div className="mx-auto w-full max-w-5xl px-3 py-3 sm:px-4" dir={isRTL ? "rtl" : "ltr"}>
         <button
           onClick={() => navigate(-1)}
-          className="btn btn-outline btn-primary mb-4"
+          className="btn btn-outline btn-primary btn-sm mb-3"
         >
           {t("back")}
         </button>
-        <h1 className="text-3xl font-bold mb-6 text-center md:text-right">
+        <h1 className="text-2xl font-bold mb-4 text-center md:text-right md:text-4xl leading-tight">
           {lecture?.name || t("loadingLecture")}
         </h1>
 
         {userRole && userRole !== "Student" && (
-          <div className="alert alert-info mb-6 shadow-lg">
+          <div className="alert alert-info mb-4 shadow-md">
             <div>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -1260,7 +1260,7 @@ const LectureDisplay = () => {
           examRequired &&
           examVerified &&
           examSubmission && (
-            <div className="alert alert-success mb-6 shadow-lg">
+            <div className="alert alert-success mb-4 shadow-md">
               <div className="flex items-center gap-2">
                 <FiAward className="stroke-current shrink-0 w-6 h-6" />
                 <div>
@@ -1281,7 +1281,7 @@ const LectureDisplay = () => {
           )}
 
         {showFiftyPercentWarning && !isVideoEffectivelyBlocked && (
-          <div className="alert alert-warning my-4 shadow-lg">
+          <div className="alert alert-warning my-3 shadow-md">
             <div>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -1302,7 +1302,7 @@ const LectureDisplay = () => {
         )}
 
         {hasAttemptedToLeave && !showFiftyPercentWarning && (
-          <div className="alert alert-warning my-4 shadow-lg">
+          <div className="alert alert-warning my-3 shadow-md">
             <div>
               <FiAlertTriangle className="stroke-current shrink-0 h-6 w-6" />
               <span>
@@ -1313,7 +1313,7 @@ const LectureDisplay = () => {
         )}
 
         {isVideoEffectivelyBlocked ? (
-          <div className="alert alert-error mb-6 shadow-lg">
+          <div className="alert alert-error mb-4 shadow-md">
             <div>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -1332,7 +1332,7 @@ const LectureDisplay = () => {
             </div>
           </div>
         ) : youtubeVideoId ? (
-          <div className="mb-6 shadow-xl rounded-lg overflow-hidden bg-base-300" ref={videoContainerRef}>
+          <div className="mb-4 shadow-lg rounded-2xl overflow-hidden bg-base-300 border border-base-300/60" ref={videoContainerRef}>
             <MediaPlayer
               ref={playerRef}
               title={lecture?.name}
@@ -1363,7 +1363,7 @@ const LectureDisplay = () => {
             </MediaPlayer>
 
             {/* Enhanced custom progress bar */}
-            <div className="p-4 bg-base-200">
+            <div className="p-3 bg-base-200">
               <div className="flex flex-col space-y-2">
                 {/* Video info */}
                 <div className="flex justify-between items-center mb-2">
@@ -1453,7 +1453,7 @@ const LectureDisplay = () => {
             </div>
 
             {/* Video stats and info */}
-            <div className="p-4 bg-base-200 rounded-b-lg">
+            <div className="p-3 bg-base-200 rounded-b-lg">
               <div className="flex flex-wrap justify-between items-center">
                 <div className="flex items-center gap-2">
                   <span className="badge badge-primary">
@@ -1489,7 +1489,7 @@ const LectureDisplay = () => {
             </div>
           </div>
         ) : lecture?.videoLink ? (
-          <div className="alert alert-warning mb-6 shadow-lg">
+          <div className="alert alert-warning mb-4 shadow-md">
             <div>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -1508,7 +1508,7 @@ const LectureDisplay = () => {
             </div>
           </div>
         ) : (
-          <div className="alert alert-warning mb-6 shadow-lg">
+          <div className="alert alert-warning mb-4 shadow-md">
             <div>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -1528,10 +1528,10 @@ const LectureDisplay = () => {
           </div>
         )}
 
-        <div className="card bg-base-100 shadow-xl mb-6">
-          <div className="card-body">
+        <div className="card bg-base-100 shadow-lg mb-4 border border-base-300/60 rounded-2xl">
+          <div className="card-body p-4 md:p-5">
             <h2 className="card-title">{t("lectureDetails")}</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm md:text-base">
               <div>
                 <p className="mb-2">
                   <strong>{t("description")}:</strong>{" "}
@@ -1564,8 +1564,8 @@ const LectureDisplay = () => {
         </div>
 
         {/* IMPROVED RESPONSIVE ATTACHMENTS DISPLAY */}
-        <div className="card bg-base-100 shadow-xl mb-6">
-          <div className="card-body">
+        <div className="card bg-base-100 shadow-lg mb-4 border border-base-300/60 rounded-2xl">
+          <div className="card-body p-4 md:p-5">
             <h2 className="card-title mb-4">{t("attachments")}</h2>
 
             {allAttachments.length === 0 ? (
@@ -1586,11 +1586,11 @@ const LectureDisplay = () => {
                 <span>{t("noAttachments")}</span>
               </div>
             ) : (
-              <div className="grid grid-cols-1 gap-4">
+              <div className="grid grid-cols-1 gap-3">
                 {allAttachments.map((attachment, index) => (
                   <div
                     key={index}
-                    className="card bg-base-100 border border-base-300 hover:border-primary transition-all duration-300"
+                    className="card bg-base-100 border border-base-300/80 hover:border-primary transition-all duration-300 rounded-xl"
                   >
                     <div className="card-body p-4">
                       <div className="flex flex-col sm:flex-row sm:items-center gap-4 justify-between">
@@ -1649,8 +1649,8 @@ const LectureDisplay = () => {
 
         {/* Homework upload section for students */}
         {userRole === "Student" && (
-          <div className="card bg-base-100 shadow-xl mb-6">
-            <div className="card-body">
+          <div className="card bg-base-100 shadow-lg mb-4 border border-base-300/60 rounded-2xl">
+            <div className="card-body p-4 md:p-5">
               <h2 className="card-title mb-4">{t("submitHomework")}</h2>
 
               <div className="tabs tabs-boxed mb-4">
@@ -1670,10 +1670,10 @@ const LectureDisplay = () => {
                 </a>
               </div>
 
-              <div className="p-4 border border-dashed border-primary rounded-lg">
+              <div className="p-3 border border-dashed border-primary rounded-lg">
                 {homeworkSubmitType === "file" ? (
                   <>
-                    <h3 className="text-lg font-semibold mb-2">
+                    <h3 className="text-base md:text-lg font-semibold mb-2">
                       {t("uploadHomeworkFile")}
                     </h3>
 
@@ -1761,7 +1761,7 @@ const LectureDisplay = () => {
                   </>
                 ) : (
                   <>
-                    <h3 className="text-lg font-semibold mb-2">
+                    <h3 className="text-base md:text-lg font-semibold mb-2">
                       {t("completeGoogleForm")}
                     </h3>
 
@@ -1824,16 +1824,16 @@ const LectureDisplay = () => {
 
         {/* Homeworks list for authorized users */}
         {hasUploadPermission() && homeworks.length > 0 && (
-          <div className="card bg-base-100 shadow-xl mb-6">
-            <div className="card-body">
+          <div className="card bg-base-100 shadow-lg mb-4 border border-base-300/60 rounded-2xl">
+            <div className="card-body p-4 md:p-5">
               <h2 className="card-title mb-4">
                 {t("studentSubmittedHomeworks")}
               </h2>
-              <div className="grid grid-cols-1 gap-4">
+              <div className="grid grid-cols-1 gap-3">
                 {homeworks.map((homework, index) => (
                   <div
                     key={index}
-                    className="card bg-base-100 border border-base-300 hover:border-primary transition-all duration-300"
+                    className="card bg-base-100 border border-base-300/80 hover:border-primary transition-all duration-300 rounded-xl"
                   >
                     <div className="card-body p-4">
                       <div className="flex flex-col sm:flex-row sm:items-center gap-4 justify-between">
@@ -1894,8 +1894,8 @@ const LectureDisplay = () => {
 
         {/* File uploader for authorized users */}
         {hasUploadPermission() && (
-          <div className="card bg-base-100 shadow-xl mb-6">
-            <div className="card-body">
+          <div className="card bg-base-100 shadow-lg mb-4 border border-base-300/60 rounded-2xl">
+            <div className="card-body p-4 md:p-5">
               <h2 className="card-title mb-4">{t("uploadNewAttachments")}</h2>
 
               <div className="tabs tabs-boxed mb-4 flex flex-wrap">
@@ -1913,7 +1913,7 @@ const LectureDisplay = () => {
                 )}
               </div>
 
-              <div className="p-4 border border-dashed border-primary rounded-lg">
+              <div className="p-3 border border-dashed border-primary rounded-lg">
                 <h3 className="text-lg font-semibold mb-2">
                   {t("addNewAttachments")} ({t(activeTab)})
                 </h3>

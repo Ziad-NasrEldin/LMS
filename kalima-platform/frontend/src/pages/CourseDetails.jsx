@@ -96,17 +96,17 @@ const ContainerItem = ({ container, isPurchased, onPurchase, purchaseInProgress,
           : undefined
       }
     >
-      <div className="card-body p-4">
-        <div className="flex justify-between items-center">
-          <div className="flex items-center gap-3">
+      <div className="card-body p-3 sm:p-4">
+        <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center">
+          <div className="flex min-w-0 items-center gap-3">
             {container.type === "lecture" ? (
               <FaPlayCircle className="text-primary" />
             ) : (
               <FaBook className="text-primary" />
             )}
-            <div>
-              <h3 className="font-medium">{container.name}</h3>
-              <div className="flex gap-2 mt-1">
+            <div className="min-w-0 flex-1">
+              <h3 className="font-medium break-words">{container.name}</h3>
+              <div className="mt-1 flex flex-wrap gap-2">
                 <span className="badge badge-accent">{containerTypeLabel}</span>
                 {container.price > 0 ? (
                   <span className="badge badge-neutral">{container.price} {t("pricing.points")}</span>
@@ -117,15 +117,15 @@ const ContainerItem = ({ container, isPurchased, onPurchase, purchaseInProgress,
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex w-full flex-wrap items-center justify-end gap-2 sm:w-auto sm:justify-start">
             {containerIsPurchased ? (
-              <span className="badge badge-success gap-1">
+              <span className="badge badge-success gap-1 whitespace-nowrap">
                 <FaUnlock size={12} />
                 {parentPurchased ? t("purchase.availableInCourse") : t("purchase.purchased")}
               </span>
             ) : (
               <button
-                className={`btn btn-sm btn-primary ${purchaseInProgress === containerId ? "loading" : ""}`}
+                className={`btn btn-sm btn-primary w-full sm:w-auto ${purchaseInProgress === containerId ? "loading" : ""}`}
                 onClick={() => onPurchase(containerId)}
                 disabled={purchaseInProgress !== null}
               >
@@ -135,7 +135,7 @@ const ContainerItem = ({ container, isPurchased, onPurchase, purchaseInProgress,
 
             {hasChildren && (
               <button
-                className="btn btn-sm border-0 text-primary-content rounded-full px-3 min-h-0 h-9 transition-all duration-300 hover:scale-[1.03] active:scale-100"
+                className="btn btn-sm border-0 text-primary-content rounded-full px-3 min-h-0 h-9 w-full sm:w-auto justify-center transition-all duration-300 hover:scale-[1.03] active:scale-100"
                 style={{
                   backgroundImage: "linear-gradient(120deg, #0E5563 0%, #146A78 52%, #F39A3F 100%)",
                   boxShadow: "0 8px 22px rgba(20, 106, 120, 0.32)",
@@ -160,20 +160,37 @@ const ContainerItem = ({ container, isPurchased, onPurchase, purchaseInProgress,
         {/* Child containers */}
         {(hasChildren || childContainers.length > 0) && (
           <div
-            className={`mt-4 overflow-hidden transition-all duration-500 ease-out ${isExpanded ? "max-h-[2200px] opacity-100" : "max-h-0 opacity-0"}`}
+            className={`mt-4 overflow-hidden transition-all duration-500 ease-out ${isExpanded ? "max-h-[4200px] opacity-100" : "max-h-0 opacity-0"}`}
           >
-            <div className="pl-6 border-r-2 border-primary/30">
-            {childContainers.map((child) => (
-              <ContainerItem
-                key={child._id}
-                container={child}
-                isPurchased={isPurchased}
-                onPurchase={onPurchase}
-                purchaseInProgress={purchaseInProgress}
-                parentPurchased={containerIsPurchased} // Pass down purchase status
-                t={t}
-              />
-            ))}
+            <div className="relative pl-4 sm:pl-6 border-r-2 border-primary/30">
+              {isExpanded && (
+                <span
+                  className="pointer-events-none absolute right-[-2px] top-2 h-[calc(100%-16px)] w-[3px] rounded-full animate-pulse"
+                  style={{
+                    backgroundImage: "linear-gradient(180deg, rgba(243,154,63,0.95) 0%, rgba(14,85,99,0.95) 100%)",
+                    boxShadow: "0 0 14px rgba(243,154,63,0.55)",
+                  }}
+                />
+              )}
+              {childContainers.map((child, index) => (
+                <div
+                  key={child._id || child.id || `${containerId}-child-${index}`}
+                  className={`transition-all duration-500 ease-out ${isExpanded ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-2 scale-[0.98]"}`}
+                  style={{
+                    transitionDelay: isExpanded ? `${Math.min(index * 70, 420)}ms` : "0ms",
+                    willChange: "transform, opacity",
+                  }}
+                >
+                  <ContainerItem
+                    container={child}
+                    isPurchased={isPurchased}
+                    onPurchase={onPurchase}
+                    purchaseInProgress={purchaseInProgress}
+                    parentPurchased={containerIsPurchased} // Pass down purchase status
+                    t={t}
+                  />
+                </div>
+              ))}
             </div>
           </div>
         )}

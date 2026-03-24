@@ -222,7 +222,7 @@ const ContainerDetailsPage = () => {
             to={userRole === "Lecturer" ? "/dashboard/lecturer-dashboard" : "/dashboard/student-dashboard/promo-codes"}
             className="btn btn-outline px-6 py-2 rounded-full flex items-center gap-2 mx-auto"
           >
-            <FiArrowLeft /> {t('containerDetails.buttons.backToDashboard')}
+            {isRTL ? <FiArrowRight /> : <FiArrowLeft />} {t('containerDetails.buttons.backToDashboard')}
           </Link>
         </div>
       </div>
@@ -236,18 +236,18 @@ const ContainerDetailsPage = () => {
   const isLectureCreation = childType === "lecture"
 
     return (
-    <div className="min-h-screen p-8" dir={isRTL ? "rtl" : "ltr"}>
+    <div className="min-h-screen p-4 sm:p-6 lg:p-8" dir={isRTL ? "rtl" : "ltr"}>
       <div className="max-w-7xl mx-auto">
         {/* Header Section */}
-        <div className="flex items-center justify-between mb-8">
+        <div className={`mb-6 flex flex-col gap-3 sm:mb-8 sm:flex-row sm:items-center sm:justify-between ${isRTL ? "sm:flex-row-reverse" : ""}`}>
           <button
             onClick={() => navigate(-1)}
             className="flex items-center gap-2 text-gray-600 hover:text-primary transition-colors"
           >
-            <span className="text-lg">←</span>
+            {isRTL ? <FiArrowRight className="text-lg" /> : <FiArrowLeft className="text-lg" />}
             <span className="font-medium">{t('containerDetails.buttons.backToDashboard')}</span>
           </button>
-          <div className="flex items-center gap-4">
+          <div className={`flex items-center gap-4 ${isRTL ? "sm:justify-start" : "sm:justify-end"}`}>
             {container.points > 0 && (
               <div className="bg-primary/30 px-4 py-2 rounded-full flex items-center gap-2">
                 <span className="text-lg">🏅</span>
@@ -258,10 +258,10 @@ const ContainerDetailsPage = () => {
         </div>
 
         {/* Main Content */}
-        <div className="rounded-2xl shadow-sm p-8 mb-8">
+        <div className="mb-8 rounded-2xl p-4 shadow-sm sm:p-6 lg:p-8">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold mb-2">{container.name}</h1>
-            <div className="flex items-center gap-4">
+            <h1 className="mb-2 text-2xl font-bold sm:text-3xl">{container.name}</h1>
+            <div className="flex flex-wrap items-center gap-3 sm:gap-4">
               <span className="flex items-center gap-2">
                 <FiFolder className="text-lg" />
                 {t(`types.${container.type.toLowerCase()}`)}
@@ -280,8 +280,8 @@ const ContainerDetailsPage = () => {
                 key={child._id}
                 className="group relative rounded-xl border border-base-300 hover:border-primary transition-all duration-300"
               >
-                <div className="p-6">
-                  <div className="flex items-center gap-4 mb-4">
+                <div className="p-5 sm:p-6">
+                  <div className="mb-4 flex items-start gap-4">
                     <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
                       {childType === "lecture" ? (
                         <FiBook className="text-primary text-xl" />
@@ -292,7 +292,7 @@ const ContainerDetailsPage = () => {
                     <h3 className="font-medium">{child.name}</h3>
                   </div>
 
-                  <div className="flex items-center justify-between">
+                  <div className={`flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between ${isRTL ? "sm:flex-row-reverse" : ""}`}>
                     <span className="text-sm">{t(`types.${childType?.toLowerCase()}`) || container.type}</span>
                     <Link
                       to={
@@ -300,7 +300,7 @@ const ContainerDetailsPage = () => {
                           ? `/dashboard/lecturer-dashboard/${childType === "lecture" ? "lecture-display" : "container-details"}/${child._id}`
                           : `/dashboard/student-dashboard/${childType === "lecture" ? "lecture-display" : "container-details"}/${child._id}`
                       }
-                      className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition-all duration-200 hover:-translate-y-[1px] ${isRTL ? "flex-row-reverse" : ""}`}
+                      className={`inline-flex w-full items-center justify-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition-all duration-200 hover:-translate-y-[1px] sm:w-auto ${isRTL ? "flex-row-reverse" : ""}`}
                       style={{
                         background: "var(--color-primary)",
                         color: "var(--color-primary-content)",
@@ -326,10 +326,10 @@ const ContainerDetailsPage = () => {
 
         {/* Lecturer Actions */}
         {userRole === "Lecturer" && childType && (
-          <div className="flex gap-4 justify-end">
+          <div className={`flex gap-4 ${isRTL ? "justify-start" : "justify-end"}`}>
             <button
               onClick={() => setShowCreateModal(true)}
-              className="btn btn-primary px-6 py-3 rounded-full flex items-center gap-2"
+              className="btn btn-primary flex w-full items-center justify-center gap-2 rounded-full px-6 py-3 sm:w-auto"
             >
               <FiPlus className="text-lg" />
               {t('containerDetails.buttons.add')} {t(`types.${creationLabel.toLowerCase()}`)}

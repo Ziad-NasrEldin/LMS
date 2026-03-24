@@ -1,15 +1,17 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Link } from "react-router-dom"
+import { Link, useLocation } from "react-router-dom"
 import { useTranslation } from 'react-i18next';
 import { getUserDashboard } from "../../../routes/auth-services"
 import { FiArrowLeft, FiArrowRight } from "react-icons/fi"
 
 const ContainersPage = () => {
   const { t, i18n } = useTranslation('lecturesPage');
+  const location = useLocation();
   const isRTL = i18n.language === "ar";
   const [containers, setContainers] = useState([])
+  const [allContainers, setAllContainers] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [userRole, setUserRole] = useState(null)
@@ -19,15 +21,20 @@ const ContainersPage = () => {
   const [totalPages, setTotalPages] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState(5)
 
-  // Fetch data with pagination
+  // Fetch data once, then paginate client-side
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true)
+
+        const isLecturerRoute = location.pathname.includes('/lecturer-dashboard/');
+        const requestedFields = isLecturerRoute
+          ? 'userInfo,containers'
+          : 'userInfo,purchaseHistory';
         
         const result = await getUserDashboard({
           params: {
-            fields: 'userInfo,containers,purchaseHistory',
+            fields: requestedFields,
             limit: 200,
             page: 1
           }
@@ -65,9 +72,7 @@ const ContainersPage = () => {
             courseContainers = uniqueCourseContainers;
           }
 
-          const paginatedContainers = applyPagination(courseContainers, currentPage, itemsPerPage);
-          setContainers(paginatedContainers);
-          setTotalPages(Math.ceil(courseContainers.length / itemsPerPage) || 1);
+          setAllContainers(courseContainers);
         } else {
           setError("Failed to load data");
         }
@@ -80,7 +85,14 @@ const ContainersPage = () => {
     };
 
     fetchData();
-  }, [currentPage, itemsPerPage]);
+  }, [location.pathname]);
+
+  // Recompute visible page when pagination controls change.
+  useEffect(() => {
+    const paginatedContainers = applyPagination(allContainers, currentPage, itemsPerPage);
+    setContainers(paginatedContainers);
+    setTotalPages(Math.ceil(allContainers.length / itemsPerPage) || 1);
+  }, [allContainers, currentPage, itemsPerPage]);
 
   // Apply pagination to an array
   const applyPagination = (items, page, limit) => {
@@ -99,6 +111,19 @@ const ContainersPage = () => {
   const handleItemsPerPageChange = (e) => {
     setItemsPerPage(Number(e.target.value));
     setCurrentPage(1); // Reset to first page
+  };
+
+  const getVisiblePages = () => {
+    const maxButtons = 5;
+    if (totalPages <= maxButtons) {
+      return Array.from({ length: totalPages }, (_, index) => index + 1);
+    }
+
+    const start = Math.max(1, currentPage - 2);
+    const end = Math.min(totalPages, start + maxButtons - 1);
+    const normalizedStart = Math.max(1, end - maxButtons + 1);
+
+    return Array.from({ length: end - normalizedStart + 1 }, (_, index) => normalizedStart + index);
   };
 
   if (loading) {
@@ -133,18 +158,18 @@ const ContainersPage = () => {
   }
 
    return (
-    <div className="container mx-auto p-4" dir={isRTL ? "rtl" : "ltr"}>
-      <h1 className="text-3xl font-bold mb-6">
+    <div className="container mx-auto p-4 sm:p-6" dir={isRTL ? "rtl" : "ltr"}>
+      <h1 className="mb-4 text-2xl font-bold sm:mb-6 sm:text-3xl">
         {userRole === 'Lecturer' ? t('containersPage.headers.lecturerCourses') : t('containersPage.headers.studentCourses')}
       </h1>
-      <p className="text-sm opacity-80">
+      <p className="text-sm leading-6 opacity-80 sm:text-base">
         {userRole === 'Lecturer' ? t('containersPage.descriptions.lecturer') : t('containersPage.descriptions.student')}
       </p>
 
       {/* Items per page selector */}
-      <div className="flex justify-end mb-4">
+      <div className={`mb-4 mt-4 flex flex-col gap-2 sm:mt-6 sm:flex-row ${isRTL ? "sm:justify-start" : "sm:justify-end"}`}>
         <select 
-          className="select select-bordered select-sm" 
+          className="select select-bordered select-sm w-full sm:w-auto" 
           value={itemsPerPage} 
           onChange={handleItemsPerPageChange}
         >
@@ -154,10 +179,10 @@ const ContainersPage = () => {
         </select>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-5 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
         {containers.map(container => (
           <div key={container._id} className="card bg-base-100 shadow-xl">
-            <div className="card-body">
+            <div className="card-body h-full">
               <h2 className="card-title">{container.name}</h2>
               
               <div className="flex flex-wrap gap-2 my-2">
@@ -190,11 +215,11 @@ const ContainersPage = () => {
                 </p>
               )}
 
-              <div className="card-actions justify-end mt-4">
+              <div className={`card-actions mt-4 ${isRTL ? "justify-start" : "justify-end"}`}>
                   {userRole === 'Lecturer' ? (
                   <Link 
                     to={`/dashboard/lecturer-dashboard/container-details/${container._id}`} 
-                    className={`inline-flex items-center gap-2 rounded-full border px-5 py-2 text-sm font-semibold transition-all duration-200 hover:-translate-y-[1px] ${isRTL ? "flex-row-reverse" : ""}`}
+                    className={`inline-flex w-full items-center justify-center gap-2 rounded-full border px-5 py-2 text-sm font-semibold transition-all duration-200 hover:-translate-y-[1px] sm:w-auto ${isRTL ? "flex-row-reverse" : ""}`}
                     style={{
                       background: "var(--color-primary)",
                       color: "var(--color-primary-content)",
@@ -208,7 +233,7 @@ const ContainersPage = () => {
                 ) : (
                   <Link 
                     to={`/dashboard/student-dashboard/container-details/${container._id}`} 
-                    className={`inline-flex items-center gap-2 rounded-full border px-5 py-2 text-sm font-semibold transition-all duration-200 hover:-translate-y-[1px] ${isRTL ? "flex-row-reverse" : ""}`}
+                    className={`inline-flex w-full items-center justify-center gap-2 rounded-full border px-5 py-2 text-sm font-semibold transition-all duration-200 hover:-translate-y-[1px] sm:w-auto ${isRTL ? "flex-row-reverse" : ""}`}
                     style={{
                       background: "var(--color-primary)",
                       color: "var(--color-primary-content)",
@@ -240,28 +265,32 @@ const ContainersPage = () => {
       )}
 
       {totalPages > 1 && (
-        <div className="flex justify-center mt-8">
-          <div className="join">
+        <div className="mt-8 flex justify-center">
+          <div className="flex w-full max-w-xl flex-wrap items-center justify-center gap-2">
             <button 
-              className="join-item btn"
+              className="btn btn-sm"
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 1}
             >
               {t('containersPage.pagination.previous')}
             </button>
             
-            {[...Array(totalPages)].map((_, index) => (
+            {getVisiblePages().map((pageNum) => (
               <button
-                key={index}
-                className={`join-item btn ${currentPage === index + 1 ? 'btn-active' : ''}`}
-                onClick={() => handlePageChange(index + 1)}
+                key={pageNum}
+                className={`btn btn-sm min-w-10 ${currentPage === pageNum ? 'btn-active' : ''}`}
+                onClick={() => handlePageChange(pageNum)}
               >
-                {index + 1}
+                {pageNum}
               </button>
             ))}
+
+            <span className="mx-1 text-xs opacity-70 sm:text-sm">
+              {currentPage} / {totalPages}
+            </span>
             
             <button 
-              className="join-item btn"
+              className="btn btn-sm"
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage === totalPages}
             >
