@@ -40,9 +40,10 @@ function SettingsPage() {
             <LanguageAppearanceSection />
 
             <SecuritySection />
-        </div>
+            </div>
       </div>
     </div>
+      </div>
   )
 }
 
