@@ -53,6 +53,7 @@
     "admin": "مسؤول",
     "assistnat": "مساعد"
   },
+    "dir": "rtl",
   "passwordStrength": {
     "label": "القوّة:",
     "weak": "ضعيف",

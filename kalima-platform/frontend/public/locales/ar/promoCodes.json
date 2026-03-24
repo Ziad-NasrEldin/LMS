@@ -20,7 +20,8 @@
     "errors": {
       "emptyCode": "من فضلك ادخل الكود",
       "generic": "فشل في شحن الكود",
-      "invalidCode": "كود غير صالح"
+      "invalidCode": "كود غير صالح",
+      "childSelected": "ارجع إلى حسابك الأساسي لشحن الكود"
     }
   },
   "referral": {
@@ -86,6 +87,10 @@
     "type": "النوع",
     "amount": "المبلغ",
     "teacher": "المدرس",
+    "dateTooltip": "تاريخ العملية",
+    "typeTooltip": "نوع العملية",
+    "amountTooltip": "عدد النقاط",
+    "teacherTooltip": "اسم المدرس",
     "actions": "الإجراءات",
     "created": "وقت الإنشاء",
     "code": "كود الشحن",
@@ -102,14 +107,46 @@
   "views": "مشاهدات",
   "totalViews": "إجمالي المشاهدات",
   "copy": "نسخ إلى الحافظة",
+  "copySuccess": "تم النسخ إلى الحافظة",
   "details": "عرض التفاصيل",
   "retry": "إعادة المحاولة",
+  "noDescription": "لا يوجد وصف متاح",
+  "children": {
+    "title": "حسابات الأبناء",
+    "yourAccount": "حسابك",
+    "noChildren": "لا توجد حسابات أبناء",
+    "noChildrenDescription": "أضف حساب ابن لإدارة النقاط والعمليات",
+    "actionsDisabled": "الإجراءات معطلة أثناء عرض حساب ابن"
+  },
+  "addChild": {
+    "title": "إضافة حساب ابن",
+    "label": "الرقم التسلسلي للابن",
+    "placeholder": "أدخل الرقم التسلسلي للابن",
+    "button": "إضافة ابن",
+    "success": "تمت إضافة حساب الابن بنجاح",
+    "errors": {
+      "emptyId": "يرجى إدخال الرقم التسلسلي للابن",
+      "generic": "فشل في إضافة حساب الابن"
+    }
+  },
+  "exams": {
+    "title": "نتائج الامتحانات",
+    "passed": "ناجح",
+    "failed": "راسب",
+    "score": "الدرجة",
+    "passingThreshold": "حد النجاح",
+    "passedMessage": "تم اجتياز الامتحان",
+    "failedMessage": "لم يتم اجتياز الامتحان",
+    "noExams": "لا توجد نتائج امتحانات",
+    "noExamsDescription": "لا توجد محاولات امتحان لهذا الحساب"
+  },
   "errors": {
     "fetchFailed": "فشل في جلب البيانات"
   },
   "profile" :{
     "email" : "البريد الالكتروني",
     "sequenceId" : "رقم التسلسل",
+    "userSerial": "التسلسل الخاص بالمستخدم",
     "sequenceIdTooltip" : "رقم التسلسل الخاص بك",
     "parentLinkTitle" : "رابط الوالدين",
     "parentLinkDescription" : "استخدم هذا الرابط للوصول للوالدين"

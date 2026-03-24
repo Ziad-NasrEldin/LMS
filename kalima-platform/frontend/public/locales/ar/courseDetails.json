@@ -87,6 +87,10 @@
       "courseObjectives": "أهداف الدورة",
       "courseContents": "محتويات الدورة"
     },
+    "actions": {
+      "show": "إظهار",
+      "hide": "إخفاء"
+    },
     "errors": {
       "fetchError": "فشل في جلب بيانات الدورة",
       "unexpected": "حدث خطأ غير متوقع",

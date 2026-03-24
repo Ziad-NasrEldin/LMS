@@ -152,7 +152,7 @@ const ContainerItem = ({ container, isPurchased, onPurchase, purchaseInProgress,
                   <span className="loading loading-spinner loading-xs"></span>
                 ) : (
                   <span className="inline-flex items-center gap-2">
-                    <span className="text-xs font-semibold tracking-wide">{isExpanded ? t("actions.collapse", { defaultValue: "Hide" }) : t("actions.expand", { defaultValue: "Explore" })}</span>
+                    <span className="text-xs font-semibold tracking-wide">{isExpanded ? t("actions.hide") : t("actions.show")}</span>
                     <FaChevronDown className={`h-3 w-3 transition-transform duration-300 ${isExpanded ? "rotate-180" : "rotate-0"}`} />
                   </span>
                 )}
@@ -166,16 +166,7 @@ const ContainerItem = ({ container, isPurchased, onPurchase, purchaseInProgress,
           <div
             className={`mt-4 overflow-hidden transition-all duration-500 ease-out ${isExpanded ? "max-h-[4200px] opacity-100" : "max-h-0 opacity-0"}`}
           >
-            <div className="relative pl-4 sm:pl-6 border-r-2 border-primary/30">
-              {isExpanded && (
-                <span
-                  className="pointer-events-none absolute right-0 top-2 h-[calc(100%_-_16px)] w-[2px] rounded-full animate-pulse"
-                  style={{
-                    backgroundImage: "linear-gradient(180deg, rgba(243,154,63,0.95) 0%, rgba(14,85,99,0.95) 100%)",
-                    boxShadow: "0 0 14px rgba(243,154,63,0.55)",
-                  }}
-                />
-              )}
+            <div className="pl-4 sm:pl-6">
               {childContainers.map((child, index) => (
                 <div
                   key={child._id || child.id || `${containerId}-child-${index}`}

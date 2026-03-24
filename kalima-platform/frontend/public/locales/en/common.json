@@ -53,6 +53,7 @@
     "admin": "Admin",
     "assistnat": "Assistant"
   },
+  "dir": "ltr",
    "passwordStrength": {
     "label": "Strength:",
     "weak": "Weak",

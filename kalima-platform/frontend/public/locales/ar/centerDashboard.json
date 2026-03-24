@@ -45,7 +45,9 @@
      "courseList": {
       "title": "جدول المحاضرات",
       "addLecture": "إضافة محاضرة",
+      "addCourse": "إضافة دورة",
       "noLessons": "لا توجد دروس",
+      "noCourses": "لا توجد دورات",
       "filters": {
         "allLevels": "جميع المستويات",
         "allLecturers": "جميع المحاضرين"
@@ -139,6 +141,9 @@
     },
     "addCourseForm": {
       "title": "إضافة دورة جديدة",
+      "courseName": "اسم الدورة",
+      "selectLecturer": "اختر محاضر",
+      "submit": "إنشاء الدورة",
       "labels": {
         "subject": "المادة",
         "lecturer": "المحاضر",
@@ -164,6 +169,11 @@
         "courseNameRequired": "اسم الدورة مطلوب",
         "lecturerRequired": "يرجى اختيار محاضر"
       }
+    },
+    "reportsSection": {
+      "title": "التقارير",
+      "generateReport": "إنشاء تقرير",
+      "noReports": "لا توجد تقارير متاحة"
     },
     "errors": {
       "fetchCentersFailed": "فشل تحميل المراكز",

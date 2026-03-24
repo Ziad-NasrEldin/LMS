@@ -20,7 +20,8 @@
     "errors": {
       "emptyCode": "Please enter a code",
       "generic": "Failed to redeem code",
-      "invalidCode": "Invalid code"
+      "invalidCode": "Invalid code",
+      "childSelected": "Switch back to your account to redeem a code"
     }
   },
   "referral": {
@@ -86,6 +87,10 @@
     "type": "Type",
     "amount": "Amount",
     "teacher": "Teacher",
+    "dateTooltip": "Transaction date",
+    "typeTooltip": "Transaction type",
+    "amountTooltip": "Points amount",
+    "teacherTooltip": "Teacher name",
     "actions": "Actions",
     "created": "Created",
     "code": "Code",
@@ -102,14 +107,46 @@
   "views": "views",
   "totalViews": "total views",
   "copy": "Copy to clipboard",
+  "copySuccess": "Copied to clipboard",
   "details": "View details",
   "retry": "Retry",
+  "noDescription": "No description available",
+  "children": {
+    "title": "Children Accounts",
+    "yourAccount": "Your Account",
+    "noChildren": "No children accounts found",
+    "noChildrenDescription": "Add a child account to manage points and transactions",
+    "actionsDisabled": "Actions are disabled when viewing a child account"
+  },
+  "addChild": {
+    "title": "Add Child Account",
+    "label": "Child Sequence ID",
+    "placeholder": "Enter child sequence ID",
+    "button": "Add Child",
+    "success": "Child account added successfully",
+    "errors": {
+      "emptyId": "Please enter a child sequence ID",
+      "generic": "Failed to add child account"
+    }
+  },
+  "exams": {
+    "title": "Exam Results",
+    "passed": "Passed",
+    "failed": "Failed",
+    "score": "Score",
+    "passingThreshold": "Passing threshold",
+    "passedMessage": "Passed the exam",
+    "failedMessage": "Did not pass the exam",
+    "noExams": "No exam results",
+    "noExamsDescription": "No exam attempts were found for this account"
+  },
   "errors": {
     "fetchFailed": "Failed to fetch data"
   },
    "profile" :{
     "email" : "Email",
     "sequenceId" : "Sequence ID",
+    "userSerial": "User Serial",
     "sequenceIdTooltip" : "Your sequence ID",
     "parentLinkTitle" :  "Parent Link",
     "parentLinkDescription" : "Use this link to access your parent account"

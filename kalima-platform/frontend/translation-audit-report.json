@@ -1,0 +1,2619 @@
+{
+  "summary": {
+    "namespaceCountEn": 32,
+    "namespaceCountAr": 32,
+    "missingArNamespacesCount": 0,
+    "missingEnNamespacesCount": 0,
+    "missingUsedKeysInEnCount": 194,
+    "missingUsedKeysInArCount": 194
+  },
+  "missingArNamespaces": [],
+  "missingEnNamespaces": [],
+  "byNamespace": {
+    "admin-signedLecturers": {
+      "enCount": 34,
+      "arCount": 34,
+      "missingInAr": [],
+      "missingInEn": [],
+      "suspiciousSame": []
+    },
+    "admin": {
+      "enCount": 316,
+      "arCount": 316,
+      "missingInAr": [],
+      "missingInEn": [],
+      "suspiciousSame": [
+        "admin.auditlog.idDisplay"
+      ]
+    },
+    "assistantPage": {
+      "enCount": 109,
+      "arCount": 109,
+      "missingInAr": [],
+      "missingInEn": [],
+      "suspiciousSame": [
+        "common.scoreFormat"
+      ]
+    },
+    "center": {
+      "enCount": 10,
+      "arCount": 10,
+      "missingInAr": [],
+      "missingInEn": [],
+      "suspiciousSame": []
+    },
+    "centerDashboard": {
+      "enCount": 202,
+      "arCount": 202,
+      "missingInAr": [],
+      "missingInEn": [],
+      "suspiciousSame": [
+        "promoBanner.title",
+        "promoBanner.contactText",
+        "promoBanner.altText"
+      ]
+    },
+    "common": {
+      "enCount": 82,
+      "arCount": 82,
+      "missingInAr": [],
+      "missingInEn": [],
+      "suspiciousSame": []
+    },
+    "courseDetails": {
+      "enCount": 52,
+      "arCount": 52,
+      "missingInAr": [],
+      "missingInEn": [],
+      "suspiciousSame": []
+    },
+    "courses": {
+      "enCount": 68,
+      "arCount": 68,
+      "missingInAr": [],
+      "missingInEn": [],
+      "suspiciousSame": []
+    },
+    "coursesDashboard": {
+      "enCount": 98,
+      "arCount": 98,
+      "missingInAr": [],
+      "missingInEn": [],
+      "suspiciousSame": [
+        "reviewCourses.sectionTitle",
+        "reviewCourses.sectionSubtitle",
+        "reviewCourses.addButton",
+        "reviewCourses.students",
+        "reviewCourses.freeWithCourse",
+        "reviewCourses.viewMore",
+        "reviewCourses.courses.1.subject",
+        "reviewCourses.courses.1.title",
+        "reviewCourses.courses.1.instructor",
+        "reviewCourses.courses.1.duration",
+        "reviewCourses.courses.1.price",
+        "reviewCourses.courses.2.subject",
+        "reviewCourses.courses.2.title",
+        "reviewCourses.courses.2.instructor",
+        "reviewCourses.courses.2.duration",
+        "reviewCourses.courses.2.price",
+        "reviewCourses.courses.3.subject",
+        "reviewCourses.courses.3.title",
+        "reviewCourses.courses.3.instructor",
+        "reviewCourses.courses.3.duration",
+        "reviewCourses.courses.3.price",
+        "reviewCourses.courses.4.subject",
+        "reviewCourses.courses.4.title",
+        "reviewCourses.courses.4.instructor",
+        "reviewCourses.courses.4.duration",
+        "reviewCourses.courses.4.price",
+        "reviewCourses.courses.5.subject",
+        "reviewCourses.courses.5.title",
+        "reviewCourses.courses.5.instructor",
+        "reviewCourses.courses.5.duration",
+        "reviewCourses.courses.5.price",
+        "reviewCourses.courses.6.subject",
+        "reviewCourses.courses.6.title",
+        "reviewCourses.courses.6.instructor",
+        "reviewCourses.courses.6.duration",
+        "reviewCourses.courses.6.price"
+      ]
+    },
+    "createAdmin": {
+      "enCount": 69,
+      "arCount": 69,
+      "missingInAr": [],
+      "missingInEn": [],
+      "suspiciousSame": []
+    },
+    "createUser": {
+      "enCount": 112,
+      "arCount": 112,
+      "missingInAr": [],
+      "missingInEn": [],
+      "suspiciousSame": []
+    },
+    "footer": {
+      "enCount": 9,
+      "arCount": 9,
+      "missingInAr": [],
+      "missingInEn": [],
+      "suspiciousSame": []
+    },
+    "home": {
+      "enCount": 101,
+      "arCount": 101,
+      "missingInAr": [],
+      "missingInEn": [],
+      "suspiciousSame": [
+        "duration"
+      ]
+    },
+    "kalimaStore-Market": {
+      "enCount": 26,
+      "arCount": 26,
+      "missingInAr": [],
+      "missingInEn": [],
+      "suspiciousSame": []
+    },
+    "kalimaStore-ProductDetails": {
+      "enCount": 110,
+      "arCount": 110,
+      "missingInAr": [],
+      "missingInEn": [],
+      "suspiciousSame": []
+    },
+    "kalimaStore-admin": {
+      "enCount": 262,
+      "arCount": 262,
+      "missingInAr": [],
+      "missingInEn": [],
+      "suspiciousSame": []
+    },
+    "kalimaStore-analytics": {
+      "enCount": 44,
+      "arCount": 44,
+      "missingInAr": [],
+      "missingInEn": [],
+      "suspiciousSame": []
+    },
+    "kalimaStore-coupons": {
+      "enCount": 65,
+      "arCount": 65,
+      "missingInAr": [],
+      "missingInEn": [],
+      "suspiciousSame": []
+    },
+    "kalimaStore-errorBoundary": {
+      "enCount": 3,
+      "arCount": 3,
+      "missingInAr": [],
+      "missingInEn": [],
+      "suspiciousSame": []
+    },
+    "kalimaStore-orders": {
+      "enCount": 84,
+      "arCount": 84,
+      "missingInAr": [],
+      "missingInEn": [],
+      "suspiciousSame": []
+    },
+    "lectureDisplay": {
+      "enCount": 141,
+      "arCount": 141,
+      "missingInAr": [],
+      "missingInEn": [],
+      "suspiciousSame": []
+    },
+    "lecturerDashboard": {
+      "enCount": 57,
+      "arCount": 57,
+      "missingInAr": [],
+      "missingInEn": [],
+      "suspiciousSame": []
+    },
+    "lectures": {
+      "enCount": 101,
+      "arCount": 101,
+      "missingInAr": [],
+      "missingInEn": [],
+      "suspiciousSame": []
+    },
+    "lecturesPage": {
+      "enCount": 107,
+      "arCount": 107,
+      "missingInAr": [],
+      "missingInEn": [],
+      "suspiciousSame": []
+    },
+    "login": {
+      "enCount": 88,
+      "arCount": 88,
+      "missingInAr": [],
+      "missingInEn": [],
+      "suspiciousSame": [
+        "emailPlaceholder"
+      ]
+    },
+    "notifications": {
+      "enCount": 13,
+      "arCount": 13,
+      "missingInAr": [],
+      "missingInEn": [],
+      "suspiciousSame": []
+    },
+    "packages": {
+      "enCount": 116,
+      "arCount": 116,
+      "missingInAr": [],
+      "missingInEn": [],
+      "suspiciousSame": []
+    },
+    "promoCodes": {
+      "enCount": 84,
+      "arCount": 84,
+      "missingInAr": [],
+      "missingInEn": [],
+      "suspiciousSame": []
+    },
+    "register": {
+      "enCount": 198,
+      "arCount": 198,
+      "missingInAr": [],
+      "missingInEn": [],
+      "suspiciousSame": []
+    },
+    "settings": {
+      "enCount": 67,
+      "arCount": 67,
+      "missingInAr": [],
+      "missingInEn": [],
+      "suspiciousSame": []
+    },
+    "teacherDetails": {
+      "enCount": 11,
+      "arCount": 11,
+      "missingInAr": [],
+      "missingInEn": [],
+      "suspiciousSame": []
+    },
+    "teachers": {
+      "enCount": 28,
+      "arCount": 28,
+      "missingInAr": [],
+      "missingInEn": [],
+      "suspiciousSame": []
+    }
+  },
+  "missingUsedInEn": [
+    {
+      "file": "src/components/CourseCard.jsx",
+      "ns": "home",
+      "key": "containerType",
+      "fn": "t"
+    },
+    {
+      "file": "src/components/lectureCard.jsx",
+      "ns": "lectures",
+      "key": "showLess",
+      "fn": "t"
+    },
+    {
+      "file": "src/components/lectureCard.jsx",
+      "ns": "lectures",
+      "key": "showMore",
+      "fn": "t"
+    },
+    {
+      "file": "src/components/navbar.jsx",
+      "ns": "common",
+      "key": "login",
+      "fn": "t"
+    },
+    {
+      "file": "src/components/navbar.jsx",
+      "ns": "common",
+      "key": "login",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/CenterDashboard/ActivityTracker.jsx",
+      "ns": "centerDashboard",
+      "key": "activityTracker.status.yes",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/CenterDashboard/ActivityTracker.jsx",
+      "ns": "centerDashboard",
+      "key": "activityTracker.status.no",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/CenterDashboard/CenterDashboard.jsx",
+      "ns": "centerDashboard",
+      "key": "courseList.addCourse",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/CenterDashboard/CenterDashboard.jsx",
+      "ns": "centerDashboard",
+      "key": "courseList.noCourses",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/CenterDashboard/CenterDashboard.jsx",
+      "ns": "centerDashboard",
+      "key": "reportsSection.title",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/CenterDashboard/CenterDashboard.jsx",
+      "ns": "centerDashboard",
+      "key": "reportsSection.generateReport",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/CenterDashboard/CenterDashboard.jsx",
+      "ns": "centerDashboard",
+      "key": "reportsSection.noReports",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/CenterDashboard/CenterDashboard.jsx",
+      "ns": "centerDashboard",
+      "key": "addCourseForm.courseName",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/CenterDashboard/CenterDashboard.jsx",
+      "ns": "centerDashboard",
+      "key": "addCourseForm.selectLecturer",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/CenterDashboard/CenterDashboard.jsx",
+      "ns": "centerDashboard",
+      "key": "addCourseForm.submit",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/CenterDashboard/ContactForm.jsx",
+      "ns": "centerDashboard",
+      "key": "contactForm.categories",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/CenterDashboard/ContactForm.jsx",
+      "ns": "centerDashboard",
+      "key": "contactForm.contentTypes",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/CenterDashboard/ContactForm.jsx",
+      "ns": "centerDashboard",
+      "key": "contactForm.grades",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/CenterDashboard/CourseCard.jsx",
+      "ns": "centerDashboard",
+      "key": "courseCard.unknownSubject",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/CenterDashboard/CourseCard.jsx",
+      "ns": "centerDashboard",
+      "key": "courseCard.unknownSubject",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/CenterDashboard/CourseCard.jsx",
+      "ns": "centerDashboard",
+      "key": "courseCard.unknownGroup",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/CenterDashboard/CourseCard.jsx",
+      "ns": "centerDashboard",
+      "key": "courseCard.errors.invalidLessonId",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/CenterDashboard/CourseCard.jsx",
+      "ns": "centerDashboard",
+      "key": "courseCard.errors.fetchLessonFailed",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/CenterDashboard/CourseCard.jsx",
+      "ns": "centerDashboard",
+      "key": "courseCard.unknownLecturer",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/CenterDashboard/CourseFilters.jsx",
+      "ns": "centerDashboard",
+      "key": "subjects",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/CourseDetails.jsx",
+      "ns": "courseDetails",
+      "key": "actions.collapse",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/CourseDetails.jsx",
+      "ns": "courseDetails",
+      "key": "actions.expand",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/KalimaStore/AdminPanel/AdminPanel.jsx",
+      "ns": "kalimaStore-admin",
+      "key": "validation.invalidSubSectionSelected",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/KalimaStore/AdminPanel/ExportSection.jsx",
+      "ns": "kalimaStore-admin",
+      "key": "export.allProducts",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/KalimaStore/AdminPanel/ExportSection.jsx",
+      "ns": "kalimaStore-admin",
+      "key": "export.booksOnly",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/KalimaStore/AdminPanel/ExportSection.jsx",
+      "ns": "kalimaStore-admin",
+      "key": "export.sections",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/KalimaStore/AdminPanel/ExportSection.jsx",
+      "ns": "kalimaStore-admin",
+      "key": "export.allProducts",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/KalimaStore/AdminPanel/ExportSection.jsx",
+      "ns": "kalimaStore-admin",
+      "key": "export.booksOnly",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/KalimaStore/AdminPanel/ExportSection.jsx",
+      "ns": "kalimaStore-admin",
+      "key": "export.sections",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/KalimaStore/AdminPanel/Orders.jsx",
+      "ns": "kalimaStore-orders",
+      "key": "filters.selectDate",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/KalimaStore/AdminPanel/Orders.jsx",
+      "ns": "kalimaStore-orders",
+      "key": "clearFilters",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/KalimaStore/AdminPanel/Orders.jsx",
+      "ns": "kalimaStore-orders",
+      "key": "activeFilters",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/KalimaStore/AdminPanel/Orders.jsx",
+      "ns": "kalimaStore-orders",
+      "key": "table.couponCode",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/KalimaStore/AdminPanel/Orders.jsx",
+      "ns": "kalimaStore-orders",
+      "key": "table.couponCode",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/KalimaStore/AdminPanel/SubSectionsManagement.jsx",
+      "ns": "kalimaStore-admin",
+      "key": "unknownSection",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/KalimaStore/AdminPanel/SubSectionsManagement.jsx",
+      "ns": "kalimaStore-admin",
+      "key": "allSections",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/KalimaStore/AdminPanel/SubSectionsManagement.jsx",
+      "ns": "kalimaStore-admin",
+      "key": "subSectionsManagement.table.createdAt",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/KalimaStore/Components/PaymentSection.jsx",
+      "ns": "kalimaStore-ProductDetails",
+      "key": "errors.copyFailed",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/KalimaStore/Components/PurchaseForm.jsx",
+      "ns": "kalimaStore-ProductDetails",
+      "key": "purchaseForm.price",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/KalimaStore/Components/PurchaseForm.jsx",
+      "ns": "kalimaStore-ProductDetails",
+      "key": "purchaseForm.couponDiscount",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/KalimaStore/Market.jsx",
+      "ns": "kalimaStore-Market",
+      "key": "allSubSections",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/KalimaStore/Market.jsx",
+      "ns": "kalimaStore-Market",
+      "key": "product.new",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/KalimaStore/storeAnalytics.jsx",
+      "ns": "kalimaStore-analytics",
+      "key": "dailyStats",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/Lecturer Dashboard/InstructorsList.jsx",
+      "ns": "lecturerDashboard",
+      "key": "Failed to create assistant",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/Lecturer Dashboard/InstructorsList.jsx",
+      "ns": "lecturerDashboard",
+      "key": "Failed to delete assistant",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/Lecturer Dashboard/InstructorsList.jsx",
+      "ns": "lecturerDashboard",
+      "key": "Failed to update assistant",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/Lecturer Dashboard/LecturerDashboard.jsx",
+      "ns": "lecturerDashboard",
+      "key": "top_categories",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/Lecturer Dashboard/LecturerDashboard.jsx",
+      "ns": "lecturerDashboard",
+      "key": "most_popular",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/Lecturer Dashboard/LecturerDashboard.jsx",
+      "ns": "lecturerDashboard",
+      "key": "featured_courses",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/Lecturer Dashboard/LecturerDashboard.jsx",
+      "ns": "lecturerDashboard",
+      "key": "view_all",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/lectures.jsx",
+      "ns": "lectures",
+      "key": "errors.loginRequired",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/lectures.jsx",
+      "ns": "lectures",
+      "key": "errors.lectureNotFound",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/lectures.jsx",
+      "ns": "lectures",
+      "key": "errors.insufficientPoints",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/lectures.jsx",
+      "ns": "lectures",
+      "key": "purchase.success",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/lectures.jsx",
+      "ns": "lectures",
+      "key": "purchase.failed",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/lectures.jsx",
+      "ns": "lectures",
+      "key": "purchase.failed",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/Login/login.jsx",
+      "ns": "login",
+      "key": "errors.fetchUserDataError",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/Login/ResetPasswordPage.jsx",
+      "ns": "login",
+      "key": "resetPassword",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/Login/VerifyOTP.jsx",
+      "ns": "login",
+      "key": "verifying",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/Packages Page/packageDetails.jsx",
+      "ns": "packages",
+      "key": "purchaseModal.insufficientPoints",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/Packages Page/packagesPage.jsx",
+      "ns": "packages",
+      "key": "purchaseModal.insufficientPoints",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/Services/WelcomeSection.jsx",
+      "ns": "home",
+      "key": "welcome.kalima",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/Settings/PersonalInfoSection.jsx",
+      "ns": "settings",
+      "key": "personalInfo",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/Settings/SecuritySection.jsx",
+      "ns": "common",
+      "key": "security.errors.mismatch",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/Settings/SecuritySection.jsx",
+      "ns": "common",
+      "key": "security.errors.length",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/Settings/SecuritySection.jsx",
+      "ns": "common",
+      "key": "security.errors.general",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/Settings/SecuritySection.jsx",
+      "ns": "common",
+      "key": "security.title",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/Settings/SecuritySection.jsx",
+      "ns": "common",
+      "key": "security.changePassword",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/Settings/SecuritySection.jsx",
+      "ns": "common",
+      "key": "security.success",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/Settings/SecuritySection.jsx",
+      "ns": "common",
+      "key": "security.labels.currentPassword",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/Settings/SecuritySection.jsx",
+      "ns": "common",
+      "key": "security.placeholders.currentPassword",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/Settings/SecuritySection.jsx",
+      "ns": "common",
+      "key": "security.hidePassword",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/Settings/SecuritySection.jsx",
+      "ns": "common",
+      "key": "security.showPassword",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/Settings/SecuritySection.jsx",
+      "ns": "common",
+      "key": "security.labels.newPassword",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/Settings/SecuritySection.jsx",
+      "ns": "common",
+      "key": "security.placeholders.newPassword",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/Settings/SecuritySection.jsx",
+      "ns": "common",
+      "key": "security.labels.confirmPassword",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/Settings/SecuritySection.jsx",
+      "ns": "common",
+      "key": "security.placeholders.confirmPassword",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/Settings/SecuritySection.jsx",
+      "ns": "common",
+      "key": "security.passwordRequirement",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/Settings/SecuritySection.jsx",
+      "ns": "common",
+      "key": "security.updateButton",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/Settings/SecuritySection.jsx",
+      "ns": "common",
+      "key": "dir",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/teacher details/Teacher-details.jsx",
+      "ns": "teacherDetails",
+      "key": "error.invalid_user_id",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/teacher details/Teacher-details.jsx",
+      "ns": "teacherDetails",
+      "key": "defaultSubject",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/teacher details/Teacher-details.jsx",
+      "ns": "teacherDetails",
+      "key": "noCoursesAvailable",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/Teachers.jsx",
+      "ns": "teachers",
+      "key": "filters.all",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/Teachers.jsx",
+      "ns": "teachers",
+      "key": "filters.all",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/Teachers.jsx",
+      "ns": "teachers",
+      "key": "filters.select",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/AddNewStuff.jsx",
+      "ns": "createAdmin",
+      "key": "forms.subject.nameAR",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/auditLog.jsx",
+      "ns": "admin",
+      "key": "admin.auditlog.table.user",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/auditLog.jsx",
+      "ns": "admin",
+      "key": "admin.auditlog.table.email",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/auditLog.jsx",
+      "ns": "admin",
+      "key": "admin.auditlog.table.action",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/auditLog.jsx",
+      "ns": "admin",
+      "key": "admin.auditlog.table.timestamp",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/auditLog.jsx",
+      "ns": "admin",
+      "key": "admin.auditlog.table.role",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/auditLog.jsx",
+      "ns": "admin",
+      "key": "admin.auditlog.table.resource",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/auditLog.jsx",
+      "ns": "admin",
+      "key": "admin.auditlog.table.status",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/CreateUserModal/CreateUserModal.jsx",
+      "ns": "createUser",
+      "key": "validation.subjectRequired",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/CreateUserModal/CreateUserModal.jsx",
+      "ns": "createUser",
+      "key": "validation.teachesAtTypeRequired",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/CreateUserModal/CreateUserModal.jsx",
+      "ns": "createUser",
+      "key": "validation.centersRequired",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/CreateUserModal/CreateUserModal.jsx",
+      "ns": "createUser",
+      "key": "validation.schoolRequired",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/CreateUserModal/CreateUserModal.jsx",
+      "ns": "createUser",
+      "key": "validation.governmentRequired",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/CreateUserModal/CreateUserModal.jsx",
+      "ns": "createUser",
+      "key": "validation.administrationZoneRequired",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
+      "ns": "admin",
+      "key": "admin.editUser.emailPlaceholder",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/home/PromoCodesGenerator.jsx",
+      "ns": "admin",
+      "key": "admin.errors.qrCodeGenerationFailed",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/home/PromoCodesGenerator.jsx",
+      "ns": "admin",
+      "key": "admin.download",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/home/PromoCodesTable.jsx",
+      "ns": "admin",
+      "key": "errors.invalidResponse",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/home/PromoCodesTable.jsx",
+      "ns": "admin",
+      "key": "errors.failedToFetchStudents",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/home/PromoCodesTable.jsx",
+      "ns": "admin",
+      "key": "errors.deleteFailed",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/home/PromoCodesTable.jsx",
+      "ns": "admin",
+      "key": "errors.unexpectedError",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/home/PromoCodesTable.jsx",
+      "ns": "admin",
+      "key": "errors.bulkDeleteFailed",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/home/PromoCodesTable.jsx",
+      "ns": "admin",
+      "key": "errors.unexpectedError",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/home/PromoCodesTable.jsx",
+      "ns": "admin",
+      "key": "modals.confirmBulkDelete",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/home/PromoCodesTable.jsx",
+      "ns": "admin",
+      "key": "modals.bulkDeleteConfirm",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.noPhoneNumber",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.name",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.email",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.phone",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.role",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.status",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.government",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.administrationZone",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.sequenceId",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.joinedDate",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.successAll",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.successFiltered",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.error",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.successAll",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.successFiltered",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.error",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.exportAll",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.exportAll",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.filterInfo",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.of",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.usersShown",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.noUsers",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.noUsersFiltered",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.noUsersYet",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Lecture Page/ContainerPage.jsx",
+      "ns": "lecturesPage",
+      "key": "containersPage.unknown",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Lecture Page/DetailedLectureViewing.jsx",
+      "ns": "lectureDisplay",
+      "key": "fileName",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Lecture Page/DetailedLectureViewing.jsx",
+      "ns": "lectureDisplay",
+      "key": "rating",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Lecture Page/DetailedLectureViewing.jsx",
+      "ns": "lectureDisplay",
+      "key": "comment",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Lecture Page/DetailedLectureViewing.jsx",
+      "ns": "lectureDisplay",
+      "key": "provideFeedback",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Lecture Page/DetailedLectureViewing.jsx",
+      "ns": "lectureDisplay",
+      "key": "rating",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Lecture Page/DetailedLectureViewing.jsx",
+      "ns": "lectureDisplay",
+      "key": "comment",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Lecture Page/DetailedLectureViewing.jsx",
+      "ns": "lectureDisplay",
+      "key": "enterYourFeedback",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Lecture Page/DetailedLectureViewing.jsx",
+      "ns": "lectureDisplay",
+      "key": "submitFeedback",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Lecture Page/LectureDisplay.jsx",
+      "ns": "lectureDisplay",
+      "key": "exitWarningMessage",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Lecture Page/LectureDisplay.jsx",
+      "ns": "lectureDisplay",
+      "key": "retry",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Lecture Page/LectureDisplay.jsx",
+      "ns": "lectureDisplay",
+      "key": "homeworkRequiredFirst",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Lecture Page/LectureDisplay.jsx",
+      "ns": "lectureDisplay",
+      "key": "homeworkRequiredDescription",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Lecture Page/LectureDisplay.jsx",
+      "ns": "lectureDisplay",
+      "key": "homeworkInfo",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Lecture Page/LectureDisplay.jsx",
+      "ns": "lectureDisplay",
+      "key": "startHomework",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Lecture Page/LectureDisplay.jsx",
+      "ns": "lectureDisplay",
+      "key": "afterCompletingHomework",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Lecture Page/LectureDisplay.jsx",
+      "ns": "lectureDisplay",
+      "key": "exitWarningMessage",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Lecture Page/LectureDisplay.jsx",
+      "ns": "lectureDisplay",
+      "key": "exitWarningTitle",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Lecture Page/LectureDisplay.jsx",
+      "ns": "lectureDisplay",
+      "key": "exitWarningMessage",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Lecture Page/LectureDisplay.jsx",
+      "ns": "lectureDisplay",
+      "key": "stayOnPage",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Lecture Page/LectureDisplay.jsx",
+      "ns": "lectureDisplay",
+      "key": "leavePage",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Lecture Page/LecturesPage.jsx",
+      "ns": "lecturesPage",
+      "key": "lecturesPage.messages.lectureCreatedSuccessfully",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/promoCodes.jsx",
+      "ns": "promoCodes",
+      "key": "redeem.errors.childSelected",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/promoCodes.jsx",
+      "ns": "promoCodes",
+      "key": "addChild.errors.emptyId",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/promoCodes.jsx",
+      "ns": "promoCodes",
+      "key": "addChild.success",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/promoCodes.jsx",
+      "ns": "promoCodes",
+      "key": "addChild.errors.generic",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/promoCodes.jsx",
+      "ns": "promoCodes",
+      "key": "addChild.errors.generic",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/promoCodes.jsx",
+      "ns": "promoCodes",
+      "key": "copySuccess",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/promoCodes.jsx",
+      "ns": "promoCodes",
+      "key": "table.dateTooltip",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/promoCodes.jsx",
+      "ns": "promoCodes",
+      "key": "table.typeTooltip",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/promoCodes.jsx",
+      "ns": "promoCodes",
+      "key": "table.amountTooltip",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/promoCodes.jsx",
+      "ns": "promoCodes",
+      "key": "table.teacherTooltip",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/promoCodes.jsx",
+      "ns": "promoCodes",
+      "key": "noDescription",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/promoCodes.jsx",
+      "ns": "promoCodes",
+      "key": "exams.passed",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/promoCodes.jsx",
+      "ns": "promoCodes",
+      "key": "exams.failed",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/promoCodes.jsx",
+      "ns": "promoCodes",
+      "key": "noDescription",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/promoCodes.jsx",
+      "ns": "promoCodes",
+      "key": "exams.score",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/promoCodes.jsx",
+      "ns": "promoCodes",
+      "key": "exams.passingThreshold",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/promoCodes.jsx",
+      "ns": "promoCodes",
+      "key": "exams.passedMessage",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/promoCodes.jsx",
+      "ns": "promoCodes",
+      "key": "exams.failedMessage",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/promoCodes.jsx",
+      "ns": "promoCodes",
+      "key": "exams.noExams",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/promoCodes.jsx",
+      "ns": "promoCodes",
+      "key": "exams.noExamsDescription",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/promoCodes.jsx",
+      "ns": "promoCodes",
+      "key": "children.title",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/promoCodes.jsx",
+      "ns": "promoCodes",
+      "key": "children.yourAccount",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/promoCodes.jsx",
+      "ns": "promoCodes",
+      "key": "children.noChildren",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/promoCodes.jsx",
+      "ns": "promoCodes",
+      "key": "children.noChildrenDescription",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/promoCodes.jsx",
+      "ns": "promoCodes",
+      "key": "profile.userSerial",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/promoCodes.jsx",
+      "ns": "promoCodes",
+      "key": "profile.userSerial",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/promoCodes.jsx",
+      "ns": "promoCodes",
+      "key": "addChild.title",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/promoCodes.jsx",
+      "ns": "promoCodes",
+      "key": "addChild.label",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/promoCodes.jsx",
+      "ns": "promoCodes",
+      "key": "addChild.placeholder",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/promoCodes.jsx",
+      "ns": "promoCodes",
+      "key": "addChild.button",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/promoCodes.jsx",
+      "ns": "promoCodes",
+      "key": "children.actionsDisabled",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/promoCodes.jsx",
+      "ns": "promoCodes",
+      "key": "exams.title",
+      "fn": "t"
+    }
+  ],
+  "missingUsedInAr": [
+    {
+      "file": "src/components/CourseCard.jsx",
+      "ns": "home",
+      "key": "containerType",
+      "fn": "t"
+    },
+    {
+      "file": "src/components/lectureCard.jsx",
+      "ns": "lectures",
+      "key": "showLess",
+      "fn": "t"
+    },
+    {
+      "file": "src/components/lectureCard.jsx",
+      "ns": "lectures",
+      "key": "showMore",
+      "fn": "t"
+    },
+    {
+      "file": "src/components/navbar.jsx",
+      "ns": "common",
+      "key": "login",
+      "fn": "t"
+    },
+    {
+      "file": "src/components/navbar.jsx",
+      "ns": "common",
+      "key": "login",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/CenterDashboard/ActivityTracker.jsx",
+      "ns": "centerDashboard",
+      "key": "activityTracker.status.yes",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/CenterDashboard/ActivityTracker.jsx",
+      "ns": "centerDashboard",
+      "key": "activityTracker.status.no",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/CenterDashboard/CenterDashboard.jsx",
+      "ns": "centerDashboard",
+      "key": "courseList.addCourse",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/CenterDashboard/CenterDashboard.jsx",
+      "ns": "centerDashboard",
+      "key": "courseList.noCourses",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/CenterDashboard/CenterDashboard.jsx",
+      "ns": "centerDashboard",
+      "key": "reportsSection.title",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/CenterDashboard/CenterDashboard.jsx",
+      "ns": "centerDashboard",
+      "key": "reportsSection.generateReport",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/CenterDashboard/CenterDashboard.jsx",
+      "ns": "centerDashboard",
+      "key": "reportsSection.noReports",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/CenterDashboard/CenterDashboard.jsx",
+      "ns": "centerDashboard",
+      "key": "addCourseForm.courseName",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/CenterDashboard/CenterDashboard.jsx",
+      "ns": "centerDashboard",
+      "key": "addCourseForm.selectLecturer",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/CenterDashboard/CenterDashboard.jsx",
+      "ns": "centerDashboard",
+      "key": "addCourseForm.submit",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/CenterDashboard/ContactForm.jsx",
+      "ns": "centerDashboard",
+      "key": "contactForm.categories",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/CenterDashboard/ContactForm.jsx",
+      "ns": "centerDashboard",
+      "key": "contactForm.contentTypes",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/CenterDashboard/ContactForm.jsx",
+      "ns": "centerDashboard",
+      "key": "contactForm.grades",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/CenterDashboard/CourseCard.jsx",
+      "ns": "centerDashboard",
+      "key": "courseCard.unknownSubject",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/CenterDashboard/CourseCard.jsx",
+      "ns": "centerDashboard",
+      "key": "courseCard.unknownSubject",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/CenterDashboard/CourseCard.jsx",
+      "ns": "centerDashboard",
+      "key": "courseCard.unknownGroup",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/CenterDashboard/CourseCard.jsx",
+      "ns": "centerDashboard",
+      "key": "courseCard.errors.invalidLessonId",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/CenterDashboard/CourseCard.jsx",
+      "ns": "centerDashboard",
+      "key": "courseCard.errors.fetchLessonFailed",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/CenterDashboard/CourseCard.jsx",
+      "ns": "centerDashboard",
+      "key": "courseCard.unknownLecturer",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/CenterDashboard/CourseFilters.jsx",
+      "ns": "centerDashboard",
+      "key": "subjects",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/CourseDetails.jsx",
+      "ns": "courseDetails",
+      "key": "actions.collapse",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/CourseDetails.jsx",
+      "ns": "courseDetails",
+      "key": "actions.expand",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/KalimaStore/AdminPanel/AdminPanel.jsx",
+      "ns": "kalimaStore-admin",
+      "key": "validation.invalidSubSectionSelected",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/KalimaStore/AdminPanel/ExportSection.jsx",
+      "ns": "kalimaStore-admin",
+      "key": "export.allProducts",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/KalimaStore/AdminPanel/ExportSection.jsx",
+      "ns": "kalimaStore-admin",
+      "key": "export.booksOnly",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/KalimaStore/AdminPanel/ExportSection.jsx",
+      "ns": "kalimaStore-admin",
+      "key": "export.sections",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/KalimaStore/AdminPanel/ExportSection.jsx",
+      "ns": "kalimaStore-admin",
+      "key": "export.allProducts",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/KalimaStore/AdminPanel/ExportSection.jsx",
+      "ns": "kalimaStore-admin",
+      "key": "export.booksOnly",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/KalimaStore/AdminPanel/ExportSection.jsx",
+      "ns": "kalimaStore-admin",
+      "key": "export.sections",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/KalimaStore/AdminPanel/Orders.jsx",
+      "ns": "kalimaStore-orders",
+      "key": "filters.selectDate",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/KalimaStore/AdminPanel/Orders.jsx",
+      "ns": "kalimaStore-orders",
+      "key": "clearFilters",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/KalimaStore/AdminPanel/Orders.jsx",
+      "ns": "kalimaStore-orders",
+      "key": "activeFilters",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/KalimaStore/AdminPanel/Orders.jsx",
+      "ns": "kalimaStore-orders",
+      "key": "table.couponCode",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/KalimaStore/AdminPanel/Orders.jsx",
+      "ns": "kalimaStore-orders",
+      "key": "table.couponCode",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/KalimaStore/AdminPanel/SubSectionsManagement.jsx",
+      "ns": "kalimaStore-admin",
+      "key": "unknownSection",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/KalimaStore/AdminPanel/SubSectionsManagement.jsx",
+      "ns": "kalimaStore-admin",
+      "key": "allSections",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/KalimaStore/AdminPanel/SubSectionsManagement.jsx",
+      "ns": "kalimaStore-admin",
+      "key": "subSectionsManagement.table.createdAt",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/KalimaStore/Components/PaymentSection.jsx",
+      "ns": "kalimaStore-ProductDetails",
+      "key": "errors.copyFailed",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/KalimaStore/Components/PurchaseForm.jsx",
+      "ns": "kalimaStore-ProductDetails",
+      "key": "purchaseForm.price",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/KalimaStore/Components/PurchaseForm.jsx",
+      "ns": "kalimaStore-ProductDetails",
+      "key": "purchaseForm.couponDiscount",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/KalimaStore/Market.jsx",
+      "ns": "kalimaStore-Market",
+      "key": "allSubSections",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/KalimaStore/Market.jsx",
+      "ns": "kalimaStore-Market",
+      "key": "product.new",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/KalimaStore/storeAnalytics.jsx",
+      "ns": "kalimaStore-analytics",
+      "key": "dailyStats",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/Lecturer Dashboard/InstructorsList.jsx",
+      "ns": "lecturerDashboard",
+      "key": "Failed to create assistant",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/Lecturer Dashboard/InstructorsList.jsx",
+      "ns": "lecturerDashboard",
+      "key": "Failed to delete assistant",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/Lecturer Dashboard/InstructorsList.jsx",
+      "ns": "lecturerDashboard",
+      "key": "Failed to update assistant",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/Lecturer Dashboard/LecturerDashboard.jsx",
+      "ns": "lecturerDashboard",
+      "key": "top_categories",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/Lecturer Dashboard/LecturerDashboard.jsx",
+      "ns": "lecturerDashboard",
+      "key": "most_popular",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/Lecturer Dashboard/LecturerDashboard.jsx",
+      "ns": "lecturerDashboard",
+      "key": "featured_courses",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/Lecturer Dashboard/LecturerDashboard.jsx",
+      "ns": "lecturerDashboard",
+      "key": "view_all",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/lectures.jsx",
+      "ns": "lectures",
+      "key": "errors.loginRequired",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/lectures.jsx",
+      "ns": "lectures",
+      "key": "errors.lectureNotFound",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/lectures.jsx",
+      "ns": "lectures",
+      "key": "errors.insufficientPoints",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/lectures.jsx",
+      "ns": "lectures",
+      "key": "purchase.success",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/lectures.jsx",
+      "ns": "lectures",
+      "key": "purchase.failed",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/lectures.jsx",
+      "ns": "lectures",
+      "key": "purchase.failed",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/Login/login.jsx",
+      "ns": "login",
+      "key": "errors.fetchUserDataError",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/Login/ResetPasswordPage.jsx",
+      "ns": "login",
+      "key": "resetPassword",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/Login/VerifyOTP.jsx",
+      "ns": "login",
+      "key": "verifying",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/Packages Page/packageDetails.jsx",
+      "ns": "packages",
+      "key": "purchaseModal.insufficientPoints",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/Packages Page/packagesPage.jsx",
+      "ns": "packages",
+      "key": "purchaseModal.insufficientPoints",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/Services/WelcomeSection.jsx",
+      "ns": "home",
+      "key": "welcome.kalima",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/Settings/PersonalInfoSection.jsx",
+      "ns": "settings",
+      "key": "personalInfo",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/Settings/SecuritySection.jsx",
+      "ns": "common",
+      "key": "security.errors.mismatch",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/Settings/SecuritySection.jsx",
+      "ns": "common",
+      "key": "security.errors.length",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/Settings/SecuritySection.jsx",
+      "ns": "common",
+      "key": "security.errors.general",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/Settings/SecuritySection.jsx",
+      "ns": "common",
+      "key": "security.title",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/Settings/SecuritySection.jsx",
+      "ns": "common",
+      "key": "security.changePassword",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/Settings/SecuritySection.jsx",
+      "ns": "common",
+      "key": "security.success",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/Settings/SecuritySection.jsx",
+      "ns": "common",
+      "key": "security.labels.currentPassword",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/Settings/SecuritySection.jsx",
+      "ns": "common",
+      "key": "security.placeholders.currentPassword",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/Settings/SecuritySection.jsx",
+      "ns": "common",
+      "key": "security.hidePassword",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/Settings/SecuritySection.jsx",
+      "ns": "common",
+      "key": "security.showPassword",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/Settings/SecuritySection.jsx",
+      "ns": "common",
+      "key": "security.labels.newPassword",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/Settings/SecuritySection.jsx",
+      "ns": "common",
+      "key": "security.placeholders.newPassword",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/Settings/SecuritySection.jsx",
+      "ns": "common",
+      "key": "security.labels.confirmPassword",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/Settings/SecuritySection.jsx",
+      "ns": "common",
+      "key": "security.placeholders.confirmPassword",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/Settings/SecuritySection.jsx",
+      "ns": "common",
+      "key": "security.passwordRequirement",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/Settings/SecuritySection.jsx",
+      "ns": "common",
+      "key": "security.updateButton",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/Settings/SecuritySection.jsx",
+      "ns": "common",
+      "key": "dir",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/teacher details/Teacher-details.jsx",
+      "ns": "teacherDetails",
+      "key": "error.invalid_user_id",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/teacher details/Teacher-details.jsx",
+      "ns": "teacherDetails",
+      "key": "defaultSubject",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/teacher details/Teacher-details.jsx",
+      "ns": "teacherDetails",
+      "key": "noCoursesAvailable",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/Teachers.jsx",
+      "ns": "teachers",
+      "key": "filters.all",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/Teachers.jsx",
+      "ns": "teachers",
+      "key": "filters.all",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/Teachers.jsx",
+      "ns": "teachers",
+      "key": "filters.select",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/AddNewStuff.jsx",
+      "ns": "createAdmin",
+      "key": "forms.subject.nameAR",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/auditLog.jsx",
+      "ns": "admin",
+      "key": "admin.auditlog.table.user",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/auditLog.jsx",
+      "ns": "admin",
+      "key": "admin.auditlog.table.email",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/auditLog.jsx",
+      "ns": "admin",
+      "key": "admin.auditlog.table.action",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/auditLog.jsx",
+      "ns": "admin",
+      "key": "admin.auditlog.table.timestamp",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/auditLog.jsx",
+      "ns": "admin",
+      "key": "admin.auditlog.table.role",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/auditLog.jsx",
+      "ns": "admin",
+      "key": "admin.auditlog.table.resource",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/auditLog.jsx",
+      "ns": "admin",
+      "key": "admin.auditlog.table.status",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/CreateUserModal/CreateUserModal.jsx",
+      "ns": "createUser",
+      "key": "validation.subjectRequired",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/CreateUserModal/CreateUserModal.jsx",
+      "ns": "createUser",
+      "key": "validation.teachesAtTypeRequired",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/CreateUserModal/CreateUserModal.jsx",
+      "ns": "createUser",
+      "key": "validation.centersRequired",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/CreateUserModal/CreateUserModal.jsx",
+      "ns": "createUser",
+      "key": "validation.schoolRequired",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/CreateUserModal/CreateUserModal.jsx",
+      "ns": "createUser",
+      "key": "validation.governmentRequired",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/CreateUserModal/CreateUserModal.jsx",
+      "ns": "createUser",
+      "key": "validation.administrationZoneRequired",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
+      "ns": "admin",
+      "key": "admin.editUser.emailPlaceholder",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/home/PromoCodesGenerator.jsx",
+      "ns": "admin",
+      "key": "admin.errors.qrCodeGenerationFailed",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/home/PromoCodesGenerator.jsx",
+      "ns": "admin",
+      "key": "admin.download",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/home/PromoCodesTable.jsx",
+      "ns": "admin",
+      "key": "errors.invalidResponse",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/home/PromoCodesTable.jsx",
+      "ns": "admin",
+      "key": "errors.failedToFetchStudents",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/home/PromoCodesTable.jsx",
+      "ns": "admin",
+      "key": "errors.deleteFailed",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/home/PromoCodesTable.jsx",
+      "ns": "admin",
+      "key": "errors.unexpectedError",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/home/PromoCodesTable.jsx",
+      "ns": "admin",
+      "key": "errors.bulkDeleteFailed",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/home/PromoCodesTable.jsx",
+      "ns": "admin",
+      "key": "errors.unexpectedError",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/home/PromoCodesTable.jsx",
+      "ns": "admin",
+      "key": "modals.confirmBulkDelete",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/home/PromoCodesTable.jsx",
+      "ns": "admin",
+      "key": "modals.bulkDeleteConfirm",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.noPhoneNumber",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.name",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.email",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.phone",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.role",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.status",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.government",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.administrationZone",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.sequenceId",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.joinedDate",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.successAll",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.successFiltered",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.error",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.successAll",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.successFiltered",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.error",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.exportAll",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.exportAll",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.filterInfo",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.of",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.usersShown",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.noUsers",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.noUsersFiltered",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.noUsersYet",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Lecture Page/ContainerPage.jsx",
+      "ns": "lecturesPage",
+      "key": "containersPage.unknown",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Lecture Page/DetailedLectureViewing.jsx",
+      "ns": "lectureDisplay",
+      "key": "fileName",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Lecture Page/DetailedLectureViewing.jsx",
+      "ns": "lectureDisplay",
+      "key": "rating",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Lecture Page/DetailedLectureViewing.jsx",
+      "ns": "lectureDisplay",
+      "key": "comment",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Lecture Page/DetailedLectureViewing.jsx",
+      "ns": "lectureDisplay",
+      "key": "provideFeedback",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Lecture Page/DetailedLectureViewing.jsx",
+      "ns": "lectureDisplay",
+      "key": "rating",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Lecture Page/DetailedLectureViewing.jsx",
+      "ns": "lectureDisplay",
+      "key": "comment",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Lecture Page/DetailedLectureViewing.jsx",
+      "ns": "lectureDisplay",
+      "key": "enterYourFeedback",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Lecture Page/DetailedLectureViewing.jsx",
+      "ns": "lectureDisplay",
+      "key": "submitFeedback",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Lecture Page/LectureDisplay.jsx",
+      "ns": "lectureDisplay",
+      "key": "exitWarningMessage",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Lecture Page/LectureDisplay.jsx",
+      "ns": "lectureDisplay",
+      "key": "retry",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Lecture Page/LectureDisplay.jsx",
+      "ns": "lectureDisplay",
+      "key": "homeworkRequiredFirst",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Lecture Page/LectureDisplay.jsx",
+      "ns": "lectureDisplay",
+      "key": "homeworkRequiredDescription",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Lecture Page/LectureDisplay.jsx",
+      "ns": "lectureDisplay",
+      "key": "homeworkInfo",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Lecture Page/LectureDisplay.jsx",
+      "ns": "lectureDisplay",
+      "key": "startHomework",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Lecture Page/LectureDisplay.jsx",
+      "ns": "lectureDisplay",
+      "key": "afterCompletingHomework",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Lecture Page/LectureDisplay.jsx",
+      "ns": "lectureDisplay",
+      "key": "exitWarningMessage",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Lecture Page/LectureDisplay.jsx",
+      "ns": "lectureDisplay",
+      "key": "exitWarningTitle",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Lecture Page/LectureDisplay.jsx",
+      "ns": "lectureDisplay",
+      "key": "exitWarningMessage",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Lecture Page/LectureDisplay.jsx",
+      "ns": "lectureDisplay",
+      "key": "stayOnPage",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Lecture Page/LectureDisplay.jsx",
+      "ns": "lectureDisplay",
+      "key": "leavePage",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/Lecture Page/LecturesPage.jsx",
+      "ns": "lecturesPage",
+      "key": "lecturesPage.messages.lectureCreatedSuccessfully",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/promoCodes.jsx",
+      "ns": "promoCodes",
+      "key": "redeem.errors.childSelected",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/promoCodes.jsx",
+      "ns": "promoCodes",
+      "key": "addChild.errors.emptyId",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/promoCodes.jsx",
+      "ns": "promoCodes",
+      "key": "addChild.success",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/promoCodes.jsx",
+      "ns": "promoCodes",
+      "key": "addChild.errors.generic",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/promoCodes.jsx",
+      "ns": "promoCodes",
+      "key": "addChild.errors.generic",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/promoCodes.jsx",
+      "ns": "promoCodes",
+      "key": "copySuccess",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/promoCodes.jsx",
+      "ns": "promoCodes",
+      "key": "table.dateTooltip",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/promoCodes.jsx",
+      "ns": "promoCodes",
+      "key": "table.typeTooltip",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/promoCodes.jsx",
+      "ns": "promoCodes",
+      "key": "table.amountTooltip",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/promoCodes.jsx",
+      "ns": "promoCodes",
+      "key": "table.teacherTooltip",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/promoCodes.jsx",
+      "ns": "promoCodes",
+      "key": "noDescription",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/promoCodes.jsx",
+      "ns": "promoCodes",
+      "key": "exams.passed",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/promoCodes.jsx",
+      "ns": "promoCodes",
+      "key": "exams.failed",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/promoCodes.jsx",
+      "ns": "promoCodes",
+      "key": "noDescription",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/promoCodes.jsx",
+      "ns": "promoCodes",
+      "key": "exams.score",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/promoCodes.jsx",
+      "ns": "promoCodes",
+      "key": "exams.passingThreshold",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/promoCodes.jsx",
+      "ns": "promoCodes",
+      "key": "exams.passedMessage",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/promoCodes.jsx",
+      "ns": "promoCodes",
+      "key": "exams.failedMessage",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/promoCodes.jsx",
+      "ns": "promoCodes",
+      "key": "exams.noExams",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/promoCodes.jsx",
+      "ns": "promoCodes",
+      "key": "exams.noExamsDescription",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/promoCodes.jsx",
+      "ns": "promoCodes",
+      "key": "children.title",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/promoCodes.jsx",
+      "ns": "promoCodes",
+      "key": "children.yourAccount",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/promoCodes.jsx",
+      "ns": "promoCodes",
+      "key": "children.noChildren",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/promoCodes.jsx",
+      "ns": "promoCodes",
+      "key": "children.noChildrenDescription",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/promoCodes.jsx",
+      "ns": "promoCodes",
+      "key": "profile.userSerial",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/promoCodes.jsx",
+      "ns": "promoCodes",
+      "key": "profile.userSerial",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/promoCodes.jsx",
+      "ns": "promoCodes",
+      "key": "addChild.title",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/promoCodes.jsx",
+      "ns": "promoCodes",
+      "key": "addChild.label",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/promoCodes.jsx",
+      "ns": "promoCodes",
+      "key": "addChild.placeholder",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/promoCodes.jsx",
+      "ns": "promoCodes",
+      "key": "addChild.button",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/promoCodes.jsx",
+      "ns": "promoCodes",
+      "key": "children.actionsDisabled",
+      "fn": "t"
+    },
+    {
+      "file": "src/pages/User Dashboard/promoCodes.jsx",
+      "ns": "promoCodes",
+      "key": "exams.title",
+      "fn": "t"
+    }
+  ]
+}

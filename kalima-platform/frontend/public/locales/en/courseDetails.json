@@ -87,6 +87,10 @@
       "courseObjectives": "Course Objectives",
       "courseContents": "Course Contents"
     },
+    "actions": {
+      "show": "Show",
+      "hide": "Hide"
+    },
     "errors": {
       "fetchError": "Failed to fetch course data",
       "unexpected": "An unexpected error occurred",

@@ -6,7 +6,7 @@ import WaveBackground from './WaveBackground';
 
 const ResetPassword = () => {
   const { t, i18n } = useTranslation("login");
-  const isRTL = i18n.language === 'ar';
+  const isRTL = i18n.dir() === "rtl";
   const navigate = useNavigate();
   const location = useLocation();
   const { email, resetToken } = location.state || {};

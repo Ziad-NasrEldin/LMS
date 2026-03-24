@@ -6,7 +6,7 @@ import WaveBackground from './WaveBackground';
 
 const VerifyOtp = () => {
   const { t, i18n } = useTranslation("login");
-  const isRTL = i18n.language === 'ar';
+  const isRTL = i18n.dir() === "rtl";
   const location = useLocation();
   const navigate = useNavigate();
   const email = location.state?.email || '';

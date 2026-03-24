@@ -44,7 +44,9 @@
     "courseList": {
      "title": "Lectures Schedule",
       "addLecture": "Add Lecture",
+      "addCourse": "Add Course",
       "noLessons": "No lessons found",
+      "noCourses": "No courses found",
       "filters": {
         "allLevels": "All Levels",
         "allLecturers": "All Lecturers"
@@ -137,6 +139,9 @@
     },
     "addCourseForm": {
       "title": "Add New Course",
+      "courseName": "Course Name",
+      "selectLecturer": "Select Lecturer",
+      "submit": "Create Course",
       "labels": {
         "subject": "Subject",
         "lecturer": "Lecturer",
@@ -162,6 +167,11 @@
         "courseNameRequired": "Course name is required",
         "lecturerRequired": "Please select a lecturer"
       }
+    },
+    "reportsSection": {
+      "title": "Reports",
+      "generateReport": "Generate Report",
+      "noReports": "No reports available"
     },
     "errors": {
       "fetchCentersFailed": "Failed to load centers",

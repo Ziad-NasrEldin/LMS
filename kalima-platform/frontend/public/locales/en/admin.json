@@ -85,7 +85,23 @@
         "exporting": "Exporting...",
         "csvFormat": "CSV Format",
         "jsonFormat": "JSON Format",
-        "exportFiltered": "Export Filtered"
+        "exportFiltered": "Export Filtered",
+        "exportAll": "Export All",
+        "successAll": "Successfully exported {{count}} users",
+        "successFiltered": "Successfully exported {{count}} filtered users",
+        "error": "Failed to export users. Please try again.",
+        "filterInfo": "Filters applied:",
+        "of": "of",
+        "usersShown": "users shown",
+        "name": "Name",
+        "email": "Email",
+        "phone": "Phone Number",
+        "role": "Role",
+        "status": "Status",
+        "government": "Government",
+        "administrationZone": "Administration Zone",
+        "sequenceId": "Sequence ID",
+        "joinedDate": "Joined Date"
       },
       "errors": {
         "fetchLecturers": "Failed to fetch lecturers",
@@ -189,6 +205,10 @@
       "of": "of"
     },
     "confirmDelete": "Are you sure you want to delete this user?",
+    "noPhoneNumber": "No phone number available",
+    "noUsers": "No users found",
+    "noUsersFiltered": "No users match your current filters. Try adjusting your search criteria.",
+    "noUsersYet": "No users have registered yet. Check back later.",
     "NA": "N/A",
 
     "auditlog": {

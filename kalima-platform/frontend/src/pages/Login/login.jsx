@@ -15,6 +15,11 @@ const TeacherLogin = () => {
   const location = useLocation();
   const { t, i18n } = useTranslation("login");
   const isRTL = i18n.dir() === "rtl";
+  const tr = (key, arFallback, enFallback) => {
+    const translated = t(key);
+    if (translated && translated !== key) return translated;
+    return isRTL ? arFallback : enFallback;
+  };
   const [activeTab, setActiveTab] = useState("email_tab");
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
@@ -121,7 +126,7 @@ const TeacherLogin = () => {
       viewBox="0 0 900 520"
       className="h-72 w-full"
       role="img"
-      aria-label={t("loginHeroImageAlt", "Learning journey with connected ideas and growth")}
+      aria-label={tr("loginHeroImageAlt", "طلاب يتعلمون معًا", "Learning journey with connected ideas and growth")}
       preserveAspectRatio="xMidYMid slice"
     >
       <defs>
@@ -253,13 +258,14 @@ const TeacherLogin = () => {
 
             <div className="relative z-10">
               <h1 className="text-4xl font-extrabold leading-tight" style={{ color: TOKENS.inkText }}>
-                {t("loginHeroTitle", "Grow Your Mind")}
+                {tr("loginHeroTitle", "نمِّ قدراتك", "Grow Your Mind")}
                 <br />
-                <span style={{ color: TOKENS.deepTeal }}>{t("loginHeroTitle2", "with Fekra")}</span>
+                <span style={{ color: TOKENS.deepTeal }}>{tr("loginHeroTitle2", "مع فكرة", "with Fekra")}</span>
               </h1>
               <p className="mt-4 max-w-md text-base" style={{ color: TOKENS.slateText }}>
-                {t(
+                {tr(
                   "loginHeroSub",
+                  "طريق ممتع لتعلّم المهارات الجديدة للطلاب والمعلمين وأولياء الأمور.",
                   "The playful path to mastering new skills for students, teachers, and parents.",
                 )}
               </p>
@@ -270,10 +276,10 @@ const TeacherLogin = () => {
             <div className="w-full max-w-md space-y-5">
               <div className="space-y-1">
                 <h2 className="text-3xl font-extrabold sm:text-4xl" style={{ color: TOKENS.inkText }}>
-                  {t("welcomeBack", "Welcome Back!")}
+                  {tr("welcomeBack", "مرحبًا بعودتك!", "Welcome Back!")}
                 </h2>
                 <p style={{ color: TOKENS.slateText }}>
-                  {t("welcomeSubtitle", "Ready to continue your learning journey?")}
+                  {tr("welcomeSubtitle", "جاهز لمواصلة رحلتك التعليمية؟", "Ready to continue your learning journey?")}
                 </p>
               </div>
 
@@ -457,10 +463,14 @@ const TeacherLogin = () => {
               >
                 <p className="inline-flex items-center gap-2 font-semibold" style={{ color: TOKENS.deepTeal }}>
                   <Sparkles className="h-4 w-4" />
-                  {t("tipTitle", "Daily Learning Tip")}
+                  {tr("tipTitle", "نصيحة اليوم", "Daily Learning Tip")}
                 </p>
                 <p className="mt-1">
-                  {t("tipBody", "Log in daily to keep your streak and unlock growth badges faster.")}
+                  {tr(
+                    "tipBody",
+                    "سجّل دخولك يوميًا للحفاظ على سلسلة الإنجاز وفتح الشارات بشكل أسرع.",
+                    "Log in daily to keep your streak and unlock growth badges faster.",
+                  )}
                 </p>
               </div>
             </div>
