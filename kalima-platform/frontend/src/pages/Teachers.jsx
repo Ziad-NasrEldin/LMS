@@ -36,10 +36,10 @@ export default function Teachers() {
     fetchTeachers();
   }, []);
 
-  useEffect(() => {
-    // Desktop starts expanded, mobile starts collapsed.
-    setShowFilters(window.matchMedia("(min-width: 1024px)").matches);
-  }, []);
+  // useEffect(() => {
+  //   // Desktop starts expanded, mobile starts collapsed.
+  //   setShowFilters(window.matchMedia("(min-width: 1024px)").matches);
+  // }, []);
 
   const fetchTeachers = async () => {
     setLoading(true);

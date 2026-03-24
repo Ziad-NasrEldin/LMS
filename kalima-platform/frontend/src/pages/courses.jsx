@@ -88,10 +88,10 @@ export default function CoursesPage() {
     fetchContainers()
   }, [currentPage])
 
-  useEffect(() => {
-    // Keep filters open on desktop and collapsed by default on smaller screens.
-    setShowFilters(window.matchMedia("(min-width: 1024px)").matches)
-  }, [])
+  // useEffect(() => {
+  //   // Keep filters open on desktop and collapsed by default on smaller screens.
+  //   setShowFilters(window.matchMedia("(min-width: 1024px)").matches)
+  // }, [])
 
   const fetchContainers = async () => {
   setLoading(true);

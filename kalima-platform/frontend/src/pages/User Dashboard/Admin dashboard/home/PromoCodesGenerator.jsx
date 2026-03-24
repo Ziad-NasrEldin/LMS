@@ -12,6 +12,8 @@ const PromoCodeGenerator = () => {
   const { t, i18n } = useTranslation("admin")
   const isRTL = i18n.language === "ar"
   const dir = isRTL ? "rtl" : "ltr"
+  const iconInlineGap = isRTL ? "ml-1" : "mr-1"
+  const spinnerInlineGap = isRTL ? "ml-2" : "mr-2"
 
   const TOKENS = designTokens.colors;
   const SHADOWS = designTokens.shadows;
@@ -382,8 +384,8 @@ const PromoCodeGenerator = () => {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="mb-6">
-        <div className="grid grid-cols-1 xl:grid-cols-12 gap-4 mb-4">
+      <form onSubmit={handleSubmit} className="mb-8">
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-3 md:gap-4 mb-4">
           <div className="form-control xl:col-span-3 rounded-2xl border p-3 bg-white/70" style={{ borderColor: "rgba(17,24,39,0.08)" }}>
             <label className="label pt-0 pb-1">
               <span className="label-text font-medium">{t("admin.form.pointsAmount")}</span>
@@ -399,7 +401,7 @@ const PromoCodeGenerator = () => {
               disabled={formData.type === "promo"}
               required={formData.type !== "promo"}
             />
-            <span className="text-xs opacity-70 mt-2">
+            <span className="text-xs opacity-70 mt-2 leading-5">
               {isRTL ? "قيمة رقمية أكبر من 0" : "Numeric value greater than 0"}
             </span>
           </div>
@@ -419,7 +421,7 @@ const PromoCodeGenerator = () => {
               inputMode="numeric"
               required
             />
-            <span className="text-xs opacity-70 mt-2">
+            <span className="text-xs opacity-70 mt-2 leading-5">
               {isRTL ? "من 1 إلى 100" : "From 1 to 100"}
             </span>
           </div>
@@ -482,7 +484,7 @@ const PromoCodeGenerator = () => {
               <label className="label pt-0">
                 <span className="label-text font-medium">{t("admin.form.qrCodeSize")}</span>
               </label>
-              <div className="flex items-center gap-4 max-w-md">
+              <div className="flex items-center gap-3 w-full max-w-md">
                 <input
                   type="range"
                   min="64"
@@ -492,7 +494,7 @@ const PromoCodeGenerator = () => {
                   onChange={handleQrSizeChange}
                   className="range range-primary"
                 />
-                <span className="font-semibold min-w-[58px]">{qrCodeSize}px</span>
+                <span className="font-semibold min-w-[58px] text-sm">{qrCodeSize}px</span>
               </div>
             </div>
           )}
@@ -502,7 +504,7 @@ const PromoCodeGenerator = () => {
           <button type="submit" className="btn border-none text-white w-full sm:w-auto min-w-[180px] px-8 rounded-full" style={{ background: designTokens.gradients.cta, boxShadow: "0 4px 14px rgba(77, 179, 194, 0.4)" }} disabled={loading}>
             {loading ? (
               <>
-                <span className="loading loading-spinner text-white w-5 h-5 mr-2"></span>
+                <span className={`loading loading-spinner text-white w-5 h-5 ${spinnerInlineGap}`}></span>
                 {t("admin.generating")}
               </>
             ) : (
@@ -514,16 +516,16 @@ const PromoCodeGenerator = () => {
 
       {generatedCodes.length > 0 && (
         <div className="mt-6">
-          <div className="flex justify-between items-center mb-3">
+          <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center mb-3">
             <h3 className="text-lg font-bold">{t("admin.generatedCodes")}</h3>
             {generateQrCodes && qrCodeUrls.length > 0 && (
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
                 <button type="button" className="btn btn-sm btn-outline" onClick={printQRCodes}>
-                  <Printer className="w-4 h-4 mr-1" />
+                  <Printer className={`w-4 h-4 ${iconInlineGap}`} />
                   {t("admin.printQrCodes")}
                 </button>
                 <button type="button" className="btn btn-sm btn-outline" onClick={downloadAllQRCodes}>
-                  <Download className="w-4 h-4 mr-1" />
+                  <Download className={`w-4 h-4 ${iconInlineGap}`} />
                   {t("admin.downloadAllQrCodes")}
                 </button>
               </div>

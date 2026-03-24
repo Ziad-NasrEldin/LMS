@@ -113,30 +113,7 @@ function App() {
             isRTL={isRTL}
           />
 
-          {/* Unified Toggle Button for all devices */}
-          <button
-            id="sidebar-toggle"
-            className={`fixed top-20 ${
-              isRTL ? "right-0" : "left-0"
-            } z-40 bg-primary text-base-content p-2 ${
-              isRTL ? "rounded-r-md" : "rounded-l-md"
-            } shadow-md transition-transform duration-300 ease-in-out ${
-              sidebarOpen ? "md:block" : "block"
-            }`}
-            style={{
-              transform: sidebarOpen
-                ? `translateX(${isRTL ? "-13rem" : "13rem"})`
-                : "translateX(0)",
-            }}
-            onClick={toggleSidebar}
-            aria-label="Toggle Sidebar"
-          >
-            {sidebarOpen ? (
-              <FaChevronRight className={`w-4 h-4 ${!isRTL && "rotate-180"}`} />
-            ) : (
-              <FaChevronLeft className={`w-4 h-4 ${!isRTL && "rotate-180"}`} />
-            )}
-          </button>
+
         </>
       )}
       <div
