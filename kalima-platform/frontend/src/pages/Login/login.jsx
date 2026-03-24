@@ -159,9 +159,7 @@ const TeacherLogin = () => {
 
             <div className="relative z-10 my-6 overflow-hidden rounded-[1.75rem] border-8 border-base-100 shadow-xl">
               <img
-                src="/man-working.jpg"
-                alt="Learning"
-                className="h-72 w-full object-cover"
+                  src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1471&q=80"
               />
             </div>
 

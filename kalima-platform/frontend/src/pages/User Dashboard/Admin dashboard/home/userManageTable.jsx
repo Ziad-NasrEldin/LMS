@@ -86,8 +86,9 @@ const UserManagementTable = () => {
       setLoading(true)
       const result = await getAllUsers()
       if (result.success) {
-        setUsers(result.data)
-        setFilteredUsers(result.data)
+        const usersData = Array.isArray(result.data) ? result.data : Array.isArray(result.data?.data) ? result.data.data : []
+        setUsers(usersData)
+        setFilteredUsers(usersData)
       } else {
         setError(t("admin.errors.fetchUsers"))
       }

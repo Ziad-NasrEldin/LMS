@@ -20,6 +20,7 @@ const AuditLog = () => {
   // NOTE: keys now match server-side param names
   const [filters, setFilters] = useState({
     user: "",
+    email: "",
     role: "",
     action: "",
     resource_type: "",
@@ -118,14 +119,7 @@ const AuditLog = () => {
   const translateResource = (resource) => translate("resources", (resource || "").toLowerCase())
   const translateRole = (role) => translate("roles", (role || "").toLowerCase())
 
-  useEffect(() => {
-    const fetch = async () => {
-      const params = { page, limit, ...Object.fromEntries(Object.entries(filters).filter(([, v]) => v)) }
-      const res = await getAuditLogs(page, limit, params)
-      if (res.status === "success") setLogs(res.data?.logs || [])
-    }
-    fetch()
-  }, [page, filters, limit])
+  // removed duplicate useEffect
 
   const handleFilterChange = (key, value) => {
     setFilters((prev) => ({ ...prev, [key]: value }))

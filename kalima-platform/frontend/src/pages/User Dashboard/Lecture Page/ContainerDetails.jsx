@@ -79,49 +79,85 @@ const ContainerDetailsPage = () => {
     }
   }
 
-  const handleCreateLecture = async (lectureData, attachmentFile, attachmentType) => {
+  const handleCreateLecture = async (
+    lectureData,
+    _unused,
+    _unused2,
+    thumbnailFile,
+    attachmentFilesByCategory,
+    attachmentLinksByCategory,
+  ) => {
     setCreationLoading(true)
     setCreationError("")
 
     try {
-
-      const response = await createLecture(lectureData)
+      let response
+      if (thumbnailFile) {
+        const formData = new FormData()
+        Object.keys(lectureData).forEach((key) => {
+          if (lectureData[key] !== null && lectureData[key] !== undefined) {
+            formData.append(key, lectureData[key])
+          }
+        })
+        formData.append("thumbnail", thumbnailFile)
+        response = await createLecture(formData)
+      } else {
+        response = await createLecture(lectureData)
+      }
 
       if (response.status !== "success" && response.success !== true) {
         throw new Error(response.message || "Failed to create lecture")
       }
 
-      // Handle attachment after successful lecture creation
-      if (attachmentFile) {
+      // Handle attachments after successful lecture creation
+      let lectureId = null
+      if (response.data && response.data.lecture && response.data.lecture._id) {
+        lectureId = response.data.lecture._id
+      } else if (response.data && response.data._id) {
+        lectureId = response.data._id
+      } else if (response.data && response.data.lecture && response.data.lecture.id) {
+        lectureId = response.data.lecture.id
+      } else if (response.data && response.data.id) {
+        lectureId = response.data.id
+      }
+
+      if (lectureId) {
         try {
-          // Extract the lecture ID correctly from the response
-          let lectureId = null
+          const formData = new FormData()
+          const categories = ["pdfsandimages", "booklets", "homeworks", "exams"]
 
-          // Check different possible locations for the lecture ID
-          if (response.data && response.data.lecture && response.data.lecture._id) {
-            lectureId = response.data.lecture._id
-          } else if (response.data && response.data._id) {
-            lectureId = response.data._id
-          } else if (response.data && response.data.lecture && response.data.lecture.id) {
-            lectureId = response.data.lecture.id
-          } else if (response.data && response.data.id) {
-            lectureId = response.data.id
+          categories.forEach((category) => {
+            if (
+              attachmentFilesByCategory &&
+              attachmentFilesByCategory[category] &&
+              attachmentFilesByCategory[category].length > 0
+            ) {
+              attachmentFilesByCategory[category].forEach((file) => {
+                formData.append(category, file)
+              })
+            }
+          })
+
+          if (attachmentLinksByCategory) {
+            if (attachmentLinksByCategory.homeworks && attachmentLinksByCategory.homeworks.trim() !== "") {
+              formData.append("homeworks", attachmentLinksByCategory.homeworks)
+            }
+            if (attachmentLinksByCategory.exams && attachmentLinksByCategory.exams.trim() !== "") {
+              formData.append("exams", attachmentLinksByCategory.exams)
+            }
           }
 
-          if (!lectureId) {
-            console.error("Could not find lecture ID in response:", response)
-            throw new Error("Failed to extract lecture ID from response")
+          if (
+            formData.has("pdfsandimages") ||
+            formData.has("booklets") ||
+            formData.has("homeworks") ||
+            formData.has("exams")
+          ) {
+            await createLectureAttachment(lectureId, formData, true)
           }
-
-          const attachmentData = {
-            type: attachmentType,
-            attachment: attachmentFile,
-          }
-
-          const attachmentResponse = await createLectureAttachment(lectureId, attachmentData)
         } catch (attachmentError) {
-          console.error("Error uploading attachment:", attachmentError)
-          setCreationError(`Lecture created but failed to upload attachment: ${attachmentError.message}`)
+          console.error("Error uploading attachments:", attachmentError)
+          setCreationError(`Lecture created but failed to upload attachments: ${attachmentError.message}`)
         }
       }
 

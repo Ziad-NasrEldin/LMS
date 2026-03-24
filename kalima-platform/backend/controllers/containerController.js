@@ -519,12 +519,9 @@ exports.getContainerById = catchAsync(async (req, res, next) => {
     return next(new AppError("Invalid container ID format.", 400));
   }
 
-  // Fetch the container with enhanced population
+  // Fetch container metadata first. Children are resolved manually because they can be either
+  // Container docs or Lecture docs.
   const container = await Container.findById(containerId).populate([
-    {
-      path: "children",
-      select: "name type level subject image price description goal",
-    },
     { path: "createdBy", select: "name" },
     { path: "subject", select: "name" },
     { path: "level", select: "name" },
@@ -563,6 +560,36 @@ exports.getContainerById = catchAsync(async (req, res, next) => {
     }
 
     return next(new AppError("Container not found.", 404));
+  }
+
+  // Resolve children from both models while preserving the original children order.
+  const childIds = (container.children || []).map((childId) => childId.toString());
+  let orderedChildren = [];
+
+  if (childIds.length > 0) {
+    const LectureModel = require("../models/LectureModel");
+    const [containerChildren, lectureChildren] = await Promise.all([
+      Container.find({ _id: { $in: childIds } })
+        .select("name type level subject image price description goal")
+        .populate([
+          { path: "subject", select: "name" },
+          { path: "level", select: "name" },
+        ])
+        .lean(),
+      LectureModel.find({ _id: { $in: childIds } })
+        .select("name type level subject price description numberOfViews lecture_type thumbnail")
+        .populate([
+          { path: "subject", select: "name" },
+          { path: "level", select: "name" },
+        ])
+        .lean(),
+    ]);
+
+    const childrenById = new Map();
+    containerChildren.forEach((child) => childrenById.set(child._id.toString(), child));
+    lectureChildren.forEach((child) => childrenById.set(child._id.toString(), child));
+
+    orderedChildren = childIds.map((id) => childrenById.get(id)).filter(Boolean);
   }
 
   // Add image inheritance logic - if no image, check parents
@@ -611,6 +638,8 @@ exports.getContainerById = catchAsync(async (req, res, next) => {
   const responseData = container.toObject
     ? container.toObject()
     : { ...container };
+
+  responseData.children = orderedChildren;
 
   // Add inherited image info to the response if applicable
   if (inheritedImage) {

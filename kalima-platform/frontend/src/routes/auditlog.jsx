@@ -6,7 +6,8 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 export const getAuditLogs = async (page = 1, limit = 10, filters = {}) => {
   try {
-    if (!isLoggedIn()) {
+    const isAuth = await isLoggedIn();
+    if (!isAuth) {
       throw new Error("User not authenticated");
     }
 
@@ -51,7 +52,8 @@ export const getAuditLogs = async (page = 1, limit = 10, filters = {}) => {
 
 export const getAuditLogById = async (logId) => {
   try {
-    if (!isLoggedIn()) {
+    const isAuth = await isLoggedIn();
+    if (!isAuth) {
       throw new Error("User not authenticated");
     }
 
@@ -77,7 +79,8 @@ export const getAuditLogById = async (logId) => {
 
 export const getAuditLogsByEmail = async (email) => {
   try {
-    if (!isLoggedIn()) throw new Error("User not authenticated");
+    const isAuth = await isLoggedIn();
+    if (!isAuth) throw new Error("User not authenticated");
 
     const response = await axios.get(`${API_URL}/audit-logs/user/email/${email}`, {
       withCredentials: true,

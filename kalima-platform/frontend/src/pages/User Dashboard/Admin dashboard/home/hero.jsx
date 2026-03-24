@@ -26,25 +26,25 @@ const Hero = () => {
       if (!lecturerResponse.success) {
         throw new Error("Failed to fetch lecturers");
       }
-      setLecturers(lecturerResponse.data);
+      setLecturers(Array.isArray(lecturerResponse.data) ? lecturerResponse.data : Array.isArray(lecturerResponse.data?.data) ? lecturerResponse.data.data : []);
 
       const assistantResponse = await getAllAssistants();
       if (!assistantResponse.success) {
         throw new Error("Failed to fetch assistants");
       }
-      setAssistants(assistantResponse.data);
+      setAssistants(Array.isArray(assistantResponse.data) ? assistantResponse.data : Array.isArray(assistantResponse.data?.data) ? assistantResponse.data.data : []);
 
       const parentResponse = await getAllParents();
       if (!parentResponse.success) {
         throw new Error("Failed to fetch parents");
       }
-      setParents(parentResponse.data);
+      setParents(Array.isArray(parentResponse.data) ? parentResponse.data : Array.isArray(parentResponse.data?.data) ? parentResponse.data.data : []);
 
       const studentResponse = await getAllStudents();
       if (!studentResponse.success) {
         throw new Error("Failed to fetch students");
       }
-      setStudents(studentResponse.data);
+      setStudents(Array.isArray(studentResponse.data) ? studentResponse.data : Array.isArray(studentResponse.data?.data) ? studentResponse.data.data : []);
       
     } catch (error) {
       console.error("Error fetching user data:", error);

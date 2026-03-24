@@ -514,15 +514,15 @@ export default function StudentRegistration() {
               </p>
 
               <div className="mt-12 w-full max-w-md rounded-[1.75rem] border border-base-300 bg-base-100 p-6 shadow-xl">
-                <p className="text-base font-semibold text-base-content">Interactive Lessons</p>
-                <div className="mt-4 h-3 rounded-full bg-base-200">
-                  <div className="h-full w-3/4 rounded-full bg-primary" />
+                  <p className="text-base font-semibold text-base-content">{t("interactiveLessons", "Interactive Lessons")}</p>
+                  <div className="mt-4 h-3 rounded-full bg-base-200">
+                    <div className="h-full w-3/4 rounded-full bg-primary" />
+                  </div>
+                  <p className="mt-3 text-sm text-base-content/60">{t("progress", "Progress")}</p>
                 </div>
-                <p className="mt-3 text-sm text-base-content/60">Progress</p>
-              </div>
 
-              <div className="relative left-64 -top-10 hidden w-fit rounded-3xl px-6 py-4 text-base font-bold text-info-content shadow-lg xl:block" style={{ background: TOKENS.softCyanTeal }}>
-                Earn badges while you learn!
+                <div className="relative left-64 -top-10 hidden w-fit rounded-3xl px-6 py-4 text-base font-bold text-info-content shadow-lg xl:block" style={{ background: TOKENS.softCyanTeal }}>
+                  {t("earnBadges", "Earn badges while you learn!")}
               </div>
             </div>
           </section>

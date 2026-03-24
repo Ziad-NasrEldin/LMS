@@ -1,66 +1,37 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Globe } from 'lucide-react';
+import { designTokens } from '../constants/designTokens';
 
 const LanguageSwitcher = () => {
   const { i18n } = useTranslation();
-  const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef(null);
 
   useEffect(() => {
     const savedLang = localStorage.getItem('lng') || 'ar';
-    i18n.changeLanguage(savedLang);
-
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsOpen(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    if (i18n.language !== savedLang) {
+      i18n.changeLanguage(savedLang);
+    }
   }, [i18n]);
 
-  const changeLanguage = (lng) => {
-    i18n.changeLanguage(lng);
-    localStorage.setItem('lng', lng);
-    setIsOpen(false);
+  const toggleLanguage = () => {
+    const newLang = i18n.language === 'en' ? 'ar' : 'en';
+    i18n.changeLanguage(newLang);
+    localStorage.setItem('lng', newLang);
   };
 
   return (
-    <div className="relative" ref={dropdownRef}>
-      <button
-        type="button"
-        className="btn btn-ghost gap-2"
-        onClick={() => setIsOpen(!isOpen)}
-      >
-        {i18n.language === 'en' ? 'Language' : 'اللغه'}
-      </button>
-
-      {isOpen && (
-        <ul className="absolute right-0 mt-2 w-52 p-2 shadow bg-base-100 rounded-box menu z-[50]">
-          <li>
-            <button
-              type="button"
-              onClick={() => changeLanguage('en')}
-              className="flex justify-between w-full hover:bg-base-200"
-            >
-              <span>English</span>
-              <span>🇺🇸</span>
-            </button>
-          </li>
-          <li>
-            <button
-              type="button"
-              onClick={() => changeLanguage('ar')}
-              className="flex justify-between w-full hover:bg-base-200"
-            >
-              <span>العربية</span>
-              <span>🇸🇦</span>
-            </button>
-          </li>
-        </ul>
-      )}
-    </div>
+    <button
+      type="button"
+      onClick={toggleLanguage}
+      className="btn btn-ghost btn-sm rounded-full gap-2 px-3 hover:bg-base-200 transition-colors"
+      style={{ color: designTokens.colors.deepTeal }}
+      title={i18n.language === 'en' ? 'Switch to Arabic' : 'التبديل إلى الإنجليزية'}
+    >
+      <Globe className="w-4 h-4" />
+      <span className="font-semibold text-sm">
+        {i18n.language === 'en' ? 'العربية' : 'EN'}
+      </span>
+    </button>
   );
 };
 

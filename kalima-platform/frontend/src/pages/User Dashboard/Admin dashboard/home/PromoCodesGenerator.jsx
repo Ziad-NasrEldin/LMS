@@ -383,45 +383,49 @@ const PromoCodeGenerator = () => {
       )}
 
       <form onSubmit={handleSubmit} className="mb-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-          <div className="form-control">
-            <div className="flex flex-col items-start gap-2">
-              <label className="label">
-                <span className="label-text font-medium">{t("admin.form.pointsAmount")}</span>
-              </label>
-              <input
-                type="number"
-                name="pointsAmount"
-                className="input input-bordered w-full"
-                value={formData.pointsAmount}
-                onChange={handleNumberChange}
-                min="1"
-                disabled={formData.type === "promo"}
-                required={formData.type !== "promo"}
-              />
-            </div>
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-4 mb-4">
+          <div className="form-control xl:col-span-3 rounded-2xl border p-3 bg-white/70" style={{ borderColor: "rgba(17,24,39,0.08)" }}>
+            <label className="label pt-0 pb-1">
+              <span className="label-text font-medium">{t("admin.form.pointsAmount")}</span>
+            </label>
+            <input
+              type="number"
+              name="pointsAmount"
+              className="input input-bordered w-full max-w-[220px]"
+              value={formData.pointsAmount}
+              onChange={handleNumberChange}
+              min="1"
+              inputMode="numeric"
+              disabled={formData.type === "promo"}
+              required={formData.type !== "promo"}
+            />
+            <span className="text-xs opacity-70 mt-2">
+              {isRTL ? "قيمة رقمية أكبر من 0" : "Numeric value greater than 0"}
+            </span>
           </div>
 
-          <div className="form-control">
-            <div className="flex flex-col items-start gap-2">
-              <label className="label">
-                <span className="label-text font-medium">{t("admin.form.numCodes")}</span>
-              </label>
-              <input
-                type="number"
-                name="numOfCodes"
-                className="input input-bordered w-full"
-                value={formData.numOfCodes}
-                onChange={handleNumberChange}
-                min="1"
-                max="100"
-                required
-              />
-            </div>
+          <div className="form-control xl:col-span-3 rounded-2xl border p-3 bg-white/70" style={{ borderColor: "rgba(17,24,39,0.08)" }}>
+            <label className="label pt-0 pb-1">
+              <span className="label-text font-medium">{t("admin.form.numCodes")}</span>
+            </label>
+            <input
+              type="number"
+              name="numOfCodes"
+              className="input input-bordered w-full max-w-[180px]"
+              value={formData.numOfCodes}
+              onChange={handleNumberChange}
+              min="1"
+              max="100"
+              inputMode="numeric"
+              required
+            />
+            <span className="text-xs opacity-70 mt-2">
+              {isRTL ? "من 1 إلى 100" : "From 1 to 100"}
+            </span>
           </div>
 
-          <div className="form-control">
-            <label className="label">
+          <div className="form-control xl:col-span-3 rounded-2xl border p-3 bg-white/70" style={{ borderColor: "rgba(17,24,39,0.08)" }}>
+            <label className="label pt-0 pb-1">
               <span className="label-text font-medium">{t("admin.form.codeType")}</span>
             </label>
             <select
@@ -437,8 +441,8 @@ const PromoCodeGenerator = () => {
             </select>
           </div>
 
-          <div className="form-control">
-            <label className="label">
+          <div className="form-control xl:col-span-3 rounded-2xl border p-3 bg-white/70" style={{ borderColor: "rgba(17,24,39,0.08)" }}>
+            <label className="label pt-0 pb-1">
               <span className="label-text font-medium">{t("admin.form.lecturer")}</span>
             </label>
             <select
@@ -459,8 +463,9 @@ const PromoCodeGenerator = () => {
           </div>
         </div>
 
-        <div className="form-control mb-4">
-          <label className="cursor-pointer label justify-start gap-2">
+        <div className="rounded-2xl border p-4 bg-white/70 mb-4" style={{ borderColor: "rgba(17,24,39,0.08)" }}>
+          <div className="form-control mb-2">
+            <label className="cursor-pointer label justify-start gap-2 py-0">
             <input
               type="checkbox"
               className="checkbox checkbox-primary"
@@ -470,38 +475,41 @@ const PromoCodeGenerator = () => {
             <span className="label-text font-medium">{t("admin.form.generateQrCodes")}</span>
           </label>
           <p className="text-sm text-base-content/70 mt-1">{t("admin.form.qrCodeDescription")}</p>
+          </div>
+
+          {generateQrCodes && (
+            <div className="form-control mt-3">
+              <label className="label pt-0">
+                <span className="label-text font-medium">{t("admin.form.qrCodeSize")}</span>
+              </label>
+              <div className="flex items-center gap-4 max-w-md">
+                <input
+                  type="range"
+                  min="64"
+                  max="256"
+                  step="8"
+                  value={qrCodeSize}
+                  onChange={handleQrSizeChange}
+                  className="range range-primary"
+                />
+                <span className="font-semibold min-w-[58px]">{qrCodeSize}px</span>
+              </div>
+            </div>
+          )}
         </div>
 
-        {generateQrCodes && (
-          <div className="form-control mb-4">
-            <label className="label">
-              <span className="label-text font-medium">{t("admin.form.qrCodeSize")}</span>
-            </label>
-            <div className="flex items-center gap-4">
-              <input
-                type="range"
-                min="64"
-                max="256"
-                step="8"
-                value={qrCodeSize}
-                onChange={handleQrSizeChange}
-                className="range range-primary"
-              />
-              <span>{qrCodeSize}px</span>
-            </div>
-          </div>
-        )}
-
-        <button type="submit" className="btn border-none text-white w-full sm:w-auto px-8 text-lg rounded-full" style={{ background: designTokens.gradients.primary, boxShadow: "0 4px 14px rgba(77, 179, 194, 0.4)" }} disabled={loading}>
-          {loading ? (
-            <>
-              <span className="loading loading-spinner text-white w-5 h-5 mr-2"></span>
-              {t("admin.generating")}
-            </>
-          ) : (
-            t("admin.generateCodes")
-          )}
-        </button>
+        <div className="flex justify-end">
+          <button type="submit" className="btn border-none text-white w-full sm:w-auto min-w-[180px] px-8 rounded-full" style={{ background: designTokens.gradients.cta, boxShadow: "0 4px 14px rgba(77, 179, 194, 0.4)" }} disabled={loading}>
+            {loading ? (
+              <>
+                <span className="loading loading-spinner text-white w-5 h-5 mr-2"></span>
+                {t("admin.generating")}
+              </>
+            ) : (
+              t("admin.generateCodes")
+            )}
+          </button>
+        </div>
       </form>
 
       {generatedCodes.length > 0 && (

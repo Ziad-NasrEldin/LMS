@@ -270,7 +270,8 @@ export const getUserDashboard = async ({ params = {} } = {}) => {
   const finalParams = { ...defaultParams, ...params }
 
   try {
-    if (!isLoggedIn()) {
+    const isAuth = await isLoggedIn()
+    if (!isAuth) {
       return { success: false, error: "Not authenticated" }
     }
 

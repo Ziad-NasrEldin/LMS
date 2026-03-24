@@ -8,7 +8,7 @@ import {
   getUserDashboard,
   logoutUser,
 } from "../routes/auth-services";
-import { Layout, Menu, Sparkles, X } from "lucide-react";
+import { Layout, Menu, X } from "lucide-react";
 
 const NavBar = () => {
   const { t, i18n } = useTranslation("common");
@@ -23,7 +23,8 @@ const NavBar = () => {
   const lastScrollYRef = useRef(0);
   const navigate = useNavigate();
   const fetchUserRole = async () => {
-    if (isLoggedIn()) {
+    const isAuth = await isLoggedIn();
+    if (isAuth) {
       try {
         const result = await getUserDashboard();
         if (result.success) {
@@ -152,7 +153,7 @@ const NavBar = () => {
     { key: "homepage", path: "/" },
     { key: "educationalCourses", path: "/courses" },
     { key: "teachers", path: "/teachers" },
-    { key: "aboutPlatform", path: "/" },
+    
   ];
 
   return (
@@ -230,7 +231,11 @@ const NavBar = () => {
               className="inline-flex items-center gap-2 rounded-full bg-[linear-gradient(135deg,#BFE8EE,#A6DDE7)] px-4 py-2 text-sm font-bold text-[#0E5563] shadow-[0_6px_14px_rgba(14,85,99,0.15)]"
             >
               {t("logoText")}
-              <Sparkles className="h-4 w-4" />
+              <img
+                src="/Kalima.png"
+                alt="Fekra Logo"
+                className="h-4 w-4 shrink-0 scale-[2] object-contain"
+              />
             </Link>
           </div>
         </div>
