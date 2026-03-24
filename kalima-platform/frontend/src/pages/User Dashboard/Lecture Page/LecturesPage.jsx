@@ -576,11 +576,14 @@ const MyLecturesPage = () => {
           ))}
         </div>
 
-        <div className="hidden md:block overflow-x-auto">
+        <div
+          className="hidden md:block overflow-x-auto rounded-2xl border bg-base-100"
+          style={{ borderColor: "rgba(17,24,39,0.08)", boxShadow: SHADOWS.level1 }}
+        >
           <table className="table table-zebra w-full">
             <thead>
               <tr>
-                <th>{t("lecturesPage.tableHeaders.thumbnail")}</th> {/* ✅ new column */}
+                <th className="w-24">{t("lecturesPage.tableHeaders.thumbnail")}</th>
                 <th>{t("lecturesPage.tableHeaders.name")}</th>
                 {(userRole === "Student" || ["Admin", "Subadmin", "Moderator"].includes(userRole)) && (
                   <th>{t("lecturesPage.tableHeaders.lecturer")}</th>
@@ -599,18 +602,24 @@ const MyLecturesPage = () => {
                   <td>
                     {lecture.thumbnail ? (
                       <div className="avatar">
-                        <div className="w-12 h-12 rounded-full overflow-hidden">
+                        <div className="w-12 h-12 rounded-xl overflow-hidden border" style={{ borderColor: "rgba(17,24,39,0.12)" }}>
                           <img
                             src={convertPathToUrl(lecture.thumbnail) || "/placeholder.svg"}
                             alt={lecture.name}
                             className="object-cover w-full h-full"
+                            onError={(e) => {
+                              e.currentTarget.src = "/registration-image.png"
+                            }}
                           />
                         </div>
                       </div>
                     ) : (
                       <div className="avatar placeholder">
-                        <div className="w-12 h-12 rounded-full bg-neutral-focus text-neutral-content flex items-center justify-center">
-                          <span className="text-sm">N/A</span>
+                        <div
+                          className="w-12 h-12 rounded-xl flex items-center justify-center"
+                          style={{ background: TOKENS.lightAquaMist, color: TOKENS.deepTeal }}
+                        >
+                          <span className="text-xs font-bold">IMG</span>
                         </div>
                       </div>
                     )}
@@ -640,7 +649,12 @@ const MyLecturesPage = () => {
                       to={`/dashboard/${userRole === "Student" ? "student" : "lecturer"}-dashboard/${userRole === "Student" ? "lecture-display" : "detailed-lecture-view"
                         }/${lecture.id}`}
                     >
-                      <button className="btn btn-ghost">{t("lecturesPage.buttons.details")}</button>
+                      <button
+                        className="btn btn-sm"
+                        style={{ background: TOKENS.deepTeal, borderColor: TOKENS.deepTeal, color: "#F8FCFF" }}
+                      >
+                        {t("lecturesPage.buttons.details")}
+                      </button>
                     </Link>
                   </td>
                 </tr>

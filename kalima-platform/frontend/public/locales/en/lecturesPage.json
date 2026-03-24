@@ -24,6 +24,7 @@
     },
     "itemsPerPage": "{{count}} per page",
     "tableHeaders": {
+      "thumbnail": "Thumbnail",
       "name": "Name",
       "lecturer": "Lecturer",
       "subject": "Subject",

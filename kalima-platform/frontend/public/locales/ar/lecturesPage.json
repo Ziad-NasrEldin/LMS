@@ -24,6 +24,7 @@
     },
     "itemsPerPage": "{{count}} لكل صفحة",
     "tableHeaders": {
+      "thumbnail": "الصورة",
       "name": "الاسم",
       "lecturer": "المحاضر",
       "subject": "المادة",
