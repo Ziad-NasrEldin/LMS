@@ -472,6 +472,7 @@ const MyLecturesPage = () => {
           <div className="flex flex-col md:flex-row gap-4 flex-1">
             <select
               className="select select-bordered w-full md:w-64"
+              style={{ borderColor: "rgba(17,24,39,0.16)", background: "#FFFFFF" }}
               value={selectedSubjectFilter}
               onChange={(e) => {
                 setSelectedSubjectFilter(e.target.value)
@@ -488,6 +489,7 @@ const MyLecturesPage = () => {
 
             <select
               className="select select-bordered w-full md:w-64"
+              style={{ borderColor: "rgba(17,24,39,0.16)", background: "#FFFFFF" }}
               value={selectedLevelFilter}
               onChange={(e) => {
                 setSelectedLevelFilter(e.target.value)
@@ -503,13 +505,18 @@ const MyLecturesPage = () => {
             </select>
           </div>
           {["Lecturer", "Admin"].includes(userRole) && (
-            <button onClick={() => setShowCreateModal(true)} className="btn btn-primary w-full md:w-auto">
+            <button
+              onClick={() => setShowCreateModal(true)}
+              className="btn"
+              style={{ background: TOKENS.deepTeal, borderColor: TOKENS.deepTeal, color: "#F8FCFF" }}
+            >
               {t("lecturesPage.buttons.createNewLecture")}
             </button>
           )}
 
           <select
             className="select select-bordered w-full md:w-48"
+            style={{ borderColor: "rgba(17,24,39,0.16)", background: "#FFFFFF" }}
             value={itemsPerPage}
             onChange={handleItemsPerPageChange}
           >
