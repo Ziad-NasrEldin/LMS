@@ -164,9 +164,15 @@ exports.verifyExamSubmission = catchAsync(async (req, res, next) => {
 
   // Check if lecture requires either exam or homework
   if (!lecture.requiresExam && !lecture.requiresHomework) {
-    return next(
-      new AppError("This lecture does not require any submissions", 400)
-    );
+    return res.status(200).json({
+      status: "success",
+      data: {
+        exam: null,
+        homework: null,
+        passed: true,
+      },
+      message: "This lecture does not require submissions",
+    });
   }
 
   // Get student identifier (email or ID)

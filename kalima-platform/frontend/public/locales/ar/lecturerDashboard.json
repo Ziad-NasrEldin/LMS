@@ -1,5 +1,11 @@
 {
   "courseManagement": "إدارة الكورسات",
+  "dashboardOverview": "ملخص لوحة التحكم",
+  "dashboardOverviewHint": "ملخص سريع للمقررات والمحاضرات والمساعدين",
+  "myCourses": "المقررات",
+  "studentViews": "إجمالي المشاهدات",
+  "recentActivity": "آخر النشاطات",
+  "noSubject": "بدون مادة",
   "addNewCourse": "إضافة كورس جديد",
   "view": "عرض",
   "delete": "حذف",

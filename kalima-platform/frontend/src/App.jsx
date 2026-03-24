@@ -2,7 +2,6 @@
 
 import { Suspense, lazy, useEffect, useState } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
-import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import NavBar from "./components/navbar";
 import { LoadingSpinner } from "./components/LoadingSpinner";
 import { isMobile } from "./utils/isMobile";
@@ -12,6 +11,7 @@ import { useTranslation } from "react-i18next";
 // Lazy load components
 const AuditLog = lazy(() => import("./pages/User Dashboard/Admin dashboard/auditLog"))
 const AdminDashboard = lazy(() => import("./pages/User Dashboard/Admin dashboard/home/adminDashboard"))
+const FinancialDashboard = lazy(() => import("./pages/User Dashboard/Admin dashboard/home/FinancialDashboard"))
 const CourseDetails = lazy(() => import("./pages/CourseDetails"))
 const LecturesPage = lazy(() => import("./pages/lectures"))
 const TeacherLogin = lazy(() => import("./pages/Login/login"))
@@ -100,11 +100,7 @@ function App() {
 
   return (
     <div className={`App ${isRTL ? "rtl" : "ltr"}`}>
-      <NavBar
-        showSidebarToggle={showSidebar}
-        onSidebarToggle={toggleSidebar}
-        isSidebarOpen={sidebarOpen}
-      />
+      <NavBar />
       {!isAuthRoute && showSidebar && (
         <>
           <UnifiedSidebar
@@ -222,6 +218,10 @@ function App() {
             <Route
               path="/dashboard/admin-dashboard/signed-lecturers"
               element={<SignedLecturers />}
+            />
+            <Route
+              path="/dashboard/admin-dashboard/financial-dashboard"
+              element={<FinancialDashboard />}
             />
             <Route
               path="/dashboard/admin-dashboard/store-analytics"

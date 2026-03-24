@@ -343,11 +343,18 @@ const LectureDisplay = () => {
     try {
       setExamVerificationLoading(true);
 
-      // Step 1: Check all submissions (exam and homework)
-      const verificationResult = await verifyExamSubmission(lectureId);
-
-      // Step 2: Check lecture access requirements
+      // Step 1: Check lecture access requirements first.
       const accessResult = await checkLectureAccess(lectureId);
+
+      let verificationResult = { data: {} };
+      const requiresVerification =
+        accessResult?.status === "restricted" &&
+        (accessResult.data?.exam?.required || accessResult.data?.homework?.required);
+
+      // Step 2: Only verify submissions when there is an actual requirement.
+      if (requiresVerification) {
+        verificationResult = await verifyExamSubmission(lectureId);
+      }
 
       if (accessResult.status === "restricted") {
         // Handle exam requirements
@@ -438,6 +445,7 @@ const LectureDisplay = () => {
         }
 
         try {
+          setError(null);
           
           
           let apiLectureId = lectureId; // Default to lecture ID
@@ -494,12 +502,22 @@ const LectureDisplay = () => {
         }
       };
 
-      if (lectureId && userRole === "Student" && userId && purchaseId) {
-        fetchAccessData();
-      } else {
-        setError(t("noAccessToLecture"));
+      // Wait for user/purchase resolution instead of setting a premature error.
+      if (!lectureId || userRole !== "Student") {
+        return;
       }
-    }, [lectureId, navigate, userRole, userId, purchaseId, t]);
+
+      if (!userId) {
+        return;
+      }
+
+      if (!purchaseId) {
+        setAccessDataLoaded(true);
+        return;
+      }
+
+      fetchAccessData();
+    }, [lectureId, navigate, userRole, userId, purchaseId, currentPurchase, t]);
 
     // Reset upload states when changing tabs
     useEffect(() => {
@@ -1025,7 +1043,8 @@ const LectureDisplay = () => {
     if (error) {
       return (
         <div className="flex justify-center items-center min-h-screen p-4">
-          <div className="alert alert-error">
+          <div className="w-full max-w-xl rounded-2xl border border-error/30 bg-base-100 p-5 shadow-lg">
+            <div className="alert alert-error">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="stroke-current shrink-0 h-6 w-6"
@@ -1040,6 +1059,23 @@ const LectureDisplay = () => {
               />
             </svg>
             <span>{error}</span>
+            </div>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <button
+                type="button"
+                className="btn btn-sm btn-primary"
+                onClick={() => window.location.reload()}
+              >
+                {t("retry", "Retry")}
+              </button>
+              <button
+                type="button"
+                className="btn btn-sm btn-outline"
+                onClick={() => navigate(-1)}
+              >
+                {t("back", "Back")}
+              </button>
+            </div>
           </div>
         </div>
       );

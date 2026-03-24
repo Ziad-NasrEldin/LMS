@@ -7,7 +7,21 @@ import { getContainerById, purchaseContainer } from "../routes/lectures"
 import { getUserDashboard } from "../routes/auth-services"
 import { LoadingSpinner } from "../components/LoadingSpinner"
 import { ErrorAlert } from "../components/ErrorAlert"
-import { FaChalkboardTeacher, FaBook, FaGraduationCap, FaMoneyBillWave, FaUnlock, FaPlayCircle } from "react-icons/fa"
+import { FaChalkboardTeacher, FaBook, FaGraduationCap, FaMoneyBillWave, FaUnlock, FaPlayCircle, FaChevronDown } from "react-icons/fa"
+
+const normalizeId = (value) => {
+  if (!value) return null
+  if (typeof value === "string") return value
+  if (typeof value === "object") {
+    if (value._id) return normalizeId(value._id)
+    if (value.id) return normalizeId(value.id)
+  }
+
+  const asString = typeof value?.toString === "function" ? value.toString() : null
+  return asString && asString !== "[object Object]" ? asString : null
+}
+
+const getPurchaseContainerId = (purchase) => normalizeId(purchase?.container) || normalizeId(purchase?.lecture)
 
 const DetailItem = ({ label, value, icon }) => (
   <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 py-3 border-b border-base-200 last:border-b-0">
@@ -24,8 +38,22 @@ const ContainerItem = ({ container, isPurchased, onPurchase, purchaseInProgress,
   const [childContainers, setChildContainers] = useState([])
   const [loading, setLoading] = useState(false)
 
+  const containerId = normalizeId(container?._id || container?.id)
+  const hasChildren = Array.isArray(container?.children) && container.children.length > 0
+
   const fetchChildren = async () => {
-    if (isExpanded || !container.children || container.children.length === 0) return
+    if (!hasChildren) return
+
+    // Allow the dropdown to collapse/expand without re-fetching every time.
+    if (isExpanded) {
+      setIsExpanded(false)
+      return
+    }
+
+    if (childContainers.length > 0) {
+      setIsExpanded(true)
+      return
+    }
 
     setLoading(true)
     try {
@@ -47,7 +75,7 @@ const ContainerItem = ({ container, isPurchased, onPurchase, purchaseInProgress,
   }
 
   // Container is purchased if directly purchased or if parent is purchased
-  const containerIsPurchased = parentPurchased || isPurchased(container._id)
+  const containerIsPurchased = parentPurchased || (containerId ? isPurchased(containerId) : false)
   const containerTypeLabel =
     {
       course: t("containerTypes.course"),
@@ -58,7 +86,16 @@ const ContainerItem = ({ container, isPurchased, onPurchase, purchaseInProgress,
     }[container.type] || container.type
 
   return (
-    <div className="card bg-base-100 shadow-sm mb-3">
+    <div
+      className={`card mb-3 transition-all duration-300 ${isExpanded ? "shadow-xl ring-1 ring-primary/20" : "bg-base-100 shadow-sm"}`}
+      style={
+        isExpanded
+          ? {
+              backgroundImage: "linear-gradient(135deg, rgba(14,85,99,0.06) 0%, rgba(243,154,63,0.10) 100%)",
+            }
+          : undefined
+      }
+    >
       <div className="card-body p-4">
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-3">
@@ -88,28 +125,32 @@ const ContainerItem = ({ container, isPurchased, onPurchase, purchaseInProgress,
               </span>
             ) : (
               <button
-                className={`btn btn-sm btn-primary ${purchaseInProgress === container._id ? "loading" : ""}`}
-                onClick={() => onPurchase(container._id)}
+                className={`btn btn-sm btn-primary ${purchaseInProgress === containerId ? "loading" : ""}`}
+                onClick={() => onPurchase(containerId)}
                 disabled={purchaseInProgress !== null}
               >
                 {container.price > 0 ? t("purchase.buy") : t("purchase.getFree")}
               </button>
             )}
 
-            {container.children && container.children.length > 0 && (
-              <button className="btn btn-sm btn-ghost btn-circle" onClick={fetchChildren} disabled={loading}>
+            {hasChildren && (
+              <button
+                className="btn btn-sm border-0 text-primary-content rounded-full px-3 min-h-0 h-9 transition-all duration-300 hover:scale-[1.03] active:scale-100"
+                style={{
+                  backgroundImage: "linear-gradient(120deg, #0E5563 0%, #146A78 52%, #F39A3F 100%)",
+                  boxShadow: "0 8px 22px rgba(20, 106, 120, 0.32)",
+                }}
+                onClick={fetchChildren}
+                disabled={loading}
+                aria-expanded={isExpanded}
+              >
                 {loading ? (
                   <span className="loading loading-spinner loading-xs"></span>
                 ) : (
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-4 w-4"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                  </svg>
+                  <span className="inline-flex items-center gap-2">
+                    <span className="text-xs font-semibold tracking-wide">{isExpanded ? t("actions.collapse", { defaultValue: "Hide" }) : t("actions.expand", { defaultValue: "Explore" })}</span>
+                    <FaChevronDown className={`h-3 w-3 transition-transform duration-300 ${isExpanded ? "rotate-180" : "rotate-0"}`} />
+                  </span>
                 )}
               </button>
             )}
@@ -117,8 +158,11 @@ const ContainerItem = ({ container, isPurchased, onPurchase, purchaseInProgress,
         </div>
 
         {/* Child containers */}
-        {isExpanded && childContainers.length > 0 && (
-          <div className="mt-4 pl-6 border-r-2 border-base-300">
+        {(hasChildren || childContainers.length > 0) && (
+          <div
+            className={`mt-4 overflow-hidden transition-all duration-500 ease-out ${isExpanded ? "max-h-[2200px] opacity-100" : "max-h-0 opacity-0"}`}
+          >
+            <div className="pl-6 border-r-2 border-primary/30">
             {childContainers.map((child) => (
               <ContainerItem
                 key={child._id}
@@ -130,6 +174,7 @@ const ContainerItem = ({ container, isPurchased, onPurchase, purchaseInProgress,
                 t={t}
               />
             ))}
+            </div>
           </div>
         )}
       </div>
@@ -197,21 +242,24 @@ export default function CourseDetails() {
     // Create a set of all purchased container IDs for faster lookup
     const purchasedIds = new Set(
       purchaseHistory
-        .filter((purchase) => purchase.type === "containerPurchase" && purchase.container?._id)
-        .map((purchase) => purchase.container._id),
+        .map((purchase) => getPurchaseContainerId(purchase))
+        .filter(Boolean),
     )
 
     // Return a function that checks if a container is purchased
     return (containerId) => {
+      const normalizedContainerId = normalizeId(containerId)
+      if (!normalizedContainerId) return false
+
       // Direct purchase check
-      if (purchasedIds.has(containerId)) {
+      if (purchasedIds.has(normalizedContainerId)) {
         return true
       }
 
       // Check if any parent container is purchased
       if (courseData && courseData._id) {
         // If the course itself is purchased and the container is a child
-        if (purchasedIds.has(courseData._id) && containerId !== courseData._id) {
+        if (purchasedIds.has(normalizeId(courseData._id)) && normalizedContainerId !== normalizeId(courseData._id)) {
           return true
         }
 
@@ -222,9 +270,9 @@ export default function CourseDetails() {
           if (!container || !container.children) return false
 
           // Check if the target is a direct child
-          const isDirectChild = container.children.some((child) => child._id === targetId || child.id === targetId)
+          const isDirectChild = container.children.some((child) => normalizeId(child._id || child.id) === targetId)
 
-          if (isDirectChild && purchasedIds.has(container._id)) {
+          if (isDirectChild && purchasedIds.has(normalizeId(container._id))) {
             return true
           }
 
@@ -238,7 +286,7 @@ export default function CourseDetails() {
           })
         }
 
-        return findParentRecursive(courseData, containerId)
+        return findParentRecursive(courseData, normalizedContainerId)
       }
 
       return false
@@ -247,6 +295,7 @@ export default function CourseDetails() {
 
   // Handle container purchase
   const handlePurchase = async (containerId) => {
+    const normalizedContainerId = normalizeId(containerId)
     setPurchaseInProgress(containerId)
     setPurchaseError("")
     setPurchaseSuccess(false)
@@ -264,24 +313,28 @@ export default function CourseDetails() {
           setRemainingPoints(response.data.data.remainingLecturerPoints)
         }
 
-        // Add the new purchase to the purchase history
-        if (response.data.data && response.data.data.purchase) {
-          const newPurchase = response.data.data.purchase
+        const purchaseFromResponse = response.data?.data?.purchase
+        const purchasedId = getPurchaseContainerId(purchaseFromResponse) || normalizedContainerId
 
-          // Update purchase history with the new purchase
-          setPurchaseHistory((prevHistory) => [
-            ...prevHistory,
-            {
-              ...newPurchase,
-              container: {
-                _id: newPurchase.container,
+        // Optimistic, normalized update for instant button state reflection.
+        if (purchasedId) {
+          setPurchaseHistory((prevHistory) => {
+            const alreadyRecorded = prevHistory.some((purchase) => getPurchaseContainerId(purchase) === purchasedId)
+            if (alreadyRecorded) return prevHistory
+
+            return [
+              ...prevHistory,
+              {
+                ...(purchaseFromResponse || {}),
+                type: purchaseFromResponse?.type || "containerPurchase",
+                container: { _id: purchasedId },
               },
-            },
-          ])
-        } else {
-          // If purchase data is not in the response, refresh purchase history from API
-          refreshPurchaseHistory()
+            ]
+          })
         }
+
+        // Ensure absolute consistency with backend for nested/related purchases.
+        refreshPurchaseHistory()
       } else {
         setPurchaseError(response?.error || response?.data?.message || t("purchase.purchaseError"))
       }

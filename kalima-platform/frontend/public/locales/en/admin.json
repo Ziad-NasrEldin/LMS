@@ -345,13 +345,18 @@
     "revenue" :{
       "errorLoadingRevenue": "Error loading revenue data",
       "lecturerRevenue": "Lecturer Revenue",
+      "financialDashboardTitle": "Financial Dashboard",
+      "financialDashboardSubtitle": "A complete view of revenue, purchases, and monthly performance",
       "revenueSummary": "Revenue Summary",
       "totalRevenue": "Total Revenue",
       "currency": "EGP",
       "totalPurchases": "Total Purchases",
+      "activeLecturers": "Lecturers",
       "monthsWithRevenue": "Months with Revenue",
       "purchaseCount": "Purchase Count",
-      "noRevenueData": "No revenue data available for this lecturer"
+      "noRevenueData": "No revenue data available for this lecturer",
+      "breakdownByLesson": "Revenue Breakdown by Content",
+      "noBreakdownData": "No breakdown data available yet"
   },
   "modals" : {
         "confirmDelete": "delete this code?",

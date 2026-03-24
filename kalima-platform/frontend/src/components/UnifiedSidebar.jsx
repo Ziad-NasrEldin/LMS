@@ -12,13 +12,15 @@ import {
   FaUserAlt,
   FaUserTie,
   FaUserGraduate,
-  FaUserShield
+  FaUserShield,
+  FaMoneyBillWave
 } from 'react-icons/fa';
 import { getUserDashboard, logoutUser } from '../routes/auth-services';
 import { Edit, Lightbulb } from 'lucide-react';
 import { resolveProfileImageUrl } from '../utils/profileImage';
 
 const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
+  const NAVBAR_HEIGHT = 92;
   const { t, i18n } = useTranslation('common');
   const isRTL = i18n.language === 'ar';
   const location = useLocation();
@@ -129,6 +131,12 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
         title: t('signedLecturers') || 'Signed Lecturers',
         icon: <Lightbulb className="w-5 h-5" />,
         path: '/dashboard/admin-dashboard/signed-lecturers'
+      },
+      {
+        id: 'financial-dashboard',
+        title: isRTL ? 'اللوحة المالية' : 'Financial Dashboard',
+        icon: <FaMoneyBillWave className="w-5 h-5" />,
+        path: '/dashboard/admin-dashboard/financial-dashboard'
       },
     ];
 
@@ -247,9 +255,13 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
       {/* Sidebar */}
       <div
         id="user-sidebar"
-        className={`fixed top-0 ${isRTL ? 'right-0' : 'left-0'
-          } h-full w-64 bg-base-100 text-base-content shadow-xl z-40 transform transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : isRTL ? 'translate-x-full' : '-translate-x-full'
+        className={`fixed ${isRTL ? 'right-0' : 'left-0'
+          } w-64 bg-base-100 text-base-content shadow-xl z-40 transform transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : isRTL ? 'translate-x-full' : '-translate-x-full'
           }`}
+        style={{
+          top: `${NAVBAR_HEIGHT}px`,
+          height: `calc(100dvh - ${NAVBAR_HEIGHT}px)`,
+        }}
         dir={isRTL ? 'rtl' : 'ltr'}
       >
         <div className="p-4 border-b border-base-300 flex items-center justify-between">
@@ -350,7 +362,7 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
       <button
         id="sidebar-toggle"
         onClick={toggleSidebar}
-        className={`fixed top-1/2 ${isRTL ? 'right-0' : 'left-0'
+        className={`fixed ${isRTL ? 'right-0' : 'left-0'
           } z-30 transform -translate-y-1/2 transition-all duration-300 
           ${isOpen && isRTL
               ? 'translate-x-64'
@@ -360,6 +372,7 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
             } 
           bg-primary text-primary-content rounded-r-full p-2 shadow-lg`}
         style={{
+          top: `calc(50% + ${NAVBAR_HEIGHT / 2}px)`,
           [isRTL ? 'borderTopLeftRadius' : 'borderTopRightRadius']: '9999px',
           [isRTL ? 'borderBottomLeftRadius' : 'borderBottomRightRadius']: '9999px',
         }}

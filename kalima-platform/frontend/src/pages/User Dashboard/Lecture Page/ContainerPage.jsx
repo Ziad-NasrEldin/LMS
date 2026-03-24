@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
 import { useTranslation } from 'react-i18next';
 import { getUserDashboard } from "../../../routes/auth-services"
+import { FiArrowLeft, FiArrowRight } from "react-icons/fi"
 
 const ContainersPage = () => {
   const { t, i18n } = useTranslation('lecturesPage');
@@ -193,18 +194,30 @@ const ContainersPage = () => {
                   {userRole === 'Lecturer' ? (
                   <Link 
                     to={`/dashboard/lecturer-dashboard/container-details/${container._id}`} 
-                    className="btn btn-primary"
+                    className={`inline-flex items-center gap-2 rounded-full border px-5 py-2 text-sm font-semibold transition-all duration-200 hover:-translate-y-[1px] ${isRTL ? "flex-row-reverse" : ""}`}
+                    style={{
+                      background: "var(--color-primary)",
+                      color: "var(--color-primary-content)",
+                      borderColor: "transparent",
+                    }}
                     state={{ userRole: 'Lecturer' }}
                   >
                     {t('containersPage.buttons.viewDetails')}
+                    {isRTL ? <FiArrowLeft className="h-4 w-4" /> : <FiArrowRight className="h-4 w-4" />}
                   </Link>
                 ) : (
                   <Link 
                     to={`/dashboard/student-dashboard/container-details/${container._id}`} 
-                    className="btn btn-primary"
+                    className={`inline-flex items-center gap-2 rounded-full border px-5 py-2 text-sm font-semibold transition-all duration-200 hover:-translate-y-[1px] ${isRTL ? "flex-row-reverse" : ""}`}
+                    style={{
+                      background: "var(--color-primary)",
+                      color: "var(--color-primary-content)",
+                      borderColor: "transparent",
+                    }}
                     state={{ userRole: 'Student' }}
                   >
                     {t('containersPage.buttons.viewDetails')}
+                    {isRTL ? <FiArrowLeft className="h-4 w-4" /> : <FiArrowRight className="h-4 w-4" />}
                   </Link>
                 )}
               </div>

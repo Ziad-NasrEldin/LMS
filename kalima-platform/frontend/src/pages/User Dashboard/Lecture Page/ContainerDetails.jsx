@@ -5,7 +5,7 @@ import { Link, useParams, useNavigate } from "react-router-dom"
 import { useTranslation } from 'react-i18next';
 import { getContainerById, createContainer, createLecture, createLectureAttachment } from "../../../routes/lectures"
 import { getUserDashboard } from "../../../routes/auth-services"
-import { FiBook, FiFolder, FiArrowLeft, FiPlus } from "react-icons/fi"
+import { FiBook, FiFolder, FiArrowLeft, FiArrowRight, FiPlus } from "react-icons/fi"
 import LectureCreationModal from "../../../components/LectureCreationModal"
 import ContainerCreationModal from "../../../components/ContainerCreationModal"
 
@@ -300,9 +300,15 @@ const ContainerDetailsPage = () => {
                           ? `/dashboard/lecturer-dashboard/${childType === "lecture" ? "lecture-display" : "container-details"}/${child._id}`
                           : `/dashboard/student-dashboard/${childType === "lecture" ? "lecture-display" : "container-details"}/${child._id}`
                       }
-                      className="btn btn-ghost btn-sm text-primary hover:bg-primary/10 rounded-full"
+                      className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition-all duration-200 hover:-translate-y-[1px] ${isRTL ? "flex-row-reverse" : ""}`}
+                      style={{
+                        background: "var(--color-primary)",
+                        color: "var(--color-primary-content)",
+                        borderColor: "transparent",
+                      }}
                     >
-                      {t('containerDetails.buttons.viewDetails')} →
+                      {t('containerDetails.buttons.viewDetails')}
+                      {isRTL ? <FiArrowLeft className="h-4 w-4" /> : <FiArrowRight className="h-4 w-4" />}
                     </Link>
                   </div>
                 </div>

@@ -348,13 +348,18 @@
     "revenue": {
       "errorLoadingRevenue": "خطأ في تحميل بيانات الإيرادات",
       "lecturerRevenue": "إيرادات المحاضر",
+      "financialDashboardTitle": "اللوحة المالية",
+      "financialDashboardSubtitle": "نظرة شاملة على الإيرادات والمشتريات والأداء الشهري",
       "revenueSummary": "ملخص الإيرادات",
       "totalRevenue": "إجمالي الإيرادات",
       "currency": "جنيه",
       "totalPurchases": "إجمالي المشتريات",
+      "activeLecturers": "عدد المحاضرين",
       "monthsWithRevenue": "أشهر بها إيرادات",
       "purchaseCount": "عدد المشتريات",
-      "noRevenueData": "لا توجد بيانات إيرادات لهذا المحاضر"
+      "noRevenueData": "لا توجد بيانات إيرادات لهذا المحاضر",
+      "breakdownByLesson": "تفصيل الإيرادات حسب المحتوى",
+      "noBreakdownData": "لا توجد بيانات تفصيلية حالياً"
     },
      "modals" : {
         "confirmDelete": " حذف هذا الكود؟",

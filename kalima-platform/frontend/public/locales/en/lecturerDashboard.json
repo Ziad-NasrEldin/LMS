@@ -1,5 +1,11 @@
 {
   "courseManagement": "Course Management",
+  "dashboardOverview": "Dashboard Overview",
+  "dashboardOverviewHint": "A quick summary of your courses, lectures, and assistants",
+  "myCourses": "Courses",
+  "studentViews": "Total Views",
+  "recentActivity": "Recent Activity",
+  "noSubject": "No subject",
   "addNewCourse": "Add New Course",
   "view": "View",
   "delete": "Delete",

@@ -17,6 +17,9 @@ const TeacherLogin = () => {
   const isRTL = i18n.language === "ar";
   const [activeTab, setActiveTab] = useState("email_tab");
   const [showPassword, setShowPassword] = useState(false);
+  const [heroImageSrc, setHeroImageSrc] = useState(
+    "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1471&q=80",
+  );
   const [formData, setFormData] = useState({
     email: "",
     phoneNumber: "",
@@ -115,6 +118,13 @@ const TeacherLogin = () => {
     }
   };
 
+  const handleHeroImageError = () => {
+    // Use a local asset fallback to avoid blank states if remote image fails.
+    if (heroImageSrc !== "/registration-image.png") {
+      setHeroImageSrc("/registration-image.png");
+    }
+  };
+
   return (
     <div
       className="min-h-screen pt-24 px-3 pb-8 sm:px-6 lg:px-8"
@@ -159,7 +169,12 @@ const TeacherLogin = () => {
 
             <div className="relative z-10 my-6 overflow-hidden rounded-[1.75rem] border-8 border-base-100 shadow-xl">
               <img
-                  src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1471&q=80"
+                src={heroImageSrc}
+                alt={t("loginHeroImageAlt", "Students collaborating and learning together")}
+                className="h-72 w-full object-cover"
+                loading="lazy"
+                decoding="async"
+                onError={handleHeroImageError}
               />
             </div>
 
