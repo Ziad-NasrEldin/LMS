@@ -1,79 +1,45 @@
 "use client"
 
-import { useState, useEffect } from "react"
 import { useTranslation } from "react-i18next"
 import PageHeader from "./PageHeader"
 import PersonalInfoSection from "./PersonalInfoSection"
 import LanguageAppearanceSection from "./LanguageAppearanceSection"
 import SecuritySection from "./SecuritySection"
-import NotificationsSection from "./NotificationsSection"
-import { FaBars } from "react-icons/fa"
+import { designTokens } from "../../constants/designTokens"
 
 function SettingsPage() {
   const { t, i18n } = useTranslation("settings")
   const isRTL = i18n.language === 'ar'
-  const [sidebarOpen, setSidebarOpen] = useState(true)
-  const [isMobile, setIsMobile] = useState(false)
-  const [formData, setFormData] = useState({
-    fullName: t('personalInfo.placeholders.fullName'),
-    phoneNumber: t('personalInfo.placeholders.phoneNumber'),
-    email: t('personalInfo.placeholders.email'),
-    idNumber: "",
-    currentPassword: "",
-    newPassword: "",
-    confirmPassword: "",
-  })
-  useEffect(() => {
-    setFormData({
-      fullName: t('personalInfo.placeholders.fullName'),
-      phoneNumber: t('personalInfo.placeholders.phoneNumber'),
-      email: t('personalInfo.placeholders.email'),
-      idNumber: "",
-      currentPassword: "",
-      newPassword: "",
-      confirmPassword: "",
-    })
-  }, [t])
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target
-    setFormData({
-      ...formData,
-      [name]: value,
-    })
-  }
+  const TOKENS = designTokens.colors
+  const SHADOWS = designTokens.shadows
+  const GRADIENTS = designTokens.gradients
 
   return (
-      <div 
-      className={`flex flex-col ${isRTL ? 'lg:flex-row-reverse' : 'lg:flex-row'} min-h-screen bg-base-100`} 
-      dir={isRTL ? 'ltr' : 'rtl'}
+      <div
+      className="min-h-screen"
+      style={{
+        background: `${GRADIENTS.pageAtmosphere}, ${TOKENS.creamSurface}`,
+        color: TOKENS.inkText,
+      }}
+      dir={isRTL ? 'rtl' : 'ltr'}
     >
-      <div className="container mx-auto">
-
-        {/* Main Content */}
-        <div className={`flex-1 p-4 lg:p-8 md:pt-4 pt-16 ${isRTL ? 'text-right' : 'text-left'}`}>
+      <div className="mx-auto w-full max-w-6xl px-4 pb-10 pt-16 md:px-6 lg:px-8">
+        <div
+          className={`rounded-[2rem] border p-4 md:p-6 lg:p-8 ${isRTL ? 'text-right' : 'text-left'}`}
+          style={{
+            background: TOKENS.neutralCloud,
+            borderColor: "rgba(17,24,39,0.08)",
+            boxShadow: SHADOWS.level1,
+          }}
+        >
           <PageHeader title={t('title')} />
 
-          <PersonalInfoSection 
-            formData={formData}
-            handleInputChange={handleInputChange}
-          />
+          <div className="space-y-6">
+            <PersonalInfoSection />
 
-          <LanguageAppearanceSection 
-            title={t('languageAppearance.title')}
-            options={t('languageAppearance.options', { returnObjects: true })}
-          />
+            <LanguageAppearanceSection />
 
-          <SecuritySection
-            formData={formData}
-            handleInputChange={handleInputChange}
-            labels={t('security.labels', { returnObjects: true })}
-          />
-
-          <NotificationsSection
-            title={t('notifications.title')}
-            options={t('notifications.options', { returnObjects: true })}
-          />
+            <SecuritySection />
         </div>
       </div>
     </div>

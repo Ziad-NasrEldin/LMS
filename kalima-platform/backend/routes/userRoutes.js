@@ -41,6 +41,9 @@ router.use(verifyJWT);
 // Get current user's data (for student/parent only)
 router.get("/me/dashboard", userController.getMyData);
 
+// Get purchased course containers for current student with lightweight payload
+router.get("/me/purchased-course-containers", userController.getMyPurchasedCourseContainers);
+
 // Get parent's children data with detailed information
 router.get("/me/children", userController.getParentChildrenData);
 

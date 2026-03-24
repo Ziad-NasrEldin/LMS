@@ -7,10 +7,13 @@ import { getUserDashboard } from "../../routes/auth-services"
 import { updateCurrentUser } from "../../routes/update-user"
 import { Check, X, Camera, Upload } from "lucide-react"
 import { resolveProfileImageUrl } from "../../utils/profileImage"
+import { designTokens } from "../../constants/designTokens"
 
 function PersonalInfoSection() {
   const { t, i18n } = useTranslation("settings")
   const isRTL = i18n.language === "ar"
+  const TOKENS = designTokens.colors
+  const SHADOWS = designTokens.shadows
 
   // State for user data
   const [userData, setUserData] = useState(null)
@@ -298,23 +301,37 @@ function PersonalInfoSection() {
 
   if (loading) {
     return (
-      <div className="mb-8">
+      <section>
         <SectionHeader title={personalInfo.title} />
-        <div className="card bg-base-100 shadow-sm">
-          <div className="card-body flex items-center justify-center p-8">
+        <div
+          className="rounded-3xl border p-4 md:p-5"
+          style={{
+            background: "rgba(255,255,255,0.75)",
+            borderColor: "rgba(17,24,39,0.08)",
+            boxShadow: SHADOWS.level1,
+          }}
+        >
+          <div className="flex items-center justify-center p-8">
             <div className="loading loading-spinner loading-lg text-primary"></div>
           </div>
         </div>
-      </div>
+      </section>
     )
   }
 
   if (error) {
     return (
-      <div className="mb-8">
+      <section>
         <SectionHeader title={personalInfo.title} />
-        <div className="card bg-base-100 shadow-sm">
-          <div className="card-body">
+        <div
+          className="rounded-3xl border p-4 md:p-5"
+          style={{
+            background: "rgba(255,255,255,0.75)",
+            borderColor: "rgba(17,24,39,0.08)",
+            boxShadow: SHADOWS.level1,
+          }}
+        >
+          <div>
             <div className="alert alert-error">
               <span>{error}</span>
               <button className="btn btn-sm btn-outline" onClick={() => window.location.reload()}>
@@ -323,7 +340,7 @@ function PersonalInfoSection() {
             </div>
           </div>
         </div>
-      </div>
+      </section>
     )
   }
 
@@ -331,11 +348,18 @@ function PersonalInfoSection() {
   const currentProfilePicUrl = resolveProfileImageUrl(userData?.profilePic)
 
   return (
-    <div className="mb-8">
+    <section>
       <SectionHeader title={personalInfo.title} />
-      <div className="card bg-base-100 shadow-sm">
-        <div className="card-body">
-          <h3 className={`text-lg font-semibold mb-4 ${isRTL ? "text-right" : "text-left"}`}>
+      <div
+        className="rounded-3xl border p-4 md:p-5"
+        style={{
+          background: "rgba(255,255,255,0.75)",
+          borderColor: "rgba(17,24,39,0.08)",
+          boxShadow: SHADOWS.level1,
+        }}
+      >
+        <div className="mx-auto max-w-4xl">
+          <h3 className={`mb-4 text-base font-semibold md:text-lg ${isRTL ? "text-right" : "text-left"}`} style={{ color: TOKENS.slateText }}>
             {personalInfo.subtitle}
           </h3>
 
@@ -466,7 +490,7 @@ function PersonalInfoSection() {
                 value={isEditing.fullName ? formData.fullName : userData?.name || ""}
                 onChange={handleInputChange}
                 placeholder={personalInfo.placeholders.fullName}
-                className={`input input-bordered w-full ${isRTL ? "text-right" : "text-left"}`}
+                className={`input input-bordered w-full max-w-2xl ${isRTL ? "text-right" : "text-left"}`}
                 dir={isRTL ? "rtl" : "ltr"}
                 readOnly={!isEditing.fullName}
               />
@@ -518,7 +542,7 @@ function PersonalInfoSection() {
                 value={isEditing.phoneNumber ? formData.phoneNumber : userData?.phoneNumber || ""}
                 onChange={handleInputChange}
                 placeholder={personalInfo.placeholders.phoneNumber}
-                className={`input input-bordered w-full ${isRTL ? "text-right" : "text-left"}`}
+                className={`input input-bordered w-full max-w-2xl ${isRTL ? "text-right" : "text-left"}`}
                 dir={isRTL ? "rtl" : "ltr"}
                 readOnly={!isEditing.phoneNumber}
               />
@@ -570,7 +594,7 @@ function PersonalInfoSection() {
                 value={isEditing.email ? formData.email : userData?.email || ""}
                 onChange={handleInputChange}
                 placeholder={personalInfo.placeholders.email}
-                className={`input input-bordered w-full ${isRTL ? "text-right" : "text-left"} ${emailError && isEditing.email ? "input-error animate-shake" : ""}`}
+                className={`input input-bordered w-full max-w-2xl ${isRTL ? "text-right" : "text-left"} ${emailError && isEditing.email ? "input-error animate-shake" : ""}`}
                 dir={isRTL ? "rtl" : "ltr"}
                 readOnly={!isEditing.email}
               />
@@ -595,7 +619,7 @@ function PersonalInfoSection() {
               <input
                 type="text"
                 value={userData.level.name || ""}
-                className={`input input-bordered w-full ${isRTL ? "text-right" : "text-left"}`}
+                className={`input input-bordered w-full max-w-2xl ${isRTL ? "text-right" : "text-left"}`}
                 dir={isRTL ? "rtl" : "ltr"}
                 readOnly
               />
@@ -605,11 +629,11 @@ function PersonalInfoSection() {
           {/* Points display for students */}
           {userData?.role === "Student" && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-              <div className="stat bg-base-200 rounded-box">
+              <div className="stat rounded-box" style={{ background: TOKENS.neutralCloud }}>
                 <div className="stat-title">{personalInfo.labels.generalPoints || t("General Points")}</div>
                 <div className="stat-value">{userData.generalPoints || 0}</div>
               </div>
-              <div className="stat bg-base-200 rounded-box">
+              <div className="stat rounded-box" style={{ background: TOKENS.neutralCloud }}>
                 <div className="stat-title">{personalInfo.labels.totalPoints || t("Total Points")}</div>
                 <div className="stat-value">{userData.totalPoints || 0}</div>
               </div>
@@ -617,7 +641,7 @@ function PersonalInfoSection() {
           )}
         </div>
       </div>
-    </div>
+    </section>
   )
 }
 

@@ -678,7 +678,7 @@ exports.getAllContainers = catchAsync(async (req, res, next) => {
     { path: "subject", select: "name" },
     { path: "level", select: "name" },
     { path: "parent", select: "name" },
-  ]);
+  ]).lean();
 
   // Role-specific logic for authenticated users
   if (req.user && req.user.role?.toLowerCase() === "teacher") {

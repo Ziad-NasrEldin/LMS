@@ -377,6 +377,41 @@ export const getUserDashboard = async ({ params = {} } = {}) => {
   }
 }
 
+export const getMyPurchasedCourseContainers = async ({ params = {} } = {}) => {
+  const finalParams = { page: 1, limit: 200, ...params }
+
+  try {
+    const isAuth = await isLoggedIn()
+    if (!isAuth) {
+      return { success: false, error: "Not authenticated" }
+    }
+
+    const token = getToken()
+
+    const response = await api.get(`/users/me/purchased-course-containers`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      params: finalParams,
+    })
+
+    return {
+      success: true,
+      data: response.data,
+      status: response.status,
+      headers: response.headers,
+    }
+  } catch (error) {
+    return {
+      success: false,
+      status: error.response?.status,
+      error: error.response?.data?.message || "Failed to fetch purchased course containers",
+      details: error.response?.data,
+    }
+  }
+}
+
 // --- AUTHENTICATED API HELPERS ---
 
 const handleAuthenticatedRequest = async (requestFn, url, ...args) => {

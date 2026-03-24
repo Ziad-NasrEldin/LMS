@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { Link, useLocation } from "react-router-dom"
 import { useTranslation } from 'react-i18next';
-import { getUserDashboard } from "../../../routes/auth-services"
+import { getMyPurchasedCourseContainers, getUserDashboard } from "../../../routes/auth-services"
 import { FiArrowLeft, FiArrowRight } from "react-icons/fi"
 
 const ContainersPage = () => {
@@ -26,56 +26,45 @@ const ContainersPage = () => {
     const fetchData = async () => {
       try {
         setLoading(true)
+        setError(null)
 
         const isLecturerRoute = location.pathname.includes('/lecturer-dashboard/');
-        const requestedFields = isLecturerRoute
-          ? 'userInfo,containers'
-          : 'userInfo,purchaseHistory';
-        
-        const result = await getUserDashboard({
-          params: {
-            fields: requestedFields,
-            limit: 200,
-            page: 1
-          }
-        });
 
-        if (result.success) {
-          const { userInfo } = result.data.data;
+        if (isLecturerRoute) {
+          const result = await getUserDashboard({
+            params: {
+              fields: 'userInfo,containers',
+              limit: 200,
+              page: 1,
+            }
+          });
+
+          if (!result.success) {
+            setError("Failed to load data");
+            return;
+          }
+
+          const { userInfo, containers = [] } = result.data.data;
           setUserRole(userInfo.role);
-
-          let courseContainers = [];
-
-          if (userInfo.role === 'Lecturer') {
-            // For lecturers: containers are directly in response.data.containers
-            const { containers = [] } = result.data.data;
-            courseContainers = containers.filter(container => container.type === 'course');
-          } else if (userInfo.role === 'Student') {
-            // For students: containers are in response.data.purchaseHistory.container
-            const { purchaseHistory = [] } = result.data.data;
-            const containerPurchases = purchaseHistory
-              .filter(p => 
-                p.type === 'containerPurchase' && 
-                p.container && 
-                p.container.type === 'course'
-              );
-            // Remove duplicates by container._id
-            const uniqueCourseContainers = Array.from(
-              new Map(containerPurchases.map(p => [p.container._id, p])).values()
-            ).map(p => ({
-              ...p.container,
-              lecturer: p.lecturer,
-              purchasedAt: p.purchasedAt,
-              purchaseId: p._id,
-              price: p.points || 0
-            }));
-            courseContainers = uniqueCourseContainers;
-          }
-
-          setAllContainers(courseContainers);
-        } else {
-          setError("Failed to load data");
+          setAllContainers(containers.filter((container) => container.type === 'course'));
+          return;
         }
+
+        const result = await getMyPurchasedCourseContainers({
+          params: {
+            page: 1,
+            limit: 200,
+          },
+        })
+
+        if (!result.success) {
+          setError("Failed to load data")
+          return
+        }
+
+        const { userInfo, containers = [] } = result.data.data
+        setUserRole(userInfo.role)
+        setAllContainers(containers)
       } catch (err) {
         setError("Failed to load data. Please try again later.");
         console.error("Error:", err);

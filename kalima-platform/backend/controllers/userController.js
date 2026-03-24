@@ -810,6 +810,73 @@ const getMyData = catchAsync(async (req, res, next) => {
   });
 });
 
+const getMyPurchasedCourseContainers = catchAsync(async (req, res, next) => {
+  const userId = req.user._id;
+  const userRole = req.user.role;
+
+  if (userRole !== "Student") {
+    return next(new AppError("Only students can access purchased course containers", 403));
+  }
+
+  const page = Math.max(parseInt(req.query.page, 10) || 1, 1);
+  const limit = Math.max(parseInt(req.query.limit, 10) || 20, 1);
+
+  const purchases = await Purchase.find({
+    student: userId,
+    type: "containerPurchase",
+  })
+    .select("container lecturer points purchasedAt")
+    .populate({
+      path: "container",
+      select: "name type price subject level createdBy containerImage",
+      populate: [
+        { path: "subject", select: "name" },
+        { path: "level", select: "name" },
+      ],
+    })
+    .populate({ path: "lecturer", select: "name" })
+    .sort({ purchasedAt: -1 })
+    .lean();
+
+  const uniqueContainers = new Map();
+
+  for (const purchase of purchases) {
+    if (!purchase.container || purchase.container.type !== "course") continue;
+
+    const containerId = purchase.container._id.toString();
+    if (uniqueContainers.has(containerId)) continue;
+
+    uniqueContainers.set(containerId, {
+      ...purchase.container,
+      lecturer: purchase.lecturer || null,
+      purchasedAt: purchase.purchasedAt,
+      purchaseId: purchase._id,
+      price: purchase.points || purchase.container.price || 0,
+    });
+  }
+
+  const allContainers = Array.from(uniqueContainers.values());
+  const start = (page - 1) * limit;
+  const paginatedContainers = allContainers.slice(start, start + limit);
+
+  return res.status(200).json({
+    status: "success",
+    data: {
+      userInfo: {
+        id: userId,
+        role: userRole,
+      },
+      containers: paginatedContainers,
+    },
+    pagination: {
+      totalCount: allContainers.length,
+      page,
+      limit,
+      totalPages: Math.ceil(allContainers.length / limit) || 1,
+    },
+  });
+});
+
 // Helper function to get additional data for students and parents
 const getStudentParentAdditionalData = async (
   userId,
@@ -908,18 +975,6 @@ const getStudentParentAdditionalData = async (
       },
     };
 
-    // Ensure student's purchaseHistory array is up to date (if field exists)
-    const StudentModel = require("../models/studentModel.js");
-    const studentDoc = await StudentModel.findById(userId);
-    if (studentDoc && Array.isArray(studentDoc.purchaseHistory)) {
-      // Add any missing purchase IDs
-      const purchaseIds = purchaseHistory.map(p => p._id.toString());
-      const missingIds = purchaseIds.filter(id => !studentDoc.purchaseHistory.map(x => x.toString()).includes(id));
-      if (missingIds.length > 0) {
-        studentDoc.purchaseHistory.push(...missingIds);
-        await studentDoc.save();
-      }
-    }
   }
 
   // Only include redeemed codes if requested or no specific fields were requested
@@ -1388,6 +1443,7 @@ module.exports = {
   changePassword,
   uploadFileForBulkCreation,
   getMyData,
+  getMyPurchasedCourseContainers,
   getParentChildrenData,
   updateMe,
   confirmTeacher

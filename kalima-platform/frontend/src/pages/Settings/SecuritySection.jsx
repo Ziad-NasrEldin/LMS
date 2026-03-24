@@ -3,10 +3,13 @@ import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import SectionHeader from "./SectionHeader"
 import { updateUserPassword } from "../../routes/update-user"
+import { designTokens } from "../../constants/designTokens"
 
 function SecuritySection() {
   const { t, i18n } = useTranslation("settings")
   const isRTL = i18n.language === 'ar'
+  const TOKENS = designTokens.colors
+  const SHADOWS = designTokens.shadows
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
@@ -97,11 +100,18 @@ function SecuritySection() {
   )
 
   return (
-    <div className="mb-8">
+    <section>
       <SectionHeader title={t('security.title')} icon={lockIcon} />
-      <div className="card bg-base-100 shadow-sm">
-        <div className="card-body">
-          <h3 className={`text-lg font-semibold mb-4 ${isRTL ? 'text-right' : 'text-left'}`}>
+      <div
+        className="rounded-3xl border p-4 md:p-5"
+        style={{
+          background: "rgba(255,255,255,0.75)",
+          borderColor: "rgba(17,24,39,0.08)",
+          boxShadow: SHADOWS.level1,
+        }}
+      >
+        <div className="mx-auto max-w-3xl">
+          <h3 className={`mb-4 text-base font-semibold md:text-lg ${isRTL ? 'text-right' : 'text-left'}`} style={{ color: TOKENS.slateText }}>
             {t('security.changePassword')}
           </h3>
 
@@ -124,11 +134,11 @@ function SecuritySection() {
           )}
 
           {/* Current Password Field */}
-          <div className="form-control mb-4">
-            <label className={`label justify-end`}>
+          <div className="form-control mb-3">
+            <label className={`label pb-1 ${isRTL ? 'justify-end' : 'justify-start'}`}>
               <span className="label-text">{t('security.labels.currentPassword')}</span>
             </label>
-            <div className="relative">
+            <div className="relative w-full max-w-2xl">
               <input
                 type={showPassword ? "text" : "password"}
                 name="currentPassword"
@@ -181,42 +191,46 @@ function SecuritySection() {
           </div>
 
           {/* New Password Field */}
-          <div className="form-control mb-4">
-            <label className={`label justify-end`}>
+          <div className="form-control mb-3">
+            <label className={`label pb-1 ${isRTL ? 'justify-end' : 'justify-start'}`}>
               <span className="label-text">{t('security.labels.newPassword')}</span>
             </label>
-            <input
-              type={showPassword ? "text" : "password"}
-              name="newPassword"
-              value={formData.newPassword}
-              onChange={handleInputChange}
-              className={`input input-bordered w-full ${isRTL ? 'text-right' : 'text-left'}`}
-              placeholder={t('security.placeholders.newPassword')}
-              dir={isRTL ? 'rtl' : 'ltr'}
-            />
+            <div className="w-full max-w-2xl">
+              <input
+                type={showPassword ? "text" : "password"}
+                name="newPassword"
+                value={formData.newPassword}
+                onChange={handleInputChange}
+                className={`input input-bordered w-full ${isRTL ? 'text-right' : 'text-left'}`}
+                placeholder={t('security.placeholders.newPassword')}
+                dir={isRTL ? 'rtl' : 'ltr'}
+              />
+            </div>
             <PasswordStrengthIndicator strength={passwordStrength} />
           </div>
 
           {/* Confirm Password Field */}
-          <div className="form-control mb-4">
-            <label className={`label justify-end`}>
+          <div className="form-control mb-3">
+            <label className={`label pb-1 ${isRTL ? 'justify-end' : 'justify-start'}`}>
               <span className="label-text">{t('security.labels.confirmPassword')}</span>
             </label>
-            <input
-              type={showPassword ? "text" : "password"}
-              name="confirmPassword"
-              value={formData.confirmPassword}
-              onChange={handleInputChange}
-              className={`input input-bordered w-full ${isRTL ? 'text-right' : 'text-left'}`}
-              placeholder={t('security.placeholders.confirmPassword')}
-              dir={isRTL ? 'rtl' : 'ltr'}
-            />
+            <div className="w-full max-w-2xl">
+              <input
+                type={showPassword ? "text" : "password"}
+                name="confirmPassword"
+                value={formData.confirmPassword}
+                onChange={handleInputChange}
+                className={`input input-bordered w-full ${isRTL ? 'text-right' : 'text-left'}`}
+                placeholder={t('security.placeholders.confirmPassword')}
+                dir={isRTL ? 'rtl' : 'ltr'}
+              />
+            </div>
             <div className={`text-xs mt-1 text-gray-500 ${isRTL ? 'text-right' : 'text-left'}`}>
               {t('security.passwordRequirement')}
             </div>
           </div>
 
-          <div className="flex justify-center mt-6">
+          <div className={`mt-5 flex ${isRTL ? "justify-end" : "justify-start"}`}>
             <button
               className={`btn btn-primary ${loading ? "loading" : ""}`}
               onClick={updatePassword}
@@ -227,7 +241,7 @@ function SecuritySection() {
           </div>
         </div>
       </div>
-    </div>
+    </section>
   )
 }
 

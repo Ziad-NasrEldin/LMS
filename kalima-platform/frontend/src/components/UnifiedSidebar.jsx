@@ -155,7 +155,7 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
         path: '/dashboard/lecturer-dashboard/lecture-page'
       },
       {
-        id: 'lectures',
+        id: 'my-lectures',
         title: t('MyLectures') || 'My Lectures',
         icon: <FaGraduationCap className="w-5 h-5" />,
         path: '/dashboard/lecturer-dashboard/lectures-page'

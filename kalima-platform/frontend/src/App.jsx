@@ -1,12 +1,13 @@
 "use client";
 
 import { Suspense, lazy, useEffect, useState } from "react";
-import { Routes, Route, useLocation } from "react-router-dom";
+import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 import NavBar from "./components/navbar";
 import { LoadingSpinner } from "./components/LoadingSpinner";
 import { isMobile } from "./utils/isMobile";
 import UnifiedSidebar from "./components/UnifiedSidebar";
 import { useTranslation } from "react-i18next";
+import { getUserFromToken } from "./routes/auth-services";
 
 // Lazy load components
 const AuditLog = lazy(() => import("./pages/User Dashboard/Admin dashboard/auditLog"))
@@ -93,7 +94,42 @@ function App() {
   }, [location.pathname]);
 
   const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
+    setSidebarOpen((prev) => !prev);
+  };
+
+  const getDashboardFallbackByRole = (role) => {
+    const normalizedRole = String(role || "").toLowerCase();
+
+    switch (normalizedRole) {
+      case "admin":
+      case "subadmin":
+        return "/dashboard/admin-dashboard";
+      case "lecturer":
+        return "/dashboard/lecturer-dashboard";
+      case "assistant":
+        return "/dashboard/assistant-page";
+      case "student":
+      case "parent":
+      case "teacher":
+        return "/dashboard/student-dashboard/promo-codes";
+      default:
+        return "/";
+    }
+  };
+
+  const renderAdminRoute = (element) => {
+    const user = getUserFromToken();
+
+    if (!user) {
+      return <Navigate to="/login" replace />;
+    }
+
+    const role = String(user.role || "").toLowerCase();
+    if (role !== "admin" && role !== "subadmin") {
+      return <Navigate to={getDashboardFallbackByRole(role)} replace />;
+    }
+
+    return element;
   };
 
   return (
@@ -195,28 +231,36 @@ function App() {
             {/* Admin Routes */}
             <Route
               path="/dashboard/admin-dashboard"
-              element={<AdminDashboard />}
+              element={renderAdminRoute(<AdminDashboard />)}
             />
             <Route
               path="/dashboard/admin-dashboard/audit-log"
-              element={<AuditLog />}
+              element={renderAdminRoute(<AuditLog />)}
             />
             <Route
               path="/dashboard/admin-dashboard/create"
-              element={<AdminCreate />}
+              element={renderAdminRoute(<AdminCreate />)}
             />
             <Route
               path="/dashboard/admin-dashboard/lectures-page"
-              element={<MyLecturesPage />}
+              element={renderAdminRoute(<MyLecturesPage />)}
             />
             <Route
               path="/dashboard/admin-dashboard/signed-lecturers"
-              element={<SignedLecturers />}
+              element={renderAdminRoute(<SignedLecturers />)}
             />
             <Route
               path="/dashboard/admin-dashboard/financial-dashboard"
-              element={<FinancialDashboard />}
+              element={renderAdminRoute(<FinancialDashboard />)}
             />
+              <Route
+                path="/dashboard/admin-dashboard/store-dashboard"
+                element={<Navigate to="/dashboard/admin-dashboard" replace />}
+              />
+              <Route
+                path="/dashboard/admin-dashboard/store-analytics"
+                element={<Navigate to="/dashboard/admin-dashboard" replace />}
+              />
             {/* Lecturer Routes */}
             <Route
               path="/dashboard/lecturer-dashboard"

@@ -1,12 +1,42 @@
+import { useTranslation } from "react-i18next"
+import { designTokens } from "../../constants/designTokens"
+
 function PageHeader({ title }) {
-    return (
-      <div className="relative">
-        <h1 className="text-3xl font-bold text-center mb-8">{title}</h1>
-        <div className="absolute top-0 left-0 right-0 h-4 bg-yellow-200 -z-10 mt-4"></div>
+  const { t, i18n } = useTranslation("settings")
+  const isRTL = i18n.language === "ar"
+  const TOKENS = designTokens.colors
+
+  return (
+    <div
+      className="mb-6 rounded-3xl border px-4 py-5 md:px-6"
+      style={{
+        background: "rgba(255,255,255,0.72)",
+        borderColor: "rgba(17,24,39,0.08)",
+      }}
+    >
+      <div className={`flex items-center justify-between gap-3 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+        <div>
+          <h1 className="text-2xl font-bold md:text-3xl" style={{ color: TOKENS.deepTeal }}>
+            {title}
+          </h1>
+          <p className="mt-1 text-sm md:text-base" style={{ color: TOKENS.slateText }}>
+            {t("personalInfo.subtitle")}
+          </p>
+        </div>
+        <span
+          className="rounded-full px-3 py-1 text-xs font-semibold"
+          style={{
+            background: "rgba(14,85,99,0.1)",
+            color: TOKENS.deepTeal,
+          }}
+        >
+          {t("title")}
+        </span>
       </div>
-    )
-  }
-  
-  export default PageHeader
+    </div>
+  )
+}
+
+export default PageHeader
   
   
