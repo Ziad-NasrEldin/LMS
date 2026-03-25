@@ -40,7 +40,19 @@ const auditLogSchema = new mongoose.Schema(
       name: {
         type: String,
         required: false
+      },
+      details: {
+        type: mongoose.Schema.Types.Mixed,
+        required: false
       }
+    },
+    description: {
+      type: String,
+      required: false
+    },
+    metadata: {
+      type: mongoose.Schema.Types.Mixed,
+      required: false
     },
     status: {
       type: String,

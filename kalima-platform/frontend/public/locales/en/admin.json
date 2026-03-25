@@ -273,6 +273,7 @@
         "parent": "Parent",
         "package": "Packages",
         "lesson": "Lesson",
+        "impersonation": "Impersonation",
                 "ec": {
           "purchase": "Purchase"
         }

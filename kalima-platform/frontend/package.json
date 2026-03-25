@@ -42,6 +42,7 @@
     "start": "vite",
     "build": "vite build",
     "serve": "vite preview",
+    "audit:i18n": "node scripts/i18n-audit.js",
     "build:android": "env-cmd -f .env.android vite build && cd .. && npx cap copy android"
   },
   "eslintConfig": {

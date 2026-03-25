@@ -55,8 +55,7 @@ function App() {
   const [showSidebar, setShowSidebar] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [impersonationSession, setImpersonationSession] = useState(getImpersonationSession());
-  const { i18n } = useTranslation();
-  const { t } = useTranslation("common");
+  const { t, i18n } = useTranslation("common");
   const isRTL = i18n.dir() === "rtl";
   const authRoutes = [
     "/login",
@@ -144,6 +143,14 @@ function App() {
     }
   };
 
+  const normalizeRoleForMatch = (role) => {
+    const normalizedRole = String(role || "")
+      .toLowerCase()
+      .replace(/[^a-z]/g, "");
+
+    return normalizedRole === "subadmin" ? "admin" : normalizedRole;
+  };
+
   const getCurrentUserRole = () => {
     const effectiveRole = getEffectiveUserRole();
     if (effectiveRole) return effectiveRole;
@@ -172,7 +179,7 @@ function App() {
     }
   };
 
-  const renderAdminRoute = (element) => {
+  const renderDashboardRoute = (element, allowedRoles = []) => {
     const user = getUserFromToken();
     const role = getCurrentUserRole();
 
@@ -180,12 +187,33 @@ function App() {
       return <Navigate to="/login" replace />;
     }
 
-    if (role !== "admin" && role !== "subadmin") {
+    if (!Array.isArray(allowedRoles) || allowedRoles.length === 0) {
+      return element;
+    }
+
+    const normalizedRole = normalizeRoleForMatch(role);
+    const allowedRoleSet = new Set(
+      allowedRoles.map((allowedRole) => normalizeRoleForMatch(allowedRole)),
+    );
+
+    if (!allowedRoleSet.has(normalizedRole)) {
       return <Navigate to={getDashboardFallbackByRole(role)} replace />;
     }
 
     return element;
   };
+
+  const renderAdminRoute = (element) =>
+    renderDashboardRoute(element, ["admin", "subadmin"]);
+
+  const renderLecturerRoute = (element) =>
+    renderDashboardRoute(element, ["lecturer"]);
+
+  const renderAssistantRoute = (element) =>
+    renderDashboardRoute(element, ["assistant"]);
+
+  const renderStudentRoute = (element) =>
+    renderDashboardRoute(element, ["student", "parent", "teacher"]);
 
   return (
     <div className={`App ${isRTL ? "rtl" : "ltr"}`}>
@@ -274,31 +302,46 @@ function App() {
             {/* User Dashboard Routes */}
             <Route
               path="/dashboard/student-dashboard/lecture-page"
-              element={<ContainersPage />}
+              element={renderStudentRoute(<ContainersPage />)}
             />
             <Route
               path="/dashboard/student-dashboard/promo-codes"
-              element={<PromoCodes />}
+              element={renderStudentRoute(<PromoCodes />)}
             />
             <Route
               path="/dashboard/student-dashboard/container-details/:containerId"
-              element={<ContainerDetails />}
+              element={renderStudentRoute(<ContainerDetails />)}
             />
             <Route
               path="/dashboard/student-dashboard/lecture-display/:lectureId"
-              element={<LectureDisplay />}
+              element={renderStudentRoute(<LectureDisplay />)}
             />
             <Route
               path="/dashboard/student-dashboard/lectures-page"
-              element={<MyLecturesPage />}
+              element={renderStudentRoute(<MyLecturesPage />)}
             />
-            <Route path="/dashboard/settings" element={<SettingsPage />} />
+            <Route
+              path="/dashboard/settings"
+              element={renderDashboardRoute(<SettingsPage />)}
+            />
 
             {/* Assistant Routes */}
-            <Route path="/dashboard/assistant-page" element={<AssistantPage />} />
-            <Route path="/dashboard/assistant-page/lectures-page" element={<MyLecturesPage />} />
-            <Route path="/dashboard/assistant-page/detailed-lecture-view/:lectureId" element={<DetailedLectureView />} />
-            <Route path="/dashboard/assistant-page/lecture-display/:lectureId" element={<LectureDisplay />} />
+            <Route
+              path="/dashboard/assistant-page"
+              element={renderAssistantRoute(<AssistantPage />)}
+            />
+            <Route
+              path="/dashboard/assistant-page/lectures-page"
+              element={renderAssistantRoute(<MyLecturesPage />)}
+            />
+            <Route
+              path="/dashboard/assistant-page/detailed-lecture-view/:lectureId"
+              element={renderAssistantRoute(<DetailedLectureView />)}
+            />
+            <Route
+              path="/dashboard/assistant-page/lecture-display/:lectureId"
+              element={renderAssistantRoute(<LectureDisplay />)}
+            />
             
             {/* Admin Routes */}
             <Route
@@ -336,41 +379,41 @@ function App() {
             {/* Lecturer Routes */}
             <Route
               path="/dashboard/lecturer-dashboard"
-              element={<DashboardPage />}
+              element={renderLecturerRoute(<DashboardPage />)}
             />
             <Route
               path="/dashboard/lecturer-dashboard/lecture-page"
-              element={<ContainersPage />}
+              element={renderLecturerRoute(<ContainersPage />)}
             />
             <Route
               path="/dashboard/lecturer-dashboard/CoursesForm"
-              element={<CoursesForm />}
+              element={renderLecturerRoute(<CoursesForm />)}
             />
             <Route
               path="/dashboard/lecturer-dashboard/container-details/:containerId"
-              element={<ContainerDetails />}
+              element={renderLecturerRoute(<ContainerDetails />)}
             />
             <Route
               path="/dashboard/lecturer-dashboard/lecture-display/:lectureId"
-              element={<LectureDisplay />}
+              element={renderLecturerRoute(<LectureDisplay />)}
             />
             <Route
               path="/dashboard/lecturer-dashboard/lectures-page"
-              element={<MyLecturesPage />}
+              element={renderLecturerRoute(<MyLecturesPage />)}
             />
             <Route
               path="/dashboard/lecturer-dashboard/detailed-lecture-view/:lectureId"
-              element={<DetailedLectureView />}
+              element={renderLecturerRoute(<DetailedLectureView />)}
             />
 
             {/* Center Dashboard Routes */}
             <Route
               path="/dashboard/courses-dashboard"
-              element={<CoursesDashboard />}
+              element={renderAdminRoute(<CoursesDashboard />)}
             />
             <Route
               path="/dashboard/center-dashboard"
-              element={<CenterDashboard />}
+              element={renderAdminRoute(<CenterDashboard />)}
             />
           </Routes>
         </Suspense>

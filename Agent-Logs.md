@@ -55,3 +55,7 @@
 ## 2026-03-25 - Ambient animation removal - GPT-5
 - Removed decorative floating/zigzag/spin utility animations globally so dotted/ring/wave ornaments no longer drift.
 - Removed remaining infinite decorative motion loops from login and services visuals.
+
+## 2026-03-25 - CoursesForm onboarding checklist - GPT-5
+- Added a sticky side checklist with live progress to guide first-time course creation step by step.
+- Linked checklist completion states to real form/structure data (basic info, parent, container, lecture, review).

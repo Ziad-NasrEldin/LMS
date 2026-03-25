@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useTranslation } from "react-i18next"
-import { ChevronLeft, ChevronRight } from "lucide-react"
+import { CheckCircle2, ChevronLeft, ChevronRight, Circle, ListChecks } from "lucide-react"
 import { motion } from "framer-motion"
 import { getUserDashboard } from "../../routes/auth-services"
 import { getAllLevels } from "../../routes/levels"
@@ -109,6 +109,45 @@ function CourseCreationForm() {
     setCourseStructure(newStructure)
   }
 
+  const checklistItems = [
+    {
+      id: "basic",
+      label: isRTL ? "أدخل البيانات الأساسية" : "Fill basic information",
+      hint: isRTL ? "اسم الكورس + المرحلة + المادة" : "Course name + level + subject",
+      done: Boolean(formData.courseName && formData.gradeLevel && formData.subject),
+    },
+    {
+      id: "parent",
+      label: isRTL ? "أنشئ الحاوية الرئيسية" : "Create parent container",
+      hint: isRTL ? "اضغط زر إنشاء الحاوية الرئيسية" : "Use the create parent container button",
+      done: Boolean(courseStructure.parent),
+    },
+    {
+      id: "container",
+      label: isRTL ? "أضف أول حاوية فرعية" : "Add first sub-container",
+      hint: isRTL ? "مثل سنة أو فصل أو شهر" : "Example: year, term, or month",
+      done: courseStructure.containers.length > 0,
+    },
+    {
+      id: "lecture",
+      label: isRTL ? "أضف أول محاضرة" : "Add first lecture",
+      hint: isRTL ? "أدخل رابط المحاضرة وتفاصيلها" : "Set lecture link and details",
+      done: courseStructure.lectures.length > 0,
+    },
+    {
+      id: "review",
+      label: isRTL ? "راجع الهيكل قبل المغادرة" : "Review your structure",
+      hint: isRTL ? "تأكد من التسلسل قبل النشر" : "Check sequence before publishing",
+      done: Boolean(
+        courseStructure.parent &&
+          (courseStructure.containers.length > 0 || courseStructure.lectures.length > 0),
+      ),
+    },
+  ]
+
+  const completedSteps = checklistItems.filter((item) => item.done).length
+  const progressPercent = Math.round((completedSteps / checklistItems.length) * 100)
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -144,7 +183,7 @@ function CourseCreationForm() {
       dir={isRTL ? "rtl" : "ltr"}
       style={{ background: `${GRADIENTS.pageAtmosphere}, ${TOKENS.creamSurface}` }}
     >
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-7xl mx-auto">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -184,37 +223,117 @@ function CourseCreationForm() {
           </div>
         </motion.div>
 
-        {/* Basic Info Form */}
-        <BasicInfoForm
-          formData={formData}
-          handleChange={handleChange}
-          subjects={subjects}
-          levels={levels}
-          isRTL={isRTL}
-          courseStructure={courseStructure}
-          updateCourseStructure={updateCourseStructure}
-          createdBy={createdBy}
-        />
+        <div className={`grid gap-6 lg:gap-8 ${isRTL ? "lg:grid-cols-[290px_minmax(0,1fr)]" : "lg:grid-cols-[minmax(0,1fr)_290px]"}`}>
+          <aside className={`${isRTL ? "lg:order-1" : "lg:order-2"}`}>
+            <motion.div
+              initial={{ opacity: 0, y: 18 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="rounded-[1.3rem] border p-4 sm:p-5 lg:sticky lg:top-24"
+              style={{
+                background: "rgba(255,255,255,0.9)",
+                borderColor: "rgba(17,24,39,0.08)",
+                boxShadow: SHADOWS.level1,
+              }}
+            >
+              <div className={`mb-3 flex items-center gap-2 ${isRTL ? "flex-row-reverse" : ""}`}>
+                <ListChecks className="h-5 w-5" style={{ color: TOKENS.deepTeal }} />
+                <h3 className={`font-bold ${isRTL ? "text-right" : "text-left"}`} style={{ color: TOKENS.inkText }}>
+                  {isRTL ? "قائمة إنشاء أول كورس" : "First Course Checklist"}
+                </h3>
+              </div>
+              <p className={`mb-4 text-xs sm:text-sm ${isRTL ? "text-right" : "text-left"}`} style={{ color: TOKENS.slateText }}>
+                {isRTL ? "اتبع الخطوات بالترتيب لتجهيز كورسك بدون تشتت." : "Follow these steps in order to stay focused and finish faster."}
+              </p>
 
-        {/* Container Creation Panel */}
-        {courseStructure.parent && (
-          <div className="mt-8">
-            <ContainerCreationPanel
+              <div className="mb-4">
+                <div className={`mb-1 flex items-center justify-between text-xs ${isRTL ? "flex-row-reverse" : ""}`} style={{ color: TOKENS.slateText }}>
+                  <span>{isRTL ? "التقدم" : "Progress"}</span>
+                  <span>{completedSteps}/{checklistItems.length}</span>
+                </div>
+                <div className="h-2 overflow-hidden rounded-full" style={{ background: "rgba(17,24,39,0.12)" }}>
+                  <div
+                    className="h-full rounded-full transition-all duration-500"
+                    style={{ width: `${progressPercent}%`, background: TOKENS.deepTeal }}
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                {checklistItems.map((item, idx) => (
+                  <div
+                    key={item.id}
+                    className={`rounded-xl border px-3 py-2 ${isRTL ? "text-right" : "text-left"}`}
+                    style={{
+                      borderColor: item.done ? "rgba(20,106,120,0.28)" : "rgba(17,24,39,0.1)",
+                      background: item.done ? "rgba(188,231,236,0.28)" : "rgba(241,243,246,0.5)",
+                    }}
+                  >
+                    <div className={`flex items-start gap-2 ${isRTL ? "flex-row-reverse" : ""}`}>
+                      {item.done ? (
+                        <CheckCircle2 className="mt-0.5 h-4 w-4 flex-none" style={{ color: TOKENS.deepTeal }} />
+                      ) : (
+                        <Circle className="mt-0.5 h-4 w-4 flex-none" style={{ color: TOKENS.slateText }} />
+                      )}
+                      <div className="min-w-0">
+                        <p className="text-sm font-semibold" style={{ color: TOKENS.inkText }}>
+                          {idx + 1}. {item.label}
+                        </p>
+                        <p className="text-xs" style={{ color: TOKENS.slateText }}>{item.hint}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {completedSteps === checklistItems.length && (
+                <div
+                  className={`mt-4 rounded-xl border px-3 py-2 text-xs sm:text-sm font-semibold ${isRTL ? "text-right" : "text-left"}`}
+                  style={{
+                    background: "rgba(188,231,236,0.35)",
+                    borderColor: "rgba(20,106,120,0.3)",
+                    color: TOKENS.deepTeal,
+                  }}
+                >
+                  {isRTL ? "ممتاز! أول كورس جاهز تقريبًا." : "Great work! Your first course is almost ready."}
+                </div>
+              )}
+            </motion.div>
+          </aside>
+
+          <div className={`${isRTL ? "lg:order-2" : "lg:order-1"}`}>
+            {/* Basic Info Form */}
+            <BasicInfoForm
+              formData={formData}
+              handleChange={handleChange}
+              subjects={subjects}
+              levels={levels}
+              isRTL={isRTL}
               courseStructure={courseStructure}
               updateCourseStructure={updateCourseStructure}
-              formData={formData}
               createdBy={createdBy}
-              isRTL={isRTL}
             />
-          </div>
-        )}
 
-        {/* Course Structure Visualization */}
-        {courseStructure.parent && courseStructure.containers.length > 0 && (
-          <div className="mt-8">
-            <CourseStructureVisualization courseStructure={courseStructure} isRTL={isRTL} />
+            {/* Container Creation Panel */}
+            {courseStructure.parent && (
+              <div className="mt-8">
+                <ContainerCreationPanel
+                  courseStructure={courseStructure}
+                  updateCourseStructure={updateCourseStructure}
+                  formData={formData}
+                  createdBy={createdBy}
+                  isRTL={isRTL}
+                />
+              </div>
+            )}
+
+            {/* Course Structure Visualization */}
+            {courseStructure.parent && courseStructure.containers.length > 0 && (
+              <div className="mt-8">
+                <CourseStructureVisualization courseStructure={courseStructure} isRTL={isRTL} />
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
     </div>
   )

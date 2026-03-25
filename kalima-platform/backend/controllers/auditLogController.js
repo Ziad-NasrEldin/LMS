@@ -298,7 +298,8 @@ exports.getResourceAuditLogs = catchAsync(async (req, res, next) => {
   const validResourceTypes = [
     "center", "code", "container", "moderator", "subAdmin",
     "assistant", "admin", "lecturer", "package", "lesson",
-    "timetable", "center-lesson", "ec.section", "ec.product", "ec.purchase"
+    "timetable", "center-lesson", "ec.section", "ec.product", "ec.purchase",
+    "impersonation"
   ];
 
   if (!validResourceTypes.includes(resourceType)) {
@@ -361,7 +362,8 @@ exports.getResourceInstanceAuditLogs = catchAsync(async (req, res, next) => {
   const validResourceTypes = [
     "center", "code", "container", "moderator", "subAdmin",
     "assistant", "admin", "lecturer", "package", "lesson",
-    "timetable", "center-lesson", "ec.section", "ec.product", "ec.purchase"
+    "timetable", "center-lesson", "ec.section", "ec.product", "ec.purchase",
+    "impersonation"
   ];
 
   if (!validResourceTypes.includes(resourceType)) {

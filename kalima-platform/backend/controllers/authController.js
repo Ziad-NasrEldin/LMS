@@ -46,7 +46,7 @@ const decodeAccessTokenFromRequest = (req) => {
 };
 
 const createImpersonationAuditLog = async ({
-  action,
+  event,
   actorId,
   actorName,
   actorRole,
@@ -54,7 +54,42 @@ const createImpersonationAuditLog = async ({
   targetName,
   targetRole,
   sessionId,
+  startedAt,
+  endedAt,
+  durationSeconds,
 }) => {
+  const normalizedEvent =
+    event === "IMPERSONATION_ENDED"
+      ? "IMPERSONATION_ENDED"
+      : "IMPERSONATION_STARTED";
+
+  const action = normalizedEvent === "IMPERSONATION_STARTED" ? "create" : "delete";
+  const nameParts = [
+    normalizedEvent,
+    `session:${sessionId}`,
+    `actor:${actorName || actorId}(${actorRole || "Unknown"})`,
+    `target:${targetName || targetId}(${targetRole || "Unknown"})`,
+  ];
+  if (typeof durationSeconds === "number") {
+    nameParts.push(`duration:${durationSeconds}s`);
+  }
+  const resourceName = nameParts.join(" | ");
+
+  const metadata = {
+    event: normalizedEvent,
+    actorId: actorId ? String(actorId) : null,
+    actorName: actorName || null,
+    actorRole: actorRole || null,
+    targetId: targetId ? String(targetId) : null,
+    targetName: targetName || null,
+    targetRole: targetRole || null,
+    sessionId: sessionId || null,
+    startedAt: startedAt || null,
+    endedAt: endedAt || null,
+    durationSeconds:
+      typeof durationSeconds === "number" ? durationSeconds : null,
+  };
+
   try {
     await AuditLog.create({
       user: {
@@ -66,9 +101,14 @@ const createImpersonationAuditLog = async ({
       resource: {
         type: "impersonation",
         id: targetId,
-        name: `session:${sessionId} actor:${actorName || actorId} target:${targetName || targetId
-          } role:${targetRole}`,
+        name: resourceName,
+        details: {
+          name: resourceName,
+          ...metadata,
+        },
       },
+      description: normalizedEvent,
+      metadata,
       status: "success",
     });
   } catch (auditError) {
@@ -251,7 +291,7 @@ const startImpersonation = catchAsync(async (req, res, next) => {
   });
 
   await createImpersonationAuditLog({
-    action: "create",
+    event: "IMPERSONATION_STARTED",
     actorId: actor._id,
     actorName: actor.name,
     actorRole: actor.role,
@@ -259,10 +299,12 @@ const startImpersonation = catchAsync(async (req, res, next) => {
     targetName: target.name,
     targetRole: target.role,
     sessionId,
+    startedAt,
   });
 
   return res.status(200).json({
     status: "success",
+    success: true,
     accessToken,
     sessionId,
     actor: {
@@ -298,9 +340,17 @@ const stopImpersonation = catchAsync(async (req, res, next) => {
   }
 
   const accessToken = generateAccessToken(actor._id, actor.role);
+  const endedAt = new Date().toISOString();
+  const startedAtDate = impersonation.startedAt
+    ? new Date(impersonation.startedAt)
+    : null;
+  const durationSeconds =
+    startedAtDate && !Number.isNaN(startedAtDate.getTime())
+      ? Math.max(0, Math.round((Date.now() - startedAtDate.getTime()) / 1000))
+      : null;
 
   await createImpersonationAuditLog({
-    action: "delete",
+    event: "IMPERSONATION_ENDED",
     actorId: actor._id,
     actorName: actor.name,
     actorRole: actor.role,
@@ -308,17 +358,29 @@ const stopImpersonation = catchAsync(async (req, res, next) => {
     targetName: impersonation.targetName,
     targetRole: impersonation.targetRole,
     sessionId: impersonation.sessionId,
+    startedAt: impersonation.startedAt || null,
+    endedAt,
+    durationSeconds,
   });
 
   return res.status(200).json({
     status: "success",
+    success: true,
     accessToken,
+    sessionId: impersonation.sessionId,
     actor: {
       id: actor._id,
       role: actor.role,
       name: actor.name,
     },
-    endedAt: new Date().toISOString(),
+    target: {
+      id: impersonation.targetId,
+      role: impersonation.targetRole,
+      name: impersonation.targetName,
+    },
+    startedAt: impersonation.startedAt || null,
+    endedAt,
+    durationSeconds,
   });
 });
 

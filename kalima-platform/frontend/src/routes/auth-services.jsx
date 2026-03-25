@@ -317,6 +317,13 @@ export const startImpersonation = async ({ targetUserId, targetRole }) => {
       return { success: false, error: "Not authenticated" }
     }
 
+    if (isImpersonationActive()) {
+      return {
+        success: false,
+        error: "Nested impersonation is not allowed. Exit current view first.",
+      }
+    }
+
     const response = await api.post(
       `/auth/impersonation/start`,
       { targetUserId, targetRole },
@@ -398,7 +405,9 @@ export const stopImpersonation = async () => {
       headers: response.headers,
     }
   } catch (error) {
-    clearImpersonationSession()
+    if (error.response?.status === 400) {
+      clearImpersonationSession()
+    }
     return {
       success: false,
       status: error.response?.status,
