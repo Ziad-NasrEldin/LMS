@@ -4,15 +4,15 @@
     "namespaceCountAr": 32,
     "missingArNamespacesCount": 0,
     "missingEnNamespacesCount": 0,
-    "missingUsedKeysInEnCount": 108,
-    "missingUsedKeysInArCount": 108
+    "missingUsedKeysInEnCount": 89,
+    "missingUsedKeysInArCount": 89
   },
   "missingArNamespaces": [],
   "missingEnNamespaces": [],
   "byNamespace": {
     "admin": {
-      "enCount": 337,
-      "arCount": 337,
+      "enCount": 376,
+      "arCount": 376,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": [
@@ -20,15 +20,15 @@
       ]
     },
     "admin-signedLecturers": {
-      "enCount": 34,
-      "arCount": 34,
+      "enCount": 39,
+      "arCount": 39,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": []
     },
     "assistantPage": {
-      "enCount": 109,
-      "arCount": 109,
+      "enCount": 123,
+      "arCount": 123,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": [
@@ -36,15 +36,15 @@
       ]
     },
     "center": {
-      "enCount": 10,
-      "arCount": 10,
+      "enCount": 12,
+      "arCount": 12,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": []
     },
     "centerDashboard": {
-      "enCount": 210,
-      "arCount": 210,
+      "enCount": 269,
+      "arCount": 269,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": [
@@ -54,15 +54,15 @@
       ]
     },
     "common": {
-      "enCount": 106,
-      "arCount": 106,
+      "enCount": 110,
+      "arCount": 110,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": []
     },
     "courseDetails": {
-      "enCount": 54,
-      "arCount": 54,
+      "enCount": 65,
+      "arCount": 65,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": [
@@ -70,15 +70,15 @@
       ]
     },
     "courses": {
-      "enCount": 68,
-      "arCount": 68,
+      "enCount": 78,
+      "arCount": 78,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": []
     },
     "coursesDashboard": {
-      "enCount": 98,
-      "arCount": 98,
+      "enCount": 120,
+      "arCount": 120,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": [
@@ -121,15 +121,15 @@
       ]
     },
     "createAdmin": {
-      "enCount": 69,
-      "arCount": 69,
+      "enCount": 78,
+      "arCount": 78,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": []
     },
     "createUser": {
-      "enCount": 112,
-      "arCount": 112,
+      "enCount": 125,
+      "arCount": 125,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": []
@@ -142,8 +142,8 @@
       "suspiciousSame": []
     },
     "home": {
-      "enCount": 101,
-      "arCount": 101,
+      "enCount": 125,
+      "arCount": 125,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": [
@@ -151,8 +151,8 @@
       ]
     },
     "kalimaStore-Market": {
-      "enCount": 26,
-      "arCount": 26,
+      "enCount": 36,
+      "arCount": 36,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": [
@@ -160,8 +160,8 @@
       ]
     },
     "kalimaStore-ProductDetails": {
-      "enCount": 110,
-      "arCount": 110,
+      "enCount": 129,
+      "arCount": 129,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": [
@@ -169,8 +169,8 @@
       ]
     },
     "kalimaStore-admin": {
-      "enCount": 262,
-      "arCount": 262,
+      "enCount": 305,
+      "arCount": 305,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": [
@@ -178,15 +178,15 @@
       ]
     },
     "kalimaStore-analytics": {
-      "enCount": 44,
-      "arCount": 44,
+      "enCount": 49,
+      "arCount": 49,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": []
     },
     "kalimaStore-coupons": {
-      "enCount": 65,
-      "arCount": 65,
+      "enCount": 73,
+      "arCount": 73,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": []
@@ -199,43 +199,43 @@
       "suspiciousSame": []
     },
     "kalimaStore-orders": {
-      "enCount": 84,
-      "arCount": 84,
+      "enCount": 88,
+      "arCount": 88,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": []
     },
     "lectureDisplay": {
-      "enCount": 151,
-      "arCount": 151,
+      "enCount": 157,
+      "arCount": 157,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": []
     },
     "lecturerDashboard": {
-      "enCount": 57,
-      "arCount": 57,
+      "enCount": 61,
+      "arCount": 61,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": []
     },
     "lectures": {
-      "enCount": 101,
-      "arCount": 101,
+      "enCount": 114,
+      "arCount": 114,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": []
     },
     "lecturesPage": {
-      "enCount": 107,
-      "arCount": 107,
+      "enCount": 140,
+      "arCount": 140,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": []
     },
     "login": {
-      "enCount": 88,
-      "arCount": 88,
+      "enCount": 89,
+      "arCount": 89,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": [
@@ -245,50 +245,50 @@
       ]
     },
     "notifications": {
-      "enCount": 13,
-      "arCount": 13,
+      "enCount": 17,
+      "arCount": 17,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": []
     },
     "packages": {
-      "enCount": 116,
-      "arCount": 116,
+      "enCount": 130,
+      "arCount": 130,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": []
     },
     "promoCodes": {
-      "enCount": 113,
-      "arCount": 113,
+      "enCount": 134,
+      "arCount": 134,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": []
     },
     "register": {
-      "enCount": 198,
-      "arCount": 198,
+      "enCount": 211,
+      "arCount": 211,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": []
     },
     "settings": {
-      "enCount": 67,
-      "arCount": 67,
+      "enCount": 83,
+      "arCount": 83,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": []
     },
     "teacherDetails": {
-      "enCount": 11,
-      "arCount": 11,
+      "enCount": 12,
+      "arCount": 12,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": []
     },
     "teachers": {
-      "enCount": 28,
-      "arCount": 28,
+      "enCount": 35,
+      "arCount": 35,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": []
@@ -353,54 +353,6 @@
       "file": "pages/User Dashboard/Lecture Page/ContainerPage.jsx",
       "ns": "lecturesPage",
       "key": "containersPage.unknown",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Lecture Page/DetailedLectureViewing.jsx",
-      "ns": "lectureDisplay",
-      "key": "fileName",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Lecture Page/DetailedLectureViewing.jsx",
-      "ns": "lectureDisplay",
-      "key": "rating",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Lecture Page/DetailedLectureViewing.jsx",
-      "ns": "lectureDisplay",
-      "key": "comment",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Lecture Page/DetailedLectureViewing.jsx",
-      "ns": "lectureDisplay",
-      "key": "provideFeedback",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Lecture Page/DetailedLectureViewing.jsx",
-      "ns": "lectureDisplay",
-      "key": "rating",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Lecture Page/DetailedLectureViewing.jsx",
-      "ns": "lectureDisplay",
-      "key": "comment",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Lecture Page/DetailedLectureViewing.jsx",
-      "ns": "lectureDisplay",
-      "key": "enterYourFeedback",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Lecture Page/DetailedLectureViewing.jsx",
-      "ns": "lectureDisplay",
-      "key": "submitFeedback",
       "fn": "t"
     },
     {
@@ -569,12 +521,6 @@
       "file": "pages/teacher details/Teacher-details.jsx",
       "ns": "teacherDetails",
       "key": "noCoursesAvailable",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Settings/PersonalInfoSection.jsx",
-      "ns": "settings",
-      "key": "personalInfo",
       "fn": "t"
     },
     {
@@ -821,66 +767,6 @@
       "file": "pages/CenterDashboard/ActivityTracker.jsx",
       "ns": "centerDashboard",
       "key": "activityTracker.status.no",
-      "fn": "t"
-    },
-    {
-      "file": "pages/CenterDashboard/ContactForm.jsx",
-      "ns": "centerDashboard",
-      "key": "contactForm.categories",
-      "fn": "t"
-    },
-    {
-      "file": "pages/CenterDashboard/ContactForm.jsx",
-      "ns": "centerDashboard",
-      "key": "contactForm.contentTypes",
-      "fn": "t"
-    },
-    {
-      "file": "pages/CenterDashboard/ContactForm.jsx",
-      "ns": "centerDashboard",
-      "key": "contactForm.grades",
-      "fn": "t"
-    },
-    {
-      "file": "pages/CenterDashboard/CourseCard.jsx",
-      "ns": "centerDashboard",
-      "key": "courseCard.unknownSubject",
-      "fn": "t"
-    },
-    {
-      "file": "pages/CenterDashboard/CourseCard.jsx",
-      "ns": "centerDashboard",
-      "key": "courseCard.unknownSubject",
-      "fn": "t"
-    },
-    {
-      "file": "pages/CenterDashboard/CourseCard.jsx",
-      "ns": "centerDashboard",
-      "key": "courseCard.unknownGroup",
-      "fn": "t"
-    },
-    {
-      "file": "pages/CenterDashboard/CourseCard.jsx",
-      "ns": "centerDashboard",
-      "key": "courseCard.errors.invalidLessonId",
-      "fn": "t"
-    },
-    {
-      "file": "pages/CenterDashboard/CourseCard.jsx",
-      "ns": "centerDashboard",
-      "key": "courseCard.errors.fetchLessonFailed",
-      "fn": "t"
-    },
-    {
-      "file": "pages/CenterDashboard/CourseCard.jsx",
-      "ns": "centerDashboard",
-      "key": "courseCard.unknownLecturer",
-      "fn": "t"
-    },
-    {
-      "file": "pages/CenterDashboard/CourseFilters.jsx",
-      "ns": "centerDashboard",
-      "key": "subjects",
       "fn": "t"
     },
     {
@@ -1006,54 +892,6 @@
       "fn": "t"
     },
     {
-      "file": "pages/User Dashboard/Lecture Page/DetailedLectureViewing.jsx",
-      "ns": "lectureDisplay",
-      "key": "fileName",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Lecture Page/DetailedLectureViewing.jsx",
-      "ns": "lectureDisplay",
-      "key": "rating",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Lecture Page/DetailedLectureViewing.jsx",
-      "ns": "lectureDisplay",
-      "key": "comment",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Lecture Page/DetailedLectureViewing.jsx",
-      "ns": "lectureDisplay",
-      "key": "provideFeedback",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Lecture Page/DetailedLectureViewing.jsx",
-      "ns": "lectureDisplay",
-      "key": "rating",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Lecture Page/DetailedLectureViewing.jsx",
-      "ns": "lectureDisplay",
-      "key": "comment",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Lecture Page/DetailedLectureViewing.jsx",
-      "ns": "lectureDisplay",
-      "key": "enterYourFeedback",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Lecture Page/DetailedLectureViewing.jsx",
-      "ns": "lectureDisplay",
-      "key": "submitFeedback",
-      "fn": "t"
-    },
-    {
       "file": "pages/User Dashboard/Lecture Page/LecturesPage.jsx",
       "ns": "lecturesPage",
       "key": "lecturesPage.messages.lectureCreatedSuccessfully",
@@ -1219,12 +1057,6 @@
       "file": "pages/teacher details/Teacher-details.jsx",
       "ns": "teacherDetails",
       "key": "noCoursesAvailable",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Settings/PersonalInfoSection.jsx",
-      "ns": "settings",
-      "key": "personalInfo",
       "fn": "t"
     },
     {
@@ -1471,66 +1303,6 @@
       "file": "pages/CenterDashboard/ActivityTracker.jsx",
       "ns": "centerDashboard",
       "key": "activityTracker.status.no",
-      "fn": "t"
-    },
-    {
-      "file": "pages/CenterDashboard/ContactForm.jsx",
-      "ns": "centerDashboard",
-      "key": "contactForm.categories",
-      "fn": "t"
-    },
-    {
-      "file": "pages/CenterDashboard/ContactForm.jsx",
-      "ns": "centerDashboard",
-      "key": "contactForm.contentTypes",
-      "fn": "t"
-    },
-    {
-      "file": "pages/CenterDashboard/ContactForm.jsx",
-      "ns": "centerDashboard",
-      "key": "contactForm.grades",
-      "fn": "t"
-    },
-    {
-      "file": "pages/CenterDashboard/CourseCard.jsx",
-      "ns": "centerDashboard",
-      "key": "courseCard.unknownSubject",
-      "fn": "t"
-    },
-    {
-      "file": "pages/CenterDashboard/CourseCard.jsx",
-      "ns": "centerDashboard",
-      "key": "courseCard.unknownSubject",
-      "fn": "t"
-    },
-    {
-      "file": "pages/CenterDashboard/CourseCard.jsx",
-      "ns": "centerDashboard",
-      "key": "courseCard.unknownGroup",
-      "fn": "t"
-    },
-    {
-      "file": "pages/CenterDashboard/CourseCard.jsx",
-      "ns": "centerDashboard",
-      "key": "courseCard.errors.invalidLessonId",
-      "fn": "t"
-    },
-    {
-      "file": "pages/CenterDashboard/CourseCard.jsx",
-      "ns": "centerDashboard",
-      "key": "courseCard.errors.fetchLessonFailed",
-      "fn": "t"
-    },
-    {
-      "file": "pages/CenterDashboard/CourseCard.jsx",
-      "ns": "centerDashboard",
-      "key": "courseCard.unknownLecturer",
-      "fn": "t"
-    },
-    {
-      "file": "pages/CenterDashboard/CourseFilters.jsx",
-      "ns": "centerDashboard",
-      "key": "subjects",
       "fn": "t"
     },
     {

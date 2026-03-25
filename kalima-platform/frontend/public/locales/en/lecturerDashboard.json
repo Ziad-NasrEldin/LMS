@@ -41,6 +41,9 @@
   "invalidEmailFormat": "Invalid email format",
   "passwordIsRequired": "Password is required",
   "passwordMustBe6Chars": "Password must be at least 6 characters",
+  "createAssistantError": "Failed to create assistant",
+  "deleteAssistantError": "Failed to delete assistant",
+  "updateAssistantError": "Failed to update assistant",
 
   "unknown": "Unknown",
   "unspecified": "Unspecified",

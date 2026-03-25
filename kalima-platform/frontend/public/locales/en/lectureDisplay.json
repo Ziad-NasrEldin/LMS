@@ -96,6 +96,12 @@
   "filesUploadedSuccessfully": "Files uploaded successfully!",
   "uploading": "Uploading...",
   "uploadFiles": "Upload Files",
+  "fileName": "File Name",
+  "rating": "Rating",
+  "comment": "Comment",
+  "provideFeedback": "Provide Feedback",
+  "enterYourFeedback": "Enter your feedback here...",
+  "submitFeedback": "Submit Feedback",
 
   "errorGeneric": "An error occurred while loading the lecture",
   "lectureNotFound": "Lecture not found",

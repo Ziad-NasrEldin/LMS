@@ -217,13 +217,20 @@
   "courseCard": {
   "session": "الحصة {{session}}",
   "showDetails" : "اظهار التفاصيل",
+    "unknownSubject": "مادة غير معروفة",
+    "unknownGroup": "مجموعة غير معروفة",
+    "unknownLecturer": "محاضر غير معروف",
   "types": {
     "lecture": "محاضرة",
     "tutorial": "تمرين",
     "lab": "مختبر"
   },
   "lecturer": "المحاضر",
-  "level": "المستوى"
+    "level": "المستوى",
+    "errors": {
+      "invalidLessonId": "معرف الدرس غير صالح",
+      "fetchLessonFailed": "فشل في جلب تفاصيل الدرس: {{message}}"
+    }
 },
 "schedule": {
   "title": "جدول الحصص"

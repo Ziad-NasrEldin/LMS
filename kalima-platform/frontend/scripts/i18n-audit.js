@@ -18,13 +18,19 @@ const flattenEntries = (value, prefix = '') => {
     return prefix ? [{ key: prefix, value }] : [];
   }
 
-  return Object.entries(value).flatMap(([key, childValue]) => {
+  const entries = prefix ? [{ key: prefix, value }] : [];
+
+  for (const [key, childValue] of Object.entries(value)) {
     const nextKey = prefix ? `${prefix}.${key}` : key;
     if (childValue && typeof childValue === 'object' && !Array.isArray(childValue)) {
-      return flattenEntries(childValue, nextKey);
+      entries.push(...flattenEntries(childValue, nextKey));
+      continue;
     }
-    return [{ key: nextKey, value: childValue }];
-  });
+
+    entries.push({ key: nextKey, value: childValue });
+  }
+
+  return entries;
 };
 
 const collectSourceFiles = (dir) => {

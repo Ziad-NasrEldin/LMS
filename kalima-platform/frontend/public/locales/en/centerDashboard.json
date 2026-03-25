@@ -215,13 +215,20 @@
 "courseCard": {
   "session": "Session {{session}}",
   "showDetails" : "Show Details",
+  "unknownSubject": "Unknown Subject",
+  "unknownGroup": "Unknown Group",
+  "unknownLecturer": "Unknown Lecturer",
   "types": {
     "lecture": "Lecture",
     "tutorial": "Tutorial",
     "lab": "Lab"
   },
   "lecturer": "Lecturer",
-  "level": "Level"
+  "level": "Level",
+  "errors": {
+    "invalidLessonId": "Invalid lesson ID",
+    "fetchLessonFailed": "Failed to fetch lesson details: {{message}}"
+  }
 },
 "schedule": {
   "title": "Class Schedule"

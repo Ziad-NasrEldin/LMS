@@ -96,6 +96,12 @@
   "filesUploadedSuccessfully": "تم رفع الملفات بنجاح!",
   "uploading": "جاري الرفع...",
   "uploadFiles": "رفع الملفات",
+  "fileName": "اسم الملف",
+  "rating": "التقييم",
+  "comment": "التعليق",
+  "provideFeedback": "إضافة تقييم",
+  "enterYourFeedback": "أدخل ملاحظاتك هنا...",
+  "submitFeedback": "إرسال التقييم",
 
   "errorGeneric": "حدث خطأ أثناء تحميل المحاضرة",
   "lectureNotFound": "المحاضرة غير موجودة",

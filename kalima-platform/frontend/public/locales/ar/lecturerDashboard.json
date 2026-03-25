@@ -41,6 +41,9 @@
   "invalidEmailFormat": "صيغة البريد الإلكتروني غير صحيحة",
   "passwordIsRequired": "كلمة المرور مطلوبة",
   "passwordMustBe6Chars": "يجب أن تكون كلمة المرور 6 أحرف على الأقل",
+  "createAssistantError": "فشل في إنشاء المساعد",
+  "deleteAssistantError": "فشل في حذف المساعد",
+  "updateAssistantError": "فشل في تحديث المساعد",
 
   "unknown": "غير معروف",
   "unspecified": "غير محدد",
