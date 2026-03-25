@@ -1,3 +1,8 @@
+## 2026-03-25 - Translation follow-up pass - GPT-5.4-mini
+- Added missing lecture feedback keys, center dashboard course-card fallbacks, and lecturer assistant error strings to remove remaining live Arabic/English fallbacks.
+- Updated the i18n audit flattening logic so object-valued locale paths are counted correctly when source code uses `returnObjects` lookups.
+- Reran the frontend translation audit to refresh the missing-key baseline after the remediation pass.
+
 ## 2026-03-25 - Translation audit runner implementation - GPT-5.4-mini
 - Added a repeatable frontend i18n audit script that scans source translation usage, compares EN/AR locale namespaces, and writes the machine-readable coverage report.
 - Exposed the audit through an npm script so the audit baseline can be regenerated from the frontend package on demand.
