@@ -49,6 +49,7 @@ const PrivacyPolicy = lazy(() => import("./pages/privacyPolicy"));
 const Market = lazy(() => import("./pages/KalimaStore/Market"));
 const ProductDetails = lazy(() => import("./pages/KalimaStore/ProductDetails"));
 const SignedLecturers = lazy(() => import("./pages/User Dashboard/Admin dashboard/signed-lecturers"));
+const PromoCodesManagementPage = lazy(() => import("./pages/User Dashboard/Admin dashboard/promo-codes-management"));
 
 function App() {
   const location = useLocation();
@@ -367,6 +368,10 @@ function App() {
             <Route
               path="/dashboard/admin-dashboard/financial-dashboard"
               element={renderAdminRoute(<FinancialDashboard />)}
+            />
+            <Route
+              path="/dashboard/admin-dashboard/promo-codes-management"
+              element={renderAdminRoute(<PromoCodesManagementPage />)}
             />
               <Route
                 path="/dashboard/admin-dashboard/store-dashboard"
