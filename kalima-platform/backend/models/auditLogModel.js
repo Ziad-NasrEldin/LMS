@@ -29,8 +29,8 @@ const auditLogSchema = new mongoose.Schema(
         enum: [
           "center", "code", "container", "moderator", "subAdmin", 
           "assistant", "admin", "lecturer", "package", 
-          "lesson", "timetable", "center-lesson", "ec.section", 
-          "ec.product", "ec.purchase"
+          "lesson", "timetable", "center-lesson", "ec.section",
+          "ec.product", "ec.purchase", "impersonation"
         ]
       },
       id: {

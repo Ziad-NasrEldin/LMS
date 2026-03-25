@@ -34,16 +34,8 @@ const ExamPreparationSection = React.memo(({ isRTL }) => {
                 />
               </svg>
             </h2>
-            <motion.div
-              className="absolute -top-3 -right-4 w-3 h-3 rounded-full bg-secondary"
-              animate={{ scale: [1, 1.2, 1] }}
-              transition={{ duration: 2, repeat: Infinity }}
-            />
-            <motion.div
-              className="absolute -bottom-2 -left-3 w-2 h-2 rounded-full bg-accent"
-              animate={{ scale: [1, 1.3, 1] }}
-              transition={{ duration: 3, repeat: Infinity, delay: 0.5 }}
-            />
+            <div className="absolute -top-3 -right-4 w-3 h-3 rounded-full bg-secondary" />
+            <div className="absolute -bottom-2 -left-3 w-2 h-2 rounded-full bg-accent" />
           </div>
         </motion.div>
 

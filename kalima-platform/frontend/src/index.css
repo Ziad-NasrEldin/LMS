@@ -50,74 +50,19 @@
   animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
 }
 
-@keyframes float-down-dottedball {
-  0% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-64px);
-  }
-  100% {
-    transform: translateY(0);
-  }
-}
-
-@keyframes float-zigzag {
-  0% {
-    transform: translateX(0);
-  }
-  50% {
-    transform: translateX(-64px);
-  }
-  100% {
-    transform: translateX(0);
-  }
-}
-@keyframes float-up-dottedball {
-  0% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(64px);
-  }
-  100% {
-    transform: translateY(0);
-  }
-}
 .animate-float-zigzag {
-  animation: float-zigzag 4s ease-in-out infinite;
+  animation: none !important;
 }
 .animate-float-up-dottedball {
-  animation: float-up-dottedball 4s ease-in-out infinite;
-}
-
-@keyframes float-down-dottedball {
-  0% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-64px);
-  }
-  100% {
-    transform: translateY(0);
-  }
+  animation: none !important;
 }
 
 .animate-float-down-dottedball {
-  animation: float-down-dottedball 3s ease-in-out infinite;
-}
-
-@keyframes spin-y {
-  0% {
-    transform: rotateY(0deg);
-  }
-  100% {
-    transform: rotateY(360deg);
-  }
+  animation: none !important;
 }
 
 .animate-spin-y {
-  animation: spin-y 3s linear infinite;
+  animation: none !important;
 }
 .scrollbar-hide::-webkit-scrollbar {
   display: none;

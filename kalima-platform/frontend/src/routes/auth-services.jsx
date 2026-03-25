@@ -12,6 +12,16 @@ import {
 
 const API_URL = import.meta.env.VITE_API_URL
 const TOKEN_KEY = "accessToken"
+const IMPERSONATION_STORAGE_KEY = "impersonationSession"
+
+const normalizeRole = (role) => String(role || "").trim().toLowerCase()
+
+const emitImpersonationChange = () => {
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new Event("impersonation-changed"))
+    window.dispatchEvent(new Event("user-auth-changed"))
+  }
+}
 
 // --- AUTH HELPERS ---
 
@@ -27,9 +37,48 @@ export const setToken = (token) => {
 
 export const removeToken = () => localStorage.removeItem(TOKEN_KEY)
 
+export const getImpersonationSession = () => {
+  try {
+    const rawSession = localStorage.getItem(IMPERSONATION_STORAGE_KEY)
+    if (!rawSession) return null
+    const parsed = JSON.parse(rawSession)
+    if (!parsed?.isActive) return null
+    return parsed
+  } catch (_error) {
+    return null
+  }
+}
+
+export const setImpersonationSession = (session) => {
+  if (!session) return
+  localStorage.setItem(IMPERSONATION_STORAGE_KEY, JSON.stringify(session))
+  emitImpersonationChange()
+}
+
+export const clearImpersonationSession = ({ silent = false } = {}) => {
+  localStorage.removeItem(IMPERSONATION_STORAGE_KEY)
+  if (!silent) {
+    emitImpersonationChange()
+  }
+}
+
+export const isImpersonationActive = () => !!getImpersonationSession()
+
+export const getEffectiveUserRole = () => {
+  const session = getImpersonationSession()
+  if (session?.isActive && session?.targetRole) {
+    return normalizeRole(session.targetRole)
+  }
+
+  const tokenUser = getUserFromToken()
+  const tokenRole = tokenUser?.role || tokenUser?.UserInfo?.role
+  return normalizeRole(tokenRole)
+}
+
 export const clearAuthData = () => {
   localStorage.removeItem(TOKEN_KEY)
   localStorage.removeItem("user")
+  clearImpersonationSession({ silent: true })
   stopTokenRefreshCheck() // Stop periodic refresh when clearing auth data
 }
 
@@ -151,6 +200,7 @@ export const loginUser = async (credentials) => {
 
     if (response.data.accessToken) {
       setToken(response.data.accessToken);
+      clearImpersonationSession({ silent: true })
       if (response.data.user) {
         localStorage.setItem("user", JSON.stringify(response.data.user));
       }
@@ -256,6 +306,104 @@ export const logoutUser = async () => {
     return {
       success: false,
       error: "Logout failed on server, but local session was cleared",
+    }
+  }
+}
+
+export const startImpersonation = async ({ targetUserId, targetRole }) => {
+  try {
+    const token = getToken()
+    if (!token) {
+      return { success: false, error: "Not authenticated" }
+    }
+
+    const response = await api.post(
+      `/auth/impersonation/start`,
+      { targetUserId, targetRole },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    )
+
+    if (!response?.data?.accessToken) {
+      return {
+        success: false,
+        error: response?.data?.message || "Failed to start impersonation",
+      }
+    }
+
+    setToken(response.data.accessToken)
+
+    setImpersonationSession({
+      isActive: true,
+      sessionId: response.data.sessionId,
+      actorRole: response.data.actor?.role,
+      actorUserId: response.data.actor?.id,
+      actorName: response.data.actor?.name,
+      targetRole: response.data.target?.role,
+      targetUserId: response.data.target?.id,
+      targetName: response.data.target?.name,
+      startedAt: response.data.startedAt || new Date().toISOString(),
+    })
+
+    return {
+      success: true,
+      data: response.data,
+      status: response.status,
+      headers: response.headers,
+    }
+  } catch (error) {
+    return {
+      success: false,
+      status: error.response?.status,
+      error: error.response?.data?.message || error.message || "Failed to start impersonation",
+      details: error.response?.data,
+    }
+  }
+}
+
+export const stopImpersonation = async () => {
+  try {
+    const token = getToken()
+    const session = getImpersonationSession()
+
+    if (!token || !session?.sessionId) {
+      clearImpersonationSession()
+      return { success: false, error: "No active impersonation session" }
+    }
+
+    const response = await api.post(
+      `/auth/impersonation/stop`,
+      { sessionId: session.sessionId },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    )
+
+    if (response?.data?.accessToken) {
+      setToken(response.data.accessToken)
+    }
+    clearImpersonationSession()
+
+    return {
+      success: true,
+      data: response.data,
+      status: response.status,
+      headers: response.headers,
+    }
+  } catch (error) {
+    clearImpersonationSession()
+    return {
+      success: false,
+      status: error.response?.status,
+      error: error.response?.data?.message || error.message || "Failed to stop impersonation",
+      details: error.response?.data,
     }
   }
 }

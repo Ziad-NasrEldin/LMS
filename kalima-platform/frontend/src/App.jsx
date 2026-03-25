@@ -7,7 +7,11 @@ import { LoadingSpinner } from "./components/LoadingSpinner";
 import { isMobile } from "./utils/isMobile";
 import UnifiedSidebar from "./components/UnifiedSidebar";
 import { useTranslation } from "react-i18next";
-import { getUserFromToken } from "./routes/auth-services";
+import {
+  getEffectiveUserRole,
+  getImpersonationSession,
+  getUserFromToken,
+} from "./routes/auth-services";
 
 // Lazy load components
 const AuditLog = lazy(() => import("./pages/User Dashboard/Admin dashboard/auditLog"))
@@ -50,7 +54,9 @@ function App() {
   const location = useLocation();
   const [showSidebar, setShowSidebar] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [impersonationSession, setImpersonationSession] = useState(getImpersonationSession());
   const { i18n } = useTranslation();
+  const { t } = useTranslation("common");
   const isRTL = i18n.dir() === "rtl";
   const authRoutes = [
     "/login",
@@ -97,6 +103,21 @@ function App() {
     window.scrollTo({ top: 0, left: 0, behavior: "instant" });
   }, [location.pathname]);
 
+  useEffect(() => {
+    const syncImpersonationSession = () => {
+      setImpersonationSession(getImpersonationSession());
+    };
+
+    syncImpersonationSession();
+    window.addEventListener("impersonation-changed", syncImpersonationSession);
+    window.addEventListener("storage", syncImpersonationSession);
+
+    return () => {
+      window.removeEventListener("impersonation-changed", syncImpersonationSession);
+      window.removeEventListener("storage", syncImpersonationSession);
+    };
+  }, []);
+
   const toggleSidebar = () => {
     setSidebarOpen((prev) => !prev);
   };
@@ -124,6 +145,9 @@ function App() {
   };
 
   const getCurrentUserRole = () => {
+    const effectiveRole = getEffectiveUserRole();
+    if (effectiveRole) return effectiveRole;
+
     const tokenUser = getUserFromToken();
 
     if (tokenUser && typeof tokenUser === "object") {
@@ -166,6 +190,25 @@ function App() {
   return (
     <div className={`App ${isRTL ? "rtl" : "ltr"}`}>
       <NavBar />
+      {!isAuthRoute && showSidebar && impersonationSession?.isActive && (
+        <div
+          className={`mx-auto mt-2 max-w-[1220px] rounded-2xl border px-4 py-3 text-sm font-semibold ${
+            isRTL ? "text-right" : "text-left"
+          }`}
+          style={{
+            background: "rgba(14,85,99,0.08)",
+            borderColor: "rgba(14,85,99,0.24)",
+            color: "#0E5563",
+          }}
+          dir={isRTL ? "rtl" : "ltr"}
+        >
+          {t("impersonationBanner", {
+            defaultValue: "You are viewing as {{role}}: {{name}}",
+            role: impersonationSession.targetRole,
+            name: impersonationSession.targetName,
+          })}
+        </div>
+      )}
       {!isAuthRoute && showSidebar && (
         <>
           <UnifiedSidebar

@@ -202,7 +202,6 @@ const TeacherLogin = () => {
       </g>
 
       <g>
-        <animateTransform attributeName="transform" type="translate" values="0 0; 0 -8; 0 0" dur="7s" repeatCount="indefinite" />
         <rect x="640" y="350" width="160" height="70" rx="18" fill="#0E5563" opacity="0.12" />
         <rect x="660" y="370" width="120" height="12" rx="6" fill="#0E5563" opacity="0.25" />
         <rect x="660" y="390" width="80" height="10" rx="5" fill="#0E5563" opacity="0.2" />

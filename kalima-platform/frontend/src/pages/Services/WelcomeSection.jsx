@@ -65,16 +65,8 @@ const WelcomeSection = React.memo(() => {
         className="w-full lg:w-1/2 relative"
         style={{ height: "clamp(350px, 55vw, 500px)" }}
       >
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-          className="absolute -left-20 -top-20 w-64 h-64 rounded-full bg-primary/10 mix-blend-multiply filter blur-xl opacity-70"
-        />
-        <motion.div
-          animate={{ scale: [1, 1.1, 1] }}
-          transition={{ duration: 8, repeat: Infinity }}
-          className="absolute -right-10 bottom-10 w-40 h-40 rounded-full bg-secondary/10 mix-blend-multiply filter blur-xl opacity-70"
-        />
+        <div className="absolute -left-20 -top-20 w-64 h-64 rounded-full bg-primary/10 mix-blend-multiply filter blur-xl opacity-70" />
+        <div className="absolute -right-10 bottom-10 w-40 h-40 rounded-full bg-secondary/10 mix-blend-multiply filter blur-xl opacity-70" />
         <div className="relative h-full w-full z-10">
           <motion.div
             className="absolute left-8 sm:left-12 md:left-16 bottom-0 h-[70%] sm:h-[75%] md:h-[80%] w-[45%] sm:w-[40%] md:w-[35%] rounded-t-full rounded-b-full p-2 sm:p-3 md:p-4 z-0"
@@ -112,16 +104,8 @@ const WelcomeSection = React.memo(() => {
             </motion.div>
           </motion.div>
         </div>
-        <motion.div
-          className="absolute top-6 sm:top-8 md:top-10 left-6 sm:left-8 md:left-10 w-6 sm:w-7 md:w-8 h-6 sm:h-7 md:h-8 rounded-full bg-accent"
-          animate={{ scale: [1, 1.2, 1] }}
-          transition={{ duration: 3, repeat: Infinity }}
-        />
-        <motion.div
-          className="absolute bottom-12 sm:bottom-16 md:bottom-20 right-12 sm:right-16 md:right-20 w-5 sm:w-6 md:w-6 h-5 sm:h-6 md:h-6 rounded-full bg-error"
-          animate={{ scale: [1, 1.3, 1] }}
-          transition={{ duration: 4, repeat: Infinity, delay: 0.5 }}
-        />
+        <div className="absolute top-6 sm:top-8 md:top-10 left-6 sm:left-8 md:left-10 w-6 sm:w-7 md:w-8 h-6 sm:h-7 md:h-8 rounded-full bg-accent" />
+        <div className="absolute bottom-12 sm:bottom-16 md:bottom-20 right-12 sm:right-16 md:right-20 w-5 sm:w-6 md:w-6 h-5 sm:h-6 md:h-6 rounded-full bg-error" />
       </motion.div>
 
       <motion.div

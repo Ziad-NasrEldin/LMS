@@ -51,3 +51,7 @@
 - Applied the new theme styling to the `CoursesForm` page with a focused hero header and clear 3-step guidance.
 - Compacted core form controls and spacing in both basic info and content creation sections to reduce wasted space.
 - Reorganized lecture creation inputs into denser two-column groups for faster data entry.
+
+## 2026-03-25 - Ambient animation removal - GPT-5
+- Removed decorative floating/zigzag/spin utility animations globally so dotted/ring/wave ornaments no longer drift.
+- Removed remaining infinite decorative motion loops from login and services visuals.
