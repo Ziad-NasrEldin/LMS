@@ -1,3 +1,8 @@
+## 2026-03-25 - Translation audit runner implementation - GPT-5.4-mini
+- Added a repeatable frontend i18n audit script that scans source translation usage, compares EN/AR locale namespaces, and writes the machine-readable coverage report.
+- Exposed the audit through an npm script so the audit baseline can be regenerated from the frontend package on demand.
+- Regenerated the translation audit report with the new runner to refresh the current namespace and missing-key baseline.
+
 ## 2026-03-25 - Translation hotspot remediation pass - GPT-5.3-Codex
 - Implemented a focused EN/AR translation fix pass for the highest-impact audit hotspots: admin, promoCodes, lectureDisplay, centerDashboard, and common direction handling.
 - Added missing keys used by user management exports, promo child/account flows, lecture exit/homework gating dialogs, and center dashboard compatibility aliases.
@@ -59,3 +64,6 @@
 ## 2026-03-25 - CoursesForm onboarding checklist - GPT-5
 - Added a sticky side checklist with live progress to guide first-time course creation step by step.
 - Linked checklist completion states to real form/structure data (basic info, parent, container, lecture, review).
+
+## 2026-03-25 - Sidebar link for CoursesForm - GPT-5
+- Added `CoursesForm` as a lecturer sidebar item with localized EN/AR label (`createCourse`).

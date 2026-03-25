@@ -383,6 +383,12 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
         path: "/dashboard/lecturer-dashboard",
       },
       {
+        id: "course-builder",
+        title: t("createCourse") || "Create Course",
+        icon: <Edit className="h-5 w-5" />,
+        path: "/dashboard/lecturer-dashboard/CoursesForm",
+      },
+      {
         id: "lectures",
         title: t("lectures") || "Lectures",
         icon: <FaGraduationCap className="h-5 w-5" />,

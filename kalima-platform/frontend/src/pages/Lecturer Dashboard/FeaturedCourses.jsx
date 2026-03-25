@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next"
 import { User, Calendar, Clock, Heart } from "lucide-react"
 
 export default function FeaturedCourses() {
-  const { t } = useTranslation("dashboard")
+  const { t } = useTranslation("lectures")
 
   // Mock data for featured courses
   const featuredCourses = [

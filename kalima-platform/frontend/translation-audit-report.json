@@ -2,17 +2,13 @@
   "summary": {
     "namespaceCountEn": 32,
     "namespaceCountAr": 32,
-    "missingArNamespacesCount": 1,
-    "missingEnNamespacesCount": 1,
-    "missingUsedKeysInEnCount": 120,
-    "missingUsedKeysInArCount": 120
+    "missingArNamespacesCount": 0,
+    "missingEnNamespacesCount": 0,
+    "missingUsedKeysInEnCount": 108,
+    "missingUsedKeysInArCount": 108
   },
-  "missingArNamespaces": [
-    "dashboard"
-  ],
-  "missingEnNamespaces": [
-    "dashboard"
-  ],
+  "missingArNamespaces": [],
+  "missingEnNamespaces": [],
   "byNamespace": {
     "admin": {
       "enCount": 337,
@@ -58,8 +54,8 @@
       ]
     },
     "common": {
-      "enCount": 105,
-      "arCount": 105,
+      "enCount": 106,
+      "arCount": 106,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": []
@@ -134,13 +130,6 @@
     "createUser": {
       "enCount": 112,
       "arCount": 112,
-      "missingInAr": [],
-      "missingInEn": [],
-      "suspiciousSame": []
-    },
-    "dashboard": {
-      "enCount": 0,
-      "arCount": 0,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": []
@@ -649,80 +638,8 @@
       "fn": "t"
     },
     {
-      "file": "pages/Lecturer Dashboard/CourseCategories.jsx",
-      "ns": "dashboard",
-      "key": "categories.science",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/CourseCategories.jsx",
-      "ns": "dashboard",
-      "key": "categories.programming",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/CourseCategories.jsx",
-      "ns": "dashboard",
-      "key": "categories.biology",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/CourseCategories.jsx",
-      "ns": "dashboard",
-      "key": "categories.design",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/CourseCategories.jsx",
-      "ns": "dashboard",
-      "key": "categories.business",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/CourseCategories.jsx",
-      "ns": "dashboard",
-      "key": "categories.math",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/CourseCategories.jsx",
-      "ns": "dashboard",
-      "key": "categories.data",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/CourseCategories.jsx",
-      "ns": "dashboard",
-      "key": "categories.languages",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/CourseCategories.jsx",
-      "ns": "dashboard",
-      "key": "categories.statistics",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/CourseCategories.jsx",
-      "ns": "dashboard",
-      "key": "categories.education",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/CourseCategories.jsx",
-      "ns": "dashboard",
-      "key": "courses_count",
-      "fn": "t"
-    },
-    {
       "file": "pages/Lecturer Dashboard/FeaturedCourses.jsx",
-      "ns": "dashboard",
-      "key": "enroll",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/FeaturedCourses.jsx",
-      "ns": "dashboard",
+      "ns": "lectures",
       "key": "details",
       "fn": "t"
     },
@@ -1371,80 +1288,8 @@
       "fn": "t"
     },
     {
-      "file": "pages/Lecturer Dashboard/CourseCategories.jsx",
-      "ns": "dashboard",
-      "key": "categories.science",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/CourseCategories.jsx",
-      "ns": "dashboard",
-      "key": "categories.programming",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/CourseCategories.jsx",
-      "ns": "dashboard",
-      "key": "categories.biology",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/CourseCategories.jsx",
-      "ns": "dashboard",
-      "key": "categories.design",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/CourseCategories.jsx",
-      "ns": "dashboard",
-      "key": "categories.business",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/CourseCategories.jsx",
-      "ns": "dashboard",
-      "key": "categories.math",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/CourseCategories.jsx",
-      "ns": "dashboard",
-      "key": "categories.data",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/CourseCategories.jsx",
-      "ns": "dashboard",
-      "key": "categories.languages",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/CourseCategories.jsx",
-      "ns": "dashboard",
-      "key": "categories.statistics",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/CourseCategories.jsx",
-      "ns": "dashboard",
-      "key": "categories.education",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/CourseCategories.jsx",
-      "ns": "dashboard",
-      "key": "courses_count",
-      "fn": "t"
-    },
-    {
       "file": "pages/Lecturer Dashboard/FeaturedCourses.jsx",
-      "ns": "dashboard",
-      "key": "enroll",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/FeaturedCourses.jsx",
-      "ns": "dashboard",
+      "ns": "lectures",
       "key": "details",
       "fn": "t"
     },
