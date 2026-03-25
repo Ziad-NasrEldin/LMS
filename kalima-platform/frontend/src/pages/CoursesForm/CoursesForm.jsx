@@ -11,10 +11,14 @@ import BasicInfoForm from "./basic-info-form"
 import ContainerCreationPanel from "./container-creation-panel"
 import CourseStructureVisualization from "./course-structure-visualization"
 import { Link } from "react-router-dom"
+import { designTokens } from "../../constants/designTokens"
 
 function CourseCreationForm() {
   const { t, i18n } = useTranslation()
   const isRTL = i18n.language === "ar"
+  const TOKENS = designTokens.colors
+  const SHADOWS = designTokens.shadows
+  const GRADIENTS = designTokens.gradients
 
   // Form state
   const [formData, setFormData] = useState({
@@ -135,32 +139,47 @@ function CourseCreationForm() {
   }
 
   return (
-    <div className="min-h-screen bg-base-100 text-base-content py-8 px-4 sm:px-6 lg:px-8" dir={isRTL ? "rtl" : "ltr"}>
+    <div
+      className="min-h-screen py-6 text-base-content sm:py-8 px-4 sm:px-6 lg:px-8"
+      dir={isRTL ? "rtl" : "ltr"}
+      style={{ background: `${GRADIENTS.pageAtmosphere}, ${TOKENS.creamSurface}` }}
+    >
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex justify-between items-center mb-8 relative"
+          className="mb-6 relative overflow-hidden rounded-[1.75rem] border p-5 sm:p-6"
+          style={{
+            background: "linear-gradient(135deg, rgba(14,85,99,0.95), rgba(20,106,120,0.92))",
+            borderColor: "rgba(255,255,255,0.18)",
+            boxShadow: SHADOWS.level2,
+          }}
         >
-          <Link to={"/dashboard/lecturer-dashboard/"} className="flex items-center text-primary hover:text-primary-600 text-sm">
-            {isRTL ? (
-              <>
-                <ChevronRight className="h-4 w-4 mr-1" />
-                <span>{t("الخروج")}</span>
-              </>
-            ) : (
-              <>
-                <ChevronLeft className="h-4 w-4 ml-1" />
-                <span>{t("back")}</span>
-              </>
-            )}
-          </Link>
-          <div className="absolute inset-x-0 flex justify-center">
-            <div className="flex items-center">
-              <div className="w-16 h-px bg-secondary"></div>
-              <h1 className="mx-4 text-2xl font-bold text-primary">{isRTL ? "انشئ كورس" : "Create Course"}</h1>
-              <div className="w-16 h-px bg-secondary"></div>
+          <div
+            className={`mb-4 flex items-center justify-between ${isRTL ? "flex-row-reverse" : ""}`}
+            style={{ color: "#E7F8FB" }}
+          >
+            <Link to={"/dashboard/lecturer-dashboard/"} className="inline-flex items-center gap-1 rounded-full border px-3 py-1.5 text-xs sm:text-sm" style={{ borderColor: "rgba(255,255,255,0.28)" }}>
+              {isRTL ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+              <span>{isRTL ? "العودة للوحة التحكم" : "Back to dashboard"}</span>
+            </Link>
+            <span className="rounded-full bg-white/15 px-3 py-1 text-xs font-semibold">
+              {isRTL ? "٣ خطوات فقط" : "3 quick steps"}
+            </span>
+          </div>
+
+          <div className={`flex flex-col gap-3 ${isRTL ? "items-end text-right" : "items-start text-left"}`}>
+            <h1 className="text-2xl font-bold text-white sm:text-3xl">{isRTL ? "أنشئ كورسك باحتراف" : "Build your course flow fast"}</h1>
+            <p className="text-sm sm:text-base" style={{ color: "#D8F2F5" }}>
+              {isRTL
+                ? "ابدأ بالبيانات الأساسية، ثم أضف الحاويات والمحاضرات بشكل منظم ومختصر."
+                : "Start with core info, then add containers and lectures in a focused compact flow."}
+            </p>
+            <div className={`flex flex-wrap gap-2 ${isRTL ? "justify-end" : ""}`}>
+              <span className="rounded-full bg-white/16 px-3 py-1 text-xs text-white/95">{isRTL ? "1. البيانات الأساسية" : "1. Basic info"}</span>
+              <span className="rounded-full bg-white/16 px-3 py-1 text-xs text-white/95">{isRTL ? "2. إضافة المحتوى" : "2. Add content"}</span>
+              <span className="rounded-full bg-white/16 px-3 py-1 text-xs text-white/95">{isRTL ? "3. مراجعة الهيكل" : "3. Review structure"}</span>
             </div>
           </div>
         </motion.div>
@@ -179,7 +198,7 @@ function CourseCreationForm() {
 
         {/* Container Creation Panel */}
         {courseStructure.parent && (
-          <div className="mt-12">
+          <div className="mt-8">
             <ContainerCreationPanel
               courseStructure={courseStructure}
               updateCourseStructure={updateCourseStructure}
@@ -192,7 +211,7 @@ function CourseCreationForm() {
 
         {/* Course Structure Visualization */}
         {courseStructure.parent && courseStructure.containers.length > 0 && (
-          <div className="mt-12">
+          <div className="mt-8">
             <CourseStructureVisualization courseStructure={courseStructure} isRTL={isRTL} />
           </div>
         )}

@@ -16,6 +16,8 @@ const CONTAINER_TYPES = {
 }
 
 function ContainerCreationPanel({ courseStructure, updateCourseStructure, formData, createdBy, isRTL }) {
+  const compactInput = "w-full input input-bordered input-sm h-10 min-h-10 bg-base-200/80"
+  const compactSelect = "w-full select select-bordered select-sm h-10 min-h-10 bg-base-200/80"
   const [containerName, setContainerName] = useState("")
   const [containerType, setContainerType] = useState(CONTAINER_TYPES.YEAR)
   const [selectedParentId, setSelectedParentId] = useState(courseStructure.parent?.id || null)
@@ -552,13 +554,18 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
   }
 
   return (
-    <div className="bg-base-100 rounded-xl shadow-md p-6">
-      <h2 className="text-lg font-bold mb-6 text-primary text-center">
-        {isRTL ? "إضافة محتوى تعليمي" : "Add Educational Content"}
-      </h2>
+    <div className="rounded-[1.4rem] border bg-white/90 p-4 shadow-md sm:p-5" style={{ borderColor: "rgba(17,24,39,0.08)" }}>
+      <div className="mb-4 rounded-2xl border p-4" style={{ borderColor: "rgba(14,85,99,0.16)", background: "linear-gradient(135deg, rgba(188,231,236,0.42), rgba(248,243,233,0.9))" }}>
+        <h2 className={`text-base sm:text-lg font-bold text-primary ${isRTL ? "text-right" : "text-left"}`}>
+          {isRTL ? "إضافة محتوى تعليمي" : "Add Educational Content"}
+        </h2>
+        <p className={`mt-1 text-xs sm:text-sm text-base-content/75 ${isRTL ? "text-right" : "text-left"}`}>
+          {isRTL ? "اختر النوع، الحاوية الأب، ثم أضف التفاصيل الأساسية بشكل سريع." : "Pick the type, parent container, and fill only the key details."}
+        </p>
+      </div>
 
       <form onSubmit={handleCreateContainer} className="mb-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
           <div>
             <label className="block text-sm font-medium mb-1">{isRTL ? "نوع المحتوى" : "Content Type"}</label>
             <select
@@ -567,7 +574,7 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
                 setContainerType(e.target.value)
                 setSelectedParentId(null)
               }}
-              className="w-full select select-bordered bg-base-200"
+              className={compactSelect}
               required
             >
               <option value={CONTAINER_TYPES.COURSE}>{isRTL ? "دورة" : "Course"}</option>
@@ -583,7 +590,7 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
             <select
               value={selectedParentId || ""}
               onChange={(e) => setSelectedParentId(e.target.value)}
-              className="w-full select select-bordered bg-base-200"
+              className={compactSelect}
               required
             >
               <option value="" disabled>
@@ -598,26 +605,26 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
           </div>
         </div>
 
-        <div className="mb-4">
+        <div className="mt-3">
           <label className="block text-sm font-medium mb-1">{isRTL ? "اسم المحتوى" : "Content Name"}</label>
           <input
             type="text"
             value={containerName}
             onChange={(e) => setContainerName(e.target.value)}
             placeholder={isRTL ? "اسم المحتوى" : "Content name"}
-            className="w-full input input-bordered bg-base-200"
+            className={compactInput}
             required
           />
         </div>
 
-        <div className="mb-4">
+        <div className="mt-3">
           <label className="block text-sm font-medium mb-1">{isRTL ? "الموضوع" : "Subject"}</label>
           <select
             value={formData.subject || ""}
             onChange={(e) => {
               updateCourseStructure({ ...courseStructure, formData: { ...formData, subject: e.target.value } })
             }}
-            className="w-full select select-bordered bg-base-200"
+            className={compactSelect}
             required
           >
             <option value="" disabled>
@@ -631,70 +638,74 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
           </select>
         </div>
 
-        <div className="mb-4">
+        <div className="mt-3">
           <label className="block text-sm font-medium mb-1">{isRTL ? "الوصف" : "Description"}</label>
           <input
             type="text"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder={isRTL ? "الوصف" : "Description"}
-            className="w-full input input-bordered bg-base-200"
+            className={compactInput}
           />
         </div>
 
         {containerType === CONTAINER_TYPES.LECTURE ? (
           <>
-            <div className="mb-4">
+            <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-2">
+              <div>
               <label className="block text-sm font-medium mb-1">{isRTL ? "نوع المحاضرة" : "Lecture Type"}</label>
               <select
                 value={lectureType}
                 onChange={(e) => setLectureType(e.target.value)}
-                className="w-full select select-bordered bg-base-200"
+                className={compactSelect}
               >
                 <option value="Paid">{isRTL ? "مدفوع" : "Paid"}</option>
                 <option value="Revision">{isRTL ? "مراجعة" : "Revision"}</option>
               </select>
-            </div>
-            <div className="mb-4">
+              </div>
+              <div>
               <label className="block text-sm font-medium mb-1">{isRTL ? "سعر المحاضرة" : "Lecture Price"}</label>
               <input
                 type="number"
                 value={lecturePrice}
                 onChange={(e) => setLecturePrice(e.target.value)}
                 placeholder={isRTL ? "سعر المحاضرة" : "Lecture price"}
-                className="w-full input input-bordered bg-base-200"
+                className={compactInput}
               />
+              </div>
             </div>
-            <div className="mb-4">
+            <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-2">
+              <div>
               <label className="block text-sm font-medium mb-1">{isRTL ? "رابط المحاضرة" : "Lecture Link"}</label>
               <input
                 type="text"
                 value={lectureLink}
                 onChange={(e) => setLectureLink(e.target.value)}
                 placeholder={isRTL ? "رابط الفيديو" : "Video link"}
-                className="w-full input input-bordered bg-base-200"
+                className={compactInput}
                 required
               />
-            </div>
-            <div className="mb-4">
+              </div>
+              <div>
               <label className="block text-sm font-medium mb-1">{isRTL ? "عدد المشاهدات" : "Number of Views"}</label>
               <input
                 type="number"
                 value={numberOfViews}
                 onChange={(e) => setNumberOfViews(e.target.value)}
                 placeholder={isRTL ? "عدد المشاهدات" : "Number of views"}
-                className="w-full input input-bordered bg-base-200"
+                className={compactInput}
                 required
               />
+              </div>
             </div>
-            <div className="mb-4">
+            <div className="mt-3">
               <label className="block text-sm font-medium mb-1">
                 {isRTL ? "هل تحتاج إلى امتحان؟" : "Requires Exam?"}
               </label>
               <select
                 value={requiresExam}
                 onChange={(e) => setRequiresExam(e.target.value === "true")}
-                className="w-full select select-bordered bg-base-200"
+                className={compactSelect}
               >
                 <option value={false}>{isRTL ? "لا" : "No"}</option>
                 <option value={true}>{isRTL ? "نعم" : "Yes"}</option>
@@ -704,10 +715,10 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
             {/* Exam Config Section */}
             {requiresExam && <ExamConfigSection />}
 
-            <div className="mb-4">
+            <div className="mt-3">
               <label className="block text-sm font-medium mb-1">{isRTL ? "نوع المرفق" : "Attachment Type"}</label>
               <select
-                className="w-full select select-bordered bg-base-200"
+                className={compactSelect}
                 value={attachmentType}
                 onChange={(e) => setAttachmentType(e.target.value)}
               >
@@ -718,7 +729,7 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
               </select>
             </div>
 
-            <div className="mb-4">
+            <div className="mt-3">
               <label className="block text-sm font-medium mb-1">
                 {isRTL ? "إرفاق واجب (اختياري، .pdf فقط)" : "Attach Homework (Optional, .pdf only)"}
               </label>
@@ -726,7 +737,7 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
                 <input
                   type="file"
                   onChange={(e) => setAttachmentFile(e.target.files[0])}
-                  className="file-input file-input-bordered w-full bg-base-200"
+                  className="file-input file-input-bordered file-input-sm w-full bg-base-200/80"
                   accept=".pdf,.jpg,.jpeg,.png"
                 />
                 <Paperclip className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-primary" />
@@ -740,18 +751,18 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
           </>
         ) : (
           <>
-            <div className="mb-4">
+            <div className="mt-3">
               <label className="block text-sm font-medium mb-1">{isRTL ? "سعر الحاوية" : "Container Price"}</label>
               <input
                 type="number"
                 value={containerPrice}
                 onChange={(e) => setContainerPrice(e.target.value)}
                 placeholder={isRTL ? "سعر الحاوية" : "Container price"}
-                className="w-full input input-bordered bg-base-200"
+                className={compactInput}
               />
             </div>
             {containerType === CONTAINER_TYPES.COURSE && (
-              <div className="mb-4">
+              <div className="mt-3">
                 <label className="block text-sm font-medium mb-1">
                   {isRTL ? "إرفاق صورة (اختياري)" : "Attach Image (Optional)"}
                 </label>
@@ -759,7 +770,7 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
                   <input
                     type="file"
                     onChange={(e) => setImageFile(e.target.files[0])}
-                    className="file-input file-input-bordered w-full bg-base-200"
+                    className="file-input file-input-bordered file-input-sm w-full bg-base-200/80"
                     accept="image/*"
                   />
                   <Paperclip className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-primary" />
@@ -774,7 +785,7 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
           </>
         )}
 
-        <button type="submit" className="btn btn-primary w-full" disabled={isSubmitting}>
+        <button type="submit" className="btn btn-primary w-full rounded-full" disabled={isSubmitting}>
           {isSubmitting ? (
             <span className="loading loading-spinner loading-xs"></span>
           ) : (

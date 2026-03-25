@@ -15,6 +15,9 @@ function BasicInfoForm({
   updateCourseStructure,
   createdBy,
 }) {
+  const compactInput = "w-full input input-bordered input-sm h-10 min-h-10 bg-base-200/80 placeholder-base-content/50"
+  const compactSelect = "w-full select select-bordered select-sm h-10 min-h-10 bg-base-200/80 appearance-none"
+  const compactTextArea = "w-full textarea textarea-bordered textarea-sm bg-base-200/80 placeholder-base-content/50"
   const [courseImage, setCourseImage] = useState(null)
   const [courseVideo, setCourseVideo] = useState(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -87,12 +90,13 @@ function BasicInfoForm({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.2 }}
-        className="bg-base-100 rounded-xl shadow-md p-6"
+        className="rounded-[1.4rem] border p-4 shadow-md"
+        style={{ borderColor: "rgba(17,24,39,0.08)", background: "rgba(255,255,255,0.9)" }}
       >
-        <div className="mb-8">
-          <h2 className="text-lg font-bold mb-6 text-primary">{isRTL ? "البيانات الاساسية" : "Basic Information"}</h2>
-          <div className="grid grid-cols-1 md:grid-cols-[65%_35%] gap-6">
-            <div className="space-y-6">
+        <div className="mb-2">
+          <h2 className="text-base font-bold mb-3 text-primary">{isRTL ? "البيانات الأساسية" : "Basic Information"}</h2>
+          <div className="grid grid-cols-1 md:grid-cols-[62%_38%] gap-3">
+            <div className="space-y-3">
               <div>
                 <label className="block text-sm font-medium mb-1">{isRTL ? "اسم الكورس" : "Course Name"}</label>
                 <input
@@ -101,7 +105,7 @@ function BasicInfoForm({
                   value={formData.courseName}
                   onChange={handleChange}
                   placeholder={isRTL ? "مثل: دوره تقديم اللغة الإنجليزية" : "e.g., English Language Course"}
-                  className="w-full input input-bordered bg-base-200 placeholder-base-content/50"
+                  className={compactInput}
                   required
                 />
               </div>
@@ -111,7 +115,7 @@ function BasicInfoForm({
                   name="gradeLevel"
                   value={formData.gradeLevel}
                   onChange={handleChange}
-                  className="w-full select select-bordered bg-base-200 appearance-none"
+                  className={compactSelect}
                   required
                 >
                   <option value="" disabled>
@@ -124,7 +128,7 @@ function BasicInfoForm({
                   ))}
                 </select>
                 <ChevronDown
-                  className={`h-4 w-4 absolute top-10 ${isRTL ? "left-3" : "right-3"} pointer-events-none`}
+                  className={`h-4 w-4 absolute top-9 ${isRTL ? "left-3" : "right-3"} pointer-events-none`}
                 />
               </div>
               <div className="relative">
@@ -133,7 +137,7 @@ function BasicInfoForm({
                   name="subject"
                   value={formData.subject}
                   onChange={handleChange}
-                  className="w-full select select-bordered bg-base-200 appearance-none"
+                  className={compactSelect}
                   required
                 >
                   <option value="" disabled>
@@ -146,7 +150,7 @@ function BasicInfoForm({
                   ))}
                 </select>
                 <ChevronDown
-                  className={`h-4 w-4 absolute top-10 ${isRTL ? "left-3" : "right-3"} pointer-events-none`}
+                  className={`h-4 w-4 absolute top-9 ${isRTL ? "left-3" : "right-3"} pointer-events-none`}
                 />
               </div>
               <div>
@@ -157,10 +161,10 @@ function BasicInfoForm({
                   value={formData.duration}
                   onChange={handleChange}
                   placeholder={isRTL ? "مثل: عدد الأسبوع أو الساعات" : "e.g., Number of weeks or hours"}
-                  className="w-full input input-bordered bg-base-200 placeholder-base-content/50"
+                  className={compactInput}
                 />
               </div>
-              <div className="mb-8">
+              <div>
                 <label className="block text-sm font-medium mb-1">{isRTL ? "وصف الكورس" : "Course Description"}</label>
                 <textarea
                   name="description"
@@ -171,11 +175,11 @@ function BasicInfoForm({
                       ? "مثل: تهدف صف الدورة إلى تحسين مهارات المتعلمين في اللغة الإنجليزية من حيث القراءة والمحادثة..."
                       : "e.g., The course aims to improve learners' English language skills in reading and speaking..."
                   }
-                  rows="4"
-                  className="w-full textarea textarea-bordered bg-base-200 placeholder-base-content/50"
+                  rows="2"
+                  className={compactTextArea}
                 ></textarea>
               </div>
-              <div className="mb-8">
+              <div>
                 <label className="block text-sm font-medium mb-1">{isRTL ? "هدف الكورس" : "Course Goal"}</label>
                 <textarea
                   name="goal"
@@ -186,18 +190,18 @@ function BasicInfoForm({
                       ? "مثل: تحسين مهارات القراءة والكتابة والمحادثة..."
                       : "e.g., Improve reading, writing and speaking skills..."
                   }
-                  rows="4"
-                  className="w-full textarea textarea-bordered bg-base-200 placeholder-base-content/50"
+                  rows="2"
+                  className={compactTextArea}
                 ></textarea>
               </div>
             </div>
-            <div className="space-y-6">
+            <div className="space-y-3">
               <div>
-                <h2 className="block text-lg text-primary font-medium mb-2">
+                <h2 className="block text-base text-primary font-semibold mb-2">
                   {isRTL ? "صورة الكورس" : "Course Image"}
                 </h2>
-                <label className="border-2 border-dashed border-primary/20 rounded-lg p-6 flex flex-col items-center justify-center h-48 cursor-pointer">
-                  <ImageIcon className="w-10 h-10 mb-2 text-primary" />
+                <label className="border border-dashed border-primary/25 rounded-xl p-4 flex flex-col items-center justify-center h-36 cursor-pointer bg-white">
+                  <ImageIcon className="w-8 h-8 mb-2 text-primary" />
                   <span className="btn text-primary btn-sm btn-ghost border-primary border-2 mb-2">
                     {isRTL ? "اضف صورة" : "Add Image"}
                   </span>
@@ -210,9 +214,9 @@ function BasicInfoForm({
                   </p>
                 )}
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+              <div className="grid grid-cols-1 gap-3">
                 <div>
-                  <h2 className="block text-lg text-primary font-medium mb-2">
+                  <h2 className="block text-base text-primary font-semibold mb-2">
                     {isRTL ? "نوع الكورس" : "Course Type"}
                   </h2>
                   <div className="flex gap-4">
@@ -239,31 +243,16 @@ function BasicInfoForm({
                       <span>{isRTL ? "مجاني" : "Free"}</span>
                     </label>
                   </div>
-                  {formData.courseType === "paid" && (
-                    <div className="mt-6 space-y-4 mb-6">
-                      <h2 className="block text-lg text-primary font-medium">
-                        {isRTL ? "سعر الكورس" : "Course Price"}
-                      </h2>
-                      <div>
-                        <label className="block text-sm font-medium mb-1">
-                          {isRTL ? "الكورس كامل" : "Full Course"}
-                        </label>
-                        <input
-                          type="text"
-                          name="priceFull"
-                          value={formData.priceFull}
-                          onChange={handleChange}
-                          placeholder={isRTL ? "الكورس كامل" : "Full Course"}
-                          className="input input-bordered bg-base-200 flex-1"
-                        />
-                      </div>
-                    </div>
-                  )}
-                  <div className="mb-6">
-                    <h2 className="block text-primary text-lg font-medium mb-2">
+                  <p className="mt-2 text-xs text-base-content/60">
+                    {isRTL
+                      ? "سيتم تحديد السعر من خطوة إنشاء الحاوية الأولى."
+                      : "Pricing is set in the first container creation step."}
+                  </p>
+                  <div className="mt-4">
+                    <h2 className="block text-primary text-base font-semibold mb-2">
                       {isRTL ? "صلاحية الوصول" : "Access Validity"}
                     </h2>
-                    <div className="flex gap-8">
+                    <div className="flex flex-wrap gap-4">
                       <label className="flex items-center gap-2">
                         <input
                           type="radio"
@@ -289,10 +278,10 @@ function BasicInfoForm({
                     </div>
                   </div>
                   <div>
-                    <h2 className="block text-primary text-lg font-medium mb-3">
+                    <h2 className="block text-primary text-base font-semibold mb-2">
                       {isRTL ? "خصوصية الكورس" : "Course Privacy"}
                     </h2>
-                    <div className="flex gap-8">
+                    <div className="flex flex-wrap gap-4">
                       <label className="flex items-center gap-2">
                         <input
                           type="radio"
@@ -322,10 +311,10 @@ function BasicInfoForm({
             </div>
           </div>
         </div>
-        <div className="flex justify-center mt-8">
+        <div className="flex justify-center mt-5">
           <button
             type="submit"
-            className="btn btn-primary px-8 py-3 text-lg"
+            className="btn btn-primary rounded-full px-7 py-2 text-sm sm:text-base"
             disabled={isSubmitting || courseStructure.parent}
           >
             {isSubmitting ? (

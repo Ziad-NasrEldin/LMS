@@ -37,8 +37,17 @@
 ## 2026-03-25 - Login hero revamp - GPT-5
 - Replaced the login page raster image with a branded, high-quality vector illustration and subtle motion.
 
+## 2026-03-25 - Courses form compaction - GPT-5
+- Removed the redundant total course price block from basic info.
+- Tightened spacing in the basic information section to reduce vertical bloat.
+
 ## 2026-03-25 - Container connector cleanup - GPT-5
 - Removed the unstable nested connector lines from the course container/lecture tree to eliminate visual misalignment.
 
 ## 2026-03-25 - Course actions localization - GPT-5
 - Localized the container tree toggle button labels by adding dedicated `actions.show` and `actions.hide` keys in `courseDetails` EN/AR locales.
+
+## 2026-03-25 - CoursesForm UX redesign - GPT-5
+- Applied the new theme styling to the `CoursesForm` page with a focused hero header and clear 3-step guidance.
+- Compacted core form controls and spacing in both basic info and content creation sections to reduce wasted space.
+- Reorganized lecture creation inputs into denser two-column groups for faster data entry.
