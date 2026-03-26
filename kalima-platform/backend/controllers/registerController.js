@@ -42,9 +42,22 @@ function formatEgyptianPhoneNumber(number) {
   return '+20' + num;
 }
 
+function normalizeDigitsToEnglish(value) {
+  return String(value || "")
+    .replace(/[٠-٩]/g, (d) => String("٠١٢٣٤٥٦٧٨٩".indexOf(d)))
+    .replace(/[۰-۹]/g, (d) => String("۰۱۲۳۴۵۶۷۸۹".indexOf(d)));
+}
+
+function sanitizeParentPhone(number) {
+  return normalizeDigitsToEnglish(number)
+    .replace(/[\u200E\u200F\u061C\u202A-\u202E]/g, "")
+    .replace(/[\s\-()]/g, "")
+    .trim();
+}
+
 function normalizeEgyptParentPhoneNumber(number) {
   if (!number) return "";
-  const num = String(number).trim();
+  const num = sanitizeParentPhone(number);
   if (/^\+20\d{10}$/.test(num)) return num;
   if (/^0\d{10}$/.test(num)) return `+20${num.slice(1)}`;
   if (/^\d{10}$/.test(num)) return `+20${num}`;

@@ -24,13 +24,28 @@ const totalSteps = {
   teacher: 3,
 }
 
+const normalizeDigitsToEnglish = (value) => {
+  const input = String(value || "")
+  return input
+    .replace(/[٠-٩]/g, (d) => String("٠١٢٣٤٥٦٧٨٩".indexOf(d)))
+    .replace(/[۰-۹]/g, (d) => String("۰۱۲۳۴۵۶۷۸۹".indexOf(d)))
+}
+
+const sanitizeParentPhone = (value) => {
+  const englishDigits = normalizeDigitsToEnglish(value)
+  return englishDigits
+    .replace(/[\u200E\u200F\u061C\u202A-\u202E]/g, "")
+    .replace(/[\s\-()]/g, "")
+    .trim()
+}
+
 const isValidEgyptParentPhone = (value) => {
-  const normalized = String(value || "").trim()
+  const normalized = sanitizeParentPhone(value)
   return /^\+20\d{10}$/.test(normalized) || /^0\d{10}$/.test(normalized) || /^\d{10}$/.test(normalized)
 }
 
 const normalizeEgyptParentPhone = (value) => {
-  const normalized = String(value || "").trim()
+  const normalized = sanitizeParentPhone(value)
   if (/^\+20\d{10}$/.test(normalized)) return normalized
   if (/^0\d{10}$/.test(normalized)) return `+20${normalized.slice(1)}`
   if (/^\d{10}$/.test(normalized)) return `+20${normalized}`
@@ -212,13 +227,14 @@ export default function StudentRegistration() {
   const handleInputChange = (e) => {
     try {
       const { name, value, type, files } = e.target;
+      const nextValue = name === "parentPhoneNumber" ? sanitizeParentPhone(value) : value;
 
       setFormData((prev) => ({
         ...prev,
         [name]:
           type === "file"
             ? files[0]
-            : value, // ✅ Always keep as string, especially for phone numbers
+            : nextValue,
       }));
 
       setErrors((prev) => ({ ...prev, [name]: undefined }));

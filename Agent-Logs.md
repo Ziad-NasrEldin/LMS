@@ -1,3 +1,8 @@
+## 2026-03-26 - Parent phone 10-digit + RTL-safe sanitization - GPT-5.3-Codex
+- Hardened student signup parent phone validation/normalization to accept `XXXXXXXXXX`, `0XXXXXXXXXX`, and `+20XXXXXXXXXX` consistently.
+- Added Arabic numeral normalization and invisible RTL character stripping in both frontend and backend phone sanitizers to prevent false invalid-format errors.
+- Updated parent phone input UX with `inputMode="tel"` and LTR direction to reduce entry issues on Arabic keyboards.
+
 ## 2026-03-26 - Course breakdown compact layout - GPT-5.3-Codex
 - Compacted nested course breakdown cards in `CourseDetails` by reducing inner spacing, badge density, and button height/width so mobile layouts are less bulky.
 - Reworked action buttons to avoid full-width stacking on mobile and keep controls readable without consuming excessive vertical space.
@@ -113,3 +118,5 @@ ounded-[2rem]\), removed hard \shadow-sm\ defaults from DaisyUI, updated primary
 - Update: Removed leftover temporary helper scripts from the repo and added `kalima-platform/frontend/temp-scripts/` to `.gitignore` so future scratch code stays out of deployed builds.
 
 - Update: Restored missing src/routes/packages.jsx API module to fix Vite build resolution failure from AddNewStuff.jsx (unresolved import ../../../routes/packages).
+
+- Update: Removed package feature code from admin account creation and purchase/audit flows so the system now only manages subjects and levels; also removed stale package-named icon usage and refreshed admin subtitle wording to exclude packages.

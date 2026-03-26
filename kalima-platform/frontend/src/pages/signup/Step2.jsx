@@ -23,6 +23,8 @@ export default function Step2({ formData, handleInputChange, t, errors }) {
             className={`input input-bordered input-sm ${errors.parentPhoneNumber ? 'input-error animate-shake' : ''}`}
             value={formData.parentPhoneNumber || ''}
             onChange={handleInputChange}
+            inputMode="tel"
+            dir="ltr"
             required
           />
           {errors.parentPhoneNumber && (
