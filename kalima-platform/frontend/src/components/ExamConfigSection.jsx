@@ -1,10 +1,12 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useTranslation } from "react-i18next"
 import { getExamConfigs, createExamConfig } from "../routes/examConfigs"
 
 const ExamConfigSection = ({
   requiresExam,
+  isEnabled,
   selectedExamConfigId,
   setSelectedExamConfigId,
   passingThreshold,
@@ -12,6 +14,7 @@ const ExamConfigSection = ({
   onExamConfigCreated,
   configType = "exam", // Default to "exam", can be "homework"
 }) => {
+  const { t } = useTranslation("lecturesPage")
   const [examConfigs, setExamConfigs] = useState([])
   const [examConfigsLoading, setExamConfigsLoading] = useState(false)
   const [examConfigsError, setExamConfigsError] = useState("")
@@ -24,14 +27,16 @@ const ExamConfigSection = ({
     formUrl: "",
     studentIdentifierColumn: "Email Address",
     scoreColumn: "Score",
-    defaultPassingThreshold: 5,
+    defaultPassingThreshold: 60,
   })
 
+  const isSectionEnabled = isEnabled ?? requiresExam
+
   useEffect(() => {
-    if (requiresExam) {
+    if (isSectionEnabled) {
       fetchExamConfigs()
     }
-  }, [requiresExam])
+  }, [isSectionEnabled])
 
   // Update passing threshold when exam config changes
   useEffect(() => {
@@ -65,7 +70,7 @@ const ExamConfigSection = ({
         if (Array.isArray(filteredConfigs) && filteredConfigs.length > 0) {
           setExamConfigs(filteredConfigs)
         } else {
-          setExamConfigsError(`No ${configType} configurations found. Please create a new one.`)
+          setExamConfigsError(t("examConfig.noConfigs", `No ${configType} configurations found. Please create a new one.`))
           setExamConfigs([])
         }
       } else {
@@ -139,7 +144,7 @@ const ExamConfigSection = ({
     setNewExamConfig(updatedConfig)
   }
 
-  if (!requiresExam) return null
+  if (!isSectionEnabled) return null
 
   const hasExistingConfigs = Array.isArray(examConfigs) && examConfigs.length > 0
 
@@ -147,7 +152,7 @@ const ExamConfigSection = ({
     <>
       <div className="form-control w-full mb-4">
         <label className="label">
-          <span className="label-text">{configType.charAt(0).toUpperCase() + configType.slice(1)} Configuration</span>
+          <span className="label-text">{t("examConfig.configurationLabel", `${configType.charAt(0).toUpperCase() + configType.slice(1)} Configuration`)}</span>
         </label>
         <div className="flex flex-col gap-4">
           <div className="flex items-center gap-2">
@@ -166,7 +171,7 @@ const ExamConfigSection = ({
               }}
               disabled={examConfigsLoading}
             >
-              <option value="">Select {configType.charAt(0).toUpperCase() + configType.slice(1)} Config</option>
+              <option value="">{t("examConfig.selectConfig", `Select ${configType.charAt(0).toUpperCase() + configType.slice(1)} Config`)}</option>
               {hasExistingConfigs ? (
                 examConfigs.map((config) => (
                   <option key={config._id} value={config._id}>
@@ -175,17 +180,17 @@ const ExamConfigSection = ({
                 ))
               ) : (
                 <option value="" disabled>
-                  No existing configs
+                  {t("examConfig.noExistingConfigs", "No existing configs")}
                 </option>
               )}
-              <option value="new">Create New {configType.charAt(0).toUpperCase() + configType.slice(1)} Config</option>
+              <option value="new">{t("examConfig.createNew", `Create New ${configType.charAt(0).toUpperCase() + configType.slice(1)} Config`)}</option>
             </select>
             {examConfigsLoading && <span className="loading loading-spinner"></span>}
           </div>
           {examConfigsError && <div className="text-error text-sm">{examConfigsError}</div>}
           {!hasExistingConfigs && !examConfigsError && !examConfigsLoading && (
             <div className="text-info text-sm">
-              No existing {configType} configurations found. You can create a new one.
+              {t("examConfig.emptyHelp", `No existing ${configType} configurations found. You can create a new one.`)}
             </div>
           )}
         </div>
@@ -193,11 +198,11 @@ const ExamConfigSection = ({
 
       {isCreatingNewExamConfig ? (
         <div className="space-y-4 mb-4 p-4 border border-base-300 rounded-lg">
-          <h4 className="font-medium">New {configType.charAt(0).toUpperCase() + configType.slice(1)} Configuration</h4>
+          <h4 className="font-medium">{t("examConfig.newConfiguration", `New ${configType.charAt(0).toUpperCase() + configType.slice(1)} Configuration`)}</h4>
 
           <div className="form-control w-full">
             <label className="label">
-              <span className="label-text">Name</span>
+              <span className="label-text">{t("fields.name", "Name")}</span>
             </label>
             <input
               type="text"
@@ -213,7 +218,7 @@ const ExamConfigSection = ({
           {/* Type selection */}
           <div className="form-control w-full">
             <label className="label">
-              <span className="label-text">Type</span>
+              <span className="label-text">{t("examConfig.type", "Type")}</span>
             </label>
             <select
               className="select select-bordered w-full"
@@ -222,17 +227,17 @@ const ExamConfigSection = ({
               key={`type-select-${configType}`}
               required
             >
-              <option value="exam">Exam</option>
-              <option value="homework">Homework</option>
+              <option value="exam">{t("examConfig.exam", "Exam")}</option>
+              <option value="homework">{t("examConfig.homework", "Homework")}</option>
             </select>
             <label className="label">
-              <span className="label-text-alt">Select whether this is for an exam or homework</span>
+              <span className="label-text-alt">{t("examConfig.typeHelp", "Select whether this is for an exam or homework")}</span>
             </label>
           </div>
 
           <div className="form-control w-full">
             <label className="label">
-              <span className="label-text">Description</span>
+              <span className="label-text">{t("fields.description", "Description")}</span>
             </label>
             <textarea
               placeholder="Enter description"
@@ -246,7 +251,7 @@ const ExamConfigSection = ({
 
           <div className="form-control w-full">
             <label className="label">
-              <span className="label-text">Google Sheet ID</span>
+              <span className="label-text">{t("examConfig.googleSheetId", "Google Sheet ID")}</span>
             </label>
             <input
               type="text"
@@ -258,13 +263,13 @@ const ExamConfigSection = ({
               required
             />
             <label className="label">
-              <span className="label-text-alt">The ID from your Google Sheet URL</span>
+              <span className="label-text-alt">{t("examConfig.googleSheetHelp", "The ID from your Google Sheet URL")}</span>
             </label>
           </div>
 
           <div className="form-control w-full">
             <label className="label">
-              <span className="label-text">Form URL</span>
+              <span className="label-text">{t("examConfig.formUrl", "Form URL")}</span>
             </label>
             <input
               type="url"
@@ -280,7 +285,7 @@ const ExamConfigSection = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="form-control w-full">
               <label className="label">
-                <span className="label-text">Student Identifier Column</span>
+                <span className="label-text">{t("examConfig.studentIdentifierColumn", "Student Identifier Column")}</span>
               </label>
               <input
                 type="text"
@@ -295,7 +300,7 @@ const ExamConfigSection = ({
 
             <div className="form-control w-full">
               <label className="label">
-                <span className="label-text">Score Column</span>
+                <span className="label-text">{t("examConfig.scoreColumn", "Score Column")}</span>
               </label>
               <input
                 type="text"
@@ -311,7 +316,7 @@ const ExamConfigSection = ({
 
           <div className="form-control w-full">
             <label className="label">
-              <span className="label-text">Default Passing Threshold (%)</span>
+              <span className="label-text">{t("examConfig.defaultPassingThreshold", "Default Passing Threshold (%)")}</span>
             </label>
             <input
               type="number"
@@ -333,7 +338,7 @@ const ExamConfigSection = ({
               onClick={handleCreateExamConfig}
               key={`create-button-${configType}`}
             >
-              Create {configType.charAt(0).toUpperCase() + configType.slice(1)} Config
+              {t("examConfig.createButton", `Create ${configType.charAt(0).toUpperCase() + configType.slice(1)} Config`)}
             </button>
           </div>
         </div>
@@ -341,7 +346,7 @@ const ExamConfigSection = ({
         selectedExamConfigId && (
           <div className="form-control w-full mb-4">
             <label className="label">
-              <span className="label-text">Passing Threshold</span>
+              <span className="label-text">{t("examConfig.passingThreshold", "Passing Threshold")}</span>
             </label>
             <input
               type="number"

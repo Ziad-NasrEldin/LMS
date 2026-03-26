@@ -7,6 +7,7 @@ const Level = require("../models/levelModel")
 const Subject = require("../models/subjectModel")
 const Lecturer = require("../models/lecturerModel")
 const Lecture = require("../models/LectureModel")
+const LecturerExamConfig = require("../models/ExamConfigModel")
 const NotificationTemplate = require("../models/notificationTemplateModel")
 const Notification = require("../models/notification")
 const Student = require("../models/studentModel")
@@ -60,6 +61,42 @@ const parseBoolean = (value) => {
   return result
 }
 
+const parseOptionalNumber = (value) => {
+  if (value === undefined || value === null || value === "") {
+    return undefined
+  }
+
+  const parsedValue = Number(value)
+  return Number.isNaN(parsedValue) ? undefined : parsedValue
+}
+
+const validateThresholdRange = (value, label) => {
+  if (value !== undefined && (value < 0 || value > 100)) {
+    throw new AppError(`${label} must be between 0 and 100`, 400)
+  }
+}
+
+const validateLectureConfig = async ({ configId, expectedType, lecturerId, session }) => {
+  if (!mongoose.isValidObjectId(configId)) {
+    throw new AppError(`Invalid ${expectedType} configuration ID`, 400)
+  }
+
+  const config = await LecturerExamConfig.findOne({
+    _id: configId,
+    lecturer: lecturerId,
+  }).session(session)
+
+  if (!config) {
+    throw new AppError(`${expectedType} configuration not found for this lecturer`, 404)
+  }
+
+  if (config.type !== expectedType) {
+    throw new AppError(`Selected configuration must be of type '${expectedType}'`, 400)
+  }
+
+  return config
+}
+
 const deleteFile = (filePath) => {
   if (filePath && fs.existsSync(filePath)) {
     fs.unlinkSync(filePath)
@@ -106,6 +143,8 @@ exports.createLecture = catchAsync(async (req, res, next) => {
       const parsedNumberOfViews = numberOfViews !== undefined && numberOfViews !== null && numberOfViews !== ""
         ? Number(numberOfViews)
         : 0
+      const parsedPassingThreshold = parseOptionalNumber(passingThreshold)
+      const parsedHomeworkPassingThreshold = parseOptionalNumber(homeworkPassingThreshold)
 
       console.log("[v0] Parsed requiresExam:", parsedRequiresExam)
       console.log("[v0] Parsed requiresHomework:", parsedRequiresHomework)
@@ -122,7 +161,11 @@ exports.createLecture = catchAsync(async (req, res, next) => {
       // Check required documents exist
       const levelDoc = await checkDoc(Level, level, session)
       const subjectDoc = await checkDoc(Subject, subject, session)
-      await checkDoc(Lecturer, createdBy || req.user._id, session)
+      const lecturerId = createdBy || req.user._id
+      await checkDoc(Lecturer, lecturerId, session)
+
+      validateThresholdRange(parsedPassingThreshold, "Exam passing threshold")
+      validateThresholdRange(parsedHomeworkPassingThreshold, "Homework passing threshold")
 
       // Validate exam config if requires exam is true
       if (parsedRequiresExam && !examConfig) {
@@ -130,10 +173,28 @@ exports.createLecture = catchAsync(async (req, res, next) => {
         throw new AppError("Exam configuration is required when requiresExam is true", 400)
       }
 
+      if (parsedRequiresExam) {
+        await validateLectureConfig({
+          configId: examConfig,
+          expectedType: "exam",
+          lecturerId,
+          session,
+        })
+      }
+
       // Validate homework config if requires homework is true
       if (parsedRequiresHomework && !homeworkConfig) {
         if (thumbnailPath) deleteFile(thumbnailPath)
         throw new AppError("Homework configuration is required when requiresHomework is true", 400)
+      }
+
+      if (parsedRequiresHomework) {
+        await validateLectureConfig({
+          configId: homeworkConfig,
+          expectedType: "homework",
+          lecturerId,
+          session,
+        })
       }
 
       // Create the lecture
@@ -147,7 +208,7 @@ exports.createLecture = catchAsync(async (req, res, next) => {
             subject,
             teacherAllowed: parsedTeacherAllowed,
             parent,
-            createdBy: createdBy || req.user._id,
+            createdBy: lecturerId,
             videoLink,
             description,
             numberOfViews: parsedNumberOfViews,
@@ -155,12 +216,12 @@ exports.createLecture = catchAsync(async (req, res, next) => {
             thumbnail: thumbnailPath,
             // Add exam requirement fields
             requiresExam: parsedRequiresExam,
-            examConfig,
-            passingThreshold,
+            examConfig: parsedRequiresExam ? examConfig : undefined,
+            passingThreshold: parsedRequiresExam ? parsedPassingThreshold : undefined,
             // Homework requirement fields
             requiresHomework: parsedRequiresHomework,
-            homeworkConfig,
-            homeworkPassingThreshold,
+            homeworkConfig: parsedRequiresHomework ? homeworkConfig : undefined,
+            homeworkPassingThreshold: parsedRequiresHomework ? parsedHomeworkPassingThreshold : undefined,
           },
         ],
         { session },
@@ -175,8 +236,6 @@ exports.createLecture = catchAsync(async (req, res, next) => {
         parentContainer.children.push(lecture[0]._id)
         await parentContainer.save({ session })
       }
-
-      const lecturerId = createdBy || req.user._id
 
       // Find or create lecturer's container
 
@@ -526,6 +585,11 @@ exports.updatelectures = catchAsync(async (req, res, next) => {
         lecture_type,
         teacherAllowed: teacherAllowed !== undefined ? parseBoolean(teacherAllowed) : undefined,
       }
+      const parsedPassingThreshold = parseOptionalNumber(passingThreshold)
+      const parsedHomeworkPassingThreshold = parseOptionalNumber(homeworkPassingThreshold)
+
+      validateThresholdRange(parsedPassingThreshold, "Exam passing threshold")
+      validateThresholdRange(parsedHomeworkPassingThreshold, "Homework passing threshold")
 
       if (req.file && req.file.path) {
         // Delete old thumbnail if it exists
@@ -546,29 +610,77 @@ exports.updatelectures = catchAsync(async (req, res, next) => {
         }
       }
 
-      // Handle exam requirement fields
-      if (requiresExam !== undefined) {
-        const parsedRequiresExam = parseBoolean(requiresExam)
-        obj.requiresExam = parsedRequiresExam
+      const normalizedExamConfig = examConfig === "" ? null : examConfig
+      const normalizedHomeworkConfig = homeworkConfig === "" ? null : homeworkConfig
+      const nextRequiresExam =
+        requiresExam !== undefined ? parseBoolean(requiresExam) : currentLecture.requiresExam
+      const nextRequiresHomework =
+        requiresHomework !== undefined ? parseBoolean(requiresHomework) : currentLecture.requiresHomework
+      const nextExamConfig =
+        normalizedExamConfig !== undefined ? normalizedExamConfig : currentLecture.examConfig
+      const nextHomeworkConfig =
+        normalizedHomeworkConfig !== undefined ? normalizedHomeworkConfig : currentLecture.homeworkConfig
 
-        // If requiresExam is true, examConfig is required
-        if (
-          parsedRequiresExam &&
-          !examConfig &&
-          !(await Lecture.findById(req.params.lectureId)
-            .select("examConfig")
-            .lean()
-            .then((doc) => doc.examConfig))
-        ) {
+      if (requiresExam !== undefined) {
+        obj.requiresExam = nextRequiresExam
+      }
+
+      if (requiresHomework !== undefined) {
+        obj.requiresHomework = nextRequiresHomework
+      }
+
+      if (nextRequiresExam) {
+        if (!nextExamConfig) {
           if (req.file && req.file.path) {
             deleteFile(req.file.path)
           }
           throw new AppError("Exam configuration is required when requiresExam is true", 400)
         }
+
+        await validateLectureConfig({
+          configId: nextExamConfig,
+          expectedType: "exam",
+          lecturerId: currentLecture.createdBy,
+          session,
+        })
+
+        if (normalizedExamConfig !== undefined) {
+          obj.examConfig = normalizedExamConfig
+        }
+
+        if (parsedPassingThreshold !== undefined) {
+          obj.passingThreshold = parsedPassingThreshold
+        }
+      } else {
+        obj.examConfig = null
+        obj.passingThreshold = null
       }
 
-      if (requiresHomework !== undefined) {
-        obj.requiresHomework = parseBoolean(requiresHomework)
+      if (nextRequiresHomework) {
+        if (!nextHomeworkConfig) {
+          if (req.file && req.file.path) {
+            deleteFile(req.file.path)
+          }
+          throw new AppError("Homework configuration is required when requiresHomework is true", 400)
+        }
+
+        await validateLectureConfig({
+          configId: nextHomeworkConfig,
+          expectedType: "homework",
+          lecturerId: currentLecture.createdBy,
+          session,
+        })
+
+        if (normalizedHomeworkConfig !== undefined) {
+          obj.homeworkConfig = normalizedHomeworkConfig
+        }
+
+        if (parsedHomeworkPassingThreshold !== undefined) {
+          obj.homeworkPassingThreshold = parsedHomeworkPassingThreshold
+        }
+      } else {
+        obj.homeworkConfig = null
+        obj.homeworkPassingThreshold = null
       }
 
       if (subject) {
@@ -585,7 +697,8 @@ exports.updatelectures = catchAsync(async (req, res, next) => {
         session,
       }).populate([
         { path: "createdBy", select: "name" },
-        { path: "examConfig", select: "name formUrl defaultPassingThreshold" }, // Populate exam config
+        { path: "examConfig", select: "name formUrl defaultPassingThreshold" },
+        { path: "homeworkConfig", select: "name formUrl defaultPassingThreshold" },
       ])
 
       if (!updatedContainer) {

@@ -193,6 +193,7 @@ const LectureCreationModal = ({
         teacherAllowed: true,
         lecture_type: newLectureType,
         requiresExam: requiresExam,
+        requiresHomework: requiresHomework,
       }
 
       // Handle exam config if required
@@ -201,13 +202,14 @@ const LectureCreationModal = ({
           throw new Error(t("validation.examConfigRequired"))
         }
         lectureData.examConfig = selectedExamConfigId
+        lectureData.passingThreshold = Number(passingThreshold)
       }
       if (requiresHomework) {
         if (!selectedHomeworkConfigId) {
           throw new Error(t("validation.homeworkConfigRequired"))
         }
-        lectureData.requiresHomework = true
         lectureData.homeworkConfig = selectedHomeworkConfigId
+        lectureData.homeworkPassingThreshold = Number(homeworkPassingThreshold)
       }
 
       // Call onSubmit ONCE with all files and links for all categories
@@ -438,7 +440,7 @@ const LectureCreationModal = ({
                           </select>
                         </div>
                         <ExamConfigSection
-                          requiresExam={requiresExam}
+                          isEnabled={requiresExam}
                           selectedExamConfigId={selectedExamConfigId}
                           setSelectedExamConfigId={setSelectedExamConfigId}
                           passingThreshold={passingThreshold}
@@ -465,7 +467,7 @@ const LectureCreationModal = ({
                         </div>
                         {requiresHomework && (
                           <ExamConfigSection
-                            requiresExam={requiresHomework}
+                            isEnabled={requiresHomework}
                             selectedExamConfigId={selectedHomeworkConfigId}
                             setSelectedExamConfigId={setSelectedHomeworkConfigId}
                             passingThreshold={homeworkPassingThreshold}

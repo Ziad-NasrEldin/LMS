@@ -346,6 +346,10 @@ const LectureDisplay = () => {
       // Step 1: Check lecture access requirements first.
       const accessResult = await checkLectureAccess(lectureId);
 
+      if (accessResult?.status === "error") {
+        throw new Error(accessResult.message || t("failedToLoadAccessData"));
+      }
+
       let verificationResult = { data: {} };
       const requiresVerification =
         accessResult?.status === "restricted" &&
@@ -414,8 +418,9 @@ const LectureDisplay = () => {
       }
     } catch (err) {
       console.error("Error in verification flow:", err);
-      setExamVerified(true); // Fallback to allow access
-      setHomeworkVerified(true);
+      setExamVerified(false);
+      setHomeworkVerified(false);
+      setError(err.message || t("failedToLoadAccessData"));
     } finally {
       setExamVerificationLoading(false);
     }

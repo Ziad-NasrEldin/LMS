@@ -24,91 +24,97 @@ const CourseCard = memo(function CourseCard({
   t,
   isRTL,
 }) {
+  const chipSideMargin = isRTL ? "ml-1" : "mr-1"
+
   return (
     <div
-      className="card border bg-white transition-all duration-300 overflow-hidden h-full flex flex-col hover:-translate-y-1"
+      className="group card border bg-white transition-all duration-300 overflow-hidden h-full flex flex-col hover:-translate-y-1"
       style={{
         borderColor: "rgba(17,24,39,0.08)",
         borderRadius: RADIUS.card,
         boxShadow: SHADOWS.level1,
       }}
     >
-      <figure className="relative h-48 flex-shrink-0">
+      <figure className="relative h-52 flex-shrink-0 overflow-hidden">
         <img
           src={getContainerImage(container, index) || "/placeholder.svg"}
           alt={container.name}
-          className="w-full h-full object-cover"
+          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
           loading="lazy"
         />
-        {container.price > 0 ? (
+        <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/45 to-transparent" />
+        <div className="absolute left-3 top-3 flex gap-2">
           <div
-            className="absolute bottom-3 left-3 px-3 py-1 rounded-full text-sm font-semibold"
-            style={{ background: TOKENS.goldenSand, color: TOKENS.inkText }}
-          >
-            {container.price} {t("currency")}
-          </div>
-        ) : (
-          <div className="absolute bottom-3 left-3 bg-success text-white px-3 py-1 rounded-full text-sm font-semibold">
-            {t("free")}
-          </div>
-        )}
-      </figure>
-
-      <div className="card-body p-4 flex-grow flex flex-col">
-        <div className="flex items-start justify-between gap-2">
-          <h3 className="card-title text-lg font-bold line-clamp-1" style={{ color: TOKENS.inkText }}>
-            {container.name}
-          </h3>
-          <div
-            className="badge whitespace-nowrap border-0"
+            className="rounded-full px-3 py-1 text-xs font-semibold shadow-sm"
             style={{ background: TOKENS.lightAquaMist, color: TOKENS.deepTeal }}
           >
             {getContainerTypeTranslation(container.type)}
           </div>
         </div>
-
-        <div className="space-y-1 mt-2">
-          <div className="flex items-center gap-2 text-sm text-base-content/70">
-            <User className="h-4 w-4 text-primary flex-shrink-0" />
-            <span className="truncate">{container.createdBy?.name || t("unknown")}</span>
+        {container.price > 0 ? (
+          <div
+            className="absolute bottom-3 right-3 px-3 py-1 rounded-full text-xs font-semibold shadow-sm"
+            style={{ background: TOKENS.goldenSand, color: TOKENS.inkText }}
+          >
+            {container.price} {t("currency")}
           </div>
-
-          <div className="flex items-center gap-2 text-sm text-base-content/70">
-            <BookOpen className="h-4 w-4 text-primary flex-shrink-0" />
-            <span className="truncate">{container.subject?.name || t("unspecified")}</span>
+        ) : (
+          <div className="absolute bottom-3 right-3 bg-success text-white px-3 py-1 rounded-full text-xs font-semibold shadow-sm">
+            {t("free")}
           </div>
+        )}
+      </figure>
 
-          <div className="flex items-center gap-2 text-sm text-base-content/70">
-            <Star className="h-4 w-4 text-primary flex-shrink-0" />
-            <span className="truncate">{container.level?.name || t("unspecified")}</span>
+      <div className="card-body flex-grow flex flex-col p-4 sm:p-5">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <h3 className="text-xl font-black tracking-tight line-clamp-2" style={{ color: TOKENS.inkText }}>
+              {container.name}
+            </h3>
+            <p className="mt-1 text-sm font-medium" style={{ color: TOKENS.slateText }}>
+              {container.subject?.name || t("unspecified")}
+            </p>
           </div>
-        </div>
-
-        <div className="divider my-2"></div>
-
-        <div className="flex justify-between text-xs text-base-content/60 mt-auto">
-          <div className="flex items-center gap-1">
-            <Users className="h-3 w-3 flex-shrink-0" />
-            <span>
-              {stats.students} {t("student")}
-            </span>
-          </div>
-          <div className="flex items-center gap-1">
-            <FileText className="h-3 w-3 flex-shrink-0" />
-            <span>
-              {stats.lectures} {t("content")}
-            </span>
-          </div>
-          <div className="flex items-center gap-1">
-            <Clock className="h-3 w-3 flex-shrink-0" />
-            <span>{stats.duration}</span>
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full" style={{ background: TOKENS.lightAquaMist, color: TOKENS.deepTeal }}>
+            <Star className="h-4 w-4" />
           </div>
         </div>
 
-        <div className="card-actions mt-3 flex flex-col sm:flex-row sm:justify-end gap-2">
+        <div className="mt-4 flex flex-wrap gap-2">
+          <div className="rounded-full border px-3 py-1 text-xs font-semibold" style={{ borderColor: "rgba(17,24,39,0.08)", color: TOKENS.slateText }}>
+            <User className={`inline-block h-3.5 w-3.5 ${chipSideMargin}`} />
+            {container.createdBy?.name || t("unknown")}
+          </div>
+          <div className="rounded-full border px-3 py-1 text-xs font-semibold" style={{ borderColor: "rgba(17,24,39,0.08)", color: TOKENS.slateText }}>
+            <BookOpen className={`inline-block h-3.5 w-3.5 ${chipSideMargin}`} />
+            {container.level?.name || t("unspecified")}
+          </div>
+        </div>
+
+        <div
+          className="mt-4 rounded-2xl border px-4 py-3"
+          style={{ background: "rgba(14,85,99,0.04)", borderColor: "rgba(17,24,39,0.06)" }}
+        >
+          <div className="flex justify-between text-xs font-semibold" style={{ color: TOKENS.slateText }}>
+            <div className="flex items-center gap-1.5">
+              <Users className="h-3.5 w-3.5 flex-shrink-0" />
+              <span>{stats.students} {t("student")}</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <FileText className="h-3.5 w-3.5 flex-shrink-0" />
+              <span>{stats.lectures} {t("content")}</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <Clock className="h-3.5 w-3.5 flex-shrink-0" />
+              <span>{stats.duration}</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="card-actions mt-4 flex flex-col gap-2 sm:flex-row sm:justify-between sm:items-center">
           <Link to={`container-details/${container._id}`} className="w-full sm:w-auto">
             <button
-              className="btn btn-sm border-0 w-full sm:w-auto"
+              className="btn btn-sm border-0 w-full sm:w-auto shadow-sm"
               style={{ background: TOKENS.lightAquaMist, color: TOKENS.deepTeal, borderRadius: RADIUS.chip }}
             >
               <Eye
@@ -119,7 +125,7 @@ const CourseCard = memo(function CourseCard({
             </button>
           </Link>
           <button
-            className="btn btn-sm w-full sm:w-auto border-0"
+            className="btn btn-sm w-full sm:w-auto border-0 shadow-sm"
             style={{ background: "#FDE8EE", color: "#BE123C", borderRadius: RADIUS.chip }}
             onClick={() => onDelete(container._id)}
             disabled={loading}

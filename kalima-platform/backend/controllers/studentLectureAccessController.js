@@ -6,6 +6,18 @@ const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
 const QueryFeatures = require("../utils/queryFeatures");
 
+const resolvePassingThreshold = (lectureThreshold, configThreshold) => {
+  if (lectureThreshold !== undefined && lectureThreshold !== null) {
+    return Number(lectureThreshold);
+  }
+
+  if (configThreshold !== undefined && configThreshold !== null) {
+    return Number(configThreshold);
+  }
+
+  return 60;
+};
+
 exports.createStudentLectureAccess = catchAsync(async (req, res, next) => {
   const { student, lecture } = req.body;
   // Check if the lecture requires exam or homework
@@ -139,13 +151,19 @@ exports.checkLectureAccess = catchAsync(async (req, res, next) => {
         required: true,
         passed: false,
         url: lecture.examConfig ? lecture.examConfig.formUrl : null,
-        passingThreshold: lecture.examConfig ? lecture.examConfig.defaultPassingThreshold : 60
+        passingThreshold: resolvePassingThreshold(
+          lecture.passingThreshold,
+          lecture.examConfig ? lecture.examConfig.defaultPassingThreshold : undefined
+        )
       } : null,
       homework: lecture.requiresHomework ? {
         required: true,
         passed: false,
         url: lecture.homeworkConfig ? lecture.homeworkConfig.formUrl : null,
-        passingThreshold: lecture.homeworkConfig ? lecture.homeworkConfig.defaultPassingThreshold : 60
+        passingThreshold: resolvePassingThreshold(
+          lecture.homeworkPassingThreshold,
+          lecture.homeworkConfig ? lecture.homeworkConfig.defaultPassingThreshold : undefined
+        )
       } : null
     };
 

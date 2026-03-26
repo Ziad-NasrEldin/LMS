@@ -18,6 +18,30 @@ const NotificationTemplate = require("../models/notificationTemplateModel");
 const Notification = require("../models/notification");
 const StudentLectureAccess = require("../models/studentLectureAccessModel");
 const Purchase = require("../models/purchaseModel");
+const { normalizeExternalUrl } = require("../utils/urlValidation");
+
+const ADMIN_ROLES = ["Admin", "SubAdmin", "Moderator"];
+
+const canManageLectureAttachments = async (user, lecture) => {
+  if (!user || !lecture) {
+    return false;
+  }
+
+  if (ADMIN_ROLES.includes(user.role)) {
+    return true;
+  }
+
+  if (user.role === "Lecturer") {
+    return lecture.createdBy?.toString() === user._id?.toString();
+  }
+
+  if (user.role === "Assistant") {
+    const assistant = await Assistant.findById(user._id).select("assignedLecturer").lean();
+    return assistant?.assignedLecturer?.toString() === lecture.createdBy?.toString();
+  }
+
+  return false;
+};
 
 // You can configure storage options here
 // Would be changed once we have established cloud storage
@@ -99,8 +123,20 @@ exports.getAttachmentFile = catchAsync(async (req, res, next) => {
   if (!attachment) {
     throw new AppError(`Attachment not found`, 404);
   }
-  const file = await axios.get(attachment.filePath, {
+
+  if (attachment.fileType === "link") {
+    throw new AppError("Link attachments should be opened directly from the stored URL", 400);
+  }
+
+  const safeFileUrl = normalizeExternalUrl(attachment.filePath);
+  if (!safeFileUrl) {
+    throw new AppError("Attachment URL is invalid or not publicly reachable", 400);
+  }
+
+  const file = await axios.get(safeFileUrl, {
     responseType: "stream",
+    timeout: 15000,
+    maxRedirects: 3,
   });
 
   res.setHeader("Content-Type", attachment.fileType);
@@ -126,6 +162,11 @@ exports.createAttachment = catchAsync(async (req, res, next) => {
   const lecture = await Lecture.findById(lectureId);
   if (!lecture) {
     throw new AppError(`Lecture not found`, 404);
+  }
+
+  const canManageAttachments = await canManageLectureAttachments(req.user, lecture);
+  if (!canManageAttachments) {
+    throw new AppError(`You are not authorized to upload attachments for this lecture`, 403);
   }
 
   // Accept links for homeworks and exams
@@ -157,12 +198,17 @@ exports.createAttachment = catchAsync(async (req, res, next) => {
       if ((type === "homeworks" && homeworkLink && homeworkLink.trim() !== "") ||
           (type === "exams" && examLink && examLink.trim() !== "")) {
         const linkValue = type === "homeworks" ? homeworkLink : examLink;
+        const safeLink = normalizeExternalUrl(linkValue);
+        if (!safeLink) {
+          throw new AppError(`Invalid ${type} link. Please provide a valid public HTTP/HTTPS URL`, 400);
+        }
+
         const attachment = new Attachment({
           lectureId,
           type,
           fileType: "link",
-          fileName: linkValue,
-          filePath: linkValue,
+          fileName: safeLink,
+          filePath: safeLink,
           fileSize: 0,
           publicId: null,
           uploadedOn: new Date(),
@@ -173,7 +219,7 @@ exports.createAttachment = catchAsync(async (req, res, next) => {
       }
     }
     if (!anyUploaded) {
-      throw new AppError(`No files or links uploaded`, 404);
+      throw new AppError(`No files or links uploaded`, 400);
     }
     await lecture.save({ session });
     await session.commitTransaction();

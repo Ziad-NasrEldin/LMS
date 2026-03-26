@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const LecturerExamConfig = require("../models/ExamConfigModel");
 const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
+const { normalizeExternalUrl } = require("../utils/urlValidation");
 
 // Create a new exam configuration for a lecturer
 exports.createExamConfig = catchAsync(async (req, res, next) => {
@@ -28,6 +29,11 @@ exports.createExamConfig = catchAsync(async (req, res, next) => {
     return next(new AppError("Type must be either 'exam' or 'homework'", 400));
   }
 
+  const normalizedFormUrl = normalizeExternalUrl(formUrl);
+  if (!normalizedFormUrl) {
+    return next(new AppError("Form URL must be a valid public HTTP/HTTPS URL", 400));
+  }
+
   // Create the configuration
   const examConfig = await LecturerExamConfig.create({
     lecturer: req.user._id, // Use the authenticated user's ID
@@ -35,7 +41,7 @@ exports.createExamConfig = catchAsync(async (req, res, next) => {
     type,
     description,
     googleSheetId,
-    formUrl,
+    formUrl: normalizedFormUrl,
     studentIdentifierColumn: studentIdentifierColumn || "Email Address",
     scoreColumn: scoreColumn || "Score",
     defaultPassingThreshold:
@@ -111,6 +117,14 @@ exports.updateExamConfig = catchAsync(async (req, res, next) => {
     return next(new AppError("Type must be either 'exam' or 'homework'", 400));
   }
 
+  let normalizedFormUrl;
+  if (formUrl !== undefined) {
+    normalizedFormUrl = normalizeExternalUrl(formUrl);
+    if (!normalizedFormUrl) {
+      return next(new AppError("Form URL must be a valid public HTTP/HTTPS URL", 400));
+    }
+  }
+
   // Find the configuration
   const examConfig = await LecturerExamConfig.findById(req.params.id);
 
@@ -130,18 +144,23 @@ exports.updateExamConfig = catchAsync(async (req, res, next) => {
   }
 
   // Update the configuration
+  const updatePayload = {
+    name,
+    description,
+    googleSheetId,
+    studentIdentifierColumn,
+    scoreColumn,
+    defaultPassingThreshold,
+    isActive,
+  };
+
+  if (normalizedFormUrl !== undefined) {
+    updatePayload.formUrl = normalizedFormUrl;
+  }
+
   const updatedConfig = await LecturerExamConfig.findByIdAndUpdate(
     req.params.id,
-    {
-      name,
-      description,
-      googleSheetId,
-      formUrl,
-      studentIdentifierColumn,
-      scoreColumn,
-      defaultPassingThreshold,
-      isActive,
-    },
+    updatePayload,
     {
       new: true,
       runValidators: true,

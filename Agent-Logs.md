@@ -1,3 +1,8 @@
+## 2026-03-26 - Lecturer course card expressive pass - GPT-5.3-Codex
+- Reworked lecturer course cards into a more deliberate media-led layout with gradient overlay, tokenized type/price pills, and denser metadata chips.
+- Tightened the action row and stats block so the cards feel closer to a designed product surface than a generic list item.
+- Kept the redesign within the existing token palette and radius/shadow system, preserving behavior and routes.
+
 ## 2026-03-26 - Lecturer dashboard rhythm pass - GPT-5.3-Codex
 - Refined the lecturer dashboard shell to use a tokenized page atmosphere, softer section frames, and stronger heading hierarchy.
 - Updated dashboard stat cards to use token-based surfaces, icon chips, spacing, and typography that better match the newer course detail rhythm.
@@ -51,6 +56,9 @@
 - Ran a full EN/AR i18n audit across all frontend locale namespaces and source key usage references.
 - Generated a machine-readable report at kalima-platform/frontend/translation-audit-report.json with namespace parity, missing used keys, and suspicious untranslated-value candidates.
 - Identified highest-impact gap clusters in admin, promoCodes, centerDashboard, lectureDisplay, and common namespaces for prioritized remediation.
+
+## 2026-03-26 - Lecturer sidebar label correction - GPT-5.3-Codex
+- Renamed the lecturer dashboard sidebar item from "Lectures" to "My Courses" using the existing common translation key so the label matches the intended meaning.
 
 ## 2026-03-25 - Signup RTL and privacy localization - GPT-5.3-Codex
 - Localized the Step 4 privacy agreement sentence using register locale keys (EN/AR) instead of hardcoded English.
@@ -132,3 +140,9 @@ ounded-[2rem]\), removed hard \shadow-sm\ defaults from DaisyUI, updated primary
 - Update: Removed package feature code from admin account creation and purchase/audit flows so the system now only manages subjects and levels; also removed stale package-named icon usage and refreshed admin subtitle wording to exclude packages.
 
 - Update: Redesigned the lecture creation popup into a wider two-column workspace with a thumbnail preview, publish summary sidebar, and sticky action footer for better UX on the admin lecture screens.
+
+## 2026-03-26 - Exam/homework config hardening phase 1 - GPT-5.3-Codex
+- Fixed lecture exam/homework persistence flow to save threshold fields, validate config ownership/type, and keep update behavior consistent when toggling requirements.
+- Corrected homework config model reference and unified threshold precedence across access-check and verification endpoints (lecture override first, config default fallback).
+- Hardened config/link inputs by validating public HTTP/HTTPS URLs, blocked server-side download proxying for link attachments, and added role/ownership checks for lecture attachment uploads.
+- Tightened student lecture gating in the frontend by removing the permissive fallback that previously granted access when verification checks failed.

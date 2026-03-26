@@ -6,6 +6,18 @@ const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
 const { configureGoogleSheets } = require("../config/googleApiConfig");
 
+const resolvePassingThreshold = (lectureThreshold, configThreshold, fallback = 60) => {
+  if (lectureThreshold !== undefined && lectureThreshold !== null) {
+    return Number(lectureThreshold);
+  }
+
+  if (configThreshold !== undefined && configThreshold !== null) {
+    return Number(configThreshold);
+  }
+
+  return fallback;
+};
+
 // Real Google Sheets API implementation to fetch exam results
 const getExamResultsFromSheet = async (
   sheetId,
@@ -232,8 +244,11 @@ exports.verifyExamSubmission = catchAsync(async (req, res, next) => {
         };
       } else {
         // Determine passing threshold
-        const passingThreshold =
-          lecture.passingThreshold || examConfig.defaultPassingThreshold;
+        const passingThreshold = resolvePassingThreshold(
+          lecture.passingThreshold,
+          examConfig.defaultPassingThreshold,
+          60
+        );
         const passed = examResults.score >= passingThreshold;
 
         // Create or update the exam submission record
@@ -330,8 +345,11 @@ exports.verifyExamSubmission = catchAsync(async (req, res, next) => {
             "No homework submission found for this student",
         };
       } else {
-        // Determine passing threshold (default to 0 if not set)
-        const passingThreshold = lecture.homeworkPassingThreshold ?? 0;
+        const passingThreshold = resolvePassingThreshold(
+          lecture.homeworkPassingThreshold,
+          homeworkConfig.defaultPassingThreshold,
+          60
+        );
         const passed = homeworkResults.score >= passingThreshold;
 
         console.log(

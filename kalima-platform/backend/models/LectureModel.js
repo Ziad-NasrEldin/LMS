@@ -86,7 +86,7 @@ const lectureSchema = new mongoose.Schema(
     },
     homeworkConfig: {
       type: mongoose.Schema.ObjectId,
-      ref: "HomeworkConfig",
+      ref: "LecturerExamConfig",
     },
     homeworkPassingThreshold: {
       type: Number,
