@@ -365,6 +365,29 @@ const ContainerDetailsPage = () => {
             boxShadow: SHADOWS.level1,
           }}
         >
+          {breadcrumbTrail.length > 0 && (
+            <div className="mb-6 flex flex-wrap items-center gap-2 overflow-x-auto rounded-2xl border px-3 py-3" style={{ background: "rgba(255,255,255,0.8)", borderColor: "rgba(17,24,39,0.08)" }}>
+              {breadcrumbTrail.map((node, index) => {
+                const nodeId = node._id || node.id
+                const isCurrentNode = index === breadcrumbTrail.length - 1
+
+                return (
+                  <div key={nodeId} className="flex items-center gap-2 whitespace-nowrap">
+                    {index > 0 && <span className="text-base-content/30">/</span>}
+                    <Link
+                      to={getContainerRoute(nodeId)}
+                      className={"inline-flex items-center gap-2 rounded-full border px-3 py-2 text-sm font-semibold transition-all duration-200 hover:-translate-y-[1px] " + (isCurrentNode ? "shadow-sm" : "hover:bg-base-200")}
+                      style={{ background: isCurrentNode ? TOKENS.lightAquaMist : "#FFFFFF", color: TOKENS.inkText, borderColor: isCurrentNode ? "rgba(15,118,110,0.18)" : "rgba(17,24,39,0.12)" }}
+                    >
+                      <FiFolder className="text-base" />
+                      <span>{node.name}</span>
+                    </Link>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+
           <div className="mb-8">
             <h1 className="mb-2 text-2xl font-bold sm:text-3xl" style={{ color: TOKENS.inkText }}>{container.name}</h1>
             <div className="flex flex-wrap items-center gap-3 text-sm sm:gap-4 sm:text-base" style={{ color: TOKENS.slateText }}>

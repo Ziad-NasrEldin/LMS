@@ -220,6 +220,7 @@ export default function CourseDetails() {
   const [purchaseInProgress, setPurchaseInProgress] = useState(null)
   const [purchaseError, setPurchaseError] = useState("")
   const [purchaseSuccess, setPurchaseSuccess] = useState(false)
+  const [showSuccessModal, setShowSuccessModal] = useState(false)
   const [remainingPoints, setRemainingPoints] = useState(null)
 
   // Fetch initial data
@@ -565,6 +566,37 @@ export default function CourseDetails() {
           </div>
         </div>
       </div>
+
+      {/* Success Modal */}
+      {showSuccessModal && (
+        <div className="modal modal-open border-none bg-black/40 backdrop-blur-sm z-50">
+          <div className="modal-box rounded-[2rem]" style={{ border: '1px solid rgba(17,24,39,0.08)', boxShadow: '0 12px 28px rgba(0,0,0,0.12)', backgroundColor: TOKENS.creamSurface }}>
+            <h3 className="font-bold text-xl" style={{ color: TOKENS.deepTeal }}>{isRTL ? "تم الشراء بنجاح!" : "Purchase Successful!"}</h3>
+            <p className="py-4 text-base font-medium" style={{ color: TOKENS.inkText }}>
+              {isRTL ? "تمت عملية الشراء بنجاح، ومحتواك الآن متاح في لوحة التحكم الخاصة بك. هل تود الانتقال إلى لوحة التحكم الآن؟" : "Your purchase was successful and is now available in your dashboard. Would you like to go to your dashboard now?"}
+            </p>
+            <div className="modal-action">
+              <button 
+                className="btn btn-ghost hover:bg-black/5 rounded-full px-6 border-none" 
+                style={{ color: TOKENS.inkText }}
+                onClick={() => setShowSuccessModal(false)}
+              >
+                {isRTL ? "لاحقاً" : "Later"}
+              </button>
+              <button 
+                className="btn text-white border-none hover:opacity-90 hover:scale-105 transition-transform rounded-full px-6" 
+                style={{ backgroundColor: TOKENS.deepTeal }}
+                onClick={() => {
+                  setShowSuccessModal(false);
+                  navigate("/dashboard/student-dashboard");
+                }}
+              >
+                {isRTL ? "نعم، انتقل للوحة التحكم" : "Yes, go to Dashboard"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
