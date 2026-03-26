@@ -42,6 +42,14 @@ function formatEgyptianPhoneNumber(number) {
   return '+20' + num;
 }
 
+function normalizeEgyptParentPhoneNumber(number) {
+  if (!number) return "";
+  const num = String(number).trim();
+  if (/^\+20\d{10}$/.test(num)) return num;
+  if (/^0\d{10}$/.test(num)) return `+20${num.slice(1)}`;
+  return "";
+}
+
 const registerNewUser = catchAsync(async (req, res, next) => {
   const {
     role,
@@ -329,6 +337,18 @@ const registerNewUser = catchAsync(async (req, res, next) => {
     case "student":
       if (!newUser.level)
         return next(new AppError("Level is required for student role", 400));
+      if (!newUser.parentPhoneNumber || !String(newUser.parentPhoneNumber).trim()) {
+        return next(new AppError("Parent phone number is required for student role", 400));
+      }
+      newUser.parentPhoneNumber = normalizeEgyptParentPhoneNumber(newUser.parentPhoneNumber);
+      if (!newUser.parentPhoneNumber) {
+        return next(
+          new AppError(
+            "Parent phone number must be in +20XXXXXXXXXX format, or 0XXXXXXXXXX which will be converted to +20XXXXXXXXXX.",
+            400
+          )
+        );
+      }
       const level = await Level.findById(newUser.level);
       if (!level)
         return next(new AppError("There is no level with this id", 404));

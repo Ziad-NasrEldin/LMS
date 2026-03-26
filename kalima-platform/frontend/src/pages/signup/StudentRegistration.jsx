@@ -24,6 +24,18 @@ const totalSteps = {
   teacher: 3,
 }
 
+const isValidEgyptParentPhone = (value) => {
+  const normalized = String(value || "").trim()
+  return /^\+20\d{10}$/.test(normalized) || /^0\d{10}$/.test(normalized)
+}
+
+const normalizeEgyptParentPhone = (value) => {
+  const normalized = String(value || "").trim()
+  if (/^\+20\d{10}$/.test(normalized)) return normalized
+  if (/^0\d{10}$/.test(normalized)) return `+20${normalized.slice(1)}`
+  return normalized
+}
+
 export default function StudentRegistration() {
   const { t, i18n } = useTranslation("register")
   const isRTL = i18n.language === "ar"
@@ -107,7 +119,7 @@ export default function StudentRegistration() {
 
       if (role === "student" && (formData.parentPhoneNumber === null || formData.parentPhoneNumber === "")) {
         errors.parentPhoneNumber = "parentPhoneRequired"
-      } else if (role === "student" && !phoneRegex.test(String(formData.parentPhoneNumber))) {
+      } else if (role === "student" && !isValidEgyptParentPhone(formData.parentPhoneNumber)) {
         errors.parentPhoneNumber = "phoneInvalid"
       }
 
@@ -270,7 +282,7 @@ export default function StudentRegistration() {
             }
           }
           data.append("faction", formData.faction || "Alpha");
-          data.append("parentPhoneNumber", formData.parentPhoneNumber);
+          data.append("parentPhoneNumber", normalizeEgyptParentPhone(formData.parentPhoneNumber));
           break;
 
         case "parent":

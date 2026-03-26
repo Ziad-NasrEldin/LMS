@@ -1,3 +1,13 @@
+## 2026-03-26 - Egyptian parent phone format enforcement - GPT-5.3-Codex
+- Enforced student `parentPhoneNumber` validation to accept only `+20` plus exactly 10 digits, with an allowed local-input exception of `0` plus 10 digits.
+- Added frontend normalization so `0XXXXXXXXXX` is converted to `+20XXXXXXXXXX` before submit.
+- Added backend normalization/guard to store student parent phone in canonical `+20XXXXXXXXXX` format and reject invalid shapes.
+
+## 2026-03-26 - Student parent phone required on signup - GPT-5.3-Codex
+- Made `parentPhoneNumber` mandatory in student Joi validation (`trim().required()`) so empty or whitespace values are rejected.
+- Added a student registration controller guard that returns a clear 400 error when parent phone is missing.
+- Enforced `parentPhoneNumber` as required in the Student mongoose schema for persistence-level validation.
+
 ## 2026-03-25 - Translation follow-up pass - GPT-5.4-mini
 - Added missing lecture feedback keys, center dashboard course-card fallbacks, and lecturer assistant error strings to remove remaining live Arabic/English fallbacks.
 - Updated the i18n audit flattening logic so object-valued locale paths are counted correctly when source code uses `returnObjects` lookups.

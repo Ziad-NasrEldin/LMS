@@ -10,7 +10,13 @@ const studentValidation = userValidation.concat(
       .messages({
         "string.pattern.base": "level must be a valid MongoDB ObjectId.",
       }),
-    parentPhoneNumber: Joi.string().optional(),
+    parentPhoneNumber: Joi.string()
+      .trim()
+      .pattern(/^(\+20\d{10}|0\d{10})$/)
+      .required()
+      .messages({
+        "string.pattern.base": "parentPhoneNumber must be a valid Egyptian number (+20XXXXXXXXXX or 0XXXXXXXXXX).",
+      }),
     phoneNumber: Joi.string().required(),
     faction: Joi.string().optional(),
     school: Joi.string().hex().length(24).optional(),
