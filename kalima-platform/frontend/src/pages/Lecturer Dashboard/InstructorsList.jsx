@@ -5,6 +5,11 @@ import { useEffect, useState } from "react"
 import { AssistantService } from "../../routes/assistants-services"
 import { CreateAssistant, deleteAssistant, updateAssistant } from "../../routes/assistants-services"
 import { BookOpen, Plus, X, Edit, Trash2 } from "lucide-react"
+import { designTokens } from "../../constants/designTokens"
+
+const TOKENS = designTokens.colors
+const SHADOWS = designTokens.shadows
+const RADIUS = designTokens.radius
 
 export default function InstructorsList() {
   const { t, i18n } = useTranslation("lecturerDashboard")
@@ -230,41 +235,78 @@ export default function InstructorsList() {
   }
 
   return (
-    <div className="p-4 md:p-6 space-y-8 max-w-7xl mx-auto">
+    <div className="p-1 md:p-2 space-y-8 max-w-7xl mx-auto">
       <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center">
-        <h2 className="text-2xl md:text-3xl font-extrabold text-primary break-words">{t("assistants")}</h2>
-        <button onClick={() => setShowAddModal(true)} className="btn bg-primary text-primary-content border-none hover:bg-primary/90 hover:scale-105 transition-transform rounded-full px-6 h-11 min-h-11 gap-2 w-full sm:w-auto">
+        <div>
+          <h2 className="text-2xl md:text-3xl font-black tracking-tight" style={{ color: TOKENS.deepTeal }}>
+            {t("assistants")}
+          </h2>
+          <p className="mt-2 text-sm md:text-base" style={{ color: TOKENS.slateText }}>
+            {isRTL ? "إدارة المساعدين ضمن نفس لغة البطاقات الحديثة" : "Manage assistants with the same modern card language."}
+          </p>
+        </div>
+        <button
+          onClick={() => setShowAddModal(true)}
+          className="btn border-none hover:scale-105 transition-transform rounded-full px-6 h-11 min-h-11 gap-2 w-full sm:w-auto"
+          style={{ background: TOKENS.deepTeal, color: "#F8FCFF" }}
+        >
           <Plus size={18} />
           {t("addAssistant")}
         </button>
       </div>
 
       {assistants?.length === 0 ? (
-        <div className="card bg-base-100 shadow-[0_6px_16px_rgba(0,0,0,0.06)] rounded-[2rem] border-base-200 border">
+        <div
+          className="card border bg-white"
+          style={{
+            borderColor: "rgba(17,24,39,0.08)",
+            borderRadius: RADIUS.section,
+            boxShadow: SHADOWS.level1,
+          }}
+        >
           <div className="card-body items-center text-center py-16">
-            <div className="w-24 h-24 bg-base-200 rounded-full flex items-center justify-center mb-4"><BookOpen className="text-neutral/40" size={48} /></div>
-            <p className="text-lg">{t("noAssistants")}</p>
-            <button onClick={() => setShowAddModal(true)} className="btn bg-primary text-primary-content border-none hover:bg-primary/90 rounded-full px-6 mt-6 gap-2 w-full sm:w-auto mx-auto">
+            <div
+              className="w-24 h-24 rounded-full flex items-center justify-center mb-4"
+              style={{ background: TOKENS.lightAquaMist }}
+            >
+              <BookOpen className="text-neutral/40" size={48} />
+            </div>
+            <p className="text-lg" style={{ color: TOKENS.inkText }}>{t("noAssistants")}</p>
+            <button
+              onClick={() => setShowAddModal(true)}
+              className="btn border-none rounded-full px-6 mt-6 gap-2 w-full sm:w-auto mx-auto"
+              style={{ background: TOKENS.deepTeal, color: "#F8FCFF" }}
+            >
               <Plus size={18} />
               {t("addYourFirstAssistant")}
             </button>
           </div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 md:gap-8" dir={isRTL ? "rtl" : "ltr"}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 md:gap-6" dir={isRTL ? "rtl" : "ltr"}>
           {assistants?.map((assistant) => (
-            <div key={assistant._id} className="card bg-base-100 shadow-[0_6px_16px_rgba(0,0,0,0.06)] hover:shadow-[0_12px_28px_rgba(0,0,0,0.12)] hover:-translate-y-1 transition-all duration-300 rounded-[2rem] relative">
+            <div
+              key={assistant._id}
+              className="card border bg-white hover:-translate-y-1 transition-all duration-300 rounded-[2rem] relative"
+              style={{
+                borderColor: "rgba(17,24,39,0.08)",
+                borderRadius: RADIUS.section,
+                boxShadow: SHADOWS.level1,
+              }}
+            >
               <div className={`absolute top-2 z-10 flex gap-2 ${isRTL ? "left-2" : "right-2"}`}>
                 <button
                   onClick={() => startEdit(assistant)}
-                  className="btn btn-sm btn-circle btn-ghost bg-base-200 hover:bg-base-300 border-none transition-colors"
+                  className="btn btn-sm btn-circle border-none transition-colors"
+                  style={{ background: TOKENS.lightAquaMist, color: TOKENS.deepTeal }}
                   title={t("editAssistant")}
                 >
                   <Edit size={16} />
                 </button>
                 <button
                   onClick={() => confirmDelete(assistant._id)}
-                  className="btn btn-sm btn-circle btn-ghost bg-[#e84157]/10 text-[#e84157] hover:bg-[#e84157]/20 border-none transition-colors"
+                  className="btn btn-sm btn-circle border-none transition-colors"
+                  style={{ background: "#FDE8EE", color: "#BE123C" }}
                   title={t("delete")}
                 >
                   <Trash2 size={16} />
@@ -272,18 +314,23 @@ export default function InstructorsList() {
               </div>
               <div className="card-body items-center text-center p-6 sm:p-8">
                 <div className="avatar mb-3">
-                  <div className="w-24 h-24 rounded-full bg-base-200 ring-[4px] ring-base-100 shadow-lg relative z-10">
+                  <div
+                    className="w-24 h-24 rounded-full ring-[4px] shadow-lg relative z-10"
+                    style={{ background: TOKENS.lightAquaMist, border: "4px solid #fff" }}
+                  >
                     {assistant.image ? (
                       <img src={assistant.image || "/placeholder.svg"} alt={assistant.name} className="object-cover w-full h-full" />
                     ) : (
-                      <div className="flex items-center justify-center h-full text-2xl font-bold">
+                      <div className="flex items-center justify-center h-full text-2xl font-bold" style={{ color: TOKENS.deepTeal }}>
                         {assistant.name.charAt(0).toUpperCase()}
                       </div>
                     )}
                   </div>
                 </div>
-                <h3 className="card-title text-xl font-bold text-base-content mt-2">{assistant.name}</h3>
-                <p className="text-sm font-medium text-neutral">{assistant.assignedLecturer?.expertise || t("assistantSpecialty")}</p>
+                <h3 className="card-title text-xl font-bold mt-2" style={{ color: TOKENS.inkText }}>{assistant.name}</h3>
+                <p className="text-sm font-medium" style={{ color: TOKENS.slateText }}>
+                  {assistant.assignedLecturer?.expertise || t("assistantSpecialty")}
+                </p>
                 <div className="mt-2">
                   <span className={`badge ${assistant.gender === "male" ? "badge-info" : "badge-accent"}`}>
                     {assistant.gender === "male" ? t("male") : t("female")}

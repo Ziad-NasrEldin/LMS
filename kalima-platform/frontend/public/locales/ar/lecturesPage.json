@@ -111,8 +111,12 @@
   "titles": {
     "createNewLecture": "إنشاء محاضرة جديدة"
   },
+  "descriptions": {
+    "createNewLectureModal": "استخدم المساحة الأكبر بالأسفل لتنظيم محتوى المحاضرة والملفات وإعدادات النشر بشكل أوضح."
+  },
   "fields": {
     "name": "الاسم",
+    "thumbnail": "الصورة المصغرة",
     "level": "المستوى",
     "subject": "المادة",
     "description": "الوصف",
@@ -140,6 +144,9 @@
     "normal": "عادي"
   },
   "sections": {
+    "contentBasics": "أساسيات المحتوى",
+    "assetPreview": "معاينة الأصول",
+    "publishSummary": "ملخص النشر",
     "examSettings": "إعدادات الاختبار",
     "homeworkSettings": "إعدادات الواجب المنزلي",
     "attachments": "المرفقات"

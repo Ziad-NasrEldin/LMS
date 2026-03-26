@@ -111,8 +111,12 @@
    "titles": {
     "createNewLecture": "Create New Lecture"
   },
+  "descriptions": {
+    "createNewLectureModal": "Use the larger workspace below to keep the lecture content, assets, and publishing settings organized."
+  },
   "fields": {
     "name": "Name",
+    "thumbnail": "Thumbnail",
     "level": "Level",
     "subject": "Subject",
     "description": "Description",
@@ -140,6 +144,9 @@
     "normal": "Normal"
   },
   "sections": {
+    "contentBasics": "Content Basics",
+    "assetPreview": "Asset Preview",
+    "publishSummary": "Publish Summary",
     "examSettings": "Exam Settings",
     "homeworkSettings": "Homework Settings",
     "attachments": "Attachments"

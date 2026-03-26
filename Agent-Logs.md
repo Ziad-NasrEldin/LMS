@@ -1,3 +1,13 @@
+## 2026-03-26 - Lecturer dashboard rhythm pass - GPT-5.3-Codex
+- Refined the lecturer dashboard shell to use a tokenized page atmosphere, softer section frames, and stronger heading hierarchy.
+- Updated dashboard stat cards to use token-based surfaces, icon chips, spacing, and typography that better match the newer course detail rhythm.
+- Tightened spacing and section subtitles in course and assistants lists so the page feels more cohesive with the current design system.
+
+## 2026-03-26 - Lecturer dashboard card token refresh - GPT-5.3-Codex
+- Restyled lecturer course cards in `CourseGrid` to use design tokens for color, radius, shadows, and action chip treatment.
+- Updated assistants section cards and empty state in `InstructorsList` to the same tokenized card language (surface, border, CTA, edit/delete controls).
+- Kept existing behavior intact while modernizing visuals to match the current design system.
+
 ## 2026-03-26 - Parent phone 10-digit + RTL-safe sanitization - GPT-5.3-Codex
 - Hardened student signup parent phone validation/normalization to accept `XXXXXXXXXX`, `0XXXXXXXXXX`, and `+20XXXXXXXXXX` consistently.
 - Added Arabic numeral normalization and invisible RTL character stripping in both frontend and backend phone sanitizers to prevent false invalid-format errors.
@@ -120,3 +130,5 @@ ounded-[2rem]\), removed hard \shadow-sm\ defaults from DaisyUI, updated primary
 - Update: Restored missing src/routes/packages.jsx API module to fix Vite build resolution failure from AddNewStuff.jsx (unresolved import ../../../routes/packages).
 
 - Update: Removed package feature code from admin account creation and purchase/audit flows so the system now only manages subjects and levels; also removed stale package-named icon usage and refreshed admin subtitle wording to exclude packages.
+
+- Update: Redesigned the lecture creation popup into a wider two-column workspace with a thumbnail preview, publish summary sidebar, and sticky action footer for better UX on the admin lecture screens.

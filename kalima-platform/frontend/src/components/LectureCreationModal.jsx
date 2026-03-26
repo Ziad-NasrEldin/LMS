@@ -7,6 +7,15 @@ import { getAllLevels } from "../routes/levels"
 import { getAllSubjects } from "../routes/courses"
 import ExamConfigSection from "./ExamConfigSection"
 
+const SummaryRow = ({ label, value, loading = false }) => (
+  <div className="flex items-center justify-between gap-4 rounded-2xl border border-base-300 bg-base-100/80 px-4 py-3">
+    <span className="text-sm font-medium text-base-content/60">{label}</span>
+    <span className="text-sm font-semibold text-right text-base-content">
+      {loading ? <span className="loading loading-spinner loading-xs"></span> : value}
+    </span>
+  </div>
+)
+
 const LectureCreationModal = ({
   isOpen,
   onClose,
@@ -235,346 +244,426 @@ const LectureCreationModal = ({
     }
   }
 
-  return (
-    <div className={`modal ${isOpen && "modal-open"}`} dir={isRTL ? "rtl" : "ltr"}>
-      <div className="modal-box max-w-md">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-bold">{t("titles.createNewLecture")}</h3>
-          <button onClick={handleClose} className="btn btn-sm btn-circle btn-ghost">
-            <FiX className="w-5 h-5" />
-          </button>
-        </div>
+  const selectedLevelInfo = levels.find((level) => level._id === selectedLevel)
+  const selectedSubjectInfo = subjects.find((subject) => subject._id === selectedSubject)
+  const selectedLevelLabel = selectedLevelInfo?.displayName || selectedLevelInfo?.name || ""
+  const selectedSubjectLabel = selectedSubjectInfo?.name || ""
+  const totalAttachments = Object.values(attachmentFilesByCategory).reduce(
+    (count, files) => count + (files?.length || 0),
+    0,
+  )
+  const lectureTypeLabel = newLectureType === "Revision" ? t("lectureTypes.revision") : t("lectureTypes.normal")
 
-        <form onSubmit={handleSubmit}>
-          <div className="form-control w-full mb-4">
-            <label className="label">
-              <span className="label-text">{t("fields.name")}</span>
-            </label>
-            <input
-              type="text"
-              placeholder={t("placeholders.enterLectureName")}
-              className="input input-bordered w-full"
-              value={newItemName}
-              onChange={(e) => setNewItemName(e.target.value)}
-              required
-            />
+  return (
+    <div className={`modal ${isOpen ? "modal-open" : ""}`} dir={isRTL ? "rtl" : "ltr"}>
+      <div className="modal-box w-11/12 max-w-7xl h-[92vh] max-h-[92vh] overflow-hidden rounded-[2rem] border border-base-300 bg-base-100 p-0 shadow-2xl">
+        <div className="flex h-full flex-col">
+          <div className="flex items-start justify-between gap-4 border-b border-base-300 px-6 py-5 sm:px-8">
+            <div className="min-w-0">
+              <p className="text-xs font-bold uppercase tracking-[0.28em] text-primary/70">{t("titles.createNewLecture")}</p>
+              <h3 className="mt-1 text-2xl font-bold leading-tight text-base-content sm:text-3xl">{t("titles.createNewLecture")}</h3>
+              <p className="mt-2 max-w-3xl text-sm text-base-content/60">{t("descriptions.createNewLectureModal")}</p>
+            </div>
+            <button type="button" onClick={handleClose} className="btn btn-sm btn-circle btn-ghost shrink-0">
+              <FiX className="w-5 h-5" />
+            </button>
           </div>
 
-          <div className="form-control w-full mb-4">
-            <label className="label">
-              <span className="label-text">{t("fields.thumbnail", "Thumbnail")}</span>
-            </label>
-            <div className="space-y-3">
-              <div className="relative">
-                <input
-                  type="file"
-                  onChange={handleThumbnailChange}
-                  className="input input-bordered w-full"
-                  accept="image/*"
-                />
-                <FiImage className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-primary" />
-              </div>
-              {thumbnailFile && (
-                <div className="space-y-2">
-                  <p className="text-sm text-base-content/70">
-                    {t("fields.selectedFile", "Selected file")}: {thumbnailFile.name}
-                  </p>
-                  {thumbnailPreview && (
-                    <div className="flex justify-center">
-                      <img
-                        src={thumbnailPreview || "/placeholder.svg"}
-                        alt="Thumbnail preview"
-                        className="w-32 h-20 object-cover rounded-lg border"
+          <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
+            <div className="min-h-0 flex-1 overflow-y-auto px-6 py-6 sm:px-8">
+              <div className="grid gap-6 lg:grid-cols-[minmax(0,1.35fr)_minmax(320px,380px)]">
+                <div className="space-y-6">
+                  <section className="rounded-[1.75rem] border border-base-300 bg-base-100 p-5 shadow-sm">
+                    <div className="mb-5 flex items-center gap-3">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary/10 text-sm font-bold text-primary">
+                        1
+                      </div>
+                      <div>
+                        <h4 className="text-lg font-bold text-base-content">{t("sections.contentBasics")}</h4>
+                        <p className="text-sm text-base-content/60">{t("fields.name")}, {t("fields.description")}, {t("fields.price")}, {t("fields.videoURL")}</p>
+                      </div>
+                    </div>
+
+                    <div className="grid gap-4 md:grid-cols-2">
+                      <div className="form-control md:col-span-2">
+                        <label className="label">
+                          <span className="label-text font-semibold">{t("fields.name")}</span>
+                        </label>
+                        <input
+                          type="text"
+                          placeholder={t("placeholders.enterLectureName")}
+                          className="input input-bordered w-full rounded-2xl"
+                          value={newItemName}
+                          onChange={(e) => setNewItemName(e.target.value)}
+                          required
+                        />
+                      </div>
+
+                      <div className="form-control md:col-span-2">
+                        <label className="label">
+                          <span className="label-text font-semibold">{t("fields.description")}</span>
+                        </label>
+                        <textarea
+                          placeholder={t("placeholders.enterDescription")}
+                          className="textarea textarea-bordered min-h-32 w-full rounded-2xl"
+                          value={newDescription}
+                          onChange={(e) => setNewDescription(e.target.value)}
+                        />
+                      </div>
+
+                      <div className="form-control">
+                        <label className="label">
+                          <span className="label-text font-semibold">{t("fields.price")}</span>
+                        </label>
+                        <input
+                          type="number"
+                          placeholder={t("placeholders.enterPrice")}
+                          className="input input-bordered w-full rounded-2xl"
+                          value={newPrice}
+                          onChange={(e) => setNewPrice(e.target.value)}
+                          min="0"
+                          required
+                        />
+                      </div>
+
+                      <div className="form-control">
+                        <label className="label">
+                          <span className="label-text font-semibold">{t("fields.numberOfViews")}</span>
+                        </label>
+                        <input
+                          type="number"
+                          placeholder={t("placeholders.enterNumberOfViews")}
+                          className="input input-bordered w-full rounded-2xl"
+                          value={numberOfViews}
+                          onChange={(e) => setNumberOfViews(e.target.value)}
+                          min="0"
+                          required
+                        />
+                      </div>
+
+                      <div className="form-control md:col-span-2">
+                        <label className="label">
+                          <span className="label-text font-semibold">{t("fields.videoURL")}</span>
+                        </label>
+                        <input
+                          type="url"
+                          placeholder={t("placeholders.enterVideoLink")}
+                          className="input input-bordered w-full rounded-2xl"
+                          value={newVideoLink}
+                          onChange={(e) => setNewVideoLink(e.target.value)}
+                          required
+                        />
+                      </div>
+
+                      <div className="form-control md:col-span-2">
+                        <label className="label">
+                          <span className="label-text font-semibold">{t("fields.lectureType")}</span>
+                        </label>
+                        <select
+                          className="select select-bordered w-full rounded-2xl"
+                          value={newLectureType}
+                          onChange={(e) => setNewLectureType(e.target.value)}
+                        >
+                          <option value="Revision">{t("lectureTypes.revision")}</option>
+                          <option value="Paid">{t("lectureTypes.normal")}</option>
+                        </select>
+                      </div>
+                    </div>
+                  </section>
+
+                  <section className="rounded-[1.75rem] border border-base-300 bg-base-100 p-5 shadow-sm">
+                    <div className="mb-5 flex items-center gap-3">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-secondary/10 text-sm font-bold text-secondary">
+                        2
+                      </div>
+                      <div>
+                        <h4 className="text-lg font-bold text-base-content">{t("sections.publishSettings")}</h4>
+                        <p className="text-sm text-base-content/60">{t("fields.level")}, {t("fields.subject")}, {t("fields.requiresExam")}, {t("fields.requiresHomework")}</p>
+                      </div>
+                    </div>
+
+                    <div className="grid gap-4 md:grid-cols-2">
+                      <div className="form-control">
+                        <label className="label">
+                          <span className="label-text font-semibold">{t("fields.level")}</span>
+                        </label>
+                        <select
+                          className="select select-bordered w-full rounded-2xl"
+                          value={selectedLevel}
+                          onChange={(e) => setSelectedLevel(e.target.value)}
+                          required
+                        >
+                          <option value="">{t("placeholders.selectLevel")}</option>
+                          {levels.map((level) => (
+                            <option key={level._id} value={level._id}>
+                              {level.displayName || level.name}
+                            </option>
+                          ))}
+                        </select>
+                        {levelsLoading && <span className="loading loading-spinner loading-sm mt-2"></span>}
+                      </div>
+
+                      <div className="form-control">
+                        <label className="label">
+                          <span className="label-text font-semibold">{t("fields.subject")}</span>
+                        </label>
+                        <select
+                          className="select select-bordered w-full rounded-2xl"
+                          value={selectedSubject}
+                          onChange={(e) => setSelectedSubject(e.target.value)}
+                          required
+                        >
+                          <option value="">{t("placeholders.selectSubject")}</option>
+                          {subjects.map((subject) => (
+                            <option key={subject._id} value={subject._id}>
+                              {subject.name}
+                            </option>
+                          ))}
+                        </select>
+                        {subjectsLoading && <span className="loading loading-spinner loading-sm mt-2"></span>}
+                      </div>
+                    </div>
+
+                    <div className="mt-4 grid gap-4 xl:grid-cols-2">
+                      <div className="rounded-[1.5rem] border border-base-300 bg-base-200/40 p-4">
+                        <div className="mb-3 flex items-center justify-between gap-3">
+                          <h5 className="font-semibold text-base-content">{t("fields.requiresExam")}</h5>
+                          <select
+                            className="select select-bordered select-sm rounded-xl"
+                            value={requiresExam}
+                            onChange={(e) => setRequiresExam(e.target.value === "true")}
+                          >
+                            <option value={false}>{t("options.no")}</option>
+                            <option value={true}>{t("options.yes")}</option>
+                          </select>
+                        </div>
+                        <ExamConfigSection
+                          requiresExam={requiresExam}
+                          selectedExamConfigId={selectedExamConfigId}
+                          setSelectedExamConfigId={setSelectedExamConfigId}
+                          passingThreshold={passingThreshold}
+                          setPassingThreshold={setPassingThreshold}
+                          onExamConfigCreated={(examConfigId) => {
+                            setSelectedExamConfigId(examConfigId)
+                          }}
+                          t={t}
+                          i18n={i18n}
+                        />
+                      </div>
+
+                      <div className="rounded-[1.5rem] border border-base-300 bg-base-200/40 p-4">
+                        <div className="mb-3 flex items-center justify-between gap-3">
+                          <h5 className="font-semibold text-base-content">{t("fields.requiresHomework")}</h5>
+                          <select
+                            className="select select-bordered select-sm rounded-xl"
+                            value={requiresHomework}
+                            onChange={(e) => setRequiresHomework(e.target.value === "true")}
+                          >
+                            <option value={false}>{t("options.no")}</option>
+                            <option value={true}>{t("options.yes")}</option>
+                          </select>
+                        </div>
+                        {requiresHomework && (
+                          <ExamConfigSection
+                            requiresExam={requiresHomework}
+                            selectedExamConfigId={selectedHomeworkConfigId}
+                            setSelectedExamConfigId={setSelectedHomeworkConfigId}
+                            passingThreshold={homeworkPassingThreshold}
+                            setPassingThreshold={setHomeworkPassingThreshold}
+                            onExamConfigCreated={(homeworkConfigId) => {
+                              setSelectedHomeworkConfigId(homeworkConfigId)
+                            }}
+                            configType="homework"
+                            t={t}
+                            i18n={i18n}
+                          />
+                        )}
+                      </div>
+                    </div>
+                  </section>
+
+                  <section className="rounded-[1.75rem] border border-base-300 bg-base-100 p-5 shadow-sm">
+                    <div className="mb-5 flex items-center gap-3">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-accent/10 text-sm font-bold text-accent">
+                        3
+                      </div>
+                      <div>
+                        <h4 className="text-lg font-bold text-base-content">{t("sections.attachments")}</h4>
+                        <p className="text-sm text-base-content/60">{t("fields.attachmentOptional")}</p>
+                      </div>
+                    </div>
+
+                    <div className="tabs tabs-boxed mb-4 flex flex-wrap gap-2 bg-base-200/60 p-1">
+                      {attachmentCategories.map((cat) => (
+                        <button
+                          type="button"
+                          key={cat.key}
+                          className={`tab min-h-0 rounded-full px-4 py-2 text-sm font-medium ${activeAttachmentTab === cat.key ? "tab-active" : ""}`}
+                          onClick={() => setActiveAttachmentTab(cat.key)}
+                        >
+                          {cat.label}
+                        </button>
+                      ))}
+                    </div>
+
+                    <div className="space-y-3">
+                      <div className="relative">
+                        <input
+                          type="file"
+                          multiple
+                          onChange={(e) => {
+                            const files = Array.from(e.target.files)
+                            setAttachmentFilesByCategory((prev) => ({
+                              ...prev,
+                              [activeAttachmentTab]: files,
+                            }))
+                          }}
+                          className="file-input file-input-bordered w-full rounded-2xl"
+                          accept=".pdf,.jpg,.jpeg,.png"
+                        />
+                        <FiPaperclip className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-primary" />
+                      </div>
+
+                      {attachmentFilesByCategory[activeAttachmentTab] && attachmentFilesByCategory[activeAttachmentTab].length > 0 && (
+                        <ul className="space-y-1 rounded-2xl bg-base-200/50 p-4 text-sm text-base-content/70">
+                          {attachmentFilesByCategory[activeAttachmentTab].map((file, idx) => (
+                            <li key={idx}>
+                              {t("fields.selectedFile")}: {file.name}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+
+                      {(activeAttachmentTab === "homeworks" || activeAttachmentTab === "exams") && (
+                        <div className="space-y-2">
+                          <input
+                            type="url"
+                            className="input input-bordered w-full rounded-2xl"
+                            placeholder={t("fields.enterGoogleFormOrLink", "Enter Google Form or link")}
+                            value={attachmentLinksByCategory[activeAttachmentTab] || ""}
+                            onChange={(e) =>
+                              setAttachmentLinksByCategory((prev) => ({
+                                ...prev,
+                                [activeAttachmentTab]: e.target.value,
+                              }))
+                            }
+                          />
+                          <span className="text-xs text-base-content/60">{t("fields.orPasteLink", "Or paste a link instead of uploading a file.")}</span>
+                        </div>
+                      )}
+                    </div>
+                  </section>
+                </div>
+
+                <aside className="space-y-6 lg:sticky lg:top-0 self-start">
+                  <section className="rounded-[1.75rem] border border-base-300 bg-gradient-to-br from-base-100 to-primary/5 p-5 shadow-sm">
+                    <div className="flex items-start justify-between gap-4">
+                      <div>
+                        <p className="text-xs font-bold uppercase tracking-[0.24em] text-primary/70">{t("sections.assetPreview")}</p>
+                        <h4 className="mt-1 text-xl font-bold text-base-content">{t("fields.thumbnail", "Thumbnail")}</h4>
+                      </div>
+                      <span className="badge badge-outline badge-primary">
+                        {containerType ? t(`types.${containerType}`, containerType) : t("lecturesPage.notSpecified")}
+                      </span>
+                    </div>
+
+                    <div className="mt-4 overflow-hidden rounded-[1.5rem] border border-dashed border-primary/20 bg-base-100">
+                      {thumbnailPreview ? (
+                        <img
+                          src={thumbnailPreview || "/placeholder.svg"}
+                          alt="Thumbnail preview"
+                          className="h-52 w-full object-cover"
+                        />
+                      ) : (
+                        <div className="flex h-52 flex-col items-center justify-center gap-3 px-6 text-center text-base-content/50">
+                          <div className="rounded-full bg-primary/10 p-4 text-primary">
+                            <FiImage className="h-7 w-7" />
+                          </div>
+                          <div>
+                            <p className="font-semibold">{t("fields.thumbnail", "Thumbnail")}</p>
+                            <p className="text-sm">{t("placeholders.enterLectureName")}</p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="mt-4">
+                      <label className="label px-0 pt-0">
+                        <span className="label-text font-semibold">{t("fields.thumbnail", "Thumbnail")}</span>
+                      </label>
+                      <input
+                        type="file"
+                        onChange={handleThumbnailChange}
+                        className="file-input file-input-bordered w-full rounded-2xl"
+                        accept="image/*"
                       />
+                      {thumbnailFile && (
+                        <p className="mt-2 text-sm text-base-content/70">
+                          {t("fields.selectedFile", "Selected file")}: {thumbnailFile.name}
+                        </p>
+                      )}
+                    </div>
+                  </section>
+
+                  <section className="rounded-[1.75rem] border border-base-300 bg-base-100 p-5 shadow-sm">
+                    <div className="flex items-center justify-between gap-3">
+                      <h4 className="text-lg font-bold text-base-content">{t("sections.publishSummary")}</h4>
+                      <span className="badge badge-neutral">{totalAttachments} files</span>
+                    </div>
+
+                    <div className="mt-4 space-y-3">
+                      <SummaryRow label={t("fields.level")} value={selectedLevelLabel || t("lecturesPage.notSpecified")} loading={levelsLoading} />
+                      <SummaryRow label={t("fields.subject")} value={selectedSubjectLabel || t("lecturesPage.notSpecified")} loading={subjectsLoading} />
+                      <SummaryRow label={t("fields.price")} value={`${Number(newPrice) || 0}`} />
+                      <SummaryRow label={t("fields.numberOfViews")} value={`${Number(numberOfViews) || 0}`} />
+                      <SummaryRow label={t("fields.lectureType")} value={lectureTypeLabel} />
+                      <SummaryRow label={t("fields.requiresExam")} value={requiresExam ? t("options.yes") : t("options.no")} />
+                      <SummaryRow label={t("fields.requiresHomework")} value={requiresHomework ? t("options.yes") : t("options.no")} />
+                      <SummaryRow label={t("sections.attachments")} value={String(totalAttachments)} />
+                    </div>
+                  </section>
+
+                  {creationError && (
+                    <div className="alert alert-error rounded-[1.5rem] border-none shadow-sm">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="stroke-current shrink-0 h-6 w-6"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                      </svg>
+                      <span>{creationError}</span>
                     </div>
                   )}
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Level dropdown */}
-          <div className="form-control w-full mb-4">
-            <label className="label">
-              <span className="label-text">{t("fields.level")}</span>
-            </label>
-            <select
-              className="select select-bordered w-full"
-              value={selectedLevel}
-              onChange={(e) => setSelectedLevel(e.target.value)}
-              required
-            >
-              <option value="">{t("placeholders.selectLevel")}</option>
-              {levels.map((level) => (
-                <option key={level._id} value={level._id}>
-                  {level.displayName || level.name}
-                </option>
-              ))}
-            </select>
-            {levelsLoading && <span className="loading loading-spinner mt-2"></span>}
-          </div>
-
-          {/* Subject dropdown */}
-          <div className="form-control w-full mb-4">
-            <label className="label">
-              <span className="label-text">{t("fields.subject")}</span>
-            </label>
-            <select
-              className="select select-bordered w-full"
-              value={selectedSubject}
-              onChange={(e) => setSelectedSubject(e.target.value)}
-              required
-            >
-              <option value="">{t("placeholders.selectSubject")}</option>
-              {subjects.map((subject) => (
-                <option key={subject._id} value={subject._id}>
-                  {subject.name}
-                </option>
-              ))}
-            </select>
-            {subjectsLoading && <span className="loading loading-spinner mt-2"></span>}
-          </div>
-
-          <div className="form-control w-full mb-4">
-            <label className="label">
-              <span className="label-text">{t("fields.description")}</span>
-            </label>
-            <textarea
-              placeholder={t("placeholders.enterDescription")}
-              className="textarea textarea-bordered w-full"
-              value={newDescription}
-              onChange={(e) => setNewDescription(e.target.value)}
-            />
-          </div>
-
-          <div className="form-control w-full mb-4">
-            <label className="label">
-              <span className="label-text">{t("fields.price")}</span>
-            </label>
-            <input
-              type="number"
-              placeholder={t("placeholders.enterPrice")}
-              className="input input-bordered w-full"
-              value={newPrice}
-              onChange={(e) => setNewPrice(e.target.value)}
-              min="0"
-              required
-            />
-          </div>
-
-          <div className="form-control w-full mb-4">
-            <label className="label">
-              <span className="label-text">{t("fields.videoURL")}</span>
-            </label>
-            <input
-              type="url"
-              placeholder={t("placeholders.enterVideoLink")}
-              className="input input-bordered w-full"
-              value={newVideoLink}
-              onChange={(e) => setNewVideoLink(e.target.value)}
-              required
-            />
-          </div>
-
-          <div className="form-control w-full mb-4">
-            <label className="label">
-              <span className="label-text">{t("fields.numberOfViews")}</span>
-            </label>
-            <input
-              type="number"
-              placeholder={t("placeholders.enterNumberOfViews")}
-              className="input input-bordered w-full"
-              value={numberOfViews}
-              onChange={(e) => setNumberOfViews(e.target.value)}
-              min="0"
-              required
-            />
-          </div>
-
-          <div className="form-control w-full mb-4">
-            <label className="label">
-              <span className="label-text">{t("fields.lectureType")}</span>
-            </label>
-            <select
-              className="select select-bordered w-full"
-              value={newLectureType}
-              onChange={(e) => setNewLectureType(e.target.value)}
-            >
-              <option value="Revision">{t("lectureTypes.revision")}</option>
-              <option value="Paid">{t("lectureTypes.normal")}</option>
-            </select>
-          </div>
-
-          {/* Exam Section */}
-          <div className="divider">{t("sections.examSettings")}</div>
-
-          <div className="form-control w-full mb-4">
-            <label className="label">
-              <span className="label-text">{t("fields.requiresExam")}</span>
-            </label>
-            <select
-              className="select select-bordered w-full"
-              value={requiresExam}
-              onChange={(e) => setRequiresExam(e.target.value === "true")}
-            >
-              <option value={false}>{t("options.no")}</option>
-              <option value={true}>{t("options.yes")}</option>
-            </select>
-          </div>
-
-          {/* Exam Config Section */}
-          <ExamConfigSection
-            requiresExam={requiresExam}
-            selectedExamConfigId={selectedExamConfigId}
-            setSelectedExamConfigId={setSelectedExamConfigId}
-            passingThreshold={passingThreshold}
-            setPassingThreshold={setPassingThreshold}
-            onExamConfigCreated={(examConfigId) => {
-              setSelectedExamConfigId(examConfigId)
-            }}
-            t={t}
-            i18n={i18n}
-          />
-
-          {/* Homework Section */}
-          <div className="divider">{t("sections.homeworkSettings")}</div>
-
-          <div className="form-control w-full mb-4">
-            <label className="label">
-              <span className="label-text">{t("fields.requiresHomework")}</span>
-            </label>
-            <select
-              className="select select-bordered w-full"
-              value={requiresHomework}
-              onChange={(e) => setRequiresHomework(e.target.value === "true")}
-            >
-              <option value={false}>{t("options.no")}</option>
-              <option value={true}>{t("options.yes")}</option>
-            </select>
-          </div>
-
-          {/* Homework Config Section */}
-          {requiresHomework && (
-            <>
-              <div className="form-control w-full mb-4">
-                <label className="label">
-                  <span className="label-text">{t("fields.homeworkConfiguration")}</span>
-                </label>
-                <ExamConfigSection
-                  requiresExam={requiresHomework}
-                  selectedExamConfigId={selectedHomeworkConfigId}
-                  setSelectedExamConfigId={setSelectedHomeworkConfigId}
-                  passingThreshold={homeworkPassingThreshold}
-                  setPassingThreshold={setHomeworkPassingThreshold}
-                  onExamConfigCreated={(homeworkConfigId) => {
-                    setSelectedHomeworkConfigId(homeworkConfigId)
-                  }}
-                  configType="homework"
-                  t={t}
-                  i18n={i18n}
-                />
+                </aside>
               </div>
-            </>
-          )}
+            </div>
 
-          {/* Attachment section with tab UI for categories */}
-          <div className="divider">{t("sections.attachments")}</div>
-          <div className="form-control w-full mb-4">
-            <label className="label">
-              <span className="label-text">{t("fields.attachmentOptional")}</span>
-            </label>
-            <div className="tabs mb-2">
-              {attachmentCategories.map((cat) => (
-                <button
-                  type="button"
-                  key={cat.key}
-                  className={`tab tab-bordered ${activeAttachmentTab === cat.key ? "tab-active" : ""}`}
-                  onClick={() => setActiveAttachmentTab(cat.key)}
-                >
-                  {cat.label}
+            <div className="border-t border-base-300 bg-base-100/95 px-6 py-4 backdrop-blur sm:px-8">
+              <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+                <button type="button" className="btn btn-ghost rounded-full" onClick={handleClose} disabled={creationLoading}>
+                  {t("buttons.cancel")}
                 </button>
-              ))}
-            </div>
-            <div className="space-y-3">
-              <div className="relative">
-                <input
-                  type="file"
-                  multiple
-                  onChange={(e) => {
-                    const files = Array.from(e.target.files)
-                    setAttachmentFilesByCategory((prev) => ({
-                      ...prev,
-                      [activeAttachmentTab]: files,
-                    }))
-                  }}
-                  className="input input-bordered w-full"
-                  accept=".pdf,.jpg,.jpeg,.png"
-                />
-                <FiPaperclip className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-primary" />
+                <button type="submit" className="btn btn-primary rounded-full" disabled={creationLoading}>
+                  {creationLoading ? (
+                    <>
+                      <span className="loading loading-spinner"></span>
+                      {t("buttons.creating")}
+                    </>
+                  ) : (
+                    t("buttons.create")
+                  )}
+                </button>
               </div>
-              {attachmentFilesByCategory[activeAttachmentTab] && attachmentFilesByCategory[activeAttachmentTab].length > 0 && (
-                <ul className="mt-2 text-sm text-base-content/70">
-                  {attachmentFilesByCategory[activeAttachmentTab].map((file, idx) => (
-                    <li key={idx}>
-                      {t("fields.selectedFile")}: {file.name}
-                    </li>
-                  ))}
-                </ul>
-              )}
-              {/* If homework or exams tab, show link input */}
-              {(activeAttachmentTab === "homeworks" || activeAttachmentTab === "exams") && (
-                <div>
-                  <input
-                    type="url"
-                    className="input input-bordered w-full mt-2"
-                    placeholder={t("fields.enterGoogleFormOrLink", "Enter Google Form or link")}
-                    value={attachmentLinksByCategory[activeAttachmentTab] || ""}
-                    onChange={e => setAttachmentLinksByCategory(prev => ({
-                      ...prev,
-                      [activeAttachmentTab]: e.target.value,
-                    }))}
-                  />
-                  <span className="text-xs text-base-content/60">{t("fields.orPasteLink", "Or paste a link instead of uploading a file.")}</span>
-                </div>
-              )}
             </div>
-          </div>
-
-          {creationError && (
-            <div className="alert alert-error mb-4">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="stroke-current shrink-0 h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-              <span>{creationError}</span>
-            </div>
-          )}
-
-          <div className="modal-action">
-            <button type="button" className="btn btn-ghost" onClick={handleClose} disabled={creationLoading}>
-              {t("buttons.cancel")}
-            </button>
-            <button type="submit" className="btn btn-primary" disabled={creationLoading}>
-              {creationLoading ? (
-                <>
-                  <span className="loading loading-spinner"></span>
-                  {t("buttons.creating")}
-                </>
-              ) : (
-                t("buttons.create")
-              )}
-            </button>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
     </div>
   )

@@ -6,6 +6,11 @@ import { User, BookOpen, Star, Edit, Eye, Clock, Users, FileText } from "lucide-
 import { Link } from "react-router-dom"
 import { getMyContainers, deleteContainerById } from "../../routes/lectures"
 import Pagination from "../../components/Pagination"
+import { designTokens } from "../../constants/designTokens"
+
+const TOKENS = designTokens.colors
+const SHADOWS = designTokens.shadows
+const RADIUS = designTokens.radius
 
 // Memoized Course Card Component
 const CourseCard = memo(function CourseCard({
@@ -20,20 +25,30 @@ const CourseCard = memo(function CourseCard({
   isRTL,
 }) {
   return (
-    <div className="card bg-base-100 shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden h-full flex flex-col">
+    <div
+      className="card border bg-white transition-all duration-300 overflow-hidden h-full flex flex-col hover:-translate-y-1"
+      style={{
+        borderColor: "rgba(17,24,39,0.08)",
+        borderRadius: RADIUS.card,
+        boxShadow: SHADOWS.level1,
+      }}
+    >
       <figure className="relative h-48 flex-shrink-0">
         <img
           src={getContainerImage(container, index) || "/placeholder.svg"}
           alt={container.name}
-          className="w-full h-full object-cover rounded-2xl"
+          className="w-full h-full object-cover"
           loading="lazy"
         />
         {container.price > 0 ? (
-          <div className="absolute bottom-2 left-2 bg-primary text-white px-2 py-1 rounded-md text-sm font-medium">
+          <div
+            className="absolute bottom-3 left-3 px-3 py-1 rounded-full text-sm font-semibold"
+            style={{ background: TOKENS.goldenSand, color: TOKENS.inkText }}
+          >
             {container.price} {t("currency")}
           </div>
         ) : (
-          <div className="absolute bottom-2 left-2 bg-success text-white px-2 py-1 rounded-md text-sm font-medium">
+          <div className="absolute bottom-3 left-3 bg-success text-white px-3 py-1 rounded-full text-sm font-semibold">
             {t("free")}
           </div>
         )}
@@ -41,8 +56,15 @@ const CourseCard = memo(function CourseCard({
 
       <div className="card-body p-4 flex-grow flex flex-col">
         <div className="flex items-start justify-between gap-2">
-          <h3 className="card-title text-lg font-bold line-clamp-1">{container.name}</h3>
-          <div className="badge badge-outline whitespace-nowrap">{getContainerTypeTranslation(container.type)}</div>
+          <h3 className="card-title text-lg font-bold line-clamp-1" style={{ color: TOKENS.inkText }}>
+            {container.name}
+          </h3>
+          <div
+            className="badge whitespace-nowrap border-0"
+            style={{ background: TOKENS.lightAquaMist, color: TOKENS.deepTeal }}
+          >
+            {getContainerTypeTranslation(container.type)}
+          </div>
         </div>
 
         <div className="space-y-1 mt-2">
@@ -85,7 +107,10 @@ const CourseCard = memo(function CourseCard({
 
         <div className="card-actions mt-3 flex flex-col sm:flex-row sm:justify-end gap-2">
           <Link to={`container-details/${container._id}`} className="w-full sm:w-auto">
-            <button className="btn btn-sm btn-ghost w-full sm:w-auto">
+            <button
+              className="btn btn-sm border-0 w-full sm:w-auto"
+              style={{ background: TOKENS.lightAquaMist, color: TOKENS.deepTeal, borderRadius: RADIUS.chip }}
+            >
               <Eye
                 className="h-4 w-4"
                 style={{ marginRight: isRTL ? 0 : "0.25rem", marginLeft: isRTL ? "0.25rem" : 0 }}
@@ -93,7 +118,12 @@ const CourseCard = memo(function CourseCard({
               {t("view")}
             </button>
           </Link>
-          <button className="btn btn-error btn-sm w-full sm:w-auto" onClick={() => onDelete(container._id)} disabled={loading}>
+          <button
+            className="btn btn-sm w-full sm:w-auto border-0"
+            style={{ background: "#FDE8EE", color: "#BE123C", borderRadius: RADIUS.chip }}
+            onClick={() => onDelete(container._id)}
+            disabled={loading}
+          >
             {t("delete")}
           </button>
         </div>
@@ -246,15 +276,25 @@ export default function CourseGrid() {
   return (
     <div className="space-y-8">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-        <h2 className="text-2xl md:text-3xl font-extrabold text-primary">{t("courseManagement")}</h2>
+        <div>
+          <h2 className="text-2xl md:text-3xl font-black tracking-tight" style={{ color: TOKENS.deepTeal }}>
+            {t("courseManagement")}
+          </h2>
+          <p className="mt-2 text-sm md:text-base" style={{ color: TOKENS.slateText }}>
+            {isRTL ? "بطاقات محدثة تتبع لغة التصميم الحالية" : "Updated cards that follow the current design language."}
+          </p>
+        </div>
         <Link to="/dashboard/lecturer-dashboard/CoursesForm">
-          <button className="btn bg-primary text-primary-content border-none hover:bg-primary/90 hover:scale-105 transition-transform rounded-full px-6 h-11 min-h-11">
+          <button
+            className="btn border-none hover:scale-105 transition-transform rounded-full px-6 h-11 min-h-11"
+            style={{ background: TOKENS.deepTeal, color: "#F8FCFF" }}
+          >
             <span>{t("addNewCourse")}</span>
           </button>
         </Link>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 lg:gap-12">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6 lg:gap-8">
         {paginationData.currentItems?.map((container, index) => {
           const stats = getContainerStats(container)
           return (
