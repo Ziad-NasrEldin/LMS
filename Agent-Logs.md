@@ -111,3 +111,5 @@ ounded-[2rem]\), removed hard \shadow-sm\ defaults from DaisyUI, updated primary
 - Update: Renamed the student promo-codes page hero to a generic account dashboard title/subtitle in both English and Arabic so the top banner matches the actual profile/referral/children content below it.
 
 - Update: Removed leftover temporary helper scripts from the repo and added `kalima-platform/frontend/temp-scripts/` to `.gitignore` so future scratch code stays out of deployed builds.
+
+- Update: Restored missing src/routes/packages.jsx API module to fix Vite build resolution failure from AddNewStuff.jsx (unresolved import ../../../routes/packages).
