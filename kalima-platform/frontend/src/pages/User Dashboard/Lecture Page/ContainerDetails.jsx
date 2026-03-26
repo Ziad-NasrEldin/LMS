@@ -19,6 +19,7 @@ const ContainerDetailsPage = () => {
   const { containerId } = useParams()
   const navigate = useNavigate()
   const [container, setContainer] = useState(null)
+  const [breadcrumbTrail, setBreadcrumbTrail] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [userRole, setUserRole] = useState(null)
@@ -29,12 +30,62 @@ const ContainerDetailsPage = () => {
   const [creationLoading, setCreationLoading] = useState(false)
   const [creationError, setCreationError] = useState("")
 
-  // Fetch container data
+    // Fetch container data
+  const normalizeContainerData = (response) => {
+    const payload = response?.data ?? response
+
+    if (!payload) return null
+    if (payload.name && payload.type) return payload
+    if (payload.container && payload.container.name && payload.container.type) return payload.container
+    if (payload.data?.container && payload.data.container.name && payload.data.container.type) {
+      return payload.data.container
+    }
+    if (payload.data && payload.data.name && payload.data.type) return payload.data
+
+    return payload
+  }
+
+  const getContainerRoute = (id) => {
+    const basePath = userRole === "Lecturer" ? "/dashboard/lecturer-dashboard" : "/dashboard/student-dashboard"
+    return basePath + "/container-details/" + id
+  }
+
+  const buildBreadcrumbTrail = async (currentContainer) => {
+    const trail = []
+    let activeContainer = currentContainer
+
+    while (activeContainer) {
+      trail.unshift(activeContainer)
+
+      const parentId = activeContainer.parent?._id || activeContainer.parent?.id || activeContainer.parent
+      if (!parentId) break
+
+      const parentResponse = await getContainerById(parentId)
+      const parentContainer = normalizeContainerData(parentResponse)
+
+      if (!parentContainer || trail.some((item) => (item._id || item.id) === (parentContainer._id || parentContainer.id))) {
+        break
+      }
+
+      activeContainer = parentContainer
+    }
+
+    return trail
+  }
+
   const fetchContainer = async () => {
     try {
       const response = await getContainerById(containerId)
       if (response.status === "success") {
-        setContainer(response.data)
+        const containerData = normalizeContainerData(response)
+        setContainer(containerData)
+
+        if (containerData) {
+          const trail = await buildBreadcrumbTrail(containerData)
+          setBreadcrumbTrail(trail)
+        } else {
+          setBreadcrumbTrail([])
+        }
       } else {
         setError("Failed to load container details")
       }
@@ -443,3 +494,4 @@ const ContainerDetailsPage = () => {
 }
 
 export default ContainerDetailsPage
+

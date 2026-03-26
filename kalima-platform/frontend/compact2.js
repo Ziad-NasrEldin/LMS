@@ -1,77 +1,106 @@
-const fs = require('fs');
+const fs = require("fs");
+const file = "src/pages/CourseDetails.jsx";
+let content = fs.readFileSync(file, "utf8");
 
-const files = [
-  'src/pages/signup/step1.jsx',
-  'src/pages/signup/Step2.jsx',
-  'src/pages/signup/StepTeacher.jsx',
-  'src/pages/signup/StepParent.jsx',
-  'src/pages/Login/login.jsx'
+const newArr = [
+'  return (',
+'    <div',
+'      className={`card mb-2 overflow-hidden transition-all duration-300 ${isExpanded ? "shadow-md ring-1 ring-primary/20" : "bg-base-100 shadow-sm"} border border-base-200/60`}',
+'      style={',
+'        isExpanded',
+'          ? {',
+'              backgroundImage: "linear-gradient(135deg, rgba(14,85,99,0.03) 0%, rgba(243,154,63,0.05) 100%)",',
+'            }',
+'          : { background: "#FFFFFF" }',
+'      }',
+'    >',
+'      <div className="p-2 sm:p-3 relative">',
+'        <div className="flex items-center gap-2">',
+'          {/* Icon */}',
+'          <div className="flex-shrink-0">',
+'            {container.type === "lecture" ? (',
+'              <FaPlayCircle className="text-primary opacity-80" size={16} />',
+'            ) : (',
+'              <FaBook className="text-primary opacity-80" size={16} />',
+'            )}',
+'          </div>',
+'',
+'          {/* Texts and badges */}',
+'          <div className="flex-1 min-w-0 flex flex-col justify-center">',
+'            <h3 className="text-[13px] sm:text-sm font-bold leading-tight truncate text-slate-800">',
+'              {container.name}',
+'            </h3>',
+'            <div className="mt-1 flex flex-wrap items-center gap-1.5 font-sans">',
+'              <span className="badge badge-accent font-semibold border-0 text-[10px] sm:text-[11px] px-1.5 min-h-0 h-4">',
+'                {containerTypeLabel}',
+'              </span>',
+'              {container.price > 0 ? (',
+'                <span className="badge badge-neutral font-semibold border-0 text-[10px] sm:text-[11px] px-1.5 min-h-0 h-4">',
+'                  {container.price} {t("pricing.points")}',
+'                </span>',
+'              ) : (',
+'                <span className="badge badge-success font-semibold border-0 text-[10px] sm:text-[11px] px-1.5 min-h-0 h-4 text-white">',
+'                  {t("pricing.free")}',
+'                </span>',
+'              )}',
+'            </div>',
+'          </div>',
+'',
+'          {/* Actions */}',
+'          <div className="flex flex-shrink-0 items-center justify-end gap-1.5">',
+'            {containerIsPurchased ? (',
+'              <span className="text-success text-[10px] sm:text-[11px] font-bold flex items-center gap-1 bg-success/10 px-1.5 py-0.5 rounded whitespace-nowrap">',
+'                <FaUnlock size={10} />',
+'                <span className="hidden sm:inline">',
+'                  {parentPurchased ? t("purchase.availableInCourse") : t("purchase.purchased")}',
+'                </span>',
+'              </span>',
+'            ) : (',
+'              <button',
+'                className={`btn btn-xs rounded bg-primary text-white border-0 px-2.5 min-h-0 h-6 ${purchaseInProgress === containerId ? "loading" : ""}`}',
+'                style={{ fontSize: "11px", fontWeight: "600" }}',
+'                onClick={() => onPurchase(containerId)}',
+'                disabled={purchaseInProgress !== null}',
+'              >',
+'                {container.price > 0 ? t("purchase.buy") : t("purchase.getFree")}',
+'              </button>',
+'            )}',
+'',
+'            {hasChildren && (',
+'              <button',
+'                className={`btn btn-circle min-h-0 h-6 w-6 border-0 flex items-center justify-center transition-all shadow-sm ${isExpanded ? "text-white" : "bg-base-200 text-slate-600 hover:bg-base-300"}`}',
+'                style={isExpanded ? {',
+'                  backgroundImage: "linear-gradient(120deg, #0E5563 0%, #146A78 52%, #F39A3F 100%)",',
+'                } : undefined }',
+'                onClick={fetchChildren}',
+'                disabled={loading}',
+'                aria-expanded={isExpanded}',
+'              >',
+'                {loading ? (',
+'                  <span className="loading loading-spinner w-3 h-3"></span>',
+'                ) : (',
+'                  <FaChevronDown className={`w-2.5 h-2.5 transition-transform duration-300 ${isExpanded ? "rotate-180" : "rotate-0"}`} />',
+'                )}',
+'              </button>',
+'            )}',
+'          </div>',
+'        </div>',
+'      </div>',
 ];
 
-for (const file of files) {
-  if (!fs.existsSync(file)) continue;
-  let code = fs.readFileSync(file, 'utf8');
+const newJsx = newArr.join("\n");
+const startTxt = "  return (\n    <div\n      className={`card mb-2 overflow-hidden transition-all duration-300 ${isExpanded ? \"shadow-lg";
+const endTxt = "        </div>\n      </div>";
 
-  // Generic adjustments for compactness across all of them:
-  // Remove big bottom padding
-  code = code.replace(/className="form-control relative pb-5"/g, 'className="form-control relative"');
-  // Reduce gap between label and input
-  code = code.replace(/className="flex flex-col gap-2"/g, 'className="flex flex-col gap-1"');
-  // Make inputs take full width of container (grid will constrain them)
-  code = code.replace(/w-full sm:w-2\/3 lg:w-1\/2/g, 'w-full');
-  // Make labels smaller padding
-  code = code.replace(/<label className="label">/g, '<label className="label py-1">');
+// if it's CRLF we might need to handle it.
+let contentNorm = content.replace(/\r\n/g, "\n");
+const startIdx = contentNorm.indexOf("  return (\n    <div\n      className={`card");
+const endIdx = contentNorm.indexOf(endTxt, startIdx);
 
-  // Wrap internal fields in grid for step 1
-  if (file.includes('step1.jsx') && !code.includes('grid-cols-1 sm:grid-cols-2')) {
-     const splitTarget = `<p className="text-2xl font-semibold">{t('form.personalDetails')}</p>`;
-     const parts = code.split(splitTarget);
-     if (parts.length > 2) { // There might be early returns with this text. The last one is the real deal
-         let bottom = parts[parts.length - 1]; // The main form fields
-         
-         let lastDiv = bottom.lastIndexOf('</div>');
-         if (lastDiv !== -1) {
-            bottom = bottom.substring(0, lastDiv) + '\n      </div>\n    ' + bottom.substring(lastDiv);
-         }
-         
-         parts[parts.length - 1] = '\n      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1">' + bottom;
-         
-         code = parts.join(`<p className="text-xl sm:text-2xl font-semibold mb-2">{t('form.personalDetails')}</p>`);
-     }
-  }
-
-  // Wrap internal fields in grid for step 2
-  if (file.includes('Step2.jsx') && !code.includes('grid-cols-1 sm:grid-cols-2')) {
-     const splitTarget = `<p className="text-lg font-semibold">{t('form.parentDetails')}</p>`;
-     const parts = code.split(splitTarget);
-     if (parts.length > 1) {
-         let bottom = parts[parts.length - 1];
-         let lastDiv = bottom.lastIndexOf('</div>');
-         if (lastDiv !== -1) {
-            bottom = bottom.substring(0, lastDiv) + '\n      </div>\n    ' + bottom.substring(lastDiv);
-         }
-         parts[parts.length - 1] = '\n      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1">' + bottom;
-         
-         code = parts.join(`<p className="text-xl sm:text-2xl font-semibold mb-2">{t('form.parentDetails')}</p>`);
-     }
-  }
-
-  // Wrap internal fields in grid for step teacher
-  if (file.includes('StepTeacher.jsx') && !code.includes('grid-cols-1 sm:grid-cols-2')) {
-     const topWrap = `<div className="space-y-4">`;
-     const parts = code.split(topWrap);
-     if (parts.length > 1) {
-         let bottom = parts[parts.length - 1];
-         let lastDiv = bottom.lastIndexOf('</div>');
-         if (lastDiv !== -1) {
-            bottom = bottom.substring(0, lastDiv) + '\n      </div>\n    ' + bottom.substring(lastDiv);
-         }
-         
-         parts[parts.length - 1] = '\n      <p className="text-xl sm:text-2xl font-semibold mb-2">{t(\'form.accountDetails\') || \'Account Details\'}</p>\n      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1">' + bottom;
-         
-         code = parts.join(topWrap);
-     }
-  }
-
-  fs.writeFileSync(file, code);
+if (startIdx !== -1 && endIdx !== -1) {
+  contentNorm = contentNorm.substring(0, startIdx) + newJsx + contentNorm.substring(endIdx + endTxt.length);
+  fs.writeFileSync(file, contentNorm);
+  console.log("Updated CourseDetails!!!");
+} else {
+  console.log("Failed to find boundaries!", startIdx, endIdx);
 }

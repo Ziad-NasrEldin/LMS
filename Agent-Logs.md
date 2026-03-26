@@ -99,3 +99,6 @@
 ## 2026-03-26 - Admin table filters & pagination redesign - Copilot
 - Updated standard DaisyUI `<input>` and `<select>` filter elements across `userManageTable.jsx` and `LecturesPage.jsx` to use the custom design tokens (soft borders, cream surface active states, teal accents).
 - Rewrote the `Pagination.jsx` component to override rigid joining classes with separated, pill-shaped pagination numeric buttons using `TOKENS` colors (`warmMango` for active page, `deepTeal` for inactive text).
+
+- **Dashboard UI Update**: Refactored \CourseGrid.jsx\ and \InstructorsList.jsx\ to match the new Fekra design tokens. Applied soft shadows (\shadow-[0_6px_16px_...]\), high radii (\ounded-[2rem]\), removed hard \shadow-sm\ defaults from DaisyUI, updated primary buttons to large pill shapes, and fine-tuned content paddings for Arabic-first Dashboard.
+

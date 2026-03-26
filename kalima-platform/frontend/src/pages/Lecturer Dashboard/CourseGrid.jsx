@@ -25,7 +25,7 @@ const CourseCard = memo(function CourseCard({
         <img
           src={getContainerImage(container, index) || "/placeholder.svg"}
           alt={container.name}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover rounded-2xl"
           loading="lazy"
         />
         {container.price > 0 ? (
@@ -245,10 +245,10 @@ export default function CourseGrid() {
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <h2 className="text-2xl font-bold">{t("courseManagement")}</h2>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+        <h2 className="text-2xl md:text-3xl font-extrabold text-primary">{t("courseManagement")}</h2>
         <Link to="/dashboard/lecturer-dashboard/CoursesForm">
-          <button className="btn btn-primary btn-base rounded-xl">
+          <button className="btn bg-primary text-primary-content border-none hover:bg-primary/90 hover:scale-105 transition-transform rounded-full px-6 h-11 min-h-11">
             <span>{t("addNewCourse")}</span>
           </button>
         </Link>
