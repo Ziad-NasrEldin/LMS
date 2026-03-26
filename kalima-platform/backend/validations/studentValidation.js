@@ -12,10 +12,10 @@ const studentValidation = userValidation.concat(
       }),
     parentPhoneNumber: Joi.string()
       .trim()
-      .pattern(/^(\+20\d{10}|0\d{10})$/)
+      .pattern(/^(\+20\d{10}|0\d{10}|\d{10})$/)
       .required()
       .messages({
-        "string.pattern.base": "parentPhoneNumber must be a valid Egyptian number (+20XXXXXXXXXX or 0XXXXXXXXXX).",
+        "string.pattern.base": "parentPhoneNumber must be a valid Egyptian number (+20XXXXXXXXXX, 0XXXXXXXXXX, or XXXXXXXXXX).",
       }),
     phoneNumber: Joi.string().required(),
     faction: Joi.string().optional(),

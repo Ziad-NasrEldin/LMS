@@ -1,3 +1,7 @@
+## 2026-03-26 - Accept flat 10-digit parent phone input - GPT-5.3-Codex
+- Updated student parent phone validation to also accept `XXXXXXXXXX` (10 digits without a leading zero), in addition to `+20XXXXXXXXXX` and `0XXXXXXXXXX`.
+- Updated frontend and backend normalization so both local formats (`0XXXXXXXXXX` and `XXXXXXXXXX`) are converted to canonical `+20XXXXXXXXXX` before save.
+
 ## 2026-03-26 - Egyptian parent phone format enforcement - GPT-5.3-Codex
 - Enforced student `parentPhoneNumber` validation to accept only `+20` plus exactly 10 digits, with an allowed local-input exception of `0` plus 10 digits.
 - Added frontend normalization so `0XXXXXXXXXX` is converted to `+20XXXXXXXXXX` before submit.

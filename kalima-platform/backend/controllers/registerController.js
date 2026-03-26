@@ -47,6 +47,7 @@ function normalizeEgyptParentPhoneNumber(number) {
   const num = String(number).trim();
   if (/^\+20\d{10}$/.test(num)) return num;
   if (/^0\d{10}$/.test(num)) return `+20${num.slice(1)}`;
+  if (/^\d{10}$/.test(num)) return `+20${num}`;
   return "";
 }
 
@@ -344,7 +345,7 @@ const registerNewUser = catchAsync(async (req, res, next) => {
       if (!newUser.parentPhoneNumber) {
         return next(
           new AppError(
-            "Parent phone number must be in +20XXXXXXXXXX format, or 0XXXXXXXXXX which will be converted to +20XXXXXXXXXX.",
+            "Parent phone number must be in +20XXXXXXXXXX format, or local 0XXXXXXXXXX/XXXXXXXXXX format which will be converted to +20XXXXXXXXXX.",
             400
           )
         );

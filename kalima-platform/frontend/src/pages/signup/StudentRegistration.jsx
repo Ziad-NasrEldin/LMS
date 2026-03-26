@@ -26,13 +26,14 @@ const totalSteps = {
 
 const isValidEgyptParentPhone = (value) => {
   const normalized = String(value || "").trim()
-  return /^\+20\d{10}$/.test(normalized) || /^0\d{10}$/.test(normalized)
+  return /^\+20\d{10}$/.test(normalized) || /^0\d{10}$/.test(normalized) || /^\d{10}$/.test(normalized)
 }
 
 const normalizeEgyptParentPhone = (value) => {
   const normalized = String(value || "").trim()
   if (/^\+20\d{10}$/.test(normalized)) return normalized
   if (/^0\d{10}$/.test(normalized)) return `+20${normalized.slice(1)}`
+  if (/^\d{10}$/.test(normalized)) return `+20${normalized}`
   return normalized
 }
 
