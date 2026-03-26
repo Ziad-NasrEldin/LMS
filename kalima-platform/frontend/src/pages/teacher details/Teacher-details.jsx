@@ -2,72 +2,71 @@
 
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect } from "react"
-import { Clock, Loader } from "lucide-react"
+import { Loader, BookOpen, GraduationCap, Star, Award, Users } from "lucide-react"
 import { useParams } from "react-router-dom"
 import { getUserById } from "../../routes/fetch-users"
 import { getContainersByLecturerId } from "../../routes/lectures"
 
 const TeacherInfoHeader = () => {
-  const { t, i18n } = useTranslation("teacherDetails");
-  const isRTL = i18n.language === 'ar';
-  
+  const { t } = useTranslation("teacherDetails");
   return (
-    <div className="w-full flex flex-col items-center py-16 md:py-32 -z-10 absolute top-0">
-      <div className="flex items-center gap-x-2">
-        <img className="h-1 mt-4" src="/Line 5.png" alt="" />
-        <h1 className="text-center text-xl md:text-2xl font-bold text-primary">
+    <div className="w-full bg-primary text-primary-content pt-20 pb-32 md:pt-28 md:pb-40 relative overflow-hidden rounded-b-[2.5rem]">
+      {/* Organic layered waves/blobs (Design System Theme) */}
+      <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] bg-secondary rounded-full opacity-40 blur-[80px] mix-blend-multiply pointer-events-none"></div>
+      <div className="absolute bottom-[-20%] right-[-10%] w-[400px] h-[400px] bg-info rounded-full opacity-30 blur-[60px] mix-blend-multiply pointer-events-none"></div>
+      
+      <div className="container mx-auto px-4 relative z-10 flex flex-col items-center">
+        <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-4 text-center">
           {t('teacherInfo')}
         </h1>
+        <div className="h-1.5 w-24 bg-accent rounded-full mt-2"></div>
       </div>
-      <img className="h-auto mt-8 md:mt-16 mr-0 md:mr-56" src="/vector 21.png" alt="" />
     </div>
   )
 }
 
-const SectionHeader = ({ titleKey }) => {
-  const { t } = useTranslation("teacherDetails");
-  
-  return (
-    <div className="flex justify-center">
-      <img className="h-1 mt-4 mr-2" src="/Line 5.png" alt="" />
-      <h1 className="text-center text-xl md:text-2xl font-bold text-primary">
-        {t(titleKey)}
-      </h1>
-    </div>
-  )
-}
-
-const CourseCard = ({ course, index }) => {
+const CourseCard = ({ course }) => {
   const { t, i18n } = useTranslation("teacherDetails");
   const isRTL = i18n.language === 'ar';
 
   return (
-    <div className={`rounded-lg overflow-hidden border-2 border-warning z-10 hover:scale-105 hover:shadow-xl shadow-lg duration-500 w-full max-w-md mx-auto relative ${isRTL ? 'text-right' : 'text-left'}`}>
-      <div className="relative">
+    <div className={`card bg-base-100 shadow-[0_6px_16px_rgba(0,0,0,0.10)] hover:shadow-[0_12px_28px_rgba(0,0,0,0.14)] hover:-translate-y-1 duration-300 transition-all rounded-3xl w-full max-w-[22rem] mx-auto overflow-hidden ${isRTL ? 'text-right' : 'text-left'}`}>
+      <figure className="relative h-48 bg-base-200 w-full p-2">
         <img
           src={`/course-4.png`}
           alt={course.title}
-          className="w-full h-32 sm:h-36 object-cover"
+          className="w-full h-full object-cover rounded-2xl"
         />
-        <div className="absolute left-2 bottom-[-70px]">
-          <img src="/Frame 81.png" alt="" className="h-12 w-12" />
+        {/* Floating badge for rating */}
+        <div className="absolute top-5 right-5 bg-base-100/95 backdrop-blur-sm px-3 py-1.5 rounded-full text-sm font-semibold flex items-center gap-1 shadow-sm">
+          <Star className="w-4 h-4 text-accent fill-accent" />
+          <span>{course.rating || "5.0"}</span>
         </div>
-        <div className="flex flex-row gap-x-2 absolute right-2 bottom-[-100px]">
-          <img src="/teacher.png" alt="" className="h-6 w-6" />
-        </div>
-      </div>
-      <div className="p-3 text-right">
-        <h4 className="font-bold text-md mb-1">{course.title}</h4>
-        <h5 className="text-sm">
-          {course.subject}-{course.class}
-        </h5>
-        <div className="flex justify-end">
-          <div className="flex items-start justify-evenly gap-1 mb-2 rounded-xl w-36 mt-2">
-            <h4 className="text-xs">{course.grade}</h4>
-            <div className="w-5 h-5 rounded-full bg-transparent flex items-start justify-evenly">
-              <img src="/school.png" alt="" />
+      </figure>
+
+      <div className="card-body p-6 flex flex-col gap-4">
+        <div>
+          <h3 className="card-title text-xl font-bold text-base-content mb-2 line-clamp-2 leading-snug">{course.title}</h3>
+          
+          <div className="flex flex-col gap-2 mt-3">
+            <div className="flex items-center gap-2 text-sm text-neutral font-medium">
+              <BookOpen className="w-4 h-4 text-info flex-shrink-0" />
+              <span className="truncate">{course.subject} - {course.class}</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-neutral font-medium">
+              <GraduationCap className="w-4 h-4 text-info flex-shrink-0" />
+              <span className="truncate">{course.grade}</span>
             </div>
           </div>
+        </div>
+
+        <div className="flex flex-col sm:flex-row items-center justify-between mt-auto pt-4 border-t border-base-200/60 gap-3">
+          <span className="text-xs font-bold text-primary bg-primary/10 px-4 py-1.5 rounded-full text-center truncate max-w-full">
+            {course.type || t('courseType')}
+          </span>
+          <button className="btn btn-primary bg-accent border-none text-base-content hover:bg-accent/90 hover:scale-105 btn-sm h-10 rounded-full px-6 w-full sm:w-auto transition-transform">
+            {t('viewDetails', 'عرض التفاصيل')}
+          </button>
         </div>
       </div>
     </div>
@@ -75,45 +74,28 @@ const CourseCard = ({ course, index }) => {
 }
 
 const SocialMediaIcons = () => (
-  <div className="flex flex-row gap-x-2 mt-4 md:mt-9 justify-center md:justify-start ml-0 md:ml-8 size-auto md:size-80">
+  <div className="flex flex-row gap-3 mt-6 justify-center md:justify-start">
     {[76, 77, 78, 79].map((num) => (
-      <div key={num}>
-        <img src={`/Frame ${num}.png`} alt={`Social media ${num}`} className="w-8 h-8" />
-      </div>
+      <button key={num} className="btn border-none btn-circle bg-base-200 shadow-sm hover:bg-info/20 hover:scale-110 transition-all duration-200 h-10 w-10 min-h-0 flex items-center justify-center">
+        <img src={`/Frame ${num}.png`} alt={`Social media ${num}`} className="w-5 h-5 object-contain" />
+      </button>
     ))}
   </div>
 )
 
-const TeacherProfileImage = () => (
-  <div className="indicator">
-    <img
-      className="indicator-item indicator-top indicator-start animate-float-up-dottedball badge bg-transparent border-transparent h-[120px] w-[85px] md:h-[240px] md:w-[170px] mt-[-80px] md:mt-[-160px] floating ml-[-20px] md:ml-[-40px]"
-      src="/rDots.png"
-      alt=""
-    />
-    <img
-      className="indicator-item indicator-top indicator-center animate-float-zigzag badge bg-transparent border-transparent h-[30px] w-[65px] md:h-[60px] md:w-[130px] mt-[-70px] md:mt-[-140px]"
-      src="/waves.png"
-      alt=""
-    />
-    <img
-      className="indicator-item indicator-top indicator-end badge animate-float-up-dottedball bg-transparent border-transparent h-[70px] w-[60px] md:h-[140px] md:w-[120px] mt-[-65px] md:mt-[-130px] mr-[-27px] md:mr-[-55px]"
-      src="/ring.png"
-      alt=""
-    />
-    <img
-      className="h-[40px] w-[40px] md:h-[80px] md:w-[80px] indicator-item indicator-bottom indicator-start animate-float-down-dottedball badge bg-transparent border-transparent ml-[-15px] md:ml-[-30px] mb-[-55px] md:mb-[-110px]"
-      src="/ball.png"
-      alt=""
-    />
-    <img
-      className="indicator-item indicator-bottom indicator-end mr-[-25px] md:mr-[-50px] bg-transparent animate-float-down-dottedball border-transparent h-[120px] w-[85px] md:h-[240px] md:w-[170px] mb-[-10px] md:mb-[-20px] z-0"
-      src="/bDots.png"
-      alt=""
-    />
-
-    <div className="relative z-10 grid h-[150px] w-[150px] md:h-[300px] md:w-[300px] place-items-center mx-auto">
-      <img className="h-full w-full" src="/Ellipse 103.png" alt="" />
+const TeacherProfileImage = ({ profileImage }) => (
+  <div className="relative mx-auto md:mx-0 w-32 h-32 md:w-48 md:h-48 lg:w-56 lg:h-56 shrink-0 group">
+    {/* Soft glowing backplates */}
+    <div className="absolute inset-0 bg-accent rounded-full opacity-20 group-hover:scale-110 transition-transform duration-500 blur-md"></div>
+    <div className="absolute inset-0 bg-info rounded-full opacity-20 scale-105 -translate-x-2 -translate-y-2 group-hover:translate-x-0 group-hover:translate-y-0 transition-all duration-500 blur-md"></div>
+    
+    <div className="w-full h-full rounded-full overflow-hidden border-[6px] border-base-100 shadow-[0_12px_28px_rgba(0,0,0,0.12)] relative z-10 bg-base-200">
+      <img 
+        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
+        src={profileImage || "/Ellipse 103.png"} 
+        alt="Teacher Profile"
+        onError={(e) => { e.target.src = "/Ellipse 103.png" }}
+      />
     </div>
   </div>
 )
@@ -162,10 +144,10 @@ export default function TeacherDetails() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <Loader className="h-8 w-8 animate-spin text-primary" />
-        <span className={isRTL ? 'mr-2' : 'ml-2'}>
-          {t('error.loading')}
+      <div className="flex justify-center items-center h-screen bg-base-200/50">
+        <Loader className="h-10 w-10 animate-spin text-primary" />
+        <span className={`text-lg font-semibold text-primary ${isRTL ? 'mr-3' : 'ml-3'}`}>
+          {t('error.loading', 'جاري التحميل...')}
         </span>
       </div>
     );
@@ -173,9 +155,9 @@ export default function TeacherDetails() {
 
   if (error) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="alert alert-error">
-          <p>{error}</p>
+      <div className="flex justify-center items-center h-screen bg-base-200/50 p-4">
+        <div className="alert alert-error max-w-md shadow-lg rounded-2xl">
+          <p className="font-semibold text-center w-full">{error}</p>
         </div>
       </div>
     );
@@ -183,75 +165,79 @@ export default function TeacherDetails() {
 
   if (!teacher) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="alert alert-warning">
-          <p>{t('error.notFound')}</p>
+      <div className="flex justify-center items-center h-screen bg-base-200/50 p-4">
+        <div className="alert alert-warning max-w-md shadow-lg rounded-2xl">
+          <p className="font-semibold text-center w-full">{t('error.notFound')}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <section className="overflow-hidden py-20 md:py-40" dir={isRTL ? 'rtl' : 'ltr'}>
+    <section className="min-h-screen bg-base-200/30 pb-20" dir={isRTL ? 'rtl' : 'ltr'}>
       <TeacherInfoHeader />
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-32">
-        <div className="flex flex-col md:flex-row items-center">
-          {/* Left side with image */}
-          <div className="w-full md:w-1/2 relative mb-8 md:mb-0">
-            <div className="relative z-10 w-full h-full">
-              <TeacherProfileImage />
-              <SocialMediaIcons />
+      
+      <div className="container mx-auto px-4 md:px-6 lg:px-8">
+        
+        {/* Profile Details Card - overlapping the header */}
+        <div className="relative z-20 -mt-16 md:-mt-24 bg-base-100 rounded-3xl shadow-[0_12px_28px_rgba(0,0,0,0.08)] p-6 md:p-10 mb-16 max-w-5xl mx-auto">
+          <div className="flex flex-col md:flex-row items-center md:items-start gap-8 md:gap-12">
+            
+            {/* Image & Socials */}
+            <div className="flex flex-col items-center shrink-0">
+               <TeacherProfileImage profileImage={teacher.profilePicture} />
+               <SocialMediaIcons />
             </div>
-          </div>
 
-          {/* Right side with text */}
-          <div className={`w-full md:w-1/2 ${isRTL ? 'text-right' : 'text-left'} md:mb-0 mb-12`}>
-            <h2 className="text-lg md:text-xl font-bold text-primary mb-2">/{teacher.role}</h2>
-            <h1 className="text-2xl md:text-4xl font-bold mb-2">{teacher.name}</h1>
+            {/* Text details */}
+            <div className={`flex flex-col flex-1 w-full ${isRTL ? 'text-right' : 'text-left'} pt-2`}>
+              <div className="inline-flex items-center gap-2 mb-2 justify-center md:justify-start">
+                <Award className="h-5 w-5 text-accent" />
+                <h2 className="text-lg font-bold text-accent">{teacher.role || t('lecturer', 'محاضر')}</h2>
+              </div>
+              
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-base-content mb-4 text-center md:text-start">
+                {teacher.name}
+              </h1>
 
-            <div className="flex flex-row justify-end gap-x-3 mt-4 mb-4">
-              <div>
-                <h3 className="font-bold text-sm md:text-base">
-                  {t('subject')} {teacher.expertise}
-                </h3>
+              <div className="flex items-center gap-2 bg-info/10 text-info w-max px-4 py-2 rounded-full font-bold text-sm md:text-base mb-6 mx-auto md:mx-0">
+                <Users className="w-5 h-5" />
+                <span>{t('subject')} {teacher.expertise || t('defaultSubject')}</span>
+              </div>
+
+              <div className="mt-4 bg-base-200/50 rounded-2xl p-6 md:p-8">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="h-6 w-1.5 bg-primary rounded-full"></div>
+                  <h3 className="text-xl md:text-2xl font-bold text-primary">
+                    {t('bioHeader', 'نبذة تعريفية')}
+                  </h3>
+                </div>
+                <p className="font-medium text-neutral leading-relaxed md:text-lg">
+                  {teacher.bio || t('bioTemplate', {
+                    name: teacher.name,
+                    expertise: teacher.expertise || t('defaultSubject')
+                  })}
+                </p>
               </div>
             </div>
-
-            <div className="flex justify-end">
-              <img className="h-1 mt-4 mr-2" src="/Line 5.png" alt="" />
-              <h1 className="text-center text-xl md:text-2xl font-bold text-primary mb-5">
-                {t('bioHeader')}
-              </h1>
-            </div>
-            <div className="flex justify-end">
-              <p className="font-semibold text-base md:text-xl w-full md:w-auto">
-                {teacher.bio || t('bioTemplate', {
-                  name: teacher.name,
-                  expertise: teacher.expertise || t('defaultSubject')
-                })}
-              </p>
-            </div>
           </div>
         </div>
-      </div>
 
-      <div className="mt-8 md:mt-16">
-        <SectionHeader titleKey="coursesHeader" />
-        <div className="flex justify-center md:justify-start md:ml-28">
-          <img src="/vector22.png" alt="" className="h-auto w-16 md:w-auto" />
-        </div>
-      </div>
-      <div className="relative py-8 md:py-16">
-        {/* Background dots */}
-        <img className="absolute top-0 animate-float-up-dottedball right-4 md:right-16 z-0 opacity-100 h-[120px] w-[85px] md:h-[240px] md:w-[170px]" src="/bDots.png" alt="" />
-        <img className="absolute top-1/3 animate-float-up-dottedball left-4 md:left-16 z-0 opacity-100 h-[120px] w-[85px] md:h-[240px] md:w-[170px]" src="/bDots.png" alt="" />
+        {/* Courses Section */}
+        <div className="max-w-6xl mx-auto">
+          <div className="flex flex-col items-center mb-12 relative">
+            <h2 className="text-3xl md:text-4xl font-extrabold text-primary mb-3 relative z-10">
+              {t('coursesHeader', 'الدورات المتاحة')}
+            </h2>
+            <div className="h-1.5 w-16 bg-accent rounded-full mb-2"></div>
+          </div>
 
-        {/* Card grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mx-auto px-4 max-w-7xl">
-          {containers.length > 0 ? (
-            containers.map((container) => (
-              <div key={container._id} className="flex justify-center">
+          {/* Card grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 xl:gap-10">
+            {containers.length > 0 ? (
+              containers.map((container) => (
                 <CourseCard 
+                  key={container._id}
                   course={{
                     id: container._id,
                     title: container.name,
@@ -263,13 +249,16 @@ export default function TeacherDetails() {
                     type: container.type,
                   }} 
                 />
+              ))
+            ) : (
+              <div className="col-span-1 sm:col-span-2 lg:col-span-3 text-center py-16 bg-base-100 rounded-3xl shadow-sm border border-base-200">
+                <div className="w-20 h-20 bg-base-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <BookOpen className="w-10 h-10 text-neutral/40" />
+                </div>
+                <p className="text-lg text-neutral font-medium">{t('noCoursesAvailable', 'لا توجد دورات متاحة حالياً')}</p>
               </div>
-            ))
-          ) : (
-            <div className="col-span-3 text-center py-10">
-              <p>{t('noCoursesAvailable')}</p>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
     </section>

@@ -37,7 +37,7 @@ const DetailItem = ({ label, value, icon, tokens }) => (
   </div>
 )
 
-const ContainerItem = ({ container, isPurchased, onPurchase, purchaseInProgress, parentPurchased = false, t }) => {
+const ContainerItem = ({ container, isPurchased, onPurchase, purchaseInProgress, parentPurchased = false, t, depth = 0 }) => {
   const [isExpanded, setIsExpanded] = useState(false)
   const [childContainers, setChildContainers] = useState([])
   const [loading, setLoading] = useState(false)
@@ -91,7 +91,7 @@ const ContainerItem = ({ container, isPurchased, onPurchase, purchaseInProgress,
 
   return (
     <div
-      className={`card mb-3 transition-all duration-300 ${isExpanded ? "shadow-xl ring-1 ring-primary/20" : "bg-base-100 shadow-sm"}`}
+      className={`card mb-2 overflow-hidden transition-all duration-300 ${isExpanded ? "shadow-lg ring-1 ring-primary/20" : "bg-base-100 shadow-sm"}`}
       style={
         isExpanded
           ? {
@@ -100,8 +100,8 @@ const ContainerItem = ({ container, isPurchased, onPurchase, purchaseInProgress,
           : undefined
       }
     >
-      <div className="card-body p-3 sm:p-4">
-        <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center">
+      <div className="card-body p-2.5 sm:p-3">
+        <div className="flex flex-col gap-2 sm:flex-row sm:justify-between sm:items-center">
           <div className="flex min-w-0 items-center gap-3">
             {container.type === "lecture" ? (
               <FaPlayCircle className="text-primary" />
@@ -109,27 +109,27 @@ const ContainerItem = ({ container, isPurchased, onPurchase, purchaseInProgress,
               <FaBook className="text-primary" />
             )}
             <div className="min-w-0 flex-1">
-              <h3 className="font-medium break-words">{container.name}</h3>
-              <div className="mt-1 flex flex-wrap gap-2">
-                <span className="badge badge-accent">{containerTypeLabel}</span>
+              <h3 className="text-sm font-medium leading-snug break-words sm:text-base">{container.name}</h3>
+              <div className="mt-1 flex flex-wrap gap-1.5">
+                <span className="badge badge-sm badge-accent">{containerTypeLabel}</span>
                 {container.price > 0 ? (
-                  <span className="badge badge-neutral">{container.price} {t("pricing.points")}</span>
+                  <span className="badge badge-sm badge-neutral">{container.price} {t("pricing.points")}</span>
                 ) : (
-                  <span className="badge badge-success">{t("pricing.free")}</span>
+                  <span className="badge badge-sm badge-success">{t("pricing.free")}</span>
                 )}
               </div>
             </div>
           </div>
 
-          <div className="flex w-full flex-wrap items-center justify-end gap-2 sm:w-auto sm:justify-start">
+          <div className="flex w-full flex-wrap items-center justify-start gap-1.5 sm:w-auto">
             {containerIsPurchased ? (
-              <span className="badge badge-success gap-1 whitespace-nowrap">
+              <span className="badge badge-sm badge-success gap-1 whitespace-nowrap">
                 <FaUnlock size={12} />
                 {parentPurchased ? t("purchase.availableInCourse") : t("purchase.purchased")}
               </span>
             ) : (
               <button
-                className={`btn btn-sm btn-primary w-full sm:w-auto ${purchaseInProgress === containerId ? "loading" : ""}`}
+                className={`btn btn-xs sm:btn-sm btn-primary min-h-0 h-8 px-3 ${purchaseInProgress === containerId ? "loading" : ""}`}
                 onClick={() => onPurchase(containerId)}
                 disabled={purchaseInProgress !== null}
               >
@@ -139,10 +139,10 @@ const ContainerItem = ({ container, isPurchased, onPurchase, purchaseInProgress,
 
             {hasChildren && (
               <button
-                className="btn btn-sm border-0 text-primary-content rounded-full px-3 min-h-0 h-9 w-full sm:w-auto justify-center transition-all duration-300 hover:scale-[1.03] active:scale-100"
+                className="btn btn-xs sm:btn-sm border-0 text-primary-content rounded-full px-3 min-h-0 h-8 justify-center transition-all duration-300 hover:scale-[1.02] active:scale-100"
                 style={{
                   backgroundImage: "linear-gradient(120deg, #0E5563 0%, #146A78 52%, #F39A3F 100%)",
-                  boxShadow: "0 8px 22px rgba(20, 106, 120, 0.32)",
+                  boxShadow: "0 5px 14px rgba(20, 106, 120, 0.25)",
                 }}
                 onClick={fetchChildren}
                 disabled={loading}
@@ -164,9 +164,18 @@ const ContainerItem = ({ container, isPurchased, onPurchase, purchaseInProgress,
         {/* Child containers */}
         {(hasChildren || childContainers.length > 0) && (
           <div
-            className={`mt-4 overflow-hidden transition-all duration-500 ease-out ${isExpanded ? "max-h-[4200px] opacity-100" : "max-h-0 opacity-0"}`}
+            className={`mt-2 overflow-hidden transition-all duration-500 ease-out ${isExpanded ? "opacity-100" : "max-h-0 opacity-0"}`}
+            style={
+              isExpanded
+                ? {
+                    maxHeight: depth === 0 ? "min(68vh, 760px)" : undefined,
+                    overflowY: depth === 0 ? "auto" : "visible",
+                    paddingRight: depth === 0 ? "0.15rem" : undefined,
+                  }
+                : undefined
+            }
           >
-            <div className="pl-4 sm:pl-6">
+            <div className="pl-2 sm:pl-4">
               {childContainers.map((child, index) => (
                 <div
                   key={child._id || child.id || `${containerId}-child-${index}`}
@@ -183,6 +192,7 @@ const ContainerItem = ({ container, isPurchased, onPurchase, purchaseInProgress,
                     purchaseInProgress={purchaseInProgress}
                     parentPurchased={containerIsPurchased} // Pass down purchase status
                     t={t}
+                    depth={depth + 1}
                   />
                 </div>
               ))}

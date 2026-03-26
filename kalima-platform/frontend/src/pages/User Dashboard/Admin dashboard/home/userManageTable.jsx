@@ -763,43 +763,78 @@ const UserManagementTable = () => {
           <input
             type="text"
             placeholder={t("admin.filters.name")}
-            className="input input-bordered flex-1 md:w-auto font-medium"
+            className="input flex-1 md:w-auto font-medium border-2 focus:outline-none focus:ring-0 rounded-full transition-colors"
+            style={{ 
+              backgroundColor: TOKENS.neutralCloud, 
+              borderColor: "transparent", 
+              color: TOKENS.deepTeal 
+            }}
+            onFocus={(e) => { e.target.style.borderColor = TOKENS.softCyanTeal; e.target.style.backgroundColor = "#fff"; }}
+            onBlur={(e) => { e.target.style.borderColor = "transparent"; e.target.style.backgroundColor = TOKENS.neutralCloud; }}
             value={filters.name}
             onChange={(e) => setFilters({ ...filters, name: e.target.value })}
           />
           <input
             type="text"
             placeholder={t("admin.filters.phone")}
-            className="input input-bordered flex-1 md:w-auto font-medium"
+            className="input flex-1 md:w-auto font-medium border-2 focus:outline-none focus:ring-0 rounded-full transition-colors"
+            style={{ 
+              backgroundColor: TOKENS.neutralCloud, 
+              borderColor: "transparent", 
+              color: TOKENS.deepTeal 
+            }}
+            onFocus={(e) => { e.target.style.borderColor = TOKENS.softCyanTeal; e.target.style.backgroundColor = "#fff"; }}
+            onBlur={(e) => { e.target.style.borderColor = "transparent"; e.target.style.backgroundColor = TOKENS.neutralCloud; }}
             value={filters.phone}
             onChange={(e) => setFilters({ ...filters, phone: e.target.value })}
           />
           <select
-            className="select select-bordered flex-1 md:w-auto font-medium"
+            className="select flex-1 md:w-auto font-medium border-2 focus:outline-none focus:ring-0 rounded-full transition-colors font-sans"
+            style={{ 
+              backgroundColor: TOKENS.neutralCloud, 
+              borderColor: "transparent", 
+              color: TOKENS.deepTeal 
+            }}
+            onFocus={(e) => { e.target.style.borderColor = TOKENS.softCyanTeal; e.target.style.backgroundColor = "#fff"; }}
+            onBlur={(e) => { e.target.style.borderColor = "transparent"; e.target.style.backgroundColor = TOKENS.neutralCloud; }}
             value={filters.role}
             onChange={(e) => setFilters({ ...filters, role: e.target.value })}
           >
-            <option value="">{t("admin.filters.allTypes")}</option>
+            <option value="" className="font-medium bg-white">{t("admin.filters.allTypes")}</option>
             {["student", "parent", "lecturer", "Teacher", "moderator", "subAdmin"].map((role) => (
-              <option key={role} value={role}>
+              <option key={role} value={role} className="font-medium bg-white">
                 {t(`admin.roles.${role}`)}
               </option>
             ))}
           </select>
           <select
-            className="select select-bordered flex-1 md:w-auto font-medium"
+            className="select flex-1 md:w-auto font-medium border-2 focus:outline-none focus:ring-0 rounded-full transition-colors font-sans"
+            style={{ 
+              backgroundColor: TOKENS.neutralCloud, 
+              borderColor: "transparent", 
+              color: TOKENS.deepTeal 
+            }}
+            onFocus={(e) => { e.target.style.borderColor = TOKENS.softCyanTeal; e.target.style.backgroundColor = "#fff"; }}
+            onBlur={(e) => { e.target.style.borderColor = "transparent"; e.target.style.backgroundColor = TOKENS.neutralCloud; }}
             value={filters.status}
             onChange={(e) => setFilters({ ...filters, status: e.target.value })}
           >
-            <option value="">{t("admin.filters.allStatus")}</option>
-            <option value={t("admin.status.valid")}>{t("admin.status.valid")}</option>
-            <option value={t("admin.status.missingData")}>{t("admin.status.missingData")}</option>
+            <option value="" className="font-medium bg-white">{t("admin.filters.allStatus")}</option>
+            <option value={t("admin.status.valid")} className="font-medium bg-white">{t("admin.status.valid")}</option>
+            <option value={t("admin.status.missingData")} className="font-medium bg-white">{t("admin.status.missingData")}</option>
           </select>
           <input
             type="number"
             min="0"
             placeholder={t("admin.filters.invites")}
-            className="input input-bordered flex-1 md:w-auto font-medium"
+            className="input flex-1 md:w-auto font-medium border-2 focus:outline-none focus:ring-0 rounded-full transition-colors"
+            style={{ 
+              backgroundColor: TOKENS.neutralCloud, 
+              borderColor: "transparent", 
+              color: TOKENS.deepTeal 
+            }}
+            onFocus={(e) => { e.target.style.borderColor = TOKENS.softCyanTeal; e.target.style.backgroundColor = "#fff"; }}
+            onBlur={(e) => { e.target.style.borderColor = "transparent"; e.target.style.backgroundColor = TOKENS.neutralCloud; }}
             value={filters.successfulInvites}
             onChange={(e) => setFilters({ ...filters, successfulInvites: e.target.value })}
           />

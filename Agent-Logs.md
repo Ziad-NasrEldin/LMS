@@ -1,3 +1,8 @@
+## 2026-03-26 - Course breakdown compact layout - GPT-5.3-Codex
+- Compacted nested course breakdown cards in `CourseDetails` by reducing inner spacing, badge density, and button height/width so mobile layouts are less bulky.
+- Reworked action buttons to avoid full-width stacking on mobile and keep controls readable without consuming excessive vertical space.
+- Added viewport-bounded scroll behavior for expanded top-level breakdown content to keep the opened tree within screen-height constraints while preserving full visibility via scroll.
+
 ## 2026-03-26 - Accept flat 10-digit parent phone input - GPT-5.3-Codex
 - Updated student parent phone validation to also accept `XXXXXXXXXX` (10 digits without a leading zero), in addition to `+20XXXXXXXXXX` and `0XXXXXXXXXX`.
 - Updated frontend and backend normalization so both local formats (`0XXXXXXXXXX` and `XXXXXXXXXX`) are converted to canonical `+20XXXXXXXXXX` before save.
@@ -86,3 +91,7 @@
 
 ## 2026-03-25 - Sidebar link for CoursesForm - GPT-5
 - Added `CoursesForm` as a lecturer sidebar item with localized EN/AR label (`createCourse`).
+
+### March 26, 2026
+- **Refactor:** Completely restructured the Teacher/Lecturer Details page (Teacher-details.jsx) to leverage the latest Fekra design system tokens (e.g., bg-primary, bg-base-100, accent highlights, organic layered background blobs). Organized component layout by extracting logical pieces into smaller functional components, improving UI scale, RTL text alignment, readability, and modern card styling.
+

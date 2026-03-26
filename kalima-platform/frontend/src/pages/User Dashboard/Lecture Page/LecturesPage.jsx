@@ -16,6 +16,12 @@ const MyLecturesPage = () => {
   const isRTL = i18n.language === "ar"
   const TOKENS = designTokens.colors
   const SHADOWS = designTokens.shadows
+  const ITEMS_PER_PAGE = 8
+  const sortLecturesNewestFirst = (left, right) => {
+    const leftTime = new Date(left.sortDate || left.createdAt || 0).getTime()
+    const rightTime = new Date(right.sortDate || right.createdAt || 0).getTime()
+    return rightTime - leftTime
+  }
   const [lectures, setLectures] = useState([])
   const [allLectures, setAllLectures] = useState([]) // Store all lectures before pagination
   const [subjects, setSubjects] = useState([])
@@ -31,7 +37,7 @@ const MyLecturesPage = () => {
   const [selectedSubjectFilter, setSelectedSubjectFilter] = useState("")
   const [selectedLevelFilter, setSelectedLevelFilter] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
-  const [itemsPerPage, setItemsPerPage] = useState(10)
+  const [itemsPerPage, setItemsPerPage] = useState(8)
   const [totalPages, setTotalPages] = useState(0)
 
   const convertPathToUrl = (filePath) => {
@@ -111,9 +117,10 @@ const MyLecturesPage = () => {
               examConfig: lecture.examConfig,
               lecturer: lecture.createdBy,
               thumbnail: lecture.thumbnail,
-              createdAt: lecture.createdAt,
+                createdAt: lecture.createdAt,
+              sortDate: lecture.createdAt || null,
             }));
-            setAllLectures(lecturesData);
+            setAllLectures(lecturesData.sort(sortLecturesNewestFirst));
           } else {
             throw new Error(allLecturesResult.message || "Failed to fetch lectures");
           }
@@ -140,7 +147,8 @@ const MyLecturesPage = () => {
                 examConfig: lecture.examConfig || null,
                 lecturer: result.data.data.userInfo,
                 thumbnail: lecture.thumbnail ? convertPathToUrl(lecture.thumbnail) : null,
-                createdAt: lecture.createdAt || null,
+                  createdAt: lecture.createdAt || null,
+                sortDate: lecture.createdAt || null,
               })) || [];
 
             const standaloneLectures = lectures?.map(lecture => ({
@@ -157,7 +165,7 @@ const MyLecturesPage = () => {
               createdAt: lecture.createdAt || null,
             })) || [];
 
-            const allLecturesCombined = [...containerLectures, ...standaloneLectures];
+            const allLecturesCombined = [...containerLectures, ...standaloneLectures].sort(sortLecturesNewestFirst);
             setAllLectures(allLecturesCombined);
           } else {
             throw new Error(result.error || "Failed to fetch lecturer data");
@@ -191,7 +199,8 @@ const MyLecturesPage = () => {
                     lecturer: p.lecturer,
                     subject: p.lecture.subject,
                     level: p.lecture.level,
-                    thumbnail: p.lecture.thumbnail,
+                      thumbnail: p.lecture.thumbnail,
+                    sortDate: p.purchasedAt || null,
                   };
                 }
                 // If container is a lecture (containerPurchase), use container
@@ -213,14 +222,15 @@ const MyLecturesPage = () => {
                     lecturer: p.lecturer,
                     subject: p.container.subject,
                     level: p.container.level,
-                    thumbnail: p.container.thumbnail,
+                      thumbnail: p.container.thumbnail,
+                    sortDate: p.purchasedAt || null,
                   };
                 }
                 // Otherwise, skip
                 return null;
               })
               .filter(Boolean) || [];
-            setAllLectures(lecturesData);
+            setAllLectures(lecturesData.sort(sortLecturesNewestFirst));
           }
         }
       } catch (err) {
@@ -254,7 +264,7 @@ const MyLecturesPage = () => {
       setLectures(paginatedLectures)
       setTotalPages(Math.ceil(filteredLectures.length / itemsPerPage))
     }
-  }, [allLectures, selectedSubjectFilter, selectedLevelFilter, currentPage, itemsPerPage, userRole])
+  }, [allLectures, selectedSubjectFilter, selectedLevelFilter, currentPage, userRole])
 
   const handlePageChange = (newPage) => {
     if (newPage >= 1 && newPage <= totalPages) setCurrentPage(newPage)
@@ -520,9 +530,9 @@ const MyLecturesPage = () => {
             value={itemsPerPage}
             onChange={handleItemsPerPageChange}
           >
-            <option value={10}>{t("lecturesPage.itemsPerPage", { count: 10 })}</option>
-            <option value={20}>{t("lecturesPage.itemsPerPage", { count: 20 })}</option>
-            <option value={50}>{t("lecturesPage.itemsPerPage", { count: 50 })}</option>
+            <option value={8}>{t("lecturesPage.itemsPerPage", { count: 8 })}</option>
+
+
           </select>
         </div>
 
@@ -729,3 +739,4 @@ const MyLecturesPage = () => {
 }
 
 export default MyLecturesPage
+
