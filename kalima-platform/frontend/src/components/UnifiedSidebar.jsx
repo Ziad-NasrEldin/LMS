@@ -373,6 +373,12 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
         icon: <FaMoneyBillWave className="h-5 w-5" />,
         path: "/dashboard/admin-dashboard/financial-dashboard",
       },
+      {
+        id: "promo-codes-management",
+        title: t("promoCodesManagement") || "Promo Codes",
+        icon: <Edit className="h-5 w-5" />,
+        path: "/dashboard/admin-dashboard/promo-codes-management",
+      },
     ];
 
     const lecturerItems = [
