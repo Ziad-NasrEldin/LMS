@@ -139,17 +139,6 @@ const enrichAuditLogs = async (logs) => {
             : null;
         }
 
-        case "package": {
-          const packageItem = await Package.findById(resourceId).lean();
-          return packageItem
-            ? {
-              name: packageItem.name,
-              type: packageItem.type,
-              price: packageItem.price
-            }
-            : null;
-        }
-
         case "lesson": {
           const lesson = await Lesson.findById(resourceId)
             .populate("subject", "name")

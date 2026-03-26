@@ -21,7 +21,7 @@ const sectionsData = [
     name: "Gifts",
     number: 3,
     thumbnail: "logo",
-    description: "Gift items and special packages",
+    description: "Gift items and special offers",
     allowedFor: ["Teacher", "Student", "Parent"]
   },
   {

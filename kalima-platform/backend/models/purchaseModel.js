@@ -49,16 +49,6 @@ const purchaseSchema = new mongoose.Schema({
     ],
   },
 
-  package: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Package",
-    required: [
-      function () {
-        return this.type === "packagePurchase";
-      },
-      "package ID is required for specific codes",
-    ],
-  },
   // Type of transaction: "pointPurchase" or "containerPurchase"
   type: {
     type: String,

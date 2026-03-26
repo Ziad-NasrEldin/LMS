@@ -13,7 +13,7 @@ import {
   Calendar,
   Filter,
   X,
-  Package,
+  Box,
   Target,
   Award,
 } from "lucide-react"
@@ -708,7 +708,7 @@ const StoreAnalytics = () => {
           <div className="card-body p-4">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                <Package className="w-5 h-5" />
+                <Box className="w-5 h-5" />
               </div>
               <div>
                 <h3 className="text-sm font-medium opacity-90">{t("insights.totalProducts")}</h3>

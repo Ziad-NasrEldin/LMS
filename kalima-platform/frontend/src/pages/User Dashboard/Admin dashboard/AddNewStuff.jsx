@@ -5,8 +5,6 @@ import { useTranslation } from "react-i18next"
 import { useNavigate } from "react-router-dom"
 import { getUserDashboard } from "../../../routes/auth-services"
 import { createSubject, getAllSubjects, deleteSubject } from "../../../routes/courses"
-import { createPackage, fetchPackages, deletePackage } from "../../../routes/packages"
-import { getAllLecturers } from "../../../routes/fetch-users"
 import { getAllLevels, createLevel, deleteLevel } from "../../../routes/levels"
 import { designTokens } from "../../../constants/designTokens"
 
@@ -18,25 +16,15 @@ export default function AdminCreate() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [success, setSuccess] = useState(null)
-  const [lecturers, setLecturers] = useState([])
   const [subjects, setSubjects] = useState([])
-  const [packages, setPackages] = useState([])
   const [levels, setLevels] = useState([])
-  const [activeForm, setActiveForm] = useState("subject") // 'subject', 'package', or 'level'
+  const [activeForm, setActiveForm] = useState("subject")
 
   const TOKENS = designTokens.colors;
   const SHADOWS = designTokens.shadows;
 
   // Subject form state
   const [subjectData, setSubjectData] = useState({ name: "", nameAR: "" })
-
-  // Package form state
-  const [packageData, setPackageData] = useState({
-    name: "",
-    price: "",
-    type: "month",
-    points: [{ lecturer: "", points: "" }],
-  })
 
   // Level form state
   const [levelData, setLevelData] = useState({ name: "", nameAr: "" })
@@ -58,19 +46,6 @@ export default function AdminCreate() {
       }
     }
 
-    const fetchLecturers = async () => {
-      try {
-        const response = await getAllLecturers()
-        if (response.success) {
-          setLecturers(response.data || [])
-        } else {
-          setError(response.error || t("errors.fetchLecturers"))
-        }
-      } catch (err) {
-        setError(t("errors.fetchLecturers"))
-      }
-    }
-
     const fetchSubjects = async () => {
       try {
         const response = await getAllSubjects()
@@ -81,19 +56,6 @@ export default function AdminCreate() {
         }
       } catch (err) {
         setError(t("errors.fetchSubjects"))
-      }
-    }
-
-    const fetchAllPackages = async () => {
-      try {
-        const response = await fetchPackages()
-        if (response.success) {
-          setPackages(response.data || [])
-        } else {
-          setError(response.error || t("errors.fetchPackages"))
-        }
-      } catch (err) {
-        setError(t("errors.fetchPackages"))
       }
     }
 
@@ -111,9 +73,7 @@ export default function AdminCreate() {
     }
 
     fetchUserData()
-    fetchLecturers()
     fetchSubjects()
-    fetchAllPackages()
     fetchAllLevels()
   }, [navigate, t])
 
@@ -139,38 +99,6 @@ export default function AdminCreate() {
     }
   }
 
-  const handlePackageSubmit = async (e) => {
-    e.preventDefault()
-    setError(null)
-    setSuccess(null)
-
-    try {
-      const formattedPoints = packageData.points.filter((point) => point.lecturer && point.points)
-      const response = await createPackage({
-        ...packageData,
-        price: Number.parseFloat(packageData.price),
-        points: formattedPoints,
-      })
-      if (response.success) {
-        setSuccess(t("success.packageCreated"))
-        setPackageData({
-          name: "",
-          price: "",
-          type: "month",
-          points: [{ lecturer: "", points: "" }],
-        })
-        const updatedPackages = await fetchPackages()
-        if (updatedPackages.success) {
-          setPackages(updatedPackages.data || [])
-        }
-      } else {
-        setError(response.error)
-      }
-    } catch (err) {
-      setError(t("errors.createPackage"))
-    }
-  }
-
   const handleLevelSubmit = async (e) => {
     e.preventDefault()
     setError(null)
@@ -193,28 +121,6 @@ export default function AdminCreate() {
     }
   }
 
-  const addPoint = () => {
-    setPackageData((prev) => ({
-      ...prev,
-      points: [...prev.points, { lecturer: "", points: "" }],
-    }))
-  }
-
-  const updatePoint = (index, field, value) => {
-    setPackageData((prev) => {
-      const newPoints = [...prev.points]
-      newPoints[index] = { ...newPoints[index], [field]: value }
-      return { ...prev, points: newPoints }
-    })
-  }
-
-  const removePoint = (index) => {
-    setPackageData((prev) => ({
-      ...prev,
-      points: prev.points.filter((_, i) => i !== index),
-    }))
-  }
-
   const handleDeleteSubject = async (subjectId) => {
     if (window.confirm(t("confirmations.deleteSubject"))) {
       try {
@@ -230,25 +136,6 @@ export default function AdminCreate() {
         }
       } catch (err) {
         setError(t("errors.deleteSubject"))
-      }
-    }
-  }
-
-  const handleDeletePackage = async (packageId) => {
-    if (window.confirm(t("confirmations.deletePackage"))) {
-      try {
-        const response = await deletePackage(packageId)
-        if (response.success) {
-          setSuccess(t("success.packageDeleted"))
-          const updatedPackages = await fetchPackages()
-          if (updatedPackages.success) {
-            setPackages(updatedPackages.data || [])
-          }
-        } else {
-          setError(response.error || t("errors.deletePackage"))
-        }
-      } catch (err) {
-        setError(t("errors.deletePackage"))
       }
     }
   }
@@ -329,16 +216,6 @@ export default function AdminCreate() {
           onClick={() => setActiveForm("subject")}
         >
           {t("forms.subject.createNew")}
-        </button>
-        <button
-          className={`px-6 py-3 rounded-xl font-bold flex-1 transition-all ${activeForm === "package" ? "shadow-sm" : "hover:bg-gray-50"}`}
-          style={{ 
-            backgroundColor: activeForm === "package" ? TOKENS.deepTeal : "transparent",
-            color: activeForm === "package" ? "white" : TOKENS.slateText
-          }}
-          onClick={() => setActiveForm("package")}
-        >
-          {t("forms.package.createNew")}
         </button>
         <button
           className={`px-6 py-3 rounded-xl font-bold flex-1 transition-all ${activeForm === "level" ? "shadow-sm" : "hover:bg-gray-50"}`}
@@ -427,169 +304,6 @@ export default function AdminCreate() {
             ) : (
               <div className="text-center py-10 rounded-2xl" style={{ backgroundColor: "rgba(17,24,39,0.02)" }}>
                 <p className="font-medium" style={{ color: TOKENS.slateText }}>{t("forms.subject.noSubjects")}</p>
-              </div>
-            )}
-          </div>
-        </>
-      )}
-
-      {/* Package Creation Form */}
-      {activeForm === "package" && (
-        <>
-          <form onSubmit={handlePackageSubmit} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text font-bold" style={{ color: TOKENS.spaceDark }}>{t("forms.package.name")}</span>
-                </label>
-                <input
-                  type="text"
-                  value={packageData.name}
-                  onChange={(e) => setPackageData({ ...packageData, name: e.target.value })}
-                  placeholder={t("forms.package.namePlaceholder")}
-                  className="input w-full rounded-xl"
-                  style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: TOKENS.spaceDark }}
-                  required
-                />
-              </div>
-
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text font-bold" style={{ color: TOKENS.spaceDark }}>{t("forms.package.price")}</span>
-                </label>
-                <input
-                  type="number"
-                  value={packageData.price}
-                  onChange={(e) => setPackageData({ ...packageData, price: e.target.value })}
-                  placeholder={t("forms.package.pricePlaceholder")}
-                  className="input w-full rounded-xl"
-                  style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: TOKENS.spaceDark }}
-                  min={0}
-                  step="0.01"
-                  required
-                />
-              </div>
-
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text font-bold" style={{ color: TOKENS.spaceDark }}>{t("forms.package.type")}</span>
-                </label>
-                <select
-                  value={packageData.type}
-                  onChange={(e) => setPackageData({ ...packageData, type: e.target.value })}
-                  className="select w-full rounded-xl h-12"
-                  style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: TOKENS.spaceDark }}
-                  disabled
-                >
-                  <option value="month">{t("forms.package.monthly")}</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="form-control pt-4 border-t" style={{ borderColor: 'rgba(17,24,39,0.1)' }}>
-              <label className="label mb-2">
-                <span className="label-text font-bold text-lg" style={{ color: TOKENS.spaceDark }}>{t("forms.package.points")}</span>
-              </label>
-              {packageData.points.map((point, index) => (
-                <div key={index} className="flex flex-col sm:flex-row items-center gap-3 mb-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
-                  <div className="w-full sm:w-1/2">
-                    <select
-                      value={point.lecturer}
-                      onChange={(e) => updatePoint(index, "lecturer", e.target.value)}
-                      className="select w-full rounded-xl h-12"
-                      style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: TOKENS.spaceDark }}
-                      required
-                    >
-                      <option value="">{t("forms.package.selectLecturer")}</option>
-                      {lecturers?.map((lecturer) => (
-                        <option key={lecturer._id} value={lecturer._id}>
-                          {lecturer.name} ({lecturer.expertise})
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="w-full sm:w-1/3">
-                    <input
-                      type="number"
-                      value={point.points}
-                      onChange={(e) => updatePoint(index, "points", e.target.value)}
-                      placeholder={t("forms.package.pointsPlaceholder")}
-                      className="input w-full rounded-xl h-12"
-                      style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: TOKENS.spaceDark }}
-                      min="0"
-                      required
-                    />
-                  </div>
-                  {packageData.points.length > 1 && (
-                    <button type="button" className="btn btn-ghost btn-sm rounded-xl h-12" style={{ color: "#E02424", backgroundColor: "rgba(224,36,36,0.1)" }} onClick={() => removePoint(index)}>
-                      {t("actions.remove")}
-                    </button>
-                  )}
-                </div>
-              ))}
-              <div className="flex justify-start">
-                <button type="button" className="btn btn-outline rounded-xl font-bold px-6 border-dashed border-2 bg-transparent" style={{ borderColor: TOKENS.deepTeal, color: TOKENS.deepTeal }} onClick={addPoint}>
-                  + {t("forms.package.addPoints")}
-                </button>
-              </div>
-            </div>
-
-            <button type="submit" className="btn rounded-xl font-bold px-8 h-12 w-full sm:w-auto mt-6" style={{ backgroundColor: TOKENS.coralAccent, color: "white", border: "none" }}>
-              {t("forms.package.create")}
-            </button>
-          </form>
-
-          {/* Package List */}
-          <div className="mt-10 pt-8 border-t" style={{ borderColor: 'rgba(17,24,39,0.1)' }}>
-            <h2 className="text-2xl font-extrabold mb-6" style={{ color: TOKENS.spaceDark }}>{t("forms.package.existing")}</h2>
-            {packages?.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {packages?.map((pkg) => (
-                  <div key={pkg._id} className="rounded-2xl border flex flex-col h-full bg-white transition-all hover:shadow-md" style={{ borderColor: "rgba(17,24,39,0.05)" }}>
-                    <div className="p-6 flex-1 flex flex-col">
-                      <div className="flex justify-between items-start mb-4">
-                        <h3 className="text-xl font-bold" style={{ color: TOKENS.spaceDark }}>{pkg.name}</h3>
-                        <span className="badge font-bold px-3 py-3 rounded-xl" style={{ backgroundColor: "rgba(77,179,194,0.1)", color: TOKENS.deepTeal, border: "none" }}>${pkg.price}</span>
-                      </div>
-                      <div className="space-y-2 mb-4 font-medium text-sm border-b pb-4" style={{ borderColor: "rgba(17,24,39,0.05)", color: TOKENS.slateText }}>
-                        <div className="flex justify-between">
-                          <span>{t("forms.package.typeLabel")}:</span>
-                          <span className="font-bold" style={{ color: TOKENS.spaceDark }}>{t(`forms.package.${pkg.type}`)}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span>{t("common.created")}:</span>
-                          <span className="font-bold" style={{ color: TOKENS.spaceDark }}>{new Date(pkg.createdAt).toLocaleDateString(i18n.language)}</span>
-                        </div>
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="text-sm font-bold uppercase tracking-wider mb-3 flex items-center gap-2" style={{ color: TOKENS.slateText }}>
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                          </svg>
-                          {t("forms.package.pointsDistribution")}
-                        </h4>
-                        <ul className="space-y-2 text-sm font-medium" style={{ color: TOKENS.slateText }}>
-                          {pkg.points?.map((point, index) => (
-                            <li key={index} className="flex items-center gap-2">
-                              <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: TOKENS.deepTeal }}></span>
-                              {point.lecturer?.name}: {" "}
-                              <span className="font-bold" style={{ color: TOKENS.spaceDark }}>{point.points} {t("forms.package.pointsUnit")}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                      {userRole !== "moderator" && (
-                        <button className="btn btn-ghost btn-sm rounded-xl mt-4 w-full" style={{ color: "#E02424", backgroundColor: "rgba(224,36,36,0.1)" }} onClick={() => handleDeletePackage(pkg._id)}>
-                          {t("actions.delete")}
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-10 rounded-2xl" style={{ backgroundColor: "rgba(17,24,39,0.02)" }}>
-                <p className="font-medium" style={{ color: TOKENS.slateText }}>{t("forms.package.noPackages")}</p>
               </div>
             )}
           </div>

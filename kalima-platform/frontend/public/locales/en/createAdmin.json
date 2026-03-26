@@ -1,6 +1,6 @@
 {
   "pageTitle": "User Accounts",
-  "pageSubtitle": "Create and maintain core account entities (subjects, packages, and levels)",
+  "pageSubtitle": "Create and maintain core account entities (subjects and levels)",
   "createNew": "Create New",
   "common": {
     "actions": "Actions",

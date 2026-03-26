@@ -27,12 +27,6 @@ router.post(
   authController.verifyRoles("Student", "Parent", "Teacher"),
   purchaseController.purchaseContainerWithPoints
 );
-// Purchase a package with General points
-router.post(
-  "/package",
-  authController.verifyRoles("Student", "Parent"),
-  purchaseController.purchasePackageWithPoints
-);
 
 // Get all purchases - admin only
 router.get(
