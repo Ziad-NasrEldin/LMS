@@ -481,8 +481,8 @@ const MyLecturesPage = () => {
         <div className="mb-4 flex flex-col md:flex-row justify-between gap-4">
           <div className="flex flex-col md:flex-row gap-4 flex-1">
             <select
-              className="select select-bordered w-full md:w-64"
-              style={{ borderColor: "rgba(17,24,39,0.16)", background: "#FFFFFF" }}
+              className="select w-full md:w-64 font-medium border-2 focus:outline-none focus:ring-0 rounded-full transition-colors font-sans"
+              style={{ backgroundColor: TOKENS.neutralCloud, borderColor: "transparent", color: TOKENS.deepTeal }} onFocus={(e) => { e.target.style.borderColor = TOKENS.softCyanTeal; e.target.style.backgroundColor = "#fff"; }} onBlur={(e) => { e.target.style.borderColor = "transparent"; e.target.style.backgroundColor = TOKENS.neutralCloud; }}
               value={selectedSubjectFilter}
               onChange={(e) => {
                 setSelectedSubjectFilter(e.target.value)
@@ -498,8 +498,8 @@ const MyLecturesPage = () => {
             </select>
 
             <select
-              className="select select-bordered w-full md:w-64"
-              style={{ borderColor: "rgba(17,24,39,0.16)", background: "#FFFFFF" }}
+              className="select w-full md:w-64 font-medium border-2 focus:outline-none focus:ring-0 rounded-full transition-colors font-sans"
+              style={{ backgroundColor: TOKENS.neutralCloud, borderColor: "transparent", color: TOKENS.deepTeal }} onFocus={(e) => { e.target.style.borderColor = TOKENS.softCyanTeal; e.target.style.backgroundColor = "#fff"; }} onBlur={(e) => { e.target.style.borderColor = "transparent"; e.target.style.backgroundColor = TOKENS.neutralCloud; }}
               value={selectedLevelFilter}
               onChange={(e) => {
                 setSelectedLevelFilter(e.target.value)
@@ -525,8 +525,8 @@ const MyLecturesPage = () => {
           )}
 
           <select
-            className="select select-bordered w-full md:w-48"
-            style={{ borderColor: "rgba(17,24,39,0.16)", background: "#FFFFFF" }}
+            className="select w-full md:w-48 font-medium border-2 focus:outline-none focus:ring-0 rounded-[1.4rem] transition-colors font-sans"
+            style={{ backgroundColor: TOKENS.neutralCloud, borderColor: "transparent", color: TOKENS.deepTeal }} onFocus={(e) => { e.target.style.borderColor = TOKENS.softCyanTeal; e.target.style.backgroundColor = "#fff"; }} onBlur={(e) => { e.target.style.borderColor = "transparent"; e.target.style.backgroundColor = TOKENS.neutralCloud; }}
             value={itemsPerPage}
             onChange={handleItemsPerPageChange}
           >

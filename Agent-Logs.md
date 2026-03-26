@@ -95,3 +95,7 @@
 ### March 26, 2026
 - **Refactor:** Completely restructured the Teacher/Lecturer Details page (Teacher-details.jsx) to leverage the latest Fekra design system tokens (e.g., bg-primary, bg-base-100, accent highlights, organic layered background blobs). Organized component layout by extracting logical pieces into smaller functional components, improving UI scale, RTL text alignment, readability, and modern card styling.
 
+
+## 2026-03-26 - Admin table filters & pagination redesign - Copilot
+- Updated standard DaisyUI `<input>` and `<select>` filter elements across `userManageTable.jsx` and `LecturesPage.jsx` to use the custom design tokens (soft borders, cream surface active states, teal accents).
+- Rewrote the `Pagination.jsx` component to override rigid joining classes with separated, pill-shaped pagination numeric buttons using `TOKENS` colors (`warmMango` for active page, `deepTeal` for inactive text).
