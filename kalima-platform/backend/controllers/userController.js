@@ -920,7 +920,6 @@ const getStudentParentAdditionalData = async (
       .populate([
         { path: "container", select: "name type price subject level videoLink lecture_type requiresExam examConfig createdBy thumbnail" },
         { path: "lecturer", select: "name expertise role" },
-        { path: "package", select: "name type price description" },
         { path: "lecture", select: "name price subject level videoLink lecture_type requiresExam examConfig createdBy thumbnail" },
       ])
       .lean();

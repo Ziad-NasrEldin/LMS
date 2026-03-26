@@ -100,7 +100,8 @@
 - Updated standard DaisyUI `<input>` and `<select>` filter elements across `userManageTable.jsx` and `LecturesPage.jsx` to use the custom design tokens (soft borders, cream surface active states, teal accents).
 - Rewrote the `Pagination.jsx` component to override rigid joining classes with separated, pill-shaped pagination numeric buttons using `TOKENS` colors (`warmMango` for active page, `deepTeal` for inactive text).
 
-- **Dashboard UI Update**: Refactored \CourseGrid.jsx\ and \InstructorsList.jsx\ to match the new Fekra design tokens. Applied soft shadows (\shadow-[0_6px_16px_...]\), high radii (\ounded-[2rem]\), removed hard \shadow-sm\ defaults from DaisyUI, updated primary buttons to large pill shapes, and fine-tuned content paddings for Arabic-first Dashboard.
+- **Dashboard UI Update**: Refactored \CourseGrid.jsx\ and \InstructorsList.jsx\ to match the new Fekra design tokens. Applied soft shadows (\shadow-[0_6px_16px_...]\), high radii (\
+ounded-[2rem]\), removed hard \shadow-sm\ defaults from DaisyUI, updated primary buttons to large pill shapes, and fine-tuned content paddings for Arabic-first Dashboard.
 
 
 - Update: Refactored mobile breakdown container in `CourseDetails.jsx` (lines 80-210) to a highly compact horizontal flex view. Dropped buttons and badges down to 10px-11px ranges, reduced generic paddings from massive tailwind defaults to fixed micro-values, keeping depth nesting free of clutter.
@@ -108,3 +109,5 @@
 - Update: Added a success modal popup to the Course Details page upon successful purchase, prompting the user to view the course in their dashboard with 'Yes' and 'Later' options styled according to the Fekra design system.
 
 - Update: Renamed the student promo-codes page hero to a generic account dashboard title/subtitle in both English and Arabic so the top banner matches the actual profile/referral/children content below it.
+
+- Update: Removed leftover temporary helper scripts from the repo and added `kalima-platform/frontend/temp-scripts/` to `.gitignore` so future scratch code stays out of deployed builds.

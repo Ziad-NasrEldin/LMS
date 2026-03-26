@@ -36,7 +36,7 @@ const subAdminRouter = require("./routes/subAdminRoutes.js");
 const moderatorRouter = require("./routes/moderatorRoutes.js");
 const lecturerRouter = require("./routes/lecturerRoutes.js");
 const assistantRouter = require("./routes/assistantRoutes.js");
-const packegeRouter = require("./routes/packageRoutes.js");
+
 const auditLogRouter = require("./routes/auditLogRoutes.js");
 const cLecturerRouter = require("./routes/center.lecturerRoutes.js");
 const cStudentRouter = require("./routes/center.studentRoutes.js");
@@ -97,7 +97,7 @@ app.use("/api/v1/sub-admins", auditLogger, subAdminRouter);
 app.use("/api/v1/moderators", auditLogger, moderatorRouter);
 app.use("/api/v1/lecturers", auditLogger, lecturerRouter);
 app.use("/api/v1/assistants", auditLogger, assistantRouter);
-app.use("/api/v1/packages", auditLogger, packegeRouter);
+
 app.use("/api/v1/audit-logs", auditLogRouter);
 app.use("/api/v1/center-lecturer", cLecturerRouter);
 app.use("/api/v1/center-student", cStudentRouter);

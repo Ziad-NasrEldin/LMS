@@ -62,7 +62,7 @@ const purchaseSchema = new mongoose.Schema({
   // Type of transaction: "pointPurchase" or "containerPurchase"
   type: {
     type: String,
-    enum: ["pointPurchase", "containerPurchase", "lecturePurchase", "packagePurchase", "promoCodePurchase"],
+    enum: ["pointPurchase", "containerPurchase", "lecturePurchase", "promoCodePurchase"],
     required: true,
   },
   // Additional details

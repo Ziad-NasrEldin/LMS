@@ -13,7 +13,7 @@ const SubAdmin = require("../models/subAdminModel");
 const Assistant = require("../models/assistantModel");
 const Admin = require("../models/adminModel");
 const Lecturer = require("../models/lecturerModel");
-const Package = require("../models/packageModel");
+
 const Lesson = require("../models/lessonModel");
 const ECSection = require("../models/ec.sectionModel");
 const ECProduct = require("../models/ec.productModel");
@@ -297,7 +297,7 @@ exports.getResourceAuditLogs = catchAsync(async (req, res, next) => {
   // Validate resource type
   const validResourceTypes = [
     "center", "code", "container", "moderator", "subAdmin",
-    "assistant", "admin", "lecturer", "package", "lesson",
+    "assistant", "admin", "lecturer", "lesson",
     "timetable", "center-lesson", "ec.section", "ec.product", "ec.purchase",
     "impersonation"
   ];
@@ -361,7 +361,7 @@ exports.getResourceInstanceAuditLogs = catchAsync(async (req, res, next) => {
   // Validate resource type
   const validResourceTypes = [
     "center", "code", "container", "moderator", "subAdmin",
-    "assistant", "admin", "lecturer", "package", "lesson",
+    "assistant", "admin", "lecturer", "lesson",
     "timetable", "center-lesson", "ec.section", "ec.product", "ec.purchase",
     "impersonation"
   ];
@@ -397,3 +397,4 @@ exports.getResourceInstanceAuditLogs = catchAsync(async (req, res, next) => {
     }
   });
 });
+

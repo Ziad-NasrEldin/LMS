@@ -28,7 +28,6 @@ const createAuditLogEntry = async (req, res, originalRes) => {
     { keywords: ["assistant", "assistants"], type: "assistant" },
     { keywords: ["admin", "admins"], type: "admin" },
     { keywords: ["lecturer", "lecturers"], type: "lecturer" },
-    { keywords: ["package", "packages"], type: "package" },
     { keywords: ["attendance"], type: "attendance" },
     { keywords: ["revenue"], type: "revenue" },
     { keywords: ["sections"], type: "ec.section" },
@@ -144,17 +143,8 @@ const createAuditLogEntry = async (req, res, originalRes) => {
   
   // Handle different response structures for different endpoints
   if (resData && !specialResource) {
-    // Special case for packages which have a different structure
-    if (resourceType === "package") {
-      if (resData.package) {
-        resourceId = resourceId || resData.package._id || resData.package.id;
-        resourceName = resData.package.name;
-      } else if (resData.packages && resData.packages.length) {
-        resourceName = `${resData.packages.length} packages`;
-      }
-    }
     // For other resource types
-    else if (resourceType === "admin" && resData.admin) {
+    if (resourceType === "admin" && resData.admin) {
       resourceId = resourceId || resData.admin._id || resData.admin.id;
       resourceName = resData.admin.name;
     } else if (resourceType === "subAdmin" && resData.subAdmin) {
@@ -238,7 +228,7 @@ const createAuditLogEntry = async (req, res, originalRes) => {
     isDeleteOperation || // DELETE operations are successful if status code is in 2xx range
     methodToAction[req.method] === 'read' || 
     resourceId || 
-    (resData && (resData.results > 0 || resData.message || resData.package || resData.packages || resData.lesson || resData.timetable || resData.attendance || resData.totalRevenue !== undefined || resData.breakdown || resData.section || resData.product || resData.purchase))
+    (resData && (resData.results > 0 || resData.message || resData.lesson || resData.timetable || resData.attendance || resData.totalRevenue !== undefined || resData.breakdown || resData.section || resData.product || resData.purchase))
   );
   
   // Use special resource and action if defined
@@ -295,3 +285,4 @@ const auditLogger = (req, res, next) => {
 };
 
 module.exports = auditLogger;
+

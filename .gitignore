@@ -39,6 +39,7 @@ frontend/.vite/
 frontend/.cache/
 .parcel-cache/
 .temp/
+kalima-platform/frontend/temp-scripts/
 .nyc_output/
 .rpt2_cache/
 .rts2_cache_cjs/

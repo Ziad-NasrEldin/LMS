@@ -35,8 +35,8 @@ const LectureDisplay = lazy(() => import("./pages/User Dashboard/Lecture Page/Le
 const AssistantPage = lazy(() => import("./pages/User Dashboard/assistantPage/assistantPage"))
 const CoursesDashboard = lazy(() => import("./pages/CoursesDashboard/CoursesDashboard"))
 const CenterDashboard = lazy(() => import("./pages/CenterDashboard/CenterDashboard"))
-const PackagesPage = lazy(() => import("./pages/Packages Page/packagesPage"))
-const PackageDetails = lazy(() => import("./pages/Packages Page/packageDetails"))
+
+
 const CoursesForm = lazy(() => import("./pages/CoursesForm/CoursesForm"))
 const ForgotPassword = lazy(() => import("./pages/Login/ForgetPassword"))
 const VerifyOtp = lazy(() => import("./pages/Login/VerifyOTP"))
@@ -286,15 +286,7 @@ function App() {
               path="/teacher-details/:userId"
               element={<TeacherDetails />}
             />
-            <Route
-              path="package-details/:packageId"
-              element={<PackageDetails />}
-            />
-            <Route path="/packages" element={<PackagesPage />} />
-            <Route
-              path="/package-details/:packageId"
-              element={<PackageDetails />}
-            />
+
             <Route
               path="/dashboard/center-dashboard/lesson-details/:id"
               element={<LessonDetailsSection />}
