@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Clock, BookOpen, Eye, Star, Wallet } from "lucide-react"
+import { Wallet } from "lucide-react"
 import { useTranslation } from "react-i18next"
 
 export const LectureCard = ({
@@ -79,7 +79,7 @@ export const LectureCard = ({
               <div className="flex items-center ml-2 text-xs">
                 <Wallet className="w-3 h-3 mr-1" />
                 <span className={hasEnoughPoints ? "text-green-600" : "text-red-600"}>
-                  {t("available : ")} {userPoints}
+                  {t("availablePoints")} {userPoints}
                 </span>
               </div>
             )}

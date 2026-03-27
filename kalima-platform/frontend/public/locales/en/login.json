@@ -44,6 +44,7 @@
     "sending" : "Sending",
     "passwordMismatch": "Passwords don't match",
     "resetPasswordTitle": "Reset Password",
+    "resetPassword": "Reset Password",
     "resetPasswordSubtitle": "Enter your new password",
     "confirmPasswordLabel": "Confirm Password",
     "resetting": "Resetting",
@@ -52,9 +53,12 @@
     "verifyOtpTitle": "Verify OTP",
     "verifyOtpSubtitle": "Enter the verification code we sent to your email",
     "otpLabel": "Verification Code",
-    "resendCodeIn": "Resend in",
+    "otpPlaceholder": "OTP",
+    "resendCodeIn": "Resend in {{countdown}}s",
     "resendCode": "Resend code",
     "verifyOtp": "Verify OTP",
+    "verifying": "Verifying...",
+    "backToLoginPrompt": "Remembered your password?",
       "errors": {
         "loginFailed": "Login failed. Please check your credentials",
         "invalidCredentials": "Invalid email/phone or password",
@@ -88,7 +92,7 @@
         "timeout": "Request timed out",
         "resetFailed": "Password reset failed. Try again later.",
         "generalError": "Something went wrong. Try again later.",
-        "requestFailed": "Request failed. Try again later."
-       
+        "requestFailed": "Request failed. Try again later.",
+        "fetchUserDataError": "Failed to fetch user data"
     }
   }

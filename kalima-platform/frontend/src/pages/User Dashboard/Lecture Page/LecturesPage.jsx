@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Link } from "react-router-dom"
+import { Link, useLocation, useNavigate } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import { getUserDashboard } from "../../../routes/auth-services"
 import { getAllSubjects } from "../../../routes/courses"
@@ -15,6 +15,8 @@ import { resolveUploadUrl } from "../../../utils/uploadUrl"
 const MyLecturesPage = () => {
   const { t, i18n } = useTranslation("lecturesPage")
   const isRTL = i18n.language === "ar"
+  const location = useLocation()
+  const navigate = useNavigate()
   const TOKENS = designTokens.colors
   const SHADOWS = designTokens.shadows
   const ITEMS_PER_PAGE = 8
@@ -51,6 +53,29 @@ const MyLecturesPage = () => {
   const closeLectureModal = () => {
     setLectureModalState({ mode: null, target: null })
   }
+
+  useEffect(() => {
+    const lectureEditTarget = location.state?.lectureEditTarget
+
+    if (!lectureEditTarget || lectureModalState.mode) {
+      return
+    }
+
+    const lectureEditTargetId = lectureEditTarget._id || lectureEditTarget.id
+
+    if (!lectureEditTargetId || allLectures.length === 0) {
+      return
+    }
+
+    const matchedLecture = allLectures.find((lecture) => String(lecture.id) === String(lectureEditTargetId))
+
+    if (!matchedLecture) {
+      return
+    }
+
+    openEditLectureModal(matchedLecture)
+    navigate(location.pathname, { replace: true, state: null })
+  }, [allLectures, lectureModalState.mode, location.pathname, location.state, navigate])
 
   useEffect(() => {
     const fetchInitialData = async () => {

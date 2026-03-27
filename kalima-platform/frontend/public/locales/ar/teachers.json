@@ -4,9 +4,18 @@
     "defaultSubject": "مدرس",
     "defaultExperience": "خبرة واسعة في التدريس",
     "allGrades": "كل المراحل الدراسية",
+    "hero": {
+      "quickMatch": "اختر المدرس المناسب حسب الاسم أو المادة خلال ثوانٍ."
+    },
+    "labels": {
+      "teacherCount": "{{count}} مدرس",
+      "activeFilters": "{{count}} فلاتر مفعلة"
+    },
     "filters": {
       "stage": "المرحلة الدراسية",
-      "subject": "المادة"
+      "subject": "المادة",
+      "all": "الكل",
+      "select": "اختر"
     },
     "stages": {
       "primary": "المرحلة الابتدائية",
@@ -24,9 +33,16 @@
       "resetFilters": "إعادة ضبط الفلاتر",
       "searchOptions": "اختيارات البحث",
       "showTeachers": "لعرض المدرسين",
+      "showFilters": "إظهار الفلاتر",
+      "hideFilters": "إخفاء الفلاتر",
       "tryAgain": "حاول مرة أخرى",
       "loadMore": "عرض المزيد من المدرسين",
       "viewDetails": "عرض التفاصيل"
+    },
+    "pagination": {
+      "previous": "السابق",
+      "next": "التالي",
+      "showingRange": "عرض {{start}} - {{end}} من {{total}} مدرس"
     },
     "placeholders": {
       "searchName": "ابحث بالاسم"

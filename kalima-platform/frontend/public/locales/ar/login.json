@@ -44,6 +44,7 @@
     "sending" : "جاري الارسال",
     "passwordMismatch": "كلمات المرور غير متطابقة",
     "resetPasswordTitle": "استعادة كلمة المرور",
+    "resetPassword": "استعادة كلمة المرور",
     "resetPasswordSubtitle": "ادخل كلمة المرور الجديدة",
     "confirmPasswordLabel": "تاكيد كلمة المرور",
     "resetting": "جاري استعادة كلمة المرور",
@@ -51,9 +52,12 @@
     "verifyOtpTitle": "تحقق من الكود",
     "verifyOtpSubtitle": "ادخل كود التحقق المرسل لبريدك الإلكتروني",
     "otpLabel": "كود التحقق",
-    "resendCodeIn": "اعادة الارسال في",
+    "otpPlaceholder": "كود التحقق",
+    "resendCodeIn": "اعادة الارسال خلال {{countdown}}ث",
     "resendCode": "اعادة الارسال",
     "verifyOtp": "تحقق من الكود",
+    "verifying": "جاري التحقق...",
+    "backToLoginPrompt": "تذكرت كلمة المرور؟",
     "errors": {
       "loginFailed": "فشل تسجيل الدخول. يرجى التحقق من البيانات",
       "invalidCredentials": "بريد إلكتروني/هاتف أو كلمة مرور خاطئة",
@@ -87,6 +91,7 @@
       "timeout": "انتهت مدة الطلب",
       "resetFailed": "فشل اعادة تعيين كلمة المرور. يرجى التحقق من البيانات",
       "generalError": "خطاء سيرفري. حاول لاحقًا",
-      "requestFailed": "فشل الطلب. حاول لاحقًا"
+      "requestFailed": "فشل الطلب. حاول لاحقًا",
+      "fetchUserDataError": "فشل في تحميل بيانات المستخدم"
   }
   }

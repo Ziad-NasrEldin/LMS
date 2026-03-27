@@ -90,23 +90,23 @@ const VerifyOtp = () => {
       <div className="w-full max-w-md p-6 z-10">
         <div className="bg-base-100 shadow-xl rounded-lg p-6">
           <h1 className="text-3xl font-bold text-center mb-2">
-            {t('verifyOtpTitle', 'Verify OTP')}
+            {t('verifyOtpTitle')}
           </h1>
           <p className="text-center text-base-600 mb-6">
-            {t('verifyOtpSubtitle', 'Enter the OTP sent to your email.')}
+            {t('verifyOtpSubtitle')}
           </p>
 
           <form onSubmit={handleSubmit} dir={isRTL ? 'rtl' : 'ltr'}>
             <div className="form-control mb-6">
               <label className="label">
-                <span className="label-text">{t('otpLabel', 'OTP Code')}</span>
+                <span className="label-text">{t('otpLabel')}</span>
               </label>
               <input
                 type="text"
                 name="otp"
                 value={otp}
                 onChange={(e) => setOtp(e.target.value)}
-                placeholder="OTP"
+                placeholder={t('otpPlaceholder')}
                 className="input input-bordered w-full"
                 required
               />
@@ -118,8 +118,8 @@ const VerifyOtp = () => {
                   disabled={resendDisabled}
                 >
                   {resendDisabled
-                    ? t('resendCodeIn', 'Resend Code in {{countdown}}s', { countdown })
-                    : t('resendCode', 'Resend Code')}
+                    ? t('resendCodeIn', { countdown })
+                    : t('resendCode')}
                 </button>
               </label>
             </div>
@@ -141,14 +141,14 @@ const VerifyOtp = () => {
               className={`btn btn-primary w-full ${loading ? 'loading' : ''}`}
               disabled={loading}
             >
-              {loading ? t('verifying', 'Verifying...') : t('verifyOtp', 'Verify OTP')}
+              {loading ? t('verifying') : t('verifyOtp')}
             </button>
 
             <div className="text-center mt-4">
               <p>
-                {t('backToLogin', 'Remembered your password?')}{' '}
+                {t('backToLoginPrompt')}{' '}
                 <Link to="/login" className="link link-primary">
-                  {t('login', 'Login here')}
+                  {t('backToLogin')}
                 </Link>
               </p>
             </div>

@@ -3,8 +3,15 @@
     "save": "Save",
     "cancel": "Cancel",
     "toggleSidebar": "Toggle Sidebar",
+    "dir": "ltr",
     "General Points": "General Points",
     "Total Points": "Total Points",
+    "passwordStrength": {
+      "label": "Password strength",
+      "weak": "Weak",
+      "medium": "Medium",
+      "strong": "Strong"
+    },
 
     "personalInfo": {
         "title": "Personal Information",

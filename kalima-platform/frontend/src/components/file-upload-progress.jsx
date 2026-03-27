@@ -1,7 +1,9 @@
 "use client"
 import { useState, useEffect } from "react"
+import { useTranslation } from "react-i18next"
 
 const FileUploadProgress = ({ file, onUploadComplete, onUploadError, uploadEndpoint, fieldName, accept = "*/*" }) => {
+  const { t } = useTranslation("common")
   const [progress, setProgress] = useState(0)
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState(null)
@@ -46,13 +48,16 @@ const FileUploadProgress = ({ file, onUploadComplete, onUploadError, uploadEndpo
             onUploadComplete?.(xhr.responseText, fieldName)
           }
         } else {
-          throw new Error(`Upload failed with status: ${xhr.status}`)
+          const errorMsg = t("upload.errors.status", { status: xhr.status })
+          setError(errorMsg)
+          setUploading(false)
+          onUploadError?.(errorMsg, fieldName)
         }
       })
 
       // Handle errors
       xhr.addEventListener("error", () => {
-        const errorMsg = "Upload failed due to network error"
+        const errorMsg = t("upload.errors.network")
         setError(errorMsg)
         setUploading(false)
         onUploadError?.(errorMsg, fieldName)
@@ -60,7 +65,7 @@ const FileUploadProgress = ({ file, onUploadComplete, onUploadError, uploadEndpo
 
       // Handle abort
       xhr.addEventListener("abort", () => {
-        const errorMsg = "Upload was cancelled"
+        const errorMsg = t("upload.errors.cancelled")
         setError(errorMsg)
         setUploading(false)
         onUploadError?.(errorMsg, fieldName)
@@ -109,7 +114,7 @@ const FileUploadProgress = ({ file, onUploadComplete, onUploadError, uploadEndpo
                 clipRule="evenodd"
               />
             </svg>
-            <span className="text-xs">Complete</span>
+            <span className="text-xs">{t("upload.status.complete")}</span>
           </div>
         )}
 
@@ -122,7 +127,7 @@ const FileUploadProgress = ({ file, onUploadComplete, onUploadError, uploadEndpo
                 clipRule="evenodd"
               />
             </svg>
-            <span className="text-xs">Failed</span>
+            <span className="text-xs">{t("upload.status.failed")}</span>
           </div>
         )}
 
@@ -149,13 +154,13 @@ const FileUploadProgress = ({ file, onUploadComplete, onUploadError, uploadEndpo
         <div className="mt-2 text-xs text-error">
           {error}
           <button onClick={resetUpload} className="ml-2 underline hover:no-underline">
-            Retry
+            {t("retry")}
           </button>
         </div>
       )}
 
       {/* File Type Validation */}
-      {file && accept !== "*/*" && <div className="mt-1 text-xs text-gray-500">Accepted: {accept}</div>}
+      {file && accept !== "*/*" && <div className="mt-1 text-xs text-gray-500">{t("upload.accepted", { types: accept })}</div>}
     </div>
   )
 }

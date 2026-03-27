@@ -22,7 +22,8 @@
   "product": {
     "discounts": "Discount",
     "currency": "ج",
-    "viewDetails": "View Details"
+    "viewDetails": "View Details",
+    "new": "NEW"
   },
   "emptyState": {
     "title": "No items found",

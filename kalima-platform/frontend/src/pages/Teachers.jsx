@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { ChevronLeft, ChevronDown, ChevronUp, Search } from "lucide-react";
+import { ChevronDown, ChevronUp, Search } from "lucide-react";
 import { getAllLecturers } from "../routes/fetch-users";
 import { motion, AnimatePresence } from "framer-motion";
 import TeacherCard from "../components/TeacherCard";
@@ -138,7 +138,7 @@ export default function Teachers() {
       label: t('filters.stage'),
       value: selectedStage,
       options: [
-        { label: t('filters.all', { defaultValue: isRTL ? "الكل" : "All" }), value: "" },
+        { label: t('filters.all'), value: "" },
         { label: t('stages.primary'), value: "primary" },
         { label: t('stages.preparatory'), value: "preparatory" },
         { label: t('stages.secondary'), value: "secondary" },
@@ -148,7 +148,7 @@ export default function Teachers() {
     {
       label: t('filters.subject'),
       value: selectedSubject,
-      options: [{ label: t('filters.all', { defaultValue: isRTL ? "الكل" : "All" }), value: "" }, ...subjectOptions],
+      options: [{ label: t('filters.all'), value: "" }, ...subjectOptions],
       onSelect: setSelectedSubject,
     },
   ];
@@ -191,11 +191,11 @@ export default function Teachers() {
 
           <h1 className="mt-4 text-4xl font-extrabold leading-[1.15] tracking-[-0.02em] md:text-6xl">{t('discoverTeachers')}</h1>
           <p className="mt-3 max-w-[70ch] text-base leading-8 text-[#DDF6FB]">
-            {isRTL ? 'اختر المدرس المناسب حسب الاسم أو المادة خلال ثوانٍ.' : 'Find the right teacher quickly by name and subject.'}
+            {t('hero.quickMatch')}
           </p>
 
           <div className="mt-6 inline-flex items-center rounded-full px-4 py-2 text-sm font-semibold" style={{ background: 'rgba(255,255,255,0.15)' }}>
-            {filteredTeachers.length} {isRTL ? 'مدرس' : 'teachers'}
+            {t('labels.teacherCount', { count: filteredTeachers.length })}
           </div>
         </section>
 
@@ -221,8 +221,8 @@ export default function Teachers() {
               aria-controls="teachers-filters-panel"
             >
               {showFilters
-                ? (isRTL ? 'إخفاء الفلاتر' : 'Hide Filters')
-                : (isRTL ? 'إظهار الفلاتر' : 'Show Filters')}
+                ? t('buttons.hideFilters')
+                : t('buttons.showFilters')}
               {showFilters ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
             </button>
 
@@ -247,7 +247,7 @@ export default function Teachers() {
                 className="inline-flex items-center rounded-full px-4 py-2 text-xs font-bold"
                 style={{ background: 'rgba(20,106,120,0.12)', color: TOKENS.deepTeal }}
               >
-                {isRTL ? `${activeFiltersCount} فلاتر مفعلة` : `${activeFiltersCount} active filters`}
+                {t('labels.activeFilters', { count: activeFiltersCount })}
               </div>
             )}
           </div>
@@ -279,7 +279,7 @@ export default function Teachers() {
                       label={filter.label}
                       options={filter.options}
                       selectedValue={filter.value}
-                      placeholder={t('filters.select', { defaultValue: isRTL ? 'اختر' : 'Select' })}
+                      placeholder={t('filters.select')}
                       onSelect={filter.onSelect}
                       isRTL={isRTL}
                     />
@@ -355,7 +355,7 @@ export default function Teachers() {
                       onClick={() => handlePageChange(currentPage - 1)}
                       disabled={currentPage === 1}
                     >
-                      {isRTL ? "السابق" : "Previous"}
+                      {t('pagination.previous')}
                     </button>
 
                     {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
@@ -391,14 +391,18 @@ export default function Teachers() {
                       onClick={() => handlePageChange(currentPage + 1)}
                       disabled={currentPage === totalPages}
                     >
-                      {isRTL ? "التالي" : "Next"}
+                      {t('pagination.next')}
                     </button>
                   </div>
                 </div>
               )}
 
               <div className="text-center text-sm mt-4" style={{ color: TOKENS.slateText }}>
-                {isRTL ? "عرض" : "Showing"} {(currentPage - 1) * ITEMS_PER_PAGE + 1} - {Math.min(currentPage * ITEMS_PER_PAGE, totalResults)} {isRTL ? "من" : "of"} {totalResults} {isRTL ? "مدرس" : "teachers"}
+                {t('pagination.showingRange', {
+                  start: (currentPage - 1) * ITEMS_PER_PAGE + 1,
+                  end: Math.min(currentPage * ITEMS_PER_PAGE, totalResults),
+                  total: totalResults,
+                })}
               </div>
             </>
           )}

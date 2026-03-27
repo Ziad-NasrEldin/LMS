@@ -96,7 +96,7 @@ const Market = () => {
         setLoading(false)
       }
     }
-// dummy comment to re-commit
+
     fetchInitialData()
   }, [t])
 
@@ -118,7 +118,7 @@ const Market = () => {
 
   // Create categories array with "All" option and fetched sections
   const categories = [
-    { id: "all", icon: "☰" },
+    { id: "all", name: t("categories.allSections"), icon: "☰" },
     ...sections.map((section) => ({
       id: section._id,
       name: section.name,
@@ -203,7 +203,7 @@ const Market = () => {
                   activeSubSection === "all" ? "bg-secondary text-white" : "hover:bg-secondary/30"
                 }`}
               >
-                {t("allSubSections") || "All"}
+                {t("categories.allSubSections")}
               </button>
               {currentSubSections.map((subSection) => (
                 <button
@@ -292,7 +292,7 @@ const Market = () => {
                     className={`bg-secondary px-3 py-1 ${isRTL ? "rounded-br-2xl" : "rounded-bl-2xl"
                       } text-sm font-medium`}
                   >
-                    {t("product.new") || "NEW"}
+                    {t("product.new")}
                   </div>
                 </div>
               )}

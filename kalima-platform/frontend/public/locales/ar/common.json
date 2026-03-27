@@ -112,5 +112,17 @@
   "impersonationRoleMismatchError": "دور المستخدم المختار لا يطابق نوع العرض المطلوب",
   "impersonationSessionMismatchError": "حدث تعارض في الجلسة. حدّث الصفحة وحاول مرة أخرى",
   "impersonationNoActiveError": "لا يوجد وضع عرض نشط لإنهائه",
-  "retry": "إعادة المحاولة"
+  "retry": "إعادة المحاولة",
+  "upload": {
+    "accepted": "الأنواع المقبولة: {{types}}",
+    "status": {
+      "complete": "اكتمل",
+      "failed": "فشل"
+    },
+    "errors": {
+      "network": "فشل الرفع بسبب خطأ في الشبكة",
+      "cancelled": "تم إلغاء الرفع",
+      "status": "فشل الرفع برمز الحالة: {{status}}"
+    }
+  }
 }

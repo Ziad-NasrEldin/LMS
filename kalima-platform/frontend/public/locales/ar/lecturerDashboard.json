@@ -8,6 +8,7 @@
   "noSubject": "بدون مادة",
   "addNewCourse": "إضافة كورس جديد",
   "view": "عرض",
+  "edit": "تعديل",
   "delete": "حذف",
   "confirmDeleteContainer": "هل أنت متأكد من حذف هذا الكورس؟",
   "failedToDeleteContainer": "فشل في حذف الكورس",
@@ -17,6 +18,9 @@
   "noCourses": "لم تقم بإنشاء أي كورسات بعد.",
 
   "assistants": "المساعدين",
+  "top_categories": "الفئات الأعلى",
+  "most_popular": "الأكثر شيوعاً",
+  "assistantsHint": "إدارة المساعدين ضمن نفس لغة البطاقات الحديثة",
   "addAssistant": "إضافة مساعد",
   "noAssistants": "لم تقم بإضافة أي مساعدين بعد.",
   "addYourFirstAssistant": "أضف أول مساعد لك",

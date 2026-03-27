@@ -89,11 +89,11 @@ export default function LecturesPage() {
         setLectures(result.data.containers)
         setFilteredLectures(result.data.containers)
       } else {
-        setError(result.message || "Failed to fetch lectures")
+        setError(result.message || t("errors.fetchLectures"))
       }
     } catch (err) {
       console.error("Error fetching lectures:", err)
-      setError("حدث خطأ أثناء تحميل المحاضرات")
+      setError(t("errors.fetchLectures"))
     } finally {
       setLoading(false)
     }
@@ -132,7 +132,7 @@ export default function LecturesPage() {
       const response = await purchaseContainer(lectureId)
 
       if (response.data && response.data.status === "success") {
-        toast.success(t("purchase.success"))
+        toast.success(t("purchaseMessages.success"))
 
         // Optimistically add to purchased lectures
   setPurchasedLectures((prev) => Array.from(new Set([...prev.map(String), lectureId.toString()])))
@@ -140,31 +140,30 @@ export default function LecturesPage() {
         // Refresh points and merge backend purchases, never reset
         fetchUserData()
       } else {
-        const errorMessage = response?.error || response?.data?.message || t("purchase.failed")
+        const errorMessage = response?.error || response?.data?.message || t("purchaseMessages.failed")
         toast.error(errorMessage)
       }
     } catch (err) {
       console.error("Error purchasing lecture:", err)
-      toast.error(err.response?.data?.message || t("purchase.failed"))
+      toast.error(err.response?.data?.message || t("purchaseMessages.failed"))
     }
   }
 
   const generateLectureData = (lecturesData) => {
-    console.log("Lecture from backend:", lecturesData)
     return lecturesData.map((lecture) => ({
       
       id: lecture._id,
       thumbnail: resolveUploadUrl(lecture.thumbnail, "product_thumbnails"),
       title: lecture.name,
-      subject: lecture.subject?.name || "غير محدد",
-      teacher: lecture.createdBy?.name || "مدرس غير محدد",
+      subject: lecture.subject?.name || t("fallback.notSpecified"),
+      teacher: lecture.createdBy?.name || t("fallback.unknownTeacher"),
       teacherId: lecture.createdBy?._id,
-      teacherRole: lecture.createdBy?.role || "محاضر",
-      grade: lecture.level?.name || "غير محدد",
+      teacherRole: lecture.createdBy?.role || t("fallback.unknownRole"),
+      grade: lecture.level?.name || t("fallback.notSpecified"),
       rating: 4,
-      stage: lecture.createdBy?.role || "غير محدد",
-      type: "محاضرة",
-      status: lecture.price > 0 ? "مدفوع" : "مجاني",
+      stage: lecture.createdBy?.role || t("fallback.notSpecified"),
+      type: t("labels.lecture"),
+      status: lecture.price > 0 ? "paid" : "free",
       price: lecture.price || 0,
       childrenCount: lecture.attachments
         ? (lecture.attachments.booklets?.length || 0) +
@@ -173,7 +172,7 @@ export default function LecturesPage() {
           (lecture.attachments.pdfsandimages?.length || 0)
         : 0,
       views: lecture.numberOfViews || 0,
-      description: lecture.description || "لا يوجد وصف",
+      description: lecture.description || t("fallback.noDescription"),
   isPurchased: purchasedLectures.map(String).includes(lecture._id?.toString()),
       teacherPoints: lecture.createdBy?._id ? getTeacherPoints(lecture.createdBy._id) : 0,
     }))
@@ -196,7 +195,7 @@ export default function LecturesPage() {
 
     if (selectedStatus) {
       filtered = filtered.filter((lecture) => {
-        const status = lecture.price > 0 ? "مدفوع" : "مجاني"
+        const status = lecture.price > 0 ? "paid" : "free"
         return status === selectedStatus
       })
     }
@@ -281,8 +280,8 @@ export default function LecturesPage() {
       label: t("filters.status"),
       value: selectedStatus,
       options: [
-        { label: "filters.statuses.free", value: "مجاني" },
-        { label: "filters.statuses.paid", value: "مدفوع" },
+        { label: "filters.statuses.free", value: "free" },
+        { label: "filters.statuses.paid", value: "paid" },
       ],
       onSelect: setSelectedStatus,
     },
@@ -354,7 +353,7 @@ export default function LecturesPage() {
         <div className="relative w-full h-full">
           <img
             src="/background-courses.png"
-            alt="background"
+            alt={t("alts.background")}
             className="absolute top-0 left-0 w-full h-full object-top opacity-50"
             style={{ maxWidth: "600px" }}
           />
@@ -365,7 +364,7 @@ export default function LecturesPage() {
         <div className={`container mx-auto px-4 pt-8 pb-4 ${isRTL ? "text-right" : "text-left"}`}>
           <div className="relative inline-block">
             <p className="text-3xl font-bold text-primary md:mx-40">{t("title")}</p>
-            <img src="/underline.png" alt="underline" className="object-contain" />
+            <img src="/underline.png" alt={t("alts.underline")} className="object-contain" />
           </div>
 
           {userData && (

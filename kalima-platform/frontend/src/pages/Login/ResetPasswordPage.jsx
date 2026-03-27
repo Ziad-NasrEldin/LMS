@@ -22,7 +22,7 @@ const ResetPassword = () => {
     setError('');
 
     if (password !== confirmPassword) {
-      setError(t('passwordMismatch', 'Passwords do not match.'));
+      setError(t('passwordMismatch'));
       setLoading(false);
       return;
     }
@@ -56,23 +56,23 @@ const ResetPassword = () => {
       <div className="w-full max-w-md p-6 z-10">
         <div className="bg-base-100 shadow-xl rounded-lg p-6">
           <h1 className="text-3xl font-bold text-center mb-2">
-            {t('resetPasswordTitle', 'Reset Password')}
+            {t('resetPasswordTitle')}
           </h1>
           <p className="text-center text-base-600 mb-6">
-            {t('resetPasswordSubtitle', 'Enter your new password.')}
+            {t('resetPasswordSubtitle')}
           </p>
 
           <form onSubmit={handleSubmit} dir={isRTL ? 'rtl' : 'ltr'}>
             <div className="form-control mb-4">
               <label className="label">
-                <span className="label-text">{t('passwordLabel', 'New Password')}</span>
+                <span className="label-text">{t('passwordLabel')}</span>
               </label>
               <input
                 type="password"
                 name="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
+                placeholder={t('passwordPlaceholder')}
                 className="input input-bordered w-full"
                 required
               />
@@ -80,14 +80,14 @@ const ResetPassword = () => {
 
             <div className="form-control mb-6">
               <label className="label">
-                <span className="label-text">{t('confirmPasswordLabel', 'Confirm Password')}</span>
+                <span className="label-text">{t('confirmPasswordLabel')}</span>
               </label>
               <input
                 type="password"
                 name="confirmPassword"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="••••••••"
+                placeholder={t('passwordPlaceholder')}
                 className="input input-bordered w-full"
                 required
               />
@@ -104,14 +104,14 @@ const ResetPassword = () => {
               className={`btn btn-primary w-full ${loading ? 'loading' : ''}`}
               disabled={loading}
             >
-              {loading ? t('resetting', 'Resetting...') : t('resetPassword', 'Reset Password')}
+              {loading ? t('resetting') : t('resetPassword')}
             </button>
 
             <div className="text-center mt-4">
               <p>
-                {t('backToLogin', 'Remembered your password?')}{' '}
+                {t('backToLoginPrompt')}{' '}
                 <Link to="/login" className="link link-primary">
-                  {t('login', 'Login here')}
+                  {t('backToLogin')}
                 </Link>
               </p>
             </div>
@@ -122,7 +122,7 @@ const ResetPassword = () => {
       {showToast && (
         <div className="toast toast-top toast-end">
           <div className="alert alert-success">
-            <span>{t('passwordResetSuccess', 'Password has been reset successfully')}</span>
+            <span>{t('passwordResetSuccess')}</span>
           </div>
         </div>
       )}

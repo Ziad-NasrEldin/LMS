@@ -396,6 +396,25 @@ const DetailedLectureView = () => {
     }
   }
 
+  const canEditLecture = ["Lecturer", "Admin", "SubAdmin", "Moderator"].includes(userRole)
+
+  const handleEditLecture = () => {
+    if (!lecture || !canEditLecture) {
+      return
+    }
+
+    const lecturesPageRoute =
+      userRole === "Lecturer"
+        ? "/dashboard/lecturer-dashboard/lectures-page"
+        : "/dashboard/admin-dashboard/lectures-page"
+
+    navigate(lecturesPageRoute, {
+      state: {
+        lectureEditTarget: lecture,
+      },
+    })
+  }
+
   // Format date to local string
   const formatDate = (dateString) => {
     try {
@@ -510,6 +529,12 @@ const DetailedLectureView = () => {
         {/* Admin/Lecturer Actions */}
         {hasAdminPrivileges && (
           <div className="flex gap-2">
+            {canEditLecture && (
+              <button className="btn btn-outline btn-primary btn-sm" onClick={handleEditLecture}>
+                <FiEdit className="w-4 h-4" />
+                {t("edit")}
+              </button>
+            )}
             <button className="btn btn-error btn-sm" onClick={() => setShowDeleteModal(true)}>
               {t('deleteLecture')}
             </button>

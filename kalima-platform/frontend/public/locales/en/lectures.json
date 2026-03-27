@@ -11,8 +11,27 @@
   "enroll": "Enroll",
   "purchased": "Purchased",
   "purchase": "Purchase",
+  "details": "Details",
+  "purchaseMessages": {
+    "success": "Lecture purchased successfully",
+    "failed": "Failed to purchase lecture"
+  },
   "available : ": " Available",
+  "availablePoints": "Available:",
   "noPointsBalances": "No points available",
+  "labels": {
+    "lecture": "Lecture"
+  },
+  "fallback": {
+    "notSpecified": "Not specified",
+    "unknownTeacher": "Unknown teacher",
+    "unknownRole": "Lecturer",
+    "noDescription": "No description available"
+  },
+  "alts": {
+    "background": "background",
+    "underline": "underline"
+  },
   "filters": {
     "reset": "Reset Filters",
     "stage": "Instructor Role",
@@ -66,7 +85,11 @@
     "loading": "Loading..."
   },
   "errors": {
-    "fetchStudents": "Failed to fetch students"
+    "fetchStudents": "Failed to fetch students",
+    "fetchLectures": "Failed to fetch lectures",
+    "loginRequired": "Please log in first",
+    "lectureNotFound": "Lecture not found",
+    "insufficientPoints": "You do not have enough points"
   },
   "lesson": {
     "detailsTitle": "Lesson Details",

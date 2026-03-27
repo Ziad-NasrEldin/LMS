@@ -112,5 +112,17 @@
   "impersonationRoleMismatchError": "Selected user role does not match requested view",
   "impersonationSessionMismatchError": "Session mismatch. Try reloading and start again",
   "impersonationNoActiveError": "No active role view to exit",
-  "retry": "Retry"
+  "retry": "Retry",
+  "upload": {
+    "accepted": "Accepted: {{types}}",
+    "status": {
+      "complete": "Complete",
+      "failed": "Failed"
+    },
+    "errors": {
+      "network": "Upload failed due to network error",
+      "cancelled": "Upload was cancelled",
+      "status": "Upload failed with status: {{status}}"
+    }
+  }
 }

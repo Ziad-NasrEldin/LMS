@@ -4,8 +4,8 @@
     "namespaceCountAr": 32,
     "missingArNamespacesCount": 0,
     "missingEnNamespacesCount": 0,
-    "missingUsedKeysInEnCount": 89,
-    "missingUsedKeysInArCount": 89
+    "missingUsedKeysInEnCount": 105,
+    "missingUsedKeysInArCount": 105
   },
   "missingArNamespaces": [],
   "missingEnNamespaces": [],
@@ -54,8 +54,8 @@
       ]
     },
     "common": {
-      "enCount": 110,
-      "arCount": 110,
+      "enCount": 119,
+      "arCount": 119,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": []
@@ -70,8 +70,8 @@
       ]
     },
     "courses": {
-      "enCount": 78,
-      "arCount": 78,
+      "enCount": 79,
+      "arCount": 79,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": []
@@ -121,8 +121,8 @@
       ]
     },
     "createAdmin": {
-      "enCount": 78,
-      "arCount": 78,
+      "enCount": 51,
+      "arCount": 51,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": []
@@ -151,8 +151,8 @@
       ]
     },
     "kalimaStore-Market": {
-      "enCount": 36,
-      "arCount": 36,
+      "enCount": 37,
+      "arCount": 37,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": [
@@ -206,36 +206,36 @@
       "suspiciousSame": []
     },
     "lectureDisplay": {
-      "enCount": 157,
-      "arCount": 157,
+      "enCount": 164,
+      "arCount": 164,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": []
     },
     "lecturerDashboard": {
-      "enCount": 61,
-      "arCount": 61,
+      "enCount": 62,
+      "arCount": 62,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": []
     },
     "lectures": {
-      "enCount": 114,
-      "arCount": 114,
+      "enCount": 126,
+      "arCount": 126,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": []
     },
     "lecturesPage": {
-      "enCount": 140,
-      "arCount": 140,
+      "enCount": 146,
+      "arCount": 146,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": []
     },
     "login": {
-      "enCount": 89,
-      "arCount": 89,
+      "enCount": 92,
+      "arCount": 92,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": [
@@ -287,8 +287,8 @@
       "suspiciousSame": []
     },
     "teachers": {
-      "enCount": 35,
-      "arCount": 35,
+      "enCount": 48,
+      "arCount": 48,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": []
@@ -332,24 +332,6 @@
       "fn": "t"
     },
     {
-      "file": "pages/Teachers.jsx",
-      "ns": "teachers",
-      "key": "filters.all",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Teachers.jsx",
-      "ns": "teachers",
-      "key": "filters.all",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Teachers.jsx",
-      "ns": "teachers",
-      "key": "filters.select",
-      "fn": "t"
-    },
-    {
       "file": "pages/User Dashboard/Lecture Page/ContainerPage.jsx",
       "ns": "lecturesPage",
       "key": "containersPage.unknown",
@@ -358,7 +340,25 @@
     {
       "file": "pages/User Dashboard/Lecture Page/LecturesPage.jsx",
       "ns": "lecturesPage",
+      "key": "lecturesPage.messages.lectureUpdatedSuccessfully",
+      "fn": "t"
+    },
+    {
+      "file": "pages/User Dashboard/Lecture Page/LecturesPage.jsx",
+      "ns": "lecturesPage",
       "key": "lecturesPage.messages.lectureCreatedSuccessfully",
+      "fn": "t"
+    },
+    {
+      "file": "pages/User Dashboard/Lecture Page/LecturesPage.jsx",
+      "ns": "lecturesPage",
+      "key": "lecturesPage.buttons.edit",
+      "fn": "t"
+    },
+    {
+      "file": "pages/User Dashboard/Lecture Page/LecturesPage.jsx",
+      "ns": "lecturesPage",
+      "key": "lecturesPage.buttons.edit",
       "fn": "t"
     },
     {
@@ -460,6 +460,12 @@
     {
       "file": "pages/User Dashboard/Admin dashboard/home/PromoCodesTable.jsx",
       "ns": "admin",
+      "key": "promoCodes.subtitle",
+      "fn": "t"
+    },
+    {
+      "file": "pages/User Dashboard/Admin dashboard/home/PromoCodesTable.jsx",
+      "ns": "admin",
       "key": "modals.confirmBulkDelete",
       "fn": "t"
     },
@@ -514,7 +520,25 @@
     {
       "file": "pages/teacher details/Teacher-details.jsx",
       "ns": "teacherDetails",
+      "key": "courseType",
+      "fn": "t"
+    },
+    {
+      "file": "pages/teacher details/Teacher-details.jsx",
+      "ns": "teacherDetails",
       "key": "error.invalid_user_id",
+      "fn": "t"
+    },
+    {
+      "file": "pages/teacher details/Teacher-details.jsx",
+      "ns": "teacherDetails",
+      "key": "lecturer",
+      "fn": "t"
+    },
+    {
+      "file": "pages/teacher details/Teacher-details.jsx",
+      "ns": "teacherDetails",
+      "key": "defaultSubject",
       "fn": "t"
     },
     {
@@ -560,12 +584,6 @@
       "fn": "t"
     },
     {
-      "file": "pages/Packages Page/packagesPage.jsx",
-      "ns": "packages",
-      "key": "purchaseModal.insufficientPoints",
-      "fn": "t"
-    },
-    {
       "file": "pages/Login/login.jsx",
       "ns": "login",
       "key": "errors.fetchUserDataError",
@@ -578,33 +596,15 @@
       "fn": "t"
     },
     {
-      "file": "pages/Login/VerifyOTP.jsx",
-      "ns": "login",
-      "key": "verifying",
+      "file": "pages/Lecturer Dashboard/CourseGrid.jsx",
+      "ns": "lecturerDashboard",
+      "key": "edit",
       "fn": "t"
     },
     {
       "file": "pages/Lecturer Dashboard/FeaturedCourses.jsx",
       "ns": "lectures",
       "key": "details",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/InstructorsList.jsx",
-      "ns": "lecturerDashboard",
-      "key": "Failed to create assistant",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/InstructorsList.jsx",
-      "ns": "lecturerDashboard",
-      "key": "Failed to delete assistant",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/InstructorsList.jsx",
-      "ns": "lecturerDashboard",
-      "key": "Failed to update assistant",
       "fn": "t"
     },
     {
@@ -629,18 +629,6 @@
       "file": "pages/Lecturer Dashboard/LecturerDashboard.jsx",
       "ns": "lecturerDashboard",
       "key": "view_all",
-      "fn": "t"
-    },
-    {
-      "file": "pages/KalimaStore/Market.jsx",
-      "ns": "kalimaStore-Market",
-      "key": "allSubSections",
-      "fn": "t"
-    },
-    {
-      "file": "pages/KalimaStore/Market.jsx",
-      "ns": "kalimaStore-Market",
-      "key": "product.new",
       "fn": "t"
     },
     {
@@ -782,6 +770,120 @@
       "fn": "t"
     },
     {
+      "file": "components/ExamConfigSection.jsx",
+      "ns": "lecturesPage",
+      "key": "examConfig.noConfigs",
+      "fn": "t"
+    },
+    {
+      "file": "components/ExamConfigSection.jsx",
+      "ns": "lecturesPage",
+      "key": "examConfig.configurationLabel",
+      "fn": "t"
+    },
+    {
+      "file": "components/ExamConfigSection.jsx",
+      "ns": "lecturesPage",
+      "key": "examConfig.selectConfig",
+      "fn": "t"
+    },
+    {
+      "file": "components/ExamConfigSection.jsx",
+      "ns": "lecturesPage",
+      "key": "examConfig.noExistingConfigs",
+      "fn": "t"
+    },
+    {
+      "file": "components/ExamConfigSection.jsx",
+      "ns": "lecturesPage",
+      "key": "examConfig.createNew",
+      "fn": "t"
+    },
+    {
+      "file": "components/ExamConfigSection.jsx",
+      "ns": "lecturesPage",
+      "key": "examConfig.emptyHelp",
+      "fn": "t"
+    },
+    {
+      "file": "components/ExamConfigSection.jsx",
+      "ns": "lecturesPage",
+      "key": "examConfig.newConfiguration",
+      "fn": "t"
+    },
+    {
+      "file": "components/ExamConfigSection.jsx",
+      "ns": "lecturesPage",
+      "key": "examConfig.type",
+      "fn": "t"
+    },
+    {
+      "file": "components/ExamConfigSection.jsx",
+      "ns": "lecturesPage",
+      "key": "examConfig.exam",
+      "fn": "t"
+    },
+    {
+      "file": "components/ExamConfigSection.jsx",
+      "ns": "lecturesPage",
+      "key": "examConfig.homework",
+      "fn": "t"
+    },
+    {
+      "file": "components/ExamConfigSection.jsx",
+      "ns": "lecturesPage",
+      "key": "examConfig.typeHelp",
+      "fn": "t"
+    },
+    {
+      "file": "components/ExamConfigSection.jsx",
+      "ns": "lecturesPage",
+      "key": "examConfig.googleSheetId",
+      "fn": "t"
+    },
+    {
+      "file": "components/ExamConfigSection.jsx",
+      "ns": "lecturesPage",
+      "key": "examConfig.googleSheetHelp",
+      "fn": "t"
+    },
+    {
+      "file": "components/ExamConfigSection.jsx",
+      "ns": "lecturesPage",
+      "key": "examConfig.formUrl",
+      "fn": "t"
+    },
+    {
+      "file": "components/ExamConfigSection.jsx",
+      "ns": "lecturesPage",
+      "key": "examConfig.studentIdentifierColumn",
+      "fn": "t"
+    },
+    {
+      "file": "components/ExamConfigSection.jsx",
+      "ns": "lecturesPage",
+      "key": "examConfig.scoreColumn",
+      "fn": "t"
+    },
+    {
+      "file": "components/ExamConfigSection.jsx",
+      "ns": "lecturesPage",
+      "key": "examConfig.defaultPassingThreshold",
+      "fn": "t"
+    },
+    {
+      "file": "components/ExamConfigSection.jsx",
+      "ns": "lecturesPage",
+      "key": "examConfig.createButton",
+      "fn": "t"
+    },
+    {
+      "file": "components/ExamConfigSection.jsx",
+      "ns": "lecturesPage",
+      "key": "examConfig.passingThreshold",
+      "fn": "t"
+    },
+    {
       "file": "components/lectureCard.jsx",
       "ns": "lectures",
       "key": "showLess",
@@ -794,15 +896,9 @@
       "fn": "t"
     },
     {
-      "file": "components/lectureCard.jsx",
-      "ns": "lectures",
-      "key": "available :",
-      "fn": "t"
-    },
-    {
       "file": "components/LectureCreationModal.jsx",
       "ns": "lecturesPage",
-      "key": "fields.thumbnail",
+      "key": "sections.publishSettings",
       "fn": "t"
     },
     {
@@ -868,24 +964,6 @@
       "fn": "t"
     },
     {
-      "file": "pages/Teachers.jsx",
-      "ns": "teachers",
-      "key": "filters.all",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Teachers.jsx",
-      "ns": "teachers",
-      "key": "filters.all",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Teachers.jsx",
-      "ns": "teachers",
-      "key": "filters.select",
-      "fn": "t"
-    },
-    {
       "file": "pages/User Dashboard/Lecture Page/ContainerPage.jsx",
       "ns": "lecturesPage",
       "key": "containersPage.unknown",
@@ -894,7 +972,25 @@
     {
       "file": "pages/User Dashboard/Lecture Page/LecturesPage.jsx",
       "ns": "lecturesPage",
+      "key": "lecturesPage.messages.lectureUpdatedSuccessfully",
+      "fn": "t"
+    },
+    {
+      "file": "pages/User Dashboard/Lecture Page/LecturesPage.jsx",
+      "ns": "lecturesPage",
       "key": "lecturesPage.messages.lectureCreatedSuccessfully",
+      "fn": "t"
+    },
+    {
+      "file": "pages/User Dashboard/Lecture Page/LecturesPage.jsx",
+      "ns": "lecturesPage",
+      "key": "lecturesPage.buttons.edit",
+      "fn": "t"
+    },
+    {
+      "file": "pages/User Dashboard/Lecture Page/LecturesPage.jsx",
+      "ns": "lecturesPage",
+      "key": "lecturesPage.buttons.edit",
       "fn": "t"
     },
     {
@@ -996,6 +1092,12 @@
     {
       "file": "pages/User Dashboard/Admin dashboard/home/PromoCodesTable.jsx",
       "ns": "admin",
+      "key": "promoCodes.subtitle",
+      "fn": "t"
+    },
+    {
+      "file": "pages/User Dashboard/Admin dashboard/home/PromoCodesTable.jsx",
+      "ns": "admin",
       "key": "modals.confirmBulkDelete",
       "fn": "t"
     },
@@ -1050,7 +1152,25 @@
     {
       "file": "pages/teacher details/Teacher-details.jsx",
       "ns": "teacherDetails",
+      "key": "courseType",
+      "fn": "t"
+    },
+    {
+      "file": "pages/teacher details/Teacher-details.jsx",
+      "ns": "teacherDetails",
       "key": "error.invalid_user_id",
+      "fn": "t"
+    },
+    {
+      "file": "pages/teacher details/Teacher-details.jsx",
+      "ns": "teacherDetails",
+      "key": "lecturer",
+      "fn": "t"
+    },
+    {
+      "file": "pages/teacher details/Teacher-details.jsx",
+      "ns": "teacherDetails",
+      "key": "defaultSubject",
       "fn": "t"
     },
     {
@@ -1096,12 +1216,6 @@
       "fn": "t"
     },
     {
-      "file": "pages/Packages Page/packagesPage.jsx",
-      "ns": "packages",
-      "key": "purchaseModal.insufficientPoints",
-      "fn": "t"
-    },
-    {
       "file": "pages/Login/login.jsx",
       "ns": "login",
       "key": "errors.fetchUserDataError",
@@ -1114,33 +1228,15 @@
       "fn": "t"
     },
     {
-      "file": "pages/Login/VerifyOTP.jsx",
-      "ns": "login",
-      "key": "verifying",
+      "file": "pages/Lecturer Dashboard/CourseGrid.jsx",
+      "ns": "lecturerDashboard",
+      "key": "edit",
       "fn": "t"
     },
     {
       "file": "pages/Lecturer Dashboard/FeaturedCourses.jsx",
       "ns": "lectures",
       "key": "details",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/InstructorsList.jsx",
-      "ns": "lecturerDashboard",
-      "key": "Failed to create assistant",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/InstructorsList.jsx",
-      "ns": "lecturerDashboard",
-      "key": "Failed to delete assistant",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/InstructorsList.jsx",
-      "ns": "lecturerDashboard",
-      "key": "Failed to update assistant",
       "fn": "t"
     },
     {
@@ -1165,18 +1261,6 @@
       "file": "pages/Lecturer Dashboard/LecturerDashboard.jsx",
       "ns": "lecturerDashboard",
       "key": "view_all",
-      "fn": "t"
-    },
-    {
-      "file": "pages/KalimaStore/Market.jsx",
-      "ns": "kalimaStore-Market",
-      "key": "allSubSections",
-      "fn": "t"
-    },
-    {
-      "file": "pages/KalimaStore/Market.jsx",
-      "ns": "kalimaStore-Market",
-      "key": "product.new",
       "fn": "t"
     },
     {
@@ -1318,6 +1402,120 @@
       "fn": "t"
     },
     {
+      "file": "components/ExamConfigSection.jsx",
+      "ns": "lecturesPage",
+      "key": "examConfig.noConfigs",
+      "fn": "t"
+    },
+    {
+      "file": "components/ExamConfigSection.jsx",
+      "ns": "lecturesPage",
+      "key": "examConfig.configurationLabel",
+      "fn": "t"
+    },
+    {
+      "file": "components/ExamConfigSection.jsx",
+      "ns": "lecturesPage",
+      "key": "examConfig.selectConfig",
+      "fn": "t"
+    },
+    {
+      "file": "components/ExamConfigSection.jsx",
+      "ns": "lecturesPage",
+      "key": "examConfig.noExistingConfigs",
+      "fn": "t"
+    },
+    {
+      "file": "components/ExamConfigSection.jsx",
+      "ns": "lecturesPage",
+      "key": "examConfig.createNew",
+      "fn": "t"
+    },
+    {
+      "file": "components/ExamConfigSection.jsx",
+      "ns": "lecturesPage",
+      "key": "examConfig.emptyHelp",
+      "fn": "t"
+    },
+    {
+      "file": "components/ExamConfigSection.jsx",
+      "ns": "lecturesPage",
+      "key": "examConfig.newConfiguration",
+      "fn": "t"
+    },
+    {
+      "file": "components/ExamConfigSection.jsx",
+      "ns": "lecturesPage",
+      "key": "examConfig.type",
+      "fn": "t"
+    },
+    {
+      "file": "components/ExamConfigSection.jsx",
+      "ns": "lecturesPage",
+      "key": "examConfig.exam",
+      "fn": "t"
+    },
+    {
+      "file": "components/ExamConfigSection.jsx",
+      "ns": "lecturesPage",
+      "key": "examConfig.homework",
+      "fn": "t"
+    },
+    {
+      "file": "components/ExamConfigSection.jsx",
+      "ns": "lecturesPage",
+      "key": "examConfig.typeHelp",
+      "fn": "t"
+    },
+    {
+      "file": "components/ExamConfigSection.jsx",
+      "ns": "lecturesPage",
+      "key": "examConfig.googleSheetId",
+      "fn": "t"
+    },
+    {
+      "file": "components/ExamConfigSection.jsx",
+      "ns": "lecturesPage",
+      "key": "examConfig.googleSheetHelp",
+      "fn": "t"
+    },
+    {
+      "file": "components/ExamConfigSection.jsx",
+      "ns": "lecturesPage",
+      "key": "examConfig.formUrl",
+      "fn": "t"
+    },
+    {
+      "file": "components/ExamConfigSection.jsx",
+      "ns": "lecturesPage",
+      "key": "examConfig.studentIdentifierColumn",
+      "fn": "t"
+    },
+    {
+      "file": "components/ExamConfigSection.jsx",
+      "ns": "lecturesPage",
+      "key": "examConfig.scoreColumn",
+      "fn": "t"
+    },
+    {
+      "file": "components/ExamConfigSection.jsx",
+      "ns": "lecturesPage",
+      "key": "examConfig.defaultPassingThreshold",
+      "fn": "t"
+    },
+    {
+      "file": "components/ExamConfigSection.jsx",
+      "ns": "lecturesPage",
+      "key": "examConfig.createButton",
+      "fn": "t"
+    },
+    {
+      "file": "components/ExamConfigSection.jsx",
+      "ns": "lecturesPage",
+      "key": "examConfig.passingThreshold",
+      "fn": "t"
+    },
+    {
       "file": "components/lectureCard.jsx",
       "ns": "lectures",
       "key": "showLess",
@@ -1330,15 +1528,9 @@
       "fn": "t"
     },
     {
-      "file": "components/lectureCard.jsx",
-      "ns": "lectures",
-      "key": "available :",
-      "fn": "t"
-    },
-    {
       "file": "components/LectureCreationModal.jsx",
       "ns": "lecturesPage",
-      "key": "fields.thumbnail",
+      "key": "sections.publishSettings",
       "fn": "t"
     },
     {

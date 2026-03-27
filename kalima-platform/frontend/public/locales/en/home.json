@@ -1,6 +1,7 @@
 {
   "welcome": {
     "title": "Welcome to {{highlight}}Fekra{{/highlight}} Platform",
+    "kalima": "Fekra",
     "description": "Fekra Platform is an e-learning platform providing resources for students from 4th grade through 12th grade.",
     "Fekra": "Fekra",
     "maleStudentAlt": "Male student",

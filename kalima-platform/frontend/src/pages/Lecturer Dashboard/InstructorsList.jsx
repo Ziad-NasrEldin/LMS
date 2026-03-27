@@ -110,7 +110,7 @@ export default function InstructorsList() {
         setShowAddModal(false)
         resetForm()
       } else {
-        throw new Error(result.error || t("Failed to create assistant"))
+        throw new Error(result.error || t("createAssistantError"))
       }
     } catch (err) {
       setSubmitError(err.message)
@@ -150,7 +150,7 @@ export default function InstructorsList() {
         }
         setShowDeleteModal(false)
       } else {
-        throw new Error(result.error || t("Failed to delete assistant"))
+        throw new Error(result.error || t("deleteAssistantError"))
       }
     } catch (err) {
       setSubmitError(err.message)
@@ -186,7 +186,7 @@ export default function InstructorsList() {
         setEditingAssistant(null)
         resetForm()
       } else {
-        throw new Error(result.error || t("Failed to update assistant"))
+        throw new Error(result.error || t("updateAssistantError"))
       }
     } catch (err) {
       setSubmitError(err.message)
@@ -242,7 +242,7 @@ export default function InstructorsList() {
             {t("assistants")}
           </h2>
           <p className="mt-2 text-sm md:text-base" style={{ color: TOKENS.slateText }}>
-            {isRTL ? "إدارة المساعدين ضمن نفس لغة البطاقات الحديثة" : "Manage assistants with the same modern card language."}
+            {t("assistantsHint")}
           </p>
         </div>
         <button

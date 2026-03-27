@@ -31,6 +31,7 @@ import {
   FiVolumeX,
   FiMaximize,
   FiMinimize,
+  FiEdit,
 } from "react-icons/fi"
 
 // Vidstack imports
@@ -215,6 +216,25 @@ const LectureDisplay = () => {
     ];
     return userRole && allowedRoles.includes(userRole);
   };
+
+  const canEditLecture = ["Lecturer", "Admin", "SubAdmin", "Moderator"].includes(userRole)
+
+  const handleEditLecture = () => {
+    if (!lecture || !canEditLecture) {
+      return
+    }
+
+    const lecturesPageRoute =
+      userRole === "Lecturer"
+        ? "/dashboard/lecturer-dashboard/lectures-page"
+        : "/dashboard/admin-dashboard/lectures-page"
+
+    navigate(lecturesPageRoute, {
+      state: {
+        lectureEditTarget: lecture,
+      },
+    })
+  }
 
   // Fetch user data first
   useEffect(() => {
@@ -1365,6 +1385,17 @@ const LectureDisplay = () => {
         <h1 className="text-2xl font-bold mb-4 text-center md:text-right md:text-4xl leading-tight">
           {lecture?.name || t("loadingLecture")}
         </h1>
+
+        {canEditLecture && (
+          <button
+            type="button"
+            onClick={handleEditLecture}
+            className="btn btn-outline btn-primary btn-sm mb-4"
+          >
+            <FiEdit className={isRTL ? "ml-2" : "mr-2"} />
+            {t("edit")}
+          </button>
+        )}
 
         {userRole && userRole !== "Student" && (
           <div className="alert alert-info mb-4 shadow-md">

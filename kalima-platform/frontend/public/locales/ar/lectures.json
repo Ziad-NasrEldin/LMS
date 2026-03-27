@@ -11,8 +11,27 @@
   "enroll": "التسجيل",
   "purchased": "مشترك",
   "purchase": "شراء",
+  "details": "التفاصيل",
+  "purchaseMessages": {
+    "success": "تم شراء المحاضرة بنجاح",
+    "failed": "فشل شراء المحاضرة"
+  },
   "available : ": " المتاحة",
+  "availablePoints": "المتاح:",
   "noPointsBalances": "لا يوجد نقاط متاحة",
+  "labels": {
+    "lecture": "محاضرة"
+  },
+  "fallback": {
+    "notSpecified": "غير محدد",
+    "unknownTeacher": "مدرس غير محدد",
+    "unknownRole": "محاضر",
+    "noDescription": "لا يوجد وصف"
+  },
+  "alts": {
+    "background": "خلفية",
+    "underline": "خط سفلي"
+  },
   "filters": {
     "reset": "إعادة تعيين الفلاتر",
     "stage": "دور المحاضر",
@@ -67,7 +86,11 @@
     "loading": "جاري التحميل..."
   },
   "errors": {
-    "fetchStudents": "فشل في جلب بيانات الطلاب"
+    "fetchStudents": "فشل في جلب بيانات الطلاب",
+    "fetchLectures": "فشل في تحميل المحاضرات",
+    "loginRequired": "يرجى تسجيل الدخول أولاً",
+    "lectureNotFound": "المحاضرة غير موجودة",
+    "insufficientPoints": "لا توجد نقاط كافية"
   },
   "lesson": {
     "detailsTitle": "تفاصيل الدرس",

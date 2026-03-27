@@ -1,10 +1,17 @@
-## 2026-03-27 - Lecturer sidebar label correction - GPT-5.4 mini
-- Renamed the lecturer sidebar item from Lectures to My Courses by reusing the shared courses translation key.
-- Kept the route unchanged so the label now matches the actual courses management page.
+## 2026-03-27 - Lecture edit entry points - GPT-5.4 mini
+- Added lecture edit buttons on the lecturer-facing lecture detail and playback screens, reusing the existing My Lectures edit modal flow through navigation state.
+- Updated the shared lecture list page to auto-open the edit modal when it receives a lecture target from those detail screens.
 
-## 2026-03-27 - Logging rule reminder - GPT-5.4 mini
-- Keep appending concise release/update notes to Agent-Logs.md after each finished task.
-- Skip low-value verification bullets so the log stays focused on shipped changes.
+## 2026-03-27 - Lecturer My Lectures crash fix - GPT-5.4 mini
+- Reworked the lecturer My Lectures page to use the edit-aware lecture modal state cleanly and removed the render-time fallback that was causing the production crash.
+- Added lecture edit entry points in the list UI so existing lectures can be opened for updates directly from the lecturer dashboard.
+
+## 2026-03-27 - Translation implementation batch 1 (frontend) - GPT-5.3-Codex
+- Started the platform translation revision by removing hardcoded UI copy and fallback literals in high-traffic surfaces: teachers, lectures, lecture card, verify OTP, market labels, assistant management, and upload progress.
+- Added and aligned EN/AR locale keys for the new UI strings (filters/pagination labels, lecture fallbacks, OTP prompts, upload statuses/errors, market NEW badge, and assistant section hint).
+- Kept existing behavior and routes intact while shifting rendering to translation keys so future locale updates can be handled in locale JSON files only.
+
+
 
 ## 2026-03-27 - Lecturer course and container edit support - GPT-5.4 mini
 - Added lecturer-owned edit flows for course containers and child containers by reusing the existing course form and container modal in edit mode.
@@ -46,19 +53,8 @@
 - Introduced shared lecture access utility functions, added backend regression tests for threshold resolution and URL/link hardening, and wired `npm run test:regression` in backend scripts.
 - Redesigned the student exam/homework requirement cards in lecture view to show clear per-requirement status, thresholds, action links, and a recheck-access workflow.
 
-## 2026-03-27 - Courses page newest-first default - GPT-5.4 mini
-- Updated the public courses page to sort course containers by newest createdAt first before pagination.
-- Made the request explicit with `sort: "-createdAt"` and added a local fallback sort so the default remains newest-first even if upstream ordering changes.
 
-## 2026-03-27 - Public courses search field - GPT-5.4 mini
-- Added a client-side search field to the public courses page so users can filter courses by title, subject, or teacher.
-- Kept the newest-first ordering as the default by searching within the already sorted course list.
-- Added EN/AR search labels and placeholders while preserving pagination and reset behavior.
 
-## 2026-03-27 - Lecture play-start accounting endpoint - GPT-5.4 mini
-- Added a dedicated atomic play-start endpoint for student lecture access accounting and kept the legacy consume-view route as a compatibility alias.
-- Swapped the lecture player to the new play-start helper and surfaced visible retry status during soft fallback attempts.
-- Locked the lecture access flow to the student owner path while preserving the existing entitlement and idempotency checks.
 
 ## 2026-03-27 - Teacher details course link fix - GPT-5.4 mini
 - Wired the teacher-details page course cards to the public course details route so the Show Details button opens the specific course instead of doing nothing.
@@ -224,4 +220,26 @@ ounded-[2rem]\), removed hard \shadow-sm\ defaults from DaisyUI, updated primary
 - Corrected homework config model reference and unified threshold precedence across access-check and verification endpoints (lecture override first, config default fallback).
 - Hardened config/link inputs by validating public HTTP/HTTPS URLs, blocked server-side download proxying for link attachments, and added role/ownership checks for lecture attachment uploads.
 - Tightened student lecture gating in the frontend by removing the permissive fallback that previously granted access when verification checks failed.
+
+## 2026-03-27 - Lecturer sidebar label correction - GPT-5.4 mini
+- Renamed the lecturer sidebar item from Lectures to My Courses by reusing the shared courses translation key.
+- Kept the route unchanged so the label now matches the actual courses management page.
+
+## 2026-03-27 - Logging rule reminder - GPT-5.4 mini
+- Keep appending concise release/update notes to Agent-Logs.md after each finished task.
+- Skip low-value verification bullets so the log stays focused on shipped changes.
+
+## 2026-03-27 - Courses page newest-first default - GPT-5.4 mini
+- Updated the public courses page to sort course containers by newest createdAt first before pagination.
+- Made the request explicit with sort: "-createdAt" and added a local fallback sort so the default remains newest-first even if upstream ordering changes.
+
+## 2026-03-27 - Public courses search field - GPT-5.4 mini
+- Added a client-side search field to the public courses page so users can filter courses by title, subject, or teacher.
+- Kept the newest-first ordering as the default by searching within the already sorted course list.
+- Added EN/AR search labels and placeholders while preserving pagination and reset behavior.
+
+## 2026-03-27 - Lecture play-start accounting endpoint - GPT-5.4 mini
+- Added a dedicated atomic play-start endpoint for student lecture access accounting and kept the legacy consume-view route as a compatibility alias.
+- Swapped the lecture player to the new play-start helper and surfaced visible retry status during soft fallback attempts.
+- Locked the lecture access flow to the student owner path while preserving the existing entitlement and idempotency checks.
 

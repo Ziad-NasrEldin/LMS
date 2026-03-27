@@ -8,6 +8,7 @@
   "noSubject": "No subject",
   "addNewCourse": "Add New Course",
   "view": "View",
+  "edit": "Edit",
   "delete": "Delete",
   "confirmDeleteContainer": "Are you sure you want to delete this course?",
   "failedToDeleteContainer": "Failed to delete course",
@@ -17,6 +18,9 @@
   "noCourses": "You haven't created any courses yet.",
 
   "assistants": "Assistants",
+  "top_categories": "Top Categories",
+  "most_popular": "Most popular",
+  "assistantsHint": "Manage assistants with the same modern card language.",
   "addAssistant": "Add Assistant",
   "noAssistants": "You haven't added any assistants yet.",
   "addYourFirstAssistant": "Add your first assistant",

@@ -4,9 +4,18 @@
     "defaultSubject": "Teacher",
     "defaultExperience": "Extensive teaching experience",
     "allGrades": "All Grade Levels",
+    "hero": {
+      "quickMatch": "Find the right teacher quickly by name and subject."
+    },
+    "labels": {
+      "teacherCount": "{{count}} teachers",
+      "activeFilters": "{{count}} active filters"
+    },
     "filters": {
       "stage": "Educational Stage",
-      "subject": "Subject"
+      "subject": "Subject",
+      "all": "All",
+      "select": "Select"
     },
     "stages": {
       "primary": "Primary Stage",
@@ -24,9 +33,16 @@
       "resetFilters": "Reset Filters",
       "searchOptions": "Search Options",
       "showTeachers": "Show Teachers",
+      "showFilters": "Show Filters",
+      "hideFilters": "Hide Filters",
       "tryAgain": "Try Again",
       "loadMore": "Load More Teachers",
       "viewDetails": "View Details"
+    },
+    "pagination": {
+      "previous": "Previous",
+      "next": "Next",
+      "showingRange": "Showing {{start}} - {{end}} of {{total}} teachers"
     },
     "placeholders": {
       "searchName": "Search by name"

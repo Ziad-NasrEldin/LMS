@@ -3,8 +3,15 @@
     "save": "حفظ",
     "cancel": "إلغاء",
     "toggleSidebar": "تبديل القائمة الجانبية",
+    "dir": "rtl",
     "General Points": "نقاط عامة",
     "Total Points": "نقاط كلية",
+    "passwordStrength": {
+      "label": "قوة كلمة المرور",
+      "weak": "ضعيفة",
+      "medium": "متوسطة",
+      "strong": "قوية"
+    },
 
     "personalInfo": {
     "title": "المعلومات الشخصية",

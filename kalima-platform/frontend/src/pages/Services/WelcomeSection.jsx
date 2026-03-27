@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { useTranslation, Trans } from "react-i18next";
+import { useTranslation } from "react-i18next";
 
 const WelcomeSection = React.memo(() => {
   const { t, i18n } = useTranslation("home");
@@ -15,7 +15,7 @@ const WelcomeSection = React.memo(() => {
     }),
     []
   );
-  const titleParts = t("welcome.title").split(/({{highlight}}|{{\/highlight}})/);
+
   const HighlightedText = ({ children, isRTL }) => (
     <span className="relative inline-block text-primary">
       {children}
