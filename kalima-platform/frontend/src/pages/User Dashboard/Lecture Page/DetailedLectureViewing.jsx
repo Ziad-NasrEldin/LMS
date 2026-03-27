@@ -141,6 +141,11 @@ const DetailedLectureView = () => {
         }
 
         if (lectureResult.success) {
+          if (lectureResult.status === "restricted") {
+            setError(lectureResult.message || t("noAccessToLecture"))
+            return
+          }
+
           setLecture(lectureResult.data.container)
 
           // Fetch lecture attachments

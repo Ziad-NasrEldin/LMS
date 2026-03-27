@@ -1,26 +1,50 @@
 const express = require("express");
 const router = express.Router();
 const studentLectureAccessController = require("../controllers/studentLectureAccessController");
+const { verifyRoles } = require("../controllers/authController");
 const verifyJWT = require("../middleware/verifyJWT");
-
 
 router.use(verifyJWT);
 
-router.route("/check/:lectureId")
-  .get(studentLectureAccessController.checkLectureAccess);
+router
+  .route("/check/:lectureId")
+  .get(verifyRoles("Student"), studentLectureAccessController.checkLectureAccess);
 
-router.route("/lecture/:lectureId")
-  .get(studentLectureAccessController.getLectureAccessByLectureId);
+router
+  .route("/lecture/:lectureId")
+  .get(
+    verifyRoles("Lecturer", "Assistant", "Admin", "SubAdmin", "Moderator"),
+    studentLectureAccessController.getLectureAccessByLectureId
+  );
 
 router
   .route("/")
-  .get(studentLectureAccessController.getAllStudentLectureAccess)
-  .post(studentLectureAccessController.createStudentLectureAccess);
+  .get(
+    verifyRoles("Admin", "SubAdmin", "Moderator"),
+    studentLectureAccessController.getAllStudentLectureAccess
+  )
+  .post(
+    verifyRoles("Admin", "SubAdmin", "Moderator"),
+    studentLectureAccessController.createStudentLectureAccess
+  );
+
+router
+  .route("/:id/consume-view")
+  .post(verifyRoles("Student"), studentLectureAccessController.consumeLectureView);
 
 router
   .route("/:id")
-  .get(studentLectureAccessController.getStudentLectureAccess)
-  .patch(studentLectureAccessController.updateStudentLectureAccess)
-  .delete(studentLectureAccessController.deleteStudentLectureAccess);
+  .get(
+    verifyRoles("Student", "Lecturer", "Assistant", "Admin", "SubAdmin", "Moderator"),
+    studentLectureAccessController.getStudentLectureAccess
+  )
+  .patch(
+    verifyRoles("Lecturer", "Assistant", "Admin", "SubAdmin", "Moderator"),
+    studentLectureAccessController.updateStudentLectureAccess
+  )
+  .delete(
+    verifyRoles("Admin", "SubAdmin", "Moderator"),
+    studentLectureAccessController.deleteStudentLectureAccess
+  );
 
 module.exports = router;

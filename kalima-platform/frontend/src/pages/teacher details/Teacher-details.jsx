@@ -3,7 +3,7 @@
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect } from "react"
 import { Loader, BookOpen, GraduationCap, Star, Award, Users } from "lucide-react"
-import { useParams } from "react-router-dom"
+import { Link, useParams } from "react-router-dom"
 import { getUserById } from "../../routes/fetch-users"
 import { getContainersByLecturerId } from "../../routes/lectures"
 
@@ -64,9 +64,12 @@ const CourseCard = ({ course }) => {
           <span className="text-xs font-bold text-primary bg-primary/10 px-4 py-1.5 rounded-full text-center truncate max-w-full">
             {course.type || t('courseType')}
           </span>
-          <button className="btn btn-primary bg-accent border-none text-base-content hover:bg-accent/90 hover:scale-105 btn-sm h-10 rounded-full px-6 w-full sm:w-auto transition-transform">
+          <Link
+            to={`/courses/${course.id}`}
+            className="btn btn-primary bg-accent border-none text-base-content hover:bg-accent/90 hover:scale-105 btn-sm h-10 rounded-full px-6 w-full sm:w-auto transition-transform"
+          >
             {t('viewDetails', 'عرض التفاصيل')}
-          </button>
+          </Link>
         </div>
       </div>
     </div>

@@ -338,6 +338,8 @@ export const getLectureById = async (lectureId) => {
 
     return {
       success: true,
+      status: response.data.status,
+      message: response.data.message,
       data: response.data.data, // Access the data property from the response
     }
   } catch (error) {

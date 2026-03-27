@@ -38,6 +38,14 @@ export default function CoursesPage() {
   const { t, i18n } = useTranslation("courses")
   const isRTL = i18n.language === "ar"
 
+  const sortByNewest = useCallback((list = []) => {
+    return [...list].sort((left, right) => {
+      const leftDate = new Date(left.createdAt || 0).getTime()
+      const rightDate = new Date(right.createdAt || 0).getTime()
+      return rightDate - leftDate
+    })
+  }, [])
+
   // Filter states
   const [selectedStage, setSelectedStage] = useState("")
   const [selectedGrade, setSelectedGrade] = useState("")
@@ -94,36 +102,35 @@ export default function CoursesPage() {
   // }, [])
 
   const fetchContainers = async () => {
-  setLoading(true);
-  setError("");
-  try {
-    // Fetch only containers with type "course" and a large limit
-    const result = await getAllContainers({
-      type: "course",
-      limit: 200,
-    });
+    setLoading(true)
+    setError("")
+    try {
+      const result = await getAllContainers({
+        type: "course",
+        limit: 200,
+        sort: "-createdAt",
+      })
 
-    if (result.status === "success") {
-      const containers = result.data.containers;
-      // Apply pagination
-      const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-      const endIndex = startIndex + ITEMS_PER_PAGE;
-      const paginatedContainers = containers.slice(startIndex, endIndex);
+      if (result.status === "success") {
+        const containers = sortByNewest(result.data.containers || [])
+        const startIndex = (currentPage - 1) * ITEMS_PER_PAGE
+        const endIndex = startIndex + ITEMS_PER_PAGE
+        const paginatedContainers = containers.slice(startIndex, endIndex)
 
-      setContainers(containers); // Store all fetched course containers
-      setFilteredContainers(paginatedContainers); // Set paginated subset
-      setTotalResults(containers.length);
-      setTotalPages(Math.ceil(containers.length / ITEMS_PER_PAGE));
-    } else {
-      setError(result.error || "Failed to fetch containers");
+        setContainers(containers)
+        setFilteredContainers(paginatedContainers)
+        setTotalResults(containers.length)
+        setTotalPages(Math.ceil(containers.length / ITEMS_PER_PAGE))
+      } else {
+        setError(result.error || "Failed to fetch containers")
+      }
+    } catch (err) {
+      console.error("Error fetching containers:", err)
+      setError("حدث خطأ أثناء تحميل البيانات")
+    } finally {
+      setLoading(false)
     }
-  } catch (err) {
-    console.error("Error fetching containers:", err);
-    setError("حدث خطأ أثناء تحميل البيانات");
-  } finally {
-    setLoading(false);
   }
-};
 
   const resetFilters = useCallback(() => {
     setSelectedStage("")
@@ -136,12 +143,12 @@ export default function CoursesPage() {
     setCurrentPage(1)
 
     // Reset to show all course containers with pagination
-    const courseContainers = containers.filter((container) => container.type === "course")
+    const courseContainers = sortByNewest(containers.filter((container) => container.type === "course"))
     const paginatedContainers = courseContainers.slice(0, ITEMS_PER_PAGE)
     setFilteredContainers(paginatedContainers)
     setTotalResults(courseContainers.length)
     setTotalPages(Math.ceil(courseContainers.length / ITEMS_PER_PAGE))
-  }, [containers])
+  }, [containers, sortByNewest])
 
   const generateCourseData = (containersData) =>
     containersData.map((container, index) => {
@@ -198,7 +205,7 @@ export default function CoursesPage() {
 
   const applyFilters = useCallback(() => {
     // Filter the containers based on selected filters
-    let filtered = [...containers].filter((container) => container.type === "course")
+    let filtered = sortByNewest(containers.filter((container) => container.type === "course"))
 
     // Apply stage filter
     if (selectedStage) {
@@ -290,6 +297,7 @@ export default function CoursesPage() {
     selectedCourseStatus,
     selectedPrice,
     levels,
+    sortByNewest,
     setShowFilters,
   ])
 
@@ -314,7 +322,7 @@ export default function CoursesPage() {
       setCurrentPage(newPage)
 
       // Get all filtered containers (without pagination)
-      const filtered = [...containers].filter((container) => container.type === "course")
+      const filtered = sortByNewest(containers.filter((container) => container.type === "course"))
 
       // Apply all active filters
       if (
@@ -332,7 +340,7 @@ export default function CoursesPage() {
         setFilteredContainers(paginatedContainers)
       } else {
         // No filters active, just paginate the course containers
-        const courseContainers = containers.filter((container) => container.type === "course")
+        const courseContainers = sortByNewest(containers.filter((container) => container.type === "course"))
         const startIndex = (newPage - 1) * ITEMS_PER_PAGE
         const endIndex = startIndex + ITEMS_PER_PAGE
         const paginatedContainers = courseContainers.slice(startIndex, endIndex)

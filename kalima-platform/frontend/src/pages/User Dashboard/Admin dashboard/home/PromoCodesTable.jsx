@@ -8,13 +8,27 @@ import { getPromoCodes, deletePromoCode, deleteBulkPromoCodes } from "../../../.
 import { getAllStudents } from "../../../../routes/fetch-users"
 import { designTokens } from "../../../../constants/designTokens"
 
+const TOKENS = designTokens.colors
+const SHADOWS = designTokens.shadows
+const RADIUS = designTokens.radius
+
 const PromoCodesTable = () => {
   const { t, i18n } = useTranslation("admin")
   const isRTL = i18n.language === "ar"
   const dir = isRTL ? "rtl" : "ltr"
 
-  const TOKENS = designTokens.colors;
-  const SHADOWS = designTokens.shadows;
+  const cardStyle = {
+    background: "linear-gradient(180deg, rgba(248,243,233,0.96) 0%, rgba(241,243,246,0.98) 100%)",
+    boxShadow: SHADOWS.level1,
+    borderRadius: RADIUS.section,
+    border: "1px solid rgba(17,24,39,0.06)",
+  }
+
+  const insetCardStyle = {
+    background: "rgba(255,255,255,0.72)",
+    border: "1px solid rgba(17,24,39,0.06)",
+    borderRadius: RADIUS.card,
+  }
   const [filters, setFilters] = useState({
     isRedeemed: "", // 'true' | 'false' | ''
     type: "general", //general | specific | false
@@ -206,19 +220,22 @@ const PromoCodesTable = () => {
       className="p-6 md:p-8 my-10" 
       dir={dir}
       style={{ 
-        background: TOKENS.neutralCloud, 
-        boxShadow: SHADOWS.level1, 
-        borderRadius: "2rem",
-        border: "1px solid rgba(17,24,39,0.05)"
+        ...cardStyle,
       }}
     >
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 border-b pb-4" style={{ borderColor: "rgba(17,24,39,0.1)" }}>
-        <h2 className="text-2xl font-extrabold" style={{ color: TOKENS.deepTeal }}>{t("promoCodes.title")}</h2>
+        <div>
+          <h2 className="text-2xl font-extrabold" style={{ color: TOKENS.deepTeal }}>{t("promoCodes.title")}</h2>
+          <p className="mt-1 text-sm" style={{ color: TOKENS.slateText }}>
+            {t("promoCodes.subtitle", { defaultValue: isRTL ? "إدارة الأكواد النشطة والمستردة من بطاقة واحدة." : "Manage active and redeemed codes from one card." })}
+          </p>
+        </div>
 
           {hasUnredeemedCodes && (
             <div className="flex gap-2">
               <button
-                className="btn btn-error btn-sm"
+                className="btn btn-sm border-none text-white"
+                style={{ background: TOKENS.warmMango, boxShadow: "0 8px 18px rgba(243,154,63,0.22)" }}
                 onClick={() => setShowBulkDeleteConfirm(true)}
                 disabled={selectedCodes.length === 0 || isDeleting}
               >
@@ -245,7 +262,7 @@ const PromoCodesTable = () => {
               <div className="alert alert-error mb-4">{state.error || studentsError || deleteError}</div>
             )}
 
-            <div className="flex flex-wrap gap-4 mb-4">
+            <div className="flex flex-wrap gap-4 mb-4 rounded-[1.4rem] p-4" style={insetCardStyle}>
               <select
                 className="select select-bordered"
                 value={filters.isRedeemed}
@@ -268,14 +285,14 @@ const PromoCodesTable = () => {
                 <option value="promo">{t("filters.promo")}</option>
               </select>
 
-              <button className="btn btn-primary" onClick={handleApplyFilters}>
+              <button className="btn border-none text-white" style={{ background: TOKENS.deepTeal }} onClick={handleApplyFilters}>
                 {t("filters.apply")}
               </button>
             </div>
 
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto rounded-[1.4rem] border" style={{ borderColor: "rgba(17,24,39,0.08)", background: "rgba(255,255,255,0.8)" }}>
               <table className="table w-full">
-                <thead>
+                <thead style={{ background: "rgba(77,179,194,0.06)" }}>
                   <tr>
                     {hasUnredeemedCodes && (
                       <th>
@@ -301,7 +318,7 @@ const PromoCodesTable = () => {
                 </thead>
                 <tbody>
                   {paginatedCodes.map((code) => (
-                    <tr key={code._id}>
+                    <tr key={code._id} className="hover:bg-base-200/40 transition-colors">
                       {hasUnredeemedCodes && (
                         <td>
                           {!code.isRedeemed && (
@@ -317,7 +334,14 @@ const PromoCodesTable = () => {
                       <td className="font-mono">{code.code}</td>
                       <td>{code.pointsAmount?.toLocaleString() || "0"}</td>
                       <td>
-                        <span className={`badge ${code.isRedeemed ? "badge-success" : "badge-warning"}`}>
+                        <span
+                          className="badge"
+                          style={{
+                            background: code.isRedeemed ? "rgba(20,106,120,0.12)" : "rgba(243,154,63,0.14)",
+                            color: code.isRedeemed ? TOKENS.deepTeal : TOKENS.warmMango,
+                            border: "none",
+                          }}
+                        >
                           {code.isRedeemed ? t("status.redeemed") : t("status.active")}
                         </span>
                       </td>
@@ -326,7 +350,8 @@ const PromoCodesTable = () => {
                       <td>
                         {!code.isRedeemed && (
                           <button
-                            className="btn btn-error btn-sm"
+                            className="btn btn-sm border-none text-white"
+                            style={{ background: TOKENS.warmMango }}
                             onClick={() => {
                               setCodeToDelete(code.code)
                               setShowDeleteConfirm(true)
@@ -367,10 +392,10 @@ const PromoCodesTable = () => {
       {/* Single Delete Confirmation Modal */}
       {showDeleteConfirm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-base-100 p-6 rounded-lg shadow-xl max-w-md w-full">
+          <div className="p-6 max-w-md w-full" style={{ ...cardStyle, background: "rgba(255,255,255,0.96)" }}>
             <h3 className="font-bold text-lg mb-4">{t("modals.confirmDelete")}</h3>
             <p>{t("modals.deleteCodeConfirm")}</p>
-            <p className="font-mono bg-base-200 p-2 rounded my-2">{codeToDelete}</p>
+            <p className="font-mono p-2 rounded my-2" style={{ background: TOKENS.neutralCloud }}>{codeToDelete}</p>
             <div className="modal-action">
               <button
                 className="btn btn-outline"
@@ -382,7 +407,7 @@ const PromoCodesTable = () => {
               >
                 {t("admin.actions.cancel")}
               </button>
-              <button className="btn btn-error" onClick={handleDeleteCode} disabled={isDeleting}>
+              <button className="btn border-none text-white" style={{ background: TOKENS.warmMango }} onClick={handleDeleteCode} disabled={isDeleting}>
                 {isDeleting ? <ImSpinner8 className="animate-spin" /> : t("admin.actions.delete")}
               </button>
             </div>
@@ -393,11 +418,11 @@ const PromoCodesTable = () => {
       {/* Bulk Delete Confirmation Modal */}
       {showBulkDeleteConfirm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-base-100 p-6 rounded-lg shadow-xl max-w-md w-full">
+          <div className="p-6 max-w-md w-full" style={{ ...cardStyle, background: "rgba(255,255,255,0.96)" }}>
             <h3 className="font-bold text-lg mb-4">{t("modals.confirmBulkDelete")}</h3>
             <p>{t("modals.bulkDeleteConfirm", { count: selectedCodes.length })}</p>
 
-            <div className="my-4 max-h-40 overflow-y-auto bg-base-200 p-2 rounded">
+            <div className="my-4 max-h-40 overflow-y-auto p-2 rounded" style={{ background: TOKENS.neutralCloud }}>
               {selectedCodes.map((code) => (
                 <div key={code} className="font-mono text-sm mb-1">
                   {code}
@@ -409,7 +434,7 @@ const PromoCodesTable = () => {
               <button className="btn btn-outline" onClick={() => setShowBulkDeleteConfirm(false)} disabled={isDeleting}>
                 {t("actions.cancel")}
               </button>
-              <button className="btn btn-error" onClick={handleBulkDelete} disabled={isDeleting}>
+              <button className="btn border-none text-white" style={{ background: TOKENS.warmMango }} onClick={handleBulkDelete} disabled={isDeleting}>
                 {isDeleting ? <ImSpinner8 className="animate-spin" /> : t("actions.delete")}
               </button>
             </div>

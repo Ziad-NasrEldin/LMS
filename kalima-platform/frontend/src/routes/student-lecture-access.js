@@ -14,20 +14,21 @@ export const getAllStudentLectureAccess = async (lectureId, limit = 100) => {
       throw new Error("Lecture ID is required")
     }
 
-    const response = await axios.get(`${import.meta.env.VITE_API_URL}/student-lecture-access`, {
-      params: {
-        lecture: lectureId,
-        limit,
+    const response = await axios.get(
+      `${import.meta.env.VITE_API_URL}/student-lecture-access/lecture/${lectureId}`,
+      {
+        params: { limit },
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+          "Content-Type": "application/json",
+        },
       },
-      headers: {
-        Authorization: `Bearer ${getToken()}`,
-        "Content-Type": "application/json",
-      },
-    })
+    )
 
     return {
       success: true,
-      data: response.data.data,
+      data: response.data.data?.accessRecords || [],
+      lecture: response.data.data?.lecture || null,
       results: response.data.results,
       status: response.data.status,
     }
@@ -70,7 +71,6 @@ export const getStudentLectureAccessByLectureId = async (lectureId) => {
   }
 }
 
-// Update the updateStudentLectureAccess function to correctly handle the API response
 export const updateStudentLectureAccess = async (accessId, data) => {
   try {
     if (!accessId) {
@@ -90,11 +90,48 @@ export const updateStudentLectureAccess = async (accessId, data) => {
 
     return {
       success: response.data.status === "success",
-      data: response.data.data, // The data is directly in response.data.data
+      data: response.data.data,
     }
   } catch (error) {
     console.error("Error updating student lecture access:", error)
     return normalizeApiError(error, "Failed to update student lecture access")
+  }
+}
+
+export const consumeStudentLectureView = async (accessId, eventId, purchaseId = null) => {
+  try {
+    if (!accessId) {
+      throw new Error("Access ID is required")
+    }
+
+    if (!eventId) {
+      throw new Error("eventId is required")
+    }
+
+    const payload = { eventId }
+
+    if (purchaseId) {
+      payload.purchaseId = purchaseId
+    }
+
+    const response = await axios.post(
+      `${import.meta.env.VITE_API_URL}/student-lecture-access/${accessId}/consume-view`,
+      payload,
+      {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+          "Content-Type": "application/json",
+        },
+      },
+    )
+
+    return {
+      success: response.data.status === "success",
+      data: response.data.data,
+    }
+  } catch (error) {
+    console.error("Error consuming student lecture view:", error)
+    return normalizeApiError(error, "Failed to consume lecture view")
   }
 }
 

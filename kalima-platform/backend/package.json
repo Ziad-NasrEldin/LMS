@@ -7,9 +7,12 @@
     "start": "cross-env NODE_OPTIONS=--no-warnings=DEP0040 nodemon server.js",
     "start:prod": "cross-env NODE_OPTIONS=--no-warnings=DEP0040 node server.js",
     "dev": "cross-env NODE_OPTIONS=--no-warnings=DEP0040 node server.js",
+    "test:regression": "node --test tests/regression/*.test.js",
     "seed": "node scripts/seed.js",
     "seed:mock": "node scripts/seedMockData.js",
-    "seed:governments": "node utils/seeds/seedGovernments.js"
+    "seed:governments": "node utils/seeds/seedGovernments.js",
+    "migrate:lecture-access": "node scripts/reconcileStudentLectureAccess.js",
+    "migrate:lecture-access:apply": "node scripts/reconcileStudentLectureAccess.js --apply"
   },
   "keywords": [],
   "author": "",

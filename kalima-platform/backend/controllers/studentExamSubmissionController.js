@@ -5,18 +5,7 @@ const Lecture = require("../models/LectureModel");
 const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
 const { configureGoogleSheets } = require("../config/googleApiConfig");
-
-const resolvePassingThreshold = (lectureThreshold, configThreshold, fallback = 60) => {
-  if (lectureThreshold !== undefined && lectureThreshold !== null) {
-    return Number(lectureThreshold);
-  }
-
-  if (configThreshold !== undefined && configThreshold !== null) {
-    return Number(configThreshold);
-  }
-
-  return fallback;
-};
+const { resolvePassingThreshold } = require("../utils/lectureAccessUtils");
 
 // Real Google Sheets API implementation to fetch exam results
 const getExamResultsFromSheet = async (

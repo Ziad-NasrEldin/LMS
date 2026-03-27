@@ -177,60 +177,88 @@ const MyLecturesPage = () => {
           });
 
           if (result.success) {
-            console.log(result.data.data)
-            const lecturesData = result.data.data.purchaseHistory
-              ?.map(p => {
-                // If lecture field exists (lecturePurchase), use it
-                if (p.lecture) {
-                  return {
-                    id: p.lecture._id || p._id,
-                    name: p.lecture.name,
-                    price: p.points,
-                    videoLink: p.lecture.videoLink,
-                    lecture_type: p.lecture.lecture_type,
-                    purchasedAt: new Date(p.purchasedAt).toLocaleString("en-gb", {
-                      day: "2-digit",
-                      month: "2-digit",
-                      year: "numeric",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                      hour12: false,
-                    }),
-                    lecturer: p.lecturer,
-                    subject: p.lecture.subject,
-                    level: p.lecture.level,
-                      thumbnail: p.lecture.thumbnail,
-                    sortDate: p.purchasedAt || null,
-                  };
+            const formatPurchaseDate = (purchaseDate) =>
+              new Date(purchaseDate).toLocaleString(i18n.language || "en-GB", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: false,
+              });
+
+            const toLectureCard = (purchase, lectureLike, fallbackName) => ({
+              id: lectureLike?._id || purchase._id,
+              name:
+                lectureLike?.name ||
+                fallbackName ||
+                purchase.description?.replace("Purchased container ", "").split(" for ")[0] ||
+                "Lecture",
+              price: lectureLike?.price ?? purchase.points,
+              videoLink: lectureLike?.videoLink,
+              lecture_type: lectureLike?.lecture_type,
+              purchasedAt: formatPurchaseDate(purchase.purchasedAt),
+              lecturer: purchase.lecturer,
+              subject: lectureLike?.subject,
+              level: lectureLike?.level,
+              thumbnail: lectureLike?.thumbnail,
+              sortDate: purchase.purchasedAt || null,
+            });
+
+            const lecturesData = (result.data.data.purchaseHistory || []).flatMap((purchase) => {
+              // Direct lecture purchase
+              if (purchase.lecture) {
+                return [toLectureCard(purchase, purchase.lecture)];
+              }
+
+              // Legacy/standalone lecture purchase represented as a lecture container
+              if (purchase.container && purchase.container.type === "lecture") {
+                return [
+                  toLectureCard(
+                    purchase,
+                    purchase.container,
+                    purchase.container.name
+                  ),
+                ];
+              }
+
+              // Purchased course/month/term/year with preloaded lecture descendants
+              if (
+                purchase.container &&
+                Array.isArray(purchase.container.lectures) &&
+                purchase.container.lectures.length > 0
+              ) {
+                return purchase.container.lectures.map((lecture) =>
+                  toLectureCard(purchase, lecture)
+                );
+              }
+
+              return [];
+            });
+
+            // Keep the most recent purchase date for duplicated lectures (e.g. direct + course purchase)
+            const uniqueLectures = Array.from(
+              lecturesData.reduce((acc, lecture) => {
+                const lectureId = lecture.id?.toString();
+                if (!lectureId) return acc;
+
+                const existing = acc.get(lectureId);
+                if (!existing) {
+                  acc.set(lectureId, lecture);
+                  return acc;
                 }
-                // If container is a lecture (containerPurchase), use container
-                if (p.container && p.container.type === "lecture") {
-                  return {
-                    id: p.container._id || p._id,
-                    name: p.container.name || p.description.replace("Purchased container ", "").split(" for ")[0],
-                    price: p.points,
-                    videoLink: p.container.videoLink,
-                    lecture_type: p.container.lecture_type,
-                    purchasedAt: new Date(p.purchasedAt).toLocaleString("en-gb", {
-                      day: "2-digit",
-                      month: "2-digit",
-                      year: "numeric",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                      hour12: false,
-                    }),
-                    lecturer: p.lecturer,
-                    subject: p.container.subject,
-                    level: p.container.level,
-                      thumbnail: p.container.thumbnail,
-                    sortDate: p.purchasedAt || null,
-                  };
+
+                const existingTime = new Date(existing.sortDate || 0).getTime();
+                const currentTime = new Date(lecture.sortDate || 0).getTime();
+                if (currentTime > existingTime) {
+                  acc.set(lectureId, lecture);
                 }
-                // Otherwise, skip
-                return null;
-              })
-              .filter(Boolean) || [];
-            setAllLectures(lecturesData.sort(sortLecturesNewestFirst));
+
+                return acc;
+              }, new Map()).values()
+            );
+
+            setAllLectures(uniqueLectures.sort(sortLecturesNewestFirst));
           }
         }
       } catch (err) {

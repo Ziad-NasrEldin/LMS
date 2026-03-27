@@ -1,3 +1,50 @@
+## 2026-03-27 - Lecture view consume accounting hardening - GPT-5.3-Codex
+- Added idempotent lecture-view consumption fields and index in `kalima-platform/backend/models/studentLectureAccessModel.js`, plus a dedicated atomic consume endpoint in `kalima-platform/backend/controllers/studentLectureAccessController.js`.
+- Locked down lecture-access routes by role in `kalima-platform/backend/routes/studentLectureAccessRoutes.js` and exposed `POST /student-lecture-access/:id/consume-view` for student playback accounting.
+- Updated student playback accounting client flow in `kalima-platform/frontend/src/routes/student-lecture-access.js` and `kalima-platform/frontend/src/pages/User Dashboard/Lecture Page/LectureDisplay.jsx` to use consume-view with bounded soft retries.
+- Added migration/backfill tooling in `kalima-platform/backend/scripts/reconcileStudentLectureAccess.js` and npm scripts in `kalima-platform/backend/package.json` for dry-run/apply reconciliation.
+## 2026-03-27 - Student lecture access 404 regression coverage - GPT-5.3-Codex
+- Added a backend regression case to [kalima-platform/backend/tests/regression/studentLectureAccessController.test.js](kalima-platform/backend/tests/regression/studentLectureAccessController.test.js) for the lecture-not-found path so the access controller’s error handling is covered too.
+
+## 2026-03-27 - Student lecture access controller regression coverage - GPT-5.3-Codex
+- Added backend regression tests for lecture access outcomes in [kalima-platform/backend/tests/regression/studentLectureAccessController.test.js](kalima-platform/backend/tests/regression/studentLectureAccessController.test.js), covering restricted exam, restricted homework, full-pass success, and no-requirements success scenarios.
+
+## 2026-03-27 - Purchase access utility extraction + regression tests - GPT-5.3-Codex
+- Extracted purchase lecture-access detection into `backend/utils/purchaseHistoryUtils.js` and wired `userController` to use the shared helper.
+- Added focused backend regression coverage in `backend/tests/regression/purchaseHistoryUtils.test.js` for direct lecture purchases, lecture-container purchases, hierarchical container lectures, and non-access cases.
+
+## 2026-03-27 - Lecture remaining-views preload fix - GPT-5.4 mini
+- Preloaded the lecture access row from the dashboard response so the remaining views badge can render without waiting for the heavier purchase-based fallback.
+- Kept the fallback access check for missing rows, and fixed the zero-views guard to block access consistently when the count reaches 0.
+
+## 2026-03-27 - Purchase enrichment flow refactor - GPT-5.3-Codex
+- Refactored dashboard purchase enrichment into shared helpers in `userController` to centralize lecture-access detection and lecture hydration logic.
+- Improved purchased-features detection by replacing the invalid `container.type` fallback query with an enrichment-based check over real container purchases.
+- Applied the same enrichment pipeline to parent-child purchase history responses so course-included lectures are resolved consistently across student and parent dashboards.
+
+## 2026-03-27 - Student My Lectures include course lectures - GPT-5.3-Codex
+- Extended dashboard purchase-history enrichment so purchased course/month/term/year containers now include their descendant lectures in `container.lectures`.
+- Updated student My Lectures mapping to flatten direct purchases + purchased-container lectures and de-duplicate repeated lecture ownership entries.
+- Fixed student lecture access check flow for container purchases to validate access against the target lecture ID, enabling lecture viewing from purchased full courses.
+- Switched student purchase date rendering on My Lectures to respect the active i18n language instead of a hardcoded locale.
+
+## 2026-03-26 - Lecture access gating + regression coverage + UX polish - GPT-5.3-Codex
+- Added server-side student lecture-content gating in lecture-by-id with a backward-compatible `restricted` payload contract that includes safe lecture snapshot and requirement details.
+- Introduced shared lecture access utility functions, added backend regression tests for threshold resolution and URL/link hardening, and wired `npm run test:regression` in backend scripts.
+- Redesigned the student exam/homework requirement cards in lecture view to show clear per-requirement status, thresholds, action links, and a recheck-access workflow.
+
+## 2026-03-27 - Courses page newest-first default - GPT-5.4 mini
+- Updated the public courses page to sort course containers by newest createdAt first before pagination.
+- Made the request explicit with `sort: "-createdAt"` and added a local fallback sort so the default remains newest-first even if upstream ordering changes.
+
+## 2026-03-27 - Teacher details course link fix - GPT-5.4 mini
+- Wired the teacher-details page course cards to the public course details route so the Show Details button opens the specific course instead of doing nothing.
+- Kept the change scoped to the button/link layer; the course data and rendering flow remain unchanged.
+
+## 2026-03-26 - Promo code admin card refresh - GPT-5.4 mini
+- Refreshed the promo code management surface to use the newer token-based panel styling, including softer surfaces, rounded section cards, and stronger section hierarchy.
+- Updated the filter block, table chrome, action buttons, and delete confirmation dialogs to match the current admin design language.
+
 ## 2026-03-26 - Lecturer course card expressive pass - GPT-5.3-Codex
 - Reworked lecturer course cards into a more deliberate media-led layout with gradient overlay, tokenized type/price pills, and denser metadata chips.
 - Tightened the action row and stats block so the cards feel closer to a designed product surface than a generic list item.
@@ -146,3 +193,4 @@ ounded-[2rem]\), removed hard \shadow-sm\ defaults from DaisyUI, updated primary
 - Corrected homework config model reference and unified threshold precedence across access-check and verification endpoints (lecture override first, config default fallback).
 - Hardened config/link inputs by validating public HTTP/HTTPS URLs, blocked server-side download proxying for link attachments, and added role/ownership checks for lecture attachment uploads.
 - Tightened student lecture gating in the frontend by removing the permissive fallback that previously granted access when verification checks failed.
+

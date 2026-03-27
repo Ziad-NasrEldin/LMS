@@ -13,7 +13,7 @@ import {
 import { verifyExamSubmission, checkLectureAccess } from "../../../routes/examsAndHomeworks"
 import { uploadHomework, getLectureHomeworks } from "../../../routes/homeworks"
 import { getUserDashboard } from "../../../routes/auth-services"
-import { checkStudentLectureAccess, updateStudentLectureAccess } from "../../../routes/student-lecture-access"
+import { checkStudentLectureAccess, consumeStudentLectureView } from "../../../routes/student-lecture-access"
 import {
   FiUpload,
   FiFile,
@@ -60,7 +60,7 @@ const getYouTubeId = (url) => {
     }
   } catch (e) {
     console.warn(
-      "Could not parse YouTube URL with standard new URL(), trying regex:",
+      "Could not parse YouTube URL with standard new URL(), trying regex:",     
       e
     );
   }
@@ -112,7 +112,7 @@ const LectureDisplay = () => {
   const [allAttachments, setAllAttachments] = useState([]);
   const [showFiftyPercentWarning, setShowFiftyPercentWarning] = useState(false);
   const [remainingViews, setRemainingViews] = useState(null);
-  const [studentLectureAccessId, setStudentLectureAccessId] = useState(null);
+  const [studentLectureAccessId, setStudentLectureAccessId] = useState(null);   
   const [videoBlocked, setVideoBlocked] = useState(false);
   const [userRole, setUserRole] = useState(null);
   const [userId, setUserId] = useState(null);
@@ -120,13 +120,13 @@ const LectureDisplay = () => {
   const [currentPurchase, setCurrentPurchase] = useState(null);
 
   // Add this state to track if we should show the exit confirmation
-  const [showExitConfirmation, setShowExitConfirmation] = useState(false)
+  const [showExitConfirmation, setShowExitConfirmation] = useState(false)       
   const [pendingNavigation, setPendingNavigation] = useState(null)
 
   // Add this function to handle navigation attempts
   const handleNavigateAway = (to) => {
-    if (userRole === "Student" && progress < 50 && !showFiftyPercentWarning) {
-      // If they haven't watched 50% of the video, show the confirmation dialog
+    if (userRole === "Student" && progress < 50 && !showFiftyPercentWarning) {  
+      // If they haven't watched 50% of the video, show the confirmation dialog 
       setShowExitConfirmation(true)
       setPendingNavigation(to)
       return false
@@ -180,7 +180,7 @@ const LectureDisplay = () => {
 
   // Homework state
   const [homeworkFiles, setHomeworkFiles] = useState([])
-  const [isSubmittingHomework, setIsSubmittingHomework] = useState(false)
+  const [isSubmittingHomework, setIsSubmittingHomework] = useState(false)       
   const [homeworkSuccess, setHomeworkSuccess] = useState(false)
   const [homeworkSubmitType, setHomeworkSubmitType] = useState("file") // "file" or "form"
   const [homeworkError, setHomeworkError] = useState(null)
@@ -196,7 +196,10 @@ const LectureDisplay = () => {
   const progressBarRef = useRef(null)
   const lastUpdateTimeRef = useRef(0)
   const hasViewedRef = useRef(false)
+  const pendingViewEventIdRef = useRef(null)
+  const viewSyncRetryTimeoutRef = useRef(null)
   const redirectTimeoutRef = useRef(null)
+  const accessResolvedForLectureRef = useRef(null)
   const fileInputRef = useRef(null)
   const videoContainerRef = useRef(null)
 
@@ -214,58 +217,86 @@ const LectureDisplay = () => {
 
   // Fetch user data first
   useEffect(() => {
+    let cancelled = false;
+
     const fetchUserData = async () => {
       try {
         const dashboardResult = await getUserDashboard();
-        if (dashboardResult.success) {
-          const { userInfo } = dashboardResult.data.data;
-          setUserRole(userInfo.role);
-          setUserId(userInfo.id);
 
-          // Get purchase ID from purchase history if available
-          if (
-            dashboardResult.data.data.purchaseHistory &&
-            dashboardResult.data.data.purchaseHistory.length > 0
-          ) {
-            
-            // Find the purchase for this lecture - handle both container and direct lecture purchases
-            const lecturePurchase = dashboardResult.data.data.purchaseHistory.find((purchase) => {
-              // Direct lecture purchase (new structure)
-              if (purchase.lecture && purchase.lecture._id === lectureId) {
-                return true;
-              }
-              
-              // Container purchase (old structure)
-              if (purchase.container && purchase.container._id === lectureId) {
-                return true;
-              }
-              
-              // Check if lecture is within a purchased container/course
-              if (purchase.container && purchase.container.lectures) {
-                return purchase.container.lectures.some(lecture => lecture._id === lectureId);
-              }
-              
-              return false;
-            });
-
-            if (lecturePurchase) {
-              setPurchaseId(lecturePurchase._id);
-              setCurrentPurchase(lecturePurchase); // Store the purchase data
-            } else {
-            }
-          } else {
-          }
-        } else {
+        if (!dashboardResult.success) {
           console.error("Failed to fetch user data:", dashboardResult.error);
           setError(t("failedToAuthenticateUser"));
+          return;
+        }
+
+        if (cancelled) return;
+
+        const dashboardData = dashboardResult.data.data || {};
+        const userInfo = dashboardData.userInfo || {};
+        setUserRole(userInfo.role);
+        setUserId(userInfo.id);
+
+        const lectureAccessRecords = Array.isArray(dashboardData.lectureAccess)
+          ? dashboardData.lectureAccess
+          : [];
+        const currentLectureAccess = lectureAccessRecords.find((access) => {
+          const accessLectureId = access?.lecture?._id || access?.lecture;
+          return accessLectureId?.toString() === lectureId;
+        });
+
+        if (currentLectureAccess) {
+          setStudentLectureAccessId(currentLectureAccess._id);
+          setRemainingViews(currentLectureAccess.remainingViews ?? 0);
+          setAccessDataLoaded(true);
+          accessResolvedForLectureRef.current = lectureId;
+
+          if ((currentLectureAccess.remainingViews ?? 0) <= 0) {
+            setVideoBlocked(true);
+            redirectTimeoutRef.current = setTimeout(() => navigate(-1), 180000);
+          }
+
+          return;
+        }
+
+        if (
+          Array.isArray(dashboardData.purchaseHistory) &&
+          dashboardData.purchaseHistory.length > 0
+        ) {
+          const lecturePurchase = dashboardData.purchaseHistory.find((purchase) => {
+            if (purchase.lecture && String(purchase.lecture._id) === String(lectureId)) {
+              return true;
+            }
+
+            if (purchase.container && String(purchase.container._id) === String(lectureId)) {
+              return true;
+            }
+
+            if (purchase.container && purchase.container.lectures) {
+              return purchase.container.lectures.some((lecture) => String(lecture._id) === String(lectureId));
+            }
+
+            return false;
+          });
+
+          if (lecturePurchase) {
+            setPurchaseId(lecturePurchase._id);
+            setCurrentPurchase(lecturePurchase);
+          }
         }
       } catch (err) {
+        if (cancelled) return;
+
         console.error("Error fetching user data:", err);
         setError(t("failedToAuthenticateUser"));
       }
     };
+
     fetchUserData();
-  }, [t]);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [lectureId, navigate, t]);
 
   // Fetch lecture data and attachments
   useEffect(() => {
@@ -458,8 +489,9 @@ const LectureDisplay = () => {
           
           // Determine if this is a standalone lecture or container-based lecture
           if (currentPurchase && currentPurchase.type === "containerPurchase" && currentPurchase.container) {
-            // For container purchases, use the container ID
-            apiLectureId = currentPurchase.container._id;
+            // For container purchases (including full courses), check access against the target lecture ID.
+            // The backend validates this lecture against the purchased container using purchaseId.
+            apiLectureId = lectureId;
             isStandaloneLecture = false;
           } else if (currentPurchase && currentPurchase.type === "lecturePurchase") {
             // For lecture purchases, use the lecture ID and mark as standalone
@@ -487,8 +519,9 @@ const LectureDisplay = () => {
               if (result.data.access.remainingViews !== undefined) {
                 setRemainingViews(result.data.access.remainingViews);
               }
+              accessResolvedForLectureRef.current = lectureId;
 
-              if (result.data.access.remainingViews < 0) {
+              if (result.data.access.remainingViews <= 0) {
                 setVideoBlocked(true)
                 redirectTimeoutRef.current = setTimeout(() => navigate(-1), 180000)
               }
@@ -509,6 +542,11 @@ const LectureDisplay = () => {
 
       // Wait for user/purchase resolution instead of setting a premature error.
       if (!lectureId || userRole !== "Student") {
+        return;
+      }
+
+      if (accessResolvedForLectureRef.current === lectureId) {
+        setAccessDataLoaded(true);
         return;
       }
 
@@ -630,45 +668,80 @@ const LectureDisplay = () => {
         userRole !== "Student" ||
         hasViewedRef.current ||
         (remainingViews !== null && remainingViews <= 0) ||
-        !accessDataLoaded
+        !accessDataLoaded ||
+        !studentLectureAccessId
       )
         return
 
       setIsPlaying(true)
 
       try {
-        hasViewedRef.current = true;
+        hasViewedRef.current = true
 
-        // Use the updateStudentLectureAccess function
-        const response = await updateStudentLectureAccess(
-          studentLectureAccessId,
-          {
-            remainingViews: remainingViews - 1,
+        const updateViewState = (accessPayload) => {
+          const nextViews = accessPayload?.access?.remainingViews
+
+          if (typeof nextViews === "number") {
+            setRemainingViews(nextViews)
+
+            if (nextViews <= 0) {
+              setVideoBlocked(true)
+              playerRef.current?.pause()
+              alert(t("noMoreViewsAlert"))
+              redirectTimeoutRef.current = setTimeout(() => navigate(-1), 180000)
+            }
           }
-        );
+
+          pendingViewEventIdRef.current = null
+        }
+
+        const scheduleRetry = (eventId, attempt = 1) => {
+          if (attempt > 3) {
+            setError(t("viewUpdateError"))
+            return
+          }
+
+          const retryDelay = Math.min(1200 * 2 ** (attempt - 1), 10000)
+          if (viewSyncRetryTimeoutRef.current) {
+            clearTimeout(viewSyncRetryTimeoutRef.current)
+          }
+
+          viewSyncRetryTimeoutRef.current = setTimeout(async () => {
+            const retryResponse = await consumeStudentLectureView(
+              studentLectureAccessId,
+              eventId,
+              purchaseId,
+            )
+
+            if (retryResponse.success) {
+              updateViewState(retryResponse.data)
+              return
+            }
+
+            scheduleRetry(eventId, attempt + 1)
+          }, retryDelay)
+        }
+
+        const generatedEventId =
+          pendingViewEventIdRef.current ||
+          `${lectureId}-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`
+
+        pendingViewEventIdRef.current = generatedEventId
+
+        const response = await consumeStudentLectureView(
+          studentLectureAccessId,
+          generatedEventId,
+          purchaseId,
+        )
 
         if (response.success) {
-          // The updated data is directly in response.data
-          setRemainingViews(response.data.remainingViews);
-
-          if (response.data.remainingViews <= 0) {
-            setVideoBlocked(true);
-            playerRef.current?.pause();
-            alert(t("noMoreViewsAlert"));
-            redirectTimeoutRef.current = setTimeout(() => navigate(-1), 180000);
-          }
+          updateViewState(response.data)
         } else {
-          console.error("Failed to update remaining views:", response.error);
-          hasViewedRef.current = false;
+          scheduleRetry(generatedEventId, 1)
         }
       } catch (error) {
-        console.error("View update error:", error);
-        hasViewedRef.current = false;
-        if (error.message && error.message.includes("CORS")) {
-          setError(t("connectionError"));
-        } else {
-          setError(t("viewUpdateError"));
-        }
+        console.error("View update error:", error)
+        setError(t("viewUpdateError"))
       }
     };
 
@@ -980,6 +1053,10 @@ const LectureDisplay = () => {
         if (redirectTimeoutRef.current) {
           clearTimeout(redirectTimeoutRef.current);
         }
+
+        if (viewSyncRetryTimeoutRef.current) {
+          clearTimeout(viewSyncRetryTimeoutRef.current)
+        }
       };
     }, []);
 
@@ -1086,101 +1163,131 @@ const LectureDisplay = () => {
       );
     }
 
-    // Render exam requirement message if needed
+    // Render requirements gate for students when lecture access is still restricted.
     if (isContentBlocked) {
-  // Determine which requirement is blocking access
-  const isHomeworkBlock = homeworkRequired && !homeworkVerified;
-  const requirementData = isHomeworkBlock ? homeworkData : examData;
-  const requirementType = isHomeworkBlock ? "homework" : "exam";
+      const requirementCards = [
+        examRequired
+          ? {
+              key: "exam",
+              title: t("examInfo"),
+              subtitle: t("examRequiredDescription"),
+              passed: examVerified,
+              threshold: examData?.passingThreshold,
+              actionUrl: examData?.examUrl,
+              actionLabel: t("startExam"),
+            }
+          : null,
+        homeworkRequired
+          ? {
+              key: "homework",
+              title: t("homeworkInfo", "Homework Information"),
+              subtitle: t(
+                "homeworkRequiredDescription",
+                "You must complete and submit homework before you can access this lecture.",
+              ),
+              passed: homeworkVerified,
+              threshold: homeworkData?.passingThreshold,
+              actionUrl: homeworkData?.homeworkUrl,
+              actionLabel: t("startHomework", "Start Homework"),
+            }
+          : null,
+      ].filter(Boolean);
 
-  return (
-    <div className="mx-auto w-full max-w-5xl px-3 py-3 sm:px-4" dir={isRTL ? "rtl" : "ltr"}>
-      <button
-        onClick={() => navigate(-1)}
-        className="btn btn-outline btn-primary btn-sm mb-3"
-      >
-        {t("back")}
-      </button>
-      <h1 className="text-2xl font-bold mb-4 text-center md:text-right md:text-4xl leading-tight">
-        {lecture?.name || t("loadingLecture")}
-      </h1>
+      return (
+        <div className="mx-auto w-full max-w-5xl px-3 py-3 sm:px-4" dir={isRTL ? "rtl" : "ltr"}>
+          <button onClick={() => navigate(-1)} className="btn btn-outline btn-primary btn-sm mb-3">
+            {t("back")}
+          </button>
 
-      <div className="card bg-base-100 shadow-lg mb-4 border border-base-300/60 rounded-2xl">
-        <div className="card-body p-4 md:p-5">
-          <h2 className="card-title flex items-center gap-2">
-            <FiAlertTriangle className="text-warning" />
-            {requirementType === "homework"
-              ? t("homeworkRequiredFirst") || "Homework Submission Required"
-              : t("examRequiredFirst")}
-          </h2>
-          <p className="my-4">
-            {requirementType === "homework"
-              ? t("homeworkRequiredDescription") ||
-                "You must complete and submit the homework before accessing this lecture content."
-              : t("examRequiredDescription")}
-          </p>
+          <h1 className="text-2xl font-bold mb-4 text-center md:text-right md:text-4xl leading-tight">
+            {lecture?.name || t("loadingLecture")}
+          </h1>
 
-          {requirementData && (
-            <div className="bg-base-200 p-3 rounded-lg my-3">
-              <h3 className="font-semibold mb-2">
-                {requirementType === "homework" 
-                  ? t("homeworkInfo") || "Homework Information" 
-                  : t("examInfo")}:
-              </h3>
-
-              {requirementData.passingThreshold && (
-                <ul className="space-y-2">
-                  <li>
-                    <span className="font-medium">{t("requiredPassingScore")}:</span> 
-                    {requirementData.passingThreshold}
-                  </li>
-                </ul>
-              )}
-
-              <div className="mt-4">
-                <a
-                  href={requirementType === "homework" 
-                    ? requirementData.homeworkUrl 
-                    : requirementData.examUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn btn-primary w-full sm:w-auto"
-                >
-                  <FiExternalLink className="mr-2" />
-                  {requirementType === "homework" 
-                    ? t("startHomework") || "Complete Homework" 
-                    : t("startExam")}
-                </a>
+          <div className="rounded-3xl border border-warning/30 bg-gradient-to-br from-base-100 to-base-200/40 p-5 shadow-xl md:p-6">
+            <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-warning/15 text-warning">
+                  <FiAlertTriangle className="h-5 w-5" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-extrabold text-base-content md:text-2xl">
+                    {t("accessLockedTitle", "Lecture Access Is Locked")}
+                  </h2>
+                  <p className="text-sm text-base-content/70">
+                    {t(
+                      "accessLockedDescription",
+                      "Complete all required exam/homework items to unlock this lecture.",
+                    )}
+                  </p>
+                </div>
               </div>
-            </div>
-          )}
 
-          <div className="alert alert-info mt-3">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              className="stroke-current shrink-0 w-6 h-6"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              ></path>
-            </svg>
-            <span>
-              {requirementType === "homework"
-                ? t("afterCompletingHomework") ||
-                  "After completing the homework, you'll be able to access this lecture."
-                : t("afterPassingExam")}
-            </span>
+              <button
+                type="button"
+                className="btn btn-primary btn-sm"
+                onClick={verifyExamAndCheckAccess}
+                disabled={examVerificationLoading}
+              >
+                {examVerificationLoading ? t("loading") : t("recheckAccess", "Recheck Access")}
+              </button>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-2">
+              {requirementCards.map((item) => (
+                <div
+                  key={item.key}
+                  className="rounded-2xl border border-base-300 bg-base-100 p-4 shadow-sm"
+                >
+                  <div className="mb-2 flex items-start justify-between gap-3">
+                    <h3 className="text-lg font-bold text-base-content">{item.title}</h3>
+                    <span className={`badge ${item.passed ? "badge-success" : "badge-warning"}`}>
+                      {item.passed
+                        ? t("statusPassed", "Passed")
+                        : t("statusPending", "Pending")}
+                    </span>
+                  </div>
+
+                  <p className="mb-3 text-sm text-base-content/70">{item.subtitle}</p>
+
+                  {item.threshold !== undefined && item.threshold !== null && (
+                    <p className="mb-3 text-sm font-medium text-base-content">
+                      {t("requiredPassingScore")}: {item.threshold}
+                    </p>
+                  )}
+
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {!item.passed && item.actionUrl && (
+                      <a
+                        href={item.actionUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn btn-primary btn-sm"
+                      >
+                        <FiExternalLink className={isRTL ? "ml-1" : "mr-1"} />
+                        {item.actionLabel}
+                      </a>
+                    )}
+
+                    {item.passed && (
+                      <span className="badge badge-success badge-outline">
+                        {t("completed", "Completed")}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-4 rounded-2xl border border-info/30 bg-info/10 px-4 py-3 text-sm text-base-content/80">
+              {t(
+                "accessVerificationHint",
+                "After submitting, wait a moment for sync, then click Recheck Access.",
+              )}
+            </div>
           </div>
         </div>
-      </div>
-    </div>
-  );
-}
+      );
+    }
 
     // Function to get appropriate icon based on file type
     const getFileIcon = (fileType) => {
@@ -1261,29 +1368,61 @@ const LectureDisplay = () => {
           </div>
         )}
 
-        {userRole === "Student" &&
-          examRequired &&
-          examVerified &&
-          examSubmission && (
-            <div className="alert alert-success mb-4 shadow-md">
-              <div className="flex items-center gap-2">
-                <FiAward className="stroke-current shrink-0 w-6 h-6" />
-                <div>
-                  <span className="font-bold">{t("examPassedSuccessfully")}</span>
-                  <div className="text-sm mt-1">
+        {userRole === "Student" && (examRequired || homeworkRequired) && (
+          <div className="mb-4 grid gap-3 md:grid-cols-2">
+            {examRequired && (
+              <div className="rounded-2xl border border-success/30 bg-success/10 p-4 shadow-sm">
+                <div className="mb-1 flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2 font-bold text-base-content">
+                    <FiAward className="h-5 w-5 text-success" />
+                    {t("examInfo")}
+                  </div>
+                  <span className={`badge ${examVerified ? "badge-success" : "badge-warning"}`}>
+                    {examVerified ? t("statusPassed", "Passed") : t("statusPending", "Pending")}
+                  </span>
+                </div>
+
+                {examSubmission && (
+                  <div className="text-sm text-base-content/80">
                     <span>
-                      {t("score")}: {examSubmission.score}/
-                      {examSubmission.maxScore}
+                      {t("score")}: {examSubmission.score}/{examSubmission.maxScore}
                     </span>
                     <span className="mx-2">|</span>
                     <span>
                       {t("passDate")}: {formatDate(examSubmission.verifiedAt)}
                     </span>
                   </div>
-                </div>
+                )}
               </div>
-            </div>
-          )}
+            )}
+
+            {homeworkRequired && (
+              <div className="rounded-2xl border border-info/30 bg-info/10 p-4 shadow-sm">
+                <div className="mb-1 flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2 font-bold text-base-content">
+                    <FiCheck className="h-5 w-5 text-info" />
+                    {t("homeworkInfo", "Homework Information")}
+                  </div>
+                  <span className={`badge ${homeworkVerified ? "badge-success" : "badge-warning"}`}>
+                    {homeworkVerified ? t("statusPassed", "Passed") : t("statusPending", "Pending")}
+                  </span>
+                </div>
+
+                {homeworkSubmission && (
+                  <div className="text-sm text-base-content/80">
+                    <span>
+                      {t("score")}: {homeworkSubmission.score}/{homeworkSubmission.maxScore}
+                    </span>
+                    <span className="mx-2">|</span>
+                    <span>
+                      {t("passDate")}: {formatDate(homeworkSubmission.verifiedAt)}
+                    </span>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
 
         {showFiftyPercentWarning && !isVideoEffectivelyBlocked && (
           <div className="alert alert-warning my-3 shadow-md">
@@ -2031,3 +2170,4 @@ const LectureDisplay = () => {
   };
 
   export default LectureDisplay;
+

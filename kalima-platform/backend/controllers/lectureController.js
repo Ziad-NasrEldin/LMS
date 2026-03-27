@@ -13,7 +13,9 @@ const Notification = require("../models/notification")
 const Student = require("../models/studentModel")
 const Purchase = require("../models/purchaseModel")
 const StudentLectureAccess = require("../models/studentLectureAccessModel")
+const StudentExamSubmission = require("../models/studentExamSubmissionModel")
 const { uploadSingleImageToDisk } = require("./../utils/upload files/uploadFiles")
+const { buildLectureRequirements, getRestrictedLectureSnapshot } = require("../utils/lectureAccessUtils")
 const fs = require("fs")
 const path = require("path")
 
@@ -378,7 +380,13 @@ exports.createLecture = catchAsync(async (req, res, next) => {
 // Get Lecture by ID
 exports.getLectureById = catchAsync(async (req, res, next) => {
   const Role = req.user.role?.toLowerCase()
-  let container = await Lecture.findById(req.params.lectureId).populate([{ path: "createdBy", select: "name" }])
+  let container = await Lecture.findById(req.params.lectureId).populate([
+    { path: "createdBy", select: "name" },
+    { path: "subject", select: "name" },
+    { path: "level", select: "name" },
+    { path: "examConfig", select: "name formUrl defaultPassingThreshold" },
+    { path: "homeworkConfig", select: "name formUrl defaultPassingThreshold" },
+  ])
 
   if (!container) {
     // Check in Container model for backward compatibility
@@ -390,6 +398,45 @@ exports.getLectureById = catchAsync(async (req, res, next) => {
   }
 
   if (!container) return next(new AppError("Lecture not found", 404))
+
+  if (req.user.role === "Student" && (container.requiresExam || container.requiresHomework)) {
+    const requirements = buildLectureRequirements(container)
+
+    if (container.requiresExam) {
+      const examSubmission = await StudentExamSubmission.findOne({
+        student: req.user._id,
+        lecture: container._id,
+        type: "exam",
+        passed: true,
+      }).lean()
+      requirements.exam.passed = !!examSubmission
+    }
+
+    if (container.requiresHomework) {
+      const homeworkSubmission = await StudentExamSubmission.findOne({
+        student: req.user._id,
+        lecture: container._id,
+        type: "homework",
+        passed: true,
+      }).lean()
+      requirements.homework.passed = !!homeworkSubmission
+    }
+
+    const isRestricted =
+      (container.requiresExam && !requirements.exam.passed) ||
+      (container.requiresHomework && !requirements.homework.passed)
+
+    if (isRestricted) {
+      return res.status(200).json({
+        status: "restricted",
+        message: "You must complete all required submissions before accessing this lecture",
+        data: {
+          container: getRestrictedLectureSnapshot(container),
+          requirements,
+        },
+      })
+    }
+  }
 
   if (Role === "teacher") {
     if (!container.teacherAllowed) {

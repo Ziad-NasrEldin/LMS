@@ -23,7 +23,7 @@ const isIpv4InRange = (ipTuple, rangeStart, rangeEnd) => {
 const isPrivateHost = (hostname) => {
   if (!hostname) return true
 
-  const normalizedHost = hostname.toLowerCase()
+  const normalizedHost = hostname.toLowerCase().replace(/^\[/, "").replace(/\]$/, "")
 
   if (normalizedHost === "localhost" || normalizedHost.endsWith(".local")) {
     return true

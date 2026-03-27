@@ -21,6 +21,7 @@ const bcrypt = require("bcrypt");
 const handleCSV = require("../utils/upload files/handleCSV.js");
 const handleExcel = require("../utils/upload files/handleEXCEL.js");
 const QueryFeatures = require("../utils/queryFeatures");
+const { hasLectureAccessFromPurchase } = require("../utils/purchaseHistoryUtils");
 const fs = require("fs");
 const path = require("path");
 const { ref } = require("joi");
@@ -877,6 +878,184 @@ const getMyPurchasedCourseContainers = catchAsync(async (req, res, next) => {
   });
 });
 
+const HIERARCHICAL_CONTAINER_TYPES = new Set(["course", "month", "term", "year"]);
+
+const enrichPurchasesWithLectureData = async (purchaseHistory = []) => {
+  if (!Array.isArray(purchaseHistory) || purchaseHistory.length === 0) {
+    return [];
+  }
+
+  const lectureIdsToPopulate = [
+    ...new Set(
+      purchaseHistory
+        .filter((p) => !p.lecture && p.container && p.container.type === "lecture")
+        .map((p) => p.container?._id?.toString())
+        .filter(Boolean)
+    ),
+  ];
+
+  const purchasedHierarchicalContainerIds = [
+    ...new Set(
+      purchaseHistory
+        .filter(
+          (p) =>
+            p.container &&
+            p.container._id &&
+            HIERARCHICAL_CONTAINER_TYPES.has(p.container.type)
+        )
+        .map((p) => p.container._id.toString())
+    ),
+  ];
+
+  let lecturesMap = {};
+  if (lectureIdsToPopulate.length > 0) {
+    const lectures = await Lecture.find({
+      _id: { $in: lectureIdsToPopulate.map((id) => new mongoose.Types.ObjectId(id)) },
+    })
+      .populate("subject", "name")
+      .populate("level", "name")
+      .lean();
+
+    lecturesMap = lectures.reduce((acc, lec) => {
+      acc[lec._id.toString()] = lec;
+      return acc;
+    }, {});
+  }
+
+  const courseContainerLecturesMap = {};
+  if (purchasedHierarchicalContainerIds.length > 0) {
+    const purchasedContainerTrees = await Container.aggregate([
+      {
+        $match: {
+          _id: {
+            $in: purchasedHierarchicalContainerIds.map(
+              (id) => new mongoose.Types.ObjectId(id)
+            ),
+          },
+        },
+      },
+      {
+        $graphLookup: {
+          from: "containers",
+          startWith: "$children",
+          connectFromField: "children",
+          connectToField: "_id",
+          as: "nestedChildren",
+        },
+      },
+    ]);
+
+    const containerToRootIds = new Map();
+
+    purchasedContainerTrees.forEach((containerTree) => {
+      const rootId = containerTree._id.toString();
+      const scopedContainerIds = new Set([
+        rootId,
+        ...(containerTree.nestedChildren || []).map((child) => child._id.toString()),
+      ]);
+
+      scopedContainerIds.forEach((containerId) => {
+        const roots = containerToRootIds.get(containerId) || [];
+        roots.push(rootId);
+        containerToRootIds.set(containerId, roots);
+      });
+
+      courseContainerLecturesMap[rootId] = [];
+    });
+
+    const allScopedContainerIds = [
+      ...new Set(Array.from(containerToRootIds.keys())),
+    ];
+
+    const allScopedContainerObjectIds = allScopedContainerIds.map(
+      (id) => new mongoose.Types.ObjectId(id)
+    );
+
+    const [lectureDocs, legacyLectureContainers] = await Promise.all([
+      Lecture.find({ parent: { $in: allScopedContainerObjectIds } })
+        .select(
+          "name price subject level videoLink lecture_type requiresExam examConfig createdBy thumbnail createdAt parent"
+        )
+        .populate("subject", "name")
+        .populate("level", "name")
+        .populate("createdBy", "name")
+        .lean(),
+      Container.find({
+        _id: { $in: allScopedContainerObjectIds },
+        type: "lecture",
+      })
+        .select(
+          "name type price subject level videoLink lecture_type requiresExam examConfig createdBy thumbnail createdAt"
+        )
+        .populate("subject", "name")
+        .populate("level", "name")
+        .populate("createdBy", "name")
+        .lean(),
+    ]);
+
+    const seenLectureIdsByRoot = new Map();
+
+    const registerLectureForRoots = (roots, lectureDoc) => {
+      roots.forEach((rootId) => {
+        const seenIds = seenLectureIdsByRoot.get(rootId) || new Set();
+        const lectureId = lectureDoc._id.toString();
+
+        if (!seenIds.has(lectureId)) {
+          courseContainerLecturesMap[rootId].push(lectureDoc);
+          seenIds.add(lectureId);
+          seenLectureIdsByRoot.set(rootId, seenIds);
+        }
+      });
+    };
+
+    lectureDocs.forEach((lectureDoc) => {
+      const parentId = lectureDoc.parent?.toString();
+      if (!parentId) return;
+      const roots = containerToRootIds.get(parentId) || [];
+      if (roots.length === 0) return;
+      registerLectureForRoots(roots, lectureDoc);
+    });
+
+    legacyLectureContainers.forEach((lectureDoc) => {
+      const roots = containerToRootIds.get(lectureDoc._id.toString()) || [];
+      if (roots.length === 0) return;
+      registerLectureForRoots(roots, lectureDoc);
+    });
+  }
+
+  return purchaseHistory.map((purchase) => {
+    if (purchase.lecture) return purchase;
+
+    if (purchase.container && purchase.container.type === "lecture") {
+      const lectureData = lecturesMap[purchase.container._id?.toString()];
+      if (lectureData) {
+        return { ...purchase, lecture: lectureData };
+      }
+    }
+
+    if (
+      purchase.container &&
+      purchase.container._id &&
+      HIERARCHICAL_CONTAINER_TYPES.has(purchase.container.type)
+    ) {
+      const purchasedContainerLectures =
+        courseContainerLecturesMap[purchase.container._id.toString()] || [];
+
+      if (purchasedContainerLectures.length > 0) {
+        return {
+          ...purchase,
+          container: {
+            ...purchase.container,
+            lectures: purchasedContainerLectures,
+          },
+        };
+      }
+    }
+
+    return purchase;
+  });
+};
+
 // Helper function to get additional data for students and parents
 const getStudentParentAdditionalData = async (
   userId,
@@ -924,42 +1103,9 @@ const getStudentParentAdditionalData = async (
       ])
       .lean();
 
-    // Enhance purchase history with lecture data from the new LectureModel
-    // This handles cases where:
-    // 1. User purchased a lecture directly (lecture field is populated)
-    // 2. User purchased a container of type "lecture" (need to fetch from LectureModel)
-    const lectureIdsToPopulate = purchaseHistory
-      .filter(p => !p.lecture && p.container && p.container.type === "lecture")
-      .map(p => p.container?._id)
-      .filter(Boolean);
-
-    let lecturesMap = {};
-    if (lectureIdsToPopulate.length > 0) {
-      const lectures = await Lecture.find({ _id: { $in: lectureIdsToPopulate } })
-        .populate("subject", "name")
-        .populate("level", "name")
-        .lean();
-      lecturesMap = lectures.reduce((acc, lec) => {
-        acc[lec._id.toString()] = lec;
-        return acc;
-      }, {});
-    }
-
-    // Map purchase history to include lecture data from LectureModel when applicable
-    responseData.purchaseHistory = purchaseHistory.map(p => {
-      // If lecture field is already populated, use it
-      if (p.lecture) return p;
-
-      // If container is of type lecture, try to get lecture data from LectureModel
-      if (p.container && p.container.type === "lecture") {
-        const lectureData = lecturesMap[p.container._id?.toString()];
-        if (lectureData) {
-          return { ...p, lecture: lectureData };
-        }
-      }
-
-      return p;
-    });
+    responseData.purchaseHistory = await enrichPurchasesWithLectureData(
+      purchaseHistory
+    );
 
     // Get total count of purchases for pagination info
     const totalPurchases = await Purchase.countDocuments({ student: userId });
@@ -1059,30 +1205,30 @@ const getStudentParentAdditionalData = async (
     // If we have purchase history, use it to determine purchased features
     if (responseData.purchaseHistory) {
       responseData.purchaseHistory.forEach((purchase) => {
-        // Check for direct lecture purchases or container-based lecture purchases
-        if (purchase.lecture || (purchase.container && purchase.container.type === "lecture")) {
+        if (hasLectureAccessFromPurchase(purchase)) {
           purchasedLectureTypes.add("lecture");
         }
       });
     }
     // Otherwise we need to query just to determine feature flags
     else {
-      // Check for both direct lecture purchases and container-based lecture purchases
-      const directLecturePurchases = await Purchase.find({
+      const featureFlagPurchases = await Purchase.find({
         student: userId,
-        lecture: { $exists: true, $ne: null },
+        $or: [
+          { lecture: { $exists: true, $ne: null } },
+          { type: "containerPurchase", container: { $exists: true, $ne: null } },
+        ],
       })
-        .limit(1)
+        .select("container lecture type")
+        .populate({ path: "container", select: "type" })
+        .populate({ path: "lecture", select: "_id" })
         .lean();
 
-      const containerLecturePurchases = await Purchase.find({
-        student: userId,
-        "container.type": "lecture",
-      })
-        .limit(1)
-        .lean();
+      const enrichedFeaturePurchases = await enrichPurchasesWithLectureData(
+        featureFlagPurchases
+      );
 
-      if (directLecturePurchases.length > 0 || containerLecturePurchases.length > 0) {
+      if (enrichedFeaturePurchases.some(hasLectureAccessFromPurchase)) {
         purchasedLectureTypes.add("lecture");
       }
     }
@@ -1153,33 +1299,9 @@ const getParentChildrenData = catchAsync(async (req, res, next) => {
         .sort({ createdAt: -1 })
         .lean();
 
-      // For containers of type "lecture", also fetch from LectureModel for backward compatibility
-      const lectureIdsToPopulate = purchaseHistory
-        .filter(p => !p.lecture && p.container && p.container.type === "lecture")
-        .map(p => p.container?._id)
-        .filter(Boolean);
-
-      if (lectureIdsToPopulate.length > 0) {
-        const lectures = await Lecture.find({ _id: { $in: lectureIdsToPopulate } })
-          .populate("subject", "name")
-          .populate("level", "name")
-          .lean();
-
-        const lecturesMap = lectures.reduce((acc, lec) => {
-          acc[lec._id.toString()] = lec;
-          return acc;
-        }, {});
-
-        // Enhance purchase history with lecture data from LectureModel
-        purchaseHistory.forEach((p, index) => {
-          if (!p.lecture && p.container && p.container.type === "lecture") {
-            const lectureData = lecturesMap[p.container._id?.toString()];
-            if (lectureData) {
-              purchaseHistory[index] = { ...p, lecture: lectureData };
-            }
-          }
-        });
-      }
+      const enrichedPurchaseHistory = await enrichPurchasesWithLectureData(
+        purchaseHistory
+      );
 
       // Get lecture access
       const lectureAccess = await StudentLectureAccess.find({ student: child._id })
@@ -1202,7 +1324,7 @@ const getParentChildrenData = catchAsync(async (req, res, next) => {
       // Return child with additional data
       return {
         ...child,
-        purchaseHistory,
+        purchaseHistory: enrichedPurchaseHistory,
         lectureAccess,
         redeemedCodes,
         examScores // Include exam scores in the response
