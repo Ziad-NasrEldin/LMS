@@ -221,9 +221,7 @@ ounded-[2rem]\), removed hard \shadow-sm\ defaults from DaisyUI, updated primary
 - Hardened config/link inputs by validating public HTTP/HTTPS URLs, blocked server-side download proxying for link attachments, and added role/ownership checks for lecture attachment uploads.
 - Tightened student lecture gating in the frontend by removing the permissive fallback that previously granted access when verification checks failed.
 
-## 2026-03-27 - Lecturer sidebar label correction - GPT-5.4 mini
-- Renamed the lecturer sidebar item from Lectures to My Courses by reusing the shared courses translation key.
-- Kept the route unchanged so the label now matches the actual courses management page.
+
 
 ## 2026-03-27 - Logging rule reminder - GPT-5.4 mini
 - Keep appending concise release/update notes to Agent-Logs.md after each finished task.
@@ -242,4 +240,8 @@ ounded-[2rem]\), removed hard \shadow-sm\ defaults from DaisyUI, updated primary
 - Added a dedicated atomic play-start endpoint for student lecture access accounting and kept the legacy consume-view route as a compatibility alias.
 - Swapped the lecture player to the new play-start helper and surfaced visible retry status during soft fallback attempts.
 - Locked the lecture access flow to the student owner path while preserving the existing entitlement and idempotency checks.
+
+## 2026-03-27 - Lecturer sidebar label correction - GPT-5.4 mini
+- Renamed the lecturer sidebar item from Lectures to My Courses by reusing the shared courses translation key.
+- Kept the route unchanged so the label now matches the actual courses management page.
 
