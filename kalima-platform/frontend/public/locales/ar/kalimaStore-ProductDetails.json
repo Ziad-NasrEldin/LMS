@@ -91,6 +91,7 @@
     "invalidDiscountValue": "قيمة الخصم المستلمة من الخادم غير صالحة.",
     "productDataNotLoaded": "بيانات المنتج غير محملة.",
     "unknownError": "حدث خطأ غير معروف"
+    ,"copyFailed": "فشل النسخ"
   },
   "success": {
     "purchaseSubmitted": "تم إرسال الشراء بنجاح!",
@@ -127,9 +128,11 @@
     "couponCodePlaceholder": "أدخل الكوبون",
     "applyCoupon": "تطبيق",
     "priceSummary": "ملخص السعر",
+    "price": "السعر",
     "originalPrice": "السعر الأصلي",
     "discountedPrice": "السعر بعد الخصم",
     "discount": "الخصم",
+    "couponDiscount": "خصم الكوبون",
     "total": "المجموع",
     "notes": "ملاحظات",
     "notesPlaceholder": "يمكنك كتابه كل ما تريده هنا قبل اجراء عمليه الشراء"

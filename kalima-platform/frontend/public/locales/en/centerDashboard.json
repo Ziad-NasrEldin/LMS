@@ -125,7 +125,9 @@
       },
       "status": {
         "pass": "Present",
-        "fail": "Absent"
+        "fail": "Absent",
+        "yes": "Yes",
+        "no": "No"
       },
       "grade": {
         "excellent": "Excellent",
@@ -356,5 +358,8 @@
       "bookletRev": "Booklet Rev",
       "totalRev": "Total Rev"
     }
+  }
+  ,"common": {
+    "na": "N/A"
   }
   }

@@ -15,6 +15,7 @@
   "searchPlaceholder": "Search by user name, product name, or serial...",
   "filters": {
     "allStatus": "All Status",
+    "selectDate": "Select date",
     "confirmed": "Confirmed",
     "pending": "Pending",
     "allTypes": "All Types",
@@ -22,14 +23,17 @@
     "products": "Products"
   },
   "refresh": "Refresh",
+  "clearFilters": "Clear Filters",
   "exportCSV": "Export CSV",
   "exporting": "Exporting...",
   "exportXLSX": "Export XLSX",
+  "activeFilters": "Active Filters",
   "table": {
     "product": "Product",
     "customer": "Customer",
     "type": "Type",
     "price": "Price",
+    "couponCode": "Coupon Code",
     "transferFrom": "Transfer From",
     "status": "Status",
     "notes": "Notes",

@@ -15,6 +15,7 @@
   "searchPlaceholder": "ابحث باسم المستخدم أو اسم المنتج أو الرقم التسلسلي...",
   "filters": {
     "allStatus": "كل الحالات",
+    "selectDate": "اختر التاريخ",
     "confirmed": "تم التأكيد",
     "pending": "قيد الانتظار",
     "allTypes": "كل الأنواع",
@@ -22,14 +23,17 @@
     "products": "المنتجات"
   },
   "refresh": "تحديث",
+  "clearFilters": "مسح الفلاتر",
   "exportCSV": "تصدير CSV",
   "exporting": "جارٍ التصدير...",
   "exportXLSX": "تصدير XLSX",
+  "activeFilters": "الفلاتر النشطة",
   "table": {
     "product": "المنتج",
     "customer": "العميل",
     "type": "النوع",
     "price": "السعر",
+    "couponCode": "كود الكوبون",
     "transferFrom": "تم التحويل من",
     "status": "الحالة",
     "notes": "الملاحظات",

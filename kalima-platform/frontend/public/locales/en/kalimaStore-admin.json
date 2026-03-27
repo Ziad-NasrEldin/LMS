@@ -49,6 +49,7 @@
     "table": {
       "name": "Name",
       "section": "Parent Section",
+      "createdAt": "Created At",
       "numberOfProducts": "Number of Products",
       "actions": "Actions",
       "edit": "Edit",
@@ -306,13 +307,19 @@
     "exporting": "Exporting...",
     "csvFormat": "CSV Format",
     "jsonFormat": "JSON Format"
+    ,"allProducts": "All Products",
+    "booksOnly": "Books Only",
+    "sections": "Sections"
   },
   "products": {
     "unknownSection": "Unknown Section"
   },
+  "unknownSection": "Unknown Section",
+  "allSections": "All Sections",
   "validation": {
     "invalidProductSelected": "Invalid product selected",
-    "invalidSectionSelected": "Invalid section selected"
+    "invalidSectionSelected": "Invalid section selected",
+    "invalidSubSectionSelected": "Invalid subsection selected"
   },
   "pagination": {
     "showing": "Showing",

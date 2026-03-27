@@ -49,6 +49,7 @@
     "table": {
       "name": "الاسم",
       "section": "القسم الأساسي",
+      "createdAt": "تاريخ الإنشاء",
       "numberOfProducts": "عدد المنتجات",
       "actions": "الإجراءات",
       "edit": "تعديل",
@@ -306,13 +307,19 @@
     "exporting": "جاري التصدير...",
     "csvFormat": "تنسيق CSV",
     "jsonFormat": "تنسيق JSON"
+    ,"allProducts": "كل المنتجات",
+    "booksOnly": "الكتب فقط",
+    "sections": "الأقسام"
   },
   "products": {
     "unknownSection": "قسم غير معروف"
   },
+  "unknownSection": "قسم غير معروف",
+  "allSections": "جميع الأقسام",
   "validation": {
     "invalidProductSelected": "تم تحديد منتج غير صالح",
-    "invalidSectionSelected": "تم تحديد قسم غير صالح"
+    "invalidSectionSelected": "تم تحديد قسم غير صالح",
+    "invalidSubSectionSelected": "تم تحديد قسم فرعي غير صالح"
   },
   "pagination": {
     "showing": "عرض",

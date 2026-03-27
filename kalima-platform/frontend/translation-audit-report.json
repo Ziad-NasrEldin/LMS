@@ -4,15 +4,15 @@
     "namespaceCountAr": 32,
     "missingArNamespacesCount": 0,
     "missingEnNamespacesCount": 0,
-    "missingUsedKeysInEnCount": 82,
-    "missingUsedKeysInArCount": 82
+    "missingUsedKeysInEnCount": 0,
+    "missingUsedKeysInArCount": 0
   },
   "missingArNamespaces": [],
   "missingEnNamespaces": [],
   "byNamespace": {
     "admin": {
-      "enCount": 376,
-      "arCount": 376,
+      "enCount": 395,
+      "arCount": 395,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": [
@@ -43,8 +43,8 @@
       "suspiciousSame": []
     },
     "centerDashboard": {
-      "enCount": 269,
-      "arCount": 269,
+      "enCount": 273,
+      "arCount": 273,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": [
@@ -54,8 +54,8 @@
       ]
     },
     "common": {
-      "enCount": 119,
-      "arCount": 119,
+      "enCount": 120,
+      "arCount": 120,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": []
@@ -121,15 +121,15 @@
       ]
     },
     "createAdmin": {
-      "enCount": 51,
-      "arCount": 51,
+      "enCount": 52,
+      "arCount": 52,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": []
     },
     "createUser": {
-      "enCount": 125,
-      "arCount": 125,
+      "enCount": 131,
+      "arCount": 131,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": []
@@ -142,8 +142,8 @@
       "suspiciousSame": []
     },
     "home": {
-      "enCount": 126,
-      "arCount": 126,
+      "enCount": 127,
+      "arCount": 127,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": [
@@ -160,8 +160,8 @@
       ]
     },
     "kalimaStore-ProductDetails": {
-      "enCount": 129,
-      "arCount": 129,
+      "enCount": 132,
+      "arCount": 132,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": [
@@ -169,8 +169,8 @@
       ]
     },
     "kalimaStore-admin": {
-      "enCount": 305,
-      "arCount": 305,
+      "enCount": 312,
+      "arCount": 312,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": [
@@ -178,8 +178,8 @@
       ]
     },
     "kalimaStore-analytics": {
-      "enCount": 49,
-      "arCount": 49,
+      "enCount": 50,
+      "arCount": 50,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": []
@@ -199,8 +199,8 @@
       "suspiciousSame": []
     },
     "kalimaStore-orders": {
-      "enCount": 88,
-      "arCount": 88,
+      "enCount": 92,
+      "arCount": 92,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": []
@@ -213,22 +213,22 @@
       "suspiciousSame": []
     },
     "lecturerDashboard": {
-      "enCount": 65,
-      "arCount": 65,
+      "enCount": 67,
+      "arCount": 67,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": []
     },
     "lectures": {
-      "enCount": 133,
-      "arCount": 133,
+      "enCount": 135,
+      "arCount": 135,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": []
     },
     "lecturesPage": {
-      "enCount": 146,
-      "arCount": 146,
+      "enCount": 174,
+      "arCount": 174,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": []
@@ -294,992 +294,6 @@
       "suspiciousSame": []
     }
   },
-  "missingUsedInEn": [
-    {
-      "file": "pages/User Dashboard/Lecture Page/ContainerPage.jsx",
-      "ns": "lecturesPage",
-      "key": "containersPage.unknown",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Lecture Page/LecturesPage.jsx",
-      "ns": "lecturesPage",
-      "key": "lecturesPage.messages.lectureUpdatedSuccessfully",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Lecture Page/LecturesPage.jsx",
-      "ns": "lecturesPage",
-      "key": "lecturesPage.messages.lectureCreatedSuccessfully",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Lecture Page/LecturesPage.jsx",
-      "ns": "lecturesPage",
-      "key": "lecturesPage.buttons.edit",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Lecture Page/LecturesPage.jsx",
-      "ns": "lecturesPage",
-      "key": "lecturesPage.buttons.edit",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/AddNewStuff.jsx",
-      "ns": "createAdmin",
-      "key": "forms.subject.nameAR",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/auditLog.jsx",
-      "ns": "admin",
-      "key": "admin.auditlog.table.user",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/auditLog.jsx",
-      "ns": "admin",
-      "key": "admin.auditlog.table.email",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/auditLog.jsx",
-      "ns": "admin",
-      "key": "admin.auditlog.table.action",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/auditLog.jsx",
-      "ns": "admin",
-      "key": "admin.auditlog.table.timestamp",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/auditLog.jsx",
-      "ns": "admin",
-      "key": "admin.auditlog.table.role",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/auditLog.jsx",
-      "ns": "admin",
-      "key": "admin.auditlog.table.resource",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/auditLog.jsx",
-      "ns": "admin",
-      "key": "admin.auditlog.table.status",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/home/PromoCodesGenerator.jsx",
-      "ns": "admin",
-      "key": "admin.errors.qrCodeGenerationFailed",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/home/PromoCodesGenerator.jsx",
-      "ns": "admin",
-      "key": "admin.download",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/home/PromoCodesTable.jsx",
-      "ns": "admin",
-      "key": "errors.invalidResponse",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/home/PromoCodesTable.jsx",
-      "ns": "admin",
-      "key": "errors.failedToFetchStudents",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/home/PromoCodesTable.jsx",
-      "ns": "admin",
-      "key": "errors.deleteFailed",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/home/PromoCodesTable.jsx",
-      "ns": "admin",
-      "key": "errors.unexpectedError",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/home/PromoCodesTable.jsx",
-      "ns": "admin",
-      "key": "errors.bulkDeleteFailed",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/home/PromoCodesTable.jsx",
-      "ns": "admin",
-      "key": "errors.unexpectedError",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/home/PromoCodesTable.jsx",
-      "ns": "admin",
-      "key": "promoCodes.subtitle",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/home/PromoCodesTable.jsx",
-      "ns": "admin",
-      "key": "modals.confirmBulkDelete",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/home/PromoCodesTable.jsx",
-      "ns": "admin",
-      "key": "modals.bulkDeleteConfirm",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/CreateUserModal.jsx",
-      "ns": "createUser",
-      "key": "validation.subjectRequired",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/CreateUserModal.jsx",
-      "ns": "createUser",
-      "key": "validation.teachesAtTypeRequired",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/CreateUserModal.jsx",
-      "ns": "createUser",
-      "key": "validation.centersRequired",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/CreateUserModal.jsx",
-      "ns": "createUser",
-      "key": "validation.schoolRequired",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/CreateUserModal.jsx",
-      "ns": "createUser",
-      "key": "validation.governmentRequired",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/CreateUserModal.jsx",
-      "ns": "createUser",
-      "key": "validation.administrationZoneRequired",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "admin.editUser.emailPlaceholder",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/LecturerDashboard.jsx",
-      "ns": "lecturerDashboard",
-      "key": "featured_courses",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/LecturerDashboard.jsx",
-      "ns": "lecturerDashboard",
-      "key": "view_all",
-      "fn": "t"
-    },
-    {
-      "file": "pages/KalimaStore/storeAnalytics.jsx",
-      "ns": "kalimaStore-analytics",
-      "key": "dailyStats",
-      "fn": "t"
-    },
-    {
-      "file": "pages/KalimaStore/Components/PaymentSection.jsx",
-      "ns": "kalimaStore-ProductDetails",
-      "key": "errors.copyFailed",
-      "fn": "t"
-    },
-    {
-      "file": "pages/KalimaStore/Components/PurchaseForm.jsx",
-      "ns": "kalimaStore-ProductDetails",
-      "key": "purchaseForm.price",
-      "fn": "t"
-    },
-    {
-      "file": "pages/KalimaStore/Components/PurchaseForm.jsx",
-      "ns": "kalimaStore-ProductDetails",
-      "key": "purchaseForm.couponDiscount",
-      "fn": "t"
-    },
-    {
-      "file": "pages/KalimaStore/AdminPanel/AdminPanel.jsx",
-      "ns": "kalimaStore-admin",
-      "key": "validation.invalidSubSectionSelected",
-      "fn": "t"
-    },
-    {
-      "file": "pages/KalimaStore/AdminPanel/ExportSection.jsx",
-      "ns": "kalimaStore-admin",
-      "key": "export.allProducts",
-      "fn": "t"
-    },
-    {
-      "file": "pages/KalimaStore/AdminPanel/ExportSection.jsx",
-      "ns": "kalimaStore-admin",
-      "key": "export.booksOnly",
-      "fn": "t"
-    },
-    {
-      "file": "pages/KalimaStore/AdminPanel/ExportSection.jsx",
-      "ns": "kalimaStore-admin",
-      "key": "export.sections",
-      "fn": "t"
-    },
-    {
-      "file": "pages/KalimaStore/AdminPanel/ExportSection.jsx",
-      "ns": "kalimaStore-admin",
-      "key": "export.allProducts",
-      "fn": "t"
-    },
-    {
-      "file": "pages/KalimaStore/AdminPanel/ExportSection.jsx",
-      "ns": "kalimaStore-admin",
-      "key": "export.booksOnly",
-      "fn": "t"
-    },
-    {
-      "file": "pages/KalimaStore/AdminPanel/ExportSection.jsx",
-      "ns": "kalimaStore-admin",
-      "key": "export.sections",
-      "fn": "t"
-    },
-    {
-      "file": "pages/KalimaStore/AdminPanel/Orders.jsx",
-      "ns": "kalimaStore-orders",
-      "key": "filters.selectDate",
-      "fn": "t"
-    },
-    {
-      "file": "pages/KalimaStore/AdminPanel/Orders.jsx",
-      "ns": "kalimaStore-orders",
-      "key": "clearFilters",
-      "fn": "t"
-    },
-    {
-      "file": "pages/KalimaStore/AdminPanel/Orders.jsx",
-      "ns": "kalimaStore-orders",
-      "key": "activeFilters",
-      "fn": "t"
-    },
-    {
-      "file": "pages/KalimaStore/AdminPanel/Orders.jsx",
-      "ns": "kalimaStore-orders",
-      "key": "table.couponCode",
-      "fn": "t"
-    },
-    {
-      "file": "pages/KalimaStore/AdminPanel/Orders.jsx",
-      "ns": "kalimaStore-orders",
-      "key": "table.couponCode",
-      "fn": "t"
-    },
-    {
-      "file": "pages/KalimaStore/AdminPanel/SubSectionsManagement.jsx",
-      "ns": "kalimaStore-admin",
-      "key": "unknownSection",
-      "fn": "t"
-    },
-    {
-      "file": "pages/KalimaStore/AdminPanel/SubSectionsManagement.jsx",
-      "ns": "kalimaStore-admin",
-      "key": "allSections",
-      "fn": "t"
-    },
-    {
-      "file": "pages/KalimaStore/AdminPanel/SubSectionsManagement.jsx",
-      "ns": "kalimaStore-admin",
-      "key": "subSectionsManagement.table.createdAt",
-      "fn": "t"
-    },
-    {
-      "file": "pages/CenterDashboard/ActivityTracker.jsx",
-      "ns": "centerDashboard",
-      "key": "activityTracker.status.yes",
-      "fn": "t"
-    },
-    {
-      "file": "pages/CenterDashboard/ActivityTracker.jsx",
-      "ns": "centerDashboard",
-      "key": "activityTracker.status.no",
-      "fn": "t"
-    },
-    {
-      "file": "pages/CenterDashboard/CourseList.jsx",
-      "ns": "centerDashboard",
-      "key": "common.na",
-      "fn": "t"
-    },
-    {
-      "file": "components/CourseCard.jsx",
-      "ns": "home",
-      "key": "containerType",
-      "fn": "t"
-    },
-    {
-      "file": "components/ExamConfigSection.jsx",
-      "ns": "lecturesPage",
-      "key": "examConfig.noConfigs",
-      "fn": "t"
-    },
-    {
-      "file": "components/ExamConfigSection.jsx",
-      "ns": "lecturesPage",
-      "key": "examConfig.configurationLabel",
-      "fn": "t"
-    },
-    {
-      "file": "components/ExamConfigSection.jsx",
-      "ns": "lecturesPage",
-      "key": "examConfig.selectConfig",
-      "fn": "t"
-    },
-    {
-      "file": "components/ExamConfigSection.jsx",
-      "ns": "lecturesPage",
-      "key": "examConfig.noExistingConfigs",
-      "fn": "t"
-    },
-    {
-      "file": "components/ExamConfigSection.jsx",
-      "ns": "lecturesPage",
-      "key": "examConfig.createNew",
-      "fn": "t"
-    },
-    {
-      "file": "components/ExamConfigSection.jsx",
-      "ns": "lecturesPage",
-      "key": "examConfig.emptyHelp",
-      "fn": "t"
-    },
-    {
-      "file": "components/ExamConfigSection.jsx",
-      "ns": "lecturesPage",
-      "key": "examConfig.newConfiguration",
-      "fn": "t"
-    },
-    {
-      "file": "components/ExamConfigSection.jsx",
-      "ns": "lecturesPage",
-      "key": "examConfig.type",
-      "fn": "t"
-    },
-    {
-      "file": "components/ExamConfigSection.jsx",
-      "ns": "lecturesPage",
-      "key": "examConfig.exam",
-      "fn": "t"
-    },
-    {
-      "file": "components/ExamConfigSection.jsx",
-      "ns": "lecturesPage",
-      "key": "examConfig.homework",
-      "fn": "t"
-    },
-    {
-      "file": "components/ExamConfigSection.jsx",
-      "ns": "lecturesPage",
-      "key": "examConfig.typeHelp",
-      "fn": "t"
-    },
-    {
-      "file": "components/ExamConfigSection.jsx",
-      "ns": "lecturesPage",
-      "key": "examConfig.googleSheetId",
-      "fn": "t"
-    },
-    {
-      "file": "components/ExamConfigSection.jsx",
-      "ns": "lecturesPage",
-      "key": "examConfig.googleSheetHelp",
-      "fn": "t"
-    },
-    {
-      "file": "components/ExamConfigSection.jsx",
-      "ns": "lecturesPage",
-      "key": "examConfig.formUrl",
-      "fn": "t"
-    },
-    {
-      "file": "components/ExamConfigSection.jsx",
-      "ns": "lecturesPage",
-      "key": "examConfig.studentIdentifierColumn",
-      "fn": "t"
-    },
-    {
-      "file": "components/ExamConfigSection.jsx",
-      "ns": "lecturesPage",
-      "key": "examConfig.scoreColumn",
-      "fn": "t"
-    },
-    {
-      "file": "components/ExamConfigSection.jsx",
-      "ns": "lecturesPage",
-      "key": "examConfig.defaultPassingThreshold",
-      "fn": "t"
-    },
-    {
-      "file": "components/ExamConfigSection.jsx",
-      "ns": "lecturesPage",
-      "key": "examConfig.createButton",
-      "fn": "t"
-    },
-    {
-      "file": "components/ExamConfigSection.jsx",
-      "ns": "lecturesPage",
-      "key": "examConfig.passingThreshold",
-      "fn": "t"
-    },
-    {
-      "file": "components/lectureCard.jsx",
-      "ns": "lectures",
-      "key": "showLess",
-      "fn": "t"
-    },
-    {
-      "file": "components/lectureCard.jsx",
-      "ns": "lectures",
-      "key": "showMore",
-      "fn": "t"
-    },
-    {
-      "file": "components/LectureCreationModal.jsx",
-      "ns": "lecturesPage",
-      "key": "sections.publishSettings",
-      "fn": "t"
-    },
-    {
-      "file": "components/LectureCreationModal.jsx",
-      "ns": "lecturesPage",
-      "key": "fields.enterGoogleFormOrLink",
-      "fn": "t"
-    },
-    {
-      "file": "components/LectureCreationModal.jsx",
-      "ns": "lecturesPage",
-      "key": "fields.orPasteLink",
-      "fn": "t"
-    },
-    {
-      "file": "components/navbar.jsx",
-      "ns": "common",
-      "key": "login",
-      "fn": "t"
-    },
-    {
-      "file": "components/navbar.jsx",
-      "ns": "common",
-      "key": "login",
-      "fn": "t"
-    }
-  ],
-  "missingUsedInAr": [
-    {
-      "file": "pages/User Dashboard/Lecture Page/ContainerPage.jsx",
-      "ns": "lecturesPage",
-      "key": "containersPage.unknown",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Lecture Page/LecturesPage.jsx",
-      "ns": "lecturesPage",
-      "key": "lecturesPage.messages.lectureUpdatedSuccessfully",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Lecture Page/LecturesPage.jsx",
-      "ns": "lecturesPage",
-      "key": "lecturesPage.messages.lectureCreatedSuccessfully",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Lecture Page/LecturesPage.jsx",
-      "ns": "lecturesPage",
-      "key": "lecturesPage.buttons.edit",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Lecture Page/LecturesPage.jsx",
-      "ns": "lecturesPage",
-      "key": "lecturesPage.buttons.edit",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/AddNewStuff.jsx",
-      "ns": "createAdmin",
-      "key": "forms.subject.nameAR",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/auditLog.jsx",
-      "ns": "admin",
-      "key": "admin.auditlog.table.user",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/auditLog.jsx",
-      "ns": "admin",
-      "key": "admin.auditlog.table.email",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/auditLog.jsx",
-      "ns": "admin",
-      "key": "admin.auditlog.table.action",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/auditLog.jsx",
-      "ns": "admin",
-      "key": "admin.auditlog.table.timestamp",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/auditLog.jsx",
-      "ns": "admin",
-      "key": "admin.auditlog.table.role",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/auditLog.jsx",
-      "ns": "admin",
-      "key": "admin.auditlog.table.resource",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/auditLog.jsx",
-      "ns": "admin",
-      "key": "admin.auditlog.table.status",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/home/PromoCodesGenerator.jsx",
-      "ns": "admin",
-      "key": "admin.errors.qrCodeGenerationFailed",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/home/PromoCodesGenerator.jsx",
-      "ns": "admin",
-      "key": "admin.download",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/home/PromoCodesTable.jsx",
-      "ns": "admin",
-      "key": "errors.invalidResponse",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/home/PromoCodesTable.jsx",
-      "ns": "admin",
-      "key": "errors.failedToFetchStudents",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/home/PromoCodesTable.jsx",
-      "ns": "admin",
-      "key": "errors.deleteFailed",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/home/PromoCodesTable.jsx",
-      "ns": "admin",
-      "key": "errors.unexpectedError",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/home/PromoCodesTable.jsx",
-      "ns": "admin",
-      "key": "errors.bulkDeleteFailed",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/home/PromoCodesTable.jsx",
-      "ns": "admin",
-      "key": "errors.unexpectedError",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/home/PromoCodesTable.jsx",
-      "ns": "admin",
-      "key": "promoCodes.subtitle",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/home/PromoCodesTable.jsx",
-      "ns": "admin",
-      "key": "modals.confirmBulkDelete",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/home/PromoCodesTable.jsx",
-      "ns": "admin",
-      "key": "modals.bulkDeleteConfirm",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/CreateUserModal.jsx",
-      "ns": "createUser",
-      "key": "validation.subjectRequired",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/CreateUserModal.jsx",
-      "ns": "createUser",
-      "key": "validation.teachesAtTypeRequired",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/CreateUserModal.jsx",
-      "ns": "createUser",
-      "key": "validation.centersRequired",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/CreateUserModal.jsx",
-      "ns": "createUser",
-      "key": "validation.schoolRequired",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/CreateUserModal.jsx",
-      "ns": "createUser",
-      "key": "validation.governmentRequired",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/CreateUserModal.jsx",
-      "ns": "createUser",
-      "key": "validation.administrationZoneRequired",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "admin.editUser.emailPlaceholder",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/LecturerDashboard.jsx",
-      "ns": "lecturerDashboard",
-      "key": "featured_courses",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/LecturerDashboard.jsx",
-      "ns": "lecturerDashboard",
-      "key": "view_all",
-      "fn": "t"
-    },
-    {
-      "file": "pages/KalimaStore/storeAnalytics.jsx",
-      "ns": "kalimaStore-analytics",
-      "key": "dailyStats",
-      "fn": "t"
-    },
-    {
-      "file": "pages/KalimaStore/Components/PaymentSection.jsx",
-      "ns": "kalimaStore-ProductDetails",
-      "key": "errors.copyFailed",
-      "fn": "t"
-    },
-    {
-      "file": "pages/KalimaStore/Components/PurchaseForm.jsx",
-      "ns": "kalimaStore-ProductDetails",
-      "key": "purchaseForm.price",
-      "fn": "t"
-    },
-    {
-      "file": "pages/KalimaStore/Components/PurchaseForm.jsx",
-      "ns": "kalimaStore-ProductDetails",
-      "key": "purchaseForm.couponDiscount",
-      "fn": "t"
-    },
-    {
-      "file": "pages/KalimaStore/AdminPanel/AdminPanel.jsx",
-      "ns": "kalimaStore-admin",
-      "key": "validation.invalidSubSectionSelected",
-      "fn": "t"
-    },
-    {
-      "file": "pages/KalimaStore/AdminPanel/ExportSection.jsx",
-      "ns": "kalimaStore-admin",
-      "key": "export.allProducts",
-      "fn": "t"
-    },
-    {
-      "file": "pages/KalimaStore/AdminPanel/ExportSection.jsx",
-      "ns": "kalimaStore-admin",
-      "key": "export.booksOnly",
-      "fn": "t"
-    },
-    {
-      "file": "pages/KalimaStore/AdminPanel/ExportSection.jsx",
-      "ns": "kalimaStore-admin",
-      "key": "export.sections",
-      "fn": "t"
-    },
-    {
-      "file": "pages/KalimaStore/AdminPanel/ExportSection.jsx",
-      "ns": "kalimaStore-admin",
-      "key": "export.allProducts",
-      "fn": "t"
-    },
-    {
-      "file": "pages/KalimaStore/AdminPanel/ExportSection.jsx",
-      "ns": "kalimaStore-admin",
-      "key": "export.booksOnly",
-      "fn": "t"
-    },
-    {
-      "file": "pages/KalimaStore/AdminPanel/ExportSection.jsx",
-      "ns": "kalimaStore-admin",
-      "key": "export.sections",
-      "fn": "t"
-    },
-    {
-      "file": "pages/KalimaStore/AdminPanel/Orders.jsx",
-      "ns": "kalimaStore-orders",
-      "key": "filters.selectDate",
-      "fn": "t"
-    },
-    {
-      "file": "pages/KalimaStore/AdminPanel/Orders.jsx",
-      "ns": "kalimaStore-orders",
-      "key": "clearFilters",
-      "fn": "t"
-    },
-    {
-      "file": "pages/KalimaStore/AdminPanel/Orders.jsx",
-      "ns": "kalimaStore-orders",
-      "key": "activeFilters",
-      "fn": "t"
-    },
-    {
-      "file": "pages/KalimaStore/AdminPanel/Orders.jsx",
-      "ns": "kalimaStore-orders",
-      "key": "table.couponCode",
-      "fn": "t"
-    },
-    {
-      "file": "pages/KalimaStore/AdminPanel/Orders.jsx",
-      "ns": "kalimaStore-orders",
-      "key": "table.couponCode",
-      "fn": "t"
-    },
-    {
-      "file": "pages/KalimaStore/AdminPanel/SubSectionsManagement.jsx",
-      "ns": "kalimaStore-admin",
-      "key": "unknownSection",
-      "fn": "t"
-    },
-    {
-      "file": "pages/KalimaStore/AdminPanel/SubSectionsManagement.jsx",
-      "ns": "kalimaStore-admin",
-      "key": "allSections",
-      "fn": "t"
-    },
-    {
-      "file": "pages/KalimaStore/AdminPanel/SubSectionsManagement.jsx",
-      "ns": "kalimaStore-admin",
-      "key": "subSectionsManagement.table.createdAt",
-      "fn": "t"
-    },
-    {
-      "file": "pages/CenterDashboard/ActivityTracker.jsx",
-      "ns": "centerDashboard",
-      "key": "activityTracker.status.yes",
-      "fn": "t"
-    },
-    {
-      "file": "pages/CenterDashboard/ActivityTracker.jsx",
-      "ns": "centerDashboard",
-      "key": "activityTracker.status.no",
-      "fn": "t"
-    },
-    {
-      "file": "pages/CenterDashboard/CourseList.jsx",
-      "ns": "centerDashboard",
-      "key": "common.na",
-      "fn": "t"
-    },
-    {
-      "file": "components/CourseCard.jsx",
-      "ns": "home",
-      "key": "containerType",
-      "fn": "t"
-    },
-    {
-      "file": "components/ExamConfigSection.jsx",
-      "ns": "lecturesPage",
-      "key": "examConfig.noConfigs",
-      "fn": "t"
-    },
-    {
-      "file": "components/ExamConfigSection.jsx",
-      "ns": "lecturesPage",
-      "key": "examConfig.configurationLabel",
-      "fn": "t"
-    },
-    {
-      "file": "components/ExamConfigSection.jsx",
-      "ns": "lecturesPage",
-      "key": "examConfig.selectConfig",
-      "fn": "t"
-    },
-    {
-      "file": "components/ExamConfigSection.jsx",
-      "ns": "lecturesPage",
-      "key": "examConfig.noExistingConfigs",
-      "fn": "t"
-    },
-    {
-      "file": "components/ExamConfigSection.jsx",
-      "ns": "lecturesPage",
-      "key": "examConfig.createNew",
-      "fn": "t"
-    },
-    {
-      "file": "components/ExamConfigSection.jsx",
-      "ns": "lecturesPage",
-      "key": "examConfig.emptyHelp",
-      "fn": "t"
-    },
-    {
-      "file": "components/ExamConfigSection.jsx",
-      "ns": "lecturesPage",
-      "key": "examConfig.newConfiguration",
-      "fn": "t"
-    },
-    {
-      "file": "components/ExamConfigSection.jsx",
-      "ns": "lecturesPage",
-      "key": "examConfig.type",
-      "fn": "t"
-    },
-    {
-      "file": "components/ExamConfigSection.jsx",
-      "ns": "lecturesPage",
-      "key": "examConfig.exam",
-      "fn": "t"
-    },
-    {
-      "file": "components/ExamConfigSection.jsx",
-      "ns": "lecturesPage",
-      "key": "examConfig.homework",
-      "fn": "t"
-    },
-    {
-      "file": "components/ExamConfigSection.jsx",
-      "ns": "lecturesPage",
-      "key": "examConfig.typeHelp",
-      "fn": "t"
-    },
-    {
-      "file": "components/ExamConfigSection.jsx",
-      "ns": "lecturesPage",
-      "key": "examConfig.googleSheetId",
-      "fn": "t"
-    },
-    {
-      "file": "components/ExamConfigSection.jsx",
-      "ns": "lecturesPage",
-      "key": "examConfig.googleSheetHelp",
-      "fn": "t"
-    },
-    {
-      "file": "components/ExamConfigSection.jsx",
-      "ns": "lecturesPage",
-      "key": "examConfig.formUrl",
-      "fn": "t"
-    },
-    {
-      "file": "components/ExamConfigSection.jsx",
-      "ns": "lecturesPage",
-      "key": "examConfig.studentIdentifierColumn",
-      "fn": "t"
-    },
-    {
-      "file": "components/ExamConfigSection.jsx",
-      "ns": "lecturesPage",
-      "key": "examConfig.scoreColumn",
-      "fn": "t"
-    },
-    {
-      "file": "components/ExamConfigSection.jsx",
-      "ns": "lecturesPage",
-      "key": "examConfig.defaultPassingThreshold",
-      "fn": "t"
-    },
-    {
-      "file": "components/ExamConfigSection.jsx",
-      "ns": "lecturesPage",
-      "key": "examConfig.createButton",
-      "fn": "t"
-    },
-    {
-      "file": "components/ExamConfigSection.jsx",
-      "ns": "lecturesPage",
-      "key": "examConfig.passingThreshold",
-      "fn": "t"
-    },
-    {
-      "file": "components/lectureCard.jsx",
-      "ns": "lectures",
-      "key": "showLess",
-      "fn": "t"
-    },
-    {
-      "file": "components/lectureCard.jsx",
-      "ns": "lectures",
-      "key": "showMore",
-      "fn": "t"
-    },
-    {
-      "file": "components/LectureCreationModal.jsx",
-      "ns": "lecturesPage",
-      "key": "sections.publishSettings",
-      "fn": "t"
-    },
-    {
-      "file": "components/LectureCreationModal.jsx",
-      "ns": "lecturesPage",
-      "key": "fields.enterGoogleFormOrLink",
-      "fn": "t"
-    },
-    {
-      "file": "components/LectureCreationModal.jsx",
-      "ns": "lecturesPage",
-      "key": "fields.orPasteLink",
-      "fn": "t"
-    },
-    {
-      "file": "components/navbar.jsx",
-      "ns": "common",
-      "key": "login",
-      "fn": "t"
-    },
-    {
-      "file": "components/navbar.jsx",
-      "ns": "common",
-      "key": "login",
-      "fn": "t"
-    }
-  ]
+  "missingUsedInEn": [],
+  "missingUsedInAr": []
 }
