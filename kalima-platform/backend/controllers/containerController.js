@@ -751,7 +751,9 @@ exports.getLecturerContainers = catchAsync(async (req, res, next) => {
 exports.getMyContainers = catchAsync(async (req, res, next) => {
   const lecturerId = req.user._id; // Extract the logged-in lecturer's ID from the JWT token
 
-  const containers = await Container.find({ createdBy: lecturerId }).populate([
+  const containers = await Container.find({ createdBy: lecturerId })
+    .sort({ createdAt: -1 })
+    .populate([
     { path: "subject", select: "name" },
     { path: "level", select: "name" },
     {

@@ -162,7 +162,14 @@ export default function CourseGrid() {
 
   // Memoized filtered containers
   const filteredContainers = useMemo(() => {
-    return containers.filter((container) => container.parent === null || container.type === "lecture")
+    return containers
+      .filter((container) => container.parent === null || container.type === "lecture")
+      .sort((left, right) => {
+        const leftDate = new Date(left.createdAt || left._id || 0).getTime()
+        const rightDate = new Date(right.createdAt || right._id || 0).getTime()
+
+        return rightDate - leftDate
+      })
   }, [containers])
 
   // Fetch lecturer's containers

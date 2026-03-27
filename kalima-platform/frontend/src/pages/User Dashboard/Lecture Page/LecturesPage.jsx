@@ -29,7 +29,6 @@ const MyLecturesPage = () => {
   const [levels, setLevels] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-  const [renderError, setRenderError] = useState(null)
   const [userRole, setUserRole] = useState(null)
   const [userId, setUserId] = useState(null)
   const [lectureModalState, setLectureModalState] = useState({ mode: null, target: null })
@@ -471,8 +470,7 @@ const MyLecturesPage = () => {
       </div>
     )
 
-  try {
-    return (
+  return (
       <div className="container mx-auto p-4 sm:p-6" dir={isRTL ? "rtl" : "ltr"}>
         <h1 className="text-2xl font-bold mb-2" style={{ color: TOKENS.inkText }}>
           {["Lecturer", "Admin", "Subadmin", "Moderator"].includes(userRole)
@@ -550,7 +548,7 @@ const MyLecturesPage = () => {
           </div>
           {["Lecturer", "Admin"].includes(userRole) && (
             <button
-              onClick={() => setShowCreateModal(true)}
+              onClick={openCreateLectureModal}
               className="btn border-none"
               style={{ background: TOKENS.deepTeal, color: "#F8FCFF" }}
             >
@@ -571,14 +569,17 @@ const MyLecturesPage = () => {
         </div>
 
         <LectureCreationModal
-          isOpen={showCreateModal}
-          onClose={() => setShowCreateModal(false)}
-          onSubmit={handleCreateLecture}
+          isOpen={Boolean(lectureModalState.mode)}
+          onClose={closeLectureModal}
+          onSubmit={handleLectureSubmit}
           containerId={null}
           userId={userId}
           containerLevel={null}
           containerSubject={null}
           containerType="month"
+          mode={lectureModalState.mode || "create"}
+          initialData={lectureModalState.target}
+          lectureId={lectureModalState.target?.id || lectureModalState.target?._id || null}
         />
 
         <div className="md:hidden space-y-3">
@@ -610,11 +611,24 @@ const MyLecturesPage = () => {
               </div>
 
               <div className="mt-3">
-                <Link
-                  to={`/dashboard/${userRole === "Student" ? "student" : "lecturer"}-dashboard/${userRole === "Student" ? "lecture-display" : "detailed-lecture-view"}/${lecture.id}`}
-                >
-                  <button className="btn btn-sm w-full border-none text-white" style={{ background: TOKENS.deepTeal }}>{t("lecturesPage.buttons.details")}</button>
-                </Link>
+                <div className="flex gap-2">
+                  <Link
+                    to={`/dashboard/${userRole === "Student" ? "student" : "lecturer"}-dashboard/${userRole === "Student" ? "lecture-display" : "detailed-lecture-view"}/${lecture.id}`}
+                    className="flex-1"
+                  >
+                    <button className="btn btn-sm w-full border-none text-white" style={{ background: TOKENS.deepTeal }}>{t("lecturesPage.buttons.details")}</button>
+                  </Link>
+                  {userRole !== "Student" && (
+                    <button
+                      type="button"
+                      className="btn btn-sm border-none"
+                      style={{ background: TOKENS.warmMango, color: "#fff" }}
+                      onClick={() => openEditLectureModal(lecture)}
+                    >
+                      {t("lecturesPage.buttons.edit", "Edit")}
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           ))}
@@ -689,24 +703,35 @@ const MyLecturesPage = () => {
                   </td>
                   {userRole === "Student" && <td>{lecture.purchasedAt}</td>}
                   <td>
-                    <Link
-                      to={`/dashboard/${userRole === "Student" ? "student" : "lecturer"}-dashboard/${userRole === "Student" ? "lecture-display" : "detailed-lecture-view"
-                        }/${lecture.id}`}
-                    >
-                      <button
-                        className="btn btn-sm border-none"
-                        style={{ background: TOKENS.deepTeal, color: "#F8FCFF" }}
+                    <div className="flex flex-wrap gap-2">
+                      <Link
+                        to={`/dashboard/${userRole === "Student" ? "student" : "lecturer"}-dashboard/${userRole === "Student" ? "lecture-display" : "detailed-lecture-view"
+                          }/${lecture.id}`}
                       >
-                        {t("lecturesPage.buttons.details")}
-                      </button>
-                    </Link>
+                        <button
+                          className="btn btn-sm border-none"
+                          style={{ background: TOKENS.deepTeal, color: "#F8FCFF" }}
+                        >
+                          {t("lecturesPage.buttons.details")}
+                        </button>
+                      </Link>
+                      {userRole !== "Student" && (
+                        <button
+                          type="button"
+                          className="btn btn-sm border-none"
+                          style={{ background: TOKENS.warmMango, color: "#fff" }}
+                          onClick={() => openEditLectureModal(lecture)}
+                        >
+                          {t("lecturesPage.buttons.edit", "Edit")}
+                        </button>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
-
         {lectures.length === 0 && (
           <div className="alert alert-info mt-4">
             <span>
@@ -780,17 +805,6 @@ const MyLecturesPage = () => {
         )}
       </div>
     )
-  } catch (err) {
-    console.error("Render error in MyLecturesPage:", err)
-    setRenderError("╪¡╪»╪½ ╪«╪╖╪ú ╪ú╪½┘å╪º╪í ╪¬╪¡┘à┘è┘ä ╪º┘ä╪╡┘ü╪¡╪⌐. ┘è╪▒╪¼┘ë ╪º┘ä┘à╪¡╪º┘ê┘ä╪⌐ ┘à╪▒╪⌐ ╪ú╪«╪▒┘ë.")
-    return (
-      <div className="container mx-auto p-4" dir="rtl">
-        <div className="alert alert-error">
-          <span>{renderError}</span>
-        </div>
-      </div>
-    )
-  }
 }
 
 export default MyLecturesPage

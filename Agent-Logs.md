@@ -1,3 +1,7 @@
+## 2026-03-27 - Lecturer sidebar label correction - GPT-5.4 mini
+- Renamed the lecturer sidebar item from Lectures to My Courses by reusing the shared courses translation key.
+- Kept the route unchanged so the label now matches the actual courses management page.
+
 ## 2026-03-27 - Logging rule reminder - GPT-5.4 mini
 - Keep appending concise release/update notes to Agent-Logs.md after each finished task.
 - Skip low-value verification bullets so the log stays focused on shipped changes.
