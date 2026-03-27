@@ -124,6 +124,17 @@ const CourseCard = memo(function CourseCard({
               {t("view")}
             </button>
           </Link>
+          {container.type !== "lecture" && (
+            <Link to={`/dashboard/lecturer-dashboard/CoursesForm/${container._id}`} className="w-full sm:w-auto">
+              <button
+                className="btn btn-sm w-full sm:w-auto border-0 shadow-sm"
+                style={{ background: "#E0F2FE", color: "#075985", borderRadius: RADIUS.chip }}
+              >
+                <Edit className="h-4 w-4" style={{ marginRight: isRTL ? 0 : "0.25rem", marginLeft: isRTL ? "0.25rem" : 0 }} />
+                {t("edit", { defaultValue: "Edit" })}
+              </button>
+            </Link>
+          )}
           <button
             className="btn btn-sm w-full sm:w-auto border-0 shadow-sm"
             style={{ background: "#FDE8EE", color: "#BE123C", borderRadius: RADIUS.chip }}

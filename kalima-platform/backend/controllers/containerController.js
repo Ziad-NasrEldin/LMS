@@ -777,7 +777,7 @@ exports.getMyContainers = catchAsync(async (req, res, next) => {
 });
 
 exports.updateContainer = catchAsync(async (req, res, next) => {
-  const { name, type, price, level, subject, description, goal, removeImage } =
+  const { name, type, price, level, subject, description, goal, teacherAllowed, removeImage } =
     req.body;
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -794,8 +794,20 @@ exports.updateContainer = catchAsync(async (req, res, next) => {
       throw new AppError("No container found with that ID", 404);
     }
 
+    const canBypassOwnership = ["Admin", "SubAdmin", "Moderator"].includes(req.user?.role);
+    if (!canBypassOwnership && container.createdBy?.toString() !== req.user._id.toString()) {
+      if (req.file && req.file.filename) {
+        await cloudinary.uploader.destroy(req.file.filename);
+      }
+      throw new AppError("You do not have permission to edit this container", 403);
+    }
+
     let obj = { name, type, price };
     let unsetObj = {};
+
+    if (teacherAllowed !== undefined) {
+      obj.teacherAllowed = teacherAllowed === true || teacherAllowed === "true";
+    }
 
     if (type === "course") {
       if (!description || !goal) {

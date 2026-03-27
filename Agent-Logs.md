@@ -1,3 +1,8 @@
+## 2026-03-27 - Lecturer course and container edit support - GPT-5.4 mini
+- Added lecturer-owned edit flows for course containers and child containers by reusing the existing course form and container modal in edit mode.
+- Hardened the backend update handlers with ownership checks for lecturers and exposed a frontend `updateContainer` helper for PATCH-based saves.
+- Wired lecturer dashboard edit entry points from course cards and container details so lecturers can open existing containers directly for updates.
+
 ## 2026-03-27 - Lecture view consume accounting hardening - GPT-5.3-Codex
 - Added idempotent lecture-view consumption fields and index in `kalima-platform/backend/models/studentLectureAccessModel.js`, plus a dedicated atomic consume endpoint in `kalima-platform/backend/controllers/studentLectureAccessController.js`.
 - Locked down lecture-access routes by role in `kalima-platform/backend/routes/studentLectureAccessRoutes.js` and exposed `POST /student-lecture-access/:id/consume-view` for student playback accounting.
@@ -40,6 +45,14 @@
 ## 2026-03-27 - Teacher details course link fix - GPT-5.4 mini
 - Wired the teacher-details page course cards to the public course details route so the Show Details button opens the specific course instead of doing nothing.
 - Kept the change scoped to the button/link layer; the course data and rendering flow remain unchanged.
+
+## 2026-03-27 - Signup phone restrictions unification - GPT-5.4 mini
+- Applied the same Egyptian phone rules to the public signup flow for student, parent, and teacher phone fields.
+- Added shared phone sanitization/normalization helpers so client-side input, server-side validation, and registration persistence all follow the same format.
+
+## 2026-03-27 - Lecture page pagination refresh - GPT-5.4 mini
+- Reworked the lecture list page pagination into the new token-based button style and aligned the surrounding filter, table, and detail-button surfaces with the updated design language.
+- Fixed a nearby lecture-details modal branch that was breaking the frontend build, so the page changes could be verified cleanly.
 
 ## 2026-03-26 - Promo code admin card refresh - GPT-5.4 mini
 - Refreshed the promo code management surface to use the newer token-based panel styling, including softer surfaces, rounded section cards, and stronger section hierarchy.

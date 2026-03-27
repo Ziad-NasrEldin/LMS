@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next"
 import { FiX, FiPaperclip, FiImage } from "react-icons/fi"
 import { getAllLevels } from "../routes/levels"
 import { getAllSubjects } from "../routes/courses"
+import { resolveUploadUrl } from "../utils/uploadUrl"
 import ExamConfigSection from "./ExamConfigSection"
 
 const SummaryRow = ({ label, value, loading = false }) => (
@@ -25,9 +26,13 @@ const LectureCreationModal = ({
   containerLevel,
   containerSubject,
   containerType,
+  mode = "create",
+  initialData = null,
+  lectureId = null,
 }) => {
   const { t, i18n } = useTranslation(["lecturesPage"])
   const isRTL = i18n.language === "ar"
+  const isEditMode = mode === "edit"
 
   // Form state
   const [newItemName, setNewItemName] = useState("")
@@ -79,21 +84,49 @@ const LectureCreationModal = ({
   const [selectedSubject, setSelectedSubject] = useState("")
   const [attachmentType, setAttachmentType] = useState("homeworks")
 
+  const populateFromInitialData = () => {
+    if (!initialData) {
+      return
+    }
+
+    setNewItemName(initialData.name || "")
+    setNewDescription(initialData.description || "")
+    setNewPrice(initialData.price ?? 0)
+    setNewVideoLink(initialData.videoLink || "")
+    setNewLectureType(initialData.lecture_type || "Revision")
+    setNumberOfViews(initialData.numberOfViews ?? 0)
+    setRequiresExam(Boolean(initialData.requiresExam))
+    setRequiresHomework(Boolean(initialData.requiresHomework))
+    setPassingThreshold(initialData.passingThreshold ?? 50)
+    setHomeworkPassingThreshold(initialData.homeworkPassingThreshold ?? 50)
+    setSelectedExamConfigId(initialData.examConfig?._id || initialData.examConfig || "")
+    setSelectedHomeworkConfigId(initialData.homeworkConfig?._id || initialData.homeworkConfig || "")
+    setSelectedLevel(initialData.level?._id || initialData.level || containerLevel || "")
+    setSelectedSubject(initialData.subject?._id || initialData.subject || containerSubject || "")
+    setThumbnailPreview(
+      initialData.thumbnail ? resolveUploadUrl(initialData.thumbnail, "lecture_thumbnails") : null,
+    )
+  }
+
   // Fetch levels and subjects when modal opens
   useEffect(() => {
     if (isOpen) {
       fetchLevels()
       fetchSubjects()
 
-      // Set default values from container if available
-      if (containerLevel) {
-        setSelectedLevel(containerLevel)
-      }
-      if (containerSubject) {
-        setSelectedSubject(containerSubject)
+      if (isEditMode) {
+        populateFromInitialData()
+      } else {
+        // Set default values from container if available
+        if (containerLevel) {
+          setSelectedLevel(containerLevel)
+        }
+        if (containerSubject) {
+          setSelectedSubject(containerSubject)
+        }
       }
     }
-  }, [isOpen, containerLevel, containerSubject])
+  }, [isOpen, containerLevel, containerSubject, isEditMode, initialData])
 
   // Functions to fetch levels and subjects
   const fetchLevels = async () => {
@@ -160,6 +193,9 @@ const LectureCreationModal = ({
     setSelectedSubject(containerSubject || "")
     setAttachmentType("homeworks")
     setCreationError("")
+    if (isEditMode && initialData?.thumbnail) {
+      setThumbnailPreview(resolveUploadUrl(initialData.thumbnail, "lecture_thumbnails"))
+    }
   }
 
   const handleClose = () => {
@@ -182,10 +218,8 @@ const LectureCreationModal = ({
       const lectureData = {
         name: newItemName,
         type: "lecture",
-        createdBy: userId,
         level: selectedLevel,
         subject: selectedSubject,
-        parent: containerId,
         price: Number(newPrice) || 0,
         description: newDescription || `${t("defaults.lectureDescription")} ${newItemName}`,
         numberOfViews: Number(numberOfViews) || 0,
@@ -213,13 +247,18 @@ const LectureCreationModal = ({
       }
 
       // Call onSubmit ONCE with all files and links for all categories
+      if (!isEditMode) {
+        lectureData.createdBy = userId
+        lectureData.parent = containerId
+      }
+
       await onSubmit(
-        lectureData,
-        null,
+        isEditMode ? lectureId || initialData?._id || initialData?.id : lectureData,
+        isEditMode ? lectureData : null,
         null,
         thumbnailFile,
         attachmentFilesByCategory,
-        attachmentLinksByCategory
+        attachmentLinksByCategory,
       )
 
       resetForm()
@@ -262,8 +301,12 @@ const LectureCreationModal = ({
         <div className="flex h-full flex-col">
           <div className="flex items-start justify-between gap-4 border-b border-base-300 px-6 py-5 sm:px-8">
             <div className="min-w-0">
-              <p className="text-xs font-bold uppercase tracking-[0.28em] text-primary/70">{t("titles.createNewLecture")}</p>
-              <h3 className="mt-1 text-2xl font-bold leading-tight text-base-content sm:text-3xl">{t("titles.createNewLecture")}</h3>
+              <p className="text-xs font-bold uppercase tracking-[0.28em] text-primary/70">
+                {isEditMode ? (isRTL ? "تعديل المحاضرة" : "Edit Lecture") : t("titles.createNewLecture")}
+              </p>
+              <h3 className="mt-1 text-2xl font-bold leading-tight text-base-content sm:text-3xl">
+                {isEditMode ? (isRTL ? "تعديل المحاضرة" : "Edit Lecture") : t("titles.createNewLecture")}
+              </h3>
               <p className="mt-2 max-w-3xl text-sm text-base-content/60">{t("descriptions.createNewLectureModal")}</p>
             </div>
             <button type="button" onClick={handleClose} className="btn btn-sm btn-circle btn-ghost shrink-0">
@@ -656,10 +699,10 @@ const LectureCreationModal = ({
                   {creationLoading ? (
                     <>
                       <span className="loading loading-spinner"></span>
-                      {t("buttons.creating")}
+                      {isEditMode ? (isRTL ? "جارٍ الحفظ" : "Saving...") : t("buttons.creating")}
                     </>
                   ) : (
-                    t("buttons.create")
+                    isEditMode ? (isRTL ? "حفظ التغييرات" : "Save Changes") : t("buttons.create")
                   )}
                 </button>
               </div>

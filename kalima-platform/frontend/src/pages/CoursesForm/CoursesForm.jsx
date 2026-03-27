@@ -4,9 +4,11 @@ import { useState, useEffect } from "react"
 import { useTranslation } from "react-i18next"
 import { CheckCircle2, ChevronLeft, ChevronRight, Circle, ListChecks } from "lucide-react"
 import { motion } from "framer-motion"
+import { useParams } from "react-router-dom"
 import { getUserDashboard } from "../../routes/auth-services"
 import { getAllLevels } from "../../routes/levels"
 import { getAllSubjects } from "../../routes/courses"
+import { getContainerById } from "../../routes/lectures"
 import BasicInfoForm from "./basic-info-form"
 import ContainerCreationPanel from "./container-creation-panel"
 import CourseStructureVisualization from "./course-structure-visualization"
@@ -16,6 +18,7 @@ import { designTokens } from "../../constants/designTokens"
 function CourseCreationForm() {
   const { t, i18n } = useTranslation()
   const isRTL = i18n.language === "ar"
+  const { containerId } = useParams()
   const TOKENS = designTokens.colors
   const SHADOWS = designTokens.shadows
   const GRADIENTS = designTokens.gradients
@@ -87,6 +90,37 @@ function CourseCreationForm() {
             teacher: userId,
           }))
         }
+
+        if (containerId) {
+          const containerResponse = await getContainerById(containerId)
+          const containerData = containerResponse?.data?.container || containerResponse?.data || containerResponse?.container
+
+          if (!containerData) {
+            throw new Error("Failed to load the selected course")
+          }
+
+          setFormData((prev) => ({
+            ...prev,
+            courseName: containerData.name || "",
+            gradeLevel: containerData.level?._id || containerData.level || "",
+            subject: containerData.subject?._id || containerData.subject || "",
+            description: containerData.description || "",
+            goal: Array.isArray(containerData.goal) ? containerData.goal.join("\n") : containerData.goal || "",
+            courseType: Number(containerData.price || 0) > 0 ? "paid" : "free",
+            priceFull: containerData.price ?? "",
+            privacy: containerData.teacherAllowed ? "teacher" : "student",
+          }))
+
+          setCourseStructure({
+            parent: {
+              id: containerData._id || containerData.id,
+              name: containerData.name,
+              type: containerData.type,
+            },
+            containers: [],
+            lectures: [],
+          })
+        }
       } catch (err) {
         console.error("Error fetching data:", err)
         setError(err.message || "Failed to load data")
@@ -95,7 +129,7 @@ function CourseCreationForm() {
       }
     }
     fetchData()
-  }, [])
+  }, [containerId])
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target
@@ -311,6 +345,8 @@ function CourseCreationForm() {
               courseStructure={courseStructure}
               updateCourseStructure={updateCourseStructure}
               createdBy={createdBy}
+              isEditMode={Boolean(containerId)}
+              editContainerId={containerId}
             />
 
             {/* Container Creation Panel */}

@@ -13,6 +13,9 @@ const catchAsync = require("../utils/catchAsync");
 const Level = require("../models/levelModel.js");
 const Government = require("../models/governmentModel.js");
 const AdministrationZone = require("../models/administrationZonesModel.js");
+const {
+  normalizeEgyptianPhoneNumber,
+} = require("../utils/phoneNumber.js");
 const validatePassword = (password) => {
   const requiredLength = 8;
 
@@ -23,46 +26,6 @@ const validatePassword = (password) => {
     );
   }
 };
-
-// Helper to format Egyptian phone numbers to international format robustly
-function formatEgyptianPhoneNumber(number) {
-  if (!number) return number;
-  // Remove all non-digit characters except leading +
-  let num = number.trim().replace(/[^\d+]/g, '');
-  // Remove leading zeros (except if it's just '0')
-  if (num.startsWith('00')) num = '+' + num.slice(2);
-  if (num.startsWith('0') && num.length > 1) num = num.slice(1);
-  // Add +20 if missing
-  if (num.startsWith('+20')) return num;
-  if (num.startsWith('20')) return '+' + num;
-  if (num.startsWith('+')) return num; // fallback for other country codes
-  // If only 10 or 11 digits, assume it's a local Egyptian number
-  if (num.length === 10) return '+20' + num;
-  if (num.length === 11 && num[0] === '1') return '+20' + num;
-  return '+20' + num;
-}
-
-function normalizeDigitsToEnglish(value) {
-  return String(value || "")
-    .replace(/[٠-٩]/g, (d) => String("٠١٢٣٤٥٦٧٨٩".indexOf(d)))
-    .replace(/[۰-۹]/g, (d) => String("۰۱۲۳۴۵۶۷۸۹".indexOf(d)));
-}
-
-function sanitizeParentPhone(number) {
-  return normalizeDigitsToEnglish(number)
-    .replace(/[\u200E\u200F\u061C\u202A-\u202E]/g, "")
-    .replace(/[\s\-()]/g, "")
-    .trim();
-}
-
-function normalizeEgyptParentPhoneNumber(number) {
-  if (!number) return "";
-  const num = sanitizeParentPhone(number);
-  if (/^\+20\d{10}$/.test(num)) return num;
-  if (/^0\d{10}$/.test(num)) return `+20${num.slice(1)}`;
-  if (/^\d{10}$/.test(num)) return `+20${num}`;
-  return "";
-}
 
 const registerNewUser = catchAsync(async (req, res, next) => {
   const {
@@ -79,9 +42,15 @@ const registerNewUser = catchAsync(async (req, res, next) => {
   } = req.body;
   const phoneRequiredRoles = ["teacher", "parent", "student"];
   const govAdminRequiredRoles = ["teacher", "parent", "student"];
+  const normalizedRole = role.toLowerCase();
+  const normalizedPhoneNumber = phoneNumber ? normalizeEgyptianPhoneNumber(phoneNumber) : "";
+  const normalizedPhoneNumber2 =
+    userData.phoneNumber2 !== undefined && userData.phoneNumber2 !== ""
+      ? normalizeEgyptianPhoneNumber(userData.phoneNumber2)
+      : "";
 
   // Only validate government and administration zone for specific roles
-  if (govAdminRequiredRoles.includes(role.toLowerCase())) {
+  if (govAdminRequiredRoles.includes(normalizedRole)) {
     if (!government || !government.trim()) {
       return next(new AppError("Government is required.", 400));
     }
@@ -180,8 +149,28 @@ const registerNewUser = catchAsync(async (req, res, next) => {
     );
   }
 
-  const duplicatePhone = await User.findOne({ phoneNumber });
-  if (phoneRequiredRoles.includes(role.toLowerCase()) && duplicatePhone) {
+  if (phoneRequiredRoles.includes(normalizedRole) && !normalizedPhoneNumber) {
+    return next(
+      new AppError(
+        "Phone number must be in +20XXXXXXXXXX format, or local 0XXXXXXXXXX/XXXXXXXXXX format which will be converted to +20XXXXXXXXXX.",
+        400
+      )
+    );
+  }
+
+  if (userData.phoneNumber2 !== undefined && userData.phoneNumber2 !== "" && !normalizedPhoneNumber2) {
+    return next(
+      new AppError(
+        "phoneNumber2 must be a valid Egyptian number (+20XXXXXXXXXX, 0XXXXXXXXXX, or XXXXXXXXXX).",
+        400
+      )
+    );
+  }
+
+  const duplicatePhone = normalizedPhoneNumber
+    ? await User.findOne({ phoneNumber: normalizedPhoneNumber })
+    : null;
+  if (phoneRequiredRoles.includes(normalizedRole) && duplicatePhone) {
     return next(
       new AppError("This phone number is already associated with a user.", 400)
     );
@@ -234,18 +223,18 @@ const registerNewUser = catchAsync(async (req, res, next) => {
   };
 
   // Only include government and administrationZone for specific roles
-  if (govAdminRequiredRoles.includes(role.toLowerCase())) {
+  if (govAdminRequiredRoles.includes(normalizedRole)) {
     newUser.government = government;
     newUser.administrationZone = administrationZone;
   }
 
 
   // Normalize phone numbers before saving
-  if (phoneNumber) {
-    newUser.phoneNumber = formatEgyptianPhoneNumber(phoneNumber);
+  if (normalizedPhoneNumber) {
+    newUser.phoneNumber = normalizedPhoneNumber;
   }
-  if (userData.phoneNumber2 !== undefined && userData.phoneNumber2 !== "") {
-    newUser.phoneNumber2 = formatEgyptianPhoneNumber(userData.phoneNumber2);
+  if (normalizedPhoneNumber2) {
+    newUser.phoneNumber2 = normalizedPhoneNumber2;
   }
 
   if (profilePicPath !== undefined) {
@@ -263,12 +252,9 @@ const registerNewUser = catchAsync(async (req, res, next) => {
 
   let user;
 
-  switch (role.toLowerCase()) {
+  switch (normalizedRole) {
     case "teacher": {
-      // check phoneNumber2 (optional, do not save empty string)
-      if (userData.phoneNumber2 !== undefined && userData.phoneNumber2 !== "") {
-        newUser.phoneNumber2 = userData.phoneNumber2;
-      } else {
+      if (!newUser.phoneNumber2) {
         delete newUser.phoneNumber2;
       }
       // Validate level (must be an array of allowed values)
@@ -354,7 +340,7 @@ const registerNewUser = catchAsync(async (req, res, next) => {
       if (!newUser.parentPhoneNumber || !String(newUser.parentPhoneNumber).trim()) {
         return next(new AppError("Parent phone number is required for student role", 400));
       }
-      newUser.parentPhoneNumber = normalizeEgyptParentPhoneNumber(newUser.parentPhoneNumber);
+      newUser.parentPhoneNumber = normalizeEgyptianPhoneNumber(newUser.parentPhoneNumber);
       if (!newUser.parentPhoneNumber) {
         return next(
           new AppError(

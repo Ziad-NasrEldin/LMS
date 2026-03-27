@@ -1,20 +1,8 @@
 const Joi = require("joi");
 const userValidation = require("./userValidation.js");
-// levels = userValidation.levels
-
-const normalizeDigitsToEnglish = (value) =>
-  String(value || "")
-    .replace(/[٠-٩]/g, (d) => String("٠١٢٣٤٥٦٧٨٩".indexOf(d)))
-    .replace(/[۰-۹]/g, (d) => String("۰۱۲۳۴۵۶۷۸۹".indexOf(d)));
-
-const sanitizeParentPhone = (value) =>
-  normalizeDigitsToEnglish(value)
-    .replace(/[\u200E\u200F\u061C\u202A-\u202E]/g, "")
-    .replace(/[\s\-()]/g, "")
-    .trim();
-
-const isValidEgyptParentPhone = (value) =>
-  /^(\+20\d{10}|0\d{10}|\d{10})$/.test(sanitizeParentPhone(value));
+const {
+  isValidEgyptianPhoneNumber,
+} = require("../utils/phoneNumber.js");
 
 const studentValidation = userValidation.concat(
   Joi.object({
@@ -28,7 +16,7 @@ const studentValidation = userValidation.concat(
       .trim()
       .required()
       .custom((value, helpers) => {
-        if (!isValidEgyptParentPhone(value)) {
+        if (!isValidEgyptianPhoneNumber(value)) {
           return helpers.error("string.pattern.base");
         }
         return value;
@@ -36,13 +24,24 @@ const studentValidation = userValidation.concat(
       .messages({
         "string.pattern.base": "parentPhoneNumber must be a valid Egyptian number (+20XXXXXXXXXX, 0XXXXXXXXXX, or XXXXXXXXXX).",
       }),
-    phoneNumber: Joi.string().required(),
+    phoneNumber: Joi.string()
+      .trim()
+      .required()
+      .custom((value, helpers) => {
+        if (!isValidEgyptianPhoneNumber(value)) {
+          return helpers.error("string.pattern.base");
+        }
+        return value;
+      })
+      .messages({
+        "string.pattern.base": "phoneNumber must be a valid Egyptian number (+20XXXXXXXXXX, 0XXXXXXXXXX, or XXXXXXXXXX).",
+      }),
     faction: Joi.string().optional(),
     school: Joi.string().hex().length(24).optional(),
     parent: Joi.string().hex().length(24).optional(),
     government: Joi.string().required(),
     administrationZone: Joi.string().required(),
-    referralSerial: Joi.string().optional(), // Allow referralSerial
+    referralSerial: Joi.string().optional(),
   })
 );
 

@@ -3,9 +3,9 @@
 import { useState, useEffect } from "react"
 import { Link, useParams, useNavigate } from "react-router-dom"
 import { useTranslation } from 'react-i18next';
-import { getContainerById, createContainer, createLecture, createLectureAttachment } from "../../../routes/lectures"
+import { getContainerById, createContainer, updateContainer, createLecture, createLectureAttachment } from "../../../routes/lectures"
 import { getUserDashboard } from "../../../routes/auth-services"
-import { FiBook, FiFolder, FiArrowLeft, FiArrowRight, FiPlus } from "react-icons/fi"
+import { FiBook, FiFolder, FiArrowLeft, FiArrowRight, FiPlus, FiEdit2 } from "react-icons/fi"
 import LectureCreationModal from "../../../components/LectureCreationModal"
 import ContainerCreationModal from "../../../components/ContainerCreationModal"
 import { designTokens } from "../../../constants/designTokens"
@@ -25,10 +25,25 @@ const ContainerDetailsPage = () => {
   const [userRole, setUserRole] = useState(null)
   const [userId, setUserId] = useState(null)
 
-  // Creation modal state
-  const [showCreateModal, setShowCreateModal] = useState(false)
+  // Modal state
+  const [modalState, setModalState] = useState({ mode: null, target: null })
   const [creationLoading, setCreationLoading] = useState(false)
   const [creationError, setCreationError] = useState("")
+
+  const openCreateModal = () => {
+    setModalState({ mode: "create", target: null })
+    setCreationError("")
+  }
+
+  const openEditModal = (targetContainer) => {
+    setModalState({ mode: "edit", target: targetContainer })
+    setCreationError("")
+  }
+
+  const closeModal = () => {
+    setModalState({ mode: null, target: null })
+    setCreationError("")
+  }
 
     // Fetch container data
   const normalizeContainerData = (response) => {
@@ -249,6 +264,27 @@ const ContainerDetailsPage = () => {
     }
   }
 
+  const handleUpdateContainer = async (containerIdToUpdate, containerData) => {
+    setCreationLoading(true)
+    setCreationError("")
+
+    try {
+      const response = await updateContainer(containerIdToUpdate, containerData)
+      if (response.status !== "success" && response.success !== true) {
+        throw new Error(response.message || "Failed to update container")
+      }
+
+      await fetchContainer()
+      return true
+    } catch (err) {
+      setCreationError(err.message)
+      console.error("Update error:", err)
+      return false
+    } finally {
+      setCreationLoading(false)
+    }
+  }
+
   if (loading) {
     return (
       <div
@@ -353,6 +389,20 @@ const ContainerDetailsPage = () => {
                 <span className="font-medium">{container.points} {t('containerDetails.labels.points')}</span>
               </div>
             )}
+            {userRole === "Lecturer" && container.type !== "lecture" && (
+              <button
+                onClick={() => openEditModal(container)}
+                className="inline-flex items-center gap-2 rounded-full border px-4 py-2 font-semibold transition-all duration-200 hover:-translate-y-[1px]"
+                style={{
+                  background: "#E0F2FE",
+                  color: "#075985",
+                  borderColor: "rgba(7,89,133,0.18)",
+                }}
+              >
+                <FiEdit2 className="text-base" />
+                <span>{isRTL ? "تعديل" : "Edit"}</span>
+              </button>
+            )}
           </div>
         </div>
 
@@ -431,22 +481,39 @@ const ContainerDetailsPage = () => {
 
                   <div className={`flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between ${isRTL ? "sm:flex-row-reverse" : ""}`}>
                     <span className="text-sm" style={{ color: TOKENS.slateText }}>{t(`types.${childType?.toLowerCase()}`) || container.type}</span>
-                    <Link
-                      to={
-                        userRole === "Lecturer"
-                          ? `/dashboard/lecturer-dashboard/${childType === "lecture" ? "lecture-display" : "container-details"}/${child._id}`
-                          : `/dashboard/student-dashboard/${childType === "lecture" ? "lecture-display" : "container-details"}/${child._id}`
-                      }
-                      className={`inline-flex w-full items-center justify-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition-all duration-200 hover:-translate-y-[1px] sm:w-auto ${isRTL ? "flex-row-reverse" : ""}`}
-                      style={{
-                        background: TOKENS.deepTeal,
-                        color: "#F8FCFF",
-                        borderColor: TOKENS.deepTeal,
-                      }}
-                    >
-                      {t('containerDetails.buttons.viewDetails')}
-                      {isRTL ? <FiArrowLeft className="h-4 w-4" /> : <FiArrowRight className="h-4 w-4" />}
-                    </Link>
+                      <div className="flex flex-col gap-2 sm:flex-row">
+                        {childType !== "lecture" && userRole === "Lecturer" && (
+                          <button
+                            type="button"
+                            onClick={() => openEditModal(child)}
+                            className="inline-flex w-full items-center justify-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition-all duration-200 hover:-translate-y-[1px] sm:w-auto"
+                            style={{
+                              background: "#E0F2FE",
+                              color: "#075985",
+                              borderColor: "rgba(7,89,133,0.18)",
+                            }}
+                          >
+                            <FiEdit2 className="h-4 w-4" />
+                            {isRTL ? "تعديل" : "Edit"}
+                          </button>
+                        )}
+                        <Link
+                          to={
+                            userRole === "Lecturer"
+                              ? `/dashboard/lecturer-dashboard/${childType === "lecture" ? "lecture-display" : "container-details"}/${child._id}`
+                              : `/dashboard/student-dashboard/${childType === "lecture" ? "lecture-display" : "container-details"}/${child._id}`
+                          }
+                          className={`inline-flex w-full items-center justify-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition-all duration-200 hover:-translate-y-[1px] sm:w-auto ${isRTL ? "flex-row-reverse" : ""}`}
+                          style={{
+                            background: TOKENS.deepTeal,
+                            color: "#F8FCFF",
+                            borderColor: TOKENS.deepTeal,
+                          }}
+                        >
+                          {t('containerDetails.buttons.viewDetails')}
+                          {isRTL ? <FiArrowLeft className="h-4 w-4" /> : <FiArrowRight className="h-4 w-4" />}
+                        </Link>
+                      </div>
                   </div>
                 </div>
               </div>
@@ -472,7 +539,7 @@ const ContainerDetailsPage = () => {
         {userRole === "Lecturer" && childType && (
           <div className={`flex gap-4 ${isRTL ? "justify-start" : "justify-end"}`}>
             <button
-              onClick={() => setShowCreateModal(true)}
+              onClick={openCreateModal}
               className="inline-flex w-full items-center justify-center gap-2 rounded-full border px-6 py-3 font-semibold transition-all duration-200 hover:-translate-y-[1px] sm:w-auto"
               style={{
                 background: TOKENS.deepTeal,
@@ -489,29 +556,57 @@ const ContainerDetailsPage = () => {
       </div>
 
       {/* Lecture Creation Modal */}
-      {isLectureCreation ? (
-        <LectureCreationModal
-          isOpen={showCreateModal}
-          onClose={() => setShowCreateModal(false)}
-          onSubmit={handleCreateLecture}
-          containerId={containerId}
-          userId={userId}
-          containerLevel={container?.level?._id}
-          containerSubject={container?.subject?._id}
-          containerType={container?.type}
-        />
-      ) : (
-        <ContainerCreationModal
-          isOpen={showCreateModal}
-          onClose={() => setShowCreateModal(false)}
-          onSubmit={handleCreateContainer}
-          containerId={containerId}
-          userId={userId}
-          containerLevel={container?.level?._id}
-          containerSubject={container?.subject?._id}
-          containerType={container?.type}
-        />
-      )}
+      {(() => {
+        if (modalState.mode === "create" && isLectureCreation) {
+          return (
+            <LectureCreationModal
+              isOpen={modalState.mode === "create"}
+              onClose={closeModal}
+              onSubmit={handleCreateLecture}
+              containerId={containerId}
+              userId={userId}
+              containerLevel={container?.level?._id}
+              containerSubject={container?.subject?._id}
+              containerType={container?.type}
+            />
+          )
+        }
+
+        if (modalState.mode === "create") {
+          return (
+            <ContainerCreationModal
+              isOpen={modalState.mode === "create"}
+              onClose={closeModal}
+              onSubmit={handleCreateContainer}
+              containerId={containerId}
+              userId={userId}
+              containerLevel={container?.level?._id}
+              containerSubject={container?.subject?._id}
+              containerType={container?.type}
+              mode="create"
+            />
+          )
+        }
+
+        if (modalState.mode === "edit") {
+          return (
+            <ContainerCreationModal
+              isOpen={modalState.mode === "edit"}
+              onClose={closeModal}
+              onSubmit={handleUpdateContainer}
+              containerId={modalState.target?._id || modalState.target?.id}
+              userId={userId}
+              containerLevel={modalState.target?.level?._id || modalState.target?.level}
+              containerSubject={modalState.target?.subject?._id || modalState.target?.subject}
+              containerType={modalState.target?.type}
+              mode="edit"
+              initialData={modalState.target}
+            />
+          )
+        }
+
+        return null
+      })()}
     </div>
   )
 }

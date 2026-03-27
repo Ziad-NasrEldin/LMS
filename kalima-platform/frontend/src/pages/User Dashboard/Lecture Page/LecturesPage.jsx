@@ -6,10 +6,11 @@ import { useTranslation } from "react-i18next"
 import { getUserDashboard } from "../../../routes/auth-services"
 import { getAllSubjects } from "../../../routes/courses"
 import { getAllLevels } from "../../../routes/levels"
-import { createLecture, createLectureAttachment } from "../../../routes/lectures"
+import { createLecture, updateLecture, createLectureAttachment } from "../../../routes/lectures"
 import { getAllLectures } from "../../../routes/lectures"
 import LectureCreationModal from "../../../components/LectureCreationModal"
 import { designTokens } from "../../../constants/designTokens"
+import { resolveUploadUrl } from "../../../utils/uploadUrl"
 
 const MyLecturesPage = () => {
   const { t, i18n } = useTranslation("lecturesPage")
@@ -31,7 +32,7 @@ const MyLecturesPage = () => {
   const [renderError, setRenderError] = useState(null)
   const [userRole, setUserRole] = useState(null)
   const [userId, setUserId] = useState(null)
-  const [showCreateModal, setShowCreateModal] = useState(false)
+  const [lectureModalState, setLectureModalState] = useState({ mode: null, target: null })
   const [creationLoading, setCreationLoading] = useState(false)
   const [successMessage, setSuccessMessage] = useState("")
   const [selectedSubjectFilter, setSelectedSubjectFilter] = useState("")
@@ -40,24 +41,16 @@ const MyLecturesPage = () => {
   const [itemsPerPage, setItemsPerPage] = useState(8)
   const [totalPages, setTotalPages] = useState(0)
 
-  const convertPathToUrl = (filePath) => {
-    if (!filePath) return null
-    if (filePath.startsWith("http")) return filePath
+  const openCreateLectureModal = () => {
+    setLectureModalState({ mode: "create", target: null })
+  }
 
-    const normalizedPath = filePath.replace(/\\/g, "/")
-    const API_URL = import.meta.env.VITE_API_URL || window.location.origin
-    const baseUrl = API_URL.replace(/\/$/, "")
-    const uploadsIndex = normalizedPath.indexOf("uploads/")
+  const openEditLectureModal = (lecture) => {
+    setLectureModalState({ mode: "edit", target: lecture })
+  }
 
-    if (uploadsIndex !== -1) {
-      const uploadsPath = normalizedPath.slice(uploadsIndex)
-      return `${baseUrl}/${uploadsPath}`
-    }
-
-    const filename = normalizedPath.split("/").pop()
-    const folder = "lecture_thumbnails"
-
-    return `${baseUrl}/uploads/${folder}/${filename}`
+  const closeLectureModal = () => {
+    setLectureModalState({ mode: null, target: null })
   }
 
   useEffect(() => {
@@ -146,7 +139,7 @@ const MyLecturesPage = () => {
                 requiresExam: lecture.requiresExam || false,
                 examConfig: lecture.examConfig || null,
                 lecturer: result.data.data.userInfo,
-                thumbnail: lecture.thumbnail ? convertPathToUrl(lecture.thumbnail) : null,
+                thumbnail: lecture.thumbnail ? resolveUploadUrl(lecture.thumbnail, "lecture_thumbnails") : null,
                   createdAt: lecture.createdAt || null,
                 sortDate: lecture.createdAt || null,
               })) || [];
@@ -161,7 +154,7 @@ const MyLecturesPage = () => {
               requiresExam: lecture.requiresExam || false,
               examConfig: lecture.examConfig || null,
               lecturer: result.data.data.userInfo,
-              thumbnail: lecture.thumbnail ? convertPathToUrl(lecture.thumbnail) : null,
+              thumbnail: lecture.thumbnail ? resolveUploadUrl(lecture.thumbnail, "lecture_thumbnails") : null,
               createdAt: lecture.createdAt || null,
             })) || [];
 
@@ -201,7 +194,7 @@ const MyLecturesPage = () => {
               lecturer: purchase.lecturer,
               subject: lectureLike?.subject,
               level: lectureLike?.level,
-              thumbnail: lectureLike?.thumbnail,
+              thumbnail: lectureLike?.thumbnail ? resolveUploadUrl(lectureLike.thumbnail, "lecture_thumbnails") : null,
               sortDate: purchase.purchasedAt || null,
             });
 
@@ -303,11 +296,41 @@ const MyLecturesPage = () => {
     setCurrentPage(1)
   }
 
+  const uploadLectureAttachments = async (lectureId, attachmentFilesByCategory, attachmentLinksByCategory) => {
+    const formData = new FormData()
+    const categories = ["pdfsandimages", "booklets", "homeworks", "exams"]
+
+    categories.forEach((category) => {
+      if (attachmentFilesByCategory && attachmentFilesByCategory[category] && attachmentFilesByCategory[category].length > 0) {
+        attachmentFilesByCategory[category].forEach((file) => {
+          formData.append(category, file)
+        })
+      }
+    })
+
+    if (attachmentLinksByCategory) {
+      if (attachmentLinksByCategory.homeworks && attachmentLinksByCategory.homeworks.trim() !== "") {
+        formData.append("homeworks", attachmentLinksByCategory.homeworks)
+      }
+      if (attachmentLinksByCategory.exams && attachmentLinksByCategory.exams.trim() !== "") {
+        formData.append("exams", attachmentLinksByCategory.exams)
+      }
+    }
+
+    if (formData.has("pdfsandimages") || formData.has("booklets") || formData.has("homeworks") || formData.has("exams")) {
+      await createLectureAttachment(lectureId, formData, true)
+    }
+  }
+
   // Batch upload all attachments and links for all categories in one request
-  const handleCreateLecture = async (lectureData, _unused, _unused2, thumbnailFile, attachmentFilesByCategory, attachmentLinksByCategory) => {
+  const handleLectureSubmit = async (lectureIdOrData, lectureDataOrUnused, _unused2, thumbnailFile, attachmentFilesByCategory, attachmentLinksByCategory) => {
     setCreationLoading(true)
     setError(null)
     setSuccessMessage("")
+
+    const isEditMode = typeof lectureIdOrData === "string"
+    const lectureId = isEditMode ? lectureIdOrData : null
+    const lectureData = isEditMode ? lectureDataOrUnused : lectureIdOrData
 
     try {
       let response
@@ -319,13 +342,13 @@ const MyLecturesPage = () => {
           }
         })
         formData.append("thumbnail", thumbnailFile)
-        response = await createLecture(formData)
+        response = isEditMode ? await updateLecture(lectureId, formData) : await createLecture(formData)
       } else {
-        response = await createLecture(lectureData)
+        response = isEditMode ? await updateLecture(lectureId, lectureData) : await createLecture(lectureData)
       }
 
       if (response.status !== "success" && response.success !== true) {
-        throw new Error(response.message || "┘ü╪┤┘ä ┘ü┘è ╪Ñ┘å╪┤╪º╪í ╪º┘ä┘à╪¡╪º╪╢╪▒╪⌐")
+        throw new Error(response.message || (isEditMode ? "Failed to update lecture" : "Failed to create lecture"))
       }
 
       let lectureId = null
@@ -339,41 +362,24 @@ const MyLecturesPage = () => {
         lectureId = response.data.id
       }
 
-      // Batch upload all files and links for all categories
       if (lectureId) {
-        const formData = new FormData()
-        // Attach files for each category
-        const categories = ["pdfsandimages", "booklets", "homeworks", "exams"]
-        categories.forEach((cat) => {
-          if (attachmentFilesByCategory && attachmentFilesByCategory[cat] && attachmentFilesByCategory[cat].length > 0) {
-            attachmentFilesByCategory[cat].forEach((file) => {
-              formData.append(cat, file)
-            })
-          }
-        })
-        // Attach links for homeworks and exams
-        if (attachmentLinksByCategory) {
-          if (attachmentLinksByCategory.homeworks && attachmentLinksByCategory.homeworks.trim() !== "") {
-            formData.append("homeworks", attachmentLinksByCategory.homeworks)
-          }
-          if (attachmentLinksByCategory.exams && attachmentLinksByCategory.exams.trim() !== "") {
-            formData.append("exams", attachmentLinksByCategory.exams)
-          }
-        }
-        // Only upload if there are files or links
-        if (formData.has("pdfsandimages") || formData.has("booklets") || formData.has("homeworks") || formData.has("exams")) {
-          try {
-            await createLectureAttachment(lectureId, formData, true)
-          } catch (attachmentError) {
-            console.error("Error uploading attachments:", attachmentError)
-            setError(`╪¬┘à ╪Ñ┘å╪┤╪º╪í ╪º┘ä┘à╪¡╪º╪╢╪▒╪⌐ ┘ê┘ä┘â┘å ┘ü╪┤┘ä ╪¬╪¡┘à┘è┘ä ╪º┘ä┘à╪▒┘ü┘é╪º╪¬: ${attachmentError.message}`)
-          }
+        try {
+          await uploadLectureAttachments(lectureId, attachmentFilesByCategory, attachmentLinksByCategory)
+        } catch (attachmentError) {
+          console.error("Error uploading attachments:", attachmentError)
+          setError(isEditMode
+            ? `Lecture updated but failed to upload attachments: ${attachmentError.message}`
+            : `Lecture created but failed to upload attachments: ${attachmentError.message}`)
         }
       }
 
       await refetchLectureData()
 
-      setSuccessMessage(t("lecturesPage.messages.lectureCreatedSuccessfully", "Lecture created successfully!"))
+      setSuccessMessage(
+        isEditMode
+          ? t("lecturesPage.messages.lectureUpdatedSuccessfully", "Lecture updated successfully!")
+          : t("lecturesPage.messages.lectureCreatedSuccessfully", "Lecture created successfully!"),
+      )
 
       setTimeout(() => {
         setSuccessMessage("")
@@ -381,7 +387,7 @@ const MyLecturesPage = () => {
 
       return true
     } catch (err) {
-      setError("┘ü╪┤┘ä ╪Ñ┘å╪┤╪º╪í ╪º┘ä┘à╪¡╪º╪╢╪▒╪⌐: " + err.message)
+      setError((isEditMode ? "Failed to update lecture: " : "Failed to create lecture: ") + err.message)
       return false
     } finally {
       setCreationLoading(false)
@@ -431,7 +437,7 @@ const MyLecturesPage = () => {
               requiresExam: lecture.requiresExam || false,
               examConfig: lecture.examConfig || null,
               lecturer: { id: userId, name: result.data.data.userInfo?.name },
-              thumbnail: lecture.thumbnail ? convertPathToUrl(lecture.thumbnail) : null,
+              thumbnail: lecture.thumbnail ? resolveUploadUrl(lecture.thumbnail, "lecture_thumbnails") : null,
               createdAt: lecture.createdAt || null,
             })) || [];
 
@@ -445,7 +451,7 @@ const MyLecturesPage = () => {
             requiresExam: lecture.requiresExam || false,
             examConfig: lecture.examConfig || null,
             lecturer: { id: userId, name: result.data.data.userInfo?.name },
-            thumbnail: lecture.thumbnail ? convertPathToUrl(lecture.thumbnail) : null,
+            thumbnail: lecture.thumbnail ? resolveUploadUrl(lecture.thumbnail, "lecture_thumbnails") : null,
             createdAt: lecture.createdAt || null,
           })) || [];
 
@@ -476,7 +482,7 @@ const MyLecturesPage = () => {
         <p className="text-sm opacity-80 mt-2 mb-5" style={{ color: TOKENS.slateText }}>{t("lecturesPage.pageDescription")}</p>
 
         {successMessage && (
-          <div className="alert alert-success mb-4">
+            <div className="mb-4 rounded-[1.4rem] border p-4" style={{ background: "rgba(20,106,120,0.1)", borderColor: "rgba(20,106,120,0.18)", color: TOKENS.deepTeal }}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="stroke-current shrink-0 h-6 w-6"
@@ -498,7 +504,7 @@ const MyLecturesPage = () => {
         )}
 
         {error && (
-          <div className="alert alert-error mb-4">
+            <div className="mb-4 rounded-[1.4rem] border p-4" style={{ background: "#FFF1F2", borderColor: "#FECACA", color: TOKENS.inkText }}>
             <span>{error}</span>
             <button className="btn btn-sm btn-ghost" onClick={() => setError(null)}>
               {t("lecturesPage.buttons.close")}
@@ -506,7 +512,7 @@ const MyLecturesPage = () => {
           </div>
         )}
 
-        <div className="mb-4 flex flex-col md:flex-row justify-between gap-4">
+        <div className="mb-4 flex flex-col md:flex-row justify-between gap-4 rounded-[1.4rem] border p-4" style={{ background: "rgba(255,255,255,0.78)", borderColor: "rgba(17,24,39,0.08)" }}>
           <div className="flex flex-col md:flex-row gap-4 flex-1">
             <select
               className="select w-full md:w-64 font-medium border-2 focus:outline-none focus:ring-0 rounded-full transition-colors font-sans"
@@ -545,8 +551,8 @@ const MyLecturesPage = () => {
           {["Lecturer", "Admin"].includes(userRole) && (
             <button
               onClick={() => setShowCreateModal(true)}
-              className="btn"
-              style={{ background: TOKENS.deepTeal, borderColor: TOKENS.deepTeal, color: "#F8FCFF" }}
+              className="btn border-none"
+              style={{ background: TOKENS.deepTeal, color: "#F8FCFF" }}
             >
               {t("lecturesPage.buttons.createNewLecture")}
             </button>
@@ -577,11 +583,11 @@ const MyLecturesPage = () => {
 
         <div className="md:hidden space-y-3">
           {lectures?.map((lecture) => (
-            <div key={lecture.id} className="rounded-2xl border border-base-300 bg-base-100 p-4 shadow-sm">
+            <div key={lecture.id} className="rounded-2xl border p-4" style={{ background: "rgba(255,255,255,0.82)", borderColor: "rgba(17,24,39,0.08)", boxShadow: SHADOWS.level1 }}>
               <div className="flex items-start gap-3">
                 {lecture.thumbnail ? (
                   <img
-                    src={convertPathToUrl(lecture.thumbnail) || "/placeholder.svg"}
+                    src={resolveUploadUrl(lecture.thumbnail, "lecture_thumbnails") || "/placeholder.svg"}
                     alt={lecture.name}
                     className="h-14 w-14 rounded-xl object-cover flex-shrink-0"
                   />
@@ -607,7 +613,7 @@ const MyLecturesPage = () => {
                 <Link
                   to={`/dashboard/${userRole === "Student" ? "student" : "lecturer"}-dashboard/${userRole === "Student" ? "lecture-display" : "detailed-lecture-view"}/${lecture.id}`}
                 >
-                  <button className="btn btn-primary btn-sm w-full">{t("lecturesPage.buttons.details")}</button>
+                  <button className="btn btn-sm w-full border-none text-white" style={{ background: TOKENS.deepTeal }}>{t("lecturesPage.buttons.details")}</button>
                 </Link>
               </div>
             </div>
@@ -615,8 +621,8 @@ const MyLecturesPage = () => {
         </div>
 
         <div
-          className="hidden md:block overflow-x-auto rounded-2xl border bg-base-100"
-          style={{ borderColor: "rgba(17,24,39,0.08)", boxShadow: SHADOWS.level1 }}
+          className="hidden md:block overflow-x-auto rounded-[1.6rem] border"
+          style={{ background: "rgba(255,255,255,0.82)", borderColor: "rgba(17,24,39,0.08)", boxShadow: SHADOWS.level1 }}
         >
           <table className="table table-zebra w-full">
             <thead>
@@ -642,7 +648,7 @@ const MyLecturesPage = () => {
                       <div className="avatar">
                         <div className="w-12 h-12 rounded-xl overflow-hidden border" style={{ borderColor: "rgba(17,24,39,0.12)" }}>
                           <img
-                            src={convertPathToUrl(lecture.thumbnail) || "/placeholder.svg"}
+                            src={resolveUploadUrl(lecture.thumbnail, "lecture_thumbnails") || "/placeholder.svg"}
                             alt={lecture.name}
                             className="object-cover w-full h-full"
                             onError={(e) => {
@@ -688,8 +694,8 @@ const MyLecturesPage = () => {
                         }/${lecture.id}`}
                     >
                       <button
-                        className="btn btn-sm"
-                        style={{ background: TOKENS.deepTeal, borderColor: TOKENS.deepTeal, color: "#F8FCFF" }}
+                        className="btn btn-sm border-none"
+                        style={{ background: TOKENS.deepTeal, color: "#F8FCFF" }}
                       >
                         {t("lecturesPage.buttons.details")}
                       </button>
@@ -712,14 +718,21 @@ const MyLecturesPage = () => {
         )}
 
         {totalPages > 1 && (
-          <div className="join flex justify-center mt-4 flex-wrap gap-2">
+          <div className="mt-5 flex flex-col items-center gap-3 rounded-[1.4rem] border p-4 sm:flex-row sm:justify-center" style={{ background: "rgba(255,255,255,0.72)", borderColor: "rgba(17,24,39,0.08)" }}>
             <button
-              className="join-item btn"
+              className="btn btn-sm rounded-[1.4rem] border-none"
+              style={{
+                background: currentPage === 1 ? TOKENS.neutralCloud : TOKENS.creamSurface,
+                color: currentPage === 1 ? TOKENS.slateText : TOKENS.deepTeal,
+                boxShadow: currentPage === 1 ? "none" : SHADOWS.level1,
+                opacity: currentPage === 1 ? 0.6 : 1,
+              }}
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 1}
             >
               {t("lecturesPage.pagination.previous")}
             </button>
+
             {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
               let pageNum
               if (totalPages <= 5) {
@@ -732,18 +745,32 @@ const MyLecturesPage = () => {
                 pageNum = currentPage - 2 + i
               }
 
+              const isActive = currentPage === pageNum
+
               return (
                 <button
                   key={i}
-                  className={`join-item btn ${currentPage === pageNum ? "btn-active" : ""}`}
+                  className="btn btn-sm min-w-10 rounded-full border-none"
+                  style={{
+                    background: isActive ? TOKENS.warmMango : TOKENS.creamSurface,
+                    color: isActive ? "#fff" : TOKENS.deepTeal,
+                    boxShadow: isActive ? "0 4px 14px rgba(243,154,63,0.4)" : SHADOWS.level1,
+                  }}
                   onClick={() => handlePageChange(pageNum)}
                 >
                   {pageNum}
                 </button>
               )
             })}
+
             <button
-              className="join-item btn"
+              className="btn btn-sm rounded-[1.4rem] border-none"
+              style={{
+                background: currentPage === totalPages ? TOKENS.neutralCloud : TOKENS.creamSurface,
+                color: currentPage === totalPages ? TOKENS.slateText : TOKENS.deepTeal,
+                boxShadow: currentPage === totalPages ? "none" : SHADOWS.level1,
+                opacity: currentPage === totalPages ? 0.6 : 1,
+              }}
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage === totalPages}
             >

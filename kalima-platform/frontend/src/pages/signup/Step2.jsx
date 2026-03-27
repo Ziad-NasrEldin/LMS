@@ -25,6 +25,7 @@ export default function Step2({ formData, handleInputChange, t, errors }) {
             onChange={handleInputChange}
             inputMode="tel"
             dir="ltr"
+            autoComplete="tel"
             required
           />
           {errors.parentPhoneNumber && (

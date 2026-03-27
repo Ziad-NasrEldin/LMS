@@ -125,6 +125,7 @@ app.use("/api/v1/ec/coupons", ecCouponRouter);
 app.use("/api/v1/ec/referrals", ecReferralRoutes);
 app.use("/api/v1/ec/subsections", auditLogger, ECSubSectionRouter);
 
+app.use("/api/v1/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 mongoose.connection.once("open", async () => {

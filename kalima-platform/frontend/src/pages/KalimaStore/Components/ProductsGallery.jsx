@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { X, ZoomIn, ChevronLeft, ChevronRight } from 'lucide-react'
+import { resolveUploadUrl } from "../../../utils/uploadUrl"
 
 const ProductGallery = ({ gallery = [], title, onImageClick }) => {
   const [selectedImage, setSelectedImage] = useState(0)
@@ -10,20 +11,9 @@ const ProductGallery = ({ gallery = [], title, onImageClick }) => {
   const [modalImageIndex, setModalImageIndex] = useState(0)
   const { t } = useTranslation("kalimaStore-ProductDetails")
 
-  const convertPathToUrl = (filePath) => {
-    if (!filePath) return null;
-    if (filePath.startsWith("http")) return filePath;
-
-    const normalizedPath = filePath.replace(/\\/g, "/");
-    const API_URL = import.meta.env.VITE_API_URL || window.location.origin;
-    const baseUrl = API_URL.replace(/\/$/, "");
-
-    return `${baseUrl}/${normalizedPath}`;
-  };
-  // dummy comment to re-commit
   const galleryImages = (gallery || [])
     .map((img, index) => ({
-      url: convertPathToUrl(img),
+      url: resolveUploadUrl(img, "product_gallery"),
       alt: `${title} - Gallery Image ${index + 1}`,
     }))
     .filter((img) => img.url)

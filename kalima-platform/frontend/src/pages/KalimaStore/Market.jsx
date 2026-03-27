@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import { getAllSections, getAllProducts, getAllSubSections } from "../../routes/market"
+import { resolveUploadUrl } from "../../utils/uploadUrl"
 
 const Market = () => {
   const { t, i18n } = useTranslation("kalimaStore-Market")
@@ -20,18 +21,6 @@ const Market = () => {
   const [error, setError] = useState(null)
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage] = useState(6)
-
-  const convertPathToUrl = (filePath, folder = "product_thumbnails") => {
-    if (!filePath) return null
-    if (filePath.startsWith("http")) return filePath
-
-    const normalizedPath = filePath.replace(/\\/g, "/")
-    const API_URL = import.meta.env.VITE_API_URL || window.location.origin
-    const baseUrl = API_URL.replace(/\/$/, "")
-    const filename = normalizedPath.split("/").pop()
-
-    return `${baseUrl}/uploads/${folder}/${filename}`
-  }
 
   // Filter products based on active tab and subsection
   const filteredBySection = useMemo(() => {
@@ -310,7 +299,7 @@ const Market = () => {
               <figure className="px-4 pt-4">
                 <img
                   src={
-                    convertPathToUrl(item.thumbnail, "product_thumbnails") ||
+                    resolveUploadUrl(item.thumbnail, "product_thumbnails") ||
                     "/placeholder.svg?height=200&width=200" ||
                     "/placeholder.svg"
                   }

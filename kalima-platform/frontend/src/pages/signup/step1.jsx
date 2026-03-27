@@ -8,15 +8,6 @@ export default function Step1({ formData, handleInputChange, t, errors, role, gr
   const [administrationZones, setAdministrationZones] = useState([]);
   const [zonesLoading, setZonesLoading] = useState(false);
 
-  const toEnglishDigits = (str) =>
-    str.replace(/[٠-٩]/g, (d) => "٠١٢٣٤٥٦٧٨٩".indexOf(d)).replace(/[^\d]/g, "");
-
-  const handleNumberOnlyChange = (e) => {
-    const { name, value } = e.target;
-    const cleaned = toEnglishDigits(value);
-    handleInputChange({ target: { name, value: cleaned } });
-  };
-
   const translateGradeLevel = (rawLabel) => {
     if (!rawLabel) return "-";
 
@@ -218,11 +209,13 @@ export default function Step1({ formData, handleInputChange, t, errors, role, gr
           </label>
           <input
             type="text"
-            inputMode="numeric"
             name="phoneNumber"
             value={formData.phoneNumber}
-            onChange={handleNumberOnlyChange}
+            onChange={handleInputChange}
             className={`input input-bordered input-sm w-full ${errors.phoneNumber ? 'input-error animate-shake' : ''}`}
+            inputMode="tel"
+            dir="ltr"
+            autoComplete="tel"
             required
           />
           {errors.phoneNumber && (
@@ -263,12 +256,13 @@ export default function Step1({ formData, handleInputChange, t, errors, role, gr
               </label>
               <input
                 type="text"
-                inputMode="numeric"
                 name="phoneNumber2"
                 value={formData.phoneNumber2}
-                onChange={handleNumberOnlyChange}
+                onChange={handleInputChange}
                 className="input input-bordered input-sm w-full"
-                required
+                inputMode="tel"
+                dir="ltr"
+                autoComplete="tel"
               />
               <label className="label py-1">
                 <span className="label-text text-xs">{t('form.optional')}</span>

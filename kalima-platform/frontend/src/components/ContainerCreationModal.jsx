@@ -14,7 +14,11 @@ const ContainerCreationModal = ({
   containerLevel,
   containerSubject,
   containerType,
+  mode = "create",
+  initialData = null,
 }) => {
+  const isEditMode = mode === "edit"
+
   // Form state
   const [newItemName, setNewItemName] = useState("")
   const [newDescription, setNewDescription] = useState("")
@@ -31,21 +35,38 @@ const ContainerCreationModal = ({
   const [selectedLevel, setSelectedLevel] = useState("")
   const [selectedSubject, setSelectedSubject] = useState("")
 
+  const populateFromInitialData = () => {
+    if (!initialData) {
+      return
+    }
+
+    setNewItemName(initialData.name || "")
+    setNewDescription(initialData.description || "")
+    setNewGoal(Array.isArray(initialData.goal) ? initialData.goal.join("\n") : initialData.goal || "")
+    setNewPrice(initialData.price ?? 0)
+    setSelectedLevel(initialData.level?._id || initialData.level || containerLevel || "")
+    setSelectedSubject(initialData.subject?._id || initialData.subject || containerSubject || "")
+  }
+
   // Fetch levels and subjects when modal opens
   useEffect(() => {
     if (isOpen) {
       fetchLevels()
       fetchSubjects()
 
-      // Set default values from container if available
-      if (containerLevel) {
-        setSelectedLevel(containerLevel)
-      }
-      if (containerSubject) {
-        setSelectedSubject(containerSubject)
+      if (isEditMode) {
+        populateFromInitialData()
+      } else {
+        // Set default values from container if available
+        if (containerLevel) {
+          setSelectedLevel(containerLevel)
+        }
+        if (containerSubject) {
+          setSelectedSubject(containerSubject)
+        }
       }
     }
-  }, [isOpen, containerLevel, containerSubject])
+  }, [isOpen, containerLevel, containerSubject, isEditMode, initialData])
 
   // Functions to fetch levels and subjects
   const fetchLevels = async () => {
@@ -103,29 +124,39 @@ const ContainerCreationModal = ({
 
     try {
       const childType = getChildType()
-      if (!childType) throw new Error("Invalid container type for creation")
+      if (!isEditMode && !childType) throw new Error("Invalid container type for creation")
       if (!newItemName) throw new Error("Name is required")
       if (!newDescription) throw new Error("Description is required")
       if (!newGoal) throw new Error("Goal is required")
       if (!selectedLevel) throw new Error("Level is required")
       if (!selectedSubject) throw new Error("Subject is required")
 
+      const nextType = isEditMode ? (initialData?.type || containerType || getChildType()) : getChildType()
+      if (!nextType) throw new Error("Invalid container type for creation")
+
       // Prepare container data
       const containerData = {
         name: newItemName,
-        type: childType,
-        createdBy: userId,
+        type: nextType,
         level: selectedLevel,
         subject: selectedSubject,
-        parent: containerId,
         price: Number(newPrice) || 0,
         description: newDescription,
         goal: newGoal,
         teacherAllowed: true,
       }
 
+      if (!isEditMode) {
+        containerData.createdBy = userId
+        containerData.parent = containerId
+      }
+
       // Call the onSubmit callback with the container data
-      await onSubmit(containerData)
+      if (isEditMode) {
+        await onSubmit(containerId, containerData)
+      } else {
+        await onSubmit(containerData)
+      }
 
       // Reset form and close modal on success
       resetForm()
@@ -155,13 +186,15 @@ const ContainerCreationModal = ({
   }
 
   const childType = getChildType()
-  const creationLabel = childType ? `${childType.charAt(0).toUpperCase() + childType.slice(1)}` : "Container"
+  const modalLabel = isEditMode
+    ? (initialData?.type ? `${initialData.type.charAt(0).toUpperCase() + initialData.type.slice(1)}` : "Container")
+    : (childType ? `${childType.charAt(0).toUpperCase() + childType.slice(1)}` : "Container")
 
   return (
     <div className={`modal ${isOpen && "modal-open"}`}>
       <div className="modal-box max-w-md">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-bold">Create New {creationLabel}</h3>
+          <h3 className="text-lg font-bold">{isEditMode ? `Edit ${modalLabel}` : `Create New ${modalLabel}`}</h3>
           <button onClick={handleClose} className="btn btn-sm btn-circle btn-ghost">
             <FiX className="w-5 h-5" />
           </button>
@@ -174,7 +207,7 @@ const ContainerCreationModal = ({
             </label>
             <input
               type="text"
-              placeholder={`Enter ${creationLabel} name`}
+              placeholder={`Enter ${modalLabel} name`}
               className="input input-bordered w-full"
               value={newItemName}
               onChange={(e) => setNewItemName(e.target.value)}
@@ -229,7 +262,7 @@ const ContainerCreationModal = ({
               <span className="label-text">Description</span>
             </label>
             <textarea
-              placeholder={`Enter ${creationLabel} description`}
+              placeholder={`Enter ${modalLabel} description`}
               className="textarea textarea-bordered w-full"
               value={newDescription}
               onChange={(e) => setNewDescription(e.target.value)}
@@ -242,7 +275,7 @@ const ContainerCreationModal = ({
               <span className="label-text">Goal</span>
             </label>
             <textarea
-              placeholder={`Enter ${creationLabel} goal`}
+              placeholder={`Enter ${modalLabel} goal`}
               className="textarea textarea-bordered w-full"
               value={newGoal}
               onChange={(e) => setNewGoal(e.target.value)}
@@ -292,10 +325,10 @@ const ContainerCreationModal = ({
               {creationLoading ? (
                 <>
                   <span className="loading loading-spinner"></span>
-                  Creating...
+                  {isEditMode ? "Saving..." : "Creating..."}
                 </>
               ) : (
-                "Create"
+                isEditMode ? "Save Changes" : "Create"
               )}
             </button>
           </div>

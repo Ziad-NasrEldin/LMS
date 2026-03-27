@@ -387,6 +387,10 @@ function App() {
               element={renderLecturerRoute(<CoursesForm />)}
             />
             <Route
+              path="/dashboard/lecturer-dashboard/CoursesForm/:containerId"
+              element={renderLecturerRoute(<CoursesForm />)}
+            />
+            <Route
               path="/dashboard/lecturer-dashboard/container-details/:containerId"
               element={renderLecturerRoute(<ContainerDetails />)}
             />

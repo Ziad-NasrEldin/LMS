@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { motion } from "framer-motion"
 import { ImageIcon, Video, ChevronDown } from "lucide-react"
-import { createContainer } from "../../routes/lectures"
+import { createContainer, updateContainer } from "../../routes/lectures"
 
 function BasicInfoForm({
   formData,
@@ -14,6 +14,8 @@ function BasicInfoForm({
   courseStructure,
   updateCourseStructure,
   createdBy,
+  isEditMode = false,
+  editContainerId = null,
 }) {
   const compactInput = "w-full input input-bordered input-sm h-10 min-h-10 bg-base-200/80 placeholder-base-content/50"
   const compactSelect = "w-full select select-bordered select-sm h-10 min-h-10 bg-base-200/80 appearance-none"
@@ -60,25 +62,28 @@ function BasicInfoForm({
         formDataPayload.append("image", courseImage)
       }
 
-      const response = await createContainer(formDataPayload)
+      const response = isEditMode && editContainerId
+        ? await updateContainer(editContainerId, formDataPayload)
+        : await createContainer(formDataPayload)
+
       if (response.status === "success") {
-        const container = response.data.container
+        const container = response.data?.container || response.data || response.container
         updateCourseStructure({
           ...courseStructure,
           parent: {
-            id: container.id,
+            id: container._id || container.id,
             name: container.name,
             type: container.type,
           },
         })
-        alert(isRTL ? "تم إنشاء الحاوية الرئيسية بنجاح" : "Parent container created successfully")
+        alert(isEditMode ? (isRTL ? "تم تحديث الحاوية الرئيسية بنجاح" : "Parent container updated successfully") : (isRTL ? "تم إنشاء الحاوية الرئيسية بنجاح" : "Parent container created successfully"))
       } else {
-        alert(isRTL ? "فشل إنشاء الحاوية الرئيسية" : "Failed to create parent container")
+        alert(isRTL ? "فشل حفظ الحاوية الرئيسية" : "Failed to save parent container")
       }
     } catch (error) {
       console.error("Error creating parent container:", error)
-      const errorMessage = error.response?.data?.message || "حدث خطأ أثناء إنشاء الحاوية الرئيسية"
-      alert(isRTL ? errorMessage : "Error creating parent container")
+      const errorMessage = error.response?.data?.message || "حدث خطأ أثناء حفظ الحاوية الرئيسية"
+      alert(isRTL ? errorMessage : "Error saving parent container")
     } finally {
       setIsSubmitting(false)
     }
@@ -94,7 +99,9 @@ function BasicInfoForm({
         style={{ borderColor: "rgba(17,24,39,0.08)", background: "rgba(255,255,255,0.9)" }}
       >
         <div className="mb-2">
-          <h2 className="text-base font-bold mb-3 text-primary">{isRTL ? "البيانات الأساسية" : "Basic Information"}</h2>
+          <h2 className="text-base font-bold mb-3 text-primary">
+            {isEditMode ? (isRTL ? "تعديل البيانات الأساسية" : "Edit Basic Information") : (isRTL ? "البيانات الأساسية" : "Basic Information")}
+          </h2>
           <div className="grid grid-cols-1 md:grid-cols-[62%_38%] gap-3">
             <div className="space-y-3">
               <div>
@@ -315,21 +322,23 @@ function BasicInfoForm({
           <button
             type="submit"
             className="btn btn-primary rounded-full px-7 py-2 text-sm sm:text-base"
-            disabled={isSubmitting || courseStructure.parent}
+            disabled={isSubmitting || (!isEditMode && courseStructure.parent)}
           >
             {isSubmitting ? (
               <span className="loading loading-spinner"></span>
-            ) : courseStructure.parent ? (
+            ) : !isEditMode && courseStructure.parent ? (
               isRTL ? (
                 "تم إنشاء الحاوية الرئيسية"
               ) : (
                 "Parent Container Created"
               )
-            ) : isRTL ? (
-              "إنشاء الحاوية الرئيسية"
-            ) : (
-              "Create Parent Container"
-            )}
+              ) : isEditMode ? (
+                isRTL ? "حفظ التعديلات" : "Save Changes"
+              ) : isRTL ? (
+                "إنشاء الحاوية الرئيسية"
+              ) : (
+                "Create Parent Container"
+              )}
           </button>
         </div>
       </motion.div>

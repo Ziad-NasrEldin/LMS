@@ -622,6 +622,14 @@ exports.updatelectures = catchAsync(async (req, res, next) => {
         throw new AppError("No lecture found with that ID", 404)
       }
 
+      const canBypassOwnership = ["Admin", "SubAdmin", "Moderator"].includes(req.user?.role)
+      if (!canBypassOwnership && currentLecture.createdBy?.toString() !== req.user._id.toString()) {
+        if (req.file && req.file.path) {
+          deleteFile(req.file.path)
+        }
+        throw new AppError("You do not have permission to edit this lecture", 403)
+      }
+
       const obj = {
         name,
         type,

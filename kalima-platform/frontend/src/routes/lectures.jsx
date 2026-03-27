@@ -225,6 +225,28 @@ export const createLecture = async (lectureData) => {
   }
 }
 
+export const updateLecture = async (lectureId, lectureData) => {
+  try {
+    const isFormData = lectureData instanceof FormData
+
+    const response = await axios.patch(`${API_URL}/lectures/${lectureId}`, lectureData, {
+      withCredentials: true,
+      headers: {
+        "Content-Type": isFormData ? "multipart/form-data" : "application/json",
+        Authorization: `Bearer ${getToken()}`,
+      },
+    })
+
+    return response.data
+  } catch (error) {
+    return {
+      status: "error",
+      message: `Error updating lecture: ${error.message}`,
+      error,
+    }
+  }
+}
+
 
 export const createContainer = async (formData) => {
   try {
@@ -239,6 +261,24 @@ export const createContainer = async (formData) => {
     throw new Error(error.response?.data?.message || "Error creating container");
   }
 };
+
+export const updateContainer = async (containerId, formData) => {
+  try {
+    const isFormData = formData instanceof FormData
+
+    const response = await axios.patch(`${API_URL}/containers/${containerId}`, formData, {
+      withCredentials: true,
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+        "Content-Type": isFormData ? "multipart/form-data" : "application/json",
+      },
+    })
+
+    return response.data
+  } catch (error) {
+    throw new Error(error.response?.data?.message || "Error updating container")
+  }
+}
 
 export const getMyContainers = async () => {
   try {

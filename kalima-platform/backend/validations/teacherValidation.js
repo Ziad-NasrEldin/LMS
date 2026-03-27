@@ -1,5 +1,8 @@
 const Joi = require("joi");
 const userValidation = require("./userValidation.js");
+const {
+  isValidEgyptianPhoneNumber,
+} = require("../utils/phoneNumber.js");
 
 const teacherValidation = userValidation.concat(
   Joi.object({
@@ -16,8 +19,36 @@ const teacherValidation = userValidation.concat(
         'any.only': 'Role must be "teacher"'
       }),
     faction: Joi.string().optional(),
-    phoneNumber: Joi.string().required(),
-    phoneNumber2: Joi.string().trim().allow(null, "").optional(),
+    phoneNumber: Joi.string()
+      .trim()
+      .required()
+      .custom((value, helpers) => {
+        if (!isValidEgyptianPhoneNumber(value)) {
+          return helpers.error("string.pattern.base");
+        }
+        return value;
+      })
+      .messages({
+        "string.pattern.base": "phoneNumber must be a valid Egyptian number (+20XXXXXXXXXX, 0XXXXXXXXXX, or XXXXXXXXXX).",
+      }),
+    phoneNumber2: Joi.string()
+      .trim()
+      .allow(null, "")
+      .optional()
+      .custom((value, helpers) => {
+        if (value === null || value === "") {
+          return value;
+        }
+
+        if (!isValidEgyptianPhoneNumber(value)) {
+          return helpers.error("string.pattern.base");
+        }
+
+        return value;
+      })
+      .messages({
+        "string.pattern.base": "phoneNumber2 must be a valid Egyptian number (+20XXXXXXXXXX, 0XXXXXXXXXX, or XXXXXXXXXX).",
+      }),
     subject: Joi.string().required(),
     level: Joi.array()
       .items(Joi.string().valid("primary", "preparatory", "secondary"))

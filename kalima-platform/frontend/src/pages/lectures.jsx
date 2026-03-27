@@ -11,6 +11,7 @@ import { ErrorAlert } from "../components/ErrorAlert"
 import { LectureCard } from "../components/lectureCard"
 import { motion, AnimatePresence } from "framer-motion"
 import { toast } from "react-hot-toast"
+import { resolveUploadUrl } from "../utils/uploadUrl"
 
 export default function LecturesPage() {
   const [lectures, setLectures] = useState([])
@@ -31,17 +32,6 @@ export default function LecturesPage() {
   const [userData, setUserData] = useState(null)
   const [pointsBalances, setPointsBalances] = useState([])
   const [purchasedLectures, setPurchasedLectures] = useState([])
-
-  const convertPathToUrl = (filePath, folder = "product_thumbnails") => {
-    if (!filePath) return null
-    if (filePath.startsWith("http")) return filePath
-
-    const normalizedPath = filePath.replace(/\\/g, "/")
-    const API_URL = import.meta.env.VITE_API_URL || window.location.origin
-    const baseUrl = API_URL.replace(/\/$/, "")
-    const filename = normalizedPath.split("/").pop()
-    return `${baseUrl}/uploads/${folder}/${filename}`
-  }
 
   useEffect(() => {
     fetchLectures()
@@ -164,7 +154,7 @@ export default function LecturesPage() {
     return lecturesData.map((lecture) => ({
       
       id: lecture._id,
-      thumbnail: convertPathToUrl(lecture.thumbnail, "product_thumbnails"),
+      thumbnail: resolveUploadUrl(lecture.thumbnail, "product_thumbnails"),
       title: lecture.name,
       subject: lecture.subject?.name || "غير محدد",
       teacher: lecture.createdBy?.name || "مدرس غير محدد",

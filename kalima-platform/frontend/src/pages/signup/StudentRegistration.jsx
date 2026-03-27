@@ -13,6 +13,11 @@ import { Link, useNavigate } from "react-router-dom"
 import axios from "axios"
 import { getAllLevels } from "../../routes/levels"
 import { designTokens } from "../../constants/designTokens"
+import {
+  isValidEgyptianPhoneNumber,
+  normalizeEgyptianPhoneNumber,
+  sanitizeEgyptianPhoneInput,
+} from "../../utils/phoneNumber"
 const apiUrl = import.meta.env.VITE_API_URL
 const TOKENS = designTokens.colors
 const SHADOWS = designTokens.shadows
@@ -22,34 +27,6 @@ const totalSteps = {
   student: 3,
   parent: 3,
   teacher: 3,
-}
-
-const normalizeDigitsToEnglish = (value) => {
-  const input = String(value || "")
-  return input
-    .replace(/[٠-٩]/g, (d) => String("٠١٢٣٤٥٦٧٨٩".indexOf(d)))
-    .replace(/[۰-۹]/g, (d) => String("۰۱۲۳۴۵۶۷۸۹".indexOf(d)))
-}
-
-const sanitizeParentPhone = (value) => {
-  const englishDigits = normalizeDigitsToEnglish(value)
-  return englishDigits
-    .replace(/[\u200E\u200F\u061C\u202A-\u202E]/g, "")
-    .replace(/[\s\-()]/g, "")
-    .trim()
-}
-
-const isValidEgyptParentPhone = (value) => {
-  const normalized = sanitizeParentPhone(value)
-  return /^\+20\d{10}$/.test(normalized) || /^0\d{10}$/.test(normalized) || /^\d{10}$/.test(normalized)
-}
-
-const normalizeEgyptParentPhone = (value) => {
-  const normalized = sanitizeParentPhone(value)
-  if (/^\+20\d{10}$/.test(normalized)) return normalized
-  if (/^0\d{10}$/.test(normalized)) return `+20${normalized.slice(1)}`
-  if (/^\d{10}$/.test(normalized)) return `+20${normalized}`
-  return normalized
 }
 
 export default function StudentRegistration() {
@@ -93,7 +70,6 @@ export default function StudentRegistration() {
   const getStepErrors = (step) => {
     const errors = {}
     const { role } = formData
-    const phoneRegex = /^\+?[0-9]\d{7,14}$/
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
     const passwordRegex = /^.{8,}$/
 
@@ -104,7 +80,7 @@ export default function StudentRegistration() {
       if (!formData.administrationZone) errors.administrationZone = "required"
       if (!formData.phoneNumber) {
         errors.phoneNumber = "required"
-      } else if (!phoneRegex.test(formData.phoneNumber)) {
+      } else if (!isValidEgyptianPhoneNumber(formData.phoneNumber)) {
         errors.phoneNumber = "phoneInvalid"
       }
 
@@ -135,8 +111,12 @@ export default function StudentRegistration() {
 
       if (role === "student" && (formData.parentPhoneNumber === null || formData.parentPhoneNumber === "")) {
         errors.parentPhoneNumber = "parentPhoneRequired"
-      } else if (role === "student" && !isValidEgyptParentPhone(formData.parentPhoneNumber)) {
+      } else if (role === "student" && !isValidEgyptianPhoneNumber(formData.parentPhoneNumber)) {
         errors.parentPhoneNumber = "phoneInvalid"
+      }
+
+      if (role === "teacher" && formData.phoneNumber2 && !isValidEgyptianPhoneNumber(formData.phoneNumber2)) {
+        errors.phoneNumber2 = "phoneInvalid"
       }
 
 
@@ -227,7 +207,9 @@ export default function StudentRegistration() {
   const handleInputChange = (e) => {
     try {
       const { name, value, type, files } = e.target;
-      const nextValue = name === "parentPhoneNumber" ? sanitizeParentPhone(value) : value;
+      const nextValue = ["phoneNumber", "phoneNumber2", "parentPhoneNumber"].includes(name)
+        ? sanitizeEgyptianPhoneInput(value)
+        : value;
 
       setFormData((prev) => ({
         ...prev,
@@ -277,7 +259,10 @@ export default function StudentRegistration() {
       data.append("password", formData.password);
       data.append("confirmPassword", formData.confirmPassword);
       data.append("gender", formData.gender);
-      data.append("phoneNumber", formData.phoneNumber);
+      const normalizedPhoneNumber = normalizeEgyptianPhoneNumber(formData.phoneNumber)
+      if (normalizedPhoneNumber) {
+        data.append("phoneNumber", normalizedPhoneNumber)
+      }
       data.append("government", formData.government);
       data.append("administrationZone", formData.administrationZone);
 
@@ -299,7 +284,7 @@ export default function StudentRegistration() {
             }
           }
           data.append("faction", formData.faction || "Alpha");
-          data.append("parentPhoneNumber", normalizeEgyptParentPhone(formData.parentPhoneNumber));
+          data.append("parentPhoneNumber", normalizeEgyptianPhoneNumber(formData.parentPhoneNumber));
           break;
 
         case "parent":
@@ -311,7 +296,12 @@ export default function StudentRegistration() {
           break;
 
         case "teacher":
-          data.append("phoneNumber2", formData.phoneNumber2);
+          if (formData.phoneNumber2) {
+            const normalizedPhoneNumber2 = normalizeEgyptianPhoneNumber(formData.phoneNumber2)
+            if (normalizedPhoneNumber2) {
+              data.append("phoneNumber2", normalizedPhoneNumber2)
+            }
+          }
           data.append("subject", formData.subject.trim());
           data.append("teachesAtType", formData.teachesAtType);
 
