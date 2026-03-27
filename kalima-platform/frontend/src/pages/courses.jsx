@@ -40,8 +40,8 @@ export default function CoursesPage() {
 
   const sortByNewest = useCallback((list = []) => {
     return [...list].sort((left, right) => {
-      const leftDate = new Date(left.createdAt || 0).getTime()
-      const rightDate = new Date(right.createdAt || 0).getTime()
+      const leftDate = new Date(left.createdAt || left._id || 0).getTime()
+      const rightDate = new Date(right.createdAt || right._id || 0).getTime()
       return rightDate - leftDate
     })
   }, [])

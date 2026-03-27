@@ -45,6 +45,7 @@ const containerSchema = new mongoose.Schema(
     toObject: { virtuals: true },
     toJSON: { virtuals: true },
     discriminatorKey: "kind",
+    timestamps: true,
   }
 );
 

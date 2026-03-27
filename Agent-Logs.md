@@ -1,3 +1,7 @@
+## 2026-03-27 - Logging rule reminder - GPT-5.4 mini
+- Keep appending concise release/update notes to Agent-Logs.md after each finished task.
+- Skip low-value verification bullets so the log stays focused on shipped changes.
+
 ## 2026-03-27 - Lecturer course and container edit support - GPT-5.4 mini
 - Added lecturer-owned edit flows for course containers and child containers by reusing the existing course form and container modal in edit mode.
 - Hardened the backend update handlers with ownership checks for lecturers and exposed a frontend `updateContainer` helper for PATCH-based saves.
@@ -41,6 +45,16 @@
 ## 2026-03-27 - Courses page newest-first default - GPT-5.4 mini
 - Updated the public courses page to sort course containers by newest createdAt first before pagination.
 - Made the request explicit with `sort: "-createdAt"` and added a local fallback sort so the default remains newest-first even if upstream ordering changes.
+
+## 2026-03-27 - Public courses search field - GPT-5.4 mini
+- Added a client-side search field to the public courses page so users can filter courses by title, subject, or teacher.
+- Kept the newest-first ordering as the default by searching within the already sorted course list.
+- Added EN/AR search labels and placeholders while preserving pagination and reset behavior.
+
+## 2026-03-27 - Lecture play-start accounting endpoint - GPT-5.4 mini
+- Added a dedicated atomic play-start endpoint for student lecture access accounting and kept the legacy consume-view route as a compatibility alias.
+- Swapped the lecture player to the new play-start helper and surfaced visible retry status during soft fallback attempts.
+- Locked the lecture access flow to the student owner path while preserving the existing entitlement and idempotency checks.
 
 ## 2026-03-27 - Teacher details course link fix - GPT-5.4 mini
 - Wired the teacher-details page course cards to the public course details route so the Show Details button opens the specific course instead of doing nothing.

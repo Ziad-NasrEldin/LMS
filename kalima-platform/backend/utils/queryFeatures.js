@@ -30,9 +30,12 @@ class QueryFeatures {
   sort() {
     if (this.queryString.sort) {
       const sortBy = this.queryString.sort.split(",").join(" ");
-      this.query = this.query.sort(sortBy);
+      const stableSortBy = sortBy.includes("createdAt") && !sortBy.includes("_id")
+        ? `${sortBy} -_id`
+        : sortBy;
+      this.query = this.query.sort(stableSortBy);
     } else {
-      this.query = this.query.sort("-createdAt");
+      this.query = this.query.sort("-createdAt -_id");
     }
     return this;
   }
