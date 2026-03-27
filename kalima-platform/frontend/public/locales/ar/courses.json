@@ -8,6 +8,10 @@
     "showing": "عرض",
     "of": "من",
     "courses": "كورسات",
+    "search": {
+      "label": "بحث عن كورس",
+      "placeholder": "ابحث باسم الكورس أو المادة أو المدرس"
+    },
     "unknownTeacher": "مدرس غير محدد",
     "lecturer": "محاضر",
     "filters": {
@@ -77,9 +81,6 @@
     "status": {
       "free": "مجاني",
       "paid": "مدفوع"
-    },
-    "search": {
-      "options": "اختيارات البحث"
     },
     "priceRanges": {
       "free": "مجاني",

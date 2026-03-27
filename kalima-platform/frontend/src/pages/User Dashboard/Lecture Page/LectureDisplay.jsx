@@ -13,7 +13,7 @@ import {
 import { verifyExamSubmission, checkLectureAccess } from "../../../routes/examsAndHomeworks"
 import { uploadHomework, getLectureHomeworks } from "../../../routes/homeworks"
 import { getUserDashboard } from "../../../routes/auth-services"
-import { checkStudentLectureAccess, consumeStudentLectureView } from "../../../routes/student-lecture-access"
+import { checkStudentLectureAccess, accountStudentLecturePlayStart } from "../../../routes/student-lecture-access"
 import {
   FiUpload,
   FiFile,
@@ -191,6 +191,7 @@ const LectureDisplay = () => {
   const [homeworkVerified, setHomeworkVerified] = useState(false);
   const [homeworkData, setHomeworkData] = useState(null);
   const [homeworkSubmission, setHomeworkSubmission] = useState(null);
+  const [viewSyncStatus, setViewSyncStatus] = useState(null);
 
   const playerRef = useRef(null)
   const progressBarRef = useRef(null)
@@ -680,6 +681,7 @@ const LectureDisplay = () => {
 
         const updateViewState = (accessPayload) => {
           const nextViews = accessPayload?.access?.remainingViews
+          setViewSyncStatus(null)
 
           if (typeof nextViews === "number") {
             setRemainingViews(nextViews)
@@ -697,17 +699,24 @@ const LectureDisplay = () => {
 
         const scheduleRetry = (eventId, attempt = 1) => {
           if (attempt > 3) {
+            setViewSyncStatus(t("viewUpdateError"))
             setError(t("viewUpdateError"))
             return
           }
 
           const retryDelay = Math.min(1200 * 2 ** (attempt - 1), 10000)
+          setViewSyncStatus(
+            t("viewSyncRetrying", {
+              defaultValue: "Syncing play progress...",
+              attempt,
+            })
+          )
           if (viewSyncRetryTimeoutRef.current) {
             clearTimeout(viewSyncRetryTimeoutRef.current)
           }
 
           viewSyncRetryTimeoutRef.current = setTimeout(async () => {
-            const retryResponse = await consumeStudentLectureView(
+            const retryResponse = await accountStudentLecturePlayStart(
               studentLectureAccessId,
               eventId,
               purchaseId,
@@ -728,7 +737,7 @@ const LectureDisplay = () => {
 
         pendingViewEventIdRef.current = generatedEventId
 
-        const response = await consumeStudentLectureView(
+        const response = await accountStudentLecturePlayStart(
           studentLectureAccessId,
           generatedEventId,
           purchaseId,
@@ -741,6 +750,7 @@ const LectureDisplay = () => {
         }
       } catch (error) {
         console.error("View update error:", error)
+        setViewSyncStatus(t("viewUpdateError"))
         setError(t("viewUpdateError"))
       }
     };
@@ -1163,6 +1173,9 @@ const LectureDisplay = () => {
       );
     }
 
+    const showViewSyncBanner =
+      userRole === "Student" && viewSyncStatus && !videoBlocked;
+
     // Render requirements gate for students when lecture access is still restricted.
     if (isContentBlocked) {
       const requirementCards = [
@@ -1202,6 +1215,12 @@ const LectureDisplay = () => {
           <h1 className="text-2xl font-bold mb-4 text-center md:text-right md:text-4xl leading-tight">
             {lecture?.name || t("loadingLecture")}
           </h1>
+
+          {showViewSyncBanner && (
+            <div className="mb-4 rounded-2xl border border-info/30 bg-info/10 px-4 py-3 text-sm text-info-content shadow-sm">
+              {viewSyncStatus}
+            </div>
+          )}
 
           <div className="rounded-3xl border border-warning/30 bg-gradient-to-br from-base-100 to-base-200/40 p-5 shadow-xl md:p-6">
             <div className="mb-5 flex flex-wrap items-center justify-between gap-3">

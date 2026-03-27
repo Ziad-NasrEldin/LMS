@@ -377,7 +377,7 @@ exports.deleteStudentLectureAccess = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.consumeLectureView = catchAsync(async (req, res, next) => {
+const accountLecturePlayStart = async (req, res, next) => {
   const role = normalizeRole(req.user?.role);
 
   if (role !== STUDENT_ROLE) {
@@ -518,7 +518,10 @@ exports.consumeLectureView = catchAsync(async (req, res, next) => {
       409
     )
   );
-});
+};
+
+exports.accountLecturePlayStart = catchAsync(accountLecturePlayStart);
+exports.consumeLectureView = catchAsync(accountLecturePlayStart);
 
 exports.checkLectureAccess = catchAsync(async (req, res, next) => {
   const { lectureId } = req.params;

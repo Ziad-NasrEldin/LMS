@@ -98,7 +98,7 @@ export const updateStudentLectureAccess = async (accessId, data) => {
   }
 }
 
-export const consumeStudentLectureView = async (accessId, eventId, purchaseId = null) => {
+export const accountStudentLecturePlayStart = async (accessId, eventId, purchaseId = null) => {
   try {
     if (!accessId) {
       throw new Error("Access ID is required")
@@ -115,7 +115,7 @@ export const consumeStudentLectureView = async (accessId, eventId, purchaseId = 
     }
 
     const response = await axios.post(
-      `${import.meta.env.VITE_API_URL}/student-lecture-access/${accessId}/consume-view`,
+      `${import.meta.env.VITE_API_URL}/student-lecture-access/${accessId}/play-start`,
       payload,
       {
         headers: {
@@ -130,10 +130,13 @@ export const consumeStudentLectureView = async (accessId, eventId, purchaseId = 
       data: response.data.data,
     }
   } catch (error) {
-    console.error("Error consuming student lecture view:", error)
-    return normalizeApiError(error, "Failed to consume lecture view")
+    console.error("Error accounting student lecture play start:", error)
+    return normalizeApiError(error, "Failed to account lecture play start")
   }
 }
+
+export const consumeStudentLectureView = async (accessId, eventId, purchaseId = null) =>
+  accountStudentLecturePlayStart(accessId, eventId, purchaseId)
 
 // Update the checkStudentLectureAccess function to handle both container and standalone lectures
 export const checkStudentLectureAccess = async (studentId, lectureId, purchaseId, isStandaloneLecture = false) => {

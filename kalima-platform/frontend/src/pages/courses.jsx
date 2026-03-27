@@ -54,6 +54,7 @@ export default function CoursesPage() {
   const [selectedCourseType, setSelectedCourseType] = useState("")
   const [selectedCourseStatus, setSelectedCourseStatus] = useState("")
   const [selectedPrice, setSelectedPrice] = useState("")
+  const [searchQuery, setSearchQuery] = useState("")
   const [showFilters, setShowFilters] = useState(false)
 
   // Fetch initial data: subjects, levels, and lecturers
@@ -91,10 +92,10 @@ export default function CoursesPage() {
     fetchInitialData()
   }, [])
 
-  // Fetch containers when page changes
+  // Fetch containers once; filtering and pagination stay client-side.
   useEffect(() => {
     fetchContainers()
-  }, [currentPage])
+  }, [])
 
   // useEffect(() => {
   //   // Keep filters open on desktop and collapsed by default on smaller screens.
@@ -140,15 +141,125 @@ export default function CoursesPage() {
     setSelectedCourseType("")
     setSelectedCourseStatus("")
     setSelectedPrice("")
+    setSearchQuery("")
+    setCurrentPage(1)
+  }, [containers, sortByNewest])
+
+  const applyFilters = useCallback(() => {
     setCurrentPage(1)
 
-    // Reset to show all course containers with pagination
-    const courseContainers = sortByNewest(containers.filter((container) => container.type === "course"))
-    const paginatedContainers = courseContainers.slice(0, ITEMS_PER_PAGE)
-    setFilteredContainers(paginatedContainers)
-    setTotalResults(courseContainers.length)
-    setTotalPages(Math.ceil(courseContainers.length / ITEMS_PER_PAGE))
-  }, [containers, sortByNewest])
+    // On mobile, collapse filter panel after apply to show results immediately.
+    if (window.matchMedia("(max-width: 1023px)").matches) {
+      setShowFilters(false)
+    }
+  }, [])
+
+  const getFilteredCourseContainers = useCallback(
+    (sourceContainers = containers) => {
+      let filtered = sortByNewest(sourceContainers.filter((container) => container.type === "course"))
+
+      if (selectedStage) {
+        filtered = filtered.filter((container) => {
+          const levelName = container.level?.name || ""
+          const translatedStage = t(`levels.${levelName}`, { defaultValue: levelName })
+          return translatedStage === selectedStage
+        })
+      }
+
+      if (selectedSubject) {
+        filtered = filtered.filter((container) => container.subject?.name === selectedSubject)
+      }
+
+      if (selectedGrade) {
+        const levelId = levels.find((level) => {
+          const translatedLevelName = t(`levels.${level.name}`, { defaultValue: level.name })
+          return translatedLevelName === selectedGrade
+        })?._id
+
+        if (levelId) {
+          filtered = filtered.filter((container) => container.level?._id === levelId)
+        }
+      }
+
+      if (selectedCourseType) {
+        let apiType = "course"
+        switch (selectedCourseType) {
+          case t("types.course"):
+            apiType = "course"
+            break
+          case t("types.year"):
+            apiType = "year"
+            break
+          case t("types.term"):
+            apiType = "term"
+            break
+          case t("types.month"):
+            apiType = "month"
+            break
+          default:
+            apiType = selectedCourseType
+        }
+        filtered = filtered.filter((container) => container.type === apiType)
+      }
+
+      if (selectedCourseStatus) {
+        filtered = filtered.filter((container) => {
+          const price = container.price || 0
+          return selectedCourseStatus === t("status.free") ? price === 0 : price > 0
+        })
+      }
+
+      if (selectedPrice) {
+        const [min, max] = selectedPrice.split("-").map(Number)
+        filtered = filtered.filter((container) => {
+          const price = container.price || 0
+          return price >= min && (max === 0 || price <= max)
+        })
+      }
+
+      const normalizedSearch = searchQuery.trim().toLowerCase()
+      if (normalizedSearch) {
+        filtered = filtered.filter((container) => {
+          const teacherId = container.createdBy?._id || container.createdBy
+          const matchedLecturer = lecturers.find((lecturer) => lecturer._id === teacherId)
+
+          const searchableText = [
+            container.name,
+            container.subject?.name,
+            container.level?.name,
+            matchedLecturer?.name,
+            matchedLecturer?.role,
+          ]
+            .filter(Boolean)
+            .join(" ")
+            .toLowerCase()
+
+          return searchableText.includes(normalizedSearch)
+        })
+      }
+
+      return filtered
+    },
+    [containers, lecturers, levels, searchQuery, selectedCourseStatus, selectedCourseType, selectedGrade, selectedPrice, selectedStage, selectedSubject, sortByNewest, t],
+  )
+
+  useEffect(() => {
+    if (containers.length === 0) return
+
+    const filtered = getFilteredCourseContainers(containers)
+    const nextTotalPages = Math.max(1, Math.ceil(filtered.length / ITEMS_PER_PAGE))
+    const safePage = Math.min(currentPage, nextTotalPages)
+    const startIndex = (safePage - 1) * ITEMS_PER_PAGE
+    const endIndex = startIndex + ITEMS_PER_PAGE
+
+    if (safePage !== currentPage) {
+      setCurrentPage(safePage)
+    }
+
+    setFilteredContainers(filtered.slice(startIndex, endIndex))
+    setTotalResults(filtered.length)
+    setTotalPages(nextTotalPages)
+  }, [containers, currentPage, getFilteredCourseContainers, ITEMS_PER_PAGE])
 
   const generateCourseData = (containersData) =>
     containersData.map((container, index) => {
@@ -203,149 +314,10 @@ export default function CoursesPage() {
       }
     })
 
-  const applyFilters = useCallback(() => {
-    // Filter the containers based on selected filters
-    let filtered = sortByNewest(containers.filter((container) => container.type === "course"))
-
-    // Apply stage filter
-    if (selectedStage) {
-      filtered = filtered.filter((container) => {
-        const levelName = container.level?.name || ""
-        const translatedStage = t(`levels.${levelName}`, { defaultValue: levelName })
-        return translatedStage === selectedStage
-      })
-    }
-
-    // Apply subject filter
-    if (selectedSubject) {
-      filtered = filtered.filter((c) => c.subject?.name === selectedSubject)
-    }
-
-    // Apply grade filter
-    if (selectedGrade) {
-      const levelId = levels.find((level) => {
-        const translatedLevelName = t(`levels.${level.name}`, { defaultValue: level.name })
-        return translatedLevelName === selectedGrade
-      })?._id
-
-      if (levelId) {
-        filtered = filtered.filter((c) => c.level?._id === levelId)
-      }
-    }
-
-    // Apply course type filter
-    if (selectedCourseType) {
-      let apiType = "course"
-      switch (selectedCourseType) {
-        case t("types.course"):
-          apiType = "course"
-          break
-        case t("types.year"):
-          apiType = "year"
-          break
-        case t("types.term"):
-          apiType = "term"
-          break
-        case t("types.month"):
-          apiType = "month"
-          break
-        default:
-          apiType = selectedCourseType
-      }
-      filtered = filtered.filter((c) => c.type === apiType)
-    }
-
-    // Apply course status filter
-    if (selectedCourseStatus) {
-      filtered = filtered.filter((c) => {
-        const price = c.price || 0
-        return selectedCourseStatus === t("status.free") ? price === 0 : price > 0
-      })
-    }
-
-    // Apply price filter
-    if (selectedPrice) {
-      const [min, max] = selectedPrice.split("-").map(Number)
-      filtered = filtered.filter((c) => {
-        const price = c.price || 0
-        return price >= min && (max === 0 || price <= max)
-      })
-    }
-
-    // Reset to first page when applying new filters
-    setCurrentPage(1)
-
-    // Apply pagination to filtered results
-    const startIndex = 0 // First page
-    const endIndex = startIndex + ITEMS_PER_PAGE
-    const paginatedContainers = filtered.slice(startIndex, endIndex)
-
-    setFilteredContainers(paginatedContainers)
-    setTotalResults(filtered.length)
-    setTotalPages(Math.ceil(filtered.length / ITEMS_PER_PAGE))
-
-    // On mobile, collapse filter panel after apply to show results immediately.
-    if (window.matchMedia("(max-width: 1023px)").matches) {
-      setShowFilters(false)
-    }
-  }, [
-    containers,
-    selectedStage,
-    selectedGrade,
-    selectedSubject,
-    selectedCourseType,
-    selectedCourseStatus,
-    selectedPrice,
-    levels,
-    sortByNewest,
-    setShowFilters,
-  ])
-
-  // Apply filters when filter selections change
-  useEffect(() => {
-    if (containers.length > 0) {
-      applyFilters()
-    }
-  }, [
-    selectedStage,
-    selectedGrade,
-    selectedSubject,
-    selectedCourseType,
-    selectedCourseStatus,
-    selectedPrice,
-    containers.length,
-  ])
-
   // Handle page change
   const handlePageChange = (newPage) => {
     if (newPage >= 1 && newPage <= totalPages) {
       setCurrentPage(newPage)
-
-      // Get all filtered containers (without pagination)
-      const filtered = sortByNewest(containers.filter((container) => container.type === "course"))
-
-      // Apply all active filters
-      if (
-        selectedStage ||
-        selectedGrade ||
-        selectedSubject ||
-        selectedCourseType ||
-        selectedCourseStatus ||
-        selectedPrice
-      ) {
-        // The filters have already been applied, so we just need to paginate the current filtered set
-        const startIndex = (newPage - 1) * ITEMS_PER_PAGE
-        const endIndex = startIndex + ITEMS_PER_PAGE
-        const paginatedContainers = filtered.slice(startIndex, endIndex)
-        setFilteredContainers(paginatedContainers)
-      } else {
-        // No filters active, just paginate the course containers
-        const courseContainers = sortByNewest(containers.filter((container) => container.type === "course"))
-        const startIndex = (newPage - 1) * ITEMS_PER_PAGE
-        const endIndex = startIndex + ITEMS_PER_PAGE
-        const paginatedContainers = courseContainers.slice(startIndex, endIndex)
-        setFilteredContainers(paginatedContainers)
-      }
     }
   }
 
@@ -437,8 +409,8 @@ export default function CoursesPage() {
   ]
 
   const activeFiltersCount = useMemo(() => {
-    return [selectedStage, selectedGrade, selectedSubject, selectedCourseType, selectedCourseStatus, selectedPrice].filter(Boolean).length
-  }, [selectedStage, selectedGrade, selectedSubject, selectedCourseType, selectedCourseStatus, selectedPrice])
+    return [selectedStage, selectedGrade, selectedSubject, selectedCourseType, selectedCourseStatus, selectedPrice, searchQuery].filter(Boolean).length
+  }, [selectedStage, selectedGrade, selectedSubject, selectedCourseType, selectedCourseStatus, selectedPrice, searchQuery])
 
   return (
     <main
@@ -514,13 +486,24 @@ export default function CoursesPage() {
             >
               {t("filters.reset")}
             </button>
-            <div
-              className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold ${isRTL ? "flex-row-reverse" : ""}`}
-              style={{ background: TOKENS.lightAquaMist, color: TOKENS.deepTeal }}
+            <label
+              className={`flex min-w-[280px] flex-1 items-center gap-2 rounded-full border bg-white px-4 py-2 text-sm shadow-sm ${isRTL ? "flex-row-reverse" : ""}`}
+              style={{ borderColor: "rgba(17,24,39,0.1)", color: TOKENS.deepTeal }}
             >
-              <Search className="h-4 w-4" />
-              {t("search.options")}
-            </div>
+              <Search className="h-4 w-4 shrink-0" />
+              <span className="sr-only">{t("search.label")}</span>
+              <input
+                type="search"
+                value={searchQuery}
+                onChange={(event) => {
+                  setSearchQuery(event.target.value)
+                  setCurrentPage(1)
+                }}
+                placeholder={t("search.placeholder")}
+                className="w-full border-0 bg-transparent p-0 text-sm outline-none placeholder:text-slate-400"
+                aria-label={t("search.label")}
+              />
+            </label>
             {activeFiltersCount > 0 && (
               <div
                 className="inline-flex items-center rounded-full px-4 py-2 text-xs font-bold"
@@ -592,7 +575,8 @@ export default function CoursesPage() {
                   selectedSubject ||
                   selectedCourseType ||
                   selectedCourseStatus ||
-                  selectedPrice) && (
+                  selectedPrice ||
+                  searchQuery) && (
                   <button
                     className="mt-4 rounded-full px-5 py-2 text-sm font-semibold"
                     style={{ border: "1px solid rgba(17,24,39,0.15)", color: TOKENS.deepTeal }}

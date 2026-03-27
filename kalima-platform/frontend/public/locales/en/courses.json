@@ -8,6 +8,10 @@
     "showing": "Showing",
     "of": "of",
     "courses": "courses",
+    "search": {
+      "label": "Search courses",
+      "placeholder": "Search by course, subject, or teacher"
+    },
     "unknownTeacher": "Unknown Teacher",
     "lecturer": "Lecturer",
     "filters": {
@@ -77,9 +81,6 @@
     "status": {
       "free": "Free",
       "paid": "Paid"
-    },
-    "search": {
-      "options": "Search Options"
     },
     "priceRanges": {
       "free": "Free",

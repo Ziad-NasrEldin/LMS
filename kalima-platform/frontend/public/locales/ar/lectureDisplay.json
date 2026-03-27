@@ -57,6 +57,7 @@
   "remainingViews": "المشاهدات المتبقية",
   "loading": "جار التحميل...",
   "retry": "إعادة المحاولة",
+  "viewSyncRetrying": "جاري مزامنة التقدم...",
   "lectureDetails": "تفاصيل المحاضرة",
   "description": "الوصف",
   "noDescriptionAvailable": "لا يوجد وصف متوفر.",

@@ -29,6 +29,10 @@ router
   );
 
 router
+  .route("/:id/play-start")
+  .post(verifyRoles("Student"), studentLectureAccessController.accountLecturePlayStart);
+
+router
   .route("/:id/consume-view")
   .post(verifyRoles("Student"), studentLectureAccessController.consumeLectureView);
 

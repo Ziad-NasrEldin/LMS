@@ -57,6 +57,7 @@
   "remainingViews": "Remaining views",
   "loading": "Loading...",
   "retry": "Retry",
+  "viewSyncRetrying": "Syncing play progress...",
   "lectureDetails": "Lecture Details",
   "description": "Description",
   "noDescriptionAvailable": "No description available.",
