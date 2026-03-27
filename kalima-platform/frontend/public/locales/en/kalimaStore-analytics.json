@@ -46,6 +46,7 @@
   }
   ,
   "exportCSV": "Export CSV",
+  "dailyStats": "Daily Statistics",
   "exporting": "Exporting...",
   "exportXLSX": "Export XLSX",
   "csv": {

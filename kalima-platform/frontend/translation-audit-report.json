@@ -4,8 +4,8 @@
     "namespaceCountAr": 32,
     "missingArNamespacesCount": 0,
     "missingEnNamespacesCount": 0,
-    "missingUsedKeysInEnCount": 105,
-    "missingUsedKeysInArCount": 105
+    "missingUsedKeysInEnCount": 82,
+    "missingUsedKeysInArCount": 82
   },
   "missingArNamespaces": [],
   "missingEnNamespaces": [],
@@ -142,8 +142,8 @@
       "suspiciousSame": []
     },
     "home": {
-      "enCount": 125,
-      "arCount": 125,
+      "enCount": 126,
+      "arCount": 126,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": [
@@ -213,15 +213,15 @@
       "suspiciousSame": []
     },
     "lecturerDashboard": {
-      "enCount": 62,
-      "arCount": 62,
+      "enCount": 65,
+      "arCount": 65,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": []
     },
     "lectures": {
-      "enCount": 126,
-      "arCount": 126,
+      "enCount": 133,
+      "arCount": 133,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": []
@@ -234,8 +234,8 @@
       "suspiciousSame": []
     },
     "login": {
-      "enCount": 92,
-      "arCount": 92,
+      "enCount": 94,
+      "arCount": 94,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": [
@@ -273,15 +273,15 @@
       "suspiciousSame": []
     },
     "settings": {
-      "enCount": 83,
-      "arCount": 83,
+      "enCount": 89,
+      "arCount": 89,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": []
     },
     "teacherDetails": {
-      "enCount": 12,
-      "arCount": 12,
+      "enCount": 17,
+      "arCount": 17,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": []
@@ -295,42 +295,6 @@
     }
   },
   "missingUsedInEn": [
-    {
-      "file": "pages/lectures.jsx",
-      "ns": "lectures",
-      "key": "errors.loginRequired",
-      "fn": "t"
-    },
-    {
-      "file": "pages/lectures.jsx",
-      "ns": "lectures",
-      "key": "errors.lectureNotFound",
-      "fn": "t"
-    },
-    {
-      "file": "pages/lectures.jsx",
-      "ns": "lectures",
-      "key": "errors.insufficientPoints",
-      "fn": "t"
-    },
-    {
-      "file": "pages/lectures.jsx",
-      "ns": "lectures",
-      "key": "purchase.success",
-      "fn": "t"
-    },
-    {
-      "file": "pages/lectures.jsx",
-      "ns": "lectures",
-      "key": "purchase.failed",
-      "fn": "t"
-    },
-    {
-      "file": "pages/lectures.jsx",
-      "ns": "lectures",
-      "key": "purchase.failed",
-      "fn": "t"
-    },
     {
       "file": "pages/User Dashboard/Lecture Page/ContainerPage.jsx",
       "ns": "lecturesPage",
@@ -515,108 +479,6 @@
       "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
       "ns": "admin",
       "key": "admin.editUser.emailPlaceholder",
-      "fn": "t"
-    },
-    {
-      "file": "pages/teacher details/Teacher-details.jsx",
-      "ns": "teacherDetails",
-      "key": "courseType",
-      "fn": "t"
-    },
-    {
-      "file": "pages/teacher details/Teacher-details.jsx",
-      "ns": "teacherDetails",
-      "key": "error.invalid_user_id",
-      "fn": "t"
-    },
-    {
-      "file": "pages/teacher details/Teacher-details.jsx",
-      "ns": "teacherDetails",
-      "key": "lecturer",
-      "fn": "t"
-    },
-    {
-      "file": "pages/teacher details/Teacher-details.jsx",
-      "ns": "teacherDetails",
-      "key": "defaultSubject",
-      "fn": "t"
-    },
-    {
-      "file": "pages/teacher details/Teacher-details.jsx",
-      "ns": "teacherDetails",
-      "key": "noCoursesAvailable",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Settings/SecuritySection.jsx",
-      "ns": "settings",
-      "key": "passwordStrength.weak",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Settings/SecuritySection.jsx",
-      "ns": "settings",
-      "key": "passwordStrength.medium",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Settings/SecuritySection.jsx",
-      "ns": "settings",
-      "key": "passwordStrength.strong",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Settings/SecuritySection.jsx",
-      "ns": "settings",
-      "key": "dir",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Settings/SecuritySection.jsx",
-      "ns": "settings",
-      "key": "passwordStrength.label",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Services/WelcomeSection.jsx",
-      "ns": "home",
-      "key": "welcome.kalima",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Login/login.jsx",
-      "ns": "login",
-      "key": "errors.fetchUserDataError",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Login/ResetPasswordPage.jsx",
-      "ns": "login",
-      "key": "resetPassword",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/CourseGrid.jsx",
-      "ns": "lecturerDashboard",
-      "key": "edit",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/FeaturedCourses.jsx",
-      "ns": "lectures",
-      "key": "details",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/LecturerDashboard.jsx",
-      "ns": "lecturerDashboard",
-      "key": "top_categories",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/LecturerDashboard.jsx",
-      "ns": "lecturerDashboard",
-      "key": "most_popular",
       "fn": "t"
     },
     {
@@ -928,42 +790,6 @@
   ],
   "missingUsedInAr": [
     {
-      "file": "pages/lectures.jsx",
-      "ns": "lectures",
-      "key": "errors.loginRequired",
-      "fn": "t"
-    },
-    {
-      "file": "pages/lectures.jsx",
-      "ns": "lectures",
-      "key": "errors.lectureNotFound",
-      "fn": "t"
-    },
-    {
-      "file": "pages/lectures.jsx",
-      "ns": "lectures",
-      "key": "errors.insufficientPoints",
-      "fn": "t"
-    },
-    {
-      "file": "pages/lectures.jsx",
-      "ns": "lectures",
-      "key": "purchase.success",
-      "fn": "t"
-    },
-    {
-      "file": "pages/lectures.jsx",
-      "ns": "lectures",
-      "key": "purchase.failed",
-      "fn": "t"
-    },
-    {
-      "file": "pages/lectures.jsx",
-      "ns": "lectures",
-      "key": "purchase.failed",
-      "fn": "t"
-    },
-    {
       "file": "pages/User Dashboard/Lecture Page/ContainerPage.jsx",
       "ns": "lecturesPage",
       "key": "containersPage.unknown",
@@ -1147,108 +973,6 @@
       "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
       "ns": "admin",
       "key": "admin.editUser.emailPlaceholder",
-      "fn": "t"
-    },
-    {
-      "file": "pages/teacher details/Teacher-details.jsx",
-      "ns": "teacherDetails",
-      "key": "courseType",
-      "fn": "t"
-    },
-    {
-      "file": "pages/teacher details/Teacher-details.jsx",
-      "ns": "teacherDetails",
-      "key": "error.invalid_user_id",
-      "fn": "t"
-    },
-    {
-      "file": "pages/teacher details/Teacher-details.jsx",
-      "ns": "teacherDetails",
-      "key": "lecturer",
-      "fn": "t"
-    },
-    {
-      "file": "pages/teacher details/Teacher-details.jsx",
-      "ns": "teacherDetails",
-      "key": "defaultSubject",
-      "fn": "t"
-    },
-    {
-      "file": "pages/teacher details/Teacher-details.jsx",
-      "ns": "teacherDetails",
-      "key": "noCoursesAvailable",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Settings/SecuritySection.jsx",
-      "ns": "settings",
-      "key": "passwordStrength.weak",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Settings/SecuritySection.jsx",
-      "ns": "settings",
-      "key": "passwordStrength.medium",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Settings/SecuritySection.jsx",
-      "ns": "settings",
-      "key": "passwordStrength.strong",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Settings/SecuritySection.jsx",
-      "ns": "settings",
-      "key": "dir",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Settings/SecuritySection.jsx",
-      "ns": "settings",
-      "key": "passwordStrength.label",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Services/WelcomeSection.jsx",
-      "ns": "home",
-      "key": "welcome.kalima",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Login/login.jsx",
-      "ns": "login",
-      "key": "errors.fetchUserDataError",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Login/ResetPasswordPage.jsx",
-      "ns": "login",
-      "key": "resetPassword",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/CourseGrid.jsx",
-      "ns": "lecturerDashboard",
-      "key": "edit",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/FeaturedCourses.jsx",
-      "ns": "lectures",
-      "key": "details",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/LecturerDashboard.jsx",
-      "ns": "lecturerDashboard",
-      "key": "top_categories",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/LecturerDashboard.jsx",
-      "ns": "lecturerDashboard",
-      "key": "most_popular",
       "fn": "t"
     },
     {

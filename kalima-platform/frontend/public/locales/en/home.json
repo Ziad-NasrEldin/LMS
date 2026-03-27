@@ -151,5 +151,6 @@
     "viewDetails":  "View Details"
   },
   "priceUnavailable": "N/A" 
+  ,"containerType": "Container Type"
   
 }

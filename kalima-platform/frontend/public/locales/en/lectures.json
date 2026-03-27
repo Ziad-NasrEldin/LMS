@@ -12,6 +12,8 @@
   "purchased": "Purchased",
   "purchase": "Purchase",
   "details": "Details",
+  "showMore": "Show more",
+  "showLess": "Show less",
   "purchaseMessages": {
     "success": "Lecture purchased successfully",
     "failed": "Failed to purchase lecture"

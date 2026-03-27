@@ -12,6 +12,8 @@
   "purchased": "مشترك",
   "purchase": "شراء",
   "details": "التفاصيل",
+  "showMore": "عرض المزيد",
+  "showLess": "عرض أقل",
   "purchaseMessages": {
     "success": "تم شراء المحاضرة بنجاح",
     "failed": "فشل شراء المحاضرة"

@@ -16,7 +16,12 @@
     "buttons": {
       "close": "Close",
       "createNewLecture": "Create New Lecture",
-      "details": "Details"
+      "details": "Details",
+      "edit": "Edit"
+    },
+    "messages": {
+      "lectureUpdatedSuccessfully": "Lecture updated successfully",
+      "lectureCreatedSuccessfully": "Lecture created successfully"
     },
     "filters": {
       "allSubjects": "All Subjects",
@@ -90,6 +95,7 @@
       "purchaseDate": "Purchase Date",
       "unknown": "Unknown"
     },
+    "unknown": "Unknown",
     "buttons": {
       "viewDetails": "View Details"
     },
@@ -127,6 +133,8 @@
     "requiresExam": "Requires Exam",
     "requiresHomework": "Requires Homework",
     "homeworkConfiguration": "Homework Configuration",
+    "enterGoogleFormOrLink": "Enter Google Form URL or share link",
+    "orPasteLink": "Or paste a public link",
     "attachmentOptional": "Attachment (Optional)",
     "selectedFile": "Selected file"
   },
@@ -147,9 +155,31 @@
     "contentBasics": "Content Basics",
     "assetPreview": "Asset Preview",
     "publishSummary": "Publish Summary",
+    "publishSettings": "Publish Settings",
     "examSettings": "Exam Settings",
     "homeworkSettings": "Homework Settings",
     "attachments": "Attachments"
+  },
+  "examConfig": {
+    "noConfigs": "No configurations found",
+    "configurationLabel": "Configuration",
+    "selectConfig": "Select configuration",
+    "noExistingConfigs": "No existing configurations",
+    "createNew": "Create New",
+    "emptyHelp": "Create a configuration to connect lecture verification",
+    "newConfiguration": "New Configuration",
+    "type": "Type",
+    "exam": "Exam",
+    "homework": "Homework",
+    "typeHelp": "Choose whether this configuration is for exam or homework",
+    "googleSheetId": "Google Sheet ID",
+    "googleSheetHelp": "Paste the sheet ID from the URL",
+    "formUrl": "Form URL",
+    "studentIdentifierColumn": "Student Identifier Column",
+    "scoreColumn": "Score Column",
+    "defaultPassingThreshold": "Default Passing Threshold",
+    "createButton": "Create Configuration",
+    "passingThreshold": "Passing Threshold"
   },
   "attachmentTypes": {
     "pdfsAndImages": "PDFs and Images",

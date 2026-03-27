@@ -37,6 +37,7 @@
       "title": "Subject",
       "createNew": "Create New Subject",
       "name": "Subject Name",
+      "nameAR": "Subject Name (Arabic)",
       "namePlaceholder": "e.g., Geography",
       "create": "Create Subject",
       "existing": "Existing Subjects",

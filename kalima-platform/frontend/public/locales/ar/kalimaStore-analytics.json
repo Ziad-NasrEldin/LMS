@@ -46,6 +46,7 @@
   }
   ,
   "exportCSV": "تصدير CSV",
+  "dailyStats": "إحصاءات يومية",
   "exporting": "جارٍ التصدير...",
   "exportXLSX": "تصدير XLSX",
   "csv": {

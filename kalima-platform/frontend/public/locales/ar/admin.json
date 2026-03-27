@@ -18,6 +18,7 @@
         "phone": "رقم الهاتف",
         "phonePlaceholder": "رقم الهاتف",
         "email": "البريد الالكتروني",
+        "emailPlaceholder": "البريد الإلكتروني",
         "password": "كلمة المرور",
         "passwordPlaceholder": "كلمة المرور",
         "passwordHint": "يرجى ادخال كلمة المرور",
@@ -110,8 +111,10 @@
         "phoneRequired": "يرجى إدخال رقم الهاتف",
         "lecturerRequired": "يرجى اختيار محاضر",
         "generationFailed": "فشل في إنشاء أكواد الخصم",
+        "qrCodeGenerationFailed": "فشل في إنشاء رمز QR",
         "fetchUsers": "فشل في جلب المستخدمين"
       },
+      "download": "تحميل",
       "success": {
         "codesGenerated": "تم إنشاء أكواد الخصم بنجاح"
       },
@@ -244,6 +247,15 @@
         "status": "الحالة",
         "email":"البريد الإلكتروني"
       },
+      "table": {
+        "user": "المستخدم",
+        "email": "البريد الإلكتروني",
+        "action": "الإجراء",
+        "timestamp": "الطابع الزمني",
+        "role": "الصلاحية",
+        "resource": "العنصر",
+        "status": "الحالة"
+      },
       
       "roles": {
         "admin": "مسؤول",
@@ -338,6 +350,7 @@
     },
     "promoCodes": {
       "title": "إدارة الأكواد الترويجية",
+      "subtitle": "إدارة دورة حياة أكواد الشحن واستخدامها",
       "code": " كود الخصم",
       "points": " النقاط",
       "status": " الحالة",
@@ -369,7 +382,12 @@
       "active": "نشط"
     },
     "errors": {
-      "fetchPromo": "فشل في جلب الأكواد الترويجية"
+      "fetchPromo": "فشل في جلب الأكواد الترويجية",
+      "invalidResponse": "استجابة غير صالحة من الخادم",
+      "failedToFetchStudents": "فشل في جلب الطلاب",
+      "deleteFailed": "فشل طلب الحذف",
+      "unexpectedError": "حدث خطأ غير متوقع",
+      "bulkDeleteFailed": "فشل الحذف الجماعي"
     },
     "revenue": {
       "errorLoadingRevenue": "خطأ في تحميل بيانات الإيرادات",
@@ -389,7 +407,9 @@
     },
      "modals" : {
         "confirmDelete": " حذف هذا الكود؟",
-        "deleteCodeConfirm": "هل انت متاكد من رغبتك في حذف هذا الكود؟"
+        "deleteCodeConfirm": "هل انت متاكد من رغبتك في حذف هذا الكود؟",
+        "confirmBulkDelete": "تأكيد الحذف الجماعي",
+        "bulkDeleteConfirm": "هل أنت متأكد من حذف أكواد الشحن المحددة؟"
 
       },
     "export": {

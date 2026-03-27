@@ -20,6 +20,8 @@
   "assistants": "Assistants",
   "top_categories": "Top Categories",
   "most_popular": "Most popular",
+  "featured_courses": "Featured Courses",
+  "view_all": "View all",
   "assistantsHint": "Manage assistants with the same modern card language.",
   "addAssistant": "Add Assistant",
   "noAssistants": "You haven't added any assistants yet.",

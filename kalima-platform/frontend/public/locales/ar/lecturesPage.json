@@ -16,7 +16,12 @@
     "buttons": {
       "close": "إغلاق",
       "createNewLecture": "إنشاء محاضرة جديدة",
-      "details": "التفاصيل"
+      "details": "التفاصيل",
+      "edit": "تعديل"
+    },
+    "messages": {
+      "lectureUpdatedSuccessfully": "تم تحديث المحاضرة بنجاح",
+      "lectureCreatedSuccessfully": "تم إنشاء المحاضرة بنجاح"
     },
     "filters": {
       "allSubjects": "كل المواد",
@@ -90,6 +95,7 @@
       "purchaseDate": "تاريخ الشراء",
       "unknown": "غير معروف"
     },
+    "unknown": "غير معروف",
     "buttons": {
       "viewDetails": "عرض التفاصيل"
     },
@@ -127,6 +133,8 @@
     "requiresExam": "يتطلب اختبار",
     "requiresHomework": "يتطلب واجب منزلي",
     "homeworkConfiguration": "إعدادات الواجب المنزلي",
+    "enterGoogleFormOrLink": "أدخل رابط نموذج جوجل أو رابط المشاركة",
+    "orPasteLink": "أو الصق رابطًا عامًا",
     "attachmentOptional": "مرفق (اختياري)",
     "selectedFile": "الملف المحدد"
   },
@@ -147,9 +155,31 @@
     "contentBasics": "أساسيات المحتوى",
     "assetPreview": "معاينة الأصول",
     "publishSummary": "ملخص النشر",
+    "publishSettings": "إعدادات النشر",
     "examSettings": "إعدادات الاختبار",
     "homeworkSettings": "إعدادات الواجب المنزلي",
     "attachments": "المرفقات"
+  },
+  "examConfig": {
+    "noConfigs": "لا توجد إعدادات متاحة",
+    "configurationLabel": "الإعداد",
+    "selectConfig": "اختر إعدادًا",
+    "noExistingConfigs": "لا توجد إعدادات محفوظة",
+    "createNew": "إنشاء جديد",
+    "emptyHelp": "أنشئ إعدادًا لربط تحقق المحاضرة",
+    "newConfiguration": "إعداد جديد",
+    "type": "النوع",
+    "exam": "اختبار",
+    "homework": "واجب",
+    "typeHelp": "اختر ما إذا كان هذا الإعداد للاختبار أو الواجب",
+    "googleSheetId": "معرّف Google Sheet",
+    "googleSheetHelp": "الصق معرّف الشيت من الرابط",
+    "formUrl": "رابط النموذج",
+    "studentIdentifierColumn": "عمود معرّف الطالب",
+    "scoreColumn": "عمود الدرجة",
+    "defaultPassingThreshold": "حد النجاح الافتراضي",
+    "createButton": "إنشاء الإعداد",
+    "passingThreshold": "حد النجاح"
   },
   "attachmentTypes": {
     "pdfsAndImages": "ملفات PDF وصور",
