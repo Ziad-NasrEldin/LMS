@@ -1,8 +1,3 @@
-## 2026-03-27 - Translation implementation batch 2 (frontend locale parity complete) - GPT-5.3-Codex
-- Added targeted EN/AR locale aliases and missing keys across lecturesPage, admin, createUser, createAdmin, common, home, lecturerDashboard, centerDashboard, and Kalima Store namespaces to match existing `t(...)` usages without changing runtime behavior.
-- Filled exam-config and lecture-creation key paths in `lecturesPage` plus missing table/filter/export aliases used by admin and store dashboards.
-- Re-ran i18n audit and reached full used-key parity in frontend locales (`missingUsedKeysInEnCount: 0`, `missingUsedKeysInArCount: 0`).
-
 ## 2026-03-27 - Lecture edit entry points - GPT-5.4 mini
 - Added lecture edit buttons on the lecturer-facing lecture detail and playback screens, reusing the existing My Lectures edit modal flow through navigation state.
 - Updated the shared lecture list page to auto-open the edit modal when it receives a lecture target from those detail screens.
