@@ -38,7 +38,7 @@ const codeSchema = new mongoose.Schema({
     type: Date,
     default: null,
   }
-});
+}, { timestamps: true });
 
 codeSchema.methods.generateCode = function () {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';

@@ -46,6 +46,13 @@ export default function Step4({ formData, t, gradeLevels }) {
     return level ? translateGradeLevel(level.label) : "-"
   }
 
+  const getHobbyName = (hobbyKey) => {
+    if (!hobbyKey) return "-"
+
+    const translated = t(`hobbies.${hobbyKey}`)
+    return translated !== `hobbies.${hobbyKey}` ? translated : hobbyKey
+  }
+
   // Function to format teacher levels
   const formatTeacherLevels = (levels) => {
     if (!levels || !Array.isArray(levels) || levels.length === 0) return "-"
@@ -84,6 +91,7 @@ export default function Step4({ formData, t, gradeLevels }) {
           {formData.role === "student" && (
             <>
               <ReviewItem label={t("form.grade")} value={getLevelName(formData.level)} />
+              <ReviewItem label={t("form.hobby")} value={getHobbyName(formData.hobby)} />
               <ReviewItem label={t("form.parentPhone")} value={formData.parentPhoneNumber} />
             </>
           )}

@@ -299,6 +299,25 @@ export const getMyContainers = async () => {
   }
 }
 
+export const getLecturerAnalytics = async (queryParams = {}) => {
+  try {
+    const response = await axios.get(`${API_URL}/lecturers/me/analytics`, {
+      params: queryParams,
+      withCredentials: true,
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
+    });
+
+    return {
+      success: true,
+      data: response.data.data,
+    };
+  } catch (error) {
+    return normalizeApiError(error, "Failed to fetch lecturer analytics");
+  }
+};
+
 // Function to get all lectures
 export const getAllLectures = async (queryParams = {}) => {
   try {

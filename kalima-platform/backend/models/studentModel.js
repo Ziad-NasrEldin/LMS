@@ -22,6 +22,18 @@ const User = require("./userModel");
 const { required } = require("joi");
 const mongooseSequence = require("mongoose-sequence")(mongoose);
 
+const ALLOWED_HOBBIES = [
+  "reading",
+  "sports",
+  "music",
+  "cooking",
+  "gaming",
+  "art",
+  "technology",
+  "bicycling",
+  "photography",
+];
+
 const lecturerPointsSchema = new mongoose.Schema(
   {
     lecturer: {
@@ -46,6 +58,11 @@ const studentSchema = new mongoose.Schema(
     parentPhoneNumber: {
       type: String,
       required: true,
+    },
+    hobby: {
+      type: String,
+      required: true,
+      enum: ALLOWED_HOBBIES,
     },
     faction: String,
     phoneNumber: { type: String },

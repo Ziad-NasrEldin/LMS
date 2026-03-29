@@ -1,19 +1,20 @@
 export default function StepsIndicator({ currentStep, t, role }) {
   const stepLabels = {
     student: [
-      t('steps.personalInfo'),
-      t('steps.parentInfo'),
-      t('steps.review')
+      "steps.personalInfo",
+      "steps.parentInfo",
+      "steps.hobbies",
+      "steps.review"
     ],
     parent: [
-      t('steps.personalInfo'),
-      t('steps.childrenInfo'),
-      t('steps.review')
+      "steps.personalInfo",
+      "steps.childrenInfo",
+      "steps.review"
     ],
     teacher: [
-      t('steps.personalInfo'),
-      t('steps.professionalInfo'),
-      t('steps.review')
+      "steps.personalInfo",
+      "steps.professionalInfo",
+      "steps.review"
     ]
   };
 
@@ -27,7 +28,7 @@ export default function StepsIndicator({ currentStep, t, role }) {
               key={stepNumber} 
               className={`text-[11px] sm:text-[13px] step ${currentStep >= stepNumber ? 'step-primary' : ''}`}
             >
-              {t(`${label}`)}
+              {t(label)}
             </div>
           );
         })}

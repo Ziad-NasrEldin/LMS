@@ -4,6 +4,18 @@ const {
   isValidEgyptianPhoneNumber,
 } = require("../utils/phoneNumber.js");
 
+const allowedHobbies = [
+  "reading",
+  "sports",
+  "music",
+  "cooking",
+  "gaming",
+  "art",
+  "technology",
+  "bicycling",
+  "photography",
+];
+
 const studentValidation = userValidation.concat(
   Joi.object({
     level: Joi.string()
@@ -23,6 +35,13 @@ const studentValidation = userValidation.concat(
       })
       .messages({
         "string.pattern.base": "parentPhoneNumber must be a valid Egyptian number (+20XXXXXXXXXX, 0XXXXXXXXXX, or XXXXXXXXXX).",
+      }),
+    hobby: Joi.string()
+      .valid(...allowedHobbies)
+      .required()
+      .messages({
+        "any.required": "hobby is required for student role.",
+        "any.only": "hobby must be one of the allowed hobbies.",
       }),
     phoneNumber: Joi.string()
       .trim()

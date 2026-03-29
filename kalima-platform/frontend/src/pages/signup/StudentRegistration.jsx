@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { useTranslation } from "react-i18next"
 import Step1 from "./step1"
 import Step2 from "./Step2"
+import Step3 from "./Step3"
 import StepParent from "./StepParent"
 import StepTeacher from "./StepTeacher"
 import Step4 from "./Step4"
@@ -24,7 +25,7 @@ const SHADOWS = designTokens.shadows
 const GRADIENTS = designTokens.gradients
 
 const totalSteps = {
-  student: 3,
+  student: 4,
   parent: 3,
   teacher: 3,
 }
@@ -47,6 +48,7 @@ export default function StudentRegistration() {
     faction: "Alpha",
     level: [],
     parentPhoneNumber: "",
+    hobby: "",
     children: [""],
     subject: "",
     teachesAtType: "",
@@ -87,6 +89,10 @@ export default function StudentRegistration() {
       if (role === "student" && (!formData.level || (Array.isArray(formData.level) && formData.level.length === 0))) {
         errors.level = "required"
       }
+    }
+
+    if (step === 3 && role === "student") {
+      if (!formData.hobby) errors.hobby = "hobbyRequired"
     }
 
 
@@ -284,6 +290,7 @@ export default function StudentRegistration() {
             }
           }
           data.append("faction", formData.faction || "Alpha");
+          data.append("hobby", formData.hobby);
           data.append("parentPhoneNumber", normalizeEgyptianPhoneNumber(formData.parentPhoneNumber));
           break;
 
@@ -424,6 +431,8 @@ export default function StudentRegistration() {
             case 2:
               return <Step2 formData={formData} handleInputChange={handleInputChange} t={t} errors={errors} />
             case 3:
+              return <Step3 formData={formData} handleInputChange={handleInputChange} t={t} errors={errors} />
+            case 4:
               return <Step4 formData={formData} t={t} gradeLevels={gradeLevels} />
             default:
               return null

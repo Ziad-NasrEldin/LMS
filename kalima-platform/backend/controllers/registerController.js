@@ -337,6 +337,9 @@ const registerNewUser = catchAsync(async (req, res, next) => {
     case "student":
       if (!newUser.level)
         return next(new AppError("Level is required for student role", 400));
+      if (newUser.hobby) {
+        newUser.hobby = String(newUser.hobby).trim().toLowerCase();
+      }
       if (!newUser.parentPhoneNumber || !String(newUser.parentPhoneNumber).trim()) {
         return next(new AppError("Parent phone number is required for student role", 400));
       }
