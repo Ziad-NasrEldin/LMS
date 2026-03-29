@@ -8,7 +8,7 @@ const ReviewItem = ({ label, value }) => (
   </div>
 )
 
-export default function Step4({ formData, t, gradeLevels }) {
+export default function Step4({ formData, t, hobbiesList = [], gradeLevels }) {
   const translateGradeLevel = (rawLabel) => {
     if (!rawLabel) return "-"
 
@@ -40,26 +40,16 @@ export default function Step4({ formData, t, gradeLevels }) {
     return normalized
   }
 
-  // Function to find and translate level name
   const getLevelName = (levelId) => {
-    const level = gradeLevels?.find((level) => level.value === levelId)
+    const level = gradeLevels?.find((item) => item.value === levelId)
     return level ? translateGradeLevel(level.label) : "-"
   }
 
-  const getHobbyName = (hobbyKey) => {
-    if (!hobbyKey) return "-"
-
-    const translated = t(`hobbies.${hobbyKey}`)
-    return translated !== `hobbies.${hobbyKey}` ? translated : hobbyKey
-  }
-
-  // Function to format teacher levels
   const formatTeacherLevels = (levels) => {
     if (!levels || !Array.isArray(levels) || levels.length === 0) return "-"
     return levels.map((level) => translateGradeLevel(level)).join(", ")
   }
 
-  // Function to format social media accounts
   const formatSocialMedia = (socialMedia) => {
     if (!socialMedia || !Array.isArray(socialMedia) || socialMedia.length === 0) return "-"
     return socialMedia
@@ -68,10 +58,31 @@ export default function Step4({ formData, t, gradeLevels }) {
       .join(", ")
   }
 
-  // Function to format centers
   const formatCenters = (centers) => {
     if (!centers || !Array.isArray(centers) || centers.length === 0) return "-"
     return centers.filter((center) => center.trim()).join(", ")
+  }
+
+  const formatStudentHobbies = () => {
+    if (Array.isArray(formData.hobbies) && formData.hobbies.length > 0) {
+      const hobbies = formData.hobbies
+        .map((id) => {
+          const hobby = hobbiesList.find((item) => item.id === id)
+          if (!hobby) return null
+          if (hobby.id === "other") return formData.otherHobbyText?.trim() || null
+          return t(`hobbies.${hobby.key}`)
+        })
+        .filter(Boolean)
+
+      return hobbies.length > 0 ? hobbies.join(", ") : "-"
+    }
+
+    if (formData.hobby) {
+      const translated = t(`hobbies.${formData.hobby}`)
+      return translated !== `hobbies.${formData.hobby}` ? translated : formData.hobby
+    }
+
+    return "-"
   }
 
   return (
@@ -84,15 +95,16 @@ export default function Step4({ formData, t, gradeLevels }) {
           <ReviewItem label={t("form.gender")} value={t(`gender.${formData.gender}`)} />
           <ReviewItem label={t("form.phoneNumber")} value={formData.phoneNumber} />
           <ReviewItem label={t("form.government") || "Government"} value={formData.government || "-"} />
-              <ReviewItem
-                label={t("form.administrationZone") || "Administration Zone"}
-                value={formData.administrationZone || "-"}
-              />
+          <ReviewItem
+            label={t("form.administrationZone") || "Administration Zone"}
+            value={formData.administrationZone || "-"}
+          />
+
           {formData.role === "student" && (
             <>
               <ReviewItem label={t("form.grade")} value={getLevelName(formData.level)} />
-              <ReviewItem label={t("form.hobby")} value={getHobbyName(formData.hobby)} />
               <ReviewItem label={t("form.parentPhone")} value={formData.parentPhoneNumber} />
+              <ReviewItem label={t("form.hobbies")} value={formatStudentHobbies()} />
             </>
           )}
 
@@ -115,22 +127,20 @@ export default function Step4({ formData, t, gradeLevels }) {
               )}
 
               <div className="col-span-2">
-                <ReviewItem
-                  label={t("form.socialMedia") || "Social Media"}
-                  value={formatSocialMedia(formData.socialMedia)}
-                />
+                <ReviewItem label={t("form.socialMedia") || "Social Media"} value={formatSocialMedia(formData.socialMedia)} />
               </div>
             </>
           )}
 
           {formData.role === "parent" && <ReviewItem label={t("form.children")} value={formData.children.join(", ")} />}
         </div>
-                  <p className="font-bold mt-10">
-                    {t("review.privacyAgreementPrefix", "By signing up, you agree to our")} {" "}
-                    <span className="underline text-blue-600">
-                      <Link to={"/privacy-policy"}>{t("review.privacyPolicy", "Privacy Policy")}</Link>
-                    </span>
-                  </p>
+
+        <p className="font-bold mt-10">
+          {t("review.privacyAgreementPrefix", "By signing up, you agree to our")}{" "}
+          <span className="underline text-blue-600">
+            <Link to="/privacy-policy">{t("review.privacyPolicy", "Privacy Policy")}</Link>
+          </span>
+        </p>
       </div>
     </div>
   )

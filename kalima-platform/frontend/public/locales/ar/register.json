@@ -88,6 +88,8 @@
     "administrationZone": "الاداره التعليميه",
     "selectAdministrationZone": "اختر الاداره التعليميه",
     "yourCustomHobbies": "هواياتك الخاصة",
+    "otherHobbyLabel": "الهواية الأخرى",
+    "otherHobbyPlaceholder": "اكتب هوايتك",
     "referralSerial": "كود الدعوه",
     "profilePic": "صورة الملف الشخصي"
 
@@ -101,15 +103,15 @@
       "english": "انجليزي"
     },
     "hobbies": {
-      "reading": "قراءة",
-      "sports": "رياضة",
-      "music": "موسيقى",
-      "cooking": "طبخ",
-      "gaming": " ألعاب",
-      "art" : "فن",
-      "technology": "تكنولوجيا",
-      "bicycling": "ركوب دراجات",
-      "photography": "تصوير"
+      "math": "الرياضيات",
+      "programming": "البرمجة",
+      "art" : "الفن",
+      "languages": "اللغات",
+      "photography": "التصوير",
+      "montage": "المونتاج",
+      "designIllustrating": "التصميم/الرسم التوضيحي",
+      "marketing": "التسويق",
+      "other": "أخرى (حقل مفتوح)"
     },
     "review": {
       "title": "مراجعة المعلومات",
@@ -197,6 +199,7 @@
         "passwordsMismatch": "كلمات المرور غير متطابقة",
         "hobbiesRequired": "اختر هواية واحدة على الأقل",
         "hobbyRequired": "اختر هواية",
+        "otherHobbyRequired": "يرجى كتابة الهواية الأخرى",
         "childIdInvalid": "تنسيق معرف الطفل غير صالح (٢٤ حرفًا)",
         "subjectRequired": "المادة مطلوبة",
         "levelRequired": "المستوى مطلوب",

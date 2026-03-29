@@ -88,6 +88,8 @@
     "administrationZone": "Administration Zone",
     "selectAdministrationZone": "Select Administration Zone",
     "yourCustomHobbies": "Your Custom Hobbies",
+    "otherHobbyLabel": "Other Hobby",
+    "otherHobbyPlaceholder": "Type your hobby",
     "referralSerial": "Referral Serial",
     "profilePic": "Profile Picture"
   },
@@ -100,15 +102,15 @@
     "english": "English"
   },
   "hobbies": {
-    "reading": "Reading",
-    "sports": "Sports",
-    "music": "Music",
-    "cooking": "Cooking",
-    "gaming": "Games",
+    "math": "Math",
+    "programming": "Programming",
     "art": "Art",
-    "technology": "Technology",
-    "bicycling": "Bicycling",
-    "photography": "Photography"
+    "languages": "Languages",
+    "photography": "Photography",
+    "montage": "Montage",
+    "designIllustrating": "Design/Illustrating",
+    "marketing": "Marketing",
+    "other": "Other (open field)"
   },
   "review": {
     "title": "Review Information",
@@ -196,6 +198,7 @@
     "passwordsMismatch": "Passwords do not match",
     "hobbiesRequired": "Select at least one hobby",
     "hobbyRequired": "Select a hobby",
+    "otherHobbyRequired": "Please enter your other hobby",
     "childIdInvalid": "Invalid child ID format (24 characters)",
     "subjectRequired": "Subject is required",
     "levelRequired": "Level is required",

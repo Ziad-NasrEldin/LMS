@@ -23,6 +23,17 @@ const apiUrl = import.meta.env.VITE_API_URL
 const TOKENS = designTokens.colors
 const SHADOWS = designTokens.shadows
 const GRADIENTS = designTokens.gradients
+const hobbiesList = [
+  { id: "math", key: "math", value: "Math" },
+  { id: "programming", key: "programming", value: "Programming" },
+  { id: "art", key: "art", value: "Art" },
+  { id: "languages", key: "languages", value: "Languages" },
+  { id: "photography", key: "photography", value: "Photography" },
+  { id: "montage", key: "montage", value: "Montage" },
+  { id: "designIllustrating", key: "designIllustrating", value: "Design/Illustrating" },
+  { id: "marketing", key: "marketing", value: "Marketing" },
+  { id: "other", key: "other", value: "Other" },
+]
 
 const totalSteps = {
   student: 4,
@@ -47,8 +58,9 @@ export default function StudentRegistration() {
     gender: "",
     faction: "Alpha",
     level: [],
+    hobbies: [],
+    otherHobbyText: "",
     parentPhoneNumber: "",
-    hobby: "",
     children: [""],
     subject: "",
     teachesAtType: "",
@@ -90,11 +102,6 @@ export default function StudentRegistration() {
         errors.level = "required"
       }
     }
-
-    if (step === 3 && role === "student") {
-      if (!formData.hobby) errors.hobby = "hobbyRequired"
-    }
-
 
     if (step === 2) {
       if (!formData.email) {
@@ -172,6 +179,13 @@ export default function StudentRegistration() {
       }
     }
 
+    if (step === 3 && role === "student" && formData.hobbies.length === 0) {
+      errors.hobbies = "hobbiesRequired"
+    }
+
+    if (step === 3 && role === "student" && formData.hobbies.includes("other") && !formData.otherHobbyText?.trim()) {
+      errors.otherHobbyText = "otherHobbyRequired"
+    }
     return errors
   }
 
@@ -194,6 +208,31 @@ export default function StudentRegistration() {
     fetchLevels()
   }, [])
 
+  const toggleHobby = (hobbyId) => {
+    try {
+      setFormData((prev) => {
+        const isSelected = prev.hobbies.includes(hobbyId)
+        const updatedHobbies = isSelected
+          ? prev.hobbies.filter((id) => id !== hobbyId)
+          : [...prev.hobbies, hobbyId]
+
+        return {
+          ...prev,
+          hobbies: updatedHobbies,
+          otherHobbyText: hobbyId === "other" && isSelected ? "" : prev.otherHobbyText,
+        }
+      })
+      setErrors((prev) => ({ ...prev, hobbies: undefined, otherHobbyText: undefined }))
+    } catch (error) {
+      console.error("Error toggling hobby:", error)
+      setApiError("Failed to update hobby selection")
+    }
+  }
+
+  const handleOtherHobbyChange = (value) => {
+    setFormData((prev) => ({ ...prev, otherHobbyText: value }))
+    setErrors((prev) => ({ ...prev, otherHobbyText: undefined }))
+  }
   const handleNext = () => {
     const stepErrors = getStepErrors(currentStep)
 
@@ -290,8 +329,22 @@ export default function StudentRegistration() {
             }
           }
           data.append("faction", formData.faction || "Alpha");
-          data.append("hobby", formData.hobby);
-          data.append("parentPhoneNumber", normalizeEgyptianPhoneNumber(formData.parentPhoneNumber));
+          const normalizedParentPhoneNumber = normalizeEgyptianPhoneNumber(formData.parentPhoneNumber)
+          if (normalizedParentPhoneNumber) {
+            data.append("parentPhoneNumber", normalizedParentPhoneNumber)
+          }
+
+          formData.hobbies
+            .map((id) => {
+              const hobby = hobbiesList.find((h) => h.id === id)
+              if (!hobby) return null
+              if (hobby.id === "other") return formData.otherHobbyText?.trim() || null
+              return hobby.value
+            })
+            .filter(Boolean)
+            .forEach((hobby, index) => {
+              data.append(`hobbies[${index}]`, hobby);
+            });
           break;
 
         case "parent":
@@ -431,9 +484,18 @@ export default function StudentRegistration() {
             case 2:
               return <Step2 formData={formData} handleInputChange={handleInputChange} t={t} errors={errors} />
             case 3:
-              return <Step3 formData={formData} handleInputChange={handleInputChange} t={t} errors={errors} />
+              return (
+                <Step3
+                  formData={formData}
+                  toggleHobby={toggleHobby}
+                  handleOtherHobbyChange={handleOtherHobbyChange}
+                  t={t}
+                  hobbiesList={hobbiesList}
+                  errors={errors}
+                />
+              )
             case 4:
-              return <Step4 formData={formData} t={t} gradeLevels={gradeLevels} />
+              return <Step4 formData={formData} t={t} hobbiesList={hobbiesList} gradeLevels={gradeLevels} />
             default:
               return null
           }
@@ -455,7 +517,7 @@ export default function StudentRegistration() {
                 />
               )
             case 3:
-              return <Step4 formData={formData} t={t} />
+              return <Step4 formData={formData} t={t} hobbiesList={hobbiesList} />
             default:
               return null
           }
@@ -476,7 +538,7 @@ export default function StudentRegistration() {
                 />
               )
             case 3:
-              return <Step4 formData={formData} t={t} gradeLevels={gradeLevels} />
+              return <Step4 formData={formData} t={t} hobbiesList={hobbiesList} gradeLevels={gradeLevels} />
             default:
               return null
           }
