@@ -1,0 +1,135 @@
+{
+  "meta": {
+    "badge": "Privacy Policy",
+    "title": "Privacy Policy for Fekra",
+    "intro": "This page explains what information Fekra collects, how we use it, when we share it, and the controls you have. It reflects the product features currently implemented in the platform.",
+    "effectiveDateLabel": "Effective date",
+    "effectiveDate": "March 29, 2026",
+    "lastUpdatedLabel": "Last updated",
+    "lastUpdated": "March 29, 2026",
+    "contactLabel": "Privacy contact",
+    "contactName": "Fekra Team",
+    "scopeLabel": "Coverage",
+    "scope": "Egypt + global baseline",
+    "childrenLabel": "Child access",
+    "childrenSummary": "All ages with safeguards"
+  },
+  "highlights": {
+    "title": "At a glance"
+  },
+  "summaryCards": [
+    {
+      "title": "What we collect",
+      "text": "Account data, learning activity, purchases, uploads, device details, and support messages that keep the platform working."
+    },
+    {
+      "title": "Why we use it",
+      "text": "To run accounts, deliver lessons, verify exams and homework, process purchases, send notifications, and improve the service."
+    },
+    {
+      "title": "Who may receive it",
+      "text": "Cloud storage, email, and verification providers that support Fekra under contract and only for service operations."
+    },
+    {
+      "title": "Your controls",
+      "text": "You can review, correct, or request deletion of certain data, and you can manage language, login, and notification choices."
+    }
+  ],
+  "sections": {
+    "collection": {
+      "title": "1. Information We Collect",
+      "summary": "We collect the information needed to create accounts, manage access, support learning, and complete transactions.",
+      "items": [
+        "Account and profile details such as name, email, phone number, password hash, gender, role, government, administration zone, level, hobby, referral source, user serial, and profile photo.",
+        "Student and parent relationship data, including children links, parent phone numbers, balances, lecture access, and referral metadata.",
+        "Teacher and lecturer details such as subject, levels taught, centers, school, social media handles, bio, expertise, and assigned lecturer references.",
+        "Learning records such as lecture access, attendance, exam submissions, homework submissions, scores, progress, and notification history.",
+        "Purchase and marketplace records such as product names, payment numbers, transfer numbers, payment screenshots, notes, coupon usage, and personalized book fields.",
+        "Technical data such as access and refresh tokens, local storage values, device/browser behavior, service-worker cache usage, and camera usage for QR or barcode scanning.",
+        "Support and communication data such as OTP verification records, password-reset requests, transactional emails, in-app notifications, and bulk message delivery to parents."
+      ]
+    },
+    "usage": {
+      "title": "2. How We Use Information",
+      "summary": "We use data to operate the platform and keep the educational and commerce flows working end to end.",
+      "items": [
+        "Create and authenticate accounts, maintain sessions, and handle role-based access.",
+        "Deliver personalized learning content, track lecture access, and show progress and purchase history.",
+        "Verify homework and exam results through configured Google Sheets sources when a lecture requires it.",
+        "Process marketplace orders, confirm purchases, calculate discounts, and generate order serials.",
+        "Send OTPs, password-reset emails, purchase confirmations, and platform notifications.",
+        "Run QR and barcode workflows for live attendance, promo-code redemption, and related validation.",
+        "Improve reliability, detect abuse, debug errors, and protect the platform from fraud or unauthorized access."
+      ]
+    },
+    "sharing": {
+      "title": "3. Sharing and Disclosures",
+      "summary": "We do not sell your personal data. We only share data when it is needed to run the service or when required by law.",
+      "items": [
+        "Cloudinary stores uploaded profile photos, product images, book samples, payment screenshots, and other media used by the platform.",
+        "Resend handles transactional emails such as email verification, password reset, and purchase confirmation messages.",
+        "Google Sheets is read for exam and homework verification when lecturers configure those workflows.",
+        "Service providers and infrastructure vendors may process data strictly for hosting, delivery, messaging, or security purposes under appropriate safeguards.",
+        "Parent or mentor coordination flows may expose limited student-related information where the platform is explicitly designed to do so.",
+        "We may disclose information when required to comply with law, respond to valid legal requests, or protect the rights, users, and security of the platform."
+      ]
+    },
+    "storage": {
+      "title": "4. Data Storage and Security",
+      "summary": "We use practical safeguards, but no online system is perfectly secure.",
+      "items": [
+        "Passwords are hashed before storage, and tokens are used for authenticated sessions rather than exposing credentials directly.",
+        "Uploads may be stored locally or in Cloudinary depending on the feature that handles them.",
+        "Audit logs record administrative actions, impersonation sessions, and resource changes for accountability and security review.",
+        "Cookies, local storage, and cached assets are used to keep language selection, login state, and app behavior consistent across visits.",
+        "We apply reasonable technical and organizational measures to reduce unauthorized access, loss, misuse, or alteration."
+      ]
+    },
+    "retention": {
+      "title": "5. Retention",
+      "summary": "We keep some records only as long as needed for the feature that created them, support, legal obligations, or security review.",
+      "items": [
+        "OTP records expire after about 10 minutes unless consumed sooner.",
+        "Password-reset verification data and reset tokens are short-lived and are cleared after use or expiry.",
+        "Access tokens last about 30 minutes, while refresh tokens can remain valid for up to 7 days unless revoked earlier.",
+        "Notifications, audit logs, purchases, attendance, and exam records may be retained longer for education, accounting, dispute handling, or security purposes.",
+        "When a record is no longer needed, we delete it or keep only what is necessary for legal or operational reasons."
+      ]
+    },
+    "children": {
+      "title": "6. Children and Guardian Safeguards",
+      "summary": "Fekra may be used by learners of different ages, but we expect parent or guardian involvement where local law or the product flow requires it.",
+      "items": [
+        "Parent accounts are designed to connect child data and to support monitoring, coordination, and communication.",
+        "We collect only the information needed to deliver learning and account features, and we avoid collecting more than is required for the service.",
+        "If we learn that information was provided in a way that is not permitted, we may restrict access or delete the data as appropriate."
+      ]
+    },
+    "rights": {
+      "title": "7. Your Rights and Choices",
+      "summary": "You can control much of your data through your account and by contacting us directly.",
+      "items": [
+        "Access, review, or correct the personal data you provided where the product allows it.",
+        "Request deletion of certain data, subject to legal, accounting, security, or operational obligations.",
+        "Manage language, login, and notification choices through your browser or account settings where available.",
+        "Stop using camera-based features when you do not want QR or barcode scanning to run.",
+        "Contact us if you believe a record is inaccurate, unnecessary, or handled incorrectly."
+      ]
+    },
+    "changes": {
+      "title": "8. Updates to This Policy",
+      "summary": "We may update this policy as the product changes or legal requirements evolve.",
+      "items": [
+        "We will post the updated policy on this page and refresh the date shown above.",
+        "Material changes may also be reflected in product notices, banner messages, or related communication channels when appropriate."
+      ]
+    }
+  },
+  "contact": {
+    "title": "Contact Us",
+    "description": "For privacy requests, questions, or corrections, contact the Fekra Team at the address below.",
+    "name": "Fekra Team",
+    "email": "support@fekra-platform.com",
+    "response": "We review privacy requests through the support inbox."
+  }
+}

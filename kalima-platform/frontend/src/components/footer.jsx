@@ -66,7 +66,7 @@ export default function Footer() {
                 { name: t('home'), path: '/' },
                 { name: t('courses'), path: '/courses' },
                 { name: t('teachers'), path: '/teachers' },
-                { name: 'Privacy Policy', path: '/privacy-policy', isStatic: true },
+                { name: t('privacyPolicy'), path: '/privacy-policy', isStatic: true },
               ].map((link, idx) => (
                 <li key={idx}>
                   <Link 
