@@ -5,6 +5,76 @@ const QueryFeatures = require("../utils/queryFeatures");
 const User = require("../models/userModel");
 const mongoose = require("mongoose");
 const Lecturer = require("../models/lecturerModel");
+const fs = require("fs");
+const fsPromises = require("fs/promises");
+const path = require("path");
+const multer = require("multer");
+const imageSizeModule = require("image-size");
+
+const getImageDimensions =
+  imageSizeModule.imageSize || imageSizeModule.default || imageSizeModule;
+
+const PROMO_TEMPLATE_WIDTH = 392;
+const PROMO_TEMPLATE_HEIGHT = 210;
+const promoTemplateUploadDir = path.join(
+  __dirname,
+  "..",
+  "uploads",
+  "promocode-templates"
+);
+
+const ensurePromoTemplateDir = () => {
+  if (!fs.existsSync(promoTemplateUploadDir)) {
+    fs.mkdirSync(promoTemplateUploadDir, { recursive: true });
+  }
+};
+
+const promoTemplateStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    ensurePromoTemplateDir();
+    cb(null, promoTemplateUploadDir);
+  },
+  filename: (req, file, cb) => {
+    const extension = path.extname(file.originalname || "").toLowerCase() || ".png";
+    const safeName = path
+      .basename(file.originalname || "template", extension)
+      .replace(/[^a-zA-Z0-9-_]/g, "-")
+      .slice(0, 60);
+    cb(null, `${Date.now()}-${safeName}${extension}`);
+  },
+});
+
+const promoTemplateUpload = multer({
+  storage: promoTemplateStorage,
+  fileFilter: (req, file, cb) => {
+    if (!file.mimetype || !file.mimetype.startsWith("image/")) {
+      return cb(new AppError("Only image files are allowed for promo templates", 400), false);
+    }
+    cb(null, true);
+  },
+  limits: { fileSize: 5 * 1024 * 1024 },
+});
+
+const buildTemplateUrl = (req, fileName) =>
+  `${req.protocol}://${req.get("host")}/uploads/promocode-templates/${encodeURIComponent(fileName)}`;
+
+const removeFileSilently = async (filePath) => {
+  try {
+    await fsPromises.unlink(filePath);
+  } catch (error) {
+    if (error && error.code !== "ENOENT") {
+      console.error("Failed to delete invalid promo template:", error);
+    }
+  }
+};
+
+const parseTemplateDimensions = (filePath) => {
+  const dimensions = getImageDimensions(filePath);
+  return {
+    width: dimensions?.width,
+    height: dimensions?.height,
+  };
+};
 
 // i will modify err msg and make validation later
 // restricted to admin-center-lectural
@@ -92,6 +162,90 @@ const getCodeById = catchAsync(async (req, res, next) => {
     status: "success",
     data: {
       code,
+    },
+  });
+});
+
+const getPromoTemplates = catchAsync(async (req, res, next) => {
+  ensurePromoTemplateDir();
+
+  const files = await fsPromises.readdir(promoTemplateUploadDir, { withFileTypes: true });
+  const templates = [];
+
+  for (const file of files) {
+    if (!file.isFile()) continue;
+
+    const absolutePath = path.join(promoTemplateUploadDir, file.name);
+    try {
+      const { width, height } = parseTemplateDimensions(absolutePath);
+      const stats = await fsPromises.stat(absolutePath);
+
+      templates.push({
+        id: file.name,
+        name: file.name,
+        url: buildTemplateUrl(req, file.name),
+        width,
+        height,
+        createdAt: stats.birthtime,
+      });
+    } catch (error) {
+      // Skip invalid files in directory without failing the request.
+      console.error("Skipping invalid promo template file:", absolutePath, error.message);
+    }
+  }
+
+  templates.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      templates,
+    },
+  });
+});
+
+const createPromoTemplate = catchAsync(async (req, res, next) => {
+  if (!req.file) {
+    return next(new AppError("Template image is required", 400));
+  }
+
+  const absolutePath = req.file.path;
+  let dimensions;
+
+  try {
+    dimensions = parseTemplateDimensions(absolutePath);
+  } catch (error) {
+    await removeFileSilently(absolutePath);
+    return next(new AppError("Invalid image file. Please upload a valid image.", 400));
+  }
+
+  if (
+    dimensions.width !== PROMO_TEMPLATE_WIDTH ||
+    dimensions.height !== PROMO_TEMPLATE_HEIGHT
+  ) {
+    await removeFileSilently(absolutePath);
+    return next(
+      new AppError(
+        `Image dimensions must be exactly ${PROMO_TEMPLATE_WIDTH}x${PROMO_TEMPLATE_HEIGHT} px`,
+        400
+      )
+    );
+  }
+
+  const stats = await fsPromises.stat(absolutePath);
+  const template = {
+    id: req.file.filename,
+    name: req.file.filename,
+    url: buildTemplateUrl(req, req.file.filename),
+    width: dimensions.width,
+    height: dimensions.height,
+    createdAt: stats.birthtime,
+  };
+
+  res.status(201).json({
+    status: "success",
+    data: {
+      template,
     },
   });
 });
@@ -255,4 +409,7 @@ module.exports = {
   deleteMultipleCodes,
   redeemCode,
   getCodeById,
+  getPromoTemplates,
+  createPromoTemplate,
+  uploadPromoTemplate: promoTemplateUpload.single("template"),
 };

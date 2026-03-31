@@ -134,6 +134,18 @@
       },
       "printQrCodes": "Print QR Codes",
       "downloadAllQrCodes": "Download All QR Codes",
+      "template": {
+        "selectorLabel": "Print Template",
+        "uploadLabel": "Upload New Template",
+        "requiredDimensions": "Required dimensions: {{width}} x {{height}} px",
+        "invalidDimensions": "Image dimensions must be exactly {{width}}x{{height}} px",
+        "uploadSuccess": "Template uploaded successfully",
+        "uploadFailed": "Failed to upload template image",
+        "loadFailed": "Failed to load promo templates",
+        "defaultOption": "Default Template",
+        "invalidImage": "Invalid image file",
+        "imageOnly": "Only image files are allowed"
+      },
       "points": "Points",
       "userManagement": {
         "title": "User Actions Log",

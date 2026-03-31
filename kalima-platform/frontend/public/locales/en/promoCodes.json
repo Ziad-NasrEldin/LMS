@@ -146,6 +146,7 @@
   "profile" :{
     "email" : "Email",
     "profession": "Profession / Work",
+    "studentId": "Student ID",
     "sequenceId" : "Sequence ID",
     "userSerial": "User Serial",
     "sequenceIdTooltip" : "Your sequence ID",

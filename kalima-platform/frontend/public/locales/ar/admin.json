@@ -134,6 +134,18 @@
       
       "printQrCodes": "طباعة رموز QR",
       "downloadAllQrCodes": "تحميل جميع رموز QR",
+      "template": {
+        "selectorLabel": "قالب الطباعة",
+        "uploadLabel": "رفع قالب جديد",
+        "requiredDimensions": "الأبعاد المطلوبة: {{width}} x {{height}} بكسل",
+        "invalidDimensions": "يجب أن تكون أبعاد الصورة {{width}}x{{height}} بكسل",
+        "uploadSuccess": "تم رفع القالب بنجاح",
+        "uploadFailed": "فشل في رفع صورة القالب",
+        "loadFailed": "فشل في تحميل قوالب أكواد الخصم",
+        "defaultOption": "القالب الافتراضي",
+        "invalidImage": "ملف الصورة غير صالح",
+        "imageOnly": "يُسمح فقط بملفات الصور"
+      },
     
       "points": "نقاط",
       "userManagement": {

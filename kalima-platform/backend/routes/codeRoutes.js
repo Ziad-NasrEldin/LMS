@@ -21,13 +21,25 @@ router
     codeController.deleteCodes
   );
 
-router.route("/:id").get(codeController.getCodeById);
+router
+  .route("/promo-templates")
+  .get(
+    authController.verifyRoles("Admin", "SubAdmin"),
+    codeController.getPromoTemplates
+  )
+  .post(
+    authController.verifyRoles("Admin", "SubAdmin"),
+    codeController.uploadPromoTemplate,
+    codeController.createPromoTemplate
+  );
 
 router.delete(
   "/multiple",
   authController.verifyRoles("Admin", "SubAdmin"),
   codeController.deleteMultipleCodes
 );
+
+router.route("/:id").get(codeController.getCodeById);
 
 router
   .route("/redeem")

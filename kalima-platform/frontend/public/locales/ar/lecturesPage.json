@@ -25,7 +25,8 @@
     },
     "filters": {
       "allSubjects": "كل المواد",
-      "allLevels": "كل المراحل"
+      "allLevels": "كل المراحل",
+      "searchLecture": "ابحث باسم المحاضرة أو المادة أو المحاضر..."
     },
     "itemsPerPage": "{{count}} لكل صفحة",
     "tableHeaders": {
@@ -48,7 +49,8 @@
     "notSpecified": "غير محدد",
     "emptyStates": {
       "noLectures": "لا توجد محاضرات متاحة",
-      "noPurchases": "لم تقم بشراء أي محاضرات بعد"
+      "noPurchases": "لم تقم بشراء أي محاضرات بعد",
+      "noSearchResults": "لا توجد محاضرات مطابقة للبحث."
     },
     "pagination": {
       "previous": "السابق",

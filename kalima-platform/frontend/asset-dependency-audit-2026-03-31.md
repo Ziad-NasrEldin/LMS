@@ -1,0 +1,177 @@
+# Frontend Asset Dependency Audit (2026-03-31)
+
+## Scope
+- Repository root: `E:\GitHub\fekra`
+- Frontend root: `E:\GitHub\fekra\kalima-platform\frontend`
+- Scanned files for static image refs: `src/**` + `public/locales/**`
+- Extensions: `.png`, `.jpg`, `.jpeg`, `.svg`, `.webp`, `.gif`
+
+## Summary
+- Deleted assets in git diff (rontend/public/**): 142
+- Deleted assets still referenced by exact public path: 0
+- Deleted assets not referenced by exact public path: 142
+- Static asset refs found in source/locales: 80
+- Internal missing static refs (after fixes): 0
+- External protocol-relative refs (//...): 10
+
+## Deleted Assets Still Referenced
+- None
+
+## Internal Missing Static Refs
+- None
+
+## External Protocol-Relative Asset Refs
+- //cdn-icons-png.flaticon.com/512/2695/2695395.png | E:\GitHub\fekra\kalima-platform\frontend\src\pages\CoursesDashboard\CourseSection.jsx
+- //cdn-icons-png.flaticon.com/512/2933/2933245.png | E:\GitHub\fekra\kalima-platform\frontend\src\pages\CoursesDashboard\CourseSection.jsx
+- //cdn-icons-png.flaticon.com/512/2936/2936881.png | E:\GitHub\fekra\kalima-platform\frontend\src\pages\CoursesDashboard\CourseSection.jsx
+- //cdn-icons-png.flaticon.com/512/2936/2936883.png | E:\GitHub\fekra\kalima-platform\frontend\src\pages\CoursesDashboard\CourseSection.jsx
+- //cdn-icons-png.flaticon.com/512/2936/2936886.png | E:\GitHub\fekra\kalima-platform\frontend\src\pages\CoursesDashboard\CourseSection.jsx
+- //cdn-icons-png.flaticon.com/512/2964/2964300.png | E:\GitHub\fekra\kalima-platform\frontend\src\pages\CoursesDashboard\CourseSection.jsx
+- //cdn-icons-png.flaticon.com/512/3048/3048127.png | E:\GitHub\fekra\kalima-platform\frontend\src\pages\CoursesDashboard\CourseSection.jsx
+- //cdn-icons-png.flaticon.com/512/3424/3424655.png | E:\GitHub\fekra\kalima-platform\frontend\src\pages\CoursesDashboard\CourseSection.jsx
+- //cdn-icons-png.flaticon.com/512/3898/3898082.png | E:\GitHub\fekra\kalima-platform\frontend\src\pages\CoursesDashboard\CourseSection.jsx
+- //cdn-icons-png.flaticon.com/512/3899/3899618.png | E:\GitHub\fekra\kalima-platform\frontend\src\pages\CoursesDashboard\CourseSection.jsx
+
+## Deleted Assets Not Referenced (Exact Path)
+- kalima-platform/frontend/public/3books.png
+- kalima-platform/frontend/public/about.png
+- kalima-platform/frontend/public/about1.png
+- kalima-platform/frontend/public/AdminA.png
+- kalima-platform/frontend/public/adminSmile.png
+- kalima-platform/frontend/public/ball.png
+- kalima-platform/frontend/public/big-hero.png
+- kalima-platform/frontend/public/Book-1.png
+- kalima-platform/frontend/public/Book-10.png
+- kalima-platform/frontend/public/Book-11.png
+- kalima-platform/frontend/public/Book-12.png
+- kalima-platform/frontend/public/Book-13.png
+- kalima-platform/frontend/public/Book-14.png
+- kalima-platform/frontend/public/Book-15.png
+- kalima-platform/frontend/public/Book-16.png
+- kalima-platform/frontend/public/Book-17.png
+- kalima-platform/frontend/public/Book-18.png
+- kalima-platform/frontend/public/Book-19.png
+- kalima-platform/frontend/public/Book-2.png
+- kalima-platform/frontend/public/Book-3.png
+- kalima-platform/frontend/public/Book-4.png
+- kalima-platform/frontend/public/Book-5.png
+- kalima-platform/frontend/public/Book-6.png
+- kalima-platform/frontend/public/Book-7.png
+- kalima-platform/frontend/public/Book-8.png
+- kalima-platform/frontend/public/Book-9.png
+- kalima-platform/frontend/public/Book.png
+- kalima-platform/frontend/public/bookshelf.png
+- kalima-platform/frontend/public/civilco_logo.png
+- kalima-platform/frontend/public/CourseDetails1.png
+- kalima-platform/frontend/public/CourseDetails2.png
+- kalima-platform/frontend/public/CoursesDashboard/3d-medical-background-with-virus-cells-dna-strand.png
+- kalima-platform/frontend/public/CoursesDashboard/BG-1.png
+- kalima-platform/frontend/public/CoursesDashboard/BG-2.png
+- kalima-platform/frontend/public/CoursesDashboard/BG.png
+- kalima-platform/frontend/public/CoursesDashboard/book-with-green-board-background.png
+- kalima-platform/frontend/public/CoursesDashboard/Books.png
+- kalima-platform/frontend/public/CoursesDashboard/Dictionary-Language-Book--Streamline-Core.png
+- kalima-platform/frontend/public/CoursesDashboard/Earth.png
+- kalima-platform/frontend/public/CoursesDashboard/Frame 15-1.png
+- kalima-platform/frontend/public/CoursesDashboard/Frame 15-2.png
+- kalima-platform/frontend/public/CoursesDashboard/Frame 15.png
+- kalima-platform/frontend/public/CoursesDashboard/Frame 22-2.png
+- kalima-platform/frontend/public/CoursesDashboard/Frame 22-3.png
+- kalima-platform/frontend/public/CoursesDashboard/Frame 22-4.png
+- kalima-platform/frontend/public/CoursesDashboard/Frame 22-5.png
+- kalima-platform/frontend/public/CoursesDashboard/Frame 22.png
+- kalima-platform/frontend/public/CoursesDashboard/gnome-power-statistics logo.png
+- kalima-platform/frontend/public/CoursesDashboard/Group.png
+- kalima-platform/frontend/public/CoursesDashboard/image 10.png
+- kalima-platform/frontend/public/CoursesDashboard/Image.png
+- kalima-platform/frontend/public/CoursesDashboard/jake-nackos-IF9TK5Uy-KI-unsplash 1.png
+- kalima-platform/frontend/public/CoursesDashboard/photo.png
+- kalima-platform/frontend/public/curved-arrow-about.png
+- kalima-platform/frontend/public/custom-imagery/course-english.svg
+- kalima-platform/frontend/public/custom-imagery/course-math.svg
+- kalima-platform/frontend/public/custom-imagery/course-science.svg
+- kalima-platform/frontend/public/custom-imagery/cta-growth.svg
+- kalima-platform/frontend/public/custom-imagery/fallback.svg
+- kalima-platform/frontend/public/custom-imagery/feature-motivation.svg
+- kalima-platform/frontend/public/custom-imagery/feature-playful.svg
+- kalima-platform/frontend/public/custom-imagery/feature-tracking.svg
+- kalima-platform/frontend/public/custom-imagery/home-hero-alt.svg
+- kalima-platform/frontend/public/custom-imagery/home-hero-main.svg
+- kalima-platform/frontend/public/custom-imagery/path-challenge.svg
+- kalima-platform/frontend/public/custom-imagery/path-micro-lessons.svg
+- kalima-platform/frontend/public/custom-imagery/path-onboarding.svg
+- kalima-platform/frontend/public/custom-imagery/path-reinforcement.svg
+- kalima-platform/frontend/public/custom-imagery/scene-a.svg
+- kalima-platform/frontend/public/custom-imagery/scene-b.svg
+- kalima-platform/frontend/public/custom-imagery/scene-c.svg
+- kalima-platform/frontend/public/custom-imagery/tile-book.svg
+- kalima-platform/frontend/public/custom-imagery/tile-mentor.svg
+- kalima-platform/frontend/public/education-card2.png
+- kalima-platform/frontend/public/education-image-services.png
+- kalima-platform/frontend/public/Frame 81.png
+- kalima-platform/frontend/public/hero-new.jpg
+- kalima-platform/frontend/public/hero.png
+- kalima-platform/frontend/public/hobbies/art.jpg
+- kalima-platform/frontend/public/hobbies/bicycle.jpg
+- kalima-platform/frontend/public/hobbies/cooking.jpg
+- kalima-platform/frontend/public/hobbies/gaming.jpg
+- kalima-platform/frontend/public/hobbies/music.jpg
+- kalima-platform/frontend/public/hobbies/photography.jpg
+- kalima-platform/frontend/public/hobbies/reading.jpg
+- kalima-platform/frontend/public/hobbies/sports.jpg
+- kalima-platform/frontend/public/hobbies/technology.jpg
+- kalima-platform/frontend/public/Line 5.png
+- kalima-platform/frontend/public/man-working.jpg
+- kalima-platform/frontend/public/qr-code.png
+- kalima-platform/frontend/public/school.png
+- kalima-platform/frontend/public/servicesherosection1.png
+- kalima-platform/frontend/public/servicesherosection2.png
+- kalima-platform/frontend/public/Servicies/3d-medical-background-with-virus-cells-dna-strand.png
+- kalima-platform/frontend/public/Servicies/Book-1.png
+- kalima-platform/frontend/public/Servicies/Book-10.png
+- kalima-platform/frontend/public/Servicies/Book-11.png
+- kalima-platform/frontend/public/Servicies/Book-12.png
+- kalima-platform/frontend/public/Servicies/Book-13.png
+- kalima-platform/frontend/public/Servicies/Book-14.png
+- kalima-platform/frontend/public/Servicies/Book-15.png
+- kalima-platform/frontend/public/Servicies/Book-16.png
+- kalima-platform/frontend/public/Servicies/Book-17.png
+- kalima-platform/frontend/public/Servicies/Book-18.png
+- kalima-platform/frontend/public/Servicies/Book-19.png
+- kalima-platform/frontend/public/Servicies/Book-2.png
+- kalima-platform/frontend/public/Servicies/Book-3.png
+- kalima-platform/frontend/public/Servicies/Book-4.png
+- kalima-platform/frontend/public/Servicies/Book-5.png
+- kalima-platform/frontend/public/Servicies/Book-6.png
+- kalima-platform/frontend/public/Servicies/Book-7.png
+- kalima-platform/frontend/public/Servicies/Book-8.png
+- kalima-platform/frontend/public/Servicies/Book-9.png
+- kalima-platform/frontend/public/Servicies/Book.png
+- kalima-platform/frontend/public/Servicies/Component 11.png
+- kalima-platform/frontend/public/Servicies/Component 17-1.png
+- kalima-platform/frontend/public/Servicies/Component 17-2.png
+- kalima-platform/frontend/public/Servicies/Component 17-3.png
+- kalima-platform/frontend/public/Servicies/Component 17.png
+- kalima-platform/frontend/public/Servicies/education-banner.png
+- kalima-platform/frontend/public/Servicies/education-card1.png
+- kalima-platform/frontend/public/Servicies/education-card2.png
+- kalima-platform/frontend/public/Servicies/education-image-services.png
+- kalima-platform/frontend/public/Servicies/Frame 412.png
+- kalima-platform/frontend/public/Servicies/Group 13835.png
+- kalima-platform/frontend/public/Servicies/Group 13838.png
+- kalima-platform/frontend/public/Servicies/Group 13839.png
+- kalima-platform/frontend/public/Servicies/Group 13840.png
+- kalima-platform/frontend/public/Servicies/Group 13841.png
+- kalima-platform/frontend/public/Servicies/languagedetails.png
+- kalima-platform/frontend/public/Servicies/Rectangle 139.png
+- kalima-platform/frontend/public/Servicies/Vector 23.png
+- kalima-platform/frontend/public/small-hero.png
+- kalima-platform/frontend/public/smile.png
+- kalima-platform/frontend/public/starC.png
+- kalima-platform/frontend/public/starG.png
+- kalima-platform/frontend/public/starGr.png
+- kalima-platform/frontend/public/starP.png
+- kalima-platform/frontend/public/student_illustration.png
+- kalima-platform/frontend/public/teacher.png
+- kalima-platform/frontend/public/Vector 21.png
+- kalima-platform/frontend/public/whatsApp.png

@@ -175,11 +175,16 @@ export default function CourseGrid() {
   // Fetch lecturer's containers
   const fetchContainers = useCallback(async () => {
     setLoading(true)
+    setError(null)
     try {
       const result = await getMyContainers()
+      const message = String(result?.message || "").toLowerCase()
+      const noContainersMessage = message.includes("no containers found for this lecturer")
 
       if (result.status === "success") {
         setContainers(result.data?.containers || [])
+      } else if (noContainersMessage) {
+        setContainers([])
       } else {
         setError(result.message || "Failed to fetch containers")
       }
@@ -199,7 +204,7 @@ export default function CourseGrid() {
         setLoading(true)
         const result = await deleteContainerById(containerId)
         if (result.status === "success") {
-          fetchContainers()
+          await fetchContainers()
         } else {
           setError(result.message || t("failedToDeleteContainer"))
         }
@@ -216,6 +221,13 @@ export default function CourseGrid() {
   useEffect(() => {
     fetchContainers()
   }, [fetchContainers])
+
+  useEffect(() => {
+    const totalPages = Math.max(1, Math.ceil(filteredContainers.length / itemsPerPage))
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages)
+    }
+  }, [filteredContainers.length, currentPage, itemsPerPage])
 
   // Memoized pagination data
   const paginationData = useMemo(() => {

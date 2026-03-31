@@ -47,7 +47,7 @@ export const CourseCard = ({
     ? containerImage 
     : !imageError && image 
       ? image 
-      : "/course1.png"
+      : "/course-1.png"
 
   return (
     <div

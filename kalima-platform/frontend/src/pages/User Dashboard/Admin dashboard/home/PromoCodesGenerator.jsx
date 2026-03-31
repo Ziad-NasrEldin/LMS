@@ -3,10 +3,14 @@
 import { useState, useEffect, useRef } from "react"
 import { useTranslation } from "react-i18next"
 import { Ticket, Copy, Check, AlertCircle, Download, Printer } from 'lucide-react'
-import { generatePromoCodes } from "../../../../routes/codes"
+import { generatePromoCodes, getPromoCodeTemplates, uploadPromoCodeTemplate } from "../../../../routes/codes"
 import { getAllLecturers } from "../../../../routes/fetch-users"
 import QRCode from "qrcode"
 import { designTokens } from "../../../../constants/designTokens"
+
+const PROMO_TEMPLATE_WIDTH = 392
+const PROMO_TEMPLATE_HEIGHT = 210
+const DEFAULT_PROMO_TEMPLATE_URL = "/promocodes/promocode-template.png"
 
 const PromoCodeGenerator = () => {
   const { t, i18n } = useTranslation("admin")
@@ -27,6 +31,12 @@ const PromoCodeGenerator = () => {
   const [generateQrCodes, setGenerateQrCodes] = useState(false)
   const [qrCodeSize, setQrCodeSize] = useState(128)
   const [qrCodeUrls, setQrCodeUrls] = useState([])
+  const [promoTemplates, setPromoTemplates] = useState([])
+  const [selectedTemplateUrl, setSelectedTemplateUrl] = useState(DEFAULT_PROMO_TEMPLATE_URL)
+  const [templateLoading, setTemplateLoading] = useState(false)
+  const [templateUploading, setTemplateUploading] = useState(false)
+  const [templateError, setTemplateError] = useState("")
+  const [templateSuccess, setTemplateSuccess] = useState("")
   const printFrameRef = useRef(null)
 
   useEffect(() => {
@@ -49,6 +59,28 @@ const PromoCodeGenerator = () => {
     }
 
     fetchLecturers()
+  }, [t])
+
+  useEffect(() => {
+    const fetchPromoTemplates = async () => {
+      try {
+        setTemplateLoading(true)
+        const response = await getPromoCodeTemplates()
+
+        if (response.success) {
+          setPromoTemplates(Array.isArray(response.data) ? response.data : [])
+        } else {
+          setTemplateError(response.error || t("admin.template.loadFailed"))
+        }
+      } catch (err) {
+        console.error("Error fetching promo templates:", err)
+        setTemplateError(t("admin.template.loadFailed"))
+      } finally {
+        setTemplateLoading(false)
+      }
+    }
+
+    fetchPromoTemplates()
   }, [t])
 
   // Generate QR codes when codes are generated and QR option is enabled
@@ -111,6 +143,82 @@ const PromoCodeGenerator = () => {
 
   const handleQrSizeChange = (e) => {
     setQrCodeSize(Number.parseInt(e.target.value) || 128)
+  }
+
+  const validateTemplateDimensions = (file) =>
+    new Promise((resolve, reject) => {
+      const objectUrl = URL.createObjectURL(file)
+      const img = new Image()
+
+      img.onload = () => {
+        const isValid =
+          img.width === PROMO_TEMPLATE_WIDTH && img.height === PROMO_TEMPLATE_HEIGHT
+        URL.revokeObjectURL(objectUrl)
+
+        if (!isValid) {
+          reject(
+            new Error(
+              t("admin.template.invalidDimensions", {
+                width: PROMO_TEMPLATE_WIDTH,
+                height: PROMO_TEMPLATE_HEIGHT,
+              })
+            )
+          )
+          return
+        }
+        resolve()
+      }
+
+      img.onerror = () => {
+        URL.revokeObjectURL(objectUrl)
+        reject(new Error(t("admin.template.invalidImage")))
+      }
+
+      img.src = objectUrl
+    })
+
+  const handleTemplateUpload = async (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setTemplateError("")
+    setTemplateSuccess("")
+
+    if (!file.type || !file.type.startsWith("image/")) {
+      setTemplateError(t("admin.template.imageOnly"))
+      e.target.value = ""
+      return
+    }
+
+    try {
+      await validateTemplateDimensions(file)
+    } catch (err) {
+      setTemplateError(err.message)
+      e.target.value = ""
+      return
+    }
+
+    try {
+      setTemplateUploading(true)
+      const response = await uploadPromoCodeTemplate(file)
+
+      if (response.success && response.data) {
+        setPromoTemplates((prev) => {
+          const withoutDuplicate = prev.filter((template) => template.id !== response.data.id)
+          return [response.data, ...withoutDuplicate]
+        })
+        setSelectedTemplateUrl(response.data.url)
+        setTemplateSuccess(t("admin.template.uploadSuccess"))
+      } else {
+        setTemplateError(response.error || t("admin.template.uploadFailed"))
+      }
+    } catch (err) {
+      console.error("Error uploading promo template:", err)
+      setTemplateError(t("admin.template.uploadFailed"))
+    } finally {
+      setTemplateUploading(false)
+      e.target.value = ""
+    }
   }
 
   const [formData, setFormData] = useState({
@@ -221,7 +329,7 @@ const PromoCodeGenerator = () => {
       return
     }
 
-    const templateImage = "/promocodes/promocode-template.png"
+    const templateImage = new URL(selectedTemplateUrl, window.location.origin).toString()
 
     const printContent = `
     <!DOCTYPE html>
@@ -352,6 +460,18 @@ const PromoCodeGenerator = () => {
     printWindow.document.write(printContent);
     printWindow.document.close();
   }
+
+  const templateOptions = [
+    {
+      id: "default-template",
+      name: t("admin.template.defaultOption"),
+      url: DEFAULT_PROMO_TEMPLATE_URL,
+      width: PROMO_TEMPLATE_WIDTH,
+      height: PROMO_TEMPLATE_HEIGHT,
+    },
+    ...promoTemplates,
+  ]
+
   return (
     <div 
       className="p-6 md:p-8 mb-10 w-full" 
@@ -519,15 +639,63 @@ const PromoCodeGenerator = () => {
           <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center mb-3">
             <h3 className="text-lg font-bold">{t("admin.generatedCodes")}</h3>
             {generateQrCodes && qrCodeUrls.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                <button type="button" className="btn btn-sm btn-outline" onClick={printQRCodes}>
-                  <Printer className={`w-4 h-4 ${iconInlineGap}`} />
-                  {t("admin.printQrCodes")}
-                </button>
-                <button type="button" className="btn btn-sm btn-outline" onClick={downloadAllQRCodes}>
-                  <Download className={`w-4 h-4 ${iconInlineGap}`} />
-                  {t("admin.downloadAllQrCodes")}
-                </button>
+              <div className="flex flex-col gap-2 sm:items-end">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-end">
+                  <div className="form-control">
+                    <label className="label py-0">
+                      <span className="label-text text-xs">{t("admin.template.selectorLabel")}</span>
+                    </label>
+                    <select
+                      className="select select-bordered select-sm min-w-[220px]"
+                      value={selectedTemplateUrl}
+                      onChange={(e) => {
+                        setSelectedTemplateUrl(e.target.value)
+                        setTemplateError("")
+                        setTemplateSuccess("")
+                      }}
+                      disabled={templateLoading}
+                    >
+                      {templateOptions.map((template) => (
+                        <option key={template.id} value={template.url}>
+                          {template.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="form-control">
+                    <label className="label py-0">
+                      <span className="label-text text-xs">{t("admin.template.uploadLabel")}</span>
+                    </label>
+                    <input
+                      type="file"
+                      accept="image/png,image/jpeg,image/jpg,image/webp"
+                      className="file-input file-input-bordered file-input-sm min-w-[220px]"
+                      onChange={handleTemplateUpload}
+                      disabled={templateUploading}
+                    />
+                  </div>
+                </div>
+
+                <p className="text-xs opacity-70">
+                  {t("admin.template.requiredDimensions", {
+                    width: PROMO_TEMPLATE_WIDTH,
+                    height: PROMO_TEMPLATE_HEIGHT,
+                  })}
+                </p>
+                {templateError && <p className="text-xs text-error">{templateError}</p>}
+                {templateSuccess && <p className="text-xs text-success">{templateSuccess}</p>}
+
+                <div className="flex flex-wrap gap-2">
+                  <button type="button" className="btn btn-sm btn-outline" onClick={printQRCodes}>
+                    <Printer className={`w-4 h-4 ${iconInlineGap}`} />
+                    {t("admin.printQrCodes")}
+                  </button>
+                  <button type="button" className="btn btn-sm btn-outline" onClick={downloadAllQRCodes}>
+                    <Download className={`w-4 h-4 ${iconInlineGap}`} />
+                    {t("admin.downloadAllQrCodes")}
+                  </button>
+                </div>
               </div>
             )}
           </div>

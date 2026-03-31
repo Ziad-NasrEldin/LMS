@@ -851,6 +851,11 @@ const PromoCodes = () => {
                         </div>
                         <div className="flex-1">
                           <h3 className="text-lg font-medium">{child.name}</h3>
+                          {child.sequencedId && (
+                            <p className="text-sm opacity-70 mt-1">
+                              {t("profile.studentId")}: {child.sequencedId}
+                            </p>
+                          )}
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2 mt-2">
                             <div className="flex items-center gap-2">
                               <GraduationCap className="w-4 h-4 text-primary" />
@@ -864,12 +869,6 @@ const PromoCodes = () => {
                               <Wallet className="w-4 h-4 text-primary" />
                               <span className="text-sm">
                                 {child.generalPoints || 0} {t("balance.currency")}
-                              </span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <Info className="w-4 h-4 text-primary" />
-                              <span className="text-sm">
-                                {t("profile.sequenceId")}: {child.sequencedId}
                               </span>
                             </div>
                           </div>

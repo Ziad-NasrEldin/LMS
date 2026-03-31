@@ -29,6 +29,8 @@ const PromoCodes = lazy(() => import("./pages/User Dashboard/promoCodes"))
 const SettingsPage = lazy(() => import("./pages/Settings/SettingsPage"))
 const Services = lazy(() => import("./pages/Services/Services"))
 const DashboardPage = lazy(() => import("./pages/Lecturer Dashboard/LecturerDashboard"))
+const LecturerPromoCodesPage = lazy(() => import("./pages/Lecturer Dashboard/LecturerPromoCodesPage"))
+const LecturerLinkedStudentsPage = lazy(() => import("./pages/Lecturer Dashboard/LecturerLinkedStudentsPage"))
 const ContainersPage = lazy(() => import("./pages/User Dashboard/Lecture Page/ContainerPage"))
 const ContainerDetails = lazy(() => import("./pages/User Dashboard/Lecture Page/ContainerDetails"))
 const LectureDisplay = lazy(() => import("./pages/User Dashboard/Lecture Page/LectureDisplay"))
@@ -405,6 +407,14 @@ function App() {
             <Route
               path="/dashboard/lecturer-dashboard/detailed-lecture-view/:lectureId"
               element={renderLecturerRoute(<DetailedLectureView />)}
+            />
+            <Route
+              path="/dashboard/lecturer-dashboard/promo-codes"
+              element={renderLecturerRoute(<LecturerPromoCodesPage />)}
+            />
+            <Route
+              path="/dashboard/lecturer-dashboard/linked-students"
+              element={renderLecturerRoute(<LecturerLinkedStudentsPage />)}
             />
 
             {/* Center Dashboard Routes */}

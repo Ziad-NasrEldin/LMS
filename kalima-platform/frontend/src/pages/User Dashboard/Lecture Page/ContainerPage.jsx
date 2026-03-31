@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { Link, useLocation } from "react-router-dom"
 import { useTranslation } from 'react-i18next';
 import { getMyPurchasedCourseContainers, getUserDashboard } from "../../../routes/auth-services"
-import { FiArrowLeft, FiArrowRight } from "react-icons/fi"
+import { FiArrowLeft, FiArrowRight, FiChevronDown } from "react-icons/fi"
 import { designTokens } from "../../../constants/designTokens"
 
 const ContainersPage = () => {
@@ -200,20 +200,27 @@ const ContainersPage = () => {
 
           {/* Items per page selector */}
           <div className={`mb-4 mt-4 flex flex-col gap-2 sm:mt-0 sm:flex-row ${isRTL ? "sm:justify-start" : "sm:justify-end"}`}>
-            <select
-              className="select select-bordered select-sm w-full rounded-xl sm:w-auto"
-              style={{
-                borderColor: "rgba(17,24,39,0.16)",
-                background: "#FFFFFF",
-                color: TOKENS.inkText,
-              }}
-              value={itemsPerPage}
-              onChange={handleItemsPerPageChange}
-            >
-              <option value={5}>{t('containersPage.itemsPerPage', { count: 5 })}</option>
-              <option value={10}>{t('containersPage.itemsPerPage', { count: 10 })}</option>
-              <option value={20}>{t('containersPage.itemsPerPage', { count: 20 })}</option>
-            </select>
+            <div className="relative w-full sm:w-auto">
+              <select
+                className={`h-11 w-full appearance-none rounded-full border px-4 text-base font-semibold shadow-sm transition focus:outline-none focus:ring-2 focus:ring-cyan-200/70 sm:min-w-[168px] ${isRTL ? "pl-10 pr-4 text-right" : "pr-10 text-left"}`}
+                style={{
+                  borderColor: "rgba(17,24,39,0.14)",
+                  background: TOKENS.creamSurface,
+                  color: TOKENS.inkText,
+                  boxShadow: SHADOWS.level1,
+                }}
+                value={itemsPerPage}
+                onChange={handleItemsPerPageChange}
+              >
+                <option value={5}>{t('containersPage.itemsPerPage', { count: 5 })}</option>
+                <option value={10}>{t('containersPage.itemsPerPage', { count: 10 })}</option>
+                <option value={20}>{t('containersPage.itemsPerPage', { count: 20 })}</option>
+              </select>
+              <FiChevronDown
+                className={`pointer-events-none absolute top-1/2 -translate-y-1/2 text-sm ${isRTL ? "left-4" : "right-4"}`}
+                style={{ color: TOKENS.deepTeal }}
+              />
+            </div>
           </div>
 
           <div className="grid grid-cols-1 gap-5 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">

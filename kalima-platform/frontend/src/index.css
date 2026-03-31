@@ -227,3 +227,87 @@ body[dir="rtl"],
     opacity: 0.085;
   }
 }
+
+@keyframes lecture-watermark-edge-drift {
+  0% {
+    top: var(--wm-gap);
+    left: var(--wm-gap);
+    transform: translate(0, 0);
+  }
+  25% {
+    top: var(--wm-gap);
+    left: calc(100% - var(--wm-gap));
+    transform: translate(-100%, 0);
+  }
+  50% {
+    top: calc(100% - var(--wm-gap));
+    left: calc(100% - var(--wm-gap));
+    transform: translate(-100%, -100%);
+  }
+  75% {
+    top: calc(100% - var(--wm-gap));
+    left: var(--wm-gap);
+    transform: translate(0, -100%);
+  }
+  100% {
+    top: var(--wm-gap);
+    left: var(--wm-gap);
+    transform: translate(0, 0);
+  }
+}
+
+.lecture-video-watermark {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 25;
+  overflow: hidden;
+}
+
+.lecture-video-watermark__content {
+  --wm-gap: 12px;
+  position: absolute;
+  top: var(--wm-gap);
+  left: var(--wm-gap);
+  border-radius: 9999px;
+  border: none;
+  background: rgba(196, 214, 236, 0.12);
+  color: rgba(217, 231, 247, 0.62);
+  padding: 0.28rem 0.68rem;
+  font-size: clamp(10px, 1.2vw, 13px);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-shadow: 0 1px 2px rgba(5, 13, 26, 0.28);
+  backdrop-filter: blur(1.5px);
+  -webkit-backdrop-filter: blur(1.5px);
+  animation: lecture-watermark-edge-drift 42s linear infinite;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.lecture-video-watermark__name,
+.lecture-video-watermark__id {
+  white-space: nowrap;
+}
+
+.lecture-video-watermark__name {
+  text-transform: uppercase;
+}
+
+.lecture-video-watermark__id {
+  font-size: 0.9em;
+  opacity: 0.9;
+  width: 100%;
+  text-align: center;
+}
+
+@media (max-width: 640px) {
+  .lecture-video-watermark__content {
+    --wm-gap: 10px;
+    padding: 0.2rem 0.54rem;
+    font-size: 10px;
+  }
+}

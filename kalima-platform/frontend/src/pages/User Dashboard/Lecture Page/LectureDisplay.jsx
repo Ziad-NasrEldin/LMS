@@ -117,6 +117,8 @@ const LectureDisplay = () => {
   const [videoBlocked, setVideoBlocked] = useState(false);
   const [userRole, setUserRole] = useState(null);
   const [userId, setUserId] = useState(null);
+  const [studentFullName, setStudentFullName] = useState("");
+  const [studentSequenceId, setStudentSequenceId] = useState("");
   const [purchaseId, setPurchaseId] = useState(null);
   const [currentPurchase, setCurrentPurchase] = useState(null);
 
@@ -256,6 +258,21 @@ const LectureDisplay = () => {
         const userInfo = dashboardData.userInfo || {};
         setUserRole(userInfo.role);
         setUserId(userInfo.id);
+        setStudentSequenceId(userInfo.sequencedId || "");
+        const computedFullName =
+          [
+            userInfo.firstName,
+            userInfo.middleName,
+            userInfo.lastName,
+          ]
+            .filter(Boolean)
+            .join(" ")
+            .trim() ||
+          userInfo.fullName ||
+          userInfo.name ||
+          userInfo.username ||
+          "";
+        setStudentFullName(computedFullName);
 
         const lectureAccessRecords = Array.isArray(dashboardData.lectureAccess)
           ? dashboardData.lectureAccess
@@ -1526,35 +1543,47 @@ const LectureDisplay = () => {
             </div>
           </div>
         ) : youtubeVideoId ? (
-          <div className="mb-4 shadow-lg rounded-2xl overflow-hidden bg-base-300 border border-base-300/60" ref={videoContainerRef}>
-            <MediaPlayer
-              ref={playerRef}
-              title={lecture?.name}
-              src={`youtube/${youtubeVideoId}`}
-              poster={lecture?.thumbnailLink || ""}
-              playsInline
-              autoPlay={false}
-              onCanPlay={handleOnCanPlay}
-              onPlay={handleOnPlay}
-              onTimeUpdate={handleOnTimeUpdate}
-              onPause={handleOnPause}
-              onEnded={handleOnEnded}
-              onError={handleOnError}
-              onVolumeChange={handleVolumeChange}
-              onRateChange={handlePlaybackRateChange}
-              aspectRatio="16/9"
-            >
-              <MediaProvider>
-                {lecture?.thumbnailLink && (
-                  <Poster
-                    className="vds-poster"
-                    src={lecture.thumbnailLink}
-                    alt={t("lecturePoster", { name: lecture?.name })}
-                  />
-                )}
-              </MediaProvider>
-              <DefaultVideoLayout icons={defaultLayoutIcons} thumbnails={lecture?.videoThumbnailsVTT || null} />
-            </MediaPlayer>
+          <div className="relative mb-4 shadow-lg rounded-2xl overflow-hidden bg-base-300 border border-base-300/60" ref={videoContainerRef}>
+            <div className="relative">
+              <MediaPlayer
+                ref={playerRef}
+                title={lecture?.name}
+                src={`youtube/${youtubeVideoId}`}
+                poster={lecture?.thumbnailLink || ""}
+                playsInline
+                autoPlay={false}
+                onCanPlay={handleOnCanPlay}
+                onPlay={handleOnPlay}
+                onTimeUpdate={handleOnTimeUpdate}
+                onPause={handleOnPause}
+                onEnded={handleOnEnded}
+                onError={handleOnError}
+                onVolumeChange={handleVolumeChange}
+                onRateChange={handlePlaybackRateChange}
+                aspectRatio="16/9"
+              >
+                <MediaProvider>
+                  {lecture?.thumbnailLink && (
+                    <Poster
+                      className="vds-poster"
+                      src={lecture.thumbnailLink}
+                      alt={t("lecturePoster", { name: lecture?.name })}
+                    />
+                  )}
+                </MediaProvider>
+                <DefaultVideoLayout icons={defaultLayoutIcons} thumbnails={lecture?.videoThumbnailsVTT || null} />
+              </MediaPlayer>
+              {userRole === "Student" && studentFullName && (
+                <div className="lecture-video-watermark" aria-hidden="true">
+                  <div className="lecture-video-watermark__content">
+                    <span className="lecture-video-watermark__name">{studentFullName}</span>
+                    {studentSequenceId && (
+                      <span className="lecture-video-watermark__id">{studentSequenceId}</span>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
 
             {/* Enhanced custom progress bar */}
             <div className="p-3 bg-base-200">

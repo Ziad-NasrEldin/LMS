@@ -165,7 +165,7 @@ const Market = () => {
       <div className="py-6 px-4">
         <div className="md:max-w-7xl lg:max-w-7xl max-w-3xl mx-auto">
           <div className="flex flex-wrap items-center gap-2 mb-6">
-            <img src="/bookshelf.png" alt={t("hero.booksIllustration")} className="h-24 w-auto" />
+            <img src="/placeholder.svg" alt={t("hero.booksIllustration")} className="h-24 w-auto object-contain" />
             <h1 className={`text-lg font-semibold flex-1 text-center ${isRTL ? "md:text-left" : "md:text-right"}`}>
               {t("hero.tagline")}
             </h1>

@@ -38,9 +38,12 @@ const MyLecturesPage = () => {
   const [successMessage, setSuccessMessage] = useState("")
   const [selectedSubjectFilter, setSelectedSubjectFilter] = useState("")
   const [selectedLevelFilter, setSelectedLevelFilter] = useState("")
+  const [searchTerm, setSearchTerm] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState(8)
   const [totalPages, setTotalPages] = useState(0)
+  const isStudentLikeRole = userRole === "Student" || userRole === "Parent"
+  const isAdminLikeRole = ["Admin", "Subadmin", "Moderator"].includes(userRole)
 
   const openCreateLectureModal = () => {
     setLectureModalState({ mode: "create", target: null })
@@ -187,7 +190,7 @@ const MyLecturesPage = () => {
           } else {
             throw new Error(result.error || "Failed to fetch lecturer data");
           }
-        } else if (userRole === "Student") {
+        } else if (userRole === "Student" || userRole === "Parent") {
           // Handle student case
           const result = await getUserDashboard({
             params: { fields: "purchaseHistory", limit: 500 },
@@ -290,26 +293,46 @@ const MyLecturesPage = () => {
   }, [])
 
   useEffect(() => {
-    if (allLectures.length > 0) {
-      let filteredLectures = [...allLectures]
+    let filteredLectures = [...allLectures]
 
-      if (!["Admin", "Subadmin", "Moderator"].includes(userRole)) {
-        if (selectedSubjectFilter) {
-          filteredLectures = filteredLectures.filter((l) => l.subject?._id === selectedSubjectFilter)
-        }
-
-        if (selectedLevelFilter) {
-          filteredLectures = filteredLectures.filter((l) => l.level?._id === selectedLevelFilter)
-        }
+    if (!isAdminLikeRole) {
+      if (selectedSubjectFilter) {
+        filteredLectures = filteredLectures.filter((l) => l.subject?._id === selectedSubjectFilter)
       }
 
-      const startIndex = (currentPage - 1) * itemsPerPage
-      const paginatedLectures = filteredLectures.slice(startIndex, startIndex + itemsPerPage)
-
-      setLectures(paginatedLectures)
-      setTotalPages(Math.ceil(filteredLectures.length / itemsPerPage))
+      if (selectedLevelFilter) {
+        filteredLectures = filteredLectures.filter((l) => l.level?._id === selectedLevelFilter)
+      }
     }
-  }, [allLectures, selectedSubjectFilter, selectedLevelFilter, currentPage, userRole])
+
+    if (searchTerm.trim()) {
+      const normalizedSearch = searchTerm.trim().toLowerCase()
+      filteredLectures = filteredLectures.filter((lecture) => {
+        const name = String(lecture.name || "").toLowerCase()
+        const subjectName = String(lecture.subject?.name || "").toLowerCase()
+        const lecturerName = String(lecture.lecturer?.name || "").toLowerCase()
+        const lectureType = String(lecture.lecture_type || "").toLowerCase()
+        return (
+          name.includes(normalizedSearch) ||
+          subjectName.includes(normalizedSearch) ||
+          lecturerName.includes(normalizedSearch) ||
+          lectureType.includes(normalizedSearch)
+        )
+      })
+    }
+
+    const computedTotalPages = Math.max(1, Math.ceil(filteredLectures.length / itemsPerPage))
+    if (currentPage > computedTotalPages) {
+      setCurrentPage(computedTotalPages)
+      return
+    }
+
+    const startIndex = (currentPage - 1) * itemsPerPage
+    const paginatedLectures = filteredLectures.slice(startIndex, startIndex + itemsPerPage)
+
+    setLectures(paginatedLectures)
+    setTotalPages(computedTotalPages)
+  }, [allLectures, selectedSubjectFilter, selectedLevelFilter, searchTerm, currentPage, itemsPerPage, isAdminLikeRole])
 
   const handlePageChange = (newPage) => {
     if (newPage >= 1 && newPage <= totalPages) setCurrentPage(newPage)
@@ -537,6 +560,19 @@ const MyLecturesPage = () => {
 
         <div className="mb-4 flex flex-col md:flex-row justify-between gap-4 rounded-[1.4rem] border p-4" style={{ background: "rgba(255,255,255,0.78)", borderColor: "rgba(17,24,39,0.08)" }}>
           <div className="flex flex-col md:flex-row gap-4 flex-1">
+            <input
+              type="text"
+              className="input w-full md:w-80 font-medium border-2 focus:outline-none focus:ring-0 rounded-full transition-colors font-sans"
+              style={{ backgroundColor: TOKENS.neutralCloud, borderColor: "transparent", color: TOKENS.deepTeal }}
+              onFocus={(e) => { e.target.style.borderColor = TOKENS.softCyanTeal; e.target.style.backgroundColor = "#fff"; }}
+              onBlur={(e) => { e.target.style.borderColor = "transparent"; e.target.style.backgroundColor = TOKENS.neutralCloud; }}
+              value={searchTerm}
+              placeholder={t("lecturesPage.filters.searchLecture")}
+              onChange={(e) => {
+                setSearchTerm(e.target.value)
+                setCurrentPage(1)
+              }}
+            />
             <select
               className="select w-full md:w-64 font-medium border-2 focus:outline-none focus:ring-0 rounded-full transition-colors font-sans"
               style={{ backgroundColor: TOKENS.neutralCloud, borderColor: "transparent", color: TOKENS.deepTeal }} onFocus={(e) => { e.target.style.borderColor = TOKENS.softCyanTeal; e.target.style.backgroundColor = "#fff"; }} onBlur={(e) => { e.target.style.borderColor = "transparent"; e.target.style.backgroundColor = TOKENS.neutralCloud; }}
@@ -624,13 +660,13 @@ const MyLecturesPage = () => {
                 <div className="min-w-0 flex-1">
                   <h3 className="font-semibold leading-5 break-words">{lecture.name}</h3>
                   <div className="mt-2 text-xs opacity-80 space-y-1">
-                    {(userRole === "Student" || ["Admin", "Subadmin", "Moderator"].includes(userRole)) && (
+                    {(isStudentLikeRole || isAdminLikeRole) && (
                       <p className="break-words"><span className="font-medium">{t("lecturesPage.tableHeaders.lecturer")}: </span>{lecture.lecturer?.name || t("lecturesPage.unknown")}</p>
                     )}
                     <p className="break-words"><span className="font-medium">{t("lecturesPage.tableHeaders.subject")}: </span>{lecture.subject?.name || t("lecturesPage.notSpecified")}</p>
                     <p><span className="font-medium">{t("lecturesPage.tableHeaders.level")}: </span>{t(`gradeLevels.${lecture.level?.name}`, { ns: "common" }) || lecture.level?.name || t("lecturesPage.notSpecified")}</p>
                     <p><span className="font-medium">{t("lecturesPage.tableHeaders.price")}: </span>{lecture.price || 0} {t("lecturesPage.points")}</p>
-                    {userRole === "Student" && <p><span className="font-medium">{t("lecturesPage.tableHeaders.purchaseDate")}: </span>{lecture.purchasedAt}</p>}
+                    {isStudentLikeRole && <p><span className="font-medium">{t("lecturesPage.tableHeaders.purchaseDate")}: </span>{lecture.purchasedAt}</p>}
                   </div>
                 </div>
               </div>
@@ -638,12 +674,12 @@ const MyLecturesPage = () => {
               <div className="mt-3">
                 <div className="flex gap-2">
                   <Link
-                    to={`/dashboard/${userRole === "Student" ? "student" : "lecturer"}-dashboard/${userRole === "Student" ? "lecture-display" : "detailed-lecture-view"}/${lecture.id}`}
+                    to={`/dashboard/${isStudentLikeRole ? "student" : "lecturer"}-dashboard/${isStudentLikeRole ? "lecture-display" : "detailed-lecture-view"}/${lecture.id}`}
                     className="flex-1"
                   >
                     <button className="btn btn-sm w-full border-none text-white" style={{ background: TOKENS.deepTeal }}>{t("lecturesPage.buttons.details")}</button>
                   </Link>
-                  {userRole !== "Student" && (
+                  {!isStudentLikeRole && (
                     <button
                       type="button"
                       className="btn btn-sm border-none"
@@ -668,15 +704,15 @@ const MyLecturesPage = () => {
               <tr>
                 <th className="w-24">{t("lecturesPage.tableHeaders.thumbnail")}</th>
                 <th>{t("lecturesPage.tableHeaders.name")}</th>
-                {(userRole === "Student" || ["Admin", "Subadmin", "Moderator"].includes(userRole)) && (
+                {(isStudentLikeRole || isAdminLikeRole) && (
                   <th>{t("lecturesPage.tableHeaders.lecturer")}</th>
                 )}
                 <th>{t("lecturesPage.tableHeaders.subject")}</th>
                 <th>{t("lecturesPage.tableHeaders.level")}</th>
                 <th>{t("lecturesPage.tableHeaders.type")}</th>
                 <th>{t("lecturesPage.tableHeaders.price")}</th>
-                {userRole === "Student" && <th>{t("lecturesPage.tableHeaders.purchaseDate")}</th>}
-                {userRole !== "Student" && <th>{t("lecturesPage.tableHeaders.actions")}</th>}
+                {isStudentLikeRole && <th>{t("lecturesPage.tableHeaders.purchaseDate")}</th>}
+                {!isStudentLikeRole && <th>{t("lecturesPage.tableHeaders.actions")}</th>}
               </tr>
             </thead>
             <tbody>
@@ -709,7 +745,7 @@ const MyLecturesPage = () => {
                   </td>
 
                   <td>{lecture.name}</td>
-                  {(userRole === "Student" || ["Admin", "Subadmin", "Moderator"].includes(userRole)) && (
+                  {(isStudentLikeRole || isAdminLikeRole) && (
                     <td>{lecture.lecturer?.name || t("lecturesPage.unknown")}</td>
                   )}
                   <td>{lecture.subject?.name || t("lecturesPage.notSpecified")}</td>
@@ -726,11 +762,11 @@ const MyLecturesPage = () => {
                   <td>
                     {lecture.price || 0} {t("lecturesPage.points")}
                   </td>
-                  {userRole === "Student" && <td>{lecture.purchasedAt}</td>}
+                  {isStudentLikeRole && <td>{lecture.purchasedAt}</td>}
                   <td>
                     <div className="flex flex-wrap gap-2">
                       <Link
-                        to={`/dashboard/${userRole === "Student" ? "student" : "lecturer"}-dashboard/${userRole === "Student" ? "lecture-display" : "detailed-lecture-view"
+                        to={`/dashboard/${isStudentLikeRole ? "student" : "lecturer"}-dashboard/${isStudentLikeRole ? "lecture-display" : "detailed-lecture-view"
                           }/${lecture.id}`}
                       >
                         <button
@@ -740,7 +776,7 @@ const MyLecturesPage = () => {
                           {t("lecturesPage.buttons.details")}
                         </button>
                       </Link>
-                      {userRole !== "Student" && (
+                      {!isStudentLikeRole && (
                         <button
                           type="button"
                           className="btn btn-sm border-none"
@@ -760,7 +796,9 @@ const MyLecturesPage = () => {
         {lectures.length === 0 && (
           <div className="alert alert-info mt-4">
             <span>
-              {["Lecturer", "Admin", "Subadmin", "Moderator"].includes(userRole)
+              {searchTerm.trim()
+                ? t("lecturesPage.emptyStates.noSearchResults")
+                : ["Lecturer", "Admin", "Subadmin", "Moderator"].includes(userRole)
                 ? t("lecturesPage.emptyStates.noLectures")
                 : t("lecturesPage.emptyStates.noPurchases")}
             </span>

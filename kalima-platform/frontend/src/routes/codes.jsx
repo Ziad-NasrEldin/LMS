@@ -125,6 +125,58 @@ export const getPromoCodes = async ({ params = {} } = {}) => {
   }
 };
 
+export const getPromoCodeTemplates = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/codes/promo-templates`, {
+      headers: {
+        ...getAuthHeader(),
+        "Content-Type": "application/json",
+      },
+      withCredentials: true,
+    });
+
+    if (response.data?.status === "success") {
+      return {
+        success: true,
+        data: response.data?.data?.templates || [],
+      };
+    }
+
+    return { success: false, error: "Unexpected API response structure" };
+  } catch (error) {
+    return normalizeApiError(error, "Failed to fetch promo templates");
+  }
+};
+
+export const uploadPromoCodeTemplate = async (file) => {
+  try {
+    if (!file) {
+      return { success: false, error: "Template file is required" };
+    }
+
+    const formData = new FormData();
+    formData.append("template", file);
+
+    const response = await axios.post(`${API_URL}/codes/promo-templates`, formData, {
+      headers: {
+        ...getAuthHeader(),
+      },
+      withCredentials: true,
+    });
+
+    if (response.data?.status === "success") {
+      return {
+        success: true,
+        data: response.data?.data?.template,
+      };
+    }
+
+    return { success: false, error: "Unexpected API response structure" };
+  } catch (error) {
+    return normalizeApiError(error, "Failed to upload promo template");
+  }
+};
+
 /**
  * Deletes a single promo code by code number
  * 

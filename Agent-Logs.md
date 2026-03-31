@@ -245,3 +245,11 @@ ounded-[2rem]\), removed hard \shadow-sm\ defaults from DaisyUI, updated primary
 - Renamed the lecturer sidebar item from Lectures to My Courses by reusing the shared courses translation key.
 - Kept the route unchanged so the label now matches the actual courses management page.
 
+## 2026-03-31 - Unused image cleanup - GPT-5.4 mini
+
+## 2026-03-31 - Remaining image pack trim - GPT-5.4 mini
+
+## 2026-03-31 - Refactor skill creation - GPT-5.4 mini
+- Added a new workspace skill at [kalima-platform/.github/skills/refactor/SKILL.md](kalima-platform/.github/skills/refactor/SKILL.md) for safe incremental refactoring with tests, backward compatibility, and common refactoring techniques.
+
+

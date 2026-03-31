@@ -7,9 +7,7 @@ import {
   Clock3,
   DollarSign,
   Download,
-  Eye,
   FileText,
-  Link2,
   ListOrdered,
   PieChart,
   Ticket,
@@ -60,6 +58,9 @@ export default function LecturerOverviewPanel() {
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
   const [appliedFilters, setAppliedFilters] = useState({ dateFrom: "", dateTo: "" });
+  const [forceDemoData, setForceDemoData] = useState(false);
+  const [promoCodesPage, setPromoCodesPage] = useState(1);
+  const [linkedStudentsPage, setLinkedStudentsPage] = useState(1);
 
   useEffect(() => {
     const fetchOverview = async () => {
@@ -76,8 +77,14 @@ export default function LecturerOverviewPanel() {
           }),
         ]);
 
+        const containersMessage = String(containersRes?.message || "");
+        const noContainersMessage =
+          containersMessage.toLowerCase().includes("no containers found for this lecturer");
+
         if (containersRes.status === "success") {
           setContainers(containersRes.data?.containers || []);
+        } else if (noContainersMessage) {
+          setContainers([]);
         } else {
           throw new Error(containersRes.message || "Failed to fetch containers");
         }
@@ -140,15 +147,144 @@ export default function LecturerOverviewPanel() {
     return rows.slice(0, 6);
   }, [analytics]);
 
+  const placeholderChartRows = useMemo(
+    () => [
+      {
+        contentId: "sample-course-1",
+        contentType: "course",
+        contentName: isRTL ? "كورس جبر" : "Algebra Course",
+        purchaseCount: 18,
+        revenue: 5400,
+        uniqueStudents: 14,
+        promoPurchases: 3,
+      },
+      {
+        contentId: "sample-course-2",
+        contentType: "course",
+        contentName: isRTL ? "كورس فيزياء" : "Physics Course",
+        purchaseCount: 12,
+        revenue: 3600,
+        uniqueStudents: 10,
+        promoPurchases: 2,
+      },
+      {
+        contentId: "sample-lecture-1",
+        contentType: "lecture",
+        contentName: isRTL ? "محاضرة مراجعة" : "Revision Lecture",
+        purchaseCount: 8,
+        revenue: 1600,
+        uniqueStudents: 7,
+        promoPurchases: 1,
+      },
+      {
+        contentId: "sample-lecture-2",
+        contentType: "lecture",
+        contentName: isRTL ? "محاضرة مسائل" : "Practice Lecture",
+        purchaseCount: 6,
+        revenue: 1200,
+        uniqueStudents: 5,
+        promoPurchases: 1,
+      },
+    ],
+    [isRTL]
+  );
+
+  const usesPlaceholderCharts = forceDemoData;
+  const effectiveChartRows = usesPlaceholderCharts ? placeholderChartRows : chartRows;
+
+  const placeholderPromoCodes = useMemo(
+    () => [
+      {
+        id: "sample-promo-1",
+        code: "WELCOME25",
+        pointsAmount: 250,
+        isRedeemed: true,
+        redeemedAt: new Date().toISOString(),
+        createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+      },
+      {
+        id: "sample-promo-2",
+        code: "SPRING10",
+        pointsAmount: 100,
+        isRedeemed: false,
+        redeemedAt: null,
+        createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+      },
+    ],
+    []
+  );
+
+  const usesPlaceholderPromoCodes = forceDemoData;
+  const effectivePromoCodes = usesPlaceholderPromoCodes ? placeholderPromoCodes : analytics?.promoCodes || [];
+
+  const placeholderAccessRecords = useMemo(
+    () => [
+      {
+        studentId: "sample-student-1",
+        studentName: isRTL ? "محمد أحمد" : "Mohamed Ahmed",
+        lectureId: "sample-lecture-1",
+        lectureName: isRTL ? "محاضرة مراجعة" : "Revision Lecture",
+        remainingViews: 2,
+      },
+      {
+        studentId: "sample-student-2",
+        studentName: isRTL ? "سارة علي" : "Sara Ali",
+        lectureId: "sample-lecture-2",
+        lectureName: isRTL ? "محاضرة مسائل" : "Practice Lecture",
+        remainingViews: 1,
+      },
+    ],
+    [isRTL]
+  );
+
+  const usesPlaceholderAccessRecords = forceDemoData;
+  const effectiveAccessRecords = usesPlaceholderAccessRecords ? placeholderAccessRecords : analytics?.accessRecords || [];
+
+  const PROMO_CODES_PAGE_SIZE = 10;
+  const LINKED_STUDENTS_PAGE_SIZE = 10;
+
+  const promoCodesTotalPages = Math.max(1, Math.ceil(effectivePromoCodes.length / PROMO_CODES_PAGE_SIZE));
+  const linkedStudentsTotalPages = Math.max(1, Math.ceil(effectiveAccessRecords.length / LINKED_STUDENTS_PAGE_SIZE));
+
+  useEffect(() => {
+    setPromoCodesPage(1);
+  }, [forceDemoData, effectivePromoCodes.length]);
+
+  useEffect(() => {
+    setLinkedStudentsPage(1);
+  }, [forceDemoData, effectiveAccessRecords.length]);
+
+  useEffect(() => {
+    if (promoCodesPage > promoCodesTotalPages) {
+      setPromoCodesPage(promoCodesTotalPages);
+    }
+  }, [promoCodesPage, promoCodesTotalPages]);
+
+  useEffect(() => {
+    if (linkedStudentsPage > linkedStudentsTotalPages) {
+      setLinkedStudentsPage(linkedStudentsTotalPages);
+    }
+  }, [linkedStudentsPage, linkedStudentsTotalPages]);
+
+  const paginatedPromoCodes = useMemo(() => {
+    const start = (promoCodesPage - 1) * PROMO_CODES_PAGE_SIZE;
+    return effectivePromoCodes.slice(start, start + PROMO_CODES_PAGE_SIZE);
+  }, [effectivePromoCodes, promoCodesPage]);
+
+  const paginatedLinkedStudents = useMemo(() => {
+    const start = (linkedStudentsPage - 1) * LINKED_STUDENTS_PAGE_SIZE;
+    return effectiveAccessRecords.slice(start, start + LINKED_STUDENTS_PAGE_SIZE);
+  }, [effectiveAccessRecords, linkedStudentsPage]);
+
   const revenueChartData = useMemo(() => {
     return {
-      labels: chartRows.map((item) =>
+      labels: effectiveChartRows.map((item) =>
         item.contentName.length > 24 ? `${item.contentName.slice(0, 24)}...` : item.contentName
       ),
       datasets: [
         {
           label: t("revenue", { defaultValue: isRTL ? "الإيراد" : "Revenue" }),
-          data: chartRows.map((item) => Number(item.revenue || 0)),
+          data: effectiveChartRows.map((item) => Number(item.revenue || 0)),
           backgroundColor: "rgba(14, 116, 144, 0.75)",
           borderColor: "rgba(14, 116, 144, 1)",
           borderWidth: 1,
@@ -156,7 +292,7 @@ export default function LecturerOverviewPanel() {
         },
       ],
     };
-  }, [chartRows, i18n.language, isRTL, t]);
+  }, [effectiveChartRows, i18n.language, isRTL, t]);
 
   const purchasesChartData = useMemo(() => {
     const colors = [
@@ -168,17 +304,17 @@ export default function LecturerOverviewPanel() {
       "rgba(59, 130, 246, 0.85)",
     ];
     return {
-      labels: chartRows.map((item) => item.contentName),
+      labels: effectiveChartRows.map((item) => item.contentName),
       datasets: [
         {
           label: t("purchases", { defaultValue: isRTL ? "المشتريات" : "Purchases" }),
-          data: chartRows.map((item) => Number(item.purchaseCount || 0)),
-          backgroundColor: chartRows.map((_, index) => colors[index % colors.length]),
+          data: effectiveChartRows.map((item) => Number(item.purchaseCount || 0)),
+          backgroundColor: effectiveChartRows.map((_, index) => colors[index % colors.length]),
           borderWidth: 0,
         },
       ],
     };
-  }, [chartRows, i18n.language, isRTL, t]);
+  }, [effectiveChartRows, i18n.language, isRTL, t]);
 
   const revenueChartOptions = useMemo(() => {
     return {
@@ -394,86 +530,86 @@ export default function LecturerOverviewPanel() {
         </div>
       )}
 
+      <div className="mb-6 rounded-2xl border border-base-300 bg-base-200/50 p-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <label className="flex items-center gap-3 cursor-pointer">
+          <input
+            type="checkbox"
+            className="toggle toggle-warning toggle-sm"
+            checked={forceDemoData}
+            onChange={(event) => setForceDemoData(event.target.checked)}
+          />
+          <span className="text-sm font-semibold">
+            {t("showDemoData", {
+              defaultValue: isRTL ? "عرض بيانات تجريبية" : "Show demo data",
+            })}
+          </span>
+        </label>
+        <p className="text-xs opacity-70">
+          {forceDemoData
+            ? t("demoDataEnabled", {
+                defaultValue: isRTL ? "الوضع التجريبي مفعل الآن." : "Demo mode is currently enabled.",
+              })
+            : t("demoDataDisabled", {
+                defaultValue: isRTL ? "سيتم عرض البيانات الحقيقية عند توفرها." : "Real analytics will be shown when available.",
+              })}
+        </p>
+      </div>
+
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 mb-4">
         <DashboardStatCard
           icon={<BookOpen className="w-5 h-5" />}
           title={t("myCourses", { defaultValue: isRTL ? "المقررات" : "Courses" })}
           value={metrics.totalCourses}
+          subtitle={t("myCoursesDesc", {
+            defaultValue: isRTL ? "عدد الكورسات المنشورة حالياً." : "Number of published courses.",
+          })}
           className="bg-base-200 border-base-300"
         />
         <DashboardStatCard
           icon={<FileText className="w-5 h-5" />}
           title={t("lectures", { defaultValue: isRTL ? "المحاضرات" : "Lectures" })}
           value={metrics.totalLectures}
+          subtitle={t("lecturesDesc", {
+            defaultValue: isRTL ? "إجمالي المحاضرات داخل كل الكورسات." : "Total lectures across all courses.",
+          })}
           className="bg-base-200 border-base-300"
         />
         <DashboardStatCard
           icon={<DollarSign className="w-5 h-5" />}
           title={t("totalRevenue", { defaultValue: isRTL ? "إجمالي الإيراد" : "Total Revenue" })}
           value={`${formatNumber(metrics.totalRevenue, i18n.language)} ${t("currency", { defaultValue: isRTL ? "جنيه" : "EGP" })}`}
+          subtitle={t("totalRevenueDesc", {
+            defaultValue: isRTL ? "إيرادك الفعلي من المبيعات." : "Your actual earnings from sales.",
+          })}
           className="bg-base-200 border-base-300"
         />
         <DashboardStatCard
           icon={<ListOrdered className="w-5 h-5" />}
           title={t("totalPurchases", { defaultValue: isRTL ? "إجمالي المشتريات" : "Total Purchases" })}
           value={metrics.totalPurchases}
+          subtitle={t("totalPurchasesDesc", {
+            defaultValue: isRTL ? "عدد عمليات الشراء المنفذة." : "Number of completed purchase orders.",
+          })}
           className="bg-base-200 border-base-300"
         />
         <DashboardStatCard
           icon={<Users className="w-5 h-5" />}
           title={t("studentsBought", { defaultValue: isRTL ? "الطلاب المشترون" : "Students Bought" })}
           value={metrics.totalStudentsBought}
-          className="bg-base-200 border-base-300"
-        />
-        <DashboardStatCard
-          icon={<Eye className="w-5 h-5" />}
-          title={t("studentViews", { defaultValue: isRTL ? "إجمالي المشاهدات" : "Total Views" })}
-          value={metrics.totalViewsConsumed}
-          className="bg-base-200 border-base-300"
-        />
-        <DashboardStatCard
-          icon={<Link2 className="w-5 h-5" />}
-          title={t("studentsEntered", { defaultValue: isRTL ? "الطلاب المرتبطون" : "Linked Students" })}
-          value={metrics.totalStudentsEntered}
-          className="bg-base-200 border-base-300"
-        />
-        <DashboardStatCard
-          icon={<Ticket className="w-5 h-5" />}
-          title={t("promoCodesApplied", { defaultValue: isRTL ? "الأكواد المطبقة" : "Promo Codes Applied" })}
-          value={metrics.totalPromoCodesApplied}
-          className="bg-base-200 border-base-300"
-        />
-        <DashboardStatCard
-          icon={<Ticket className="w-5 h-5" />}
-          title={t("promoCodesSold", { defaultValue: isRTL ? "الأكواد المباعة" : "Promo Codes Sold" })}
-          value={metrics.totalPromoCodesSold}
+          subtitle={t("studentsBoughtDesc", {
+            defaultValue: isRTL ? "عدد الطلاب المختلفين الذين اشتروا." : "Unique students who purchased your content.",
+          })}
           className="bg-base-200 border-base-300"
         />
         <DashboardStatCard
           icon={<UserCog className="w-5 h-5" />}
           title={t("assistants", { defaultValue: isRTL ? "المساعدون" : "Assistants" })}
           value={metrics.assistantsCount}
+          subtitle={t("assistantsDesc", {
+            defaultValue: isRTL ? "عدد المساعدين المضافين لحسابك." : "Assistants currently linked to your account.",
+          })}
           className="bg-base-200 border-base-300"
         />
-      </div>
-
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-3 mb-8">
-        <div className="rounded-2xl border border-base-300 bg-base-200/60 p-4">
-          <p className="text-sm opacity-70">{t("promoCodesValue", { defaultValue: isRTL ? "قيمة الأكواد" : "Promo Code Value" })}</p>
-          <p className="mt-2 text-2xl font-black">
-            {formatNumber(metrics.promoCodesSoldValue, i18n.language)} {t("currency", { defaultValue: isRTL ? "جنيه" : "EGP" })}
-          </p>
-        </div>
-        <div className="rounded-2xl border border-base-300 bg-base-200/60 p-4">
-          <p className="text-sm opacity-70">{t("linkedAccessRecords", { defaultValue: isRTL ? "سجلات الربط" : "Linked Access Records" })}</p>
-          <p className="mt-2 text-2xl font-black">{formatNumber(metrics.totalLinkedAccessRecords, i18n.language)}</p>
-        </div>
-        <div className="rounded-2xl border border-base-300 bg-base-200/60 p-4">
-          <p className="text-sm opacity-70">{t("promoCodesAppliedValue", { defaultValue: isRTL ? "قيمة الأكواد المطبقة" : "Applied Promo Value" })}</p>
-          <p className="mt-2 text-2xl font-black">
-            {formatNumber(metrics.promoCodesAppliedValue, i18n.language)} {t("currency", { defaultValue: isRTL ? "جنيه" : "EGP" })}
-          </p>
-        </div>
       </div>
 
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-2 mb-8">
@@ -486,7 +622,19 @@ export default function LecturerOverviewPanel() {
               })}
             </h3>
           </div>
-          {chartRows.length ? (
+          <p className="text-sm opacity-70 mb-3">
+            {t("revenueByContentDesc", {
+              defaultValue: isRTL ? "يوضح أي محتوى يحقق أعلى إيراد." : "Shows which content brings the highest revenue.",
+            })}
+          </p>
+          {usesPlaceholderCharts ? (
+            <p className="text-xs font-semibold text-warning mb-3">
+              {t("sampleDataNotice", {
+                defaultValue: isRTL ? "بيانات تجريبية للعرض فقط حتى تتوفر بيانات حقيقية." : "Sample data for preview only until real analytics are available.",
+              })}
+            </p>
+          ) : null}
+          {effectiveChartRows.length ? (
             <div className="h-72">
               <Bar data={revenueChartData} options={revenueChartOptions} />
             </div>
@@ -508,7 +656,19 @@ export default function LecturerOverviewPanel() {
               })}
             </h3>
           </div>
-          {chartRows.length ? (
+          <p className="text-sm opacity-70 mb-3">
+            {t("purchasesDistributionDesc", {
+              defaultValue: isRTL ? "نسبة المشتريات بين الكورسات والمحاضرات." : "Purchase share across your content.",
+            })}
+          </p>
+          {usesPlaceholderCharts ? (
+            <p className="text-xs font-semibold text-warning mb-3">
+              {t("sampleDataNotice", {
+                defaultValue: isRTL ? "بيانات تجريبية للعرض فقط حتى تتوفر بيانات حقيقية." : "Sample data for preview only until real analytics are available.",
+              })}
+            </p>
+          ) : null}
+          {effectiveChartRows.length ? (
             <div className="h-72">
               <Doughnut data={purchasesChartData} options={purchasesChartOptions} />
             </div>
@@ -529,8 +689,20 @@ export default function LecturerOverviewPanel() {
             {t("purchaseBreakdown", { defaultValue: isRTL ? "تفصيل المشتريات حسب المحتوى" : "Purchase Breakdown by Content" })}
           </h3>
         </div>
+        <div className="px-4 py-2 text-sm opacity-70 border-t border-base-300 bg-base-100">
+          {t("purchaseBreakdownDesc", {
+            defaultValue: isRTL ? "تفاصيل كل محتوى: عدد المبيعات والإيراد والطلاب." : "Details per content: sales, revenue, and students.",
+          })}
+        </div>
+        {usesPlaceholderCharts ? (
+          <div className="px-4 py-2 text-xs font-semibold text-warning border-t border-base-300 bg-base-100">
+            {t("sampleDataNotice", {
+              defaultValue: isRTL ? "بيانات تجريبية للعرض فقط حتى تتوفر بيانات حقيقية." : "Sample data for preview only until real analytics are available.",
+            })}
+          </div>
+        ) : null}
 
-        {analytics?.purchasesByContent?.length ? (
+        {effectiveChartRows.length ? (
           <div className="overflow-x-auto">
             <table className="table">
               <thead>
@@ -544,7 +716,7 @@ export default function LecturerOverviewPanel() {
                 </tr>
               </thead>
               <tbody>
-                {analytics.purchasesByContent.map((item) => (
+                {effectiveChartRows.map((item) => (
                   <tr key={`${item.contentType}-${item.contentId}`}>
                     <td className="font-semibold">{item.contentName}</td>
                     <td>{item.contentType === "lecture" ? t("lecture", { defaultValue: isRTL ? "محاضرة" : "Lecture" }) : t("containerTypes.course", { defaultValue: isRTL ? "كورس" : "Course" })}</td>
@@ -570,6 +742,11 @@ export default function LecturerOverviewPanel() {
             <Clock3 className="w-4 h-4 text-primary" />
             <h3 className="font-semibold">{t("recentActivity", { defaultValue: isRTL ? "آخر النشاطات" : "Recent Activity" })}</h3>
           </div>
+          <div className="px-4 py-2 text-sm opacity-70 border-t border-base-300 bg-base-100">
+            {t("recentActivityDesc", {
+              defaultValue: isRTL ? "آخر الكورسات أو المحاضرات التي تم تعديلها." : "Latest courses or lectures that were updated.",
+            })}
+          </div>
 
           {recentItems.length === 0 ? (
             <div className="p-4 text-sm opacity-70">
@@ -593,14 +770,31 @@ export default function LecturerOverviewPanel() {
         </div>
 
         <div className="rounded-2xl border border-base-300 overflow-hidden">
-          <div className="px-4 py-3 bg-base-200 flex items-center gap-2">
-            <Ticket className="w-4 h-4 text-primary" />
-            <h3 className="font-semibold">{t("promoCodes", { defaultValue: isRTL ? "أكواد الشحن" : "Promo Codes" })}</h3>
+          <div className="px-4 py-3 bg-base-200 flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <Ticket className="w-4 h-4 text-primary" />
+              <h3 className="font-semibold">{t("promoCodes", { defaultValue: isRTL ? "أكواد الشحن" : "Promo Codes" })}</h3>
+            </div>
+            <Link to="/dashboard/lecturer-dashboard/promo-codes" className="btn btn-xs btn-outline rounded-lg">
+              {t("viewFullList", { defaultValue: isRTL ? "عرض القائمة الكاملة" : "View full list" })}
+            </Link>
+          </div>
+          <div className="px-4 py-2 text-sm opacity-70 border-t border-base-300 bg-base-100">
+            {t("promoCodesDesc", {
+              defaultValue: isRTL ? "كل الأكواد التي أنشأتها وحالتها الحالية." : "All created promo codes and their current status.",
+            })}
           </div>
 
-          {analytics?.promoCodes?.length ? (
+          {usesPlaceholderPromoCodes ? (
+            <div className="px-4 py-2 text-xs font-semibold text-warning border-t border-base-300 bg-base-100">
+              {t("sampleDataNotice", {
+                defaultValue: isRTL ? "بيانات تجريبية للعرض فقط حتى تتوفر بيانات حقيقية." : "Sample data for preview only until real analytics are available.",
+              })}
+            </div>
+          ) : null}
+          {effectivePromoCodes.length ? (
             <ul className="divide-y divide-base-300">
-              {analytics.promoCodes.map((code) => (
+              {paginatedPromoCodes.map((code) => (
                 <li key={code.id} className="p-4 flex items-center justify-between gap-4">
                   <div>
                     <p className="font-semibold tracking-widest">{code.code}</p>
@@ -628,18 +822,62 @@ export default function LecturerOverviewPanel() {
               {t("noPromoCodes", { defaultValue: isRTL ? "لا توجد أكواد شحن بعد." : "No promo codes yet." })}
             </div>
           )}
+          {effectivePromoCodes.length > PROMO_CODES_PAGE_SIZE ? (
+            <div className="border-t border-base-300 px-4 py-3 flex items-center justify-between gap-3">
+              <button
+                type="button"
+                className="btn btn-xs btn-outline rounded-lg"
+                onClick={() => setPromoCodesPage((prev) => Math.max(1, prev - 1))}
+                disabled={promoCodesPage === 1}
+              >
+                {t("previous", { defaultValue: isRTL ? "السابق" : "Previous" })}
+              </button>
+              <span className="text-xs opacity-70">
+                {t("pageOf", {
+                  current: promoCodesPage,
+                  total: promoCodesTotalPages,
+                  defaultValue: isRTL ? "صفحة {{current}} من {{total}}" : "Page {{current}} of {{total}}",
+                })}
+              </span>
+              <button
+                type="button"
+                className="btn btn-xs btn-outline rounded-lg"
+                onClick={() => setPromoCodesPage((prev) => Math.min(promoCodesTotalPages, prev + 1))}
+                disabled={promoCodesPage === promoCodesTotalPages}
+              >
+                {t("next", { defaultValue: isRTL ? "التالي" : "Next" })}
+              </button>
+            </div>
+          ) : null}
         </div>
       </div>
 
-      <div className="rounded-2xl border border-base-300 overflow-hidden mt-8">
-        <div className="px-4 py-3 bg-base-200 flex items-center gap-2">
-          <Users className="w-4 h-4 text-primary" />
-          <h3 className="font-semibold">{t("linkedStudents", { defaultValue: isRTL ? "الطلاب المرتبطون" : "Linked Students" })}</h3>
+        <div className="rounded-2xl border border-base-300 overflow-hidden mt-8">
+        <div className="px-4 py-3 bg-base-200 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <Users className="w-4 h-4 text-primary" />
+            <h3 className="font-semibold">{t("linkedStudents", { defaultValue: isRTL ? "الطلاب المرتبطون" : "Linked Students" })}</h3>
+          </div>
+          <Link to="/dashboard/lecturer-dashboard/linked-students" className="btn btn-xs btn-outline rounded-lg">
+            {t("viewFullList", { defaultValue: isRTL ? "عرض القائمة الكاملة" : "View full list" })}
+          </Link>
+        </div>
+        <div className="px-4 py-2 text-sm opacity-70 border-t border-base-300 bg-base-100">
+          {t("linkedStudentsDesc", {
+            defaultValue: isRTL ? "الطلاب المرتبطون بمحاضراتك وعدد المشاهدات المتبقية." : "Students linked to your lectures and their remaining views.",
+          })}
         </div>
 
-        {analytics?.accessRecords?.length ? (
+        {usesPlaceholderAccessRecords ? (
+          <div className="px-4 py-2 text-xs font-semibold text-warning border-t border-base-300 bg-base-100">
+            {t("sampleDataNotice", {
+              defaultValue: isRTL ? "بيانات تجريبية للعرض فقط حتى تتوفر بيانات حقيقية." : "Sample data for preview only until real analytics are available.",
+            })}
+          </div>
+        ) : null}
+        {effectiveAccessRecords.length ? (
           <ul className="divide-y divide-base-300">
-            {analytics.accessRecords.slice(0, 10).map((record, index) => (
+            {paginatedLinkedStudents.map((record, index) => (
               <li key={`${record.studentId || "student"}-${record.lectureId || "lecture"}-${index}`} className="p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-2">
                 <div>
                   <p className="font-semibold">{record.studentName || t("unknown", { defaultValue: isRTL ? "غير معروف" : "Unknown" })}</p>
@@ -656,6 +894,33 @@ export default function LecturerOverviewPanel() {
             {t("noLinkedStudents", { defaultValue: isRTL ? "لا توجد بيانات ربط بعد." : "No linked students yet." })}
           </div>
         )}
+        {effectiveAccessRecords.length > LINKED_STUDENTS_PAGE_SIZE ? (
+          <div className="border-t border-base-300 px-4 py-3 flex items-center justify-between gap-3">
+            <button
+              type="button"
+              className="btn btn-xs btn-outline rounded-lg"
+              onClick={() => setLinkedStudentsPage((prev) => Math.max(1, prev - 1))}
+              disabled={linkedStudentsPage === 1}
+            >
+              {t("previous", { defaultValue: isRTL ? "السابق" : "Previous" })}
+            </button>
+            <span className="text-xs opacity-70">
+              {t("pageOf", {
+                current: linkedStudentsPage,
+                total: linkedStudentsTotalPages,
+                defaultValue: isRTL ? "صفحة {{current}} من {{total}}" : "Page {{current}} of {{total}}",
+              })}
+            </span>
+            <button
+              type="button"
+              className="btn btn-xs btn-outline rounded-lg"
+              onClick={() => setLinkedStudentsPage((prev) => Math.min(linkedStudentsTotalPages, prev + 1))}
+              disabled={linkedStudentsPage === linkedStudentsTotalPages}
+            >
+              {t("next", { defaultValue: isRTL ? "التالي" : "Next" })}
+            </button>
+          </div>
+        ) : null}
       </div>
     </section>
   );
