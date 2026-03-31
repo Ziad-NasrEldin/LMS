@@ -25,7 +25,7 @@
     },
     "filters": {
       "allSubjects": "كل المواد",
-      "allLevels": "كل المستويات"
+      "allLevels": "كل المراحل"
     },
     "itemsPerPage": "{{count}} لكل صفحة",
     "tableHeaders": {
@@ -33,7 +33,7 @@
       "name": "الاسم",
       "lecturer": "المحاضر",
       "subject": "المادة",
-      "level": "المستوى",
+      "level": "المرحلة",
       "type": "النوع",
       "price": "السعر",
       "purchaseDate": "تاريخ الشراء",
@@ -123,7 +123,7 @@
   "fields": {
     "name": "الاسم",
     "thumbnail": "الصورة المصغرة",
-    "level": "المستوى",
+    "level": "المرحلة",
     "subject": "المادة",
     "description": "الوصف",
     "price": "السعر",
@@ -140,7 +140,7 @@
   },
   "placeholders": {
     "enterLectureName": "أدخل اسم المحاضرة",
-    "selectLevel": "اختر مستوى",
+    "selectLevel": "اختر مرحلة",
     "selectSubject": "اختر مادة",
     "enterDescription": "أدخل وصف المحاضرة",
     "enterPrice": "أدخل السعر",
@@ -189,7 +189,7 @@
   },
   "validation": {
     "nameRequired": "الاسم مطلوب",
-    "levelRequired": "المستوى مطلوب",
+    "levelRequired": "المرحلة مطلوبة",
     "subjectRequired": "المادة مطلوبة",
     "videoLinkRequired": "رابط الفيديو مطلوب للمحاضرات",
     "examConfigRequired": "الرجاء اختيار إعدادات الاختبار",

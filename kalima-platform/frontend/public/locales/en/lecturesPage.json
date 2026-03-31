@@ -85,8 +85,8 @@
       "studentCourses": "Purchased Courses"
     },
     "descriptions": {
-      "lecturer": "Lectures you've published",
-      "student": "Lectures you've purchased"
+      "lecturer": "Courses you've published",
+      "student": "Courses you've purchased"
     },
     "labels": {
       "course": "Course",

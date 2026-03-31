@@ -36,6 +36,7 @@ const parentSchema = new mongoose.Schema({
   children: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Student' }],
   views: { type: Number, default: 0 },
   phoneNumber: { type: String, required: true },
+  profession: { type: String, required: true, trim: true },
   level: { type: String, enum: User.levels, lowercase: true },
   // Array of lecturer-specific point balances
   lecturerPoints: [lecturerPointsSchema],

@@ -20,6 +20,7 @@
           "fullName": "Full Name",
           "phoneNumber": "Mobile Number",
           "email": "Email Address",
+          "profession": "Profession / Work",
           "idNumber": "ID Number"
         },
         "placeholders": {

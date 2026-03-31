@@ -145,6 +145,7 @@
   },
   "profile" :{
     "email" : "البريد الالكتروني",
+    "profession": "المهنة / العمل",
     "sequenceId" : "رقم التسلسل",
     "userSerial": "التسلسل الخاص بالمستخدم",
     "sequenceIdTooltip" : "رقم التسلسل الخاص بك",

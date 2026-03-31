@@ -181,8 +181,8 @@ export default function CourseManagementSection() {
                 </span>
                 <select className="select select-bordered w-full" value={levelFilter} onChange={(e) => setLevelFilter(e.target.value)}>
                   <option value="all">{isRTL ? "الكل" : "All"}</option>
-                  <option value="with-level">{isRTL ? "بمستويات" : "With Levels"}</option>
-                  <option value="no-level">{isRTL ? "بدون مستويات" : "No Levels"}</option>
+                  <option value="with-level">{isRTL ? "بمراحل" : "With Levels"}</option>
+                  <option value="no-level">{isRTL ? "بدون مراحل" : "No Levels"}</option>
                 </select>
               </label>
 

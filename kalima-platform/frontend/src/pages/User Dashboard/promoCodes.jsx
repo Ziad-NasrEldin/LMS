@@ -933,6 +933,12 @@ const PromoCodes = () => {
                     <span className="text-xs font-semibold text-base-content/60">{t("profile.email")}:</span>
                     <p className="text-sm opacity-70 truncate">{userInfo?.email || ""}</p>
                   </div>
+                  {userInfo?.role === "Parent" && (
+                    <div className="flex items-center gap-1">
+                      <span className="text-xs font-semibold text-base-content/60">{t("profile.profession")}:</span>
+                      <p className="text-sm opacity-70 truncate">{userInfo?.profession || "-"}</p>
+                    </div>
+                  )}
                   <div
                     className="flex items-center gap-1 tooltip"
                     data-tip={

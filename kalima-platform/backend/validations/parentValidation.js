@@ -27,6 +27,7 @@ const parentValidation = userValidation.concat(
         "string.pattern.base": "level must be a valid MongoDB ObjectId.",
 
       }),
+    profession: Joi.string().trim().required(),
     government: Joi.string().required(),
     administrationZone: Joi.string().required(),
     referralSerial: Joi.string().optional(), // Allow referralSerial

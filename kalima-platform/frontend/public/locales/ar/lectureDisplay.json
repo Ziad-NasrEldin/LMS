@@ -147,7 +147,7 @@
   "lecturer": "المحاضر",
   "unknown": "غير معروف",
   "subject": "المادة",
-  "level": "المستوى",
+  "level": "المرحلة",
   "viewsCount": "عدد المشاهدات",
   "teacherAllowed": "مسموح للمعلم",
   "no": "لا",
@@ -155,7 +155,7 @@
   "noAccess": "لم يتم العثور على سجلات وصول للطلاب",
 
   "failedToLoadSubjects": "فشل في تحميل المواد، لكن يمكنك المتابعة.",
-  "failedToLoadLevels": "فشل في تحميل المستويات، لكن يمكنك المتابعة.",
+  "failedToLoadLevels": "فشل في تحميل المراحل، لكن يمكنك المتابعة.",
   "failedToFetchLectureDetails": "فشل في جلب تفاصيل المحاضرة",
   "failedToLoadLectureData": "فشل تحميل بيانات المحاضرة: {{error}}",
   "failedToFetchStudentSubmissions": "فشل في جلب تسليمات الطلاب",

@@ -61,6 +61,7 @@ export default function StudentRegistration() {
     hobbies: [],
     otherHobbyText: "",
     parentPhoneNumber: "",
+    profession: "",
     children: [""],
     subject: "",
     teachesAtType: "",
@@ -130,6 +131,10 @@ export default function StudentRegistration() {
 
       if (role === "teacher" && formData.phoneNumber2 && !isValidEgyptianPhoneNumber(formData.phoneNumber2)) {
         errors.phoneNumber2 = "phoneInvalid"
+      }
+
+      if (role === "parent" && !formData.profession?.trim()) {
+        errors.profession = "professionRequired"
       }
 
 
@@ -348,6 +353,7 @@ export default function StudentRegistration() {
           break;
 
         case "parent":
+          data.append("profession", formData.profession.trim());
           formData.children
             .filter((c) => c.trim() !== "")
             .forEach((child, index) => {

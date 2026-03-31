@@ -31,9 +31,9 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, gr
   }
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-3">
       <p className="text-xl sm:text-2xl font-semibold mb-2">{t('form.accountDetails') || 'Account Details'}</p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
       <div className="form-control">
         <div className="flex flex-col gap-1">
           <label className="label py-1">
@@ -108,14 +108,14 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, gr
         </div>
       </div>
       {/* Level Selection */}
-      <div className="form-control">
+      <div className="form-control sm:col-span-2">
         <div className="flex flex-col gap-1">
           <label className="label py-1">
             <span className="label-text text-xs">{t("form.level")}</span>
           </label>
-          <div className="flex flex-row gap-2">
+          <div className="flex flex-wrap gap-x-4 gap-y-2">
             {["primary", "preparatory", "secondary"].map((levelOption) => (
-              <label key={levelOption} className="flex items-center gap-2 cursor-pointer">
+              <label key={levelOption} className="flex items-center gap-2 cursor-pointer whitespace-nowrap">
                 <input
                   type="checkbox"
                   className="checkbox"
@@ -247,16 +247,19 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, gr
       )}
 
       {/* Social Media */}
-      <div className="form-control">
+      <div className="form-control sm:col-span-2">
         <div className="flex flex-col gap-1">
           <label className="label py-1">
             <span className="label-text text-xs">{t("form.socialMedia") || "Social Media"}</span>
           </label>
           <div className="flex flex-col gap-1">
             {(formData.socialMedia || [{ platform: "", account: "" }]).map((social, index) => (
-              <div key={index} className="grid grid-cols-2 gap-2">
+              <div
+                key={index}
+                className="grid grid-cols-1 gap-2 sm:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)_2.25rem] sm:items-center"
+              >
                 <select
-                  className={`select select-bordered select-sm ${errors.socialMedia?.[index]?.platform ? "select-error animate-shake" : ""}`}
+                  className={`select select-bordered select-sm w-full ${errors.socialMedia?.[index]?.platform ? "select-error animate-shake" : ""}`}
                   value={social.platform || ""}
                   onChange={(e) => {
                     const newSocialMedia = [...(formData.socialMedia || [{ platform: "", account: "" }])]
@@ -280,47 +283,45 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, gr
                     </option>
                   ))}
                 </select>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    className={`input input-bordered input-sm flex-1 ${errors.socialMedia?.[index]?.account ? "input-error animate-shake" : ""}`}
-                    value={social.account || ""}
-                    onChange={(e) => {
-                      const newSocialMedia = [...(formData.socialMedia || [{ platform: "", account: "" }])]
-                      newSocialMedia[index] = { ...newSocialMedia[index], account: e.target.value }
+                <input
+                  type="text"
+                  className={`input input-bordered input-sm w-full placeholder:text-base-content/65 ${errors.socialMedia?.[index]?.account ? "input-error animate-shake" : ""}`}
+                  value={social.account || ""}
+                  onChange={(e) => {
+                    const newSocialMedia = [...(formData.socialMedia || [{ platform: "", account: "" }])]
+                    newSocialMedia[index] = { ...newSocialMedia[index], account: e.target.value }
+                    handleInputChange({ target: { name: "socialMedia", value: newSocialMedia } })
+                  }}
+                  placeholder={`${t("form.accountName") || "Account name/handle"}`}
+                />
+                {index === (formData.socialMedia || [{ platform: "", account: "" }]).length - 1 ? (
+                  <button
+                    type="button"
+                    className="btn btn-sm btn-outline h-8 min-h-8 w-9 p-0"
+                    onClick={() => {
+                      const newSocialMedia = [
+                        ...(formData.socialMedia || [{ platform: "", account: "" }]),
+                        { platform: "", account: "" },
+                      ]
                       handleInputChange({ target: { name: "socialMedia", value: newSocialMedia } })
                     }}
-                    placeholder={`${t("form.accountName") || "Account name/handle"}`}
-                  />
-                  {index === (formData.socialMedia || [{ platform: "", account: "" }]).length - 1 ? (
-                    <button
-                      type="button"
-                      className="btn btn-square btn-outline"
-                      onClick={() => {
-                        const newSocialMedia = [
-                          ...(formData.socialMedia || [{ platform: "", account: "" }]),
-                          { platform: "", account: "" },
-                        ]
-                        handleInputChange({ target: { name: "socialMedia", value: newSocialMedia } })
-                      }}
-                    >
-                      +
-                    </button>
-                  ) : (
-                    <button
-                      type="button"
-                      className="btn btn-square btn-outline btn-error"
-                      onClick={() => {
-                        const newSocialMedia = (formData.socialMedia || [{ platform: "", account: "" }]).filter(
-                          (_, i) => i !== index,
-                        )
-                        handleInputChange({ target: { name: "socialMedia", value: newSocialMedia } })
-                      }}
-                    >
-                      -
-                    </button>
-                  )}
-                </div>
+                  >
+                    +
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    className="btn btn-sm btn-outline btn-error h-8 min-h-8 w-9 p-0"
+                    onClick={() => {
+                      const newSocialMedia = (formData.socialMedia || [{ platform: "", account: "" }]).filter(
+                        (_, i) => i !== index,
+                      )
+                      handleInputChange({ target: { name: "socialMedia", value: newSocialMedia } })
+                    }}
+                  >
+                    -
+                  </button>
+                )}
               </div>
             ))}
           </div>

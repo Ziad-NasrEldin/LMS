@@ -528,6 +528,23 @@ function PersonalInfoSection() {
             {emailError && isEditing && <div className="mt-2 text-error text-sm">{emailError}</div>}
           </div>
 
+          {userData?.role === "Parent" && (
+            <div className="form-control mb-4">
+              <label className={`label pb-1 ${isRTL ? "justify-end" : "justify-start"}`}>
+                <span className="label-text">{personalInfo.labels.profession || "Profession"}</span>
+              </label>
+              <div className="w-full">
+                <input
+                  type="text"
+                  value={userData?.profession || ""}
+                  className={`input input-bordered w-full max-w-2xl ${isRTL ? "text-right" : "text-left"}`}
+                  dir={isRTL ? "rtl" : "ltr"}
+                  readOnly
+                />
+              </div>
+            </div>
+          )}
+
           {/* Student-specific fields */}
           {userData?.role === "Student" && userData?.level && (
             <div className="form-control mb-4">

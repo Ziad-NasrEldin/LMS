@@ -59,7 +59,7 @@ const Services = () => {
         appIos: "تحميل على App Store",
         appAndroid: "تحميل على Google Play",
         ctaTitle: "جاهز تبدأ؟",
-        ctaBody: "سجل الآن وابدأ خطة تعلم مناسبة لمستواك.",
+        ctaBody: "سجل الآن وابدأ خطة تعلم مناسبة لمرحلتك.",
         ctaButton: "انشئ حسابك",
       },
       en: {

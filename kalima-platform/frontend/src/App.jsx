@@ -294,7 +294,7 @@ function App() {
 
             {/* User Dashboard Routes */}
             <Route
-              path="/dashboard/student-dashboard/lecture-page"
+              path="/dashboard/student-dashboard/courses-page"
               element={renderStudentRoute(<ContainersPage />)}
             />
             <Route
@@ -379,7 +379,7 @@ function App() {
               element={renderLecturerRoute(<DashboardPage />)}
             />
             <Route
-              path="/dashboard/lecturer-dashboard/lecture-page"
+              path="/dashboard/lecturer-dashboard/courses-page"
               element={renderLecturerRoute(<ContainersPage />)}
             />
             <Route

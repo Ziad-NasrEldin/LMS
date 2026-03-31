@@ -396,9 +396,9 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
       },
       {
         id: "lectures",
-        title: t("lectures") || "Lectures",
+        title: t("courses") || "My Courses",
         icon: <FaGraduationCap className="h-5 w-5" />,
-        path: "/dashboard/lecturer-dashboard/lecture-page",
+        path: "/dashboard/lecturer-dashboard/courses-page",
       },
       {
         id: "my-lectures",
@@ -428,7 +428,7 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
         id: "courses",
         title: t("courses") || "Courses",
         icon: <FaGraduationCap className="h-5 w-5" />,
-        path: "/dashboard/student-dashboard/lecture-page",
+        path: "/dashboard/student-dashboard/courses-page",
       },
       {
         id: "student-lectures",
@@ -449,7 +449,7 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
         id: "parent-courses",
         title: t("courses") || "Courses",
         icon: <FaGraduationCap className="h-5 w-5" />,
-        path: "/dashboard/student-dashboard/lecture-page",
+        path: "/dashboard/student-dashboard/courses-page",
       },
       {
         id: "parent-lectures",

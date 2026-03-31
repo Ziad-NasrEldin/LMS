@@ -132,7 +132,12 @@ export default function Step4({ formData, t, hobbiesList = [], gradeLevels }) {
             </>
           )}
 
-          {formData.role === "parent" && <ReviewItem label={t("form.children")} value={formData.children.join(", ")} />}
+          {formData.role === "parent" && (
+            <>
+              <ReviewItem label={t("form.profession")} value={formData.profession} />
+              <ReviewItem label={t("form.children")} value={formData.children.join(", ")} />
+            </>
+          )}
         </div>
 
         <p className="font-bold mt-10">

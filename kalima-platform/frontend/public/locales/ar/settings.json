@@ -20,6 +20,7 @@
       "fullName": "اسم الطالب بالكامل",
       "phoneNumber": "رقم هاتف الجوال",
       "email": "البريد الإلكتروني",
+      "profession": "المهنة / العمل",
       "idNumber": "رقم الهوية"
     },
     "placeholders": {

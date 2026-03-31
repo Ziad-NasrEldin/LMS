@@ -454,6 +454,7 @@ const getMyData = catchAsync(async (req, res, next) => {
       responseData.userInfo = {
         ...responseData.userInfo,
         phoneNumber: parent.phoneNumber,
+        profession: parent.profession,
         level: parent.level,
         children: parent.children,
         generalPoints: parent.generalPoints || 0,

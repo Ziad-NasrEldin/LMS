@@ -49,7 +49,7 @@
       "noLessons": "لا توجد دروس",
       "noCourses": "لا توجد دورات",
       "filters": {
-        "allLevels": "جميع المستويات",
+        "allLevels": "جميع المراحل",
         "allLecturers": "جميع المحاضرين"
       },
       "pagination": {
@@ -149,14 +149,14 @@
       "labels": {
         "subject": "المادة",
         "lecturer": "المحاضر",
-        "level": "المستوى",
+        "level": "المرحلة",
         "startDate": "تاريخ البدء",
         "duration": "المدة (دقيقة)"
       },
       "selectPlaceholder": {
         "subject": "اختر المادة",
         "lecturer": "اختر المحاضر",
-        "level": "اختر المستوى"
+        "level": "اختر المرحلة"
       },
       "submitButton": "إنشاء الدورة",
       "saving": "جاري الحفظ...",
@@ -187,7 +187,7 @@
   "category": "الفئة",
   "content": "المحتوى",
   "grade": "الصف",
-  "level": "المستوى",
+  "level": "المرحلة",
   "description": "وصف الطلب",
   "selectPlaceholder": "اختر",
   "categories": {
@@ -206,8 +206,8 @@
     "third": "الثالث"
   },
   "placeholders": {
-    "level": "المستوى",
-    "subLevel": "المستوى الفرعي",
+    "level": "المرحلة",
+    "subLevel": "المرحلة الفرعية",
     "details": "التفاصيل",
     "description": "يرجى كتابة تفاصيل طلبك أو استفسارك هنا..."
   },
@@ -228,7 +228,7 @@
     "lab": "مختبر"
   },
   "lecturer": "المحاضر",
-    "level": "المستوى",
+    "level": "المرحلة",
     "errors": {
       "invalidLessonId": "معرف الدرس غير صالح",
       "fetchLessonFailed": "فشل في جلب تفاصيل الدرس: {{message}}"
@@ -247,7 +247,7 @@
   "select_group": "اختر مجموعة",
   "group_label": "المجموعة {{group}}",
   "semesters": ["الفصل الأول", "الفصل الثاني", "الفصل الصيفي"],
-  "allLevels": "جميع المستويات",
+  "allLevels": "جميع المراحل",
   "allLecturers": "جميع المحاضرين"
 },
 "subjects": {

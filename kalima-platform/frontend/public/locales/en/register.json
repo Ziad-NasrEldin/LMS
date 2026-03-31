@@ -46,6 +46,7 @@
     "uploadAvatar": "Upload Profile Picture",
     "hobbies": "Hobbies",
     "personalDetails": "Personal Details",
+    "accountDetails": "Account Details",
     "parentDetails": "Parent Details",
     "schoolDetails": "School and Study Details",
     "password": "Password",
@@ -56,6 +57,7 @@
     "childrenSequenceIdsHelp" :"Use commas to separate child sequence IDs",
     "childrenSequenceIds" : "Children Sequence IDs",
     "level" : "Level",
+    "profession": "Profession / Work",
     "optional" : "Optional",
     "selectLevel" : "Select Level",
     "validatepassword": "Confirm Password",
@@ -213,7 +215,8 @@
     "socialMediaPlatform": "Platform is required",
     "socialMediaAccount": "Account name is required",
     "governmentRequired": "Government is required",
-    "administrationZoneRequired": "Administration zone is required"
+    "administrationZoneRequired": "Administration zone is required",
+    "professionRequired": "Profession / work is required"
   },
   
   "errors": {

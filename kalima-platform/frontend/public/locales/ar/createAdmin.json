@@ -1,6 +1,6 @@
 {
   "pageTitle": "حسابات المستخدمين",
-  "pageSubtitle": "إنشاء وإدارة الكيانات الأساسية للحسابات (المواد والمستويات)",
+  "pageSubtitle": "إنشاء وإدارة الكيانات الأساسية للحسابات (المواد والمراحل)",
   "createNew": "إنشاء جديد",
   "common": {
     "actions": "إجراءات",
@@ -16,21 +16,21 @@
     "verifyPermissions": "فشل في التحقق من صلاحيات المستخدم",
     "fetchLecturers": "فشل في جلب المحاضرين",
     "fetchSubjects": "فشل في جلب المواد",
-    "fetchLevels": "فشل في جلب المستويات",
+    "fetchLevels": "فشل في جلب المراحل",
     "createSubject": "فشل في إنشاء المادة",
-    "createLevel": "فشل في إنشاء المستوى",
+    "createLevel": "فشل في إنشاء المرحلة",
     "deleteSubject": "فشل في حذف المادة",
-    "deleteLevel": "فشل في حذف المستوى"
+    "deleteLevel": "فشل في حذف المرحلة"
   },
   "success": {
     "subjectCreated": "تم إنشاء المادة بنجاح",
-    "levelCreated": "تم إنشاء المستوى بنجاح",
+    "levelCreated": "تم إنشاء المرحلة بنجاح",
     "subjectDeleted": "تم حذف المادة بنجاح",
-    "levelDeleted": "تم حذف المستوى بنجاح"
+    "levelDeleted": "تم حذف المرحلة بنجاح"
   },
   "confirmations": {
     "deleteSubject": "هل أنت متأكد من رغبتك في حذف هذه المادة؟",
-    "deleteLevel": "هل أنت متأكد من رغبتك في حذف هذا المستوى؟"
+    "deleteLevel": "هل أنت متأكد من رغبتك في حذف هذه المرحلة؟"
   },
   "forms": {
     "subject": {
@@ -45,18 +45,18 @@
       "noSubjects": "لا توجد مواد متاحة."
     },
     "level": {
-      "title": "المستوى",
-      "createNew": "إنشاء مستوى جديد",
-      "name": "اسم المستوى",
-      "nameEn": "اسم المستوى (إنجليزي)",
-      "nameAr": "اسم المستوى (عربي)",
+      "title": "المرحلة",
+      "createNew": "إنشاء مرحلة جديدة",
+      "name": "اسم المرحلة",
+      "nameEn": "اسم المرحلة (إنجليزي)",
+      "nameAr": "اسم المرحلة (عربي)",
       "namePlaceholder": "مثال: الثانوية العليا",
       "namePlaceholderEn": "مثال: Higher Secondary",
       "namePlaceholderAr": "مثال: الثانوية العليا",
-      "create": "إنشاء مستوى",
-      "existing": "المستويات الموجودة",
-      "nameColumn": "اسم المستوى",
-      "noLevels": "لا توجد مستويات متاحة."
+      "create": "إنشاء مرحلة",
+      "existing": "المراحل الموجودة",
+      "nameColumn": "اسم المرحلة",
+      "noLevels": "لا توجد مراحل متاحة."
     }
   }
 }

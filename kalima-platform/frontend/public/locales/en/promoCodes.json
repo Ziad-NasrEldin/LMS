@@ -143,8 +143,9 @@
   "errors": {
     "fetchFailed": "Failed to fetch data"
   },
-   "profile" :{
+  "profile" :{
     "email" : "Email",
+    "profession": "Profession / Work",
     "sequenceId" : "Sequence ID",
     "userSerial": "User Serial",
     "sequenceIdTooltip" : "Your sequence ID",

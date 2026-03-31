@@ -151,6 +151,27 @@ export default function StepParent({ formData, handleChildrenChange, t, errors, 
                 </div>
             </div>
 
+            <div className="form-control">
+                <div className="flex flex-col gap-1">
+                    <label className="label py-1">
+                        <span className="label-text text-xs">{t('form.profession')}</span>
+                    </label>
+                    <input
+                        type="text"
+                        name="profession"
+                        className={`input input-bordered input-sm ${errors.profession ? 'input-error animate-shake' : ''}`}
+                        value={formData.profession || ''}
+                        onChange={handleInputChange}
+                        required
+                    />
+                    {errors.profession && (
+                        <span className="text-error text-sm mt-1">
+                            {t(`validation.${errors.profession}`)}
+                        </span>
+                    )}
+                </div>
+            </div>
+
             <p className="text-lg font-semibold mt-6">{t('form.childrenSequenceIds')}</p>
             <p className="text-sm text-gray-500">{t('form.childrenSequenceIdsHelp')}</p>
 
