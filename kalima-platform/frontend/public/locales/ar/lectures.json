@@ -1,6 +1,6 @@
 { 
-  "generalPoints": "نقاط عامة",
-  "points": "نقاط",
+  "generalPoints": "الرصيد العام",
+  "points": "جنيه",
   "welcome": "مرحبا بك في موقع ",
   "title": "المحاضرات",
   "discover": "اكتشف أحدث المحاضرات",
@@ -19,8 +19,8 @@
     "failed": "فشل شراء المحاضرة"
   },
   "available : ": " المتاحة",
-  "availablePoints": "المتاح:",
-  "noPointsBalances": "لا يوجد نقاط متاحة",
+  "availablePoints": "الرصيد:",
+  "noPointsBalances": "لا يوجد رصيد متاح",
   "labels": {
     "lecture": "محاضرة"
   },
@@ -92,7 +92,7 @@
     "fetchLectures": "فشل في تحميل المحاضرات",
     "loginRequired": "يرجى تسجيل الدخول أولاً",
     "lectureNotFound": "المحاضرة غير موجودة",
-    "insufficientPoints": "لا توجد نقاط كافية"
+    "insufficientPoints": "لا يوجد رصيد كاف"
   },
   "lesson": {
     "detailsTitle": "تفاصيل الدرس",

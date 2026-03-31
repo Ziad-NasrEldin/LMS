@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { motion } from "framer-motion"
 import { ImageIcon, Video, ChevronDown } from "lucide-react"
+import toast from "react-hot-toast"
 import { createContainer, updateContainer } from "../../routes/lectures"
 
 function BasicInfoForm({
@@ -14,6 +15,7 @@ function BasicInfoForm({
   courseStructure,
   updateCourseStructure,
   createdBy,
+  courseSnapshot,
   isEditMode = false,
   editContainerId = null,
 }) {
@@ -29,14 +31,14 @@ function BasicInfoForm({
     if (file && file.size <= 1024 * 1024 * 1024) {
       setCourseImage(file)
     } else {
-      alert(isRTL ? "حجم الملف يجب أن يكون أقل من 1 جيجابايت" : "File size must be less than 1GB")
+      toast.error(isRTL ? "حجم الملف يجب أن يكون أقل من 1 جيجابايت" : "File size must be less than 1GB")
     }
   }
 
   const handleCreateParentContainer = async (e) => {
     e.preventDefault()
     if (!formData.courseName || !formData.gradeLevel || !formData.subject) {
-      alert(isRTL ? "يرجى ملء جميع الحقول المطلوبة" : "Please fill all required fields")
+      toast.error(isRTL ? "يرجى ملء جميع الحقول المطلوبة" : "Please fill all required fields")
       return
     }
 
@@ -76,14 +78,14 @@ function BasicInfoForm({
             type: container.type,
           },
         })
-        alert(isEditMode ? (isRTL ? "تم تحديث الحاوية الرئيسية بنجاح" : "Parent container updated successfully") : (isRTL ? "تم إنشاء الحاوية الرئيسية بنجاح" : "Parent container created successfully"))
+        toast.success(isEditMode ? (isRTL ? "تم تحديث الحاوية الرئيسية بنجاح" : "Parent container updated successfully") : (isRTL ? "تم إنشاء الحاوية الرئيسية بنجاح" : "Parent container created successfully"))
       } else {
-        alert(isRTL ? "فشل حفظ الحاوية الرئيسية" : "Failed to save parent container")
+        toast.error(isRTL ? "فشل حفظ الحاوية الرئيسية" : "Failed to save parent container")
       }
     } catch (error) {
       console.error("Error creating parent container:", error)
       const errorMessage = error.response?.data?.message || "حدث خطأ أثناء حفظ الحاوية الرئيسية"
-      alert(isRTL ? errorMessage : "Error saving parent container")
+      toast.error(isRTL ? errorMessage : "Error saving parent container")
     } finally {
       setIsSubmitting(false)
     }
@@ -100,8 +102,41 @@ function BasicInfoForm({
       >
         <div className="mb-2">
           <h2 className="text-base font-bold mb-3 text-primary">
-            {isEditMode ? (isRTL ? "تعديل البيانات الأساسية" : "Edit Basic Information") : (isRTL ? "البيانات الأساسية" : "Basic Information")}
+            {isEditMode ? (isRTL ? "تعديل أساسيات الكورس" : "Edit course basics") : (isRTL ? "أساسيات الكورس" : "Course basics")}
           </h2>
+          <div className="mb-4 rounded-xl border p-3" style={{ borderColor: "rgba(20,106,120,0.14)", background: "rgba(188,231,236,0.18)" }}>
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.16em]" style={{ color: "rgba(17,24,39,0.6)" }}>
+                  {isRTL ? "معاينة حية" : "Live preview"}
+                </p>
+                <h3 className="mt-1 text-base font-bold" style={{ color: "rgba(17,24,39,0.92)" }}>
+                  {courseSnapshot?.title || (isRTL ? "اسم الكورس سيظهر هنا" : "Course title will appear here")}
+                </h3>
+              </div>
+              <div className="rounded-full px-3 py-1 text-xs font-semibold" style={{ background: "rgba(14,85,99,0.12)", color: "rgba(14,85,99,1)" }}>
+                {formData.courseType === "free" ? (isRTL ? "مجاني" : "Free") : (isRTL ? "مدفوع" : "Paid")}
+              </div>
+            </div>
+            <div className="mt-3 grid gap-2 text-xs sm:grid-cols-2">
+              <div className="rounded-lg bg-white/70 px-3 py-2">
+                <span className="block opacity-60">{isRTL ? "المرحلة" : "Level"}</span>
+                <span className="font-semibold">{courseSnapshot?.level || "-"}</span>
+              </div>
+              <div className="rounded-lg bg-white/70 px-3 py-2">
+                <span className="block opacity-60">{isRTL ? "المادة" : "Subject"}</span>
+                <span className="font-semibold">{courseSnapshot?.subject || "-"}</span>
+              </div>
+              <div className="rounded-lg bg-white/70 px-3 py-2">
+                <span className="block opacity-60">{isRTL ? "السعر" : "Price"}</span>
+                <span className="font-semibold">{courseSnapshot?.pricing || "-"}</span>
+              </div>
+              <div className="rounded-lg bg-white/70 px-3 py-2">
+                <span className="block opacity-60">{isRTL ? "الخصوصية" : "Privacy"}</span>
+                <span className="font-semibold">{courseSnapshot?.privacy || "-"}</span>
+              </div>
+            </div>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-[62%_38%] gap-3">
             <div className="space-y-3">
               <div>
@@ -220,6 +255,9 @@ function BasicInfoForm({
                     {isRTL ? "تم اختيار: " : "Selected: "} {courseImage.name}
                   </p>
                 )}
+                <p className="mt-2 text-xs text-center text-base-content/55">
+                  {isRTL ? "الصورة تظهر في بطاقة الكورس وفي المعاينات." : "This image appears in course cards and previews."}
+                </p>
               </div>
               <div className="grid grid-cols-1 gap-3">
                 <div>
@@ -252,38 +290,9 @@ function BasicInfoForm({
                   </div>
                   <p className="mt-2 text-xs text-base-content/60">
                     {isRTL
-                      ? "سيتم تحديد السعر من خطوة إنشاء الحاوية الأولى."
-                      : "Pricing is set in the first container creation step."}
+                      ? "اختر مجانياً أو مدفوعاً. يمكن تعديل السعر قبل الإطلاق."
+                      : "Choose free or paid. You can adjust the price before launch."}
                   </p>
-                  <div className="mt-4">
-                    <h2 className="block text-primary text-base font-semibold mb-2">
-                      {isRTL ? "صلاحية الوصول" : "Access Validity"}
-                    </h2>
-                    <div className="flex flex-wrap gap-4">
-                      <label className="flex items-center gap-2">
-                        <input
-                          type="radio"
-                          name="accessType"
-                          value="both"
-                          checked={formData.accessType === "both"}
-                          onChange={handleChange}
-                          className="radio radio-primary"
-                        />
-                        <span>{isRTL ? "التطبيق و المنصة" : "App and Platform"}</span>
-                      </label>
-                      <label className="flex items-center gap-2">
-                        <input
-                          type="radio"
-                          name="accessType"
-                          value="app"
-                          checked={formData.accessType === "app"}
-                          onChange={handleChange}
-                          className="radio radio-primary"
-                        />
-                        <span>{isRTL ? "التطبيق" : "App"}</span>
-                      </label>
-                    </div>
-                  </div>
                   <div>
                     <h2 className="block text-primary text-base font-semibold mb-2">
                       {isRTL ? "خصوصية الكورس" : "Course Privacy"}
@@ -328,19 +337,24 @@ function BasicInfoForm({
               <span className="loading loading-spinner"></span>
             ) : !isEditMode && courseStructure.parent ? (
               isRTL ? (
-                "تم إنشاء الحاوية الرئيسية"
+                "تم حفظ أساسيات الكورس"
               ) : (
-                "Parent Container Created"
+                "Course basics saved"
               )
               ) : isEditMode ? (
-                isRTL ? "حفظ التعديلات" : "Save Changes"
+                isRTL ? "حفظ التعديلات" : "Save changes"
               ) : isRTL ? (
-                "إنشاء الحاوية الرئيسية"
+                "حفظ أساسيات الكورس"
               ) : (
-                "Create Parent Container"
+                "Save course basics"
               )}
           </button>
         </div>
+        <p className="mt-2 text-xs text-center text-base-content/55">
+          {isRTL
+            ? "بعد الحفظ ستنتقل لإضافة السنوات والفصول والمحاضرات."
+            : "After saving, you can add years, terms, months, and lectures."}
+        </p>
       </motion.div>
     </form>
   )

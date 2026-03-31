@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { FolderPlus, FileText, Paperclip } from "lucide-react"
+import toast from "react-hot-toast"
 import { createContainer, createLecture, createLectureAttachment } from "../../routes/lectures"
 import { getAllSubjects } from "../../routes/courses"
 import { getExamConfigs, createExamConfig } from "../../routes/examConfigs"
@@ -131,12 +132,12 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
     e.preventDefault()
 
     if (!selectedParentId) {
-      alert(isRTL ? "يرجى تحديد الحاوية الأب" : "Please select a parent container")
+      toast.error(isRTL ? "يرجى تحديد الحاوية الأب" : "Please select a parent container")
       return
     }
 
     if (!containerName) {
-      alert(isRTL ? "يرجى إدخال اسم الحاوية" : "Please enter a container name")
+      toast.error(isRTL ? "يرجى إدخال اسم الحاوية" : "Please enter a container name")
       return
     }
 
@@ -145,7 +146,7 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
     try {
       if (containerType === CONTAINER_TYPES.LECTURE) {
         if (!lectureLink) {
-          alert(isRTL ? "يرجى إدخال رابط المحاضرة" : "Please enter a lecture link")
+          toast.error(isRTL ? "يرجى إدخال رابط المحاضرة" : "Please enter a lecture link")
           setIsSubmitting(false)
           return
         }
@@ -173,7 +174,7 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
           if (isCreatingNewExamConfig) {
             // Validate required fields for new exam config
             if (!newExamConfig.name || !newExamConfig.googleSheetId || !newExamConfig.formUrl) {
-              alert(
+              toast.error(
                 isRTL
                   ? "يرجى ملء جميع حقول تكوين الامتحان المطلوبة"
                   : "Please fill in all required exam configuration fields",
@@ -208,7 +209,7 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
             }
           } else {
             if (!selectedExamConfigId) {
-              alert(isRTL ? "يرجى تحديد تكوين الامتحان" : "Please select an exam configuration")
+              toast.error(isRTL ? "يرجى تحديد تكوين الامتحان" : "Please select an exam configuration")
               setIsSubmitting(false)
               return
             }
@@ -251,7 +252,7 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
             const attachmentResponse = await createLectureAttachment(lectureId, attachmentData)
           } catch (attachmentError) {
             console.error("Error uploading attachment:", attachmentError)
-            alert(
+            toast.error(
               isRTL
                 ? `تم إنشاء المحاضرة ولكن فشل تحميل المرفق: ${attachmentError.message}`
                 : `Lecture created but failed to upload attachment: ${attachmentError.message}`,
@@ -333,14 +334,14 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
       })
       setAttachmentType("homeworks")
 
-      alert(
+      toast.success(
         isRTL
           ? `تم إنشاء ${containerType === CONTAINER_TYPES.LECTURE ? "المحاضرة" : "الحاوية"} بنجاح`
           : `${containerType === CONTAINER_TYPES.LECTURE ? "Lecture" : "Container"} created successfully`,
       )
     } catch (error) {
       console.error(`Error creating ${containerType}:`, error)
-      alert(
+      toast.error(
         isRTL
           ? `حدث خطأ أثناء إنشاء ${containerType === CONTAINER_TYPES.LECTURE ? "المحاضرة" : "الحاوية"}`
           : `Error creating ${containerType === CONTAINER_TYPES.LECTURE ? "lecture" : "container"}`,
@@ -560,7 +561,26 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
           {isRTL ? "إضافة محتوى تعليمي" : "Add Educational Content"}
         </h2>
         <p className={`mt-1 text-xs sm:text-sm text-base-content/75 ${isRTL ? "text-right" : "text-left"}`}>
-          {isRTL ? "اختر النوع، الحاوية الأب، ثم أضف التفاصيل الأساسية بشكل سريع." : "Pick the type, parent container, and fill only the key details."}
+          {isRTL ? "ابدأ بالهيكل الصحيح: سنة ثم فصل ثم شهر ثم محاضرة." : "Use the hierarchy in order: year, term, month, then lecture."}
+        </p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          <span className="rounded-full bg-white/70 px-3 py-1 text-xs font-semibold text-base-content/70">
+            {isRTL ? "1. اختر النوع" : "1. Choose type"}
+          </span>
+          <span className="rounded-full bg-white/70 px-3 py-1 text-xs font-semibold text-base-content/70">
+            {isRTL ? "2. اختر الأب" : "2. Choose parent"}
+          </span>
+          <span className="rounded-full bg-white/70 px-3 py-1 text-xs font-semibold text-base-content/70">
+            {isRTL ? "3. املأ التفاصيل" : "3. Fill details"}
+          </span>
+          <span className="rounded-full bg-white/70 px-3 py-1 text-xs font-semibold text-base-content/70">
+            {isRTL ? "4. احفظ" : "4. Save"}
+          </span>
+        </div>
+        <p className={`mt-3 text-xs text-base-content/60 ${isRTL ? "text-right" : "text-left"}`}>
+          {isRTL
+            ? "المحاضرات يجب أن تكون داخل الشهور، والشهور داخل الفصول، والفصول داخل السنوات."
+            : "Lectures belong under months, months under terms, and terms under years."}
         </p>
       </div>
 
@@ -583,6 +603,13 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
               <option value={CONTAINER_TYPES.MONTH}>{isRTL ? "شهر" : "Month"}</option>
               <option value={CONTAINER_TYPES.LECTURE}>{isRTL ? "محاضرة" : "Lecture"}</option>
             </select>
+            <p className="mt-1 text-xs text-base-content/55">
+              {containerType === CONTAINER_TYPES.LECTURE
+                ? (isRTL ? "المحاضرة ستظهر داخل الشهر المختار." : "The lecture will live under the selected month.")
+                : isRTL
+                  ? "أنشئ هذا الجزء في المكان الصحيح من الهيكل."
+                  : "Create this part in the correct place within the structure."}
+            </p>
           </div>
 
           <div>
@@ -602,6 +629,9 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
                 </option>
               ))}
             </select>
+            <p className="mt-1 text-xs text-base-content/55">
+              {isRTL ? "اختر الحاوية التي ستحتوي هذا العنصر." : "Pick the parent container that will contain this item."}
+            </p>
           </div>
         </div>
 

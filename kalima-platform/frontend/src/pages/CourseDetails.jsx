@@ -248,7 +248,7 @@ export default function CourseDetails() {
         if (dashboardResult?.success) {
           setPurchaseHistory(dashboardResult.data.data.purchaseHistory || [])
 
-          // Store user points if available
+          // Store user balance if available
           if (dashboardResult.data.data.userInfo) {
             setRemainingPoints(dashboardResult.data.data.userInfo.generalPoints)
           }
@@ -335,7 +335,7 @@ export default function CourseDetails() {
       if (response && response.data && response.data.status === "success") {
         setPurchaseSuccess(true)
 
-        // Update remaining points if available in the response
+        // Update remaining balance if available in the response
         if (response.data.data && response.data.data.remainingLecturerPoints !== undefined) {
           setRemainingPoints(response.data.data.remainingLecturerPoints)
         }
@@ -385,7 +385,7 @@ export default function CourseDetails() {
       if (dashboardResult?.success) {
         setPurchaseHistory(dashboardResult.data.data.purchaseHistory || [])
 
-        // Update remaining points if available
+        // Update remaining balance if available
         if (dashboardResult.data.data.userInfo) {
           setRemainingPoints(dashboardResult.data.data.userInfo.generalPoints || 0)
         }

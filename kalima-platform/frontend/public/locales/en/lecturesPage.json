@@ -44,7 +44,7 @@
       "paid": "Paid",
       "review": "Review"
     },
-    "points": "points",
+    "points": "EGP",
     "unknown": "Unknown",
     "notSpecified": "Not specified",
     "emptyStates": {
@@ -64,7 +64,7 @@
       "add": "Add"
     },
     "labels": {
-      "points": "Points"
+      "points": "EGP"
     },
     "types": {
       
@@ -92,7 +92,7 @@
     },
     "labels": {
       "course": "Course",
-      "price": "Price: {{price}} points",
+      "price": "Price: {{price}} EGP",
       "lecturer": "Lecturer",
       "purchaseDate": "Purchase Date",
       "unknown": "Unknown"

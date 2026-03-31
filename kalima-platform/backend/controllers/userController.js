@@ -1194,7 +1194,7 @@ const getStudentParentAdditionalData = async (
     };
   }
 
-  // Always include points balances as they're small
+  // Always include balance records as they're small
   if (!fields || fields.includes("pointsBalances")) {
     responseData.pointsBalances = pointsBalances;
   }

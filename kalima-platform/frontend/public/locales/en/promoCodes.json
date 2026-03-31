@@ -1,10 +1,10 @@
 {
   "title": "Account Dashboard",
-  "subtitle": "Manage your account, children, points, and quick actions",
+  "subtitle": "Manage your account, children, balances, and quick actions",
   "balance": {
     "title": "Balance",
     "currency": "EGP",
-    "description": "Total points available to use"
+    "description": "Total balance available to use"
   },
   "redeem": {
     "title": "Redeem Code",
@@ -14,7 +14,7 @@
     "rulesTitle": "Redemption Rules",
     "rules": {
       "1": "Each code can only be redeemed once",
-      "2": "You can only use points with the teacher who issued the card"
+      "2": "You can only use this balance with the teacher who issued the card"
     },
     "success": "Code redeemed successfully!",
     "errors": {
@@ -30,7 +30,7 @@
     "used": "Used",
     "oneTime": "One-time use",
     "infoTitle": "Have a referral code?",
-    "infoDescription": "If someone referred you to our platform, enter their referral serial below to get bonus points and help them earn rewards too!",
+    "infoDescription": "If someone referred you to our platform, enter their referral serial below to get bonus EGP and help them earn rewards too!",
     "label": "Referral Serial",
     "required": "Required",
     "placeholder": "Enter referral serial (e.g., REF123456)",
@@ -38,10 +38,10 @@
     "alreadyApplied": "You have successfully applied a referral code!",
     "referredBy": "Referred by:",
     "benefitsTitle": "Referral Benefits",
-    "benefit1": "Get bonus points when you apply a valid referral code",
+    "benefit1": "Get bonus EGP when you apply a valid referral code",
     "benefit2": "Help your friend earn rewards for referring you",
     "benefit3": "One-time use ensures fair distribution of rewards",
-    "success": "Referral code applied successfully! You may receive bonus points.",
+    "success": "Referral code applied successfully! You may receive bonus EGP.",
     "errors": {
       "emptySerial": "Please enter a referral serial",
       "alreadyUsed": "You have already used a referral code",
@@ -62,8 +62,8 @@
     "title": "Quick Actions"
   },
   "lecturerPoints": {
-    "title": "Points by Lecturer",
-    "description": "Total points available for each lecturer"
+    "title": "Balance by Lecturer",
+    "description": "Total balance available for each lecturer"
   },
   "scanner": {
     "title": "Scan QR Code",
@@ -89,7 +89,7 @@
     "teacher": "Teacher",
     "dateTooltip": "Transaction date",
     "typeTooltip": "Transaction type",
-    "amountTooltip": "Points amount",
+    "amountTooltip": "Amount",
     "teacherTooltip": "Teacher name",
     "actions": "Actions",
     "created": "Created",
@@ -97,12 +97,12 @@
     "id": "ID"
   },
   "noData": "No data available",
-  "noLecturerPoints": "No lecturer points available",
+  "noLecturerPoints": "No lecturer balance available",
   "noLectures": "No lectures available",
   "noLecturesDescription": "You haven't accessed any lectures yet",
   "user": "User",
   "student": "Student",
-  "generalPoints": "General",
+  "generalPoints": "General Balance",
   "notAvailable": "N/A",
   "views": "views",
   "totalViews": "total views",
@@ -115,7 +115,7 @@
     "title": "Children Accounts",
     "yourAccount": "Your Account",
     "noChildren": "No children accounts found",
-    "noChildrenDescription": "Add a child account to manage points and transactions",
+    "noChildrenDescription": "Add a child account to manage balances and transactions",
     "actionsDisabled": "Actions are disabled when viewing a child account"
   },
   "addChild": {

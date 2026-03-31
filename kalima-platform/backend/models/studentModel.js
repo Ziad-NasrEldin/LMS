@@ -68,9 +68,9 @@ const studentSchema = new mongoose.Schema(
     phoneNumber: { type: String },
     school: { type: mongoose.Schema.Types.ObjectId, ref: "School" },
     parent: { type: mongoose.Schema.Types.ObjectId, ref: "Parent" },
-    // Array of lecturer-specific point balances
+    // Array of lecturer-specific balance records
     lecturerPoints: [lecturerPointsSchema],
-    // General points balance
+    // General balance
     generalPoints: {
       type: Number,
       default: 0,
@@ -89,7 +89,7 @@ const studentSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    // Track promo code points separately
+    // Track promo code balance separately
     promoPoints: {
       type: Number,
       default: 0,
@@ -120,7 +120,7 @@ const studentSchema = new mongoose.Schema(
 //   localField: "_id",
 //   foreignField: "student",
 // });
-// Helper method to get points balance for a specific lecturer
+// Helper method to get balance for a specific lecturer
 studentSchema.methods.getLecturerPointsBalance = function (lecturerId) {
   const lecturerPointsEntry = this.lecturerPoints.find(
     (entry) => entry.lecturer.toString() === lecturerId.toString()
@@ -128,7 +128,7 @@ studentSchema.methods.getLecturerPointsBalance = function (lecturerId) {
   return lecturerPointsEntry ? lecturerPointsEntry.points : 0;
 };
 
-// Helper method to add points for a specific lecturer
+// Helper method to add balance for a specific lecturer
 studentSchema.methods.addLecturerPoints = function (lecturerId, pointsToAdd) {
   const lecturerPointsEntry = this.lecturerPoints.find(
     (entry) => entry.lecturer.toString() === lecturerId.toString()
@@ -141,9 +141,9 @@ studentSchema.methods.addLecturerPoints = function (lecturerId, pointsToAdd) {
   }
 };
 
-// Helper method to use points for a specific lecturer
+// Helper method to use balance for a specific lecturer
 studentSchema.methods.useLecturerPoints = function (lecturerId, pointsToUse) {
-  // Special case - if trying to deduct 0 points, always succeed
+  // Special case - if trying to deduct 0, always succeed
   if (pointsToUse === 0) {
     return true;
   }
@@ -153,11 +153,11 @@ studentSchema.methods.useLecturerPoints = function (lecturerId, pointsToUse) {
   );
 
   if (!lecturerPointsEntry || lecturerPointsEntry.points < pointsToUse) {
-    return false; // Not enough points
+    return false; // Not enough balance
   }
 
   lecturerPointsEntry.points -= pointsToUse;
-  return true; // Successfully used points
+  return true; // Successfully used balance
 };
 
 studentSchema.pre("save", async function (next) {

@@ -470,12 +470,12 @@ const PromoCodes = () => {
             <th className="tooltip hidden md:table-cell" data-tip={t("table.typeTooltip") || "Type of transaction"}>
               {t("table.type")} <Info className="w-3 h-3 inline-block ml-1 opacity-60" />
             </th>
-            <th className="tooltip" data-tip={t("table.amountTooltip") || "Points added or deducted"}>
+            <th className="tooltip" data-tip={t("table.amountTooltip") || "Amount added or deducted"}>
               {t("table.amount")} <Info className="w-3 h-3 inline-block ml-1 opacity-60" />
             </th>
             <th
               className="tooltip hidden md:table-cell"
-              data-tip={t("table.teacherTooltip") || "Teacher associated with these points"}
+              data-tip={t("table.teacherTooltip") || "Teacher associated with this balance"}
             >
               {t("table.teacher")} <Info className="w-3 h-3 inline-block ml-1 opacity-60" />
             </th>

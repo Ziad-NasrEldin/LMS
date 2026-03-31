@@ -259,4 +259,16 @@ ounded-[2rem]\), removed hard \shadow-sm\ defaults from DaisyUI, updated primary
 ## 2026-03-31 - Component + asset dead-code sweep - GPT-5.4 mini
 - Ran a full frontend reachability sweep from `main.jsx`/`App.jsx`, removed all unreachable component/module files, then performed a follow-up static asset audit and deleted newly orphaned images while keeping `Kalima.png` protected.
 
+## 2026-03-31 - Backend dead-module sweep - GPT-5.4 mini
+- Removed four backend orphan files with zero references across runtime, scripts, and tests: `models/schoolModel.js`, `validations/coursemonthValidation.js`, `utils/seeds/seedDatabase.js`, and `utils/seeds/seedSections.js`.
+- Kept all mounted routes/controllers and regression test files intact; only standalone unreachable modules were deleted.
+
+## 2026-03-31 - Backend dead-helper trim - GPT-5.4 mini
+- Removed two unreferenced controller helpers from active backend files: `isValidPDF` in `controllers/ec.productController.js` and `findAllChildContainers` in `controllers/purchaseController.js`.
+- Removed the now-unused `path` import from `ec.productController.js` as part of the same safe cleanup step.
+
+## 2026-03-31 - Frontend in-file dead element trim - GPT-5.4 mini
+- Removed five unreferenced constants from active frontend modules (`SHADOWS`, `GRADIENTS`, `ITEMS_PER_PAGE`, `API_URL`, `TOKEN_KEY`) after a symbol-level sweep.
+- Kept all route-rendered components intact and limited this pass to true in-file dead elements only.
+
 

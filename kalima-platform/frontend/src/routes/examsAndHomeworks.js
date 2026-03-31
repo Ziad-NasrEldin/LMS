@@ -3,8 +3,6 @@ import { getToken } from "./auth-services"; // Adjust the path based on your pro
 import { getAuthHeader } from "./fetch-users"; // Adjust the path based on your project structure
 import { normalizeApiError } from "../utils/apiError";
 
-const API_URL = import.meta.env.VITE_API_URL;
-
 /**
  * Fetches student submissions for a specific lecture
  * @param {string} lectureId - The ID of the lecture

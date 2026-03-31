@@ -1,13 +1,13 @@
 const mongoose = require("mongoose");
 
 const purchaseSchema = new mongoose.Schema({
-  // Who purchased the points
+  // Who purchased the balance
   student: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true,
   },
-  // For which lecturer these points are valid
+  // For which lecturer this balance is valid
   lecturer: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Lecturer",
@@ -18,7 +18,7 @@ const purchaseSchema = new mongoose.Schema({
       "Lecturer ID is required for specific codes",
     ],
   },
-  // Points amount purchased or container purchased
+  // Amount purchased or container purchased
   points: {
     type: Number,
     required: true,

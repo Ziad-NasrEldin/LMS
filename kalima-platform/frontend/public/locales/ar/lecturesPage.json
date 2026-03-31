@@ -44,7 +44,7 @@
       "paid": "مدفوعة",
       "review": "مراجعة"
     },
-    "points": "نقطة",
+    "points": "جنيه",
     "unknown": "غير معروف",
     "notSpecified": "غير محدد",
     "emptyStates": {
@@ -64,7 +64,7 @@
       "add": "إضافة"
     },
     "labels": {
-      "points": "نقطة"
+      "points": "جنيه"
     },
     "types": {
       "course": "دورة",
@@ -92,7 +92,7 @@
     },
     "labels": {
       "course": "دورة",
-      "price": "السعر: {{price}} نقطة",
+      "price": "السعر: {{price}} جنيه",
       "lecturer": "المحاضر",
       "purchaseDate": "تاريخ الشراء",
       "unknown": "غير معروف"

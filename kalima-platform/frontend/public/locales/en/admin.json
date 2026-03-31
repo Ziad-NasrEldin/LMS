@@ -42,8 +42,8 @@
       "parentPhone": "Parent Phone",
       "faction": "Faction",
       "hobbies": "Hobbies",
-      "generalPoints": "General Points",
-      "totalPoints": "Total Points",
+      "generalPoints": "General Balance",
+      "totalPoints": "Total Balance",
       "parentInfo": "Parent Information",
       "children": "Children",
       "noChildren": "No children",
@@ -106,7 +106,7 @@
       },
       "errors": {
         "fetchLecturers": "Failed to fetch lecturers",
-        "pointsError": "Points amount must be greater than zero",
+        "pointsError": "Amount must be greater than zero",
         "codesError": "Number of codes must be greater than zero",
         "phoneRequired": "Please enter phone number",
         "lecturerRequired": "Please select a lecturer",
@@ -120,7 +120,7 @@
         "codesGenerated": "Promo codes generated successfully"
       },
       "form": {
-        "pointsAmount": "Points Amount",
+        "pointsAmount": "Amount",
         "amountAfter": "Amount After",
         "amountBefore": "Amount Before",
         "amountBeforePlaceholder": "Enter old amount",
@@ -150,7 +150,7 @@
         "invalidImage": "Invalid image file",
         "imageOnly": "Only image files are allowed"
       },
-      "points": "Points",
+      "points": "EGP",
       "userManagement": {
         "title": "User Actions Log",
         "subtitle": "Manage and export user data",
@@ -177,7 +177,7 @@
     "promoTable": {
       "number": "#",
       "code": "Promo Code",
-      "points": "Points",
+      "points": "Amount",
       "type": "Type",
       "actions": "Actions",
       "discount": "Discount"
@@ -365,7 +365,7 @@
       "title": "Promo Codes Management",
       "subtitle": "Manage promo code lifecycle and usage",
       "code": "Promo Code",
-      "points": "Points",
+      "points": "EGP",
       "status": "Status",
       "redeemedAt": "Redeemed At",
       "redeemedBy": "Redeemed By",

@@ -92,7 +92,7 @@
     "actions": "الإجراءات",
     "details": "التفاصيل",
     "notAvailable": "غير متوفر",
-    "pricePoints": "{{price}} نقطة",
+    "pricePoints": "{{price}} جنيه",
     "free": "مجاني",
     "noDescription": "لا يوجد وصف",
     "noSubject": "لا توجد مادة",
@@ -163,6 +163,3 @@
     "assistant": "مساعد"
   }
 }
-
-  
-  

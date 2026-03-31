@@ -4,8 +4,8 @@
     "cancel": "إلغاء",
     "toggleSidebar": "تبديل القائمة الجانبية",
     "dir": "rtl",
-    "General Points": "نقاط عامة",
-    "Total Points": "نقاط كلية",
+    "General Points": "الرصيد العام",
+    "Total Points": "إجمالي الرصيد",
     "passwordStrength": {
       "label": "قوة كلمة المرور",
       "weak": "ضعيفة",

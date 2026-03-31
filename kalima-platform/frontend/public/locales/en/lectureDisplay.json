@@ -62,7 +62,7 @@
   "description": "Description",
   "noDescriptionAvailable": "No description available.",
   "price": "Price",
-  "pricePoints": "{{price}} points",
+  "pricePoints": "{{price}} EGP",
   "notSpecified": "Not specified",
   "type": "Type",
   "createdBy": "Created by",
@@ -151,7 +151,7 @@
   "viewsCount": "Views Count",
   "teacherAllowed": "Teacher Allowed",
   "no": "No",
-  "points": "points",
+  "points": "EGP",
   "noAccess": "No student access records found",
 
   "failedToLoadSubjects": "Failed to load subjects, but you can continue.",

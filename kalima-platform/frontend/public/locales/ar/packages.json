@@ -5,12 +5,12 @@
     "tryAgain": "حاول مرة أخرى",
     "backToPackages": "العودة إلى الباقات",
     "packageNotFound": "الباقة غير موجودة",
-    "points": "نقاط",
+    "points": "جنيه",
     "cancel": "إلغاء",
     "details": "التفاصيل",
     "purchase": "شراء",
     "purchased": "تم الشراء",
-    "insufficientPoints": "نقاط غير كافية"
+    "insufficientPoints": "رصيد غير كاف"
   },
   "errors": {
     "fetchStudents": "فشل في جلب بيانات الطلاب"
@@ -77,10 +77,10 @@
     "allPrices": "جميع الأسعار",
     "allTeachers": "جميع المعلمين",
     "priceRanges": {
-      "0-200": "0 - 200 نقطة",
-      "200-500": "200 - 500 نقطة",
-      "500-1000": "500 - 1000 نقطة",
-      "1000+": "1000+ نقطة"
+      "0-200": "0 - 200 جنيه",
+      "200-500": "200 - 500 جنيه",
+      "500-1000": "500 - 1000 جنيه",
+      "1000+": "1000+ جنيه"
     },
     "resetFilters": "إعادة تعيين التصفية",
     "showing": "عرض {{current}} من {{total}} باقة",
@@ -90,8 +90,8 @@
       "monthly": "شهري",
       "teachers": "المعلمون",
       "includes": "يتضمن",
-      "enoughPoints": "لديك نقاط كافية",
-      "notEnoughPoints": "نقاط غير كافية",
+      "enoughPoints": "لديك رصيد كاف",
+      "notEnoughPoints": "رصيد غير كاف",
       "alreadyPurchased": "تم الشراء بالفعل"
     }
   },
@@ -100,8 +100,8 @@
     "duration": "المدة",
     "teachers": "المعلمون",
     "expertInstructors": "معلم خبير",
-    "totalPoints": "إجمالي النقاط",
-    "pointsDistributed": "نقاط موزعة",
+    "totalPoints": "إجمالي الرصيد",
+    "pointsDistributed": "الرصيد الموزع",
     "created": "تم الإنشاء",
     "packagePrice": "سعر الباقة",
     "alreadyPurchased": "تم الشراء بالفعل",
@@ -109,17 +109,17 @@
     "yourBalance": "رصيدك",
     "afterPurchase": "بعد الشراء",
     "purchaseNow": "اشتر الآن",
-    "insufficientPoints": "نقاط غير كافية",
-    "needMorePoints": "تحتاج إلى {{points}} نقطة إضافية لشراء هذه الباقة",
+    "insufficientPoints": "رصيد غير كاف",
+    "needMorePoints": "تحتاج إلى {{points}} جنيه إضافي لشراء هذه الباقة",
     "loginToPurchase": "يرجى تسجيل الدخول لشراء هذه الباقة",
     "loginButton": "تسجيل الدخول للشراء",
-    "generalPointsOnly": "* يمكن شراء هذه الباقة فقط باستخدام النقاط العامة",
+    "generalPointsOnly": "* يمكن شراء هذه الباقة فقط باستخدام الرصيد العام",
     "teachersIncluded": "المعلمون المشمولون",
     "packageBenefits": "مزايا الباقة",
     "benefits": {
       "accessToContent": "الوصول إلى محتوى من {{count}} معلم خبير",
       "durationAccess": "{{duration}} للوصول إلى جميع المواد المضمنة",
-      "totalPoints": "إجمالي {{points}} نقطة موزعة على المعلمين",
+      "totalPoints": "إجمالي {{points}} جنيه موزعة على المعلمين",
       "flexibleLearning": "تعلم مرن بالوتيرة الخاصة بك",
       "comprehensiveCurriculum": "منهج شامل يغطي مواضيع متعددة"
     }
@@ -134,7 +134,7 @@
     "afterPurchase": "بعد الشراء",
     "confirmButton": "تأكيد الشراء",
     "successMessage": "تم شراء الباقة بنجاح!",
-    "remainingPoints": "النقاط المتبقية: {{points}}",
+    "remainingPoints": "الرصيد المتبقي: {{points}}",
     "failureMessage": "فشل في شراء الباقة",
     "errorMessage": "حدث خطأ أثناء شراء الباقة"
   },

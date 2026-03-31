@@ -4,8 +4,8 @@
     "cancel": "Cancel",
     "toggleSidebar": "Toggle Sidebar",
     "dir": "ltr",
-    "General Points": "General Points",
-    "Total Points": "Total Points",
+    "General Points": "General Balance",
+    "Total Points": "Total Balance",
     "passwordStrength": {
       "label": "Password strength",
       "weak": "Weak",

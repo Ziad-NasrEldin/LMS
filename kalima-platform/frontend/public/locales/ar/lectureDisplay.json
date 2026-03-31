@@ -62,7 +62,7 @@
   "description": "الوصف",
   "noDescriptionAvailable": "لا يوجد وصف متوفر.",
   "price": "السعر",
-  "pricePoints": "{{price}} نقاط",
+  "pricePoints": "{{price}} جنيه",
   "notSpecified": "غير محدد",
   "type": "النوع",
   "createdBy": "أنشأها",
@@ -151,7 +151,7 @@
   "viewsCount": "عدد المشاهدات",
   "teacherAllowed": "مسموح للمعلم",
   "no": "لا",
-  "points": "نقاط",
+  "points": "جنيه",
   "noAccess": "لم يتم العثور على سجلات وصول للطلاب",
 
   "failedToLoadSubjects": "فشل في تحميل المواد، لكن يمكنك المتابعة.",

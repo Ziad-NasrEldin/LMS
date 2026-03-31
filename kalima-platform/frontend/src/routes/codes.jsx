@@ -57,7 +57,7 @@ export const generatePromoCodes = async (data) => {
     }
 
     if (data.type !== "promo" && !data.pointsAmount) {
-      throw new Error("Points amount is required for non-promo codes");
+      throw new Error("Amount is required for non-promo codes");
     }
 
     // Prepare the payload based on type
@@ -66,7 +66,7 @@ export const generatePromoCodes = async (data) => {
       type: data.type
     };
 
-    // Only include pointsAmount if not promo type
+    // Only include amount if not promo type
     if (data.type !== "promo") {
       payload.pointsAmount = data.pointsAmount;
     }

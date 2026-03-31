@@ -19,7 +19,6 @@ const MyLecturesPage = () => {
   const navigate = useNavigate()
   const TOKENS = designTokens.colors
   const SHADOWS = designTokens.shadows
-  const ITEMS_PER_PAGE = 8
   const sortLecturesNewestFirst = (left, right) => {
     const leftTime = new Date(left.sortDate || left.createdAt || 0).getTime()
     const rightTime = new Date(right.sortDate || right.createdAt || 0).getTime()

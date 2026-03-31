@@ -8,7 +8,6 @@ export default function Footer() {
   const isRTL = i18n.language === 'ar';
   
   const TOKENS = designTokens.colors;
-  const SHADOWS = designTokens.shadows;
 
   return (
     <footer 

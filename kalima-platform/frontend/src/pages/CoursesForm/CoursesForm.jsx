@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import { CheckCircle2, ChevronLeft, ChevronRight, Circle, ListChecks } from "lucide-react"
 import { motion } from "framer-motion"
@@ -36,7 +37,6 @@ function CourseCreationForm() {
     priceFull: "",
     priceMonthly: "",
     priceSession: "",
-    accessType: "both",
     privacy: "student",
   })
 
@@ -181,6 +181,26 @@ function CourseCreationForm() {
 
   const completedSteps = checklistItems.filter((item) => item.done).length
   const progressPercent = Math.round((completedSteps / checklistItems.length) * 100)
+  const nextChecklistItem = useMemo(
+    () => checklistItems.find((item) => !item.done) || checklistItems[checklistItems.length - 1],
+    [checklistItems]
+  )
+  const courseSnapshot = useMemo(() => {
+    const levelName = levels.find((level) => level._id === formData.gradeLevel)?.name
+    const subjectName = subjects.find((subject) => subject._id === formData.subject)?.name
+
+    return {
+      title: formData.courseName?.trim() || (isRTL ? "اسم الكورس سيظهر هنا" : "Course title will appear here"),
+      level: levelName || (isRTL ? "لم يتم الاختيار" : "Not selected"),
+      subject: subjectName || (isRTL ? "لم يتم الاختيار" : "Not selected"),
+      pricing: formData.courseType === "free"
+        ? (isRTL ? "مجاني" : "Free")
+        : `${formData.priceFull || 0} ${isRTL ? "جنيه" : "EGP"}`,
+      privacy: formData.privacy === "teacher"
+        ? (isRTL ? "المعلم فقط" : "Teacher only")
+        : (isRTL ? "الطلاب / أولياء الأمور" : "Students / guardians"),
+    }
+  }, [formData.courseName, formData.courseType, formData.gradeLevel, formData.priceFull, formData.privacy, formData.subject, isRTL, levels, subjects])
 
   if (isLoading) {
     return (
@@ -243,11 +263,11 @@ function CourseCreationForm() {
           </div>
 
           <div className={`flex flex-col gap-3 ${isRTL ? "items-end text-right" : "items-start text-left"}`}>
-            <h1 className="text-2xl font-bold text-white sm:text-3xl">{isRTL ? "أنشئ كورسك باحتراف" : "Build your course flow fast"}</h1>
+            <h1 className="text-2xl font-bold text-white sm:text-3xl">{isRTL ? "أنشئ الكورس خطوة بخطوة" : "Build the course in clear steps"}</h1>
             <p className="text-sm sm:text-base" style={{ color: "#D8F2F5" }}>
               {isRTL
-                ? "ابدأ بالبيانات الأساسية، ثم أضف الحاويات والمحاضرات بشكل منظم ومختصر."
-                : "Start with core info, then add containers and lectures in a focused compact flow."}
+                ? "ابدأ بالمعلومات الأساسية، ثم أضف الهيكل والمحتوى بدون تشويش."
+                : "Start with the basics, then add structure and lectures without the clutter."}
             </p>
             <div className={`flex flex-wrap gap-2 ${isRTL ? "justify-end" : ""}`}>
               <span className="rounded-full bg-white/16 px-3 py-1 text-xs text-white/95">{isRTL ? "1. البيانات الأساسية" : "1. Basic info"}</span>
@@ -272,12 +292,24 @@ function CourseCreationForm() {
               <div className={`mb-3 flex items-center gap-2 ${isRTL ? "flex-row-reverse" : ""}`}>
                 <ListChecks className="h-5 w-5" style={{ color: TOKENS.deepTeal }} />
                 <h3 className={`font-bold ${isRTL ? "text-right" : "text-left"}`} style={{ color: TOKENS.inkText }}>
-                  {isRTL ? "قائمة إنشاء أول كورس" : "First Course Checklist"}
+                  {isRTL ? "قائمة إعداد الكورس" : "Course setup checklist"}
                 </h3>
               </div>
               <p className={`mb-4 text-xs sm:text-sm ${isRTL ? "text-right" : "text-left"}`} style={{ color: TOKENS.slateText }}>
-                {isRTL ? "اتبع الخطوات بالترتيب لتجهيز كورسك بدون تشتت." : "Follow these steps in order to stay focused and finish faster."}
+                {isRTL ? "أكمل أول خطوة التالية بدل القفز بين الحقول." : "Complete the next step instead of jumping between fields."}
               </p>
+
+              <div className="mb-4 rounded-xl border px-3 py-2" style={{ borderColor: "rgba(20,106,120,0.18)", background: "rgba(188,231,236,0.18)" }}>
+                <p className="text-xs font-semibold uppercase tracking-[0.16em]" style={{ color: TOKENS.slateText }}>
+                  {isRTL ? "الخطوة التالية" : "Next step"}
+                </p>
+                <p className="mt-1 text-sm font-bold" style={{ color: TOKENS.inkText }}>
+                  {nextChecklistItem.label}
+                </p>
+                <p className="text-xs" style={{ color: TOKENS.slateText }}>
+                  {nextChecklistItem.hint}
+                </p>
+              </div>
 
               <div className="mb-4">
                 <div className={`mb-1 flex items-center justify-between text-xs ${isRTL ? "flex-row-reverse" : ""}`} style={{ color: TOKENS.slateText }}>
@@ -328,7 +360,7 @@ function CourseCreationForm() {
                     color: TOKENS.deepTeal,
                   }}
                 >
-                  {isRTL ? "ممتاز! أول كورس جاهز تقريبًا." : "Great work! Your first course is almost ready."}
+                  {isRTL ? "ممتاز! هيكل الكورس مكتمل تقريبًا." : "Great work! Your course structure is almost ready."}
                 </div>
               )}
             </motion.div>
@@ -347,6 +379,7 @@ function CourseCreationForm() {
               createdBy={createdBy}
               isEditMode={Boolean(containerId)}
               editContainerId={containerId}
+              courseSnapshot={courseSnapshot}
             />
 
             {/* Container Creation Panel */}

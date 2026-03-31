@@ -74,7 +74,7 @@ export const LectureCard = ({
               <span className="badge badge-success">{t("free")}</span>
             )}
 
-            {/* Show teacher-specific points if enabled */}
+            {/* Show teacher-specific balance if enabled */}
             {showTeacherPoints && price > 0 && (
               <div className="flex items-center ml-2 text-xs">
                 <Wallet className="w-3 h-3 mr-1" />

@@ -137,7 +137,7 @@ export default function LecturesPage() {
         // Optimistically add to purchased lectures
   setPurchasedLectures((prev) => Array.from(new Set([...prev.map(String), lectureId.toString()])))
 
-        // Refresh points and merge backend purchases, never reset
+        // Refresh balances and merge backend purchases, never reset
         fetchUserData()
       } else {
         const errorMessage = response?.error || response?.data?.message || t("purchaseMessages.failed")
@@ -379,7 +379,7 @@ export default function LecturesPage() {
                   </div>
                 </div>
                 
-                {/* Teacher-specific points balances */}
+                {/* Teacher-specific balances */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 mt-2">
                   {pointsBalances && pointsBalances.length > 0 ? (
                     pointsBalances.map((balance, index) => (

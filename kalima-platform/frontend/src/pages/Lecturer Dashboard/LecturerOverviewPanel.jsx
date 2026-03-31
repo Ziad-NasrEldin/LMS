@@ -400,7 +400,7 @@ export default function LecturerOverviewPanel() {
       });
       pushRow([]);
 
-      pushRow(["PromoCodes", "Code", "Points amount", "Redeemed", "Created at", "Redeemed at"]);
+      pushRow(["PromoCodes", "Code", "Amount (EGP)", "Redeemed", "Created at", "Redeemed at"]);
       (analytics?.promoCodes || []).forEach((code) => {
         pushRow([
           "PromoCodes",

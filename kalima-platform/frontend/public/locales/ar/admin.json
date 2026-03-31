@@ -42,8 +42,8 @@
   "parentPhone": "هاتف ولي الأمر",
   "faction": "الفئة",
   "hobbies": "الهوايات",
-  "generalPoints": "النقاط العامة",
-  "totalPoints": "إجمالي النقاط",
+  "generalPoints": "الرصيد العام",
+  "totalPoints": "إجمالي الرصيد",
   "parentInfo": "معلومات ولي الأمر",
   "children": "الأبناء",
   "noChildren": "لا يوجد أبناء",
@@ -106,7 +106,7 @@
       },
       "errors": {
         "fetchLecturers": "فشل في جلب المحاضرين",
-        "pointsError": "يجب أن تكون قيمة النقاط أكبر من صفر",
+        "pointsError": "يجب أن تكون القيمة أكبر من صفر",
         "codesError": "يجب أن يكون عدد الأكواد أكبر من صفر",
         "phoneRequired": "يرجى إدخال رقم الهاتف",
         "lecturerRequired": "يرجى اختيار محاضر",
@@ -119,7 +119,7 @@
         "codesGenerated": "تم إنشاء أكواد الخصم بنجاح"
       },
       "form": {
-        "pointsAmount": "مقدار النقاط",
+        "pointsAmount": "المبلغ",
         "amountAfter": "المبلغ بعد",
         "amountBefore": "المبلغ قبل",
         "amountBeforePlaceholder": "أدخل المبلغ القديم",
@@ -151,7 +151,7 @@
         "imageOnly": "يُسمح فقط بملفات الصور"
       },
     
-      "points": "نقاط",
+      "points": "جنيه",
       "userManagement": {
         "title": "سجل الاجراءات",
         "subtitle": "إدارة وتصدير بيانات المستخدمين",
@@ -178,7 +178,7 @@
     "promoTable": {
       "number": "الرقم",
       "code": "كود الخصم",
-      "points": "النقاط",
+      "points": "المبلغ",
       "type": "النوع",
       "actions": "الإجراءات",
       "discount": "الخصم"
@@ -368,7 +368,7 @@
       "title": "إدارة الأكواد الترويجية",
       "subtitle": "إدارة دورة حياة أكواد الشحن واستخدامها",
       "code": " كود الخصم",
-      "points": " النقاط",
+      "points": " الجنيه",
       "status": " الحالة",
       "redeemedAt": "تم استرداده في",
       "redeemedBy": "تم الاسترداد بواسطة",

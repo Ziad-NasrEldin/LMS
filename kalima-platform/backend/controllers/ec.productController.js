@@ -1,15 +1,5 @@
 const ECProduct = require("../models/ec.productModel");
-const path = require("path");
 const fs = require("fs");
-
-// Helper to check PDF file size (max 50MB)
-function isValidPDF(file) {
-    return (
-        file &&
-        file.mimetype === "application/pdf" &&
-        file.size <= 75 * 1024 * 1024 // 50MB
-    );
-}
 
 exports.createProduct = async (req, res, next) => {
     try {

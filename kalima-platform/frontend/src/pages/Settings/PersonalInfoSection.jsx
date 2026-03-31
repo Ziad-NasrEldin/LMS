@@ -561,7 +561,7 @@ function PersonalInfoSection() {
             </div>
           )}
 
-          {/* Points display for students */}
+          {/* Balance display for students */}
           {userData?.role === "Student" && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
               <div className="stat rounded-box" style={{ background: TOKENS.neutralCloud }}>

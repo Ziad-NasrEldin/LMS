@@ -91,7 +91,7 @@
     "actions": "Actions",
     "details": "Details",
     "notAvailable": "N/A",
-    "pricePoints": "{{price}} points",
+    "pricePoints": "{{price}} EGP",
     "free": "Free",
     "noDescription": "No description",
     "noSubject": "No subject",
@@ -162,4 +162,3 @@
     "assistant": "Assistant"
   }
   }
-  

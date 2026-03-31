@@ -85,13 +85,13 @@ const createCodes = catchAsync(async (req, res, next) => {
     return next(new AppError("Code type and number of codes are required"));
   }
 
-  // For promo codes, we'll set a very large point amount (e.g., 1,000,000) 
+  // For promo codes, we'll set a very large amount (e.g., 1,000,000)
   // so users can purchase anything they want
   const actualPointsAmount = type === "promo" ? 1000000 : pointsAmount;
 
-  // Validate pointsAmount for non-promo codes
+  // Validate amount for non-promo codes
   if (type !== "promo" && !pointsAmount) {
-    return next(new AppError("Points amount is required for non-promo codes"));
+    return next(new AppError("Amount is required for non-promo codes"));
   }
 
   let lecturer = null;
@@ -350,13 +350,13 @@ const redeemCode = catchAsync(async (req, res, next) => {
         currentUser.hasPromoCode = true;
         currentUser.hasUsedPromoCode = false; // Reset this flag if they're redeeming a new promo code
 
-        // Store promo points separately instead of adding to general points
+        // Store promo balance separately instead of adding to general balance
         currentUser.promoPoints = isExistCode.pointsAmount;
       }
 
       responseMessage = "Your promotional code has been redeemed successfully. You can use it for one purchase of any value!";
     } else if (isExistCode.type === "specific") {
-      // For specific lecturer codes: Add points to the specific lecturer's balance
+      // For specific lecturer codes: Add balance to the specific lecturer's balance
       if (!isExistCode.lecturerId) {
         await session.abortTransaction();
         return next(new AppError("This code is not properly configured", 500));
@@ -367,15 +367,17 @@ const redeemCode = catchAsync(async (req, res, next) => {
         isExistCode.pointsAmount
       );
 
-      responseMessage = `Your code has been redeemed successfully, +${isExistCode.pointsAmount} points for this lecturer`;
+      responseMessage = `Your code has been redeemed successfully, +${isExistCode.pointsAmount} EGP for this lecturer`;
     } else {
-      // For general codes: Add points to the general points balance
+      // For general codes: Add balance to the general balance
       currentUser.generalPoints = (currentUser.generalPoints || 0) + isExistCode.pointsAmount;
 
-      responseMessage = `Your code has been redeemed successfully, +${isExistCode.pointsAmount} general points`;
+      responseMessage = `Your code has been redeemed successfully, +${isExistCode.pointsAmount} general balance`;
     }
 
-    await currentUser.save({ session });
+    // Redeeming a code only updates balance/promo flags; skip full-profile validation
+    // so legacy accounts with incomplete optional profile data can still redeem.
+    await currentUser.save({ session, validateBeforeSave: false });
 
     // Mark the code as redeemed
     await Code.findOneAndUpdate(

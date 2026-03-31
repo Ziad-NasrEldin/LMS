@@ -71,42 +71,6 @@ const resolvePointsUserModel = async ({ userId, session, roleHint, populate }) =
   return null;
 };
 
-const findAllChildContainers = async (containerId, session) => {
-  try {
-    // Find the container and all its nested children using GraphLookup
-    const containerTree = await Container.aggregate([
-      {
-        $match: { _id: new mongoose.Types.ObjectId(containerId) },
-      },
-      {
-        $graphLookup: {
-          from: "containers", // Collection name
-          startWith: "$children",
-          connectFromField: "children",
-          connectToField: "_id",
-          as: "nestedChildren",
-        },
-      },
-    ]).session(session);
-
-    if (!containerTree || containerTree.length === 0) {
-      return [];
-    }
-
-    // Return all child containers regardless of price
-    const containerDoc = containerTree[0];
-    const allChildren = containerDoc.nestedChildren;
-
-    console.log(
-      `Found ${allChildren.length} child containers for container ${containerId}`
-    );
-    return allChildren;
-  } catch (error) {
-    console.error("Error finding child containers:", error);
-    return [];
-  }
-};
-
 // updated version
 exports.purchaseLecturerPoints = catchAsync(async (req, res, next) => {
   const { lecturerId, lectureId } = req.body;
@@ -141,7 +105,7 @@ exports.purchaseLecturerPoints = catchAsync(async (req, res, next) => {
         (index) => index.lecturer.toString() === lecturerId
       );
     if (currentUserIndexOfPointsToThisLecture === -1) {
-      return next(new AppError("You don't have points to this lecturer", 400));
+      return next(new AppError("You don't have balance for this lecturer", 400));
     }
 
     const lecturePrice = lecture.price;
@@ -152,12 +116,12 @@ exports.purchaseLecturerPoints = catchAsync(async (req, res, next) => {
     );
     if (!hasEnoughPoints) {
       await session.abortTransaction();
-      return next(
-        new AppError(
-          "You don't have enough points for purchasing from this lecturer",
-          400
-        )
-      );
+        return next(
+          new AppError(
+            "You don't have enough balance for purchasing from this lecturer",
+            400
+          )
+        );
     }
 
     currentUser.totalPoints -= lecturePrice;
@@ -182,7 +146,7 @@ exports.purchaseLecturerPoints = catchAsync(async (req, res, next) => {
           lecturer: lecture.createdBy,
           points: lecturePrice,
           type: "pointPurchase",
-          description: `Purchased lecture ${lecture.name} for ${lecturePrice} points`,
+          description: `Purchased lecture ${lecture.name} for ${lecturePrice} EGP`,
         },
       ],
       { session }
@@ -194,7 +158,7 @@ exports.purchaseLecturerPoints = catchAsync(async (req, res, next) => {
 
     res.status(200).json({
       status: "success",
-      message: `Lecture purchased successfully, your remaining points for this lecturer now ${updatedPoints}`,
+      message: `Lecture purchased successfully, your remaining balance for this lecturer now ${updatedPoints}`,
     });
   } catch (error) {
     await session.abortTransaction();
@@ -210,7 +174,7 @@ exports.purchaseLecturerPoints = catchAsync(async (req, res, next) => {
 });
 
 /**
- * Purchase points for a specific lecturer
+ * Purchase balance for a specific lecturer
  */
 /*
 exports.purchaseLecturerPoints = catchAsync(async (req, res, next) => {
@@ -324,7 +288,7 @@ exports.purchaseLecturerPoints = catchAsync(async (req, res, next) => {
 });
 */
 /**
- * Purchase a container using lecturer-specific points
+ * Purchase a container using lecturer-specific balance
  */
 exports.purchaseContainerWithPoints = catchAsync(async (req, res, next) => {
   // Get userId from the authenticated user's JWT token - try multiple possible properties
@@ -386,21 +350,21 @@ exports.purchaseContainerWithPoints = catchAsync(async (req, res, next) => {
       return next(new AppError(`User not found with ID: ${userId}`, 404));
     }
 
-    // Check if user has enough points for this lecturer
+    // Check if user has enough balance for this lecturer
     const lecturerPoints = userModel.getLecturerPointsBalance(lecturerId);
     const generalPoints = userModel.generalPoints || 0;
     const promoPoints = userModel.promoPoints || 0;
     let purchaseType = "";
     let isPromoCodePurchase = false;
 
-    // First try to use lecturer-specific points
+    // First try to use lecturer-specific balance
     if (lecturerPoints >= pointsRequired) {
       const success = userModel.useLecturerPoints(lecturerId, pointsRequired);
       if (!success) {
         await session.abortTransaction();
-        return next(new AppError("Failed to deduct lecturer points", 500));
+        return next(new AppError("Failed to deduct lecturer balance", 500));
       }
-      purchaseType = pointsRequired === 0 ? "Free (lecturer)" : "Lecturer points";
+      purchaseType = pointsRequired === 0 ? "Free (lecturer)" : "Lecturer balance";
     } else if (userModel.hasPromoCode && !userModel.hasUsedPromoCode && promoPoints > 0) {
       userModel.hasUsedPromoCode = true;
       userModel.promoPoints = 0;
@@ -408,10 +372,10 @@ exports.purchaseContainerWithPoints = catchAsync(async (req, res, next) => {
       isPromoCodePurchase = true;
     } else if (generalPoints >= pointsRequired) {
       userModel.generalPoints -= pointsRequired;
-      purchaseType = "General points";
+      purchaseType = "General balance";
     } else {
       await session.abortTransaction();
-      return next(new AppError(`Not enough points. Required: ${pointsRequired}, Available lecturer points: ${lecturerPoints}, Available general points: ${generalPoints}`, 400));
+      return next(new AppError(`Not enough balance. Required: ${pointsRequired}, Available lecturer balance: ${lecturerPoints}, Available general balance: ${generalPoints}`, 400));
     }
 
     await userModel.save({ session });
@@ -424,7 +388,7 @@ exports.purchaseContainerWithPoints = catchAsync(async (req, res, next) => {
           points: isPromoCodePurchase ? 0 : pointsRequired,
           lecture: containerId,
           type: isPromoCodePurchase ? "promoCodePurchase" : "lecturePurchase",
-          description: `Purchased lecture ${item.name} ${isPromoCodePurchase ? "using promotional code" : `for ${pointsRequired} points using ${purchaseType}`}`,
+          description: `Purchased lecture ${item.name} ${isPromoCodePurchase ? "using promotional code" : `for ${pointsRequired} EGP using ${purchaseType}`}`,
         }
         : {
           student: userId,
@@ -432,7 +396,7 @@ exports.purchaseContainerWithPoints = catchAsync(async (req, res, next) => {
           points: isPromoCodePurchase ? 0 : pointsRequired,
           container: containerId,
           type: isPromoCodePurchase ? "promoCodePurchase" : "containerPurchase",
-          description: `Purchased container ${item.name} ${isPromoCodePurchase ? "using promotional code" : `for ${pointsRequired} points using ${purchaseType}`}`,
+          description: `Purchased container ${item.name} ${isPromoCodePurchase ? "using promotional code" : `for ${pointsRequired} EGP using ${purchaseType}`}`,
         },
     ], { session });
     // Grant access if it's a lecture
@@ -494,7 +458,7 @@ exports.getAllPurchases = catchAsync(async (req, res, next) => {
 });
 
 /**
- * Get points balance for a user with a specific lecturer
+ * Get balance for a user with a specific lecturer
  */
 exports.getLecturerPointsBalance = catchAsync(async (req, res, next) => {
   // Use current user's ID if not specified in params
@@ -531,7 +495,7 @@ exports.getLecturerPointsBalance = catchAsync(async (req, res, next) => {
     return next(new AppError(`User not found with ID: ${userId}`, 404));
   }
 
-  // Get points balance
+  // Get balance
   const pointsBalance = userModel.getLecturerPointsBalance(lecturerId);
 
   // Get purchase history for this user-lecturer combination
@@ -554,7 +518,7 @@ exports.getLecturerPointsBalance = catchAsync(async (req, res, next) => {
 });
 
 /**
- * Get all user's points balances
+ * Get all user's balances
  */
 exports.getAllUserPointBalances = catchAsync(async (req, res, next) => {
   // Use current user's ID if not specified in params
@@ -585,15 +549,15 @@ exports.getAllUserPointBalances = catchAsync(async (req, res, next) => {
     return next(new AppError(`User not found with ID: ${userId}`, 404));
   }
 
-  // Get points balances
+  // Get balances
   const pointsBalances = userModel.lecturerPoints || [];
   const generalPoints = userModel.generalPoints || 0;
   const promoPoints = userModel.promoPoints || 0;
   const hasPromoCode = userModel.hasPromoCode || false;
 
-  // Log points balances for debugging
-  console.log(`User ${userModel.name} general points: ${generalPoints}`);
-  console.log(`User ${userModel.name} promo points: ${promoPoints}`);
+  // Log balances for debugging
+  console.log(`User ${userModel.name} general balance: ${generalPoints}`);
+  console.log(`User ${userModel.name} promo balance: ${promoPoints}`);
 
   res.status(200).json({
     status: "success",

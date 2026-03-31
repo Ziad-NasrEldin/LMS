@@ -1,7 +1,7 @@
 {
   "title": "Lectures",
-  "generalPoints": "General Points",
-  "points": "Points",
+  "generalPoints": "General Balance",
+  "points": "EGP",
    "welcome": "Welcome to the Fekra Platform Lectures Section",
   "discover": "Discover Our Latest Lectures",
   "showLectures": "Show Lectures",
@@ -19,8 +19,8 @@
     "failed": "Failed to purchase lecture"
   },
   "available : ": " Available",
-  "availablePoints": "Available:",
-  "noPointsBalances": "No points available",
+  "availablePoints": "Balance:",
+  "noPointsBalances": "No balance available",
   "labels": {
     "lecture": "Lecture"
   },
@@ -91,7 +91,7 @@
     "fetchLectures": "Failed to fetch lectures",
     "loginRequired": "Please log in first",
     "lectureNotFound": "Lecture not found",
-    "insufficientPoints": "You do not have enough points"
+    "insufficientPoints": "You do not have enough balance"
   },
   "lesson": {
     "detailsTitle": "Lesson Details",

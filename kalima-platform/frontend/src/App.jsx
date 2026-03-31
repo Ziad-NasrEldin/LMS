@@ -2,6 +2,7 @@
 
 import { Suspense, lazy, useEffect, useState } from "react";
 import { Routes, Route, useLocation, Navigate } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
 import NavBar from "./components/navbar";
 import { LoadingSpinner } from "./components/LoadingSpinner";
 import { isMobile } from "./utils/isMobile";
@@ -220,6 +221,16 @@ function App() {
 
   return (
     <div className={`App ${isRTL ? "rtl" : "ltr"}`}>
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 3000,
+          style: {
+            borderRadius: "14px",
+            padding: "12px 16px",
+          },
+        }}
+      />
       <NavBar />
       {!isAuthRoute && showSidebar && impersonationSession?.isActive && (
         <div

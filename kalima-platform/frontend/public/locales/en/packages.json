@@ -5,12 +5,12 @@
     "tryAgain": "Try Again",
     "backToPackages": "Back to Packages",
     "packageNotFound": "Package not found",
-    "points": "Points",
+    "points": "EGP",
     "cancel": "Cancel",
     "details": "Details",
     "purchase": "Purchase",
     "purchased": "Purchased",
-    "insufficientPoints": "Insufficient Points"
+    "insufficientPoints": "Insufficient balance"
   },
   "errors": {
     "fetchStudents": "Failed to fetch students"
@@ -77,10 +77,10 @@
     "allPrices": "All Prices",
     "allTeachers": "All Teachers",
     "priceRanges": {
-      "0-200": "0 - 200 Points",
-      "200-500": "200 - 500 Points",
-      "500-1000": "500 - 1000 Points",
-      "1000+": "1000+ Points"
+      "0-200": "0 - 200 EGP",
+      "200-500": "200 - 500 EGP",
+      "500-1000": "500 - 1000 EGP",
+      "1000+": "1000+ EGP"
     },
     "resetFilters": "Reset Filters",
     "showing": "Showing {{current}} of {{total}} packages",
@@ -90,8 +90,8 @@
       "monthly": "Monthly",
       "teachers": "Teachers",
       "includes": "Includes",
-      "enoughPoints": "You have enough points",
-      "notEnoughPoints": "Not enough points",
+      "enoughPoints": "You have enough balance",
+      "notEnoughPoints": "Not enough balance",
       "alreadyPurchased": "Already purchased"
     }
   },
@@ -100,8 +100,8 @@
     "duration": "Duration",
     "teachers": "Teachers",
     "expertInstructors": "expert instructors",
-    "totalPoints": "Total Points",
-    "pointsDistributed": "points distributed",
+    "totalPoints": "Total Balance",
+    "pointsDistributed": "balance distributed",
     "created": "Created",
     "packagePrice": "Package Price",
     "alreadyPurchased": "Already Purchased",
@@ -109,17 +109,17 @@
     "yourBalance": "Your Balance",
     "afterPurchase": "After Purchase",
     "purchaseNow": "Purchase Now",
-    "insufficientPoints": "Insufficient Points",
-    "needMorePoints": "You need {{points}} more points to purchase this package",
+    "insufficientPoints": "Insufficient balance",
+    "needMorePoints": "You need {{points}} more EGP to purchase this package",
     "loginToPurchase": "Please log in to purchase this package",
     "loginButton": "Log In to Purchase",
-    "generalPointsOnly": "* This package can only be purchased using general points",
+    "generalPointsOnly": "* This package can only be purchased using the general balance",
     "teachersIncluded": "Teachers Included",
     "packageBenefits": "Package Benefits",
     "benefits": {
       "accessToContent": "Access to content from {{count}} expert teachers",
       "durationAccess": "{{duration}} to all included materials",
-      "totalPoints": "Total of {{points}} points distributed across teachers",
+      "totalPoints": "Total of {{points}} EGP distributed across teachers",
       "flexibleLearning": "Flexible learning at your own pace",
       "comprehensiveCurriculum": "Comprehensive curriculum covering multiple subjects"
     }
@@ -134,7 +134,7 @@
     "afterPurchase": "After Purchase",
     "confirmButton": "Confirm Purchase",
     "successMessage": "Package purchased successfully!",
-    "remainingPoints": "Remaining points: {{points}}",
+    "remainingPoints": "Remaining balance: {{points}}",
     "failureMessage": "Failed to purchase package",
     "errorMessage": "An error occurred while purchasing the package"
   },

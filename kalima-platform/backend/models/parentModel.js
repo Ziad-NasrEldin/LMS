@@ -38,7 +38,7 @@ const parentSchema = new mongoose.Schema({
   phoneNumber: { type: String, required: true },
   profession: { type: String, required: true, trim: true },
   level: { type: String, enum: User.levels, lowercase: true },
-  // Array of lecturer-specific point balances
+  // Array of lecturer-specific balance records
   lecturerPoints: [lecturerPointsSchema],
   government: { type: String, required: true },
   administrationZone: { type: String, required: true },
@@ -57,7 +57,7 @@ const parentSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Helper method to get points balance for a specific lecturer
+// Helper method to get balance for a specific lecturer
 parentSchema.methods.getLecturerPointsBalance = function (lecturerId) {
   const lecturerPointsEntry = this.lecturerPoints.find(
     entry => entry.lecturer.toString() === lecturerId.toString()
@@ -65,7 +65,7 @@ parentSchema.methods.getLecturerPointsBalance = function (lecturerId) {
   return lecturerPointsEntry ? lecturerPointsEntry.points : 0;
 };
 
-// Helper method to add points for a specific lecturer
+// Helper method to add balance for a specific lecturer
 parentSchema.methods.addLecturerPoints = function (lecturerId, pointsToAdd) {
   const lecturerPointsEntry = this.lecturerPoints.find(
     entry => entry.lecturer.toString() === lecturerId.toString()
@@ -78,9 +78,9 @@ parentSchema.methods.addLecturerPoints = function (lecturerId, pointsToAdd) {
   }
 };
 
-// Helper method to use points for a specific lecturer
+// Helper method to use balance for a specific lecturer
 parentSchema.methods.useLecturerPoints = function (lecturerId, pointsToUse) {
-  // Special case - if trying to deduct 0 points, always succeed
+  // Special case - if trying to deduct 0, always succeed
   if (pointsToUse === 0) {
     return true;
   }
@@ -90,11 +90,11 @@ parentSchema.methods.useLecturerPoints = function (lecturerId, pointsToUse) {
   );
 
   if (!lecturerPointsEntry || lecturerPointsEntry.points < pointsToUse) {
-    return false; // Not enough points
+    return false; // Not enough balance
   }
 
   lecturerPointsEntry.points -= pointsToUse;
-  return true; // Successfully used points
+  return true; // Successfully used balance
 };
 
 parentSchema.pre('save', async function (next) {

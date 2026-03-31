@@ -60,7 +60,6 @@ const Hero = () => {
 
   const TOKENS = designTokens.colors;
   const SHADOWS = designTokens.shadows;
-  const GRADIENTS = designTokens.gradients;
 
   return (
     <div className="mx-auto w-full font-[Cairo]">
