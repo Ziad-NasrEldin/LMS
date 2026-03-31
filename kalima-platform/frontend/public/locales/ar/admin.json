@@ -120,6 +120,10 @@
       },
       "form": {
         "pointsAmount": "مقدار النقاط",
+        "amountAfter": "المبلغ بعد",
+        "amountBefore": "المبلغ قبل",
+        "amountBeforePlaceholder": "أدخل المبلغ القديم",
+        "amountBeforeHint": "اختياري. يُستخدم فقط في قالب الطباعة كالمبلغ القديم المشطوب.",
         "numCodes": "عدد الأكواد",
         "codeType": "نوع الكود",
         "general": "عام",

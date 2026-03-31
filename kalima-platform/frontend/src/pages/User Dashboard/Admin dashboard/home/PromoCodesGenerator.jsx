@@ -138,7 +138,15 @@ const PromoCodeGenerator = () => {
 
   const handleNumberChange = (e) => {
     const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: Number.parseInt(value) || 0 }))
+    setFormData((prev) => {
+      if (name === "amountBefore") {
+        if (value === "") {
+          return { ...prev, amountBefore: "" }
+        }
+        return { ...prev, amountBefore: Number.parseInt(value, 10) || 0 }
+      }
+      return { ...prev, [name]: Number.parseInt(value, 10) || 0 }
+    })
   }
 
   const handleQrSizeChange = (e) => {
@@ -223,6 +231,7 @@ const PromoCodeGenerator = () => {
 
   const [formData, setFormData] = useState({
     pointsAmount: 1000,
+    amountBefore: "",
     numOfCodes: 3,
     lecturerId: "",
     type: "general",
@@ -392,6 +401,44 @@ const PromoCodeGenerator = () => {
           text-align: left;
           z-index: 2;
         }
+        .amount-stack {
+          position: absolute;
+          top: 9%;
+          left: 6.8%;
+          width: 15%;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          z-index: 2;
+        }
+        .amount-before {
+          position: relative;
+          font-size: 10px;
+          font-weight: 700;
+          color: #111;
+          line-height: 1.1;
+          text-decoration: line-through;
+          text-decoration-thickness: 1.5px;
+          text-decoration-color: #c51616;
+        }
+        .amount-before::after {
+          content: "";
+          position: absolute;
+          left: -4%;
+          right: -4%;
+          top: 52%;
+          border-top: 1.5px solid rgba(197, 22, 22, 0.8);
+          transform: rotate(-2deg);
+        }
+        .amount-after {
+          margin-top: 4px;
+          font-size: 14px;
+          font-weight: 800;
+          color: #000;
+          line-height: 1;
+          letter-spacing: 0.2px;
+          text-shadow: 0 0 0.01px #000;
+        }
         .promo-code {
           position: absolute;
           bottom: 13%;
@@ -412,22 +459,34 @@ const PromoCodeGenerator = () => {
     </head>
     <body>
       <div class="print-container">
-        ${generatedCodes.map((code, index) => `
+        ${generatedCodes.map((code, index) => {
+      const hasAmountBefore = Number(formData.amountBefore) > 0
+      const amountBeforeDisplay = hasAmountBefore ? Number(formData.amountBefore) : null
+      const amountAfterDisplay = formData.type === "promo"
+        ? formData.pointsAmount
+        : code.pointsAmount || formData.pointsAmount
+      const legacyCodeValue = formData.type === "promo"
+        ? t("admin.discount")
+        : `${amountAfterDisplay}`
+
+      return `
           <div class="qr-item">
             <img class="template-image" src="${templateImage}" /> <!-- Added template image -->
             <div class="code-number">#${index + 1}</div>
             <div class="qr-code">
               <img src="${qrCodeUrls[index]}" alt="QR Code">
             </div>
-            <div class="code-value">
-              ${formData.type === 'promo'
-        ? t('admin.discount')
-        : `${code.pointsAmount || formData.pointsAmount}`
-      }
-            </div>
+            ${hasAmountBefore
+          ? `<div class="amount-stack">
+                <div class="amount-before">${amountBeforeDisplay}</div>
+                <div class="amount-after">${amountAfterDisplay}</div>
+              </div>`
+          : `<div class="code-value">${legacyCodeValue}</div>`
+        }
             <div class="promo-code">${code.code}</div>
           </div>
-        `).join('')}
+        `
+    }).join("")}
       </div>
       <script>
         window.onload = function() {
@@ -508,7 +567,7 @@ const PromoCodeGenerator = () => {
         <div className="grid grid-cols-1 xl:grid-cols-12 gap-3 md:gap-4 mb-4">
           <div className="form-control xl:col-span-3 rounded-2xl border p-3 bg-white/70" style={{ borderColor: "rgba(17,24,39,0.08)" }}>
             <label className="label pt-0 pb-1">
-              <span className="label-text font-medium">{t("admin.form.pointsAmount")}</span>
+              <span className="label-text font-medium">{t("admin.form.amountAfter")}</span>
             </label>
             <input
               type="number"
@@ -518,11 +577,28 @@ const PromoCodeGenerator = () => {
               onChange={handleNumberChange}
               min="1"
               inputMode="numeric"
-              disabled={formData.type === "promo"}
-              required={formData.type !== "promo"}
             />
             <span className="text-xs opacity-70 mt-2 leading-5">
               {isRTL ? "قيمة رقمية أكبر من 0" : "Numeric value greater than 0"}
+            </span>
+          </div>
+
+          <div className="form-control xl:col-span-3 rounded-2xl border p-3 bg-white/70" style={{ borderColor: "rgba(17,24,39,0.08)" }}>
+            <label className="label pt-0 pb-1">
+              <span className="label-text font-medium">{t("admin.form.amountBefore")}</span>
+            </label>
+            <input
+              type="number"
+              name="amountBefore"
+              className="input input-bordered w-full max-w-[220px]"
+              value={formData.amountBefore}
+              onChange={handleNumberChange}
+              min="1"
+              inputMode="numeric"
+              placeholder={t("admin.form.amountBeforePlaceholder")}
+            />
+            <span className="text-xs opacity-70 mt-2 leading-5">
+              {t("admin.form.amountBeforeHint")}
             </span>
           </div>
 

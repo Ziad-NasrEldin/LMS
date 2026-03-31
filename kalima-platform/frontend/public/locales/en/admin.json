@@ -121,6 +121,10 @@
       },
       "form": {
         "pointsAmount": "Points Amount",
+        "amountAfter": "Amount After",
+        "amountBefore": "Amount Before",
+        "amountBeforePlaceholder": "Enter old amount",
+        "amountBeforeHint": "Optional. Used only on the print template as the crossed-out old amount.",
         "numCodes": "Number of Codes",
         "codeType": "Code Type",
         "general": "General",

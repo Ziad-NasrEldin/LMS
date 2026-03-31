@@ -252,4 +252,11 @@ ounded-[2rem]\), removed hard \shadow-sm\ defaults from DaisyUI, updated primary
 ## 2026-03-31 - Refactor skill creation - GPT-5.4 mini
 - Added a new workspace skill at [kalima-platform/.github/skills/refactor/SKILL.md](kalima-platform/.github/skills/refactor/SKILL.md) for safe incremental refactoring with tests, backward compatibility, and common refactoring techniques.
 
+## 2026-03-31 - Unused frontend module purge - GPT-5.4 mini
+- Removed 48 unreachable frontend modules by tracing reachability from `kalima-platform/frontend/src/main.jsx`, including dead islands under Services legacy sections, KalimaStore AdminPanel, unused dashboard subcomponents, and obsolete utility/service-worker files.
+- Removed the now-empty `kalima-platform/frontend/src/pages/KalimaStore/AdminPanel` directory after module deletion.
+
+## 2026-03-31 - Component + asset dead-code sweep - GPT-5.4 mini
+- Ran a full frontend reachability sweep from `main.jsx`/`App.jsx`, removed all unreachable component/module files, then performed a follow-up static asset audit and deleted newly orphaned images while keeping `Kalima.png` protected.
+
 
