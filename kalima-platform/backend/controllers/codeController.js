@@ -68,8 +68,9 @@ const removeFileSilently = async (filePath) => {
   }
 };
 
-const parseTemplateDimensions = (filePath) => {
-  const dimensions = getImageDimensions(filePath);
+const parseTemplateDimensions = async (filePath) => {
+  const imageBuffer = await fsPromises.readFile(filePath);
+  const dimensions = getImageDimensions(imageBuffer);
   return {
     width: dimensions?.width,
     height: dimensions?.height,
@@ -177,7 +178,7 @@ const getPromoTemplates = catchAsync(async (req, res, next) => {
 
     const absolutePath = path.join(promoTemplateUploadDir, file.name);
     try {
-      const { width, height } = parseTemplateDimensions(absolutePath);
+      const { width, height } = await parseTemplateDimensions(absolutePath);
       const stats = await fsPromises.stat(absolutePath);
 
       templates.push({
@@ -213,7 +214,7 @@ const createPromoTemplate = catchAsync(async (req, res, next) => {
   let dimensions;
 
   try {
-    dimensions = parseTemplateDimensions(absolutePath);
+    dimensions = await parseTemplateDimensions(absolutePath);
   } catch (error) {
     await removeFileSilently(absolutePath);
     return next(new AppError("Invalid image file. Please upload a valid image.", 400));
