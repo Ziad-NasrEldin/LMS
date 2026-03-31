@@ -136,3 +136,94 @@ body[dir="rtl"],
 .text-error {
   color: #d64055 !important;
 }
+
+.home-logo-watermark {
+  --logo-watermark-color: #d2e0ef;
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: -10;
+  overflow: hidden;
+}
+
+.home-logo-watermark__body,
+.home-logo-watermark__fill,
+.home-logo-watermark__outline {
+  position: absolute;
+  top: 45%;
+  left: 45%;
+  width: min(155vmax, 2500px);
+  aspect-ratio: 2494 / 1926;
+  background-image: url("/Kalima.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  transform: translate(-50%, -42%);
+}
+
+.home-logo-watermark__body {
+  opacity: 0.2;
+  background-image: none;
+  background-color: var(--logo-watermark-color);
+  -webkit-mask-image: url("/Kalima.png");
+  mask-image: url("/Kalima.png");
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  mix-blend-mode: normal;
+}
+
+.home-logo-watermark__fill {
+  opacity: 0.084;
+  filter: grayscale(1) brightness(1.44) contrast(0.8) saturate(0);
+  mix-blend-mode: soft-light;
+}
+
+.home-logo-watermark__outline {
+  opacity: 0.11;
+  background-image: none;
+  background-color: var(--logo-watermark-color);
+  -webkit-mask-image: url("/Kalima.png");
+  mask-image: url("/Kalima.png");
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  filter: drop-shadow(0 0 1.5px var(--logo-watermark-color));
+  mix-blend-mode: normal;
+}
+
+.home-logo-watermark--rtl .home-logo-watermark__body,
+.home-logo-watermark--rtl .home-logo-watermark__fill,
+.home-logo-watermark--rtl .home-logo-watermark__outline {
+  transform: translate(-46%, -42%);
+}
+
+@media (max-width: 768px) {
+  .home-logo-watermark__body,
+  .home-logo-watermark__fill,
+  .home-logo-watermark__outline {
+    width: min(125vw, 760px);
+    height: min(185vh, 1220px);
+    transform: translate(-50%, -45%) rotate(-90deg);
+    transform-origin: center center;
+    background-size: 95% auto;
+  }
+
+  .home-logo-watermark__body {
+    opacity: 0.16;
+  }
+
+  .home-logo-watermark__fill {
+    opacity: 0.056;
+  }
+
+  .home-logo-watermark__outline {
+    opacity: 0.085;
+  }
+}

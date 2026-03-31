@@ -189,7 +189,7 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, gr
                   {index === (formData.centers || [""]).length - 1 ? (
                     <button
                       type="button"
-                      className="btn btn-square btn-outline"
+                      className="btn btn-sm btn-outline h-8 min-h-8 w-9 p-0"
                       onClick={() => {
                         const newCenters = [...(formData.centers || [""]), ""]
                         handleInputChange({ target: { name: "centers", value: newCenters } })
@@ -200,7 +200,7 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, gr
                   ) : (
                     <button
                       type="button"
-                      className="btn btn-square btn-outline btn-error"
+                      className="btn btn-sm btn-outline btn-error h-8 min-h-8 w-9 p-0"
                       onClick={() => {
                         const newCenters = (formData.centers || [""]).filter((_, i) => i !== index)
                         handleInputChange({ target: { name: "centers", value: newCenters } })

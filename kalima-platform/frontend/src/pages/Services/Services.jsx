@@ -130,7 +130,7 @@ const Services = () => {
   return (
     <main
       dir={isRTL ? "rtl" : "ltr"}
-      className="min-h-[100dvh] px-4 py-10 sm:px-6 md:px-8 lg:px-10 lg:py-14"
+      className="relative isolate min-h-[100dvh] overflow-x-clip px-4 py-10 sm:px-6 md:px-8 lg:px-10 lg:py-14"
       style={{
         background: TOKENS.creamSurface,
         color: TOKENS.inkText,
@@ -139,8 +139,14 @@ const Services = () => {
           : "'Plus Jakarta Sans', 'Helvetica Neue', sans-serif",
       }}
     >
+      <div className={`home-logo-watermark${isRTL ? " home-logo-watermark--rtl" : ""}`} aria-hidden="true">
+        <span className="home-logo-watermark__body" />
+        <span className="home-logo-watermark__fill" />
+        <span className="home-logo-watermark__outline" />
+      </div>
+
       <div
-        className="pointer-events-none fixed inset-0 -z-10 opacity-50"
+        className="pointer-events-none fixed inset-0 -z-20 opacity-50"
         style={{
           background: GRADIENTS.pageAtmosphere,
         }}
