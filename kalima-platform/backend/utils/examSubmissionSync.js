@@ -28,6 +28,8 @@ const buildLegacyFormResponsesTabs = (maxNumberedTabs = 20) => {
 };
 
 const LEGACY_FORM_RESPONSES_TABS = buildLegacyFormResponsesTabs();
+const FORM_RESPONSES_TAB_PATTERN = /^Form Responses(?: \d+)?$/i;
+const FORM_RESPONSES_UNDERSCORE_TAB_PATTERN = /^Form_Responses(?: \d+)?$/i;
 
 const normalizeString = (value) => String(value ?? "").trim();
 
@@ -91,6 +93,9 @@ const parseSubmissionScore = (rawScore) => {
 
 const toComparableLower = (value) => normalizeString(value).toLowerCase();
 
+const isMissingRangeError = (error) =>
+  String(error?.message || "").toLowerCase().includes("unable to parse range");
+
 const buildSheetTabCandidates = (configuredTabName, fallbackSheetTabName, fallbackSheetTabNames = []) => {
   const candidates = [
     normalizeSheetTabName(configuredTabName),
@@ -101,6 +106,52 @@ const buildSheetTabCandidates = (configuredTabName, fallbackSheetTabName, fallba
   ];
 
   return [...new Set(candidates.filter(Boolean))];
+};
+
+const buildTabLookupSet = (tabNames = []) =>
+  new Set(tabNames.map(normalizeSheetTabName).filter(Boolean));
+
+const detectDynamicFormResponseTabs = async (sheets, sheetId, existingTabNames = []) => {
+  if (!sheetId || typeof sheets?.spreadsheets?.get !== "function") {
+    return [];
+  }
+
+  try {
+    const response = await sheets.spreadsheets.get({
+      spreadsheetId: sheetId,
+      fields: "sheets(properties(title,index))",
+    });
+
+    const existingTabs = buildTabLookupSet(existingTabNames);
+
+    return (response?.data?.sheets || [])
+      .map((sheetMeta) => {
+        const title = normalizeSheetTabName(sheetMeta?.properties?.title);
+        const index = Number(sheetMeta?.properties?.index);
+
+        return {
+          title,
+          index: Number.isFinite(index) ? index : Number.MAX_SAFE_INTEGER,
+        };
+      })
+      .filter(({ title }) => {
+        if (!title || existingTabs.has(title)) return false;
+
+        return (
+          FORM_RESPONSES_TAB_PATTERN.test(title) ||
+          FORM_RESPONSES_UNDERSCORE_TAB_PATTERN.test(title)
+        );
+      })
+      .sort((left, right) => {
+        if (left.index !== right.index) {
+          return left.index - right.index;
+        }
+        return left.title.localeCompare(right.title);
+      })
+      .map(({ title }) => title);
+  } catch (error) {
+    return [];
+  }
 };
 
 const getExamResultsFromSheet = async (
@@ -144,9 +195,15 @@ const getExamResultsFromSheet = async (
   }
 
   const sheets = googleApiConfig.configureGoogleSheets();
+  const dynamicFormResponseTabs = await detectDynamicFormResponseTabs(
+    sheets,
+    sheetId,
+    sheetTabCandidates
+  );
+  const allSheetTabCandidates = [...sheetTabCandidates, ...dynamicFormResponseTabs];
   let lastError = null;
 
-  for (const sheetTabName of sheetTabCandidates) {
+  for (const sheetTabName of allSheetTabCandidates) {
     try {
       const response = await sheets.spreadsheets.values.get({
         spreadsheetId: sheetId,
@@ -321,8 +378,7 @@ const getExamResultsFromSheet = async (
         sheetTabName,
       };
     } catch (error) {
-      const errorMessage = String(error?.message || "");
-      if (errorMessage.toLowerCase().includes("unable to parse range")) {
+      if (isMissingRangeError(error)) {
         lastError = `Configured tab '${sheetTabName}' was not found in this spreadsheet`;
         continue;
       }
@@ -612,6 +668,8 @@ const processAssessmentSubmissionFromSheet = async ({
 module.exports = {
   DEFAULT_PASSING_THRESHOLD,
   DEFAULT_MASTER_SHEET_RAW_TAB,
+  buildSheetTabCandidates,
+  detectDynamicFormResponseTabs,
   normalizeAssessmentType,
   parseSubmissionScore,
   getExamResultsFromSheet,

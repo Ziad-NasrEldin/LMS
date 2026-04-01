@@ -301,4 +301,15 @@ ounded-[2rem]\), removed hard \shadow-sm\ defaults from DaisyUI, updated primary
 - Verified no notification references remain in tracked backend/frontend source + locale files via `git grep` scan.
 - Revalidated project health: frontend production build succeeded, backend startup succeeded on port 5001, and backend regression tests passed (26/26).
 
+## 2026-04-01 - Repository audit + safe refactor wave 1 - GPT-5.3-Codex
+- Refactored exam submission sheet fallback to dynamically discover Google Forms response tabs from spreadsheet metadata (including high-numbered tabs), and added regression coverage for this path.
+- Deduplicated repeated exam/homework pass checks in student lecture access controller through a shared helper without changing endpoint contracts.
+- Hardened credential hygiene by deleting tracked service-account JSON credentials from the repository and adding explicit ignore coverage in `.gitignore`.
+- Reduced sensitive logging in email/OTP flows by gating debug logs behind `EMAIL_DEBUG` and avoiding unconditional OTP/content logging.
+
+## 2026-04-01 - Repository audit + safe refactor wave 2 (frontend) - GPT-5.3-Codex
+- Refactored frontend lecture API route helpers by introducing shared auth config builders in `frontend/src/routes/lectures.jsx`, reducing repeated request boilerplate while preserving response contracts.
+- Extracted pure lecture-view helper logic (URL picking, YouTube ID extraction, time formatting) into `frontend/src/pages/User Dashboard/Lecture Page/lectureDisplay.utils.js` and wired `LectureDisplay.jsx` to use the shared utilities.
+- Extracted duplicated promo transaction mapping logic into `frontend/src/pages/User Dashboard/promoCodes.utils.js` and updated `promoCodes.jsx` to consume shared mapping/combine utilities.
+
 

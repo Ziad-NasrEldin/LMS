@@ -24,8 +24,6 @@ const handleExcel = require("../utils/upload files/handleEXCEL.js");
 const QueryFeatures = require("../utils/queryFeatures");
 const { hasLectureAccessFromPurchase } = require("../utils/purchaseHistoryUtils");
 const fs = require("fs");
-const path = require("path");
-const { ref } = require("joi");
 
 const STUDENT_HOBBY_ALIASES = {
   "design/illustrating": "designillustrating",
@@ -90,18 +88,9 @@ const getUser = catchAsync(async (req, res, next) => {
 
 const createUser = registerController.registerNewUser;
 
-/*
-show fields to update deending on the current user role,
-for ex :- if current user role is student that means if the children is passed in the req.body, the err msg should appear
-*/
 const updateUser = catchAsync(async (req, res, next) => {
   const { name, email, address, password, children, ...restBody } = req.body;
 
-  /*
-  BUG -->> that means any user can update any user
-  To fix it -->> Onlyy authenticated current user has permission to update his self
-  userId = req.user._id 
-  */
   const userId = req.params.userId;
 
   // If password is provided, hash it and allow update
@@ -119,22 +108,6 @@ const updateUser = catchAsync(async (req, res, next) => {
 
   if (!foundUser) return next(new AppError("User not found", 404));
 
-  /*
-  BUG -->> if the array here is empty, no err occured!!!!!!,
-  the for loop runs but does nothing, we sould reject it because empty array is invalid input,
-
-  ex:- "children": ["4"] , "children": []  -->> should not passed, but passed
-
-  BUG-->> if the current parent enter a valid objectId, that passes with no problem , but the problem here that:
-  if children not belong to cuurent parent (or it may not in our db broooo) , we should fix it
-
-  BUG -->> assume you passed a valid ids in children and when you updating you replace the filed children(in db) 
-  with the children(that given in the req.body), means if the current parent has an id === 4 in the children array, when 
-  parent make an update to add new one (for ex: id =5) then when updating , the old one is replaced by the newes , it
-  becoms has a childer  whose id =5 not whos ids =4 &5
-
-  TAKE CARE OFF -->> when fixing the above , don't allow the repeatition of ids in children array
-  */
   const childrenById = [];
   if (!!children) {
     for (let id of children) {

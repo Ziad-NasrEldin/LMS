@@ -224,6 +224,17 @@ const hasLectureEntitlement = async (studentId, lectureId, purchaseId) => {
   return Boolean(matchingPurchase);
 };
 
+const hasPassedAssessment = async (studentId, lectureId, assessmentType) => {
+  const submission = await StudentExamSubmission.findOne({
+    student: studentId,
+    lecture: lectureId,
+    passed: true,
+    type: assessmentType,
+  });
+
+  return Boolean(submission);
+};
+
 exports.createStudentLectureAccess = catchAsync(async (req, res, next) => {
   const { student, lecture } = req.body;
 
@@ -236,14 +247,9 @@ exports.createStudentLectureAccess = catchAsync(async (req, res, next) => {
   }
 
   if (lectureDoc.requiresExam) {
-    const examSubmission = await StudentExamSubmission.findOne({
-      student,
-      lecture,
-      passed: true,
-      type: "exam",
-    });
+    const examPassed = await hasPassedAssessment(student, lecture, "exam");
 
-    if (!examSubmission) {
+    if (!examPassed) {
       return next(
         new AppError(
           "You must pass the exam before accessing this lecture",
@@ -254,14 +260,9 @@ exports.createStudentLectureAccess = catchAsync(async (req, res, next) => {
   }
 
   if (lectureDoc.requiresHomework) {
-    const homeworkSubmission = await StudentExamSubmission.findOne({
-      student,
-      lecture,
-      passed: true,
-      type: "homework",
-    });
+    const homeworkPassed = await hasPassedAssessment(student, lecture, "homework");
 
-    if (!homeworkSubmission) {
+    if (!homeworkPassed) {
       return next(
         new AppError(
           "You must pass the homework before accessing this lecture",
@@ -539,23 +540,15 @@ exports.checkLectureAccess = catchAsync(async (req, res, next) => {
     const results = buildLectureRequirements(lecture);
 
     if (lecture.requiresExam) {
-      const examSubmission = await StudentExamSubmission.findOne({
-        student: studentId,
-        lecture: lectureId,
-        type: "exam",
-        passed: true,
-      });
-      results.exam.passed = !!examSubmission;
+      results.exam.passed = await hasPassedAssessment(studentId, lectureId, "exam");
     }
 
     if (lecture.requiresHomework) {
-      const homeworkSubmission = await StudentExamSubmission.findOne({
-        student: studentId,
-        lecture: lectureId,
-        type: "homework",
-        passed: true,
-      });
-      results.homework.passed = !!homeworkSubmission;
+      results.homework.passed = await hasPassedAssessment(
+        studentId,
+        lectureId,
+        "homework"
+      );
     }
 
     if (

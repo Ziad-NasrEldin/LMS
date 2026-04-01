@@ -5,16 +5,26 @@ import { translateErrorMessage } from "../utils/errorTranslator"
 
 const API_URL = import.meta.env.VITE_API_URL;
 
+const authHeaders = (extraHeaders = {}) => ({
+  Authorization: `Bearer ${getToken()}`,
+  ...extraHeaders,
+})
+
+const authConfig = ({ withCredentials = true, headers = {}, ...rest } = {}) => ({
+  ...rest,
+  ...(withCredentials ? { withCredentials: true } : {}),
+  headers: authHeaders(headers),
+})
+
 // Function to get all containers
 export const getAllContainers = async (queryParams = {}) => {
   try {
-    const response = await axios.get(`${API_URL}/containers`, {
-      params: queryParams, // Pass query parameters like limit and type
-      withCredentials: true,
-      headers: {
-        Authorization: `Bearer ${getToken()}`,
-      },
-    });
+    const response = await axios.get(
+      `${API_URL}/containers`,
+      authConfig({
+        params: queryParams,
+      })
+    );
     return response.data;
   } catch (error) {
     return normalizeApiError(error, "Error fetching containers");
@@ -51,15 +61,14 @@ export const getAllContainersPublic = async () => {
 //Function to purchase a container
 export const purchaseContainer = async (containerId) => {
   try {
-    const response = await axios.post(`${API_URL}/purchases/container`,
-      { containerId }, // Send containerId in the request body
-      {
-        withCredentials: true,
+    const response = await axios.post(
+      `${API_URL}/purchases/container`,
+      { containerId },
+      authConfig({
         headers: {
-          Authorization: `Bearer ${getToken()}`,
-          'Content-Type': 'application/json'
-        }
-      }
+          "Content-Type": "application/json",
+        },
+      })
     )
     return response;
 
@@ -79,15 +88,7 @@ export const getContainerById = async (containerId) => {
       throw new Error(translateErrorMessage("Missing container ID"));
     }
 
-    const response = await axios.get(
-      `${API_URL}/containers/${containerId}`,
-      {
-        withCredentials: true,
-        headers: {
-          Authorization: `Bearer ${getToken()}`,
-        },
-      }
-    );
+    const response = await axios.get(`${API_URL}/containers/${containerId}`, authConfig());
 
     // Handle non-2xx status codes
     if (response.status < 200 || response.status >= 300) {
@@ -206,13 +207,15 @@ export const createLecture = async (lectureData) => {
   try {
     const isFormData = lectureData instanceof FormData
 
-    const response = await axios.post(`${API_URL}/lectures`, lectureData, {
-      withCredentials: true,
-      headers: {
-        "Content-Type": isFormData ? "multipart/form-data" : "application/json",
-        Authorization: `Bearer ${getToken()}`,
-      },
-    })
+    const response = await axios.post(
+      `${API_URL}/lectures`,
+      lectureData,
+      authConfig({
+        headers: {
+          "Content-Type": isFormData ? "multipart/form-data" : "application/json",
+        },
+      })
+    )
 
     return response.data
   } catch (error) {
@@ -230,13 +233,15 @@ export const updateLecture = async (lectureId, lectureData) => {
   try {
     const isFormData = lectureData instanceof FormData
 
-    const response = await axios.patch(`${API_URL}/lectures/${lectureId}`, lectureData, {
-      withCredentials: true,
-      headers: {
-        "Content-Type": isFormData ? "multipart/form-data" : "application/json",
-        Authorization: `Bearer ${getToken()}`,
-      },
-    })
+    const response = await axios.patch(
+      `${API_URL}/lectures/${lectureId}`,
+      lectureData,
+      authConfig({
+        headers: {
+          "Content-Type": isFormData ? "multipart/form-data" : "application/json",
+        },
+      })
+    )
 
     return response.data
   } catch (error) {
@@ -251,12 +256,7 @@ export const updateLecture = async (lectureId, lectureData) => {
 
 export const createContainer = async (formData) => {
   try {
-    const response = await axios.post(`${API_URL}/containers`, formData, {
-      withCredentials: true,
-      headers: {
-        Authorization: `Bearer ${getToken()}`,
-      },
-    });
+    const response = await axios.post(`${API_URL}/containers`, formData, authConfig());
     return response.data;
   } catch (error) {
     throw new Error(error.response?.data?.message || "Error creating container");
@@ -267,13 +267,15 @@ export const updateContainer = async (containerId, formData) => {
   try {
     const isFormData = formData instanceof FormData
 
-    const response = await axios.patch(`${API_URL}/containers/${containerId}`, formData, {
-      withCredentials: true,
-      headers: {
-        Authorization: `Bearer ${getToken()}`,
-        "Content-Type": isFormData ? "multipart/form-data" : "application/json",
-      },
-    })
+    const response = await axios.patch(
+      `${API_URL}/containers/${containerId}`,
+      formData,
+      authConfig({
+        headers: {
+          "Content-Type": isFormData ? "multipart/form-data" : "application/json",
+        },
+      })
+    )
 
     return response.data
   } catch (error) {
@@ -283,12 +285,7 @@ export const updateContainer = async (containerId, formData) => {
 
 export const getMyContainers = async () => {
   try {
-    const response = await axios.get(`${API_URL}/containers/my-containers`, {
-      withCredentials: true,
-      headers: {
-        Authorization: `Bearer ${getToken()}`,
-      },
-    })
+    const response = await axios.get(`${API_URL}/containers/my-containers`, authConfig())
 
     return {
       status: "success",
@@ -301,13 +298,12 @@ export const getMyContainers = async () => {
 
 export const getLecturerAnalytics = async (queryParams = {}) => {
   try {
-    const response = await axios.get(`${API_URL}/lecturers/me/analytics`, {
-      params: queryParams,
-      withCredentials: true,
-      headers: {
-        Authorization: `Bearer ${getToken()}`,
-      },
-    });
+    const response = await axios.get(
+      `${API_URL}/lecturers/me/analytics`,
+      authConfig({
+        params: queryParams,
+      })
+    );
 
     return {
       success: true,
@@ -321,13 +317,12 @@ export const getLecturerAnalytics = async (queryParams = {}) => {
 // Function to get all lectures
 export const getAllLectures = async (queryParams = {}) => {
   try {
-    const response = await axios.get(`${API_URL}/lectures`, {
-      params: queryParams,
-      withCredentials: true,
-      headers: {
-        Authorization: `Bearer ${getToken()}`,
-      },
-    });
+    const response = await axios.get(
+      `${API_URL}/lectures`,
+      authConfig({
+        params: queryParams,
+      })
+    );
     return response.data;
   } catch (error) {
     console.error("Error fetching lectures:", error);
@@ -337,12 +332,7 @@ export const getAllLectures = async (queryParams = {}) => {
 
 export const getContainersByLecturerId = async (lecturerId) => {
   try {
-    const response = await axios.get(`${API_URL}/containers/lecturer/${lecturerId}`, {
-      withCredentials: true,
-      headers: {
-        Authorization: `Bearer ${getToken()}`,
-      },
-    });
+    const response = await axios.get(`${API_URL}/containers/lecturer/${lecturerId}`, authConfig());
     return response.data;
   } catch (error) {
     return normalizeApiError(error, `Error fetching containers for lecturer ${lecturerId}`);
@@ -415,11 +405,10 @@ export const getLectureById = async (lectureId) => {
 // Function to delete a container by ID
 export const deleteContainerById = async (containerId) => {
   try {
-    const response = await axios.delete(`${API_URL}/containers/${containerId}`, {
-      headers: {
-        Authorization: `Bearer ${getToken()}`,
-      },
-    })
+    const response = await axios.delete(
+      `${API_URL}/containers/${containerId}`,
+      authConfig({ withCredentials: false })
+    )
     if (response.status === 200) {
       alert(`Container ${containerId} deleted successfully`)
     }
@@ -443,13 +432,11 @@ export const createLectureAttachment = async (lectureId, attachmentData, isFormD
     const response = await axios.post(
       `${API_URL}/lectures/attachments/${lectureId}`,
       formData,
-      {
-        withCredentials: true,
+      authConfig({
         headers: {
-          Authorization: `Bearer ${getToken()}`,
           "Content-Type": "multipart/form-data",
         },
-      }
+      })
     );
     return response.data;
   } catch (error) {

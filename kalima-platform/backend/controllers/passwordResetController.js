@@ -10,6 +10,16 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 // Store OTP codes temporarily (in production, consider using a database)
 const otpStore = new Map();
 
+const isOtpDebugEnabled =
+  String(process.env.EMAIL_DEBUG || "false").toLowerCase() === "true" &&
+  String(process.env.NODE_ENV || "").toLowerCase() !== "production";
+
+const otpDebugLog = (...args) => {
+  if (isOtpDebugEnabled) {
+    console.log(...args);
+  }
+};
+
 // Generate a random 6-digit OTP
 const generateOTP = () => {
   return Math.floor(100000 + Math.random() * 900000).toString();
@@ -45,8 +55,8 @@ exports.requestPasswordReset = catchAsync(async (req, res, next) => {
   // Send email using Resend
   try {
     const fromEmail = 'Kalima Team <noreply@kalima-edu.com>';
-    
-    console.log('Sending password reset OTP to:', email);
+
+    otpDebugLog('Sending password reset OTP to:', email);
     
     await resend.emails.send({
       from: fromEmail,
@@ -65,7 +75,7 @@ exports.requestPasswordReset = catchAsync(async (req, res, next) => {
       `,
     });
     
-    console.log(`Password reset OTP sent to ${email}`);
+    otpDebugLog(`Password reset OTP sent to ${email}`);
   } catch (error) {
     console.error('Error sending email:', error);
   }

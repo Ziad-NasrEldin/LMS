@@ -54,7 +54,7 @@ kalima-platform/frontend/temp-scripts/
 .env
 .env.*
 .pnpm-debug.log*
-Agent-Logs.md`r`n.lock-wscript
+.lock-wscript
 .eslintcache
 .stylelintcache
 .node_repl_history
@@ -85,4 +85,7 @@ coverage/
 
 # Imported local skills packs
 Skills/
+
+# Service account credentials
+curious-ocean-390413-90076f9c2e4d.json
 

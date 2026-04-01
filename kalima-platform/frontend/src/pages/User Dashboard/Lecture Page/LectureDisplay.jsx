@@ -10,6 +10,12 @@ import {
   downloadAttachmentById,
   createLectureAttachment,
 } from "../../../routes/lectures"
+import {
+  findFirstAttachmentLinkUrl,
+  formatTime,
+  getYouTubeId,
+  pickFirstUrl,
+} from "./lectureDisplay.utils"
 import { verifyExamSubmission, checkLectureAccess } from "../../../routes/examsAndHomeworks"
 import { uploadHomework, getLectureHomeworks } from "../../../routes/homeworks"
 import { getUserDashboard } from "../../../routes/auth-services"
@@ -42,96 +48,6 @@ import {
 } from "@vidstack/react/player/layouts/default";
 import "@vidstack/react/player/styles/default/theme.css";
 import "@vidstack/react/player/styles/default/layouts/video.css";
-
-// Helper function to extract YouTube Video ID
-const getYouTubeId = (url) => {
-  if (!url) return null;
-  let videoId = null;
-  try {
-    const parsedUrl = new URL(url);
-    if (parsedUrl.hostname === "youtu.be") {
-      // Handles youtu.be short links
-      videoId = parsedUrl.pathname.slice(1);
-    } else if (parsedUrl.hostname.includes("youtube.com")) {
-      // Handles youtube.com links
-      videoId = parsedUrl.searchParams.get("v");
-    } else if (parsedUrl.pathname.includes("/embed/")) {
-      // Handles youtube.com/embed links
-      videoId = parsedUrl.pathname.split("/").pop();
-    }
-  } catch (e) {
-    console.warn(
-      "Could not parse YouTube URL with standard new URL(), trying regex:",     
-      e
-    );
-  }
-
-  if (!videoId) {
-    // Fallback regex for various URL formats
-    const patterns = [
-      /(?:youtube\.com\/(?:[^/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?/\s]{11})/,
-      /youtube\.com\/shorts\/([a-zA-Z0-9_-]{11})/,
-      /youtube\.com\/live\/([a-zA-Z0-9_-]{11})/,
-    ];
-    for (const pattern of patterns) {
-      const match = url.match(pattern);
-      if (match && match[1]) {
-        videoId = match[1];
-        break;
-      }
-    }
-  }
-  return videoId;
-};
-
-// Helper function to format time in HH:MM:SS format
-const formatTime = (seconds) => {
-  if (isNaN(seconds) || seconds < 0) return "00:00:00"
-
-  const hours = Math.floor(seconds / 3600)
-  const minutes = Math.floor((seconds % 3600) / 60)
-  const secs = Math.floor(seconds % 60)
-
-  return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`
-}
-
-const normalizeUrl = (value) => {
-  if (typeof value !== "string") return null
-  const trimmed = value.trim()
-  return trimmed.length > 0 ? trimmed : null
-}
-
-const findFirstAttachmentLinkUrl = (items) => {
-  if (!Array.isArray(items)) return null
-
-  for (const item of items) {
-    if (!item) continue
-    if (typeof item === "string") {
-      const normalized = normalizeUrl(item)
-      if (normalized) return normalized
-      continue
-    }
-
-    if (item.fileType === "link") {
-      const normalized = normalizeUrl(item.filePath || item.fileName)
-      if (normalized) return normalized
-      continue
-    }
-
-    const fallback = normalizeUrl(item.filePath)
-    if (fallback) return fallback
-  }
-
-  return null
-}
-
-const pickFirstUrl = (...values) => {
-  for (const value of values) {
-    const normalized = normalizeUrl(value)
-    if (normalized) return normalized
-  }
-  return null
-}
 
 const LectureDisplay = () => {
   const { t, i18n } = useTranslation("lectureDisplay");

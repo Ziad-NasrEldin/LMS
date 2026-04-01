@@ -10,6 +10,12 @@ import { getToken } from "../../routes/auth-services"
 import { updateCurrentUser } from "../../routes/update-user"
 import { useNavigate } from "react-router-dom"
 import ReferralSection from "./ReferralSection"
+import {
+  combineTransactionsByNewest,
+  mapPurchaseHistoryTransactions,
+  mapRedeemedCodesForChild,
+  mapRedeemedCodesForDashboard,
+} from "./promoCodes.utils"
 
 const PromoCodes = () => {
   const { t, i18n } = useTranslation("promoCodes")
@@ -70,45 +76,20 @@ const PromoCodes = () => {
           setIsParent(userInfo?.role === "Parent")
 
           if (!selectedChild) {
-            const mappedRedeemedCodes = (redeemedCodes || []).map((code, index) => ({
-              id: `code-${index + 1}`,
-              type: t("transactions.types.codeRedemption"),
-              code: code.code,
-              amount: code.pointsAmount,
-              instructorName: code.lecturerId
-                ? pointsBalances?.find((b) => b.lecturer?._id === code.lecturerId)?.lecturer?.name || t("notAvailable")
-                : t("generalPoints"),
-              createdAt: new Date(code.redeemedAt).toLocaleString(i18n.language, {
-                year: "numeric",
-                month: "short",
-                day: "numeric",
-                hour: "2-digit",
-                minute: "2-digit",
-                hour12: true,
-              }),
-              isRedemption: true,
-            }))
+            const mappedRedeemedCodes = mapRedeemedCodesForDashboard({
+              redeemedCodes,
+              pointsBalances,
+              t,
+              language: i18n.language,
+            })
 
-            const mappedPurchaseHistory = (purchaseHistory || []).map((purchase, index) => ({
-              id: `purchase-${index + 1}`,
-              type: t("transactions.types.coursePurchase"),
-              code: purchase.description,
-              amount: purchase.points,
-              instructorName: purchase.lecturer?.name || t("notAvailable"),
-              createdAt: new Date(purchase.purchasedAt).toLocaleString(i18n.language, {
-                year: "numeric",
-                month: "short",
-                day: "numeric",
-                hour: "2-digit",
-                minute: "2-digit",
-                hour12: true,
-              }),
-              isRedemption: false,
-            }))
+            const mappedPurchaseHistory = mapPurchaseHistoryTransactions({
+              purchaseHistory,
+              t,
+              language: i18n.language,
+            })
 
-            const combinedTransactions = [...mappedRedeemedCodes, ...mappedPurchaseHistory].sort(
-              (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
-            )
+            const combinedTransactions = combineTransactionsByNewest(mappedRedeemedCodes, mappedPurchaseHistory)
 
             setTransactions(combinedTransactions)
             setPointsBalances(pointsBalances || [])
@@ -164,43 +145,19 @@ const PromoCodes = () => {
       if (childData) {
         setBalance(childData.totalPoints || 0)
 
-        const mappedRedeemedCodes = (childData.redeemedCodes || []).map((code, index) => ({
-          id: `code-${index + 1}`,
-          type: t("transactions.types.codeRedemption"),
-          code: code.code,
-          amount: code.pointsAmount,
-          instructorName: code.lecturerId ? t("notAvailable") : t("generalPoints"),
-          createdAt: new Date(code.redeemedAt).toLocaleString(i18n.language, {
-            year: "numeric",
-            month: "short",
-            day: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: true,
-          }),
-          isRedemption: true,
-        }))
+        const mappedRedeemedCodes = mapRedeemedCodesForChild({
+          redeemedCodes: childData.redeemedCodes,
+          t,
+          language: i18n.language,
+        })
 
-        const mappedPurchaseHistory = (childData.purchaseHistory || []).map((purchase, index) => ({
-          id: `purchase-${index + 1}`,
-          type: t("transactions.types.coursePurchase"),
-          code: purchase.description,
-          amount: purchase.points,
-          instructorName: purchase.lecturer?.name || t("notAvailable"),
-          createdAt: new Date(purchase.purchasedAt).toLocaleString(i18n.language, {
-            year: "numeric",
-            month: "short",
-            day: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: true,
-          }),
-          isRedemption: false,
-        }))
+        const mappedPurchaseHistory = mapPurchaseHistoryTransactions({
+          purchaseHistory: childData.purchaseHistory,
+          t,
+          language: i18n.language,
+        })
 
-        const combinedTransactions = [...mappedRedeemedCodes, ...mappedPurchaseHistory].sort(
-          (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
-        )
+        const combinedTransactions = combineTransactionsByNewest(mappedRedeemedCodes, mappedPurchaseHistory)
 
         setTransactions(combinedTransactions)
         setLectureAccess(childData.lectureAccess || [])

@@ -3,9 +3,15 @@ const { Resend } = require('resend');
 // Initialize Resend with API key from environment variables
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-// Log the API key status and FROM address for debugging
-console.log('Resend API Key configured:', !!process.env.RESEND_API_KEY);
-console.log('Email FROM configured as:', process.env.EMAIL_FROM || 'Not set');
+const isEmailDebugEnabled =
+  String(process.env.EMAIL_DEBUG || 'false').toLowerCase() === 'true' &&
+  String(process.env.NODE_ENV || '').toLowerCase() !== 'production';
+
+const debugEmailLog = (...args) => {
+  if (isEmailDebugEnabled) {
+    console.log(...args);
+  }
+};
 
 /**
  * Send an email using Resend
@@ -15,19 +21,17 @@ console.log('Email FROM configured as:', process.env.EMAIL_FROM || 'Not set');
  * @returns {Promise} - Promise resolving to the sent message info
  */
 const sendEmail = async (to, subject, html) => {
-  // If Resend API key is not set, log to console
+  // If Resend API key is not set, skip sending.
   if (!process.env.RESEND_API_KEY) {
-    console.log('Resend API key not set. Email would be sent to:', to);
-    console.log('Subject:', subject);
-    console.log('Content:', html);
+    debugEmailLog('Resend API key not set. Email send skipped for:', to);
     return { id: 'api-key-missing' };
   }
 
   try {
     // Using your verified domain directly
     const fromEmail = 'Kalima Team <noreply@kalima-edu.com>';
-    
-    console.log('Sending email from:', fromEmail);
+
+    debugEmailLog('Sending email from:', fromEmail);
     
     const data = await resend.emails.send({
       from: fromEmail,
@@ -36,7 +40,7 @@ const sendEmail = async (to, subject, html) => {
       html,
     });
     
-    console.log('Email sent successfully', data);
+    debugEmailLog('Email sent successfully', data?.id || 'ok');
     return data;
   } catch (error) {
     console.error('Error sending email with Resend:', error);
@@ -67,8 +71,7 @@ const sendOTPEmail = async (to, otp) => {
     return await sendEmail(to, subject, html);
   } catch (error) {
     console.error('Error sending OTP email:', error);
-    // Always log the OTP for development purposes
-    console.log(`OTP for ${to}: ${otp}`);
+    debugEmailLog('OTP email delivery failed for:', to);
     throw error;
   }
 };
