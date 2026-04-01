@@ -296,7 +296,6 @@ const DetailedLectureView = () => {
       setShowFeedbackModal(false)
       
       // Show success message
-      // You might want to replace this with a toast notification
       alert('Feedback submitted successfully')
     } catch (error) {
       console.error('Error submitting feedback:', error)

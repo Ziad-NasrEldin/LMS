@@ -15,11 +15,9 @@ import {
 } from "./routes/auth-services";
 
 // Lazy load components
-const AuditLog = lazy(() => import("./pages/User Dashboard/Admin dashboard/auditLog"))
 const AdminDashboard = lazy(() => import("./pages/User Dashboard/Admin dashboard/home/adminDashboard"))
 const FinancialDashboard = lazy(() => import("./pages/User Dashboard/Admin dashboard/home/FinancialDashboard"))
 const CourseDetails = lazy(() => import("./pages/CourseDetails"))
-const LecturesPage = lazy(() => import("./pages/lectures"))
 const TeacherLogin = lazy(() => import("./pages/Login/login"))
 const Footer = lazy(() => import("./components/footer"))
 const CoursesPage = lazy(() => import("./pages/courses"))
@@ -36,21 +34,14 @@ const ContainersPage = lazy(() => import("./pages/User Dashboard/Lecture Page/Co
 const ContainerDetails = lazy(() => import("./pages/User Dashboard/Lecture Page/ContainerDetails"))
 const LectureDisplay = lazy(() => import("./pages/User Dashboard/Lecture Page/LectureDisplay"))
 const AssistantPage = lazy(() => import("./pages/User Dashboard/assistantPage/assistantPage"))
-const CoursesDashboard = lazy(() => import("./pages/CoursesDashboard/CoursesDashboard"))
-const CenterDashboard = lazy(() => import("./pages/CenterDashboard/CenterDashboard"))
-
-
 const CoursesForm = lazy(() => import("./pages/CoursesForm/CoursesForm"))
 const ForgotPassword = lazy(() => import("./pages/Login/ForgetPassword"))
 const VerifyOtp = lazy(() => import("./pages/Login/VerifyOTP"))
 const ResetPassword = lazy(() => import("./pages/Login/ResetPasswordPage"))
-const LessonDetailsSection = lazy(() => import("./pages/CenterDashboard/LessonDetails"))
 const AdminCreate = lazy(() => import("./pages/User Dashboard/Admin dashboard/AddNewStuff"))
 const MyLecturesPage = lazy(() => import("./pages/User Dashboard/Lecture Page/LecturesPage"))
 const DetailedLectureView = lazy(() => import ("./pages/User Dashboard/Lecture Page/DetailedLectureViewing"))
 const PrivacyPolicy = lazy(() => import("./pages/privacyPolicy"));
-const Market = lazy(() => import("./pages/KalimaStore/Market"));
-const ProductDetails = lazy(() => import("./pages/KalimaStore/ProductDetails"));
 const SignedLecturers = lazy(() => import("./pages/User Dashboard/Admin dashboard/signed-lecturers"));
 const PromoCodesManagementPage = lazy(() => import("./pages/User Dashboard/Admin dashboard/promo-codes-management"));
 
@@ -63,11 +54,8 @@ function App() {
   const isRTL = i18n.dir() === "rtl";
   const authRoutes = [
     "/login",
-    "/signin",
     "/register",
     "/signup",
-    "/sign-in",
-    "/sign-up",
     "/forgot-password",
     "/verify-otp",
     "/reset-password",
@@ -278,31 +266,19 @@ function App() {
             <Route path="/courses" element={<CoursesPage />} />
             <Route path="/teachers" element={<Teachers />} />
             <Route path="privacy-policy" element={<PrivacyPolicy />} />
-            <Route path="/market" element={<Market />} />
-            <Route path="/market/product-details/:type/:id" element={<ProductDetails />} />
-
             {/* Authentication Routes */}
             <Route path="/login" element={<TeacherLogin />} />
-            <Route path="/signin" element={<TeacherLogin />} />
-            <Route path="/sign-in" element={<TeacherLogin />} />
             <Route path="/register" element={<RegisterStudent />} />
             <Route path="/signup" element={<RegisterStudent />} />
-            <Route path="/sign-up" element={<RegisterStudent />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/verify-otp" element={<VerifyOtp />} />
             <Route path="/reset-password" element={<ResetPassword />} />
 
             {/* Content Routes */}
             <Route path="/courses/:courseId" element={<CourseDetails />} />
-            <Route path="/lectures" element={<LecturesPage />} />
             <Route
               path="/teacher-details/:userId"
               element={<TeacherDetails />}
-            />
-
-            <Route
-              path="/dashboard/center-dashboard/lesson-details/:id"
-              element={<LessonDetailsSection />}
             />
 
             {/* User Dashboard Routes */}
@@ -337,10 +313,6 @@ function App() {
               element={renderAssistantRoute(<AssistantPage />)}
             />
             <Route
-              path="/dashboard/assistant-page/lectures-page"
-              element={renderAssistantRoute(<MyLecturesPage />)}
-            />
-            <Route
               path="/dashboard/assistant-page/detailed-lecture-view/:lectureId"
               element={renderAssistantRoute(<DetailedLectureView />)}
             />
@@ -353,10 +325,6 @@ function App() {
             <Route
               path="/dashboard/admin-dashboard"
               element={renderAdminRoute(<AdminDashboard />)}
-            />
-            <Route
-              path="/dashboard/admin-dashboard/audit-log"
-              element={renderAdminRoute(<AuditLog />)}
             />
             <Route
               path="/dashboard/admin-dashboard/create"
@@ -378,14 +346,6 @@ function App() {
               path="/dashboard/admin-dashboard/promo-codes-management"
               element={renderAdminRoute(<PromoCodesManagementPage />)}
             />
-              <Route
-                path="/dashboard/admin-dashboard/store-dashboard"
-                element={<Navigate to="/dashboard/admin-dashboard" replace />}
-              />
-              <Route
-                path="/dashboard/admin-dashboard/store-analytics"
-                element={<Navigate to="/dashboard/admin-dashboard" replace />}
-              />
             {/* Lecturer Routes */}
             <Route
               path="/dashboard/lecturer-dashboard"
@@ -426,16 +386,6 @@ function App() {
             <Route
               path="/dashboard/lecturer-dashboard/linked-students"
               element={renderLecturerRoute(<LecturerLinkedStudentsPage />)}
-            />
-
-            {/* Center Dashboard Routes */}
-            <Route
-              path="/dashboard/courses-dashboard"
-              element={renderAdminRoute(<CoursesDashboard />)}
-            />
-            <Route
-              path="/dashboard/center-dashboard"
-              element={renderAdminRoute(<CenterDashboard />)}
             />
           </Routes>
         </Suspense>

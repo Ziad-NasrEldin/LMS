@@ -25,6 +25,7 @@ const ExamConfigSection = ({
     type: configType, // Set the type based on the prop
     description: "",
     googleSheetId: "",
+    googleSheetTabName: "RAW_SUBMISSIONS",
     formUrl: "",
     studentIdentifierColumn: "Email Address",
     scoreColumn: "Score",
@@ -243,6 +244,30 @@ const ExamConfigSection = ({
             />
             <label className="label">
               <span className="label-text-alt">{t("examConfig.googleSheetHelp", "The ID from your Google Sheet URL")}</span>
+            </label>
+          </div>
+
+          <div className="form-control w-full">
+            <label className="label">
+              <span className="label-text">
+                {t("examConfig.googleSheetTabName", "Google Sheet Tab Name")}
+              </span>
+            </label>
+            <input
+              type="text"
+              placeholder="RAW_SUBMISSIONS"
+              className="input input-bordered w-full"
+              value={newExamConfig.googleSheetTabName}
+              onChange={(e) => handleInputChange("googleSheetTabName", e.target.value)}
+              key={`sheet-tab-input-${configType}`}
+            />
+            <label className="label">
+              <span className="label-text-alt">
+                {t(
+                  "examConfig.googleSheetTabHelp",
+                  "Defaults to RAW_SUBMISSIONS for master-sheet mode."
+                )}
+              </span>
             </label>
           </div>
 

@@ -287,4 +287,18 @@ ounded-[2rem]\), removed hard \shadow-sm\ defaults from DaisyUI, updated primary
 - Normalized role handling in backend profile endpoints so student-specific fields (including hobby) are returned and accepted regardless of role string casing.
 - Updated settings save flow to re-fetch `users/me/dashboard` after profile updates and hydrate hobby/level from server data, preventing false local-only saved states.
 
+## 2026-04-01 - Student hobby save/reset hotfix - GPT-5.4 mini
+- Hardened student hobby extraction in settings to support both `hobby` and legacy `hobbies` payload shapes and prevent empty overwrite during post-save refresh.
+- Updated backend dashboard/update handlers to normalize hobby aliases and accept legacy `hobbies` input by mapping it to canonical `hobby` values.
+- Updated purchase balance-save paths to skip unrelated full-profile validation so legacy missing hobby fields no longer block course/lecture purchases.
+
+## 2026-04-01 - Backend startup fix for stale notification import - GPT-5.3-Codex
+- Removed stale notification-template dependency usage from `attachmentController` so missing deleted models no longer crash backend boot.
+- Confirmed backend server starts successfully again on port 5000 after the cleanup.
+
+## 2026-04-01 - Notification content purge + verification - GPT-5.3-Codex
+- Removed remaining notification-related locale blocks and wording from runtime locale files in `frontend/public/locales` (settings, center dashboard, and privacy policy in EN/AR).
+- Verified no notification references remain in tracked backend/frontend source + locale files via `git grep` scan.
+- Revalidated project health: frontend production build succeeded, backend startup succeeded on port 5001, and backend regression tests passed (26/26).
+
 

@@ -136,7 +136,7 @@ const NavBar = () => {
       case "Subadmin":
         return "/dashboard/admin-dashboard";
       case "Assistant":
-        return "/dashboard/assistant-dashboard";
+        return "/dashboard/assistant-page";
       default:
         return "/";
     }

@@ -293,7 +293,6 @@ const UserManagementTable = () => {
         const successMessage = exportAll
           ? t("admin.export.successAll", { count: dataToExport.length })
           : t("admin.export.successFiltered", { count: dataToExport.length })
-        // You can replace this with a toast notification if you have one
         alert(successMessage)
       }
     } catch (error) {

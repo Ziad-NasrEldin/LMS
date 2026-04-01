@@ -8,7 +8,6 @@ import { updateCurrentUser } from "../../routes/update-user"
 import { Check, X, Camera, Upload, Pencil } from "lucide-react"
 import { resolveProfileImageUrl } from "../../utils/profileImage"
 import { designTokens } from "../../constants/designTokens"
-import { translateErrorMessage } from "../../utils/errorTranslator"
 
 const SIGNUP_HOBBY_OPTIONS = [
   "math",
@@ -35,6 +34,24 @@ const normalizeHobbyValue = (value) => {
   const raw = String(value).trim().toLowerCase()
   if (!raw) return ""
   return HOBBY_ALIASES[raw] || raw
+}
+
+const extractStudentHobby = (source) => {
+  if (!source) return ""
+
+  const directHobby = normalizeHobbyValue(source.hobby)
+  if (directHobby) return directHobby
+
+  if (Array.isArray(source.hobbies) && source.hobbies.length > 0) {
+    const firstHobby = normalizeHobbyValue(source.hobbies[0])
+    if (firstHobby) return firstHobby
+  }
+
+  if (typeof source.hobbies === "string") {
+    return normalizeHobbyValue(source.hobbies)
+  }
+
+  return ""
 }
 
 function PersonalInfoSection() {
@@ -80,14 +97,14 @@ function PersonalInfoSection() {
       // Validate file type
       const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/gif"]
       if (!allowedTypes.includes(file.type)) {
-        alert(translateErrorMessage(t("validation.invalidImageType") || "Please select a valid image file (JPEG, PNG, GIF)"))
+        alert(t("validation.invalidImageType") || "Please select a valid image file (JPEG, PNG, GIF)")
         return
       }
 
       // Validate file size (5MB limit)
       const maxSize = 5 * 1024 * 1024 // 5MB in bytes
       if (file.size > maxSize) {
-        alert(translateErrorMessage(t("validation.fileTooLarge") || "File size must be less than 5MB"))
+        alert(t("validation.fileTooLarge") || "File size must be less than 5MB")
         return
       }
 
@@ -145,7 +162,7 @@ function PersonalInfoSection() {
         setUpdateStatus({
           loading: false,
           success: false,
-          error: translateErrorMessage(result.error || "Failed to upload profile picture"),
+          error: result.error || "Failed to upload profile picture",
         })
       }
     } catch (error) {
@@ -153,7 +170,7 @@ function PersonalInfoSection() {
       setUpdateStatus({
         loading: false,
         success: false,
-        error: translateErrorMessage("An unexpected error occurred while uploading"),
+        error: "An unexpected error occurred while uploading",
       })
     } finally {
       setProfilePicUploading(false)
@@ -182,15 +199,15 @@ function PersonalInfoSection() {
             fullName: userInfo.name || "",
             phoneNumber: userInfo.phoneNumber || "",
             email: userInfo.email || "",
-            hobby: normalizeHobbyValue(userInfo.hobby),
+            hobby: extractStudentHobby(userInfo),
             profilePic: null,
           })
         } else {
-          setError(translateErrorMessage(result.error || "Failed to fetch user data"))
+          setError(result.error || "Failed to fetch user data")
         }
       } catch (error) {
         console.error("Error fetching user data:", error)
-        setError(translateErrorMessage("An error occurred while fetching your information"))
+        setError("An error occurred while fetching your information")
       } finally {
         setLoading(false)
       }
@@ -216,7 +233,7 @@ function PersonalInfoSection() {
     if (name === "email") {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
       if (!emailRegex.test(value)) {
-        setEmailError(translateErrorMessage(t("validation.invalidEmail") || "Invalid email address"))
+        setEmailError(t("validation.invalidEmail") || "Invalid email address")
       } else {
         setEmailError("")
       }
@@ -234,7 +251,7 @@ function PersonalInfoSection() {
       fullName: userData?.name || "",
       phoneNumber: userData?.phoneNumber || "",
       email: userData?.email || "",
-      hobby: normalizeHobbyValue(userData?.hobby),
+      hobby: extractStudentHobby(userData),
     }))
     setIsEditing(true)
   }
@@ -245,7 +262,7 @@ function PersonalInfoSection() {
       fullName: userData?.name || "",
       phoneNumber: userData?.phoneNumber || "",
       email: userData?.email || "",
-      hobby: normalizeHobbyValue(userData?.hobby),
+      hobby: extractStudentHobby(userData),
     }))
     setEmailError("")
     setIsEditing(false)
@@ -272,25 +289,50 @@ function PersonalInfoSection() {
       }
 
       if (isStudentRole) {
-        updateData.hobby = normalizeHobbyValue(formData.hobby)
+        const nextHobby = extractStudentHobby({ hobby: formData.hobby })
+        if (nextHobby) {
+          updateData.hobby = nextHobby
+        }
       }
 
       const result = await updateCurrentUser(updateData)
 
       if (result.success) {
+        const updatedUserFromPatch = result.data?.data?.user || null
+        const updatedHobbyFromPatch = extractStudentHobby(updatedUserFromPatch)
+
+        if (updatedUserFromPatch) {
+          setUserData((prev) => ({
+            ...(prev || {}),
+            ...updatedUserFromPatch,
+            hobby: updatedHobbyFromPatch || extractStudentHobby(prev) || extractStudentHobby({ hobby: formData.hobby }),
+          }))
+        }
+
         const refreshResult = await getUserDashboard()
 
         if (refreshResult.success) {
           const refreshedUserInfo = refreshResult.data?.data?.userInfo || null
 
           if (refreshedUserInfo) {
-            setUserData(refreshedUserInfo)
+            const refreshedHobby = extractStudentHobby(refreshedUserInfo)
+            const fallbackHobby =
+              refreshedHobby ||
+              updatedHobbyFromPatch ||
+              extractStudentHobby({ hobby: formData.hobby }) ||
+              extractStudentHobby(userData)
+
+            setUserData((prev) => ({
+              ...(prev || {}),
+              ...refreshedUserInfo,
+              hobby: fallbackHobby,
+            }))
             setFormData((prev) => ({
               ...prev,
               fullName: refreshedUserInfo.name || "",
               phoneNumber: refreshedUserInfo.phoneNumber || "",
               email: refreshedUserInfo.email || "",
-              hobby: normalizeHobbyValue(refreshedUserInfo.hobby),
+              hobby: fallbackHobby,
             }))
           }
         } else {
@@ -299,7 +341,7 @@ function PersonalInfoSection() {
             name: formData.fullName,
             phoneNumber: formData.phoneNumber,
             email: formData.email,
-            hobby: isStudentRole ? normalizeHobbyValue(formData.hobby) : prev.hobby,
+            hobby: isStudentRole ? extractStudentHobby({ hobby: formData.hobby }) || extractStudentHobby(prev) : prev.hobby,
           }))
         }
 
@@ -320,7 +362,7 @@ function PersonalInfoSection() {
         setUpdateStatus({
           loading: false,
           success: false,
-          error: translateErrorMessage(result.error || "Failed to update"),
+          error: result.error || "Failed to update",
         })
       }
     } catch (error) {
@@ -328,7 +370,7 @@ function PersonalInfoSection() {
       setUpdateStatus({
         loading: false,
         success: false,
-        error: translateErrorMessage("An unexpected error occurred"),
+        error: "An unexpected error occurred",
       })
     }
   }
@@ -421,13 +463,13 @@ function PersonalInfoSection() {
   })()
 
   const studentHobbyLabel = (() => {
-    if (!userData?.hobby) return ""
-    const normalizedHobby = normalizeHobbyValue(userData.hobby)
+    const normalizedHobby = extractStudentHobby(userData) || extractStudentHobby({ hobby: formData.hobby })
+    if (!normalizedHobby) return ""
     return t(`personalInfo.hobbyOptions.${normalizedHobby}`, { defaultValue: normalizedHobby })
   })()
 
   const studentHobbyOptions = (() => {
-    const currentHobby = normalizeHobbyValue(formData.hobby || userData?.hobby)
+    const currentHobby = extractStudentHobby({ hobby: formData.hobby }) || extractStudentHobby(userData)
     if (!currentHobby || SIGNUP_HOBBY_OPTIONS.includes(currentHobby)) {
       return SIGNUP_HOBBY_OPTIONS
     }

@@ -4,6 +4,17 @@ const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
 const { normalizeExternalUrl } = require("../utils/urlValidation");
 
+const DEFAULT_MASTER_SHEET_TAB = "RAW_SUBMISSIONS";
+
+const normalizeSheetTabName = (value) => {
+  if (value === undefined || value === null) {
+    return undefined;
+  }
+
+  const normalizedValue = String(value).trim();
+  return normalizedValue || DEFAULT_MASTER_SHEET_TAB;
+};
+
 // Create a new exam configuration for a lecturer
 exports.createExamConfig = catchAsync(async (req, res, next) => {
   const {
@@ -11,6 +22,7 @@ exports.createExamConfig = catchAsync(async (req, res, next) => {
     type = "exam",
     description,
     googleSheetId,
+    googleSheetTabName,
     formUrl,
     studentIdentifierColumn,
     scoreColumn,
@@ -41,6 +53,7 @@ exports.createExamConfig = catchAsync(async (req, res, next) => {
     type,
     description,
     googleSheetId,
+    googleSheetTabName: normalizeSheetTabName(googleSheetTabName),
     formUrl: normalizedFormUrl,
     studentIdentifierColumn: studentIdentifierColumn || "Email Address",
     scoreColumn: scoreColumn || "Score",
@@ -105,6 +118,7 @@ exports.updateExamConfig = catchAsync(async (req, res, next) => {
     type,
     description,
     googleSheetId,
+    googleSheetTabName,
     formUrl,
     studentIdentifierColumn,
     scoreColumn,
@@ -148,6 +162,7 @@ exports.updateExamConfig = catchAsync(async (req, res, next) => {
     name,
     description,
     googleSheetId,
+    googleSheetTabName: normalizeSheetTabName(googleSheetTabName),
     studentIdentifierColumn,
     scoreColumn,
     defaultPassingThreshold,

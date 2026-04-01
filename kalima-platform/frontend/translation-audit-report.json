@@ -244,13 +244,6 @@
         "passwordPlaceholder"
       ]
     },
-    "notifications": {
-      "enCount": 17,
-      "arCount": 17,
-      "missingInAr": [],
-      "missingInEn": [],
-      "suspiciousSame": []
-    },
     "packages": {
       "enCount": 130,
       "arCount": 130,

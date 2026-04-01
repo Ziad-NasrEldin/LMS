@@ -79,7 +79,6 @@
         "title": "Student Activity Tracker"
       },
       "buttons": {
-        "sendNotifications": "Send Notifications",
         "publishResults": "Publish Results",
         "viewDetails": "View"
       },

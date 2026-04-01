@@ -27,6 +27,11 @@ const lecturerExamConfigSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    googleSheetTabName: {
+      type: String,
+      trim: true,
+      default: "RAW_SUBMISSIONS",
+    },
     studentIdentifierColumn: {
       type: String,
       required: true,
@@ -57,5 +62,7 @@ const lecturerExamConfigSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+lecturerExamConfigSchema.index({ lecturer: 1, type: 1, formUrl: 1 });
 
 module.exports = mongoose.model("LecturerExamConfig", lecturerExamConfigSchema);

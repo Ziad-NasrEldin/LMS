@@ -274,8 +274,8 @@ exports.getLectureById = catchAsync(async (req, res, next) => {
     { path: "createdBy", select: "name" },
     { path: "subject", select: "name" },
     { path: "level", select: "name" },
-    { path: "examConfig", select: "name formUrl defaultPassingThreshold" },
-    { path: "homeworkConfig", select: "name formUrl defaultPassingThreshold" },
+    { path: "examConfig", select: "name formUrl googleSheetId googleSheetTabName defaultPassingThreshold" },
+    { path: "homeworkConfig", select: "name formUrl googleSheetId googleSheetTabName defaultPassingThreshold" },
   ])
 
   if (!container) {
@@ -642,8 +642,8 @@ exports.updatelectures = catchAsync(async (req, res, next) => {
         session,
       }).populate([
         { path: "createdBy", select: "name" },
-        { path: "examConfig", select: "name formUrl defaultPassingThreshold" },
-        { path: "homeworkConfig", select: "name formUrl defaultPassingThreshold" },
+        { path: "examConfig", select: "name formUrl googleSheetId googleSheetTabName defaultPassingThreshold" },
+        { path: "homeworkConfig", select: "name formUrl googleSheetId googleSheetTabName defaultPassingThreshold" },
       ])
 
       if (!updatedContainer) {

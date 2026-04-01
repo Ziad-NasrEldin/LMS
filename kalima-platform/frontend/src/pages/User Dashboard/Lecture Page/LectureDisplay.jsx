@@ -1153,7 +1153,6 @@ const LectureDisplay = () => {
           setAllAttachments(allAttachmentsArray);
         }
 
-        // Show success notification using toast
         toast.success(t("homeworkUploadSuccess"));
 
         setHomeworkFiles([]);
@@ -1165,7 +1164,6 @@ const LectureDisplay = () => {
         console.error("Error uploading homework:", err);
         setHomeworkError(`${t("homeworkUploadFailed")}: ${err.message}`);
 
-        // Show error notification using toast
         toast.error(`${t("homeworkUploadFailed")}: ${err.message}`);
       } finally {
         setIsSubmittingHomework(false);

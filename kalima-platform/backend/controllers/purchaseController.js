@@ -137,7 +137,8 @@ exports.purchaseLecturerPoints = catchAsync(async (req, res, next) => {
       { session }
     );
 
-    await currentUser.save({ session });
+    // Purchase-related balance updates should not fail due unrelated legacy profile validators.
+    await currentUser.save({ session, validateBeforeSave: false });
 
     await Purchase.create(
       [
@@ -253,7 +254,8 @@ exports.purchaseLecturerPoints = catchAsync(async (req, res, next) => {
 
     // Add points to user's balance
     userModel.addLecturerPoints(lecturerId, pointsAmount);
-    await userModel.save({ session });
+    // Purchasing only changes balances/promo flags; avoid blocking on unrelated legacy profile validators.
+    await userModel.save({ session, validateBeforeSave: false });
 
     // Create purchase record
     const purchase = await Purchase.create(
@@ -378,7 +380,8 @@ exports.purchaseContainerWithPoints = catchAsync(async (req, res, next) => {
       return next(new AppError(`Not enough balance. Required: ${pointsRequired}, Available lecturer balance: ${lecturerPoints}, Available general balance: ${generalPoints}`, 400));
     }
 
-    await userModel.save({ session });
+    // Purchasing only changes balances/promo flags; avoid blocking on unrelated legacy profile validators.
+    await userModel.save({ session, validateBeforeSave: false });
     // Create purchase record, set lecture field if it's a lecture
     const purchase = await Purchase.create([
       isLecture

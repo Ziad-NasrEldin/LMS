@@ -27,6 +27,39 @@ const fs = require("fs");
 const path = require("path");
 const { ref } = require("joi");
 
+const STUDENT_HOBBY_ALIASES = {
+  "design/illustrating": "designillustrating",
+  "design-illustrating": "designillustrating",
+  "design_illustrating": "designillustrating",
+  designillustrating: "designillustrating",
+  designillustratings: "designillustrating",
+};
+
+const normalizeStudentHobby = (value) => {
+  if (!value) return "";
+  const raw = String(value).trim().toLowerCase();
+  if (!raw) return "";
+  return STUDENT_HOBBY_ALIASES[raw] || raw;
+};
+
+const extractStudentHobby = (studentDoc) => {
+  if (!studentDoc) return "";
+
+  const directHobby = normalizeStudentHobby(studentDoc.hobby);
+  if (directHobby) return directHobby;
+
+  if (Array.isArray(studentDoc.hobbies) && studentDoc.hobbies.length > 0) {
+    const firstHobby = normalizeStudentHobby(studentDoc.hobbies[0]);
+    if (firstHobby) return firstHobby;
+  }
+
+  if (typeof studentDoc.hobbies === "string") {
+    return normalizeStudentHobby(studentDoc.hobbies);
+  }
+
+  return "";
+};
+
 const getAllUsers = catchAsync(async (req, res, next) => {
   const users = await User.find().select("-password").lean();
 
@@ -62,7 +95,7 @@ show fields to update deending on the current user role,
 for ex :- if current user role is student that means if the children is passed in the req.body, the err msg should appear
 */
 const updateUser = catchAsync(async (req, res, next) => {
-  const { name, email, address, password, children, subjectNotify } = req.body;
+  const { name, email, address, password, children, ...restBody } = req.body;
 
   /*
   BUG -->> that means any user can update any user
@@ -135,17 +168,10 @@ const updateUser = catchAsync(async (req, res, next) => {
     address,
     children: childrenById,
     role: foundUser.role, // Explicitly preserve the original role
-    ...req.body,
+    ...restBody,
   };
   if (hashedPassword) {
     updatedUser.password = hashedPassword;
-  }
-
-  if (
-    foundUser.role.toLowerCase() === "student" &&
-    typeof subjectNotify !== "undefined"
-  ) {
-    updatedUser.subjectNotify = subjectNotify;
   }
 
   let user;
@@ -406,11 +432,13 @@ const getMyData = catchAsync(async (req, res, next) => {
       }
 
       // Add student-specific fields
+      const resolvedStudentHobby = extractStudentHobby(student);
       responseData.userInfo = {
         ...responseData.userInfo,
         phoneNumber: student.phoneNumber,
         level: student.level,
-        hobby: student.hobby,
+        hobby: resolvedStudentHobby,
+        hobbies: resolvedStudentHobby ? [resolvedStudentHobby] : [],
         generalPoints: student.generalPoints || 0,
         totalPoints: student.totalPoints || 0,
         faction: student.faction,
@@ -1388,8 +1416,21 @@ const updateMe = catchAsync(async (req, res, next) => {
     }
   });
 
-  if (normalizedUserRole === "student" && typeof filteredBody.hobby === "string") {
-    filteredBody.hobby = filteredBody.hobby.trim().toLowerCase();
+  if (normalizedUserRole === "student" && filteredBody.hobby === undefined && req.body.hobbies !== undefined) {
+    if (Array.isArray(req.body.hobbies)) {
+      filteredBody.hobby = req.body.hobbies[0];
+    } else {
+      filteredBody.hobby = req.body.hobbies;
+    }
+  }
+
+  if (normalizedUserRole === "student" && filteredBody.hobby !== undefined) {
+    const normalizedHobby = normalizeStudentHobby(filteredBody.hobby);
+    if (!normalizedHobby) {
+      delete filteredBody.hobby;
+    } else {
+      filteredBody.hobby = normalizedHobby;
+    }
   }
 
   if (normalizedUserRole === "student" && filteredBody.level !== undefined) {
