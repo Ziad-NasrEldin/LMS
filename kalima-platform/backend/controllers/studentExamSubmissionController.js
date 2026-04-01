@@ -5,23 +5,6 @@ const catchAsync = require("../utils/catchAsync");
 const examSubmissionSync = require("../utils/examSubmissionSync");
 const { ASSESSMENT_MAP } = require("../utils/lectureAccessUtils");
 
-exports.syncExamSubmission = catchAsync(async (req, res) => {
-  examSubmissionSync.verifyExamSyncWebhook({
-    rawBody: req.rawBody || JSON.stringify(req.body || {}),
-    timestamp: req.get("x-exam-sync-timestamp") || req.body?.timestamp || null,
-    signature: req.get("x-exam-sync-signature") || req.body?.signature || null,
-  });
-
-  const result = await examSubmissionSync.processAssessmentSubmissionFromWebhook({
-    payload: req.body || {},
-  });
-
-  res.status(200).json({
-    status: "success",
-    data: result,
-  });
-});
-
 exports.verifyExamSubmission = catchAsync(async (req, res, next) => {
   const { lectureId } = req.params;
   const studentId = req.user._id;

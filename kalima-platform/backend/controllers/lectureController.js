@@ -13,6 +13,13 @@ const StudentLectureAccess = require("../models/studentLectureAccessModel")
 const StudentExamSubmission = require("../models/studentExamSubmissionModel")
 const { uploadSingleImageToDisk } = require("./../utils/upload files/uploadFiles")
 const { buildLectureRequirements, getRestrictedLectureSnapshot } = require("../utils/lectureAccessUtils")
+const { normalizeExternalUrl } = require("../utils/urlValidation")
+const {
+  MASTER_ASSESSMENT_SHEET_ID,
+  MASTER_ASSESSMENT_IDENTIFIER_COLUMN,
+  MASTER_ASSESSMENT_SCORE_COLUMN,
+  MASTER_ASSESSMENT_RAW_TAB,
+} = require("../config/masterAssessmentConfig")
 const fs = require("fs")
 const path = require("path")
 
@@ -87,6 +94,146 @@ const validateLectureConfig = async ({ configId, expectedType, lecturerId, sessi
   return config
 }
 
+const normalizePublicFormUrl = (rawUrl, assessmentLabel) => {
+  const normalizedUrl = normalizeExternalUrl(rawUrl)
+  if (!normalizedUrl) {
+    throw new AppError(`${assessmentLabel} form URL must be a valid public HTTP/HTTPS URL`, 400)
+  }
+  return normalizedUrl
+}
+
+const sanitizeTabSegment = (value) => {
+  const normalizedValue = String(value || "")
+    .toLowerCase()
+    .trim()
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+
+  return normalizedValue || "lecture"
+}
+
+const toObjectIdOrNull = (value) => {
+  if (!value) return null
+  const idValue = typeof value === "object" && value._id ? value._id : value
+  if (!mongoose.Types.ObjectId.isValid(idValue)) return null
+  return new mongoose.Types.ObjectId(idValue)
+}
+
+const buildAssessmentTabBase = (lectureName, assessmentType) => {
+  const suffix = assessmentType === "homework" ? "homework" : "exam"
+  return `${sanitizeTabSegment(lectureName)}-${suffix}`
+}
+
+const resolveUniqueAssessmentTabName = async ({
+  sheetId,
+  baseName,
+  excludeConfigId = null,
+  session,
+}) => {
+  const normalizedBaseName = (baseName || MASTER_ASSESSMENT_RAW_TAB).slice(0, 100)
+  const maxAttempts = 200
+
+  for (let index = 1; index <= maxAttempts; index += 1) {
+    const candidate = index === 1 ? normalizedBaseName : `${normalizedBaseName}-${index}`.slice(0, 100)
+    const query = {
+      googleSheetId: sheetId,
+      googleSheetTabName: candidate,
+    }
+
+    if (excludeConfigId) {
+      query._id = { $ne: excludeConfigId }
+    }
+
+    const existingConfig = await LecturerExamConfig.findOne(query).session(session)
+    if (!existingConfig) {
+      return candidate
+    }
+  }
+
+  throw new AppError("Unable to allocate a unique sheet tab for this lecture", 500)
+}
+
+const ensureManagedAssessmentConfig = async ({
+  lecturerId,
+  lectureName,
+  assessmentType,
+  formUrl,
+  passingThreshold,
+  existingConfigId = null,
+  session,
+}) => {
+  if (!MASTER_ASSESSMENT_SHEET_ID) {
+    throw new AppError(
+      "Master assessment sheet is not configured on the server",
+      500
+    )
+  }
+
+  const assessmentLabel = assessmentType === "homework" ? "Homework" : "Exam"
+  const normalizedFormUrl = normalizePublicFormUrl(formUrl, assessmentLabel)
+  const existingId = toObjectIdOrNull(existingConfigId)
+  const defaultPassingThreshold = passingThreshold !== undefined ? Number(passingThreshold) : 60
+
+  let configDoc = null
+  if (existingId) {
+    configDoc = await LecturerExamConfig.findOne({
+      _id: existingId,
+      lecturer: lecturerId,
+      type: assessmentType,
+    }).session(session)
+  }
+
+  if (!configDoc) {
+    const tabName = await resolveUniqueAssessmentTabName({
+      sheetId: MASTER_ASSESSMENT_SHEET_ID,
+      baseName: buildAssessmentTabBase(lectureName, assessmentType),
+      session,
+    })
+
+    const createdConfig = await LecturerExamConfig.create(
+      [
+        {
+          lecturer: lecturerId,
+          name: `${lectureName} ${assessmentLabel}`,
+          type: assessmentType,
+          description: `${assessmentLabel} configuration for ${lectureName}`,
+          googleSheetId: MASTER_ASSESSMENT_SHEET_ID,
+          googleSheetTabName: tabName,
+          formUrl: normalizedFormUrl,
+          studentIdentifierColumn: MASTER_ASSESSMENT_IDENTIFIER_COLUMN,
+          scoreColumn: MASTER_ASSESSMENT_SCORE_COLUMN,
+          defaultPassingThreshold,
+          isActive: true,
+        },
+      ],
+      { session },
+    )
+
+    return createdConfig[0]
+  }
+
+  configDoc.formUrl = normalizedFormUrl
+  configDoc.googleSheetId = MASTER_ASSESSMENT_SHEET_ID
+  configDoc.studentIdentifierColumn = MASTER_ASSESSMENT_IDENTIFIER_COLUMN
+  configDoc.scoreColumn = MASTER_ASSESSMENT_SCORE_COLUMN
+  if (configDoc.defaultPassingThreshold === undefined || configDoc.defaultPassingThreshold === null) {
+    configDoc.defaultPassingThreshold = defaultPassingThreshold
+  }
+
+  if (!configDoc.googleSheetTabName) {
+    configDoc.googleSheetTabName = await resolveUniqueAssessmentTabName({
+      sheetId: MASTER_ASSESSMENT_SHEET_ID,
+      baseName: buildAssessmentTabBase(lectureName, assessmentType),
+      excludeConfigId: configDoc._id,
+      session,
+    })
+  }
+
+  await configDoc.save({ session })
+  return configDoc
+}
+
 const deleteFile = (filePath) => {
   if (filePath && fs.existsSync(filePath)) {
     fs.unlinkSync(filePath)
@@ -118,9 +265,11 @@ exports.createLecture = catchAsync(async (req, res, next) => {
         // New exam requirement fields
         requiresExam,
         examConfig,
+        examFormUrl,
         passingThreshold,
         requiresHomework,
         homeworkConfig,
+        homeworkFormUrl,
         homeworkPassingThreshold,
       } = req.body
 
@@ -151,34 +300,58 @@ exports.createLecture = catchAsync(async (req, res, next) => {
       validateThresholdRange(parsedPassingThreshold, "Exam passing threshold")
       validateThresholdRange(parsedHomeworkPassingThreshold, "Homework passing threshold")
 
-      // Validate exam config if requires exam is true
-      if (parsedRequiresExam && !examConfig) {
-        if (thumbnailPath) deleteFile(thumbnailPath)
-        throw new AppError("Exam configuration is required when requiresExam is true", 400)
-      }
-
+      let resolvedExamConfigId = null
       if (parsedRequiresExam) {
-        await validateLectureConfig({
-          configId: examConfig,
-          expectedType: "exam",
-          lecturerId,
-          session,
-        })
+        if (examFormUrl) {
+          const managedExamConfig = await ensureManagedAssessmentConfig({
+            lecturerId,
+            lectureName: name,
+            assessmentType: "exam",
+            formUrl: examFormUrl,
+            passingThreshold: parsedPassingThreshold,
+            existingConfigId: examConfig,
+            session,
+          })
+          resolvedExamConfigId = managedExamConfig._id
+        } else if (examConfig) {
+          const existingExamConfig = await validateLectureConfig({
+            configId: examConfig,
+            expectedType: "exam",
+            lecturerId,
+            session,
+          })
+          resolvedExamConfigId = existingExamConfig._id
+        } else {
+          if (thumbnailPath) deleteFile(thumbnailPath)
+          throw new AppError("Exam form URL is required when requiresExam is true", 400)
+        }
       }
 
-      // Validate homework config if requires homework is true
-      if (parsedRequiresHomework && !homeworkConfig) {
-        if (thumbnailPath) deleteFile(thumbnailPath)
-        throw new AppError("Homework configuration is required when requiresHomework is true", 400)
-      }
-
+      let resolvedHomeworkConfigId = null
       if (parsedRequiresHomework) {
-        await validateLectureConfig({
-          configId: homeworkConfig,
-          expectedType: "homework",
-          lecturerId,
-          session,
-        })
+        if (homeworkFormUrl) {
+          const managedHomeworkConfig = await ensureManagedAssessmentConfig({
+            lecturerId,
+            lectureName: name,
+            assessmentType: "homework",
+            formUrl: homeworkFormUrl,
+            passingThreshold: parsedHomeworkPassingThreshold,
+            existingConfigId: homeworkConfig,
+            session,
+          })
+          resolvedHomeworkConfigId = managedHomeworkConfig._id
+        } else if (homeworkConfig) {
+          const existingHomeworkConfig = await validateLectureConfig({
+            configId: homeworkConfig,
+            expectedType: "homework",
+            lecturerId,
+            session,
+          })
+          resolvedHomeworkConfigId = existingHomeworkConfig._id
+        } else {
+          if (thumbnailPath) deleteFile(thumbnailPath)
+          throw new AppError("Homework form URL is required when requiresHomework is true", 400)
+        }
       }
 
       // Create the lecture
@@ -200,11 +373,11 @@ exports.createLecture = catchAsync(async (req, res, next) => {
             thumbnail: thumbnailPath,
             // Add exam requirement fields
             requiresExam: parsedRequiresExam,
-            examConfig: parsedRequiresExam ? examConfig : undefined,
+            examConfig: parsedRequiresExam ? resolvedExamConfigId : undefined,
             passingThreshold: parsedRequiresExam ? parsedPassingThreshold : undefined,
             // Homework requirement fields
             requiresHomework: parsedRequiresHomework,
-            homeworkConfig: parsedRequiresHomework ? homeworkConfig : undefined,
+            homeworkConfig: parsedRequiresHomework ? resolvedHomeworkConfigId : undefined,
             homeworkPassingThreshold: parsedRequiresHomework ? parsedHomeworkPassingThreshold : undefined,
           },
         ],
@@ -288,6 +461,14 @@ exports.getLectureById = catchAsync(async (req, res, next) => {
   }
 
   if (!container) return next(new AppError("Lecture not found", 404))
+
+  if (container?.examConfig?.formUrl) {
+    container.examFormUrl = container.examConfig.formUrl
+  }
+
+  if (container?.homeworkConfig?.formUrl) {
+    container.homeworkFormUrl = container.homeworkConfig.formUrl
+  }
 
   if (req.user.role === "Student" && (container.requiresExam || container.requiresHomework)) {
     const requirements = buildLectureRequirements(container)
@@ -495,9 +676,11 @@ exports.updatelectures = catchAsync(async (req, res, next) => {
       // New exam requirement fields
       requiresExam,
       examConfig,
+      examFormUrl,
       passingThreshold,
       requiresHomework,
       homeworkConfig,
+      homeworkFormUrl,
       homeworkPassingThreshold,
     } = req.body
 
@@ -557,6 +740,8 @@ exports.updatelectures = catchAsync(async (req, res, next) => {
 
       const normalizedExamConfig = examConfig === "" ? null : examConfig
       const normalizedHomeworkConfig = homeworkConfig === "" ? null : homeworkConfig
+      const normalizedExamFormUrl = examFormUrl === "" ? null : examFormUrl
+      const normalizedHomeworkFormUrl = homeworkFormUrl === "" ? null : homeworkFormUrl
       const nextRequiresExam =
         requiresExam !== undefined ? parseBoolean(requiresExam) : currentLecture.requiresExam
       const nextRequiresHomework =
@@ -575,22 +760,34 @@ exports.updatelectures = catchAsync(async (req, res, next) => {
       }
 
       if (nextRequiresExam) {
-        if (!nextExamConfig) {
+        if (normalizedExamFormUrl !== undefined && normalizedExamFormUrl !== null) {
+          const managedExamConfig = await ensureManagedAssessmentConfig({
+            lecturerId: currentLecture.createdBy,
+            lectureName: name || currentLecture.name,
+            assessmentType: "exam",
+            formUrl: normalizedExamFormUrl,
+            passingThreshold: parsedPassingThreshold,
+            existingConfigId: currentLecture.examConfig || normalizedExamConfig,
+            session,
+          })
+
+          obj.examConfig = managedExamConfig._id
+        } else if (nextExamConfig) {
+          const validatedExamConfig = await validateLectureConfig({
+            configId: nextExamConfig,
+            expectedType: "exam",
+            lecturerId: currentLecture.createdBy,
+            session,
+          })
+
+          if (normalizedExamConfig !== undefined) {
+            obj.examConfig = validatedExamConfig._id
+          }
+        } else {
           if (req.file && req.file.path) {
             deleteFile(req.file.path)
           }
-          throw new AppError("Exam configuration is required when requiresExam is true", 400)
-        }
-
-        await validateLectureConfig({
-          configId: nextExamConfig,
-          expectedType: "exam",
-          lecturerId: currentLecture.createdBy,
-          session,
-        })
-
-        if (normalizedExamConfig !== undefined) {
-          obj.examConfig = normalizedExamConfig
+          throw new AppError("Exam form URL is required when requiresExam is true", 400)
         }
 
         if (parsedPassingThreshold !== undefined) {
@@ -602,22 +799,34 @@ exports.updatelectures = catchAsync(async (req, res, next) => {
       }
 
       if (nextRequiresHomework) {
-        if (!nextHomeworkConfig) {
+        if (normalizedHomeworkFormUrl !== undefined && normalizedHomeworkFormUrl !== null) {
+          const managedHomeworkConfig = await ensureManagedAssessmentConfig({
+            lecturerId: currentLecture.createdBy,
+            lectureName: name || currentLecture.name,
+            assessmentType: "homework",
+            formUrl: normalizedHomeworkFormUrl,
+            passingThreshold: parsedHomeworkPassingThreshold,
+            existingConfigId: currentLecture.homeworkConfig || normalizedHomeworkConfig,
+            session,
+          })
+
+          obj.homeworkConfig = managedHomeworkConfig._id
+        } else if (nextHomeworkConfig) {
+          const validatedHomeworkConfig = await validateLectureConfig({
+            configId: nextHomeworkConfig,
+            expectedType: "homework",
+            lecturerId: currentLecture.createdBy,
+            session,
+          })
+
+          if (normalizedHomeworkConfig !== undefined) {
+            obj.homeworkConfig = validatedHomeworkConfig._id
+          }
+        } else {
           if (req.file && req.file.path) {
             deleteFile(req.file.path)
           }
-          throw new AppError("Homework configuration is required when requiresHomework is true", 400)
-        }
-
-        await validateLectureConfig({
-          configId: nextHomeworkConfig,
-          expectedType: "homework",
-          lecturerId: currentLecture.createdBy,
-          session,
-        })
-
-        if (normalizedHomeworkConfig !== undefined) {
-          obj.homeworkConfig = normalizedHomeworkConfig
+          throw new AppError("Homework form URL is required when requiresHomework is true", 400)
         }
 
         if (parsedHomeworkPassingThreshold !== undefined) {

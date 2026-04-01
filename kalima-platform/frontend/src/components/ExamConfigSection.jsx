@@ -16,6 +16,10 @@ const ExamConfigSection = ({
   configType = "exam", // Default to "exam", can be "homework"
 }) => {
   const { t } = useTranslation("lecturesPage")
+  const fixedMasterSheetId = String(
+    import.meta.env.VITE_MASTER_ASSESSMENT_SHEET_ID || ""
+  ).trim()
+  const hasFixedMasterSheetId = Boolean(fixedMasterSheetId)
   const [examConfigs, setExamConfigs] = useState([])
   const [examConfigsLoading, setExamConfigsLoading] = useState(false)
   const [examConfigsError, setExamConfigsError] = useState("")
@@ -24,7 +28,7 @@ const ExamConfigSection = ({
     name: "",
     type: configType, // Set the type based on the prop
     description: "",
-    googleSheetId: "",
+    googleSheetId: fixedMasterSheetId,
     googleSheetTabName: "RAW_SUBMISSIONS",
     formUrl: "",
     studentIdentifierColumn: "Email Address",
@@ -86,11 +90,22 @@ const ExamConfigSection = ({
 
   const handleCreateExamConfig = async () => {
     try {
+      const payload = {
+        ...newExamConfig,
+        googleSheetId: hasFixedMasterSheetId
+          ? fixedMasterSheetId
+          : newExamConfig.googleSheetId,
+      }
+
       // Validate required fields for new exam config
-      if (!newExamConfig.name || !newExamConfig.googleSheetId || !newExamConfig.formUrl) {
+      if (
+        !payload.name ||
+        (!hasFixedMasterSheetId && !payload.googleSheetId) ||
+        !payload.formUrl
+      ) {
         throw new Error(translateErrorMessage(`Please fill in all required ${configType} configuration fields`))
       }
-      const createResponse = await createExamConfig(newExamConfig)
+      const createResponse = await createExamConfig(payload)
 
       if (!createResponse.success || !createResponse.data?._id) {
         throw new Error(translateErrorMessage(createResponse.message || `Failed to create ${configType} config`))
@@ -229,23 +244,48 @@ const ExamConfigSection = ({
             />
           </div>
 
-          <div className="form-control w-full">
-            <label className="label">
-              <span className="label-text">{t("examConfig.googleSheetId", "Google Sheet ID")}</span>
-            </label>
-            <input
-              type="text"
-              placeholder="Eg : 1Iaosq_KHl7w6__oJB9nFnFr9QYiTDmSSKrWADszUcsM"
-              className="input input-bordered w-full"
-              value={newExamConfig.googleSheetId}
-              onChange={(e) => handleInputChange("googleSheetId", e.target.value)}
-              key={`sheet-id-input-${configType}`}
-              required
-            />
-            <label className="label">
-              <span className="label-text-alt">{t("examConfig.googleSheetHelp", "The ID from your Google Sheet URL")}</span>
-            </label>
-          </div>
+          {hasFixedMasterSheetId ? (
+            <div className="form-control w-full">
+              <label className="label">
+                <span className="label-text">
+                  {t("examConfig.googleSheetId", "Google Sheet ID")}
+                </span>
+              </label>
+              <input
+                type="text"
+                className="input input-bordered w-full"
+                value={fixedMasterSheetId}
+                disabled
+                readOnly
+              />
+              <label className="label">
+                <span className="label-text-alt">
+                  {t(
+                    "examConfig.googleSheetFixedHelp",
+                    "Organization master sheet is preconfigured and used automatically."
+                  )}
+                </span>
+              </label>
+            </div>
+          ) : (
+            <div className="form-control w-full">
+              <label className="label">
+                <span className="label-text">{t("examConfig.googleSheetId", "Google Sheet ID")}</span>
+              </label>
+              <input
+                type="text"
+                placeholder="Eg : 1Iaosq_KHl7w6__oJB9nFnFr9QYiTDmSSKrWADszUcsM"
+                className="input input-bordered w-full"
+                value={newExamConfig.googleSheetId}
+                onChange={(e) => handleInputChange("googleSheetId", e.target.value)}
+                key={`sheet-id-input-${configType}`}
+                required
+              />
+              <label className="label">
+                <span className="label-text-alt">{t("examConfig.googleSheetHelp", "The ID from your Google Sheet URL")}</span>
+              </label>
+            </div>
+          )}
 
           <div className="form-control w-full">
             <label className="label">

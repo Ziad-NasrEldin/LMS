@@ -40,13 +40,7 @@ const ecReferralRoutes = require("./routes/ec.referralRoutes");
 connectDB();
 
 app.use(cors(corsOptions));
-const captureRawJsonBody = (req, _res, buf) => {
-  if (buf && buf.length > 0) {
-    req.rawBody = buf.toString("utf8");
-  }
-};
-
-app.use(express.json({ limit: "120mb", verify: captureRawJsonBody }));
+app.use(express.json({ limit: "120mb" }));
 app.use(express.urlencoded({ limit: '120mb', extended: true }));
 
 app.use(mongoSanitize());

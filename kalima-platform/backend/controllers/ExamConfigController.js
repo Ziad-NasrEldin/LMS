@@ -3,8 +3,15 @@ const LecturerExamConfig = require("../models/ExamConfigModel");
 const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
 const { normalizeExternalUrl } = require("../utils/urlValidation");
+const {
+  MASTER_ASSESSMENT_SHEET_ID,
+  MASTER_ASSESSMENT_IDENTIFIER_COLUMN,
+  MASTER_ASSESSMENT_SCORE_COLUMN,
+  MASTER_ASSESSMENT_RAW_TAB,
+  extractGoogleSheetId,
+} = require("../config/masterAssessmentConfig");
 
-const DEFAULT_MASTER_SHEET_TAB = "RAW_SUBMISSIONS";
+const DEFAULT_MASTER_SHEET_TAB = MASTER_ASSESSMENT_RAW_TAB;
 
 const normalizeSheetTabName = (value) => {
   if (value === undefined || value === null) {
@@ -13,6 +20,11 @@ const normalizeSheetTabName = (value) => {
 
   const normalizedValue = String(value).trim();
   return normalizedValue || DEFAULT_MASTER_SHEET_TAB;
+};
+
+const normalizeSheetId = (value) => {
+  if (value === undefined || value === null) return undefined;
+  return extractGoogleSheetId(value) || undefined;
 };
 
 // Create a new exam configuration for a lecturer
@@ -24,16 +36,15 @@ exports.createExamConfig = catchAsync(async (req, res, next) => {
     googleSheetId,
     googleSheetTabName,
     formUrl,
-    studentIdentifierColumn,
-    scoreColumn,
     defaultPassingThreshold,
   } = req.body;
 
+  const resolvedGoogleSheetId =
+    MASTER_ASSESSMENT_SHEET_ID || normalizeSheetId(googleSheetId);
+
   // Validate required fields
-  if (!name || !googleSheetId || !formUrl) {
-    return next(
-      new AppError("Name, Google Sheet ID, and Form URL are required", 400)
-    );
+  if (!name || !resolvedGoogleSheetId || !formUrl) {
+    return next(new AppError("Name and Form URL are required", 400));
   }
 
   // Validate type
@@ -52,11 +63,11 @@ exports.createExamConfig = catchAsync(async (req, res, next) => {
     name,
     type,
     description,
-    googleSheetId,
+    googleSheetId: resolvedGoogleSheetId,
     googleSheetTabName: normalizeSheetTabName(googleSheetTabName),
     formUrl: normalizedFormUrl,
-    studentIdentifierColumn: studentIdentifierColumn || "Email Address",
-    scoreColumn: scoreColumn || "Score",
+    studentIdentifierColumn: MASTER_ASSESSMENT_IDENTIFIER_COLUMN,
+    scoreColumn: MASTER_ASSESSMENT_SCORE_COLUMN,
     defaultPassingThreshold:
       defaultPassingThreshold != null ? defaultPassingThreshold : 60,
   });
@@ -120,11 +131,12 @@ exports.updateExamConfig = catchAsync(async (req, res, next) => {
     googleSheetId,
     googleSheetTabName,
     formUrl,
-    studentIdentifierColumn,
-    scoreColumn,
     defaultPassingThreshold,
     isActive,
   } = req.body;
+
+  const resolvedGoogleSheetId =
+    MASTER_ASSESSMENT_SHEET_ID || normalizeSheetId(googleSheetId);
 
   // Validate type if provided
   if (type && type !== "exam" && type !== "homework") {
@@ -161,13 +173,17 @@ exports.updateExamConfig = catchAsync(async (req, res, next) => {
   const updatePayload = {
     name,
     description,
-    googleSheetId,
+    googleSheetId: resolvedGoogleSheetId,
     googleSheetTabName: normalizeSheetTabName(googleSheetTabName),
-    studentIdentifierColumn,
-    scoreColumn,
+    studentIdentifierColumn: MASTER_ASSESSMENT_IDENTIFIER_COLUMN,
+    scoreColumn: MASTER_ASSESSMENT_SCORE_COLUMN,
     defaultPassingThreshold,
     isActive,
   };
+
+  if (resolvedGoogleSheetId === undefined) {
+    delete updatePayload.googleSheetId;
+  }
 
   if (normalizedFormUrl !== undefined) {
     updatePayload.formUrl = normalizedFormUrl;

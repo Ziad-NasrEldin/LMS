@@ -5,7 +5,6 @@ import { FolderPlus, FileText, Paperclip } from "lucide-react"
 import toast from "react-hot-toast"
 import { createContainer, createLecture, createLectureAttachment } from "../../routes/lectures"
 import { getAllSubjects } from "../../routes/courses"
-import ExamConfigSection from "../../components/ExamConfigSection"
 import ContainerList from "./container-list"
 import { translateErrorMessage } from "../../utils/errorTranslator"
 
@@ -31,10 +30,10 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
   const [lecturePrice, setLecturePrice] = useState(0)
   const [lectureType, setLectureType] = useState("Paid")
   const [requiresExam, setRequiresExam] = useState(false)
-  const [selectedExamConfigId, setSelectedExamConfigId] = useState("")
+  const [examFormUrl, setExamFormUrl] = useState("")
   const [passingThreshold, setPassingThreshold] = useState(60)
   const [requiresHomework, setRequiresHomework] = useState(false)
-  const [selectedHomeworkConfigId, setSelectedHomeworkConfigId] = useState("")
+  const [homeworkFormUrl, setHomeworkFormUrl] = useState("")
   const [homeworkPassingThreshold, setHomeworkPassingThreshold] = useState(60)
   const [containerPrice, setContainerPrice] = useState(0)
   const [description, setDescription] = useState("")
@@ -105,28 +104,28 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
         }
 
         if (requiresExam) {
-          if (!selectedExamConfigId) {
-            toast.error(isRTL ? "يرجى تحديد تكوين الامتحان" : "Please select an exam configuration")
+          if (!examFormUrl) {
+            toast.error(isRTL ? "يرجى إدخال رابط امتحان" : "Please provide an exam form URL")
             setIsSubmitting(false)
             return
           }
 
           lectureData.requiresExam = true
-          lectureData.examConfig = selectedExamConfigId
+          lectureData.examFormUrl = examFormUrl
           lectureData.passingThreshold = Number(passingThreshold)
         } else {
           lectureData.requiresExam = false
         }
 
         if (requiresHomework) {
-          if (!selectedHomeworkConfigId) {
-            toast.error(isRTL ? "يرجى تحديد تكوين الواجب المنزلي" : "Please select a homework configuration")
+          if (!homeworkFormUrl) {
+            toast.error(isRTL ? "يرجى إدخال رابط واجب" : "Please provide a homework form URL")
             setIsSubmitting(false)
             return
           }
 
           lectureData.requiresHomework = true
-          lectureData.homeworkConfig = selectedHomeworkConfigId
+          lectureData.homeworkFormUrl = homeworkFormUrl
           lectureData.homeworkPassingThreshold = Number(homeworkPassingThreshold)
         } else {
           lectureData.requiresHomework = false
@@ -226,10 +225,10 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
       setLecturePrice(0)
       setLectureType("Paid")
       setRequiresExam(false)
-      setSelectedExamConfigId("")
+      setExamFormUrl("")
       setPassingThreshold(60)
       setRequiresHomework(false)
-      setSelectedHomeworkConfigId("")
+      setHomeworkFormUrl("")
       setHomeworkPassingThreshold(60)
       setContainerPrice(0)
       setDescription("")
@@ -458,14 +457,34 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
 
             {requiresExam && (
               <div className="mt-3 rounded-xl border border-base-300 bg-base-100/70 p-3">
-                <ExamConfigSection
-                  isEnabled={requiresExam}
-                  selectedExamConfigId={selectedExamConfigId}
-                  setSelectedExamConfigId={setSelectedExamConfigId}
-                  passingThreshold={passingThreshold}
-                  setPassingThreshold={setPassingThreshold}
-                  onExamConfigCreated={setSelectedExamConfigId}
-                />
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-sm font-medium mb-1">
+                      {isRTL ? "رابط الامتحان" : "Exam Form URL"}
+                    </label>
+                    <input
+                      type="url"
+                      value={examFormUrl}
+                      onChange={(e) => setExamFormUrl(e.target.value)}
+                      placeholder={isRTL ? "رابط Google Form للامتحان" : "Google Form URL for exam"}
+                      className={compactInput}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">
+                      {isRTL ? "حد النجاح" : "Passing Threshold"}
+                    </label>
+                    <input
+                      type="number"
+                      value={passingThreshold}
+                      onChange={(e) => setPassingThreshold(e.target.value)}
+                      className={compactInput}
+                      min="0"
+                      max="100"
+                    />
+                  </div>
+                </div>
               </div>
             )}
 
@@ -485,15 +504,34 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
 
             {requiresHomework && (
               <div className="mt-3 rounded-xl border border-base-300 bg-base-100/70 p-3">
-                <ExamConfigSection
-                  isEnabled={requiresHomework}
-                  selectedExamConfigId={selectedHomeworkConfigId}
-                  setSelectedExamConfigId={setSelectedHomeworkConfigId}
-                  passingThreshold={homeworkPassingThreshold}
-                  setPassingThreshold={setHomeworkPassingThreshold}
-                  onExamConfigCreated={setSelectedHomeworkConfigId}
-                  configType="homework"
-                />
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-sm font-medium mb-1">
+                      {isRTL ? "رابط الواجب" : "Homework Form URL"}
+                    </label>
+                    <input
+                      type="url"
+                      value={homeworkFormUrl}
+                      onChange={(e) => setHomeworkFormUrl(e.target.value)}
+                      placeholder={isRTL ? "رابط Google Form للواجب" : "Google Form URL for homework"}
+                      className={compactInput}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">
+                      {isRTL ? "حد النجاح" : "Passing Threshold"}
+                    </label>
+                    <input
+                      type="number"
+                      value={homeworkPassingThreshold}
+                      onChange={(e) => setHomeworkPassingThreshold(e.target.value)}
+                      className={compactInput}
+                      min="0"
+                      max="100"
+                    />
+                  </div>
+                </div>
               </div>
             )}
 

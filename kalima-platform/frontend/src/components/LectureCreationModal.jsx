@@ -7,7 +7,6 @@ import { getAllLevels } from "../routes/levels"
 import { getAllSubjects } from "../routes/courses"
 import { getLectureAttachments } from "../routes/lectures"
 import { resolveUploadUrl } from "../utils/uploadUrl"
-import ExamConfigSection from "./ExamConfigSection"
 import { translateErrorMessage } from "../utils/errorTranslator"
 
 const ATTACHMENT_BUCKET_KEYS = ["pdfsandimages", "booklets", "homeworks", "exams"]
@@ -88,12 +87,12 @@ const LectureCreationModal = ({
   // Exam related state
   const [requiresExam, setRequiresExam] = useState(false)
   const [passingThreshold, setPassingThreshold] = useState(50)
-  const [selectedExamConfigId, setSelectedExamConfigId] = useState("")
+  const [examFormUrl, setExamFormUrl] = useState("")
 
   // Homework related state
   const [requiresHomework, setRequiresHomework] = useState(false)
   const [homeworkPassingThreshold, setHomeworkPassingThreshold] = useState(50)
-  const [selectedHomeworkConfigId, setSelectedHomeworkConfigId] = useState("")
+  const [homeworkFormUrl, setHomeworkFormUrl] = useState("")
 
   // Levels and subjects state
   const [levels, setLevels] = useState([])
@@ -150,8 +149,8 @@ const LectureCreationModal = ({
     setRequiresHomework(Boolean(initialData.requiresHomework))
     setPassingThreshold(initialData.passingThreshold ?? 50)
     setHomeworkPassingThreshold(initialData.homeworkPassingThreshold ?? 50)
-    setSelectedExamConfigId(initialData.examConfig?._id || initialData.examConfig || "")
-    setSelectedHomeworkConfigId(initialData.homeworkConfig?._id || initialData.homeworkConfig || "")
+    setExamFormUrl(initialData.examFormUrl || initialData.examConfig?.formUrl || "")
+    setHomeworkFormUrl(initialData.homeworkFormUrl || initialData.homeworkConfig?.formUrl || "")
     setSelectedLevel(initialData.level?._id || initialData.level || containerLevel || "")
     setSelectedSubject(initialData.subject?._id || initialData.subject || containerSubject || "")
     setThumbnailPreview(
@@ -284,12 +283,12 @@ const LectureCreationModal = ({
     // Reset exam fields
     setRequiresExam(false)
     setPassingThreshold(50)
-    setSelectedExamConfigId("")
+    setExamFormUrl("")
 
     // Reset homework fields
     setRequiresHomework(false)
     setHomeworkPassingThreshold(50)
-    setSelectedHomeworkConfigId("")
+    setHomeworkFormUrl("")
 
     setSelectedLevel(containerLevel || "")
     setSelectedSubject(containerSubject || "")
@@ -333,17 +332,17 @@ const LectureCreationModal = ({
 
       // Handle exam config if required
       if (requiresExam) {
-        if (!selectedExamConfigId) {
-          throw new Error(t("validation.examConfigRequired"))
+        if (!examFormUrl) {
+          throw new Error(t("validation.examFormUrlRequired", "Exam form URL is required"))
         }
-        lectureData.examConfig = selectedExamConfigId
+        lectureData.examFormUrl = examFormUrl
         lectureData.passingThreshold = Number(passingThreshold)
       }
       if (requiresHomework) {
-        if (!selectedHomeworkConfigId) {
-          throw new Error(t("validation.homeworkConfigRequired"))
+        if (!homeworkFormUrl) {
+          throw new Error(t("validation.homeworkFormUrlRequired", "Homework form URL is required"))
         }
-        lectureData.homeworkConfig = selectedHomeworkConfigId
+        lectureData.homeworkFormUrl = homeworkFormUrl
         lectureData.homeworkPassingThreshold = Number(homeworkPassingThreshold)
       }
 
@@ -626,18 +625,39 @@ const LectureCreationModal = ({
                             <option value={true}>{t("options.yes")}</option>
                           </select>
                         </div>
-                        <ExamConfigSection
-                          isEnabled={requiresExam}
-                          selectedExamConfigId={selectedExamConfigId}
-                          setSelectedExamConfigId={setSelectedExamConfigId}
-                          passingThreshold={passingThreshold}
-                          setPassingThreshold={setPassingThreshold}
-                          onExamConfigCreated={(examConfigId) => {
-                            setSelectedExamConfigId(examConfigId)
-                          }}
-                          t={t}
-                          i18n={i18n}
-                        />
+                        {requiresExam && (
+                          <div className="space-y-3">
+                            <div className="form-control">
+                              <label className="label px-0">
+                                <span className="label-text font-semibold">
+                                  {t("attachments.formUrl", "Google Form URL")}
+                                </span>
+                              </label>
+                              <input
+                                type="url"
+                                className="input input-bordered w-full rounded-2xl"
+                                placeholder={t("attachments.formUrlPlaceholder", "Paste exam form URL")}
+                                value={examFormUrl}
+                                onChange={(e) => setExamFormUrl(e.target.value)}
+                              />
+                            </div>
+                            <div className="form-control">
+                              <label className="label px-0">
+                                <span className="label-text font-semibold">
+                                  {t("examConfig.passingThreshold", "Passing Threshold")}
+                                </span>
+                              </label>
+                              <input
+                                type="number"
+                                className="input input-bordered w-full rounded-2xl"
+                                value={passingThreshold}
+                                onChange={(e) => setPassingThreshold(Number(e.target.value))}
+                                min="0"
+                                max="100"
+                              />
+                            </div>
+                          </div>
+                        )}
                       </div>
 
                       <div className="rounded-[1.5rem] border border-base-300 bg-base-200/40 p-4">
@@ -653,19 +673,37 @@ const LectureCreationModal = ({
                           </select>
                         </div>
                         {requiresHomework && (
-                          <ExamConfigSection
-                            isEnabled={requiresHomework}
-                            selectedExamConfigId={selectedHomeworkConfigId}
-                            setSelectedExamConfigId={setSelectedHomeworkConfigId}
-                            passingThreshold={homeworkPassingThreshold}
-                            setPassingThreshold={setHomeworkPassingThreshold}
-                            onExamConfigCreated={(homeworkConfigId) => {
-                              setSelectedHomeworkConfigId(homeworkConfigId)
-                            }}
-                            configType="homework"
-                            t={t}
-                            i18n={i18n}
-                          />
+                          <div className="space-y-3">
+                            <div className="form-control">
+                              <label className="label px-0">
+                                <span className="label-text font-semibold">
+                                  {t("attachments.formUrl", "Google Form URL")}
+                                </span>
+                              </label>
+                              <input
+                                type="url"
+                                className="input input-bordered w-full rounded-2xl"
+                                placeholder={t("attachments.formUrlPlaceholder", "Paste homework form URL")}
+                                value={homeworkFormUrl}
+                                onChange={(e) => setHomeworkFormUrl(e.target.value)}
+                              />
+                            </div>
+                            <div className="form-control">
+                              <label className="label px-0">
+                                <span className="label-text font-semibold">
+                                  {t("examConfig.passingThreshold", "Passing Threshold")}
+                                </span>
+                              </label>
+                              <input
+                                type="number"
+                                className="input input-bordered w-full rounded-2xl"
+                                value={homeworkPassingThreshold}
+                                onChange={(e) => setHomeworkPassingThreshold(Number(e.target.value))}
+                                min="0"
+                                max="100"
+                              />
+                            </div>
+                          </div>
                         )}
                       </div>
                     </div>
