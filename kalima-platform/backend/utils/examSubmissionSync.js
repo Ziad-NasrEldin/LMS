@@ -17,7 +17,17 @@ const {
 
 const DEFAULT_PASSING_THRESHOLD = 60;
 const DEFAULT_MASTER_SHEET_RAW_TAB = MASTER_ASSESSMENT_RAW_TAB;
-const LEGACY_FORM_RESPONSES_TAB = "Form Responses 1";
+const buildLegacyFormResponsesTabs = (maxNumberedTabs = 20) => {
+  const tabs = ["Form_Responses", "Form Responses"];
+
+  for (let index = 1; index <= maxNumberedTabs; index += 1) {
+    tabs.push(`Form Responses ${index}`);
+  }
+
+  return tabs;
+};
+
+const LEGACY_FORM_RESPONSES_TABS = buildLegacyFormResponsesTabs();
 
 const normalizeString = (value) => String(value ?? "").trim();
 
@@ -81,6 +91,18 @@ const parseSubmissionScore = (rawScore) => {
 
 const toComparableLower = (value) => normalizeString(value).toLowerCase();
 
+const buildSheetTabCandidates = (configuredTabName, fallbackSheetTabName, fallbackSheetTabNames = []) => {
+  const candidates = [
+    normalizeSheetTabName(configuredTabName),
+    normalizeSheetTabName(fallbackSheetTabName),
+    ...(Array.isArray(fallbackSheetTabNames) ? fallbackSheetTabNames.map(normalizeSheetTabName) : []),
+    DEFAULT_MASTER_SHEET_RAW_TAB,
+    ...LEGACY_FORM_RESPONSES_TABS,
+  ];
+
+  return [...new Set(candidates.filter(Boolean))];
+};
+
 const getExamResultsFromSheet = async (
   sheetIdOrOptions,
   legacyStudentIdentifier,
@@ -107,220 +129,213 @@ const getExamResultsFromSheet = async (
     normalizeString(options.studentIdentifierColumn) || MASTER_ASSESSMENT_IDENTIFIER_COLUMN;
   const scoreColumn =
     normalizeString(options.scoreColumn) || MASTER_ASSESSMENT_SCORE_COLUMN;
-  const sheetTabName =
-    normalizeSheetTabName(options.sheetTabName) ||
-    normalizeSheetTabName(options.fallbackSheetTabName) ||
-    DEFAULT_MASTER_SHEET_RAW_TAB;
+  const sheetTabCandidates = buildSheetTabCandidates(
+    options.sheetTabName,
+    options.fallbackSheetTabName,
+    options.fallbackSheetTabNames,
+  );
 
   if (!sheetId) {
     return { found: false, error: "Google Sheet ID is required" };
   }
 
-  if (!sheetTabName) {
+  if (sheetTabCandidates.length === 0) {
     return { found: false, error: "Google Sheet tab name is required" };
   }
 
-  try {
-    const sheets = googleApiConfig.configureGoogleSheets();
-    const response = await sheets.spreadsheets.values.get({
-      spreadsheetId: sheetId,
-      range: sheetTabName,
-      valueRenderOption: "UNFORMATTED_VALUE",
-      dateTimeRenderOption: "FORMATTED_STRING",
-    });
+  const sheets = googleApiConfig.configureGoogleSheets();
+  let lastError = null;
 
-    const rows = response.data.values || [];
-    if (rows.length === 0) {
-      return {
-        found: false,
-        error: `No data found in '${sheetTabName}' tab`,
-      };
-    }
+  for (const sheetTabName of sheetTabCandidates) {
+    try {
+      const response = await sheets.spreadsheets.values.get({
+        spreadsheetId: sheetId,
+        range: sheetTabName,
+        valueRenderOption: "UNFORMATTED_VALUE",
+        dateTimeRenderOption: "FORMATTED_STRING",
+      });
 
-    const headers = rows[0].map((value) => normalizeString(value));
-    const dataRows = rows.slice(1);
+      const rows = response.data.values || [];
+      if (rows.length === 0) {
+        lastError = `No data found in '${sheetTabName}' tab`;
+        continue;
+      }
 
-    const rawAssessmentIndex = findHeaderIndex(headers, "assessmentType");
-    const rawFormUrlIndex = findHeaderIndex(headers, "formUrl");
-    const rawLecturerIdIndex = findHeaderIndex(headers, "lecturerId");
-    const rawStudentIdentifierIndex = findHeaderIndex(headers, "studentIdentifier");
-    const rawStudentEmailIndex = findHeaderIndex(headers, "studentEmail");
-    const rawScoreIndex = findHeaderIndex(headers, "score");
-    const rawMaxScoreIndex = findHeaderIndex(headers, "maxScore");
-    const rawSubmittedAtIndex = findHeaderIndex(headers, "submittedAt");
-    const rawSourceRowNumberIndex = findHeaderIndex(headers, "sourceRowNumber");
+      const headers = rows[0].map((value) => normalizeString(value));
+      const dataRows = rows.slice(1);
 
-    const hasMasterRawShape =
-      rawAssessmentIndex !== -1 &&
-      rawFormUrlIndex !== -1 &&
-      rawLecturerIdIndex !== -1 &&
-      rawScoreIndex !== -1 &&
-      (rawStudentIdentifierIndex !== -1 || rawStudentEmailIndex !== -1);
+      const rawAssessmentIndex = findHeaderIndex(headers, "assessmentType");
+      const rawFormUrlIndex = findHeaderIndex(headers, "formUrl");
+      const rawLecturerIdIndex = findHeaderIndex(headers, "lecturerId");
+      const rawStudentIdentifierIndex = findHeaderIndex(headers, "studentIdentifier");
+      const rawStudentEmailIndex = findHeaderIndex(headers, "studentEmail");
+      const rawScoreIndex = findHeaderIndex(headers, "score");
+      const rawMaxScoreIndex = findHeaderIndex(headers, "maxScore");
+      const rawSubmittedAtIndex = findHeaderIndex(headers, "submittedAt");
+      const rawSourceRowNumberIndex = findHeaderIndex(headers, "sourceRowNumber");
 
-    if (hasMasterRawShape) {
-      const comparableIdentifier = toComparableLower(studentIdentifier);
-      const comparableEmail = toComparableLower(studentEmail);
-      const normalizedFormUrl = normalizeString(formUrl);
+      const hasMasterRawShape =
+        rawAssessmentIndex !== -1 &&
+        rawFormUrlIndex !== -1 &&
+        rawLecturerIdIndex !== -1 &&
+        rawScoreIndex !== -1 &&
+        (rawStudentIdentifierIndex !== -1 || rawStudentEmailIndex !== -1);
 
-      const filteredRows = dataRows
-        .map((row, rowIndex) => ({ row, rowIndex }))
-        .filter(({ row }) => {
-          if (assessmentType) {
-            const rowType = normalizeAssessmentType(row[rawAssessmentIndex]);
-            if (rowType !== assessmentType) return false;
-          }
+      if (hasMasterRawShape) {
+        const comparableIdentifier = toComparableLower(studentIdentifier);
+        const comparableEmail = toComparableLower(studentEmail);
+        const normalizedFormUrl = normalizeString(formUrl);
 
-          if (lecturerId && normalizeString(row[rawLecturerIdIndex]) !== lecturerId) {
-            return false;
-          }
-
-          if (normalizedFormUrl && normalizeString(row[rawFormUrlIndex]) !== normalizedFormUrl) {
-            return false;
-          }
-
-          const rowIdentifier = toComparableLower(
-            rawStudentIdentifierIndex === -1 ? null : row[rawStudentIdentifierIndex]
-          );
-          const rowEmail = toComparableLower(
-            rawStudentEmailIndex === -1 ? null : row[rawStudentEmailIndex]
-          );
-
-          const matchesIdentifier =
-            Boolean(comparableIdentifier) &&
-            (rowIdentifier === comparableIdentifier || rowEmail === comparableIdentifier);
-          const matchesEmail =
-            Boolean(comparableEmail) &&
-            (rowEmail === comparableEmail || rowIdentifier === comparableEmail);
-
-          return matchesIdentifier || matchesEmail;
-        })
-        .map(({ row, rowIndex }) => {
-          const parsedScore = parseSubmissionScore(row[rawScoreIndex]);
-          if (!parsedScore) return null;
-
-          if (rawMaxScoreIndex !== -1) {
-            const parsedMaxScore = Number(row[rawMaxScoreIndex]);
-            if (Number.isFinite(parsedMaxScore)) {
-              parsedScore.maxScore = parsedMaxScore;
+        const filteredRows = dataRows
+          .map((row, rowIndex) => ({ row, rowIndex }))
+          .filter(({ row }) => {
+            if (assessmentType) {
+              const rowType = normalizeAssessmentType(row[rawAssessmentIndex]);
+              if (rowType !== assessmentType) return false;
             }
-          }
+            if (lecturerId && normalizeString(row[rawLecturerIdIndex]) !== lecturerId) {
+              return false;
+            }
 
-          const submittedAt =
-            parseDateValue(rawSubmittedAtIndex === -1 ? null : row[rawSubmittedAtIndex]) ||
-            new Date(0);
-          const sourceRowNumber = Number(
-            rawSourceRowNumberIndex === -1 ? NaN : row[rawSourceRowNumberIndex]
-          );
+            if (normalizedFormUrl && normalizeString(row[rawFormUrlIndex]) !== normalizedFormUrl) {
+              return false;
+            }
 
-          return {
-            row,
-            score: parsedScore.score,
-            maxScore: parsedScore.maxScore,
-            submittedAt,
-            sourceRowNumber: Number.isFinite(sourceRowNumber)
-              ? sourceRowNumber
-              : rowIndex + 2,
-          };
-        })
-        .filter(Boolean)
-        .sort((left, right) => {
-          if (right.submittedAt.getTime() !== left.submittedAt.getTime()) {
-            return right.submittedAt - left.submittedAt;
-          }
-          return right.sourceRowNumber - left.sourceRowNumber;
-        });
+            const rowIdentifier = toComparableLower(
+              rawStudentIdentifierIndex === -1 ? null : row[rawStudentIdentifierIndex]
+            );
+            const rowEmail = toComparableLower(
+              rawStudentEmailIndex === -1 ? null : row[rawStudentEmailIndex]
+            );
 
-      const latestRow = filteredRows[0];
-      if (!latestRow) {
+            const matchesIdentifier =
+              Boolean(comparableIdentifier) &&
+              (rowIdentifier === comparableIdentifier || rowEmail === comparableIdentifier);
+            const matchesEmail =
+              Boolean(comparableEmail) &&
+              (rowEmail === comparableEmail || rowIdentifier === comparableEmail);
+
+            return matchesIdentifier || matchesEmail;
+          })
+          .map(({ row, rowIndex }) => {
+            const parsedScore = parseSubmissionScore(row[rawScoreIndex]);
+            if (!parsedScore) return null;
+
+            if (rawMaxScoreIndex !== -1) {
+              const parsedMaxScore = Number(row[rawMaxScoreIndex]);
+              if (Number.isFinite(parsedMaxScore)) {
+                parsedScore.maxScore = parsedMaxScore;
+              }
+            }
+
+            const submittedAt =
+              parseDateValue(rawSubmittedAtIndex === -1 ? null : row[rawSubmittedAtIndex]) ||
+              new Date(0);
+            const sourceRowNumber = Number(
+              rawSourceRowNumberIndex === -1 ? NaN : row[rawSourceRowNumberIndex]
+            );
+
+            return {
+              row,
+              score: parsedScore.score,
+              maxScore: parsedScore.maxScore,
+              submittedAt,
+              sourceRowNumber: Number.isFinite(sourceRowNumber)
+                ? sourceRowNumber
+                : rowIndex + 2,
+            };
+          })
+          .filter(Boolean)
+          .sort((left, right) => {
+            if (right.submittedAt.getTime() !== left.submittedAt.getTime()) {
+              return right.submittedAt - left.submittedAt;
+            }
+            return right.sourceRowNumber - left.sourceRowNumber;
+          });
+
+        const latestRow = filteredRows[0];
+        if (!latestRow) {
+          lastError = `No submission found in '${sheetTabName}' for the provided student`;
+          continue;
+        }
+
         return {
-          found: false,
-          error: `No submission found in '${sheetTabName}' for the provided student`,
+          found: true,
+          score: latestRow.score,
+          maxScore: latestRow.maxScore,
+          studentRow: latestRow.row,
+          fetchTime: new Date().toISOString(),
+          sheetTabName,
         };
+      }
+
+      const identifierColIndex = findHeaderIndex(headers, studentIdentifierColumn);
+      const scoreColIndex = findHeaderIndex(headers, scoreColumn);
+      const submittedAtIndex = findHeaderIndex(headers, "submittedAt");
+
+      if (identifierColIndex === -1) {
+        lastError = `Column '${studentIdentifierColumn}' not found in '${sheetTabName}'`;
+        continue;
+      }
+
+      if (scoreColIndex === -1) {
+        lastError = `Column '${scoreColumn}' not found in '${sheetTabName}'`;
+        continue;
+      }
+
+      const comparableIdentifier = toComparableLower(studentIdentifier);
+      const studentRows = dataRows.filter((row) => {
+        const rowIdentifier = toComparableLower(row[identifierColIndex]);
+        return rowIdentifier && rowIdentifier === comparableIdentifier;
+      });
+
+      if (studentRows.length === 0) {
+        lastError = `No submission found for student with identifier: ${studentIdentifier}`;
+        continue;
+      }
+
+      studentRows.sort((leftRow, rightRow) => {
+        const leftDate =
+          parseDateValue(
+            submittedAtIndex === -1 ? leftRow[0] : leftRow[submittedAtIndex]
+          ) || new Date(0);
+        const rightDate =
+          parseDateValue(
+            submittedAtIndex === -1 ? rightRow[0] : rightRow[submittedAtIndex]
+          ) || new Date(0);
+        return rightDate - leftDate;
+      });
+
+      const parsedScore = parseSubmissionScore(studentRows[0][scoreColIndex]);
+      if (!parsedScore) {
+        lastError = `Invalid score format for student: ${studentIdentifier}`;
+        continue;
       }
 
       return {
         found: true,
-        score: latestRow.score,
-        maxScore: latestRow.maxScore,
-        studentRow: latestRow.row,
+        score: parsedScore.score,
+        maxScore: parsedScore.maxScore,
+        studentRow: studentRows[0],
         fetchTime: new Date().toISOString(),
         sheetTabName,
       };
+    } catch (error) {
+      const errorMessage = String(error?.message || "");
+      if (errorMessage.toLowerCase().includes("unable to parse range")) {
+        lastError = `Configured tab '${sheetTabName}' was not found in this spreadsheet`;
+        continue;
+      }
+
+      lastError = `Unable to fetch exam results: ${error.message}`;
+      continue;
     }
-
-    const identifierColIndex = findHeaderIndex(headers, studentIdentifierColumn);
-    const scoreColIndex = findHeaderIndex(headers, scoreColumn);
-    const submittedAtIndex = findHeaderIndex(headers, "submittedAt");
-
-    if (identifierColIndex === -1) {
-      return {
-        found: false,
-        error: `Column '${studentIdentifierColumn}' not found in '${sheetTabName}'`,
-      };
-    }
-
-    if (scoreColIndex === -1) {
-      return {
-        found: false,
-        error: `Column '${scoreColumn}' not found in '${sheetTabName}'`,
-      };
-    }
-
-    const comparableIdentifier = toComparableLower(studentIdentifier);
-    const studentRows = dataRows.filter((row) => {
-      const rowIdentifier = toComparableLower(row[identifierColIndex]);
-      return rowIdentifier && rowIdentifier === comparableIdentifier;
-    });
-
-    if (studentRows.length === 0) {
-      return {
-        found: false,
-        error: `No submission found for student with identifier: ${studentIdentifier}`,
-      };
-    }
-
-    studentRows.sort((leftRow, rightRow) => {
-      const leftDate =
-        parseDateValue(
-          submittedAtIndex === -1 ? leftRow[0] : leftRow[submittedAtIndex]
-        ) || new Date(0);
-      const rightDate =
-        parseDateValue(
-          submittedAtIndex === -1 ? rightRow[0] : rightRow[submittedAtIndex]
-        ) || new Date(0);
-      return rightDate - leftDate;
-    });
-
-    const parsedScore = parseSubmissionScore(studentRows[0][scoreColIndex]);
-    if (!parsedScore) {
-      return {
-        found: false,
-        error: `Invalid score format for student: ${studentIdentifier}`,
-      };
-    }
-
-    return {
-      found: true,
-      score: parsedScore.score,
-      maxScore: parsedScore.maxScore,
-      studentRow: studentRows[0],
-      fetchTime: new Date().toISOString(),
-      sheetTabName,
-    };
-  } catch (error) {
-    const errorMessage = String(error?.message || "");
-    if (errorMessage.toLowerCase().includes("unable to parse range")) {
-      return {
-        found: false,
-        error: `Configured tab '${sheetTabName}' was not found in this spreadsheet`,
-      };
-    }
-
-    return {
-      found: false,
-      error: `Unable to fetch exam results: ${error.message}`,
-    };
   }
+
+  return {
+    found: false,
+    error: lastError || "No matching submission was found",
+  };
 };
 
 const resolveAssessmentConfigDoc = async (lecture, assessmentType) => {
@@ -494,7 +509,6 @@ const processAssessmentSubmissionFromSheet = async ({
   let sheetResult = await getExamResultsFromSheet({
     sheetId: configDoc.googleSheetId,
     sheetTabName: configuredTabName,
-    fallbackSheetTabName: DEFAULT_MASTER_SHEET_RAW_TAB,
     studentIdentifier,
     studentEmail: normalizeString(studentIdentifier).includes("@")
       ? studentIdentifier
@@ -505,31 +519,6 @@ const processAssessmentSubmissionFromSheet = async ({
     lecturerId: lecture?.createdBy || configDoc.lecturer,
     formUrl: configDoc.formUrl,
   });
-
-  if (
-    !sheetResult.found &&
-    !normalizeSheetTabName(configDoc.googleSheetTabName) &&
-    configuredTabName !== LEGACY_FORM_RESPONSES_TAB
-  ) {
-    const legacyResult = await getExamResultsFromSheet({
-      sheetId: configDoc.googleSheetId,
-      sheetTabName: LEGACY_FORM_RESPONSES_TAB,
-      fallbackSheetTabName: LEGACY_FORM_RESPONSES_TAB,
-      studentIdentifier,
-      studentEmail: normalizeString(studentIdentifier).includes("@")
-        ? studentIdentifier
-        : null,
-      studentIdentifierColumn: MASTER_ASSESSMENT_IDENTIFIER_COLUMN,
-      scoreColumn: MASTER_ASSESSMENT_SCORE_COLUMN,
-      assessmentType,
-      lecturerId: lecture?.createdBy || configDoc.lecturer,
-      formUrl: configDoc.formUrl,
-    });
-
-    if (legacyResult.found) {
-      sheetResult = legacyResult;
-    }
-  }
 
   if (!sheetResult.found) {
     if (existingSubmission) {

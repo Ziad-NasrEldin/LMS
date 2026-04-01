@@ -10,6 +10,7 @@ import LectureCreationModal from "../../../components/LectureCreationModal"
 import ContainerCreationModal from "../../../components/ContainerCreationModal"
 import { designTokens } from "../../../constants/designTokens"
 import { translateErrorMessage } from "../../../utils/errorTranslator"
+import { objectToFormData } from "../../../utils/contentCreationPayloads"
 
 const ContainerDetailsPage = () => {
   const { t, i18n } = useTranslation('lecturesPage');
@@ -164,13 +165,7 @@ const ContainerDetailsPage = () => {
     try {
       let response
       if (thumbnailFile) {
-        const formData = new FormData()
-        Object.keys(lectureData).forEach((key) => {
-          if (lectureData[key] !== null && lectureData[key] !== undefined) {
-            formData.append(key, lectureData[key])
-          }
-        })
-        formData.append("thumbnail", thumbnailFile)
+        const formData = objectToFormData(lectureData, [{ key: "thumbnail", file: thumbnailFile }])
         response = await createLecture(formData)
       } else {
         response = await createLecture(lectureData)

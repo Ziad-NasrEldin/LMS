@@ -153,16 +153,6 @@ lectureSchema.pre("save", function (next) {
   next()
 })
 
-lectureSchema.pre("save", function (next) {
-  if (this.requiresExam && !this.examConfig) {
-    return next(new Error("Exam configuration is required when requiresExam is true"))
-  }
-  if (this.requiresHomework && !this.homeworkConfig) {
-    return next(new Error("Homework configuration is required when requiresHomework is true"))
-  }
-  next()
-})
-
 const Lecture = mongoose.model("Lecture", lectureSchema)
 
 module.exports = Lecture

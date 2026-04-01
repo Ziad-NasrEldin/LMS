@@ -12,6 +12,7 @@ import LectureCreationModal from "../../../components/LectureCreationModal"
 import { designTokens } from "../../../constants/designTokens"
 import { resolveUploadUrl } from "../../../utils/uploadUrl"
 import { translateErrorMessage } from "../../../utils/errorTranslator"
+import { objectToFormData } from "../../../utils/contentCreationPayloads"
 
 const MyLecturesPage = () => {
   const { t, i18n } = useTranslation("lecturesPage")
@@ -435,13 +436,7 @@ const MyLecturesPage = () => {
     try {
       let response
       if (thumbnailFile) {
-        const formData = new FormData()
-        Object.keys(lectureData).forEach((key) => {
-          if (lectureData[key] !== null && lectureData[key] !== undefined) {
-            formData.append(key, lectureData[key])
-          }
-        })
-        formData.append("thumbnail", thumbnailFile)
+        const formData = objectToFormData(lectureData, [{ key: "thumbnail", file: thumbnailFile }])
         response = isEditMode ? await updateLecture(lectureId, formData) : await createLecture(formData)
       } else {
         response = isEditMode ? await updateLecture(lectureId, lectureData) : await createLecture(lectureData)

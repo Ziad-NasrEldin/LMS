@@ -1,6 +1,6 @@
 import axios from "axios"
 import { getToken, isLoggedIn } from "./auth-services"
-import { normalizeApiError } from "../utils/apiError"
+import { normalizeApiError, normalizeApiErrorWithEmpty404 } from "../utils/apiError"
 import { translateErrorMessage } from "../utils/errorTranslator"
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -295,8 +295,7 @@ export const getMyContainers = async () => {
       data: response.data.data
     }
   } catch (error) {
-    console.error("Error fetching my containers:", error)
-    return normalizeApiError(error, "Failed to fetch containers")
+    return normalizeApiErrorWithEmpty404(error, "Failed to fetch containers")
   }
 }
 

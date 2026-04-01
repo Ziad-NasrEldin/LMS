@@ -169,10 +169,6 @@ exports.getAssistantsByLecturer = catchAsync(async (req, res, next) => {
         .populate("assignedLecturer", "name email")
         .select("-password");
 
-    if (!assistants || assistants.length === 0) {
-        return next(new AppError("No assistants found for this lecturer.", 404));
-    }
-
     res.status(200).json({
         status: "success",
         results: assistants.length,

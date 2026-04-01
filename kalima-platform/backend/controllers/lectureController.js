@@ -13,6 +13,15 @@ const StudentLectureAccess = require("../models/studentLectureAccessModel")
 const StudentExamSubmission = require("../models/studentExamSubmissionModel")
 const { uploadSingleImageToDisk } = require("./../utils/upload files/uploadFiles")
 const { buildLectureRequirements, getRestrictedLectureSnapshot } = require("../utils/lectureAccessUtils")
+const {
+  buildTargetAncestorIds,
+  loadPurchaseForStudent,
+  purchaseUnlocksTarget,
+  resolveAccessibleLectureTarget,
+  sanitizeLectureForAccess,
+  serializeStudentLectureAccess,
+  upsertStudentLectureAccess,
+} = require("../utils/lectureAccessResolver")
 const { normalizeExternalUrl } = require("../utils/urlValidation")
 const {
   MASTER_ASSESSMENT_SHEET_ID,
@@ -998,99 +1007,37 @@ exports.deleteLectureThumbnail = catchAsync(async (req, res, next) => {
 
 // Check student access to standalone lecture
 exports.checkStudentLectureAccess = catchAsync(async (req, res, next) => {
-  const session = await mongoose.startSession();
-  session.startTransaction();
+  const { studentId, lectureId, purchaseId } = req.params
 
-  try {
-    const { studentId, lectureId, purchaseId } = req.params;
-
-    // Validate IDs
-    if (
-      !mongoose.Types.ObjectId.isValid(studentId) ||
-      !mongoose.Types.ObjectId.isValid(lectureId) ||
-      !mongoose.Types.ObjectId.isValid(purchaseId)
-    ) {
-      throw new AppError("Invalid ID provided.", 400);
-    }
-
-    // Check if purchase exists and is a lecture purchase for this lecture
-    const purchase = await Purchase.findById(purchaseId)
-      .select("lecture type student")
-      .session(session);
-
-    if (!purchase) {
-      throw new AppError("Purchase not found", 403);
-    }
-
-    if (purchase.type !== "lecturePurchase") {
-      throw new AppError("Invalid purchase type for lecture access", 403);
-    }
-
-    if (purchase.lecture.toString() !== lectureId) {
-      throw new AppError("Purchase does not match the requested lecture", 403);
-    }
-
-    if (purchase.student.toString() !== studentId) {
-      throw new AppError("Purchase does not belong to this student", 403);
-    }
-
-    // Check if lecture exists
-    const lecture = await Lecture.findById(lectureId).session(session);
-    if (!lecture) {
-      throw new AppError("Lecture not found", 404);
-    }
-
-    // Get or create student lecture access
-    let access = await StudentLectureAccess.findOne({
-      student: studentId,
-      lecture: lectureId,
-    }).session(session);
-
-    if (!access) {
-      const accessRecords = await StudentLectureAccess.create(
-        [
-          {
-            student: studentId,
-            lecture: lectureId,
-            remainingViews: lecture.numberOfViews !== undefined && lecture.numberOfViews !== null
-              ? lecture.numberOfViews
-              : 3, // Only default to 3 if numberOfViews is not set
-          },
-        ],
-        { session }
-      );
-      access = accessRecords[0];
-
-      if (!access) {
-        throw new AppError("Failed to grant access", 500);
-      }
-    } else {
-      // Update last accessed time
-      access.lastAccessed = Date.now();
-      await access.save({ session });
-    }
-
-    await session.commitTransaction();
-
-    res.status(200).json({
-      status: "success",
-      data: {
-        lecture: {
-          _id: lecture._id,
-          name: lecture.name,
-          kind: "Lecture"
-        },
-        access: {
-          _id: access._id,
-          remainingViews: access.remainingViews,
-          lastAccessed: access.lastAccessed
-        }
-      },
-    });
-  } catch (error) {
-    await session.abortTransaction();
-    return next(error);
-  } finally {
-    session.endSession();
+  if (
+    !mongoose.Types.ObjectId.isValid(studentId) ||
+    !mongoose.Types.ObjectId.isValid(lectureId) ||
+    !mongoose.Types.ObjectId.isValid(purchaseId)
+  ) {
+    throw new AppError("Invalid ID provided.", 400)
   }
+
+  const lectureResult = await resolveAccessibleLectureTarget(lectureId)
+
+  if (!lectureResult) {
+    throw new AppError("Lecture not found", 404)
+  }
+
+  const purchase = await loadPurchaseForStudent(purchaseId, studentId)
+  const targetAncestorIds = await buildTargetAncestorIds(lectureResult.targetDoc)
+
+  if (!purchaseUnlocksTarget(purchase, lectureResult.targetDoc, targetAncestorIds)) {
+    throw new AppError("Purchase does not match the requested lecture", 403)
+  }
+
+  const access = await upsertStudentLectureAccess(studentId, lectureResult.targetDoc)
+  const lecture = sanitizeLectureForAccess(lectureResult.targetDoc, access)
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      lecture,
+      access: serializeStudentLectureAccess(access),
+    },
+  })
 });

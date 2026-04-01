@@ -5,6 +5,7 @@ import { motion } from "framer-motion"
 import { ImageIcon, Video, ChevronDown } from "lucide-react"
 import toast from "react-hot-toast"
 import { createContainer, updateContainer } from "../../routes/lectures"
+import { buildContainerPayloadObject, objectToFormData } from "../../utils/contentCreationPayloads"
 
 function BasicInfoForm({
   formData,
@@ -43,6 +44,16 @@ function BasicInfoForm({
       return
     }
 
+    if (!formData.description?.trim()) {
+      toast.error(isRTL ? "يرجى إدخال وصف للكورس" : "Please enter a course description")
+      return
+    }
+
+    if (!formData.goal?.trim()) {
+      toast.error(isRTL ? "يرجى إدخال هدف الكورس" : "Please enter a course goal")
+      return
+    }
+
     if (isPaidCourse && (!formData.priceFull || Number(formData.priceFull) <= 0)) {
       toast.error(
         isRTL
@@ -55,24 +66,19 @@ function BasicInfoForm({
     setIsSubmitting(true)
 
     try {
-      const formDataPayload = new FormData()
-      
-      // Append required fields
-      formDataPayload.append("name", formData.courseName)
-      formDataPayload.append("type", "course") // Adjust to "month" if required by your API
-      formDataPayload.append("createdBy", createdBy)
-      formDataPayload.append("level", formData.gradeLevel)
-      formDataPayload.append("subject", formData.subject)
-      formDataPayload.append("description", formData.description || "")
-      formDataPayload.append("goal", formData.goal || "")
-      formDataPayload.append("price", isPaidCourse ? Number(formData.priceFull) || 0 : 0)
-      formDataPayload.append("teacherAllowed", formData.privacy === "teacher")
-      formDataPayload.append("priceAllowed", isPaidCourse)
+      const containerPayload = buildContainerPayloadObject({
+        name: formData.courseName,
+        type: "course",
+        createdBy,
+        level: formData.gradeLevel,
+        subject: formData.subject,
+        description: formData.description.trim(),
+        goal: formData.goal.trim(),
+        price: isPaidCourse ? Number(formData.priceFull) || 0 : 0,
+        teacherAllowed: formData.privacy === "teacher",
+      })
 
-      // Append image file if exists (video omitted unless API supports it)
-      if (courseImage) {
-        formDataPayload.append("image", courseImage)
-      }
+      const formDataPayload = objectToFormData(containerPayload, courseImage ? [{ key: "image", file: courseImage }] : [])
 
       const response = isEditMode && editContainerId
         ? await updateContainer(editContainerId, formDataPayload)

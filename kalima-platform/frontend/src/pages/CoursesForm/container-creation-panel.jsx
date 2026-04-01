@@ -7,6 +7,11 @@ import { createContainer, createLecture, createLectureAttachment } from "../../r
 import { getAllSubjects } from "../../routes/courses"
 import ContainerList from "./container-list"
 import { translateErrorMessage } from "../../utils/errorTranslator"
+import {
+  buildContainerPayloadObject,
+  buildLecturePayloadObject,
+  objectToFormData,
+} from "../../utils/contentCreationPayloads"
 
 const CONTAINER_TYPES = {
   COURSE: "course",
@@ -37,9 +42,75 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
   const [homeworkPassingThreshold, setHomeworkPassingThreshold] = useState(60)
   const [containerPrice, setContainerPrice] = useState(0)
   const [description, setDescription] = useState("")
+  const [goal, setGoal] = useState("")
   const [imageFile, setImageFile] = useState(null)
   const [expandedItems, setExpandedItems] = useState({})
   const [attachmentType, setAttachmentType] = useState("homeworks")
+
+  const normalizeId = (value) => value?._id || value?.id || value || null
+
+  const getContainerById = (containerId) => {
+    if (!containerId) return null
+
+    const rootId = normalizeId(courseStructure.parent)
+    if (rootId && String(rootId) === String(containerId)) {
+      return courseStructure.parent
+    }
+
+    return courseStructure.containers.find((container) => String(container.id) === String(containerId)) || null
+  }
+
+  const getNextChildType = (parentType) => {
+    switch (String(parentType || "").toLowerCase()) {
+      case CONTAINER_TYPES.COURSE:
+        return CONTAINER_TYPES.YEAR
+      case CONTAINER_TYPES.YEAR:
+        return CONTAINER_TYPES.TERM
+      case CONTAINER_TYPES.TERM:
+        return CONTAINER_TYPES.MONTH
+      case CONTAINER_TYPES.MONTH:
+        return CONTAINER_TYPES.LECTURE
+      default:
+        return null
+    }
+  }
+
+  const getSuggestedParentIdForType = (nextType) => {
+    switch (nextType) {
+      case CONTAINER_TYPES.YEAR:
+        return normalizeId(courseStructure.parent)
+      case CONTAINER_TYPES.TERM: {
+        const latestYear = [...courseStructure.containers].filter((container) => container.type === CONTAINER_TYPES.YEAR).slice(-1)[0]
+        return normalizeId(latestYear)
+      }
+      case CONTAINER_TYPES.MONTH: {
+        const latestTerm = [...courseStructure.containers].filter((container) => container.type === CONTAINER_TYPES.TERM).slice(-1)[0]
+        return normalizeId(latestTerm)
+      }
+      case CONTAINER_TYPES.LECTURE: {
+        const latestMonth = [...courseStructure.containers].filter((container) => container.type === CONTAINER_TYPES.MONTH).slice(-1)[0]
+        return normalizeId(latestMonth)
+      }
+      case CONTAINER_TYPES.COURSE:
+      default:
+        return normalizeId(courseStructure.parent)
+    }
+  }
+
+  const handleContainerTypeChange = (nextType) => {
+    setContainerType(nextType)
+    const suggestedParentId = getSuggestedParentIdForType(nextType)
+    setSelectedParentId(suggestedParentId || "")
+  }
+
+  const handleParentSelection = (parentId) => {
+    setSelectedParentId(parentId)
+    const parentContainer = getContainerById(parentId)
+    const nextType = getNextChildType(parentContainer?.type)
+    if (nextType) {
+      setContainerType(nextType)
+    }
+  }
 
   useEffect(() => {
     const fetchSubjects = async () => {
@@ -88,48 +159,37 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
         }
 
         // Create the base lecture data object
-        const lectureData = {
+        if (requiresExam && !examFormUrl) {
+          toast.error(isRTL ? "يرجى إدخال رابط امتحان" : "Please provide an exam form URL")
+          setIsSubmitting(false)
+          return
+        }
+
+        if (requiresHomework && !homeworkFormUrl) {
+          toast.error(isRTL ? "يرجى إدخال رابط واجب" : "Please provide a homework form URL")
+          setIsSubmitting(false)
+          return
+        }
+
+        const lectureData = buildLecturePayloadObject({
           name: containerName,
-          type: "lecture",
-          createdBy: createdBy,
+          price: Number(lecturePrice),
           level: formData.gradeLevel,
           subject: formData.subject,
           parent: selectedParentId,
-          price: Number(lecturePrice),
-          description: description || `Lecture for ${containerName}`,
-          numberOfViews: Number(numberOfViews),
+          createdBy,
           videoLink: lectureLink,
           teacherAllowed: formData.privacy === "teacher",
-          lecture_type: lectureType,
-        }
-
-        if (requiresExam) {
-          if (!examFormUrl) {
-            toast.error(isRTL ? "يرجى إدخال رابط امتحان" : "Please provide an exam form URL")
-            setIsSubmitting(false)
-            return
-          }
-
-          lectureData.requiresExam = true
-          lectureData.examFormUrl = examFormUrl
-          lectureData.passingThreshold = Number(passingThreshold)
-        } else {
-          lectureData.requiresExam = false
-        }
-
-        if (requiresHomework) {
-          if (!homeworkFormUrl) {
-            toast.error(isRTL ? "يرجى إدخال رابط واجب" : "Please provide a homework form URL")
-            setIsSubmitting(false)
-            return
-          }
-
-          lectureData.requiresHomework = true
-          lectureData.homeworkFormUrl = homeworkFormUrl
-          lectureData.homeworkPassingThreshold = Number(homeworkPassingThreshold)
-        } else {
-          lectureData.requiresHomework = false
-        }
+          description: description || `Lecture for ${containerName}`,
+          numberOfViews: Number(numberOfViews),
+          lectureType: lectureType,
+          requiresExam,
+          examFormUrl,
+          passingThreshold: Number(passingThreshold),
+          requiresHomework,
+          homeworkFormUrl,
+          homeworkPassingThreshold: Number(homeworkPassingThreshold),
+        })
 
         const response = await createLecture(lectureData)
 
@@ -184,22 +244,43 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
           ...courseStructure,
           lectures: [...courseStructure.lectures, newLecture],
         })
-      } else {
-        const formDataPayload = new FormData()
-        formDataPayload.append("name", containerName)
-        formDataPayload.append("type", containerType)
-        formDataPayload.append("createdBy", createdBy)
-        formDataPayload.append("level", formData.gradeLevel)
-        formDataPayload.append("subject", formData.subject)
-        formDataPayload.append("parent", selectedParentId)
-        formDataPayload.append("price", Number(containerPrice))
-        formDataPayload.append("description", description || `Container for ${containerName}`)
-        formDataPayload.append("teacherAllowed", formData.privacy === "teacher")
 
-        // Only append image if containerType is "course" and an image is selected
-        if (containerType === CONTAINER_TYPES.COURSE && imageFile) {
-          formDataPayload.append("image", imageFile)
+        const nextLectureType = getNextChildType(lecture.type || containerType)
+        if (nextLectureType) {
+          setContainerType(nextLectureType)
+          setSelectedParentId(newLecture.id)
         }
+      } else {
+        const isCourseContainer = containerType === CONTAINER_TYPES.COURSE
+
+        if (isCourseContainer && !description.trim()) {
+          toast.error(isRTL ? "يرجى إدخال وصف الكورس" : "Please enter a course description")
+          setIsSubmitting(false)
+          return
+        }
+
+        if (isCourseContainer && !goal.trim()) {
+          toast.error(isRTL ? "يرجى إدخال هدف الكورس" : "Please enter a course goal")
+          setIsSubmitting(false)
+          return
+        }
+
+        const containerPayload = buildContainerPayloadObject({
+          name: containerName,
+          type: containerType,
+          createdBy,
+          level: formData.gradeLevel,
+          subject: formData.subject,
+          parent: selectedParentId,
+          price: Number(containerPrice),
+          description: isCourseContainer ? description.trim() : undefined,
+          goal: isCourseContainer ? goal.trim() : undefined,
+          teacherAllowed: formData.privacy === "teacher",
+        })
+
+        const formDataPayload = isCourseContainer && imageFile
+          ? objectToFormData(containerPayload, [{ key: "image", file: imageFile }])
+          : containerPayload
 
         const response = await createContainer(formDataPayload)
         const container = response.data.container
@@ -215,6 +296,12 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
           ...courseStructure,
           containers: [...courseStructure.containers, newContainer],
         })
+
+        const nextContainerType = getNextChildType(containerType)
+        if (nextContainerType) {
+          setContainerType(nextContainerType)
+          setSelectedParentId(newContainer.id)
+        }
       }
 
       // Reset form fields
@@ -232,6 +319,7 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
       setHomeworkPassingThreshold(60)
       setContainerPrice(0)
       setDescription("")
+      setGoal("")
       setImageFile(null)
       setAttachmentType("homeworks")
 
@@ -255,7 +343,7 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
   const getAvailableParents = () => {
     switch (containerType) {
       case CONTAINER_TYPES.YEAR:
-        return [courseStructure.parent]
+        return [courseStructure.parent].filter(Boolean)
       case CONTAINER_TYPES.TERM:
         return courseStructure.containers.filter((c) => c.type === CONTAINER_TYPES.YEAR)
       case CONTAINER_TYPES.MONTH:
@@ -263,7 +351,7 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
       case CONTAINER_TYPES.LECTURE:
         return courseStructure.containers.filter((c) => c.type === CONTAINER_TYPES.MONTH)
       default:
-        return [courseStructure.parent]
+        return [courseStructure.parent].filter(Boolean)
     }
   }
 
@@ -303,18 +391,23 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
             <label className="block text-sm font-medium mb-1">{isRTL ? "نوع المحتوى" : "Content Type"}</label>
             <select
               value={containerType}
-              onChange={(e) => {
-                setContainerType(e.target.value)
-                setSelectedParentId(null)
-              }}
+              onChange={(e) => handleContainerTypeChange(e.target.value)}
               className={compactSelect}
               required
             >
               <option value={CONTAINER_TYPES.COURSE}>{isRTL ? "دورة" : "Course"}</option>
-              <option value={CONTAINER_TYPES.YEAR}>{isRTL ? "سنة دراسية" : "Academic Year"}</option>
-              <option value={CONTAINER_TYPES.TERM}>{isRTL ? "فصل دراسي" : "Term"}</option>
-              <option value={CONTAINER_TYPES.MONTH}>{isRTL ? "شهر" : "Month"}</option>
-              <option value={CONTAINER_TYPES.LECTURE}>{isRTL ? "محاضرة" : "Lecture"}</option>
+              <option value={CONTAINER_TYPES.YEAR} disabled={!getSuggestedParentIdForType(CONTAINER_TYPES.YEAR)}>
+                {isRTL ? "سنة دراسية" : "Academic Year"}
+              </option>
+              <option value={CONTAINER_TYPES.TERM} disabled={!getSuggestedParentIdForType(CONTAINER_TYPES.TERM)}>
+                {isRTL ? "فصل دراسي" : "Term"}
+              </option>
+              <option value={CONTAINER_TYPES.MONTH} disabled={!getSuggestedParentIdForType(CONTAINER_TYPES.MONTH)}>
+                {isRTL ? "شهر" : "Month"}
+              </option>
+              <option value={CONTAINER_TYPES.LECTURE} disabled={!getSuggestedParentIdForType(CONTAINER_TYPES.LECTURE)}>
+                {isRTL ? "محاضرة" : "Lecture"}
+              </option>
             </select>
             <p className="mt-1 text-xs text-base-content/55">
               {containerType === CONTAINER_TYPES.LECTURE
@@ -323,13 +416,18 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
                   ? "أنشئ هذا الجزء في المكان الصحيح من الهيكل."
                   : "Create this part in the correct place within the structure."}
             </p>
+            <p className="mt-1 text-xs text-base-content/45">
+              {isRTL
+                ? "اختيار الأب سيملأ النوع المناسب تلقائياً، ويمكنك تغييره يدوياً لاحقاً."
+                : "Picking a parent auto-fills the right type, and you can still change it later."}
+            </p>
           </div>
 
           <div>
             <label className="block text-sm font-medium mb-1">{isRTL ? "الحاوية الأب" : "Parent Container"}</label>
             <select
               value={selectedParentId || ""}
-              onChange={(e) => setSelectedParentId(e.target.value)}
+              onChange={(e) => handleParentSelection(e.target.value)}
               className={compactSelect}
               required
             >
@@ -343,7 +441,9 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
               ))}
             </select>
             <p className="mt-1 text-xs text-base-content/55">
-              {isRTL ? "اختر الحاوية التي ستحتوي هذا العنصر." : "Pick the parent container that will contain this item."}
+              {isRTL
+                ? "اختيار الأب يملأ نوع المحتوى تلقائياً."
+                : "Selecting a parent auto-fills the matching content type."}
             </p>
           </div>
         </div>
@@ -381,30 +481,44 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
           </select>
         </div>
 
-        <div className="mt-3">
-          <label className="block text-sm font-medium mb-1">{isRTL ? "الوصف" : "Description"}</label>
-          <input
-            type="text"
-            value={description}
+            <div className="mt-3">
+              <label className="block text-sm font-medium mb-1">{isRTL ? "الوصف" : "Description"}</label>
+              <input
+                type="text"
+                value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder={isRTL ? "الوصف" : "Description"}
-            className={compactInput}
-          />
-        </div>
+                className={compactInput}
+              />
+            </div>
 
-        {containerType === CONTAINER_TYPES.LECTURE ? (
-          <>
+            {containerType === CONTAINER_TYPES.COURSE && (
+              <div className="mt-3">
+                <label className="block text-sm font-medium mb-1">{isRTL ? "هدف الكورس" : "Course Goal"}</label>
+                <textarea
+                  value={goal}
+                  onChange={(e) => setGoal(e.target.value)}
+                  placeholder={isRTL ? "هدف الكورس" : "Course goal"}
+                  className={`${compactTextArea} min-h-24`}
+                />
+              </div>
+            )}
+
+            {containerType === CONTAINER_TYPES.LECTURE ? (
+              <>
             <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-2">
               <div>
-              <label className="block text-sm font-medium mb-1">{isRTL ? "نوع المحاضرة" : "Lecture Type"}</label>
-              <select
-                value={lectureType}
-                onChange={(e) => setLectureType(e.target.value)}
-                className={compactSelect}
-              >
-                <option value="Paid">{isRTL ? "مدفوع" : "Paid"}</option>
-                <option value="Revision">{isRTL ? "مراجعة" : "Revision"}</option>
-              </select>
+                <label className="block text-sm font-medium mb-1">{isRTL ? "نوع المحاضرة" : "Lecture Type"}</label>
+                <select
+                  value={lectureType}
+                  onChange={(e) => setLectureType(e.target.value)}
+                  className={compactSelect}
+                >
+                  <option value="Free">{isRTL ? "مجاني" : "Free"}</option>
+                  <option value="Paid">{isRTL ? "مدفوع" : "Paid"}</option>
+                  <option value="Revision">{isRTL ? "مراجعة" : "Revision"}</option>
+                  <option value="Teachers Only">{isRTL ? "للمعلمين فقط" : "Teachers Only"}</option>
+                </select>
               </div>
               <div>
               <label className="block text-sm font-medium mb-1">{isRTL ? "سعر المحاضرة" : "Lecture Price"}</label>
@@ -627,7 +741,7 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
         courseStructure={courseStructure}
         isRTL={isRTL}
         selectedParentId={selectedParentId}
-        setSelectedParentId={setSelectedParentId}
+        setSelectedParentId={handleParentSelection}
         expandedItems={expandedItems}
         toggleExpand={toggleExpand}
       />

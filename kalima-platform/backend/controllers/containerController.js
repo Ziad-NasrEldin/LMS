@@ -7,11 +7,19 @@ const QueryFeatures = require("../utils/queryFeatures");
 const Level = require("../models/levelModel");
 const Subject = require("../models/subjectModel");
 const Lecturer = require("../models/lecturerModel");
-const StudentLectureAccess = require("../models/studentLectureAccessModel");
 const multer = require("multer");
 const cloudinary = require("cloudinary").v2;
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const configureCloudinary = require("../config/cloudinaryOptions");
+const {
+  buildTargetAncestorIds,
+  loadPurchaseForStudent,
+  purchaseUnlocksTarget,
+  resolveAccessibleLectureTarget,
+  sanitizeLectureForAccess,
+  serializeStudentLectureAccess,
+  upsertStudentLectureAccess,
+} = require("../utils/lectureAccessResolver");
 
 // Configure Cloudinary for container images
 configureCloudinary();
@@ -44,195 +52,39 @@ const checkDoc = async (Model, id, session) => {
   return doc;
 };
 exports.getAccessibleChildContainers = catchAsync(async (req, res, next) => {
-  const session = await mongoose.startSession();
-  session.startTransaction();
-  try {
-    const { studentId, containerId, purchaseId } = req.params;
+  const { studentId, containerId, purchaseId } = req.params;
 
-    if (
-      !mongoose.Types.ObjectId.isValid(studentId) ||
-      !mongoose.Types.ObjectId.isValid(containerId) ||
-      (purchaseId && !mongoose.Types.ObjectId.isValid(purchaseId))
-    ) {
-      throw new AppError("Invalid ID provided.", 400);
-    }
-
-    let purchasedContainerId;
-
-    if (purchaseId) {
-      const purchase = await Purchase.findById(purchaseId)
-        .select("container lecture type")
-        .session(session);
-      if (!purchase) {
-        throw new AppError("Purchase not found or unauthorized", 403);
-      }
-
-      // Handle both container purchases and lecture purchases
-      if (purchase.type === "containerPurchase" && purchase.container) {
-        purchasedContainerId = purchase.container.toString();
-        console.log("Container purchase found, using container ID:", purchasedContainerId);
-      } else if (purchase.type === "lecturePurchase" && purchase.lecture) {
-        // For lecture purchases, the lecture ID is the container ID
-        purchasedContainerId = purchase.lecture.toString();
-        console.log("Lecture purchase found, using lecture ID:", purchasedContainerId);
-      } else {
-        console.log("Invalid purchase type or missing data:", { type: purchase.type, container: purchase.container, lecture: purchase.lecture });
-        throw new AppError("Invalid purchase type or missing purchase data", 403);
-      }
-    }
-    //  else {
-    //   // Otherwise, fallback to finding any purchase for this student.
-    //   const purchase = await Purchase.findOne({
-    //     student: studentId,
-    //     type: "containerPurchase",
-    //   })
-    //     .select("container")
-    //     .session(session);
-    //   if (!purchase) {
-    //     throw new AppError("No purchases found for this student", 403);
-    //   }
-    //   purchasedContainerId = purchase.container.toString();
-    // }
-
-    // Traverse upward from the provided container to get its parent chain.
-    const containerChainResult = await Container.aggregate([
-      {
-        $match: { _id: new mongoose.Types.ObjectId(containerId) },
-      },
-      {
-        $graphLookup: {
-          from: "containers", // Ensure this matches your actual collection name.
-          startWith: "$parent",
-          connectFromField: "parent",
-          connectToField: "_id",
-          as: "parentChain",
-        },
-      },
-    ]).session(session);
-
-    if (!containerChainResult || containerChainResult.length === 0) {
-      // Try to find in Lecture model
-      const Lecture = require("../models/LectureModel");
-      const lectureDoc = await Lecture.findById(containerId).session(session);
-
-      if (lectureDoc) {
-        // If found in Lecture model, we need to build the chain from its parent
-        if (lectureDoc.parent) {
-          const parentChainResult = await Container.aggregate([
-            {
-              $match: { _id: new mongoose.Types.ObjectId(lectureDoc.parent) },
-            },
-            {
-              $graphLookup: {
-                from: "containers",
-                startWith: "$parent",
-                connectFromField: "parent",
-                connectToField: "_id",
-                as: "parentChain",
-              },
-            },
-          ]).session(session);
-
-          if (parentChainResult && parentChainResult.length > 0) {
-            const parentDoc = parentChainResult[0];
-            // Construct a container-like object for the lecture
-            const containerDoc = {
-              ...lectureDoc.toObject(),
-              kind: "Lecture", // Simulate kind for consistency
-              parentChain: [parentDoc, ...parentDoc.parentChain]
-            };
-
-            // Continue with this constructed doc
-            // We need to wrap this in a way that matches the flow
-            // But since the flow below expects containerChainResult[0] to be the doc
-            // We can just assign it to a variable and skip the error
-
-            // Let's restructure the code slightly to handle both cases
-            return handleAccessCheck(containerDoc, purchasedContainerId, studentId, session, res);
-          }
-        } else {
-          // Lecture has no parent, so it's a root item (unlikely but possible)
-          const containerDoc = {
-            ...lectureDoc.toObject(),
-            kind: "Lecture",
-            parentChain: []
-          };
-          return handleAccessCheck(containerDoc, purchasedContainerId, studentId, session, res);
-        }
-      }
-
-      throw new AppError("Container not found", 404);
-    }
-    const containerDoc = containerChainResult[0];
-    return handleAccessCheck(containerDoc, purchasedContainerId, studentId, session, res);
-
-  } catch (error) {
-    await session.abortTransaction();
-    return next(error);
-  } finally {
-    session.endSession();
-  }
-});
-
-const handleAccessCheck = async (containerDoc, purchasedContainerId, studentId, session, res) => {
-  // Build set of container IDs from the container upward.
-  const accessibleChainIds = new Set();
-  accessibleChainIds.add(containerDoc._id.toString());
-  if (containerDoc.parentChain) {
-    containerDoc.parentChain.forEach((doc) => {
-      accessibleChainIds.add(doc._id.toString());
-    });
+  if (
+    !mongoose.Types.ObjectId.isValid(studentId) ||
+    !mongoose.Types.ObjectId.isValid(containerId) ||
+    (purchaseId && !mongoose.Types.ObjectId.isValid(purchaseId))
+  ) {
+    throw new AppError("Invalid ID provided.", 400);
   }
 
-  // Check if the purchased container is in the chain.
-  if (!accessibleChainIds.has(purchasedContainerId)) {
+  const targetResult = await resolveAccessibleLectureTarget(containerId);
+
+  if (!targetResult) {
+    throw new AppError("Container not found", 404);
+  }
+
+  const purchase = await loadPurchaseForStudent(purchaseId, studentId);
+  const targetAncestorIds = await buildTargetAncestorIds(targetResult.targetDoc);
+
+  if (!purchaseUnlocksTarget(purchase, targetResult.targetDoc, targetAncestorIds)) {
     throw new AppError("You do not have access to this container", 403);
   }
 
-  delete containerDoc.parentChain;
-  let access;
-  // Check if it's a lecture (either from Lecture model or Container model with kind='Lecture')
-  if (containerDoc.kind === "Lecture" || containerDoc.type === "lecture") {
-    access = await StudentLectureAccess.findOne({
-      student: studentId,
-      lecture: containerDoc._id,
-    }).session(session);
+  const access = await upsertStudentLectureAccess(studentId, targetResult.targetDoc);
+  const containerDoc = sanitizeLectureForAccess(targetResult.targetDoc, access);
 
-    if (!access) {
-      const remainingViews = containerDoc.numberOfViews !== undefined && containerDoc.numberOfViews !== null
-        ? containerDoc.numberOfViews
-        : 3; // Default to 3 if not set
-
-      const accessRecords = await StudentLectureAccess.create(
-        [
-          {
-            student: studentId,
-            lecture: containerDoc._id,
-            remainingViews: remainingViews,
-          },
-        ],
-        { session }
-      );
-      access = accessRecords[0];
-      if (!access) {
-        throw new AppError("Failed to grant access", 500);
-      }
-    } else {
-      if (access.remainingViews > 0) {
-        // access.remainingViews -= 1;
-        access.lastAccessed = Date.now();
-        await access.save({ session });
-      } else {
-        delete containerDoc.videoLink;
-      }
-    }
-  }
-
-  await session.commitTransaction();
   res
     .status(200)
-    .json({ status: "success", data: { container: containerDoc, access } });
-};
+    .json({
+      status: "success",
+      data: { container: containerDoc, access: serializeStudentLectureAccess(access) },
+    });
+});
 
 exports.getAllContainerPurchaseCounts = catchAsync(async (req, res, next) => {
   // Aggregate purchase counts for all containers
@@ -632,10 +484,6 @@ exports.getLecturerContainers = catchAsync(async (req, res, next) => {
     { path: "level", select: "name" },
   ]);
 
-  if (!containers || containers.length === 0) {
-    return next(new AppError("No containers found for this lecturer.", 404));
-  }
-
   res.status(200).json({
     status: "success",
     results: containers.length,
@@ -663,10 +511,6 @@ exports.getMyContainers = catchAsync(async (req, res, next) => {
     { path: "parent", select: "name type" },
     { path: "createdBy", select: "name email" },
   ]);
-
-  if (!containers || containers.length === 0) {
-    return next(new AppError("No containers found for this lecturer.", 404));
-  }
 
   res.status(200).json({
     status: "success",

@@ -5,6 +5,7 @@ import { FiX } from "react-icons/fi"
 import { getAllLevels } from "../routes/levels"
 import { getAllSubjects } from "../routes/courses"
 import { translateErrorMessage } from "../utils/errorTranslator"
+import { buildContainerPayloadObject } from "../utils/contentCreationPayloads"
 
 const ContainerCreationModal = ({
   isOpen,
@@ -125,32 +126,31 @@ const ContainerCreationModal = ({
 
     try {
       const childType = getChildType()
+      const nextType = isEditMode ? (initialData?.type || containerType || childType) : childType
       if (!isEditMode && !childType) throw new Error(translateErrorMessage("Invalid container type for creation"))
       if (!newItemName) throw new Error(translateErrorMessage("Name is required"))
-      if (!newDescription) throw new Error(translateErrorMessage("Description is required"))
-      if (!newGoal) throw new Error(translateErrorMessage("Goal is required"))
       if (!selectedLevel) throw new Error(translateErrorMessage("Level is required"))
       if (!selectedSubject) throw new Error(translateErrorMessage("Subject is required"))
 
-      const nextType = isEditMode ? (initialData?.type || containerType || getChildType()) : getChildType()
       if (!nextType) throw new Error(translateErrorMessage("Invalid container type for creation"))
+      const isCourseType = nextType === "course"
+
+      if (isCourseType && !newDescription) throw new Error(translateErrorMessage("Description is required"))
+      if (isCourseType && !newGoal) throw new Error(translateErrorMessage("Goal is required"))
 
       // Prepare container data
-      const containerData = {
+      const containerData = buildContainerPayloadObject({
         name: newItemName,
         type: nextType,
         level: selectedLevel,
         subject: selectedSubject,
         price: Number(newPrice) || 0,
-        description: newDescription,
-        goal: newGoal,
-        teacherAllowed: true,
-      }
-
-      if (!isEditMode) {
-        containerData.createdBy = userId
-        containerData.parent = containerId
-      }
+        description: isCourseType ? newDescription : undefined,
+        goal: isCourseType ? newGoal : undefined,
+        teacherAllowed: initialData?.teacherAllowed ?? true,
+        createdBy: isEditMode ? undefined : userId,
+        parent: isEditMode ? undefined : containerId,
+      })
 
       // Call the onSubmit callback with the container data
       if (isEditMode) {
@@ -187,6 +187,7 @@ const ContainerCreationModal = ({
   }
 
   const childType = getChildType()
+  const isCourseType = (isEditMode ? initialData?.type || containerType : childType) === "course"
   const modalLabel = isEditMode
     ? (initialData?.type ? `${initialData.type.charAt(0).toUpperCase() + initialData.type.slice(1)}` : "Container")
     : (childType ? `${childType.charAt(0).toUpperCase() + childType.slice(1)}` : "Container")
@@ -258,31 +259,35 @@ const ContainerCreationModal = ({
             {subjectsLoading && <span className="loading loading-spinner mt-2"></span>}
           </div>
 
-          <div className="form-control w-full mb-4">
-            <label className="label">
-              <span className="label-text">Description</span>
-            </label>
-            <textarea
-              placeholder={`Enter ${modalLabel} description`}
-              className="textarea textarea-bordered w-full"
-              value={newDescription}
-              onChange={(e) => setNewDescription(e.target.value)}
-              required
-            />
-          </div>
+          {isCourseType && (
+            <>
+              <div className="form-control w-full mb-4">
+                <label className="label">
+                  <span className="label-text">Description</span>
+                </label>
+                <textarea
+                  placeholder={`Enter ${modalLabel} description`}
+                  className="textarea textarea-bordered w-full"
+                  value={newDescription}
+                  onChange={(e) => setNewDescription(e.target.value)}
+                  required
+                />
+              </div>
 
-          <div className="form-control w-full mb-4">
-            <label className="label">
-              <span className="label-text">Goal</span>
-            </label>
-            <textarea
-              placeholder={`Enter ${modalLabel} goal`}
-              className="textarea textarea-bordered w-full"
-              value={newGoal}
-              onChange={(e) => setNewGoal(e.target.value)}
-              required
-            />
-          </div>
+              <div className="form-control w-full mb-4">
+                <label className="label">
+                  <span className="label-text">Goal</span>
+                </label>
+                <textarea
+                  placeholder={`Enter ${modalLabel} goal`}
+                  className="textarea textarea-bordered w-full"
+                  value={newGoal}
+                  onChange={(e) => setNewGoal(e.target.value)}
+                  required
+                />
+              </div>
+            </>
+          )}
 
           <div className="form-control w-full mb-4">
             <label className="label">

@@ -8,6 +8,7 @@ import { getAllSubjects } from "../routes/courses"
 import { getLectureAttachments } from "../routes/lectures"
 import { resolveUploadUrl } from "../utils/uploadUrl"
 import { translateErrorMessage } from "../utils/errorTranslator"
+import { buildLecturePayloadObject } from "../utils/contentCreationPayloads"
 
 const ATTACHMENT_BUCKET_KEYS = ["pdfsandimages", "booklets", "homeworks", "exams"]
 const FORM_LINK_KEYS = ["homeworks", "exams"]
@@ -315,9 +316,15 @@ const LectureCreationModal = ({
       if (!newVideoLink) throw new Error(t("validation.videoLinkRequired"))
 
       // Prepare lecture data
-      const lectureData = {
+      if (requiresExam && !examFormUrl) {
+        throw new Error(t("validation.examFormUrlRequired", "Exam form URL is required"))
+      }
+      if (requiresHomework && !homeworkFormUrl) {
+        throw new Error(t("validation.homeworkFormUrlRequired", "Homework form URL is required"))
+      }
+
+      const lectureData = buildLecturePayloadObject({
         name: newItemName,
-        type: "lecture",
         level: selectedLevel,
         subject: selectedSubject,
         price: Number(newPrice) || 0,
@@ -325,33 +332,18 @@ const LectureCreationModal = ({
         numberOfViews: Number(numberOfViews) || 0,
         videoLink: newVideoLink,
         teacherAllowed: true,
-        lecture_type: newLectureType,
-        requiresExam: requiresExam,
-        requiresHomework: requiresHomework,
-      }
-
-      // Handle exam config if required
-      if (requiresExam) {
-        if (!examFormUrl) {
-          throw new Error(t("validation.examFormUrlRequired", "Exam form URL is required"))
-        }
-        lectureData.examFormUrl = examFormUrl
-        lectureData.passingThreshold = Number(passingThreshold)
-      }
-      if (requiresHomework) {
-        if (!homeworkFormUrl) {
-          throw new Error(t("validation.homeworkFormUrlRequired", "Homework form URL is required"))
-        }
-        lectureData.homeworkFormUrl = homeworkFormUrl
-        lectureData.homeworkPassingThreshold = Number(homeworkPassingThreshold)
-      }
+        lectureType: newLectureType,
+        requiresExam,
+        examFormUrl,
+        passingThreshold: Number(passingThreshold),
+        requiresHomework,
+        homeworkFormUrl,
+        homeworkPassingThreshold: Number(homeworkPassingThreshold),
+        createdBy: !isEditMode ? userId : undefined,
+        parent: !isEditMode ? containerId : undefined,
+      })
 
       // Call onSubmit ONCE with all files and links for all categories
-      if (!isEditMode) {
-        lectureData.createdBy = userId
-        lectureData.parent = containerId
-      }
-
       await onSubmit(
         isEditMode ? lectureId || initialData?._id || initialData?.id : lectureData,
         isEditMode ? lectureData : null,
@@ -415,7 +407,14 @@ const LectureCreationModal = ({
     (count, files) => count + (files?.length || 0),
     0,
   ) + existingAttachmentsTotal
-  const lectureTypeLabel = newLectureType === "Revision" ? t("lectureTypes.revision") : t("lectureTypes.normal")
+  const lectureTypeLabel =
+    newLectureType === "Revision"
+      ? t("lectureTypes.revision")
+      : newLectureType === "Free"
+        ? t("lectureTypes.free", "Free")
+        : newLectureType === "Teachers Only"
+          ? t("lectureTypes.teachersOnly", "Teachers Only")
+          : t("lectureTypes.normal")
 
   const handleUnifiedAttachmentFilesChange = (files) => {
     setAttachmentFilesByCategory({
@@ -552,6 +551,8 @@ const LectureCreationModal = ({
                           value={newLectureType}
                           onChange={(e) => setNewLectureType(e.target.value)}
                         >
+                          <option value="Free">{t("lectureTypes.free", "Free")}</option>
+                          <option value="Teachers Only">{t("lectureTypes.teachersOnly", "Teachers Only")}</option>
                           <option value="Revision">{t("lectureTypes.revision")}</option>
                           <option value="Paid">{t("lectureTypes.normal")}</option>
                         </select>

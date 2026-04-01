@@ -116,6 +116,98 @@ test("getExamResultsFromSheet reads explicit tab and resolves latest matching ro
   }
 });
 
+test("getExamResultsFromSheet falls back to the Google Forms response tab", async () => {
+  try {
+    const calls = [];
+    googleApiConfig.configureGoogleSheets = () => ({
+      spreadsheets: {
+        values: {
+          get: async ({ range }) => {
+            calls.push(range);
+
+            if (range === "Form_Responses") {
+              return {
+                data: {
+                  values: [
+                    ["Timestamp", "Email Address", "Untitled Question", "Score", "Column 4"],
+                    ["4/1/2026 4:54:29", "student@example.com", "Option 1", "10 / 10", "Option 1"],
+                  ],
+                },
+              };
+            }
+
+            throw new Error(`Unable to parse range: ${range}`);
+          },
+        },
+      },
+    });
+
+    const result = await examSubmissionSync.getExamResultsFromSheet({
+      sheetId: "master-sheet-id",
+      sheetTabName: "test 2-exam",
+      studentIdentifier: "student@example.com",
+      studentEmail: "student@example.com",
+      assessmentType: "exam",
+      lecturerId: "65f5aaee1e35cd6cf4899ee1",
+      formUrl: "https://docs.google.com/forms/d/test-form/viewform",
+    });
+
+    assert.equal(result.found, true);
+    assert.equal(result.score, 10);
+    assert.equal(result.maxScore, 10);
+    assert.equal(result.sheetTabName, "Form_Responses");
+    assert.deepEqual(calls.slice(0, 3), ["test 2-exam", "RAW_SUBMISSIONS", "Form_Responses"]);
+  } finally {
+    restorePatches();
+  }
+});
+
+test("getExamResultsFromSheet falls back to numbered Google Forms tabs", async () => {
+  try {
+    const calls = [];
+    googleApiConfig.configureGoogleSheets = () => ({
+      spreadsheets: {
+        values: {
+          get: async ({ range }) => {
+            calls.push(range);
+
+            if (range === "Form Responses 3") {
+              return {
+                data: {
+                  values: [
+                    ["Timestamp", "Email Address", "Untitled Question", "Score", "Column 4"],
+                    ["4/1/2026 5:14:29", "student@example.com", "Option 1", "8 / 10", "Option 1"],
+                  ],
+                },
+              };
+            }
+
+            throw new Error(`Unable to parse range: ${range}`);
+          },
+        },
+      },
+    });
+
+    const result = await examSubmissionSync.getExamResultsFromSheet({
+      sheetId: "master-sheet-id",
+      sheetTabName: "test 2-exam",
+      studentIdentifier: "student@example.com",
+      studentEmail: "student@example.com",
+      assessmentType: "exam",
+      lecturerId: "65f5aaee1e35cd6cf4899ee1",
+      formUrl: "https://docs.google.com/forms/d/test-form/viewform",
+    });
+
+    assert.equal(result.found, true);
+    assert.equal(result.score, 8);
+    assert.equal(result.maxScore, 10);
+    assert.equal(result.sheetTabName, "Form Responses 3");
+    assert.ok(calls.includes("Form Responses 3"));
+  } finally {
+    restorePatches();
+  }
+});
+
 test("getExamResultsFromSheet returns clean error when configured tab does not exist", async () => {
   try {
     googleApiConfig.configureGoogleSheets = () => ({
@@ -135,10 +227,7 @@ test("getExamResultsFromSheet returns clean error when configured tab does not e
     });
 
     assert.equal(result.found, false);
-    assert.equal(
-      result.error,
-      "Configured tab 'LECTURE_BIOLOGY_EXAM' was not found in this spreadsheet"
-    );
+    assert.match(result.error, /was not found in this spreadsheet/);
   } finally {
     restorePatches();
   }

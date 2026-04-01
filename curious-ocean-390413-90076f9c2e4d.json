@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "curious-ocean-390413",
+  "private_key_id": "90076f9c2e4df325eb678b6e186323dffc258453",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDwC+jpeEOA8X8K\nsJdnnG3mXx4aLEYSWgJAFPGlhuL3LKVvV2ZmxpAlnHK1LOl7jtNa0P5yFrDzMpLN\n9qokNnRFaQWxJLMSiBUzS9mgcERtm2rJxGgw7nTHuvCXWOHX3+5dSg3l3mcrbFDm\n7gdP8M9dSZLc9Kj98D6FNtInIbKV8nL04ts/U5bqgFCUeEkbk7GD3tUplJ36SRN7\nc45f2nIY9nP+Dz0Ys1jt5YS1Xs6uVkhEoGfW4N9aNvBDhPz4661VjYzfCT6e0GrJ\nVVaRRcWcQ5mmYVbvrAmWTQnVc7q+/gJrDGnrERY19r4sPSpl4LCz6frOOEuGHg6S\nYDp+D165AgMBAAECggEAPWyuwt9VVq91NMUPWSH8NVDtoQDnRVbm8ILretHTTjCM\nfLs+ptn0lMs9xwKhFE7t4nVMRuFrki/ExRNzYiTVB9Xh8PxVHk7YLfIg1B8mQ23b\nm5m4l5zNITbCzdeeouDYW+LRP5rzh3cGFLGgCWKzjUmAXS31+FT7ipcGm6DR0/Bh\nfsIp6Z0xa6ftgmtHiW35QlM2wydLhdwcgG9Mcba2el7yY9duiCc5bXe8uorJw8Xy\n6Ifq74cXtC2u0duy+hHcO5MmnI/TK1+1RFDdVsM9cQx385kUKB13Mp4rRZxA8HXI\nPS939k2XT6nnVPMta9Tdf5NsjnjZbGUcbrOGPTyI6QKBgQD6IAD6uuATHVmbD3D6\nC8M+36C+xTBbqPAksWRLp7AVPKWMjWG+D7zfgYbt56hYWkraJ75QkQZjn794IRSw\nvxLCCtOfIMzpBpsVTdki8IVV4V/Ouoe/qBwlC+CqGT/NBQY13rZeB9uxl/paf+Sf\nw1UKpdFAXuO4v2GiaKHQrzNvRwKBgQD1r03iaec138Edl/IPZPjMhPjL8+KVtcS7\nLx6LB/xRyr03JM/GydwKhnSZRbSvzx5Jpt6Ot6vnugSgxyTX9/MEq+o5tTjzFY3V\nKVM0RldoXiOOWOujaZwN8GfTmkKLYEnLOHkEYWYYbIHyLXPUkJ6eUvW1H8bCgeGQ\n1VO5gxnB/wKBgQCeqlCUvJjJ51NhJpFvPKj1KFzKx0Ge03LKg/DwgQYU4qzNlR4M\nt+UDDyJtpgdHTLew3Yc/ik+4QKzv4mRCnmKizsVhaygxJeyYvhJgtJyQVvA0rmTQ\nci6wXXF91ZiAUJCY+ZdL3MZDSPoaEIkRw5IduAQeRlNEbbrckG0deRYynwKBgATc\nuEzfzayaRgcg57B4Thg2FXpr1DMkSsVtlEwqF0tDGOWLe/UyL4Gh0ZLq9z13euD4\nRXVLm0JVwxuvdUI07QFNqbAEryDYb1slmzjwn3A4VLnPdrJgN69q75MXfXOmry8v\nae21Q8D9/MBfN+igCBOYDrbL7zIQQfeM0UBdoNffAoGAdUbgEPBiMhT1O3DRKbal\nnzqKwgirKx/l0ACQfFiinbYRBz1BC6ktDQz/hD/v+3CkQ9HtXP1A1phGmJ4u8fGk\naJa2gOgJ/d5EdJR9RzjI3rG2bMsSeRbgH+8HYpSSTc/3AMuwCNPvMSQ5JMY3j4/Q\n7T+SZC+CBCjjl/fAeaQtE04=\n-----END PRIVATE KEY-----\n",
+  "client_email": "sheets-access@curious-ocean-390413.iam.gserviceaccount.com",
+  "client_id": "106745692177663618965",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/sheets-access%40curious-ocean-390413.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
