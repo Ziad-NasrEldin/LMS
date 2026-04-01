@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { getLessonById } from "../../routes/center";
 import { getAllSubjects } from "../../routes/courses";
+import { translateErrorMessage } from "../../utils/errorTranslator";
 
 const CourseCard = ({ course }) => {
   const { t, i18n } = useTranslation("centerDashboard");
@@ -18,7 +19,7 @@ const CourseCard = ({ course }) => {
       if (response.success) {
         setSubjects(response.data);
       } else {
-        setSubjectError(response.error);
+        setSubjectError(translateErrorMessage(response.error));
       }
     };
     fetchSubjects();
@@ -49,11 +50,11 @@ const CourseCard = ({ course }) => {
       if (response.status === "success") {
         navigate(`/dashboard/center-dashboard/lesson-details/${lessonId}`, { state: { lesson: response.data } });
       } else {
-        throw new Error(response.message || "Failed to fetch lesson details");
+        throw new Error(translateErrorMessage(response.message || "Failed to fetch lesson details"));
       }
     } catch (error) {
       console.error("Error fetching lesson details:", error);
-      alert(t('courseCard.errors.fetchLessonFailed', { message: error.message }));
+      alert(t('courseCard.errors.fetchLessonFailed', { message: translateErrorMessage(error.message) }));
     }
   };
 

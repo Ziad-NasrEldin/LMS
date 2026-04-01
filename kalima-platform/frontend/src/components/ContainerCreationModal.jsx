@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { FiX } from "react-icons/fi"
 import { getAllLevels } from "../routes/levels"
 import { getAllSubjects } from "../routes/courses"
+import { translateErrorMessage } from "../utils/errorTranslator"
 
 const ContainerCreationModal = ({
   isOpen,
@@ -124,15 +125,15 @@ const ContainerCreationModal = ({
 
     try {
       const childType = getChildType()
-      if (!isEditMode && !childType) throw new Error("Invalid container type for creation")
-      if (!newItemName) throw new Error("Name is required")
-      if (!newDescription) throw new Error("Description is required")
-      if (!newGoal) throw new Error("Goal is required")
-      if (!selectedLevel) throw new Error("Level is required")
-      if (!selectedSubject) throw new Error("Subject is required")
+      if (!isEditMode && !childType) throw new Error(translateErrorMessage("Invalid container type for creation"))
+      if (!newItemName) throw new Error(translateErrorMessage("Name is required"))
+      if (!newDescription) throw new Error(translateErrorMessage("Description is required"))
+      if (!newGoal) throw new Error(translateErrorMessage("Goal is required"))
+      if (!selectedLevel) throw new Error(translateErrorMessage("Level is required"))
+      if (!selectedSubject) throw new Error(translateErrorMessage("Subject is required"))
 
       const nextType = isEditMode ? (initialData?.type || containerType || getChildType()) : getChildType()
-      if (!nextType) throw new Error("Invalid container type for creation")
+      if (!nextType) throw new Error(translateErrorMessage("Invalid container type for creation"))
 
       // Prepare container data
       const containerData = {
@@ -162,7 +163,7 @@ const ContainerCreationModal = ({
       resetForm()
       onClose()
     } catch (err) {
-      setCreationError(err.message)
+      setCreationError(translateErrorMessage(err.message))
       console.error("Creation error:", err)
     } finally {
       setCreationLoading(false)

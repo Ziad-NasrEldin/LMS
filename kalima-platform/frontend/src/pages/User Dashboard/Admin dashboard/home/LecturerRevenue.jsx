@@ -6,6 +6,7 @@ import { getAllLecturers } from "../../../../routes/fetch-users"
 import { getLecturerMonthlyRevenue } from "../../../../routes/revenue"
 import { BookOpen, Trophy } from "lucide-react"
 import { designTokens } from "../../../../constants/designTokens"
+import { translateErrorMessage } from "../../../../utils/errorTranslator"
 
 export default function LecturerRevenue() {
   const { t, i18n } = useTranslation("admin")
@@ -32,10 +33,10 @@ export default function LecturerRevenue() {
             setSelectedLecturer(result.data[0]._id)
           }
         } else {
-          throw new Error(result)
+          throw new Error(translateErrorMessage(result))
         }
       } catch (err) {
-        setError(err.message)
+        setError(translateErrorMessage(err.message))
       } finally {
         setLoading(false)
       }
@@ -55,7 +56,7 @@ export default function LecturerRevenue() {
         setRevenueData(result)
         setError(null)
       } catch (err) {
-        setError(err.message)
+        setError(translateErrorMessage(err.message))
       } finally {
         setLoading(false)
       }

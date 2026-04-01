@@ -7,6 +7,7 @@ import { Link } from "react-router-dom"
 import { getMyContainers, deleteContainerById } from "../../routes/lectures"
 import Pagination from "../../components/Pagination"
 import { designTokens } from "../../constants/designTokens"
+import { translateErrorMessage } from "../../utils/errorTranslator"
 
 const TOKENS = designTokens.colors
 const SHADOWS = designTokens.shadows
@@ -186,11 +187,11 @@ export default function CourseGrid() {
       } else if (noContainersMessage) {
         setContainers([])
       } else {
-        setError(result.message || "Failed to fetch containers")
+        setError(translateErrorMessage(result.message || "Failed to fetch containers"))
       }
     } catch (err) {
       console.error("Error fetching containers:", err)
-      setError(t("errorDeletingContainer"))
+      setError(translateErrorMessage(t("errorDeletingContainer")))
     } finally {
       setLoading(false)
     }
@@ -206,11 +207,11 @@ export default function CourseGrid() {
         if (result.status === "success") {
           await fetchContainers()
         } else {
-          setError(result.message || t("failedToDeleteContainer"))
+          setError(translateErrorMessage(result.message || t("failedToDeleteContainer")))
         }
       } catch (err) {
         console.error("Error deleting container:", err)
-        setError(t("errorDeletingContainer"))
+        setError(translateErrorMessage(t("errorDeletingContainer")))
       } finally {
         setLoading(false)
       }

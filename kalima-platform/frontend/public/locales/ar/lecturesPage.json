@@ -189,6 +189,23 @@
     "homeworks": "واجبات منزلية",
     "exams": "اختبارات"
   },
+  "attachments": {
+    "uploadTitle": "ملفات المحاضرة",
+    "uploadHelper": "ارفع ملفات PDF أو PowerPoint أو Word أو الصور أو أي ملفات تخص المحاضرة هنا.",
+    "fileCount": "ملفات",
+    "savedFiles": "الملفات المحفوظة",
+    "openFile": "فتح الملف",
+    "uploadHint": "هذا الصندوق مخصص لموارد المحاضرة فقط، وستظهر الملفات في صفحة المحاضرة بشكل موحد.",
+    "googleFormTitle": "رابط نموذج Google",
+    "googleFormHelper": "استخدم رابط Google Form واحد لاختبار أو واجب ما بعد المحاضرة.",
+    "homeworkType": "واجب",
+    "examType": "اختبار",
+    "formType": "نوع النموذج",
+    "formUrl": "رابط Google Form",
+    "formUrlPlaceholder": "الصق رابط Google Form هنا",
+    "formUrlHint": "بدّل نوع النموذج إذا كان الرابط للواجب بدل الاختبار أو العكس.",
+    "savedLinks": "الروابط المحفوظة"
+  },
   "validation": {
     "nameRequired": "الاسم مطلوب",
     "levelRequired": "المرحلة مطلوبة",

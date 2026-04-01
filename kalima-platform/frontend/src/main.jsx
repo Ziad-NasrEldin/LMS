@@ -4,8 +4,11 @@ import {BrowserRouter} from 'react-router-dom'
 import './index.css';
 import App from './App';
 import './components/i18n';
+import { installAxiosErrorTranslation } from './utils/errorTranslator';
 import { ErrorBoundary } from '../ErrorBoundary.jsx';
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
+
+installAxiosErrorTranslation();
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

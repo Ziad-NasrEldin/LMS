@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { translateErrorMessage } from '../utils/errorTranslator';
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL
@@ -7,10 +8,19 @@ const api = axios.create({
 api.interceptors.response.use(
   response => response,
   error => {
+    const translatedMessage = translateErrorMessage(
+      error.response?.data?.message || error.response?.data?.error || error.message,
+      error.message
+    );
     const customError = {
       status: error.response?.status || 'NETWORK_ERROR',
-      message: error.response?.data?.message || 'حدث خطأ في الاتصال',
-      data: error.response?.data || {}
+      message: translatedMessage,
+      error: translatedMessage,
+      data: {
+        ...(error.response?.data || {}),
+        message: translatedMessage,
+        error: translatedMessage
+      }
     };
     
     // يمكن إضافة معالجة إضافية حسب نوع الخطأ

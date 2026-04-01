@@ -28,6 +28,7 @@ import {
 import { getMyContainers, getLecturerAnalytics } from "../../routes/lectures";
 import { AssistantService } from "../../routes/assistants-services";
 import DashboardStatCard from "../../components/DashboardStatCard";
+import { translateErrorMessage } from "../../utils/errorTranslator";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Tooltip, Legend);
 
@@ -86,7 +87,7 @@ export default function LecturerOverviewPanel() {
         } else if (noContainersMessage) {
           setContainers([]);
         } else {
-          throw new Error(containersRes.message || "Failed to fetch containers");
+          throw new Error(translateErrorMessage(containersRes.message || "Failed to fetch containers"));
         }
 
         if (myDataRes.success && myDataRes.data?.id) {
@@ -99,10 +100,10 @@ export default function LecturerOverviewPanel() {
         if (analyticsRes.success) {
           setAnalytics(analyticsRes.data || null);
         } else {
-          throw new Error(analyticsRes.message || "Failed to fetch analytics");
-        }
+          throw new Error(translateErrorMessage(analyticsRes.message || "Failed to fetch analytics"));
+      }
       } catch (err) {
-        setError(err.message || (isRTL ? "تعذر تحميل بيانات الملخص" : "Failed to load overview data"));
+        setError(translateErrorMessage(err.message || (isRTL ? "تعذر تحميل بيانات الملخص" : "Failed to load overview data")));
       } finally {
         setLoading(false);
       }
@@ -436,9 +437,11 @@ export default function LecturerOverviewPanel() {
       URL.revokeObjectURL(url);
     } catch (csvError) {
       setError(
-        t("csvDownloadFailed", {
-          defaultValue: isRTL ? "تعذر تنزيل ملف CSV." : "Failed to download CSV file.",
-        })
+        translateErrorMessage(
+          t("csvDownloadFailed", {
+            defaultValue: isRTL ? "تعذر تنزيل ملف CSV." : "Failed to download CSV file.",
+          })
+        )
       );
     }
   };

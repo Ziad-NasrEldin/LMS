@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { getAllLecturers, getAllAssistants, getAllParents, getAllStudents } from '../../../../routes/fetch-users';
 import { useTranslation } from 'react-i18next';
 import { designTokens } from "../../../../constants/designTokens";
+import { translateErrorMessage } from "../../../../utils/errorTranslator";
 
 const Hero = () => {
   const { t, i18n } = useTranslation('admin');
@@ -24,31 +25,31 @@ const Hero = () => {
       // Fetch data one at a time (sequentially)
       const lecturerResponse = await getAllLecturers();
       if (!lecturerResponse.success) {
-        throw new Error("Failed to fetch lecturers");
+        throw new Error(translateErrorMessage("Failed to fetch lecturers"));
       }
       setLecturers(Array.isArray(lecturerResponse.data) ? lecturerResponse.data : Array.isArray(lecturerResponse.data?.data) ? lecturerResponse.data.data : []);
 
       const assistantResponse = await getAllAssistants();
       if (!assistantResponse.success) {
-        throw new Error("Failed to fetch assistants");
+        throw new Error(translateErrorMessage("Failed to fetch assistants"));
       }
       setAssistants(Array.isArray(assistantResponse.data) ? assistantResponse.data : Array.isArray(assistantResponse.data?.data) ? assistantResponse.data.data : []);
 
       const parentResponse = await getAllParents();
       if (!parentResponse.success) {
-        throw new Error("Failed to fetch parents");
+        throw new Error(translateErrorMessage("Failed to fetch parents"));
       }
       setParents(Array.isArray(parentResponse.data) ? parentResponse.data : Array.isArray(parentResponse.data?.data) ? parentResponse.data.data : []);
 
       const studentResponse = await getAllStudents();
       if (!studentResponse.success) {
-        throw new Error("Failed to fetch students");
+        throw new Error(translateErrorMessage("Failed to fetch students"));
       }
       setStudents(Array.isArray(studentResponse.data) ? studentResponse.data : Array.isArray(studentResponse.data?.data) ? studentResponse.data.data : []);
       
     } catch (error) {
       console.error("Error fetching user data:", error);
-      setError(error.message || "Failed to fetch data");
+      setError(translateErrorMessage(error.message || "Failed to fetch data"));
     } finally {
       setLoading(false);
     }

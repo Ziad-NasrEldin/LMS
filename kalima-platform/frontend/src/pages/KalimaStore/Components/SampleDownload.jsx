@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { resolveUploadUrl } from "../../../utils/uploadUrl"
+import { translateErrorMessage } from "../../../utils/errorTranslator"
 
 const SampleDownload = ({ sample, title, type, isRTL }) => {
   const { t } = useTranslation("kalimaStore-ProductDetails")
@@ -33,7 +34,7 @@ const SampleDownload = ({ sample, title, type, isRTL }) => {
       window.URL.revokeObjectURL(url)
     } catch (error) {
       console.error("Download failed:", error)
-      alert("Failed to download sample. Please try again.")
+      alert(translateErrorMessage("Failed to download sample. Please try again."))
     } finally {
       setDownloadLoading(false)
     }

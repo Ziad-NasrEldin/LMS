@@ -7,6 +7,7 @@ import { getUserDashboard } from "../../../routes/auth-services"
 import { createSubject, getAllSubjects, deleteSubject } from "../../../routes/courses"
 import { getAllLevels, createLevel, deleteLevel } from "../../../routes/levels"
 import { designTokens } from "../../../constants/designTokens"
+import { translateErrorMessage } from "../../../utils/errorTranslator"
 
 export default function AdminCreate() {
   const { t, i18n } = useTranslation("createAdmin")
@@ -52,7 +53,7 @@ export default function AdminCreate() {
         if (response.success) {
           setSubjects(response.data || [])
         } else {
-          setError(response.error || t("errors.fetchSubjects"))
+          setError(translateErrorMessage(response.error || t("errors.fetchSubjects")))
         }
       } catch (err) {
         setError(t("errors.fetchSubjects"))
@@ -65,7 +66,7 @@ export default function AdminCreate() {
         if (response.success) {
           setLevels(response.data || [])
         } else {
-          setError(response.error || t("errors.fetchLevels"))
+          setError(translateErrorMessage(response.error || t("errors.fetchLevels")))
         }
       } catch (err) {
         setError(t("errors.fetchLevels"))
@@ -92,7 +93,7 @@ export default function AdminCreate() {
           setSubjects(updatedSubjects.data || [])
         }
       } else {
-        setError(response.error)
+        setError(translateErrorMessage(response.error))
       }
     } catch (err) {
       setError(t("errors.createSubject"))
@@ -114,7 +115,7 @@ export default function AdminCreate() {
           setLevels(updatedLevels.data || [])
         }
       } else {
-        setError(response.error)
+        setError(translateErrorMessage(response.error))
       }
     } catch (err) {
       setError(t("errors.createLevel"))
@@ -132,7 +133,7 @@ export default function AdminCreate() {
             setSubjects(updatedSubjects.data || [])
           }
         } else {
-          setError(response.error || t("errors.deleteSubject"))
+          setError(translateErrorMessage(response.error || t("errors.deleteSubject")))
         }
       } catch (err) {
         setError(t("errors.deleteSubject"))
@@ -151,7 +152,7 @@ export default function AdminCreate() {
             setLevels(updatedLevels.data || [])
           }
         } else {
-          setError(response.error || t("errors.deleteLevel"))
+          setError(translateErrorMessage(response.error || t("errors.deleteLevel")))
         }
       } catch (err) {
         setError(t("errors.deleteLevel"))

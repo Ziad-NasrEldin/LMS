@@ -8,9 +8,6 @@ const Level = require("../models/levelModel");
 const Subject = require("../models/subjectModel");
 const Lecturer = require("../models/lecturerModel");
 const StudentLectureAccess = require("../models/studentLectureAccessModel");
-const NotificationTemplate = require("../models/notificationTemplateModel");
-const Notification = require("../models/notification");
-const Student = require("../models/studentModel");
 const multer = require("multer");
 const cloudinary = require("cloudinary").v2;
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
@@ -371,111 +368,11 @@ exports.createContainer = catchAsync(async (req, res, next) => {
       await parentContainer.save({ session });
     }
 
-    // Notification logic - only for paid containers with parent
-    let studentsNotified = 0;
-    if (price > 0 && parent) {
-      // Get the container chain (all parent containers up the hierarchy)
-      const containerChainResult = await Container.aggregate([
-        {
-          $match: { _id: new mongoose.Types.ObjectId(parent) },
-        },
-        {
-          $graphLookup: {
-            from: "containers",
-            startWith: "$parent",
-            connectFromField: "parent",
-            connectToField: "_id",
-            as: "parentChain",
-          },
-        },
-      ]).session(session);
-
-      // Extract all container IDs in the hierarchy (including the direct parent)
-      const containerIds = [
-        parent,
-        ...(containerChainResult[0]?.parentChain.map((c) => c._id) || []),
-      ];
-
-      // Find all purchases where container is in this hierarchy
-      const purchases = await Purchase.find({
-        container: { $in: containerIds },
-        type: "containerPurchase",
-      }).session(session);
-
-      // Get unique student IDs from these purchases
-      const studentIds = [
-        ...new Set(purchases.map((p) => p.student.toString())),
-      ];
-
-      // Find these students who want notifications
-      const students = await Student.find({
-        _id: { $in: studentIds },
-        $or: [
-          { containerNotify: true },
-          { containerNotify: { $exists: false } },
-        ],
-      }).session(session);
-
-      // Get notification template
-      const template = await NotificationTemplate.findOne({
-        type: "new_container",
-      }).session(session);
-
-      if (template && students.length > 0) {
-        const io = req.app.get("io");
-
-        const preparedNotifications = students.map((student) => {
-          const notificationData = {
-            title: template.title,
-            message: template.message
-              .replace("{container}", name)
-              .replace("{subject}", subjectDoc.name),
-            type: "new_container",
-            relatedId: container[0]._id,
-          };
-
-          const roomId = student._id.toString();
-          const isOnline = io.sockets.adapter.rooms.has(roomId);
-
-          return {
-            roomId,
-            isOnline,
-            notificationData,
-            doc: {
-              userId: student._id,
-              ...notificationData,
-              isSent: isOnline,
-            },
-          };
-        });
-
-        const createdNotifications = await Notification.insertMany(
-          preparedNotifications.map((item) => item.doc),
-          { session }
-        );
-
-        createdNotifications.forEach((notification, index) => {
-          const { roomId, isOnline, notificationData } = preparedNotifications[index];
-
-          if (!isOnline) {
-            return;
-          }
-
-          studentsNotified++;
-          io.to(roomId).emit("newContainer", {
-            ...notificationData,
-            notificationId: notification._id,
-          });
-        });
-      }
-    }
-
     await session.commitTransaction();
     res.status(201).json({
       status: "success",
       data: {
         container: container[0],
-        studentsNotified,
       },
     });
   } catch (error) {

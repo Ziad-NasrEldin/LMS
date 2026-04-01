@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { useTranslation } from "react-i18next"
 import { getExamConfigs, createExamConfig } from "../routes/examConfigs"
+import { translateErrorMessage } from "../utils/errorTranslator"
 
 const ExamConfigSection = ({
   requiresExam,
@@ -54,13 +55,8 @@ const ExamConfigSection = ({
     try {
       const response = await getExamConfigs()
 
-      if (response.success && response.data) {
-        // Try to extract exam configs from different possible response structures
-        const configs =
-          (response.data.data && response.data.data.examConfigs) || // Format: { data: { data: { examConfigs: [...] } } }
-          response.data.examConfigs || // Format: { data: { examConfigs: [...] } }
-          (Array.isArray(response.data) ? response.data : []) // Format: { data: [...] }
-
+      if (response.success) {
+        const configs = Array.isArray(response.data) ? response.data : []
         // Filter configs by type if configType is "homework"
         const filteredConfigs =
           configType === "homework"
@@ -75,12 +71,12 @@ const ExamConfigSection = ({
         }
       } else {
         console.error(`Failed to fetch ${configType} configs:`, response.message)
-        setExamConfigsError(response.message || `Failed to fetch ${configType} configs`)
+        setExamConfigsError(translateErrorMessage(response.message || `Failed to fetch ${configType} configs`))
         setExamConfigs([])
       }
     } catch (err) {
       console.error(`Error fetching ${configType} configs:`, err)
-      setExamConfigsError(err.message || `Failed to fetch ${configType} configs`)
+      setExamConfigsError(translateErrorMessage(err.message || `Failed to fetch ${configType} configs`))
       setExamConfigs([])
     } finally {
       setExamConfigsLoading(false)
@@ -91,31 +87,14 @@ const ExamConfigSection = ({
     try {
       // Validate required fields for new exam config
       if (!newExamConfig.name || !newExamConfig.googleSheetId || !newExamConfig.formUrl) {
-        throw new Error(`Please fill in all required ${configType} configuration fields`)
+        throw new Error(translateErrorMessage(`Please fill in all required ${configType} configuration fields`))
       }
       const createResponse = await createExamConfig(newExamConfig)
 
-      // Extract the exam config ID from different response formats
-      let examConfigId = null
-      if (createResponse.success === true && createResponse.data) {
-        if (createResponse.data._id) {
-          examConfigId = createResponse.data._id
-        } else if (
-          createResponse.data.data &&
-          createResponse.data.data.examConfig &&
-          createResponse.data.data.examConfig._id
-        ) {
-          examConfigId = createResponse.data.data.examConfig._id
-        } else if (createResponse.data.examConfig && createResponse.data.examConfig._id) {
-          examConfigId = createResponse.data.examConfig._id
-        } else {
-          throw new Error("Failed to extract exam config ID from response")
-        }
-      } else if (createResponse.status === "success" && createResponse.data && createResponse.data._id) {
-        examConfigId = createResponse.data._id
-      } else {
-        throw new Error(createResponse.message || `Failed to create ${configType} config`)
+      if (!createResponse.success || !createResponse.data?._id) {
+        throw new Error(translateErrorMessage(createResponse.message || `Failed to create ${configType} config`))
       }
+      const examConfigId = createResponse.data._id
 
       // Refresh the exam configs list
       await fetchExamConfigs()
@@ -131,7 +110,7 @@ const ExamConfigSection = ({
 
       return examConfigId
     } catch (err) {
-      setExamConfigsError(err.message)
+      setExamConfigsError(translateErrorMessage(err.message))
       console.error(`Error creating ${configType} config:`, err)
       throw err
     }

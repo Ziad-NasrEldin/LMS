@@ -7,6 +7,7 @@ import Reports from "./Reports"
 import { getCenterDataByType, recordAttendance } from "../../routes/center"
 import BarcodeScanner from "./QrScannerCard"
 import { useTranslation } from "react-i18next"
+import { translateErrorMessage } from "../../utils/errorTranslator"
 import {
   CalendarDays,
   CreditCard,
@@ -46,7 +47,7 @@ export default function LessonDetailsSection() {
           throw new Error(response.message || t("errors.fetchStudents", "Failed to fetch students"))
         }
       } catch (err) {
-        setError(err.message)
+        setError(translateErrorMessage(err.message))
       } finally {
         setLoading(false)
       }

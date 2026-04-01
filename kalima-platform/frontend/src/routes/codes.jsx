@@ -2,6 +2,7 @@ import axios from "axios";
 import { getToken } from "./auth-services"; // Adjust the path based on your project structure
 import { getAuthHeader } from "./fetch-users"; // Adjust the path based on your project structure
 import { normalizeApiError, normalizeApiErrorWithEmpty404 } from "../utils/apiError";
+import { translateErrorMessage } from "../utils/errorTranslator";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -34,30 +35,30 @@ export const redeemPromoCode = async (code) => {
 export const generatePromoCodes = async (data) => {
   try {
     if (!data) {
-      throw new Error("Promo code data is required");
+      throw new Error(translateErrorMessage("Promo code data is required"));
     }
 
     // Validate required fields for all types
     const requiredFields = ['numOfCodes', 'type'];
     for (const field of requiredFields) {
       if (!data[field]) {
-        throw new Error(`${field} is required`);
+        throw new Error(translateErrorMessage(`${field} is required`));
       }
     }
 
     // Validate type is one of the allowed values
     const allowedTypes = ['general', 'specific', 'promo'];
     if (!allowedTypes.includes(data.type)) {
-      throw new Error(`Invalid type. Must be one of: ${allowedTypes.join(', ')}`);
+      throw new Error(translateErrorMessage(`Invalid type. Must be one of: ${allowedTypes.join(', ')}`));
     }
 
     // Validate type-specific requirements
     if (data.type === "specific" && !data.lecturerId) {
-      throw new Error("Lecturer ID is required for specific promo codes");
+      throw new Error(translateErrorMessage("Lecturer ID is required for specific promo codes"));
     }
 
     if (data.type !== "promo" && !data.pointsAmount) {
-      throw new Error("Amount is required for non-promo codes");
+      throw new Error(translateErrorMessage("Amount is required for non-promo codes"));
     }
 
     // Prepare the payload based on type
@@ -97,7 +98,7 @@ export const generatePromoCodes = async (data) => {
       console.error("Unexpected API response structure:", response.data);
       return {
         status: "error",
-        message: "Unexpected API response structure"
+        message: translateErrorMessage("Unexpected API response structure")
       };
     }
   } catch (error) {
@@ -142,7 +143,7 @@ export const getPromoCodeTemplates = async () => {
       };
     }
 
-    return { success: false, error: "Unexpected API response structure" };
+    return { success: false, error: translateErrorMessage("Unexpected API response structure") };
   } catch (error) {
     return normalizeApiError(error, "Failed to fetch promo templates");
   }
@@ -151,7 +152,7 @@ export const getPromoCodeTemplates = async () => {
 export const uploadPromoCodeTemplate = async (file) => {
   try {
     if (!file) {
-      return { success: false, error: "Template file is required" };
+      return { success: false, error: translateErrorMessage("Template file is required") };
     }
 
     const formData = new FormData();
@@ -171,7 +172,7 @@ export const uploadPromoCodeTemplate = async (file) => {
       };
     }
 
-    return { success: false, error: "Unexpected API response structure" };
+    return { success: false, error: translateErrorMessage("Unexpected API response structure") };
   } catch (error) {
     return normalizeApiError(error, "Failed to upload promo template");
   }
@@ -222,7 +223,7 @@ export const deletePromoCode = async (code) => {
 export const deleteBulkPromoCodes = async (codes) => {
   try {
     if (!Array.isArray(codes) || codes.length === 0) {
-      return { success: false, error: 'No codes provided for deletion' };
+      return { success: false, error: translateErrorMessage('No codes provided for deletion') };
     }
 
     const response = await axios.delete(

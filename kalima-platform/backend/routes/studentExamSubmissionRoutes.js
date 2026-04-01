@@ -5,7 +5,10 @@ const verifyJWT = require("../middleware/verifyJWT");
 const authController = require("../controllers/authController");
 const { configureGoogleSheets } = require("../config/googleApiConfig");
 
-// Protect all routes
+// Public webhook for Google Apps Script sync
+router.post("/sync", examSubmissionController.syncExamSubmission);
+
+// Protect all remaining routes
 router.use(verifyJWT);
 
 // Routes for students

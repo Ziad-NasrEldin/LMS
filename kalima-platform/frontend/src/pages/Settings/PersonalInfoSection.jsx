@@ -8,6 +8,34 @@ import { updateCurrentUser } from "../../routes/update-user"
 import { Check, X, Camera, Upload, Pencil } from "lucide-react"
 import { resolveProfileImageUrl } from "../../utils/profileImage"
 import { designTokens } from "../../constants/designTokens"
+import { translateErrorMessage } from "../../utils/errorTranslator"
+
+const SIGNUP_HOBBY_OPTIONS = [
+  "math",
+  "programming",
+  "art",
+  "languages",
+  "photography",
+  "montage",
+  "designillustrating",
+  "marketing",
+  "other",
+]
+
+const HOBBY_ALIASES = {
+  "design/illustrating": "designillustrating",
+  "design-illustrating": "designillustrating",
+  "design_illustrating": "designillustrating",
+  designillustrating: "designillustrating",
+  designillustratings: "designillustrating",
+}
+
+const normalizeHobbyValue = (value) => {
+  if (!value) return ""
+  const raw = String(value).trim().toLowerCase()
+  if (!raw) return ""
+  return HOBBY_ALIASES[raw] || raw
+}
 
 function PersonalInfoSection() {
   const { t, i18n } = useTranslation("settings")
@@ -28,6 +56,7 @@ function PersonalInfoSection() {
     fullName: "",
     phoneNumber: "",
     email: "",
+    hobby: "",
     profilePic: null,
   })
 
@@ -51,14 +80,14 @@ function PersonalInfoSection() {
       // Validate file type
       const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/gif"]
       if (!allowedTypes.includes(file.type)) {
-        alert(t("validation.invalidImageType") || "Please select a valid image file (JPEG, PNG, GIF)")
+        alert(translateErrorMessage(t("validation.invalidImageType") || "Please select a valid image file (JPEG, PNG, GIF)"))
         return
       }
 
       // Validate file size (5MB limit)
       const maxSize = 5 * 1024 * 1024 // 5MB in bytes
       if (file.size > maxSize) {
-        alert(t("validation.fileTooLarge") || "File size must be less than 5MB")
+        alert(translateErrorMessage(t("validation.fileTooLarge") || "File size must be less than 5MB"))
         return
       }
 
@@ -116,7 +145,7 @@ function PersonalInfoSection() {
         setUpdateStatus({
           loading: false,
           success: false,
-          error: result.error || "Failed to upload profile picture",
+          error: translateErrorMessage(result.error || "Failed to upload profile picture"),
         })
       }
     } catch (error) {
@@ -124,7 +153,7 @@ function PersonalInfoSection() {
       setUpdateStatus({
         loading: false,
         success: false,
-        error: "An unexpected error occurred while uploading",
+        error: translateErrorMessage("An unexpected error occurred while uploading"),
       })
     } finally {
       setProfilePicUploading(false)
@@ -153,14 +182,15 @@ function PersonalInfoSection() {
             fullName: userInfo.name || "",
             phoneNumber: userInfo.phoneNumber || "",
             email: userInfo.email || "",
+            hobby: normalizeHobbyValue(userInfo.hobby),
             profilePic: null,
           })
         } else {
-          setError(result.error || "Failed to fetch user data")
+          setError(translateErrorMessage(result.error || "Failed to fetch user data"))
         }
       } catch (error) {
         console.error("Error fetching user data:", error)
-        setError("An error occurred while fetching your information")
+        setError(translateErrorMessage("An error occurred while fetching your information"))
       } finally {
         setLoading(false)
       }
@@ -186,7 +216,7 @@ function PersonalInfoSection() {
     if (name === "email") {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
       if (!emailRegex.test(value)) {
-        setEmailError(t("validation.invalidEmail") || "Invalid email address")
+        setEmailError(translateErrorMessage(t("validation.invalidEmail") || "Invalid email address"))
       } else {
         setEmailError("")
       }
@@ -204,6 +234,7 @@ function PersonalInfoSection() {
       fullName: userData?.name || "",
       phoneNumber: userData?.phoneNumber || "",
       email: userData?.email || "",
+      hobby: normalizeHobbyValue(userData?.hobby),
     }))
     setIsEditing(true)
   }
@@ -214,6 +245,7 @@ function PersonalInfoSection() {
       fullName: userData?.name || "",
       phoneNumber: userData?.phoneNumber || "",
       email: userData?.email || "",
+      hobby: normalizeHobbyValue(userData?.hobby),
     }))
     setEmailError("")
     setIsEditing(false)
@@ -222,6 +254,8 @@ function PersonalInfoSection() {
 
   const handleSaveAll = async () => {
     if (emailError) return
+
+    const isStudentRole = String(userData?.role || "").trim().toLowerCase() === "student"
 
     // Set update status to loading
     setUpdateStatus({
@@ -237,15 +271,37 @@ function PersonalInfoSection() {
         email: formData.email,
       }
 
+      if (isStudentRole) {
+        updateData.hobby = normalizeHobbyValue(formData.hobby)
+      }
+
       const result = await updateCurrentUser(updateData)
 
       if (result.success) {
-        setUserData((prev) => ({
-          ...prev,
-          name: formData.fullName,
-          phoneNumber: formData.phoneNumber,
-          email: formData.email,
-        }))
+        const refreshResult = await getUserDashboard()
+
+        if (refreshResult.success) {
+          const refreshedUserInfo = refreshResult.data?.data?.userInfo || null
+
+          if (refreshedUserInfo) {
+            setUserData(refreshedUserInfo)
+            setFormData((prev) => ({
+              ...prev,
+              fullName: refreshedUserInfo.name || "",
+              phoneNumber: refreshedUserInfo.phoneNumber || "",
+              email: refreshedUserInfo.email || "",
+              hobby: normalizeHobbyValue(refreshedUserInfo.hobby),
+            }))
+          }
+        } else {
+          setUserData((prev) => ({
+            ...prev,
+            name: formData.fullName,
+            phoneNumber: formData.phoneNumber,
+            email: formData.email,
+            hobby: isStudentRole ? normalizeHobbyValue(formData.hobby) : prev.hobby,
+          }))
+        }
 
         setUpdateStatus({
           loading: false,
@@ -264,7 +320,7 @@ function PersonalInfoSection() {
         setUpdateStatus({
           loading: false,
           success: false,
-          error: result.error || "Failed to update",
+          error: translateErrorMessage(result.error || "Failed to update"),
         })
       }
     } catch (error) {
@@ -272,7 +328,7 @@ function PersonalInfoSection() {
       setUpdateStatus({
         loading: false,
         success: false,
-        error: "An unexpected error occurred",
+        error: translateErrorMessage("An unexpected error occurred"),
       })
     }
   }
@@ -327,6 +383,58 @@ function PersonalInfoSection() {
 
   const hasProfilePic = userData?.profilePic
   const currentProfilePicUrl = resolveProfileImageUrl(userData?.profilePic)
+
+  const studentLevelLabel = (() => {
+    if (String(userData?.role || "").trim().toLowerCase() !== "student") return ""
+
+    const levelValue = userData?.level
+    if (!levelValue) {
+      return t("gradeLevels.undefined", { ns: "common", defaultValue: "" })
+    }
+
+    if (isRTL && typeof levelValue === "object" && levelValue?.nameAr) {
+      return String(levelValue.nameAr).trim()
+    }
+
+    const rawLevelName = String(typeof levelValue === "string" ? levelValue : levelValue?.name || "").trim()
+    if (!rawLevelName) {
+      return t("gradeLevels.undefined", { ns: "common", defaultValue: "" })
+    }
+
+    const typoAliases = {
+      "fiest preparatory": "first preparatory",
+      "frist preparatory": "first preparatory",
+      "fierst preparatory": "first preparatory",
+    }
+
+    const normalizedLevelName = rawLevelName
+      .replace(/\s+level$/i, "")
+      .replace(/\s+/g, " ")
+      .trim()
+      .toLowerCase()
+
+    const canonicalLevelName = typoAliases[normalizedLevelName] || normalizedLevelName
+    return t(`gradeLevels.${canonicalLevelName}`, {
+      ns: "common",
+      defaultValue: rawLevelName,
+    })
+  })()
+
+  const studentHobbyLabel = (() => {
+    if (!userData?.hobby) return ""
+    const normalizedHobby = normalizeHobbyValue(userData.hobby)
+    return t(`personalInfo.hobbyOptions.${normalizedHobby}`, { defaultValue: normalizedHobby })
+  })()
+
+  const studentHobbyOptions = (() => {
+    const currentHobby = normalizeHobbyValue(formData.hobby || userData?.hobby)
+    if (!currentHobby || SIGNUP_HOBBY_OPTIONS.includes(currentHobby)) {
+      return SIGNUP_HOBBY_OPTIONS
+    }
+    return [...SIGNUP_HOBBY_OPTIONS, currentHobby]
+  })()
+
+  const isStudentRole = String(userData?.role || "").trim().toLowerCase() === "student"
 
   return (
     <section>
@@ -546,23 +654,60 @@ function PersonalInfoSection() {
           )}
 
           {/* Student-specific fields */}
-          {userData?.role === "Student" && userData?.level && (
+          {isStudentRole && (
             <div className="form-control mb-4">
-              <label className={`label justify-end`}>
+              <label className={`label pb-1 ${isRTL ? "justify-end" : "justify-start"}`}>
+                <span className="label-text">{personalInfo.labels.hobby || "Hobby"}</span>
+              </label>
+
+              <div className="w-full">
+                {isEditing ? (
+                  <select
+                    name="hobby"
+                    value={formData.hobby || ""}
+                    onChange={handleInputChange}
+                    className={`select select-bordered w-full max-w-2xl ${isRTL ? "text-right" : "text-left"}`}
+                    dir={isRTL ? "rtl" : "ltr"}
+                  >
+                    <option value="">{personalInfo.placeholders?.hobby || "Select a hobby"}</option>
+                    {studentHobbyOptions.map((option) => (
+                      <option key={option} value={option}>
+                        {t(`personalInfo.hobbyOptions.${option}`, { defaultValue: option })}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <input
+                    type="text"
+                    value={studentHobbyLabel}
+                    className={`input input-bordered w-full max-w-2xl ${isRTL ? "text-right" : "text-left"}`}
+                    dir={isRTL ? "rtl" : "ltr"}
+                    readOnly
+                  />
+                )}
+              </div>
+            </div>
+          )}
+
+          {isStudentRole && userData?.level && (
+            <div className="form-control mb-4">
+              <label className={`label pb-1 ${isRTL ? "justify-end" : "justify-start"}`}>
                 <span className="label-text">{personalInfo.labels.level || "Level"}</span>
               </label>
-              <input
-                type="text"
-                value={userData.level.name || ""}
-                className={`input input-bordered w-full max-w-2xl ${isRTL ? "text-right" : "text-left"}`}
-                dir={isRTL ? "rtl" : "ltr"}
-                readOnly
-              />
+              <div className="w-full">
+                <input
+                  type="text"
+                  value={studentLevelLabel}
+                  className={`input input-bordered w-full max-w-2xl ${isRTL ? "text-right" : "text-left"}`}
+                  dir={isRTL ? "rtl" : "ltr"}
+                  readOnly
+                />
+              </div>
             </div>
           )}
 
           {/* Balance display for students */}
-          {userData?.role === "Student" && (
+          {isStudentRole && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
               <div className="stat rounded-box" style={{ background: TOKENS.neutralCloud }}>
                 <div className="stat-title">{personalInfo.labels.generalPoints || t("General Points")}</div>

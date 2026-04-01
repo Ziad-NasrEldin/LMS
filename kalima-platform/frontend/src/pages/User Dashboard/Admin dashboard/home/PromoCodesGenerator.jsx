@@ -7,6 +7,7 @@ import { generatePromoCodes, getPromoCodeTemplates, uploadPromoCodeTemplate } fr
 import { getAllLecturers } from "../../../../routes/fetch-users"
 import QRCode from "qrcode"
 import { designTokens } from "../../../../constants/designTokens"
+import { translateErrorMessage } from "../../../../utils/errorTranslator"
 
 const PROMO_TEMPLATE_WIDTH = 392
 const PROMO_TEMPLATE_HEIGHT = 210
@@ -201,7 +202,7 @@ const PromoCodeGenerator = () => {
     try {
       await validateTemplateDimensions(file)
     } catch (err) {
-      setTemplateError(err.message)
+      setTemplateError(translateErrorMessage(err.message))
       e.target.value = ""
       return
     }
@@ -334,7 +335,7 @@ const PromoCodeGenerator = () => {
 
     const printWindow = window.open("", "_blank")
     if (!printWindow) {
-      alert("Please allow pop-ups to print QR codes")
+      alert(translateErrorMessage("Please allow pop-ups to print QR codes"))
       return
     }
 

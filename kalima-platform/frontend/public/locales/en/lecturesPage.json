@@ -189,6 +189,23 @@
     "homeworks": "Homeworks",
     "exams": "Exams"
   },
+  "attachments": {
+    "uploadTitle": "Lecture files",
+    "uploadHelper": "Upload PDFs, PowerPoints, documents, images, or any other lecture files here.",
+    "fileCount": "files",
+    "savedFiles": "Saved files",
+    "openFile": "Open file",
+    "uploadHint": "This box is for lecture resources only. The files are unified on the lecture page.",
+    "googleFormTitle": "Google Form link",
+    "googleFormHelper": "Use one Google Form link for the after-lecture exam or homework.",
+    "homeworkType": "Homework",
+    "examType": "Exam",
+    "formType": "Form type",
+    "formUrl": "Google Form URL",
+    "formUrlPlaceholder": "Paste the Google Form link here",
+    "formUrlHint": "Switch the form type if the link is for homework instead of exam, or vice versa.",
+    "savedLinks": "Saved links"
+  },
   "validation": {
     "nameRequired": "Name is required",
     "levelRequired": "Level is required",

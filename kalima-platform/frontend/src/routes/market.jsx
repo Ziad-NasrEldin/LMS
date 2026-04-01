@@ -1,5 +1,6 @@
 import axios from "axios"
 import { getToken } from "./auth-services"
+import { translateErrorMessage } from "../utils/errorTranslator"
 
 const API_URL = import.meta.env.VITE_API_URL
 
@@ -16,7 +17,7 @@ export const getAllSections = async (queryParams = {}) => {
     return response.data
   } catch (error) {
     console.error(`Error fetching sections: ${error.message}`)
-    throw error
+    throw new Error(translateErrorMessage(error.message || "Request failed"));
   }
 }
 
@@ -33,7 +34,7 @@ export const getAllBooks = async (queryParams = {}) => {
     return response.data
   } catch (error) {
     console.error(`Error fetching books: ${error.message}`)
-    throw error
+    throw new Error(translateErrorMessage(error.message || "Request failed"));
   }
 }
 
@@ -50,7 +51,7 @@ export const getAllProducts = async (queryParams = {}) => {
     return response.data
   } catch (error) {
     console.error(`Error fetching products: ${error.message}`)
-    throw error
+    throw new Error(translateErrorMessage(error.message || "Request failed"));
   }
 }
 
@@ -66,7 +67,7 @@ export const getBookById = async (bookId) => {
     return response.data
   } catch (error) {
     console.error(`Error fetching book by ID: ${error.message}`)
-    throw error
+    throw new Error(translateErrorMessage(error.message || "Request failed"));
   }
 }
 
@@ -82,7 +83,7 @@ export const getProductById = async (productId) => {
     return response.data
   } catch (error) {
     console.error(`Error fetching product by ID: ${error.message}`)
-    throw error
+    throw new Error(translateErrorMessage(error.message || "Request failed"));
   }
 }
 
@@ -99,7 +100,7 @@ export const getBooksBySection = async (sectionId, queryParams = {}) => {
     return response.data
   } catch (error) {
     console.error(`Error fetching books by section: ${error.message}`)
-    throw error
+    throw new Error(translateErrorMessage(error.message || "Request failed"));
   }
 }
 
@@ -115,7 +116,7 @@ export const getProductsBySection = async (sectionId, queryParams = {}) => {
     return response.data
   } catch (error) {
     console.error(`Error fetching products by section: ${error.message}`)
-    throw error
+    throw new Error(translateErrorMessage(error.message || "Request failed"));
   }
 }
 
@@ -131,7 +132,7 @@ export const createSection = async (sectionData) => {
     return response.data
   } catch (error) {
     console.error(`Error creating section: ${error.message}`)
-    throw error
+    throw new Error(translateErrorMessage(error.message || "Request failed"));
   }
 }
 
@@ -148,7 +149,7 @@ export const updateSection = async (sectionId, updateData) => {
     return response.data
   } catch (error) {
     console.error(`Error updating section: ${error.message}`)
-    throw error
+    throw new Error(translateErrorMessage(error.message || "Request failed"));
   }
 }
 
@@ -164,7 +165,7 @@ export const deleteSection = async (sectionId) => {
     return response.data
   } catch (error) {
     console.error(`Error deleting section: ${error.message}`)
-    throw error
+    throw new Error(translateErrorMessage(error.message || "Request failed"));
   }
 }
 
@@ -174,7 +175,12 @@ export const createProduct = async (productData) => {
     // Validate required fields including subSection
     if (!productData.subSection || productData.subSection === "" || productData.subSection === "undefined") {
       console.error("❌ DEBUG createProduct - SubSection validation failed!")
-      throw new Error("SubSection is required. Please select a subsection before creating the product.")
+      return {
+        success: false,
+        status: "error",
+        message: translateErrorMessage("SubSection is required. Please select a subsection before creating the product."),
+        error: translateErrorMessage("SubSection is required. Please select a subsection before creating the product."),
+      }
     }
 
 
@@ -222,7 +228,7 @@ export const createProduct = async (productData) => {
     return response.data
   } catch (error) {
     console.error(`Error creating product: ${error.message}`)
-    throw error
+    throw new Error(translateErrorMessage(error.message || "Request failed"));
   }
 }
 
@@ -232,7 +238,12 @@ export const createBook = async (bookData) => {
     // Validate required fields including subSection
     if (!bookData.subSection || bookData.subSection === "" || bookData.subSection === "undefined") {
       console.error("❌ DEBUG createBook - SubSection validation failed!")
-      throw new Error("SubSection is required. Please select a subsection before creating the book.")
+      return {
+        success: false,
+        status: "error",
+        message: translateErrorMessage("SubSection is required. Please select a subsection before creating the book."),
+        error: translateErrorMessage("SubSection is required. Please select a subsection before creating the book."),
+      }
     }
 
 
@@ -277,7 +288,7 @@ export const createBook = async (bookData) => {
     return response.data
   } catch (error) {
     console.error(`Error creating book: ${error.message}`)
-    throw error
+    throw new Error(translateErrorMessage(error.message || "Request failed"));
   }
 }
 
@@ -319,7 +330,7 @@ export const updateProduct = async (productId, productData) => {
     return response.data
   } catch (error) {
     console.error(`Error updating product: ${error.message}`)
-    throw error
+    throw new Error(translateErrorMessage(error.message || "Request failed"));
   }
 }
 
@@ -335,7 +346,7 @@ export const deleteProduct = async (productId) => {
     return response.data
   } catch (error) {
     console.error(`Error deleting product: ${error.message}`)
-    throw error
+    throw new Error(translateErrorMessage(error.message || "Request failed"));
   }
 }
 
@@ -368,7 +379,7 @@ export const purchaseProduct = async (purchaseData) => {
     return response.data
   } catch (error) {
     console.error(`Error purchasing product: ${error.message}`)
-    throw error
+    throw new Error(translateErrorMessage(error.message || "Request failed"));
   }
 }
 
@@ -403,7 +414,7 @@ export const purchaseBook = async (purchaseData) => {
     return response.data
   } catch (error) {
     console.error(`Error purchasing book: ${error.message}`)
-    throw error
+    throw new Error(translateErrorMessage(error.message || "Request failed"));
   }
 }
 
@@ -423,7 +434,7 @@ export const RecalculateInvites = async () => {
     return response.data
   } catch (error) {
     console.error(`Error Calculating Invites: ${error.message}`)
-    throw error
+    throw new Error(translateErrorMessage(error.message || "Request failed"));
   }
 }
 
@@ -442,7 +453,7 @@ export const getAllSubSections = async (queryParams = {}) => {
     return response.data
   } catch (error) {
     console.error(`Error fetching subsections: ${error.message}`)
-    throw error
+    throw new Error(translateErrorMessage(error.message || "Request failed"));
   }
 }
 
@@ -459,7 +470,7 @@ export const getSubSectionsBySection = async (sectionId, queryParams = {}) => {
     return response.data
   } catch (error) {
     console.error(`Error fetching subsections by section: ${error.message}`)
-    throw error
+    throw new Error(translateErrorMessage(error.message || "Request failed"));
   }
 }
 
@@ -475,7 +486,7 @@ export const getSubSectionById = async (subSectionId) => {
     return response.data
   } catch (error) {
     console.error(`Error fetching subsection by ID: ${error.message}`)
-    throw error
+    throw new Error(translateErrorMessage(error.message || "Request failed"));
   }
 }
 
@@ -492,7 +503,7 @@ export const createSubSection = async (subSectionData) => {
     return response.data
   } catch (error) {
     console.error(`Error creating subsection: ${error.message}`)
-    throw error
+    throw new Error(translateErrorMessage(error.message || "Request failed"));
   }
 }
 
@@ -509,7 +520,7 @@ export const updateSubSection = async (subSectionId, updateData) => {
     return response.data
   } catch (error) {
     console.error(`Error updating subsection: ${error.message}`)
-    throw error
+    throw new Error(translateErrorMessage(error.message || "Request failed"));
   }
 }
 
@@ -525,7 +536,7 @@ export const deleteSubSection = async (subSectionId) => {
     return response.data
   } catch (error) {
     console.error(`Error deleting subsection: ${error.message}`)
-    throw error
+    throw new Error(translateErrorMessage(error.message || "Request failed"));
   }
 }
 

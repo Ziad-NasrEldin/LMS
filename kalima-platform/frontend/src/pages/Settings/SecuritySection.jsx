@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next"
 import SectionHeader from "./SectionHeader"
 import { updateUserPassword } from "../../routes/update-user"
 import { designTokens } from "../../constants/designTokens"
+import { translateErrorMessage } from "../../utils/errorTranslator"
 
 function SecuritySection() {
   const { t, i18n } = useTranslation("settings")
@@ -72,7 +73,7 @@ function SecuritySection() {
           confirmPassword: ""
         })
       } else {
-        setUpdateStatus({ error: result.error })
+        setUpdateStatus({ error: translateErrorMessage(result.error) })
       }
     } catch (error) {
       console.error("Error updating password:", error)

@@ -4,6 +4,7 @@ import { AlertCircle, ArrowLeft, Ticket } from "lucide-react";
 import { Link } from "react-router-dom";
 import { getLecturerAnalytics } from "../../routes/lectures";
 import { designTokens } from "../../constants/designTokens";
+import { translateErrorMessage } from "../../utils/errorTranslator";
 
 const formatNumber = (value, locale) => new Intl.NumberFormat(locale || "en").format(Number(value || 0));
 
@@ -48,7 +49,7 @@ export default function LecturerPromoCodesPage() {
       if (res.success) {
         setAnalytics(res.data || null);
       } else {
-        setError(res.message || (isRTL ? "تعذر تحميل أكواد الشحن." : "Failed to load promo codes."));
+        setError(translateErrorMessage(res.message || (isRTL ? "تعذر تحميل أكواد الشحن." : "Failed to load promo codes.")));
       }
       setLoading(false);
     };

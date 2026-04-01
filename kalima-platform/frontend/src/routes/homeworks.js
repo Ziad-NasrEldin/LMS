@@ -1,6 +1,6 @@
 import axios from "axios";
 import { getToken } from "./auth-services";
-import { getSocket } from "../utils/socket";
+import { translateErrorMessage } from "../utils/errorTranslator";
 
 /**
  * Upload homework for a lecture
@@ -11,11 +11,11 @@ import { getSocket } from "../utils/socket";
 export const uploadHomework = async (lectureId, homeworkData) => {
   try {
     if (!lectureId) {
-      throw new Error("Lecture ID is required");
+      throw new Error(translateErrorMessage("Lecture ID is required"));
     }
 
     if (!homeworkData || !homeworkData.attachment) {
-      throw new Error("Homework data and attachment are required");
+      throw new Error(translateErrorMessage("Homework data and attachment are required"));
     }
 
     // Create form data
@@ -35,19 +35,6 @@ export const uploadHomework = async (lectureId, homeworkData) => {
         },
       }
     );
-
-    // If upload successful, emit a custom event through socket if available
-    if (response.data.status === "success") {
-      const socket = getSocket();
-      if (socket && socket.connected) {
-        // Emit custom event for anyone who wants to listen (e.g., notifications)
-        socket.emit("homework:uploaded", {
-          lectureId,
-          fileName: homeworkData.attachment.name,
-          uploadDate: new Date().toISOString(),
-        });
-      }
-    }
 
     return {
       success: response.data.status === "success",
@@ -78,7 +65,7 @@ export const getLectureHomeworks = async (
 ) => {
   try {
     if (!lectureId) {
-      throw new Error("Lecture ID is required");
+      throw new Error(translateErrorMessage("Lecture ID is required"));
     }
 
     const { limit, page } = options;

@@ -1,6 +1,7 @@
 import axios from "axios"
 import { getToken } from "./auth-services"
 import { normalizeApiError } from "../utils/apiError"
+import { translateErrorMessage } from "../utils/errorTranslator";
 
 /**
  * Get all student lecture accesses for a specific lecture
@@ -11,7 +12,7 @@ import { normalizeApiError } from "../utils/apiError"
 export const getAllStudentLectureAccess = async (lectureId, limit = 100) => {
   try {
     if (!lectureId) {
-      throw new Error("Lecture ID is required")
+      throw new Error(translateErrorMessage("Lecture ID is required"))
     }
 
     const response = await axios.get(
@@ -46,7 +47,7 @@ export const getAllStudentLectureAccess = async (lectureId, limit = 100) => {
 export const getStudentLectureAccessByLectureId = async (lectureId) => {
   try {
     if (!lectureId) {
-      throw new Error("Lecture ID is required")
+      throw new Error(translateErrorMessage("Lecture ID is required"))
     }
 
     const response = await axios.get(
@@ -74,7 +75,7 @@ export const getStudentLectureAccessByLectureId = async (lectureId) => {
 export const updateStudentLectureAccess = async (accessId, data) => {
   try {
     if (!accessId) {
-      throw new Error("Access ID is required")
+      throw new Error(translateErrorMessage("Access ID is required"))
     }
 
     const response = await axios.patch(
@@ -101,11 +102,11 @@ export const updateStudentLectureAccess = async (accessId, data) => {
 export const accountStudentLecturePlayStart = async (accessId, eventId, purchaseId = null) => {
   try {
     if (!accessId) {
-      throw new Error("Access ID is required")
+      throw new Error(translateErrorMessage("Access ID is required"))
     }
 
     if (!eventId) {
-      throw new Error("eventId is required")
+      throw new Error(translateErrorMessage("eventId is required"))
     }
 
     const payload = { eventId }
@@ -142,13 +143,13 @@ export const consumeStudentLectureView = async (accessId, eventId, purchaseId = 
 export const checkStudentLectureAccess = async (studentId, lectureId, purchaseId, isStandaloneLecture = false) => {
   try {
     if (!studentId) {
-      throw new Error("Student ID is required")
+      throw new Error(translateErrorMessage("Student ID is required"))
     }
     if (!lectureId) {
-      throw new Error("Lecture ID is required")
+      throw new Error(translateErrorMessage("Lecture ID is required"))
     }
     if (!purchaseId) {
-      throw new Error("Purchase ID is required")
+      throw new Error(translateErrorMessage("Purchase ID is required"))
     }
 
     let apiUrl;

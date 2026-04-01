@@ -11,6 +11,7 @@ import AddCourseForm from "./AddCourseForm";
 
 import { getAllCenters, getCenterDataByType } from "../../routes/center";
 import RevenueGenerator from "./Revenue";
+import { translateErrorMessage } from "../../utils/errorTranslator";
 
 const CenterDashboard = () => {
   const { t, i18n } = useTranslation("centerDashboard");
@@ -54,7 +55,7 @@ const CenterDashboard = () => {
         }
       } catch (err) {
         console.error("Error fetching centers:", err);
-        setError(prev => ({ ...prev, centers: err.message }));
+        setError(prev => ({ ...prev, centers: translateErrorMessage(err.message) }));
       } finally {
         setLoading(prev => ({ ...prev, centers: false }));
       }
@@ -87,7 +88,7 @@ const CenterDashboard = () => {
         }
       } catch (err) {
         console.error("Error fetching lecturers:", err);
-        setError(prev => ({ ...prev, lecturers: err.message }));
+        setError(prev => ({ ...prev, lecturers: translateErrorMessage(err.message) }));
         setLecturers([]); // Clear lecturers on error
       } finally {
         setLoading(prev => ({ ...prev, lecturers: false }));
@@ -104,7 +105,7 @@ const CenterDashboard = () => {
         }
       } catch (err) {
         console.error("Error fetching students:", err);
-        setError(prev => ({ ...prev, students: err.message }));
+        setError(prev => ({ ...prev, students: translateErrorMessage(err.message) }));
         setStudents([]); // Clear students on error
       } finally {
         setLoading(prev => ({ ...prev, students: false }));
@@ -121,7 +122,7 @@ const CenterDashboard = () => {
         }
       } catch (err) {
         console.error("Error fetching lessons:", err);
-        setError(prev => ({ ...prev, lessons: err.message }));
+        setError(prev => ({ ...prev, lessons: translateErrorMessage(err.message) }));
         setLessons([]); // Clear lessons on error
       } finally {
         setLoading(prev => ({ ...prev, lessons: false }));
@@ -154,7 +155,7 @@ const CenterDashboard = () => {
           }
         } catch (err) {
           console.error("Error fetching lessons after adding course:", err);
-          setError(prev => ({ ...prev, lessons: err.message }));
+          setError(prev => ({ ...prev, lessons: translateErrorMessage(err.message) }));
           setLessons([]); // Clear lessons on error
         } finally {
           setLoading(prev => ({ ...prev, lessons: false }));

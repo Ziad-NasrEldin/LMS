@@ -1,3 +1,70 @@
+const ASSESSMENT_MAP = {
+  exam: {
+    requiresField: "requiresExam",
+    configField: "examConfig",
+    thresholdField: "passingThreshold",
+    attachmentCategory: "exams",
+    legacyUrlFields: ["examLink", "examFormLink", "examUrl"],
+  },
+  homework: {
+    requiresField: "requiresHomework",
+    configField: "homeworkConfig",
+    thresholdField: "homeworkPassingThreshold",
+    attachmentCategory: "homeworks",
+    legacyUrlFields: ["homeworkFormLink", "homeworkLink", "homeworkUrl"],
+  },
+}
+
+const normalizeUrl = (value) => {
+  if (typeof value !== "string") return null
+  const trimmed = value.trim()
+  return trimmed ? trimmed : null
+}
+
+const getAttachmentLinkUrl = (attachment) => {
+  if (!attachment) return null
+
+  if (typeof attachment === "string") {
+    return normalizeUrl(attachment)
+  }
+
+  if (typeof attachment === "object") {
+    if (attachment.fileType === "link") {
+      return normalizeUrl(attachment.filePath || attachment.fileName)
+    }
+    return normalizeUrl(attachment.filePath)
+  }
+
+  return null
+}
+
+const resolveLegacyAssessmentUrl = (lecture, assessmentType) => {
+  const assessment = ASSESSMENT_MAP[assessmentType]
+
+  if (!assessment || !lecture) return null
+
+  for (const field of assessment.legacyUrlFields) {
+    const directUrl = normalizeUrl(lecture[field])
+    if (directUrl) return directUrl
+  }
+
+  const attachmentEntries = lecture?.attachments?.[assessment.attachmentCategory]
+  if (Array.isArray(attachmentEntries)) {
+    for (const entry of attachmentEntries) {
+      const attachmentUrl = getAttachmentLinkUrl(entry)
+      if (attachmentUrl) return attachmentUrl
+    }
+  }
+
+  return null
+}
+
+const resolveAssessmentConfigUrl = (lecture, assessmentType) => {
+  const assessment = ASSESSMENT_MAP[assessmentType]
+  if (!assessment || !lecture) return null
+  return normalizeUrl(lecture?.[assessment.configField]?.formUrl)
+}
+
 const resolvePassingThreshold = (lectureThreshold, configThreshold, fallback = 60) => {
   if (lectureThreshold !== undefined && lectureThreshold !== null) {
     return Number(lectureThreshold)
@@ -10,31 +77,35 @@ const resolvePassingThreshold = (lectureThreshold, configThreshold, fallback = 6
   return fallback
 }
 
+const buildAssessmentRequirement = (lecture, assessmentType) => {
+  const assessment = ASSESSMENT_MAP[assessmentType]
+
+  if (!assessment || !lecture?.[assessment.requiresField]) {
+    return null
+  }
+
+  const config = lecture?.[assessment.configField]
+  const configUrl = resolveAssessmentConfigUrl(lecture, assessmentType)
+  const legacyUrl = resolveLegacyAssessmentUrl(lecture, assessmentType)
+  const resolvedUrl = configUrl || legacyUrl
+  const source = configUrl ? "config" : legacyUrl ? "legacy" : null
+
+  return {
+    required: true,
+    passed: false,
+    url: resolvedUrl,
+    source,
+    passingThreshold: resolvePassingThreshold(
+      lecture?.[assessment.thresholdField],
+      config ? config.defaultPassingThreshold : undefined,
+      60,
+    ),
+  }
+}
+
 const buildLectureRequirements = (lecture) => ({
-  exam: lecture?.requiresExam
-    ? {
-        required: true,
-        passed: false,
-        url: lecture.examConfig ? lecture.examConfig.formUrl : null,
-        passingThreshold: resolvePassingThreshold(
-          lecture.passingThreshold,
-          lecture.examConfig ? lecture.examConfig.defaultPassingThreshold : undefined,
-          60,
-        ),
-      }
-    : null,
-  homework: lecture?.requiresHomework
-    ? {
-        required: true,
-        passed: false,
-        url: lecture.homeworkConfig ? lecture.homeworkConfig.formUrl : null,
-        passingThreshold: resolvePassingThreshold(
-          lecture.homeworkPassingThreshold,
-          lecture.homeworkConfig ? lecture.homeworkConfig.defaultPassingThreshold : undefined,
-          60,
-        ),
-      }
-    : null,
+  exam: buildAssessmentRequirement(lecture, "exam"),
+  homework: buildAssessmentRequirement(lecture, "homework"),
 })
 
 const getRestrictedLectureSnapshot = (lecture) => ({
@@ -53,7 +124,11 @@ const getRestrictedLectureSnapshot = (lecture) => ({
 })
 
 module.exports = {
+  ASSESSMENT_MAP,
   resolvePassingThreshold,
+  resolveLegacyAssessmentUrl,
+  resolveAssessmentConfigUrl,
+  buildAssessmentRequirement,
   buildLectureRequirements,
   getRestrictedLectureSnapshot,
 }

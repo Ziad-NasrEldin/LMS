@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next"
 import { Phone, Book } from "lucide-react"
 import { getAllSubjects, createSubject } from "../../routes/courses"
 import { createLecturer } from "../../routes/center"
+import { translateErrorMessage } from "../../utils/errorTranslator"
 
 const LecturersList = ({ lecturers, isLoading, error, centerId }) => {
   const { t, i18n } = useTranslation("centerDashboard")
@@ -31,7 +32,7 @@ const LecturersList = ({ lecturers, isLoading, error, centerId }) => {
       if (response.success) {
         setSubjects(response.data || [])
       } else {
-        setFormError(response.error)
+        setFormError(translateErrorMessage(response.error))
       }
       setLoadingSubjects(false)
     }
@@ -79,7 +80,7 @@ const LecturersList = ({ lecturers, isLoading, error, centerId }) => {
         setFormData({ name: "", phone: "", subjects: [], center: centerId })
         setIsModalOpen(false)
       } else {
-        setFormError(response.error || t("lecturersList.lecturerAddedError", "Failed to add lecturer"))
+        setFormError(translateErrorMessage(response.error || t("lecturersList.lecturerAddedError", "Failed to add lecturer")))
       }
     } catch (err) {
       setFormError(err.message || t("lecturersList.lecturerAddedError", "Failed to add lecturer"))
@@ -98,7 +99,7 @@ const LecturersList = ({ lecturers, isLoading, error, centerId }) => {
         setNewSubjectName("")
         setFormSuccess(t("lecturersList.subjectAddedSuccess", "Subject added successfully"))
       } else {
-        setFormError(response.error || t("lecturersList.subjectAddedError", "Failed to add subject"))
+        setFormError(translateErrorMessage(response.error || t("lecturersList.subjectAddedError", "Failed to add subject")))
       }
     } catch (err) {
       setFormError(err.message || t("lecturersList.subjectAddedError", "Failed to add subject"))

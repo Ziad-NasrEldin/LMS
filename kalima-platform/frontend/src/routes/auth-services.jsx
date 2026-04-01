@@ -1,6 +1,7 @@
 import axios from "axios"
 import { jwtDecode } from "jwt-decode"
 import api from "../services/errorHandling"
+import { translateErrorMessage } from "../utils/errorTranslator"
 import {
   refreshToken,
   startTokenRefreshCheck,
@@ -15,6 +16,13 @@ const TOKEN_KEY = "accessToken"
 const IMPERSONATION_STORAGE_KEY = "impersonationSession"
 
 const normalizeRole = (role) => String(role || "").trim().toLowerCase()
+const createFailureResponse = (message, extra = {}) => ({
+  success: false,
+  ...extra,
+  status: extra.status ?? "error",
+  message: translateErrorMessage(message),
+  error: translateErrorMessage(message),
+})
 
 const emitImpersonationChange = () => {
   if (typeof window !== "undefined") {
@@ -86,7 +94,8 @@ export const decodeToken = (token) => {
   try {
     return jwtDecode(token)
   } catch (error) {
-    return `Error decoding token: ${error.message}`
+    console.error(translateErrorMessage(`Error decoding token: ${error.message}`))
+    return null
   }
 }
 
@@ -115,8 +124,9 @@ export const isLoggedIn = async () => {
 
     return true
   } catch (error) {
+    console.error(translateErrorMessage(`Error checking token validity: ${error.message}`))
     clearAuthData()
-    return `Error checking token validity: ${error.message}`
+    return false
   }
 }
 
@@ -136,7 +146,8 @@ export const getUserFromToken = () => {
     const { exp, iat, nbf, jti, ...userData } = decodedToken
     return userData
   } catch (error) {
-    return `Error extracting user from token: ${error.message}`
+    console.error(translateErrorMessage(`Error extracting user from token: ${error.message}`))
+    return null
   }
 }
 
@@ -188,7 +199,9 @@ export const registerUser = async (userData) => {
       headers: response.headers,
     }
   } catch (error) {
-    return `Registration failed: ${error.message}`
+    return createFailureResponse(error.response?.data?.message || error.message || "Registration failed", {
+      details: error.response?.data,
+    })
   }
 }
 
@@ -215,14 +228,18 @@ export const loginUser = async (credentials) => {
     } else {
       return {
         success: false,
-        error: response.data.error || "Login failed: No access token received",
+        status: "error",
+        message: translateErrorMessage(response.data.error || "Login failed: No access token received"),
+        error: translateErrorMessage(response.data.error || "Login failed: No access token received"),
         details: response.data,
       };
     }
   } catch (error) {
     return {
       success: false,
-      error: error.response?.data?.error || error.message || "Login failed",
+      status: "error",
+      message: translateErrorMessage(error.response?.data?.error || error.message || "Login failed"),
+      error: translateErrorMessage(error.response?.data?.error || error.message || "Login failed"),
       details: error.response?.data,
     };
   }
@@ -242,7 +259,9 @@ export const requestPasswordReset = async (email) => {
     )
     return response.data
   } catch (error) {
-    throw error
+    return createFailureResponse(error.response?.data?.message || error.message || "Request failed", {
+      details: error.response?.data,
+    })
   }
 }
 
@@ -259,7 +278,9 @@ export const verifyOtp = async (email, otp) => {
     )
     return response.data
   } catch (error) {
-    throw error
+    return createFailureResponse(error.response?.data?.message || error.message || "Request failed", {
+      details: error.response?.data,
+    })
   }
 }
 
@@ -276,7 +297,9 @@ export const resetPassword = async (resetToken, password, confirmPassword) => {
     )
     return response.data
   } catch (error) {
-    throw error
+    return createFailureResponse(error.response?.data?.message || error.message || "Request failed", {
+      details: error.response?.data,
+    })
   }
 }
 
@@ -303,10 +326,7 @@ export const logoutUser = async () => {
   } catch (error) {
     clearAuthData()
     stopTokenRefreshCheck() // Stop periodic refresh on logout
-    return {
-      success: false,
-      error: "Logout failed on server, but local session was cleared",
-    }
+    return createFailureResponse("Logout failed on server, but local session was cleared")
   }
 }
 
@@ -314,14 +334,11 @@ export const startImpersonation = async ({ targetUserId, targetRole }) => {
   try {
     const token = getToken()
     if (!token) {
-      return { success: false, error: "Not authenticated" }
+      return createFailureResponse("Not authenticated")
     }
 
     if (isImpersonationActive()) {
-      return {
-        success: false,
-        error: "Nested impersonation is not allowed. Exit current view first.",
-      }
+      return createFailureResponse("Nested impersonation is not allowed. Exit current view first.")
     }
 
     const response = await api.post(
@@ -336,10 +353,10 @@ export const startImpersonation = async ({ targetUserId, targetRole }) => {
     )
 
     if (!response?.data?.accessToken) {
-      return {
-        success: false,
-        error: response?.data?.message || "Failed to start impersonation",
-      }
+      return createFailureResponse(response?.data?.message || "Failed to start impersonation", {
+        status: response.status,
+        details: response.data,
+      })
     }
 
     setToken(response.data.accessToken)
@@ -363,12 +380,10 @@ export const startImpersonation = async ({ targetUserId, targetRole }) => {
       headers: response.headers,
     }
   } catch (error) {
-    return {
-      success: false,
+    return createFailureResponse(error.response?.data?.message || error.message || "Failed to start impersonation", {
       status: error.response?.status,
-      error: error.response?.data?.message || error.message || "Failed to start impersonation",
       details: error.response?.data,
-    }
+    })
   }
 }
 
@@ -379,7 +394,7 @@ export const stopImpersonation = async () => {
 
     if (!token || !session?.sessionId) {
       clearImpersonationSession()
-      return { success: false, error: "No active impersonation session" }
+      return createFailureResponse("No active impersonation session")
     }
 
     const response = await api.post(
@@ -408,12 +423,10 @@ export const stopImpersonation = async () => {
     if (error.response?.status === 400) {
       clearImpersonationSession()
     }
-    return {
-      success: false,
+    return createFailureResponse(error.response?.data?.message || error.message || "Failed to stop impersonation", {
       status: error.response?.status,
-      error: error.response?.data?.message || error.message || "Failed to stop impersonation",
       details: error.response?.data,
-    }
+    })
   }
 }
 
@@ -429,7 +442,7 @@ export const getUserDashboard = async ({ params = {} } = {}) => {
   try {
     const isAuth = await isLoggedIn()
     if (!isAuth) {
-      return { success: false, error: "Not authenticated" }
+      return createFailureResponse("Not authenticated")
     }
 
     const token = getToken()
@@ -473,8 +486,9 @@ export const getUserDashboard = async ({ params = {} } = {}) => {
               }))
           })
           .catch((err) => ({
-            success: false,
-            error: err.message || "Failed to fetch dashboard data after token refresh",
+            ...createFailureResponse(err.response?.data?.message || err.message || "Request failed"),
+            status: err.response?.status,
+            details: err.response?.data,
           }))
       }
 
@@ -500,16 +514,13 @@ export const getUserDashboard = async ({ params = {} } = {}) => {
           }
         } else {
           clearAuthData()
-          processQueue(new Error("Token refresh failed"))
-          return { success: false, error: "Token refresh failed" }
+          processQueue(new Error(translateErrorMessage("Token refresh failed")))
+          return createFailureResponse("Token refresh failed")
         }
       } catch (refreshError) {
         clearAuthData()
         processQueue(refreshError)
-        return {
-          success: false,
-          error: "Token refresh failed",
-        }
+        return createFailureResponse("Token refresh failed")
       }
     }
 
@@ -517,19 +528,14 @@ export const getUserDashboard = async ({ params = {} } = {}) => {
       return {
         success: false,
         status: error.response.status,
-        error: error.response.data?.message || "Failed to fetch dashboard data",
+        message: translateErrorMessage(error.response.data?.message || "Failed to fetch dashboard data"),
+        error: translateErrorMessage(error.response.data?.message || "Failed to fetch dashboard data"),
         details: error.response.data,
       }
     } else if (error.request) {
-      return {
-        success: false,
-        error: "No response from server. Please check your internet connection.",
-      }
+      return createFailureResponse("No response from server. Please check your internet connection.")
     } else {
-      return {
-        success: false,
-        error: "An error occurred while fetching dashboard data.",
-      }
+      return createFailureResponse("An error occurred while fetching dashboard data.")
     }
   }
 }
@@ -540,7 +546,7 @@ export const getMyPurchasedCourseContainers = async ({ params = {} } = {}) => {
   try {
     const isAuth = await isLoggedIn()
     if (!isAuth) {
-      return { success: false, error: "Not authenticated" }
+      return createFailureResponse("Not authenticated")
     }
 
     const token = getToken()
@@ -560,12 +566,10 @@ export const getMyPurchasedCourseContainers = async ({ params = {} } = {}) => {
       headers: response.headers,
     }
   } catch (error) {
-    return {
-      success: false,
+    return createFailureResponse(error.response?.data?.message || "Failed to fetch purchased course containers", {
       status: error.response?.status,
-      error: error.response?.data?.message || "Failed to fetch purchased course containers",
       details: error.response?.data,
-    }
+    })
   }
 }
 
@@ -613,8 +617,9 @@ const handleAuthenticatedRequest = async (requestFn, url, ...args) => {
             }))
           })
           .catch((err) => ({
-            success: false,
-            error: err.message || "Request failed after token refresh",
+            ...createFailureResponse(err.response?.data?.message || err.message || "Request failed"),
+            status: err.response?.status,
+            details: err.response?.data,
           }))
       }
 
@@ -640,25 +645,20 @@ const handleAuthenticatedRequest = async (requestFn, url, ...args) => {
           }
         } else {
           clearAuthData()
-          processQueue(new Error("Token refresh failed"))
-          return { success: false, error: "Token refresh failed" }
+          processQueue(new Error(translateErrorMessage("Token refresh failed")))
+          return createFailureResponse("Token refresh failed")
         }
       } catch (refreshError) {
         clearAuthData()
         processQueue(refreshError)
-        return {
-          success: false,
-          error: "Token refresh failed",
-        }
+        return createFailureResponse("Token refresh failed")
       }
     }
 
-    return {
-      success: false,
+    return createFailureResponse(error.response?.data?.message || error.message || "Request failed", {
       status: error.response?.status,
-      error: error.response?.data?.message || error.message || "Request failed",
       details: error.response?.data,
-    }
+    })
   }
 }
 

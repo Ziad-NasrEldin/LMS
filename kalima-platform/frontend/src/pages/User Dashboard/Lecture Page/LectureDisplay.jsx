@@ -95,6 +95,44 @@ const formatTime = (seconds) => {
   return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`
 }
 
+const normalizeUrl = (value) => {
+  if (typeof value !== "string") return null
+  const trimmed = value.trim()
+  return trimmed.length > 0 ? trimmed : null
+}
+
+const findFirstAttachmentLinkUrl = (items) => {
+  if (!Array.isArray(items)) return null
+
+  for (const item of items) {
+    if (!item) continue
+    if (typeof item === "string") {
+      const normalized = normalizeUrl(item)
+      if (normalized) return normalized
+      continue
+    }
+
+    if (item.fileType === "link") {
+      const normalized = normalizeUrl(item.filePath || item.fileName)
+      if (normalized) return normalized
+      continue
+    }
+
+    const fallback = normalizeUrl(item.filePath)
+    if (fallback) return fallback
+  }
+
+  return null
+}
+
+const pickFirstUrl = (...values) => {
+  for (const value of values) {
+    const normalized = normalizeUrl(value)
+    if (normalized) return normalized
+  }
+  return null
+}
+
 const LectureDisplay = () => {
   const { t, i18n } = useTranslation("lectureDisplay");
   const isRTL = i18n.language === "ar";
@@ -220,6 +258,20 @@ const LectureDisplay = () => {
   };
 
   const canEditLecture = ["Lecturer", "Admin", "SubAdmin", "Moderator"].includes(userRole)
+  const legacyExamFormUrl = pickFirstUrl(
+    lecture?.examLink,
+    lecture?.examFormLink,
+    lecture?.examUrl,
+    findFirstAttachmentLinkUrl(attachments?.exams),
+  )
+  const legacyHomeworkFormUrl = pickFirstUrl(
+    lecture?.homeworkFormLink,
+    lecture?.homeworkLink,
+    lecture?.homeworkUrl,
+    findFirstAttachmentLinkUrl(attachments?.homeworks),
+  )
+  const resolvedExamFormUrl = pickFirstUrl(examData?.examUrl, examUrl, legacyExamFormUrl)
+  const resolvedHomeworkFormUrl = pickFirstUrl(homeworkData?.homeworkUrl, legacyHomeworkFormUrl)
 
   const handleEditLecture = () => {
     if (!lecture || !canEditLecture) {
@@ -432,10 +484,18 @@ const LectureDisplay = () => {
       if (accessResult.status === "restricted") {
         // Handle exam requirements
         if (accessResult.data?.exam?.required) {
+          const resolvedExamUrl = pickFirstUrl(
+            accessResult.data?.exam?.url,
+            verificationResult.data?.exam?.url,
+            verificationResult.data?.exam?.examUrl,
+            legacyExamFormUrl,
+          )
+
           setExamRequired(true);
+          setExamUrl(resolvedExamUrl || "");
           setExamData({
             passingThreshold: accessResult.data.exam.passingThreshold,
-            examUrl: accessResult.data.exam.url,
+            examUrl: resolvedExamUrl,
             examType: "exam",
           });
 
@@ -447,16 +507,30 @@ const LectureDisplay = () => {
             setExamVerified(false);
             if (verificationResult.data?.exam?.submission) {
               setExamSubmission(verificationResult.data.exam.submission);
+            } else {
+              setExamSubmission(null);
             }
           }
+        } else {
+          setExamRequired(false);
+          setExamData(null);
+          setExamUrl("");
+          setExamSubmission(null);
         }
 
         // Handle homework requirements
         if (accessResult.data?.homework?.required && accessResult.status === "restricted") {
+          const resolvedHomeworkUrl = pickFirstUrl(
+            accessResult.data?.homework?.url,
+            verificationResult.data?.homework?.url,
+            verificationResult.data?.homework?.homeworkUrl,
+            legacyHomeworkFormUrl,
+          )
+
           setHomeworkRequired(true);
           setHomeworkData({
             passingThreshold: accessResult.data.homework.passingThreshold,
-            homeworkUrl: accessResult.data.homework.url,
+            homeworkUrl: resolvedHomeworkUrl,
             homeworkType: "homework",
           });
 
@@ -468,8 +542,14 @@ const LectureDisplay = () => {
             setHomeworkVerified(false);
             if (verificationResult.data?.homework?.submission) {
               setHomeworkSubmission(verificationResult.data.homework.submission);
+            } else {
+              setHomeworkSubmission(null);
             }
           }
+        } else {
+          setHomeworkRequired(false);
+          setHomeworkData(null);
+          setHomeworkSubmission(null);
         }
 
         // Handle case where neither exam nor homework is required but access is restricted
@@ -484,6 +564,11 @@ const LectureDisplay = () => {
         setHomeworkRequired(false);
         setExamVerified(true);
         setHomeworkVerified(true);
+        setExamData(null);
+        setHomeworkData(null);
+        setExamSubmission(null);
+        setHomeworkSubmission(null);
+        setExamUrl("");
       }
     } catch (err) {
       console.error("Error in verification flow:", err);
@@ -1024,14 +1109,14 @@ const LectureDisplay = () => {
         return;
       }
 
-      if (homeworkSubmitType === "form" && !lecture?.homeworkFormLink) {
+      if (homeworkSubmitType === "form" && !resolvedHomeworkFormUrl) {
         setHomeworkError(t("noFormLinkAvailable"));
         return;
       }
 
       if (homeworkSubmitType === "form") {
         // Open the Google Form in a new tab
-        window.open(lecture.homeworkFormLink, "_blank");
+        window.open(resolvedHomeworkFormUrl, "_blank");
         return;
       }
 
@@ -1089,8 +1174,8 @@ const LectureDisplay = () => {
 
     // Handle taking the exam
     const handleTakeExam = () => {
-      if (examData && examData.examUrl) {
-        window.open(examData.examUrl, "_blank");
+      if (resolvedExamFormUrl) {
+        window.open(resolvedExamFormUrl, "_blank");
       }
     };
 
@@ -1140,7 +1225,7 @@ const LectureDisplay = () => {
             // Clean up
             document.body.removeChild(link);
           } else {
-            throw new Error("No file path available");
+            throw new Error(translateErrorMessage("No file path available"));
           }
         } catch (fallbackErr) {
           console.error("Fallback download failed:", fallbackErr);
@@ -1223,7 +1308,7 @@ const LectureDisplay = () => {
               subtitle: t("examRequiredDescription"),
               passed: examVerified,
               threshold: examData?.passingThreshold,
-              actionUrl: examData?.examUrl,
+              actionUrl: resolvedExamFormUrl,
               actionLabel: t("startExam"),
             }
           : null,
@@ -1237,7 +1322,7 @@ const LectureDisplay = () => {
               ),
               passed: homeworkVerified,
               threshold: homeworkData?.passingThreshold,
-              actionUrl: homeworkData?.homeworkUrl,
+              actionUrl: resolvedHomeworkFormUrl,
               actionLabel: t("startHomework", "Start Homework"),
             }
           : null,
@@ -1988,23 +2073,14 @@ const LectureDisplay = () => {
                       {t("completeGoogleForm")}
                     </h3>
 
-                    {lecture?.homeworkFormLink || examUrl ? (
+                    {resolvedHomeworkFormUrl ? (
                       <div className="mb-4">
                         <p className="mb-4">
                           {t("completeGoogleFormDescription")}
                         </p>
                         <button
                           onClick={() => {
-                            // Open the Google Form in a new tab
-                            if (
-                              examData &&
-                              examData.examType === "homework" &&
-                              examUrl
-                            ) {
-                              window.open(examUrl, "_blank");
-                            } else if (lecture.homeworkFormLink) {
-                              window.open(lecture.homeworkFormLink, "_blank");
-                            }
+                            window.open(resolvedHomeworkFormUrl, "_blank");
                           }}
                           className="btn btn-primary w-full"
                         >

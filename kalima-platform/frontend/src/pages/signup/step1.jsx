@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { getAllGovernments, getGovernmentZones } from '../../routes/governments';
+import { translateErrorMessage } from '../../utils/errorTranslator';
 
 export default function Step1({ formData, handleInputChange, t, errors, role, gradeLevels }) {
   const [loading, setLoading] = useState(true);
@@ -50,11 +51,11 @@ export default function Step1({ formData, handleInputChange, t, errors, role, gr
         if (result.success) {
           setGovernments(result.data);
         } else {
-          setError(result.error);
+          setError(translateErrorMessage(result.error));
           console.error('Failed to load governments:', result.error);
         }
       } catch (err) {
-        setError(err.message);
+        setError(translateErrorMessage(err.message));
         console.error('Failed to load governments:', err);
       } finally {
         setLoading(false);

@@ -1,6 +1,7 @@
 import axios from "axios";
 import { getToken, isLoggedIn } from "./auth-services";
 import { normalizeApiError } from "../utils/apiError";
+import { translateErrorMessage } from "../utils/errorTranslator";
 
 // Use the correct API URL format
 const API_URL = import.meta.env.VITE_API_URL;
@@ -9,7 +10,7 @@ export const getAllCenters = async () => {
   try {
     const token = getToken();
     if (!token) {
-      throw new Error("Authentication token is required");
+      throw new Error(translateErrorMessage("Authentication token is required"));
     }
 
     const response = await axios.get(`${API_URL}/centers/`, {
@@ -30,7 +31,7 @@ export const getAllCenters = async () => {
       console.error("Unexpected API response structure:", response.data);
       return {
         status: "error",
-        message: "Unexpected API response structure"
+        message: translateErrorMessage("Unexpected API response structure")
       };
     }
   } catch (error) {
@@ -42,16 +43,16 @@ export const getAllCenters = async () => {
 export const getCenterDataByType = async (centerId, type) => {
   try {
     if (!centerId) {
-      throw new Error("Center ID is required");
+      throw new Error(translateErrorMessage("Center ID is required"));
     }
 
     if (!type || !["lecturers", "students", "lessons"].includes(type)) {
-      throw new Error("Valid type is required (lecturers, students, or lessons)");
+      throw new Error(translateErrorMessage("Valid type is required (lecturers, students, or lessons)"));
     }
 
     const token = getToken();
     if (!token) {
-      throw new Error("Authentication token is required");
+      throw new Error(translateErrorMessage("Authentication token is required"));
     }
 
     const response = await axios.get(`${API_URL}/centers/${centerId}/${type}`, {
@@ -72,7 +73,7 @@ export const getCenterDataByType = async (centerId, type) => {
       console.error("Unexpected API response structure:", response.data);
       return {
         status: "error",
-        message: "Unexpected API response structure"
+        message: translateErrorMessage("Unexpected API response structure")
       };
     }
   } catch (error) {
@@ -87,12 +88,12 @@ export const getCenterDataByType = async (centerId, type) => {
 export const getCenterTimetable = async (centerId) => {
   try {
     if (!centerId) {
-      throw new Error("Center ID is required");
+      throw new Error(translateErrorMessage("Center ID is required"));
     }
 
     const token = getToken();
     if (!token) {
-      throw new Error("Authentication token is required");
+      throw new Error(translateErrorMessage("Authentication token is required"));
     }
 
     const response = await axios.get(`${API_URL}/centers/${centerId}/timetable`, {
@@ -113,7 +114,7 @@ export const getCenterTimetable = async (centerId) => {
       console.error("Unexpected API response structure:", response.data);
       return {
         status: "error",
-        message: "Unexpected API response structure"
+        message: translateErrorMessage("Unexpected API response structure")
       };
     }
   } catch (error) {
@@ -124,20 +125,20 @@ export const getCenterTimetable = async (centerId) => {
 export const addNewLesson = async (lessonData) => {
   try {
     if (!lessonData) {
-      throw new Error("Lesson data is required");
+      throw new Error(translateErrorMessage("Lesson data is required"));
     }
 
     // Validate required fields
     const requiredFields = ['subject', 'lecturer', 'level', 'startTime', 'duration', 'centerId'];
     for (const field of requiredFields) {
       if (!lessonData[field]) {
-        throw new Error(`${field} is required`);
+        throw new Error(translateErrorMessage(`${field} is required`));
       }
     }
 
     const token = getToken();
     if (!token) {
-      throw new Error("Authentication token is required");
+      throw new Error(translateErrorMessage("Authentication token is required"));
     }
 
     // Format date to YYYY-MM-DD if it's a Date object
@@ -171,7 +172,7 @@ export const addNewLesson = async (lessonData) => {
       console.error("Unexpected API response structure:", response.data);
       return {
         status: "error",
-        message: "Unexpected API response structure"
+        message: translateErrorMessage("Unexpected API response structure")
       };
     }
   } catch (error) {
@@ -183,7 +184,7 @@ export const getAllParents = async () => {
   try {
     const token = getToken();
     if (!token) {
-      throw new Error("Authentication token is required");
+      throw new Error(translateErrorMessage("Authentication token is required"));
     }
 
     const response = await axios.get(`${API_URL}/parents`, {
@@ -203,7 +204,7 @@ export const getAllParents = async () => {
       console.error("Unexpected API response structure:", response.data);
       return {
         status: "error",
-        message: "Unexpected API response structure",
+        message: translateErrorMessage("Unexpected API response structure"),
       };
     }
   } catch (error) {
@@ -243,7 +244,7 @@ export const sendLessonReport = async (reportData) => {
       console.error("Unexpected API response structure:", response.data);
       return {
         status: "error",
-        message: "Unexpected API response structure",
+        message: translateErrorMessage("Unexpected API response structure"),
       };
     }
   } catch (error) {
@@ -280,7 +281,7 @@ export const sendMonthReport = async (reportData) => {
       console.error("Unexpected API response structure:", response.data);
       return {
         status: "error",
-        message: "Unexpected API response structure",
+        message: translateErrorMessage("Unexpected API response structure"),
       };
     }
   } catch (error) {
@@ -317,7 +318,7 @@ export const sendCourseReport = async (reportData) => {
       console.error("Unexpected API response structure:", response.data);
       return {
         status: "error",
-        message: "Unexpected API response structure",
+        message: translateErrorMessage("Unexpected API response structure"),
       };
     }
   } catch (error) {
@@ -349,7 +350,7 @@ export const getAllAttendance = async () => {
       console.error("Unexpected API response structure:", response.data);
       return {
         status: "error",
-        message: "Unexpected API response structure",
+        message: translateErrorMessage("Unexpected API response structure"),
       };
     }
   } catch (error) {
@@ -385,7 +386,7 @@ export const getLessonById = async (lessonId) => {
       console.error("Unexpected API response structure:", response.data);
       return {
         status: "error",
-        message: "Unexpected API response structure",
+        message: translateErrorMessage("Unexpected API response structure"),
       };
     }
   } catch (error) {

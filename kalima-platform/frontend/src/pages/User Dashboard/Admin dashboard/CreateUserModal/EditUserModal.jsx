@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { useTranslation } from "react-i18next"
 import { updateUser } from "../../../../routes/update-user"
 import { Eye, EyeOff } from "lucide-react"
+import { translateErrorMessage } from "../../../../utils/errorTranslator"
 
 const EditUserModal = ({ isOpen, onClose, user, onUserUpdated }) => {
   const { t, i18n } = useTranslation("admin")
@@ -60,7 +61,7 @@ const EditUserModal = ({ isOpen, onClose, user, onUserUpdated }) => {
 
     try {
       if (!user?._id) {
-        throw new Error("User ID is missing")
+        throw new Error(translateErrorMessage("User ID is missing"))
       }
       const result = await updateUser(user._id, updateData)
 
@@ -70,10 +71,10 @@ const EditUserModal = ({ isOpen, onClose, user, onUserUpdated }) => {
         onUserUpdated(user._id, dataToUpdate)
         onClose()
       } else {
-        setError(result.error)
+        setError(translateErrorMessage(result.error))
       }
     } catch (err) {
-      setError(err.message || "An error occurred while updating the user")
+      setError(translateErrorMessage(err.message || "An error occurred while updating the user"))
     } finally {
       setLoading(false)
     }

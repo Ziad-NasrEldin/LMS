@@ -5,6 +5,13 @@ const {
 } = require("../utils/phoneNumber.js");
 
 const allowedHobbies = [
+  "math",
+  "programming",
+  "languages",
+  "montage",
+  "designillustrating",
+  "marketing",
+  "other",
   "reading",
   "sports",
   "music",

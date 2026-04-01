@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { getAllAttendance } from "../../routes/center";
+import { translateErrorMessage } from "../../utils/errorTranslator";
 
 const ActivityTracker = ({ lessonId, students }) => {
   const { t, i18n } = useTranslation("centerDashboard");
@@ -22,10 +23,10 @@ const ActivityTracker = ({ lessonId, students }) => {
           );
           setAttendanceData(filteredAttendance);
         } else {
-          throw new Error(response.message || "Failed to fetch attendance data");
-        }
+          throw new Error(translateErrorMessage(response.message || "Failed to fetch attendance data"));
+      }
       } catch (err) {
-        setError(err.message);
+        setError(translateErrorMessage(err.message));
       } finally {
         setLoading(false);
       }

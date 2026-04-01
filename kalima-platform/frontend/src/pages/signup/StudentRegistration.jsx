@@ -14,6 +14,7 @@ import { Link, useNavigate } from "react-router-dom"
 import axios from "axios"
 import { getAllLevels } from "../../routes/levels"
 import { designTokens } from "../../constants/designTokens"
+import { translateErrorMessage } from "../../utils/errorTranslator"
 import {
   isValidEgyptianPhoneNumber,
   normalizeEgyptianPhoneNumber,
@@ -230,7 +231,7 @@ export default function StudentRegistration() {
       setErrors((prev) => ({ ...prev, hobbies: undefined, otherHobbyText: undefined }))
     } catch (error) {
       console.error("Error toggling hobby:", error)
-      setApiError("Failed to update hobby selection")
+      setApiError(translateErrorMessage("Failed to update hobby selection"))
     }
   }
 
@@ -272,7 +273,7 @@ export default function StudentRegistration() {
       setErrors((prev) => ({ ...prev, [name]: undefined }));
     } catch (error) {
       console.error("Error handling input change:", error);
-      setApiError("Failed to process input");
+      setApiError(translateErrorMessage("Failed to process input"));
     }
   };
 
@@ -288,7 +289,7 @@ export default function StudentRegistration() {
       }))
     } catch (error) {
       console.error("Error handling children change:", error)
-      setApiError("Failed to update child sequence ID")
+      setApiError(translateErrorMessage("Failed to update child sequence ID"))
     }
   }
 
@@ -339,17 +340,18 @@ export default function StudentRegistration() {
             data.append("parentPhoneNumber", normalizedParentPhoneNumber)
           }
 
-          formData.hobbies
+          const selectedHobbies = formData.hobbies
             .map((id) => {
               const hobby = hobbiesList.find((h) => h.id === id)
               if (!hobby) return null
-              if (hobby.id === "other") return formData.otherHobbyText?.trim() || null
-              return hobby.value
+              if (hobby.id === "other") return "other"
+              return String(hobby.id).trim().toLowerCase()
             })
             .filter(Boolean)
-            .forEach((hobby, index) => {
-              data.append(`hobbies[${index}]`, hobby);
-            });
+
+          if (selectedHobbies.length > 0) {
+            data.append("hobby", selectedHobbies[0])
+          }
           break;
 
         case "parent":
@@ -399,7 +401,7 @@ export default function StudentRegistration() {
           break;
 
         default:
-          throw new Error("Invalid role selected");
+          throw new Error(translateErrorMessage("Invalid role selected"));
       }
 
       const url = `${apiUrl}/register`;
@@ -553,7 +555,7 @@ export default function StudentRegistration() {
       }
     } catch (error) {
       console.error("Error rendering step content:", error)
-      setApiError("Failed to render form content")
+      setApiError(translateErrorMessage("Failed to render form content"))
       return null
     }
   }

@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { getMyPurchasedCourseContainers, getUserDashboard } from "../../../routes/auth-services"
 import { FiArrowLeft, FiArrowRight, FiChevronDown } from "react-icons/fi"
 import { designTokens } from "../../../constants/designTokens"
+import { translateErrorMessage } from "../../../utils/errorTranslator"
 
 const ContainersPage = () => {
   const { t, i18n } = useTranslation('lecturesPage');
@@ -44,7 +45,7 @@ const ContainersPage = () => {
           });
 
           if (!result.success) {
-            setError("Failed to load data");
+            setError(translateErrorMessage("Failed to load data"));
             return;
           }
 
@@ -62,7 +63,7 @@ const ContainersPage = () => {
         })
 
         if (!result.success) {
-          setError("Failed to load data")
+          setError(translateErrorMessage("Failed to load data"))
           return
         }
 
@@ -70,7 +71,7 @@ const ContainersPage = () => {
         setUserRole(userInfo.role)
         setAllContainers(containers)
       } catch (err) {
-        setError("Failed to load data. Please try again later.");
+        setError(translateErrorMessage("Failed to load data. Please try again later."));
         console.error("Error:", err);
       } finally {
         setLoading(false);

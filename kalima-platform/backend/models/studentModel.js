@@ -23,6 +23,13 @@ const { required } = require("joi");
 const mongooseSequence = require("mongoose-sequence")(mongoose);
 
 const ALLOWED_HOBBIES = [
+  "math",
+  "programming",
+  "languages",
+  "montage",
+  "designillustrating",
+  "marketing",
+  "other",
   "reading",
   "sports",
   "music",

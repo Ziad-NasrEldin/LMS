@@ -6,6 +6,7 @@ import { AssistantService } from "../../routes/assistants-services"
 import { CreateAssistant, deleteAssistant, updateAssistant } from "../../routes/assistants-services"
 import { BookOpen, Plus, X, Edit, Trash2 } from "lucide-react"
 import { designTokens } from "../../constants/designTokens"
+import { translateErrorMessage } from "../../utils/errorTranslator"
 
 const TOKENS = designTokens.colors
 const SHADOWS = designTokens.shadows
@@ -41,7 +42,7 @@ export default function InstructorsList() {
       try {
         setLoading(true)
         const myData = await AssistantService.getMyData()
-        if (!myData.success) throw new Error(myData.error)
+        if (!myData.success) throw new Error(translateErrorMessage(myData.error))
 
         setLecturerId(myData.data.id)
         const assistantsRes = await AssistantService.getAssistantsByLecturer(myData.data.id)
@@ -49,10 +50,10 @@ export default function InstructorsList() {
         if (assistantsRes.success) {
           setAssistants(assistantsRes.data || [])
         } else {
-          throw new Error(assistantsRes.error)
+          throw new Error(translateErrorMessage(assistantsRes.error))
         }
       } catch (err) {
-        setError(err.message)
+        setError(translateErrorMessage(err.message))
       } finally {
         setLoading(false)
       }
@@ -110,10 +111,10 @@ export default function InstructorsList() {
         setShowAddModal(false)
         resetForm()
       } else {
-        throw new Error(result.error || t("createAssistantError"))
+        throw new Error(translateErrorMessage(result.error || t("createAssistantError")))
       }
     } catch (err) {
-      setSubmitError(err.message)
+      setSubmitError(translateErrorMessage(err.message))
     } finally {
       setIsSubmitting(false)
     }
@@ -150,10 +151,10 @@ export default function InstructorsList() {
         }
         setShowDeleteModal(false)
       } else {
-        throw new Error(result.error || t("deleteAssistantError"))
+        throw new Error(translateErrorMessage(result.error || t("deleteAssistantError")))
       }
     } catch (err) {
-      setSubmitError(err.message)
+      setSubmitError(translateErrorMessage(err.message))
     } finally {
       setIsDeleting(false)
     }
@@ -186,10 +187,10 @@ export default function InstructorsList() {
         setEditingAssistant(null)
         resetForm()
       } else {
-        throw new Error(result.error || t("updateAssistantError"))
+        throw new Error(translateErrorMessage(result.error || t("updateAssistantError")))
       }
     } catch (err) {
-      setSubmitError(err.message)
+      setSubmitError(translateErrorMessage(err.message))
     } finally {
       setIsSubmitting(false)
     }

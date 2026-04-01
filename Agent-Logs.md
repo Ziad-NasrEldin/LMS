@@ -271,4 +271,20 @@ ounded-[2rem]\), removed hard \shadow-sm\ defaults from DaisyUI, updated primary
 - Removed five unreferenced constants from active frontend modules (`SHADOWS`, `GRADIENTS`, `ITEMS_PER_PAGE`, `API_URL`, `TOKEN_KEY`) after a symbol-level sweep.
 - Kept all route-rendered components intact and limited this pass to true in-file dead elements only.
 
+## 2026-03-31 - Student profile hobby + level localization - GPT-5.4 mini
+- Added student hobby support in settings profile view/edit so students can add or update hobby from the dashboard personal info section.
+- Updated student dashboard profile payload/patch handling to include hobby and localized level metadata, and fixed settings labels/placeholders for level/hobby in EN/AR.
+
+## 2026-03-31 - Student level field normalization + layout fix - GPT-5.4 mini
+- Fixed student level rendering in settings by normalizing common level-name typos (including `fiest preparatory`) before lookup so Arabic translation resolves correctly.
+- Aligned the level input block structure with other profile fields to fix field placement consistency in the personal info form.
+
+## 2026-03-31 - Signup/profile hobby options unification - GPT-5.4 mini
+- Unified student hobby choices in profile settings with the signup hobby set (`math`, `programming`, `art`, `languages`, `photography`, `montage`, `designillustrating`, `marketing`, `other`) and added EN/AR settings labels for those options.
+- Updated student hobby normalization and backend hobby allow-lists to accept the signup values while preserving legacy hobby values for existing student records.
+
+## 2026-03-31 - Student hobby persistence hardening - GPT-5.4 mini
+- Normalized role handling in backend profile endpoints so student-specific fields (including hobby) are returned and accepted regardless of role string casing.
+- Updated settings save flow to re-fetch `users/me/dashboard` after profile updates and hydrate hobby/level from server data, preventing false local-only saved states.
+
 

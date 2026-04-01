@@ -9,6 +9,7 @@ import EditUserModal from "../CreateUserModal/EditUserModal"
 import { getUserDashboard } from "../../../../routes/auth-services"
 import { RecalculateInvites } from "../../../../routes/market"
 import { designTokens } from "../../../../constants/designTokens"
+import { translateErrorMessage } from "../../../../utils/errorTranslator"
 
 const UserManagementTable = () => {
   const { t, i18n } = useTranslation("admin")
@@ -112,8 +113,9 @@ const UserManagementTable = () => {
         await fetchUsers()
         alert(t("admin.invites.refreshSuccess") || "Invites refreshed successfully!")
       } else {
-        setError(response.message || t("admin.invites.refreshError") || "Error calculating invites data")
-        alert(response.message || t("admin.invites.refreshError") || "Error calculating invites data")
+        const translated = translateErrorMessage(response.message || t("admin.invites.refreshError") || "Error calculating invites data")
+        setError(translated)
+        alert(translated)
       }
     } catch (error) {
       console.error("Error recalculating invites:", error)
@@ -122,8 +124,9 @@ const UserManagementTable = () => {
         error.message ||
         t("admin.invites.refreshError") ||
         "Error calculating invites data"
-      setError(errorMessage)
-      alert(errorMessage)
+      const translated = translateErrorMessage(errorMessage)
+      setError(translated)
+      alert(translated)
     } finally {
       setIsRecalculating(false)
     }
@@ -163,10 +166,10 @@ const UserManagementTable = () => {
       if (result.success) {
         setUsers((prev) => prev.filter((u) => u._id !== userId))
       } else {
-        setError(result.error)
+        setError(translateErrorMessage(result.error))
       }
     } catch (error) {
-      setError(error.message)
+      setError(translateErrorMessage(error.message))
     }
   }
 
@@ -179,10 +182,10 @@ const UserManagementTable = () => {
         setShowCreateModal(false)
         fetchUsers() // Refresh users after creation
       } else {
-        throw new Error(result.error)
+        throw new Error(translateErrorMessage(result.error))
       }
     } catch (error) {
-      setError(error.message)
+      setError(translateErrorMessage(error.message))
     }
   }
 

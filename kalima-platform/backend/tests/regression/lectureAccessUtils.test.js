@@ -42,6 +42,7 @@ test("buildLectureRequirements returns normalized exam/homework requirements", (
     required: true,
     passed: false,
     url: "https://forms.google.com/exam-1",
+    source: "config",
     passingThreshold: 70,
   })
 
@@ -49,6 +50,42 @@ test("buildLectureRequirements returns normalized exam/homework requirements", (
     required: true,
     passed: false,
     url: "https://forms.google.com/homework-1",
+    source: "config",
+    passingThreshold: 65,
+  })
+})
+
+test("buildLectureRequirements falls back to legacy links when config URL is unavailable", () => {
+  const requirements = buildLectureRequirements({
+    requiresExam: true,
+    requiresHomework: true,
+    passingThreshold: 70,
+    homeworkPassingThreshold: 65,
+    examConfig: {
+      defaultPassingThreshold: 55,
+    },
+    homeworkConfig: {
+      defaultPassingThreshold: 60,
+    },
+    examLink: "https://legacy.exam/form",
+    attachments: {
+      homeworks: [{ fileType: "link", filePath: "https://legacy.homework/form" }],
+    },
+  })
+
+  assert.deepEqual(requirements.exam, {
+    required: true,
+    passed: false,
+    url: "https://legacy.exam/form",
+    source: "legacy",
+    passingThreshold: 70,
+  })
+
+  assert.deepEqual(requirements.homework, {
+    required: true,
+    passed: false,
+    url: "https://legacy.homework/form",
+    source: "legacy",
     passingThreshold: 65,
   })
 })

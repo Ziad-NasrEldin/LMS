@@ -9,6 +9,7 @@ import { FiBook, FiFolder, FiArrowLeft, FiArrowRight, FiPlus, FiEdit2 } from "re
 import LectureCreationModal from "../../../components/LectureCreationModal"
 import ContainerCreationModal from "../../../components/ContainerCreationModal"
 import { designTokens } from "../../../constants/designTokens"
+import { translateErrorMessage } from "../../../utils/errorTranslator"
 
 const ContainerDetailsPage = () => {
   const { t, i18n } = useTranslation('lecturesPage');
@@ -102,10 +103,10 @@ const ContainerDetailsPage = () => {
           setBreadcrumbTrail([])
         }
       } else {
-        setError("Failed to load container details")
+        setError(translateErrorMessage("Failed to load container details"))
       }
     } catch (err) {
-      setError(err.message || "Failed to load data. Please try again later.")
+      setError(translateErrorMessage(err.message || "Failed to load data. Please try again later."))
     }
   }
 
@@ -115,7 +116,7 @@ const ContainerDetailsPage = () => {
         setLoading(true)
         const dashRes = await getUserDashboard()
         if (!dashRes.success) {
-          setError("Failed to load user info")
+          setError(translateErrorMessage("Failed to load user info"))
           return
         }
 
@@ -124,7 +125,7 @@ const ContainerDetailsPage = () => {
         setUserId(userInfo._id)
         await fetchContainer()
       } catch (err) {
-        setError(err.message || "Failed to load data. Please try again later.")
+        setError(translateErrorMessage(err.message || "Failed to load data. Please try again later."))
       } finally {
         setLoading(false)
       }
@@ -176,7 +177,7 @@ const ContainerDetailsPage = () => {
       }
 
       if (response.status !== "success" && response.success !== true) {
-        throw new Error(response.message || "Failed to create lecture")
+        throw new Error(translateErrorMessage(response.message || "Failed to create lecture"))
       }
 
       // Handle attachments after successful lecture creation
@@ -227,14 +228,16 @@ const ContainerDetailsPage = () => {
           }
         } catch (attachmentError) {
           console.error("Error uploading attachments:", attachmentError)
-          setCreationError(`Lecture created but failed to upload attachments: ${attachmentError.message}`)
+          setCreationError(
+            `${translateErrorMessage("Lecture created but failed to upload attachments")}: ${translateErrorMessage(attachmentError.message)}`
+          )
         }
       }
 
       await fetchContainer()
       return true
     } catch (err) {
-      setCreationError(err.message)
+      setCreationError(translateErrorMessage(err.message))
       console.error("Creation error:", err)
       return false
     } finally {
@@ -250,13 +253,13 @@ const ContainerDetailsPage = () => {
 
       const response = await createContainer(containerData)
       if (response.status !== "success" && response.success !== true) {
-        throw new Error(response.message || `Failed to create ${containerData.type}`)
+        throw new Error(translateErrorMessage(response.message || `Failed to create ${containerData.type}`))
       }
 
       await fetchContainer()
       return true
     } catch (err) {
-      setCreationError(err.message)
+      setCreationError(translateErrorMessage(err.message))
       console.error("Creation error:", err)
       return false
     } finally {
@@ -271,13 +274,13 @@ const ContainerDetailsPage = () => {
     try {
       const response = await updateContainer(containerIdToUpdate, containerData)
       if (response.status !== "success" && response.success !== true) {
-        throw new Error(response.message || "Failed to update container")
+        throw new Error(translateErrorMessage(response.message || "Failed to update container"))
       }
 
       await fetchContainer()
       return true
     } catch (err) {
-      setCreationError(err.message)
+      setCreationError(translateErrorMessage(err.message))
       console.error("Update error:", err)
       return false
     } finally {

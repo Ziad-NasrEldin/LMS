@@ -26,6 +26,7 @@ import {
   stopImpersonation,
 } from "../routes/auth-services";
 import { resolveProfileImageUrl } from "../utils/profileImage";
+import { translateErrorMessage } from "../utils/errorTranslator";
 
 const NAVBAR_HEIGHT = 92;
 
@@ -156,7 +157,7 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
         setUserData(result.data.data.userInfo);
         setError(null);
       } else {
-        setError(result.error || "Failed to fetch user data");
+        setError(translateErrorMessage(result.error || "Failed to fetch user data"));
       }
     } catch (fetchError) {
       setError("Failed to fetch user data");

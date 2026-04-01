@@ -10,6 +10,7 @@ import { getLectureHomeworks } from "../../../routes/homeworks"
 import { downloadAttachmentById } from "../../../routes/lectures"
 import { useTranslation } from "react-i18next"
 import { getAllStudentLectureAccess, updateStudentLectureAccess } from "../../../routes/student-lecture-access"
+import { translateErrorMessage } from "../../../utils/errorTranslator"
 import {
   FiArrowLeft,
   FiDownload,
@@ -299,7 +300,7 @@ const DetailedLectureView = () => {
       alert('Feedback submitted successfully')
     } catch (error) {
       console.error('Error submitting feedback:', error)
-      setFeedbackError('Failed to submit feedback. Please try again.')
+      setFeedbackError(translateErrorMessage('Failed to submit feedback. Please try again.'))
     } finally {
       setIsSubmittingFeedback(false)
     }
@@ -339,7 +340,7 @@ const DetailedLectureView = () => {
           setUpdateAccessSuccess(false)
         }, 2000)
       } else {
-        setUpdateAccessError(result.error)
+        setUpdateAccessError(translateErrorMessage(result.error))
       }
     } catch (err) {
       console.error("Error updating student lecture access:", err)

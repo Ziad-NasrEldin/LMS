@@ -7,6 +7,7 @@ import { getAuditLogs } from "../../../routes/auditlog"
 import { useTranslation } from "react-i18next"
 import { getAuditLogsByEmail } from "../../../routes/auditlog"
 import { designTokens } from "../../../constants/designTokens"
+import { translateErrorMessage } from "../../../utils/errorTranslator"
 
 const AuditLog = () => {
   const { t, i18n } = useTranslation("admin")
@@ -60,11 +61,11 @@ const AuditLog = () => {
           setLogs(response.data?.logs || [])
           setError(null)
         } else {
-          setError(response.error)
+          setError(translateErrorMessage(response.error))
           setLogs([])
         }
       } catch (e) {
-        setError("Error fetching logs")
+        setError(translateErrorMessage("Error fetching logs"))
       } finally {
         setLoading(false)
       }
@@ -86,11 +87,11 @@ const AuditLog = () => {
         setError(null)
       } else {
         setLogs([])
-        setError(response.error)
+        setError(translateErrorMessage(response.error))
       }
     } catch (e) {
       setLogs([])
-      setError("Error searching by email")
+      setError(translateErrorMessage("Error searching by email"))
     } finally {
       setLoading(false)
     }

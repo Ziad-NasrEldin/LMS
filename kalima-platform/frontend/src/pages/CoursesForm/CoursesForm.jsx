@@ -15,6 +15,7 @@ import ContainerCreationPanel from "./container-creation-panel"
 import CourseStructureVisualization from "./course-structure-visualization"
 import { Link } from "react-router-dom"
 import { designTokens } from "../../constants/designTokens"
+import { translateErrorMessage } from "../../utils/errorTranslator"
 
 function CourseCreationForm() {
   const { t, i18n } = useTranslation()
@@ -96,7 +97,7 @@ function CourseCreationForm() {
           const containerData = containerResponse?.data?.container || containerResponse?.data || containerResponse?.container
 
           if (!containerData) {
-            throw new Error("Failed to load the selected course")
+            throw new Error(translateErrorMessage("Failed to load the selected course"))
           }
 
           setFormData((prev) => ({
@@ -123,7 +124,7 @@ function CourseCreationForm() {
         }
       } catch (err) {
         console.error("Error fetching data:", err)
-        setError(err.message || "Failed to load data")
+        setError(translateErrorMessage(err.message || "Failed to load data"))
       } finally {
         setIsLoading(false)
       }

@@ -2,6 +2,7 @@ import axios from "axios";
 import { getToken } from "./auth-services"; // Adjust the path based on your project structure
 import { getAuthHeader } from "./fetch-users"; // Adjust the path based on your project structure
 import { normalizeApiError } from "../utils/apiError";
+import { translateErrorMessage } from "../utils/errorTranslator";
 
 /**
  * Fetches student submissions for a specific lecture
@@ -43,7 +44,7 @@ export const getStudentSubmissionsByLectureId = async (lectureId) => {
 export const verifyExamSubmission = async (lectureId) => {
   try {
     if (!lectureId) {
-      throw new Error("Lecture ID is required")
+      throw new Error(translateErrorMessage("Lecture ID is required"))
     }
 
     const response = await axios.post(
@@ -82,7 +83,7 @@ export const verifyExamSubmission = async (lectureId) => {
 export const checkLectureAccess = async (lectureId) => {
   try {
     if (!lectureId) {
-      throw new Error("Lecture ID is required")
+      throw new Error(translateErrorMessage("Lecture ID is required"))
     }
 
     const response = await axios.get(

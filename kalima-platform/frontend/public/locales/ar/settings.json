@@ -21,13 +21,16 @@
       "phoneNumber": "رقم هاتف الجوال",
       "email": "البريد الإلكتروني",
       "profession": "المهنة / العمل",
-      "idNumber": "رقم الهوية"
+      "idNumber": "رقم الهوية",
+      "level": "المرحلة",
+      "hobby": "الهواية"
     },
     "placeholders": {
       "fullName": "مثال: يوسف بن محمد علي",
       "phoneNumber": "971-123-4567",
       "email": "example@yahoo.com",
-      "idNumber": "أدخل رقم الهوية هنا"
+      "idNumber": "أدخل رقم الهوية هنا",
+      "hobby": "اختر هواية"
     },
     "buttons": {
       "edit": "تعديل",
@@ -41,6 +44,24 @@
     "noProfilePicHint": "اضغط على أيقونة الكاميرا لرفع صورة الملف الشخصي",
     "messages": {
       "updateSuccess": "تم التحديث بنجاح"
+    },
+    "hobbyOptions": {
+      "math": "الرياضيات",
+      "programming": "البرمجة",
+      "languages": "اللغات",
+      "montage": "المونتاج",
+      "designillustrating": "التصميم/الرسم التوضيحي",
+      "marketing": "التسويق",
+      "other": "أخرى",
+      "reading": "القراءة",
+      "sports": "الرياضة",
+      "music": "الموسيقى",
+      "cooking": "الطبخ",
+      "gaming": "الألعاب",
+      "art": "الفن",
+      "technology": "التكنولوجيا",
+      "bicycling": "ركوب الدراجات",
+      "photography": "التصوير"
     }
   },
     "validation": {
@@ -89,22 +110,5 @@
         "newPassword": "كلمة السر الجديدة",
         "confirmPassword": "تأكيد كلمة السر الجديدة"
       }
-    },
-    "notifications": {
-    "title": "الإشعارات",
-    "studentType": "إشعارات الطالب",
-    "teacherType": "إشعارات المعلم",
-    "types": {
-      "newAssignment": "تم إضافة واجب جديد",
-      "assignmentCorrection": "تم تصحيح واجبك",
-      "newLesson": "تم إضافة درس جديد",
-      "examDate": "موعد اختبار قادم",
-      "notificationUpdate": "تم تحديث إشعاراتك",
-      "teacherMessage": "تم إرسال رسالة من المعلم",
-      "assignmentSubmission": "تم تسليم واجب من طالب",
-      "studentMessage": "طالب أرسل رسالة أو استفسار",
-      "gradePosted": "تم نشر نتائج",
-      "deadlineReminder": "إشعار بموعد تحديد أو موعد تسليم"
     }
-  }
   }

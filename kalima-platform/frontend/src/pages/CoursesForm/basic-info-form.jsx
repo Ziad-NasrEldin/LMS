@@ -25,6 +25,7 @@ function BasicInfoForm({
   const [courseImage, setCourseImage] = useState(null)
   const [courseVideo, setCourseVideo] = useState(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const isPaidCourse = formData.courseType === "paid"
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0]
@@ -42,6 +43,15 @@ function BasicInfoForm({
       return
     }
 
+    if (isPaidCourse && (!formData.priceFull || Number(formData.priceFull) <= 0)) {
+      toast.error(
+        isRTL
+          ? "يرجى إدخال سعر أكبر من صفر للكورس المدفوع"
+          : "Please enter a price greater than zero for the paid course",
+      )
+      return
+    }
+
     setIsSubmitting(true)
 
     try {
@@ -55,9 +65,9 @@ function BasicInfoForm({
       formDataPayload.append("subject", formData.subject)
       formDataPayload.append("description", formData.description || "")
       formDataPayload.append("goal", formData.goal || "")
-      formDataPayload.append("price", formData.courseType === "paid" ? Number(formData.priceFull) || 0 : 0)
+      formDataPayload.append("price", isPaidCourse ? Number(formData.priceFull) || 0 : 0)
       formDataPayload.append("teacherAllowed", formData.privacy === "teacher")
-      formDataPayload.append("priceAllowed", formData.courseType === "paid")
+      formDataPayload.append("priceAllowed", isPaidCourse)
 
       // Append image file if exists (video omitted unless API supports it)
       if (courseImage) {
@@ -293,6 +303,28 @@ function BasicInfoForm({
                       ? "اختر مجانياً أو مدفوعاً. يمكن تعديل السعر قبل الإطلاق."
                       : "Choose free or paid. You can adjust the price before launch."}
                   </p>
+                  {isPaidCourse && (
+                    <div className="mt-3">
+                      <label className="block text-sm font-medium mb-1">
+                        {isRTL ? "سعر الكورس" : "Course Price"}
+                      </label>
+                      <input
+                        type="number"
+                        name="priceFull"
+                        value={formData.priceFull}
+                        onChange={handleChange}
+                        placeholder={isRTL ? "أدخل سعر الكورس" : "Enter course price"}
+                        className={compactInput}
+                        min="1"
+                        required={isPaidCourse}
+                      />
+                      <p className="mt-1 text-xs text-base-content/55">
+                        {isRTL
+                          ? "سيتم استخدام هذا السعر للحاوية الرئيسية الأولى."
+                          : "This price will be used for the first parent container."}
+                      </p>
+                    </div>
+                  )}
                   <div>
                     <h2 className="block text-primary text-base font-semibold mb-2">
                       {isRTL ? "خصوصية الكورس" : "Course Privacy"}

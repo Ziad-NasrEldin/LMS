@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import jsPDF from 'jspdf';
 import { getAllParents, sendLessonReport, sendMonthReport, sendCourseReport, getCenterDataByType, getAllAttendance } from '../../routes/center';
 import { ErrorAlert } from '../../components/ErrorAlert';
+import { translateErrorMessage } from '../../utils/errorTranslator';
 
 const Reports = ({ selectedCenter, lessonId }) => {
   const [students, setStudents] = useState([]);
@@ -21,19 +22,19 @@ const Reports = ({ selectedCenter, lessonId }) => {
         // Fetch students by center ID
         const studentsResponse = await getCenterDataByType(selectedCenter._id, 'students');
         if (studentsResponse.status !== 'success') {
-          throw new Error(studentsResponse.message || 'Failed to fetch students');
+          throw new Error(translateErrorMessage(studentsResponse.message || 'Failed to fetch students'));
         }
 
         // Fetch all parents
         const parentsResponse = await getAllParents();
         if (parentsResponse.status !== 'success') {
-          throw new Error(parentsResponse.message || 'Failed to fetch parents');
+          throw new Error(translateErrorMessage(parentsResponse.message || 'Failed to fetch parents'));
         }
 
         // Fetch attendance data
         const attendanceResponse = await getAllAttendance();
         if (attendanceResponse.status !== 'success') {
-          throw new Error(attendanceResponse.message || 'Failed to fetch attendance');
+          throw new Error(translateErrorMessage(attendanceResponse.message || 'Failed to fetch attendance'));
         }
 
         // Filter students who attended the specific lesson
@@ -53,7 +54,7 @@ const Reports = ({ selectedCenter, lessonId }) => {
         setAttendedStudents(filteredStudents);
         setParents(parentsResponse.data);
       } catch (err) {
-        setError(err.message);
+        setError(translateErrorMessage(err.message));
       } finally {
         setLoading(false);
       }
@@ -67,7 +68,7 @@ const Reports = ({ selectedCenter, lessonId }) => {
   // Handle report generation and PDF creation
   const handleGenerateReport = async () => {
     if (!selectedStudent || !reportType) {
-      setReportStatus('Please select a student and report type.');
+      setReportStatus(translateErrorMessage('Please select a student and report type.'));
       return;
     }
 
@@ -96,13 +97,13 @@ const Reports = ({ selectedCenter, lessonId }) => {
       }
 
       if (response.status === 'success') {
-        setReportStatus('Report generated successfully! Generating PDF...');
+        setReportStatus(translateErrorMessage('Report generated successfully! Generating PDF...'));
         generatePDF(selectedStudent, reportType, response.data);
       } else {
-        throw new Error(response.message || 'Failed to generate report');
+        throw new Error(translateErrorMessage(response.message || 'Failed to generate report'));
       }
     } catch (err) {
-      setReportStatus(`Error: ${err.message}`);
+      setReportStatus(translateErrorMessage(`Error: ${err.message}`));
     }
   };
 

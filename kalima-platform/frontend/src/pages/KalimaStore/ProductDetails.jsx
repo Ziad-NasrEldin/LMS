@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next"
 
 import { getBookById, getProductById, purchaseProduct, purchaseBook } from "../../routes/market"
 import { validateCoupon } from "../../routes/marketCoupouns" // Assuming this is the correct path
+import { translateErrorMessage } from "../../utils/errorTranslator"
 
 // Import components
 import ProductHeader from "./Components/ProductHeader"
@@ -95,7 +96,7 @@ const ProductDetails = () => {
           throw new Error(t("errors.fetchFailed"))
         }
       } catch (err) {
-        setError(err.message)
+        setError(translateErrorMessage(err.message))
         console.error(t("errors.fetchErrorLog"), err)
       } finally {
         setLoading(false)
@@ -255,7 +256,7 @@ const ProductDetails = () => {
         const fileInput = document.getElementById("file-upload")
         if (fileInput) fileInput.value = ""
       } else {
-        throw new Error("Unexpected response format")
+        throw new Error(translateErrorMessage("Unexpected response format"))
       }
     } catch (err) {
       console.error("💥 Error submitting purchase:", err)

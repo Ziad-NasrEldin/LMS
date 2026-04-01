@@ -1,6 +1,7 @@
 import axios from "axios"
 import { getToken, isLoggedIn } from "./auth-services"
 import { normalizeApiError } from "../utils/apiError"
+import { translateErrorMessage } from "../utils/errorTranslator"
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -66,7 +67,7 @@ export const purchaseContainer = async (containerId) => {
     return {
       success: false,
       status: error.response?.status,
-      error: error.response?.data?.message || `Error purchasing container: ${error.message}`,
+      error: translateErrorMessage(error.response?.data?.message || `Error purchasing container: ${error.message}`),
       data: error.response?.data,
     };
   }
@@ -75,7 +76,7 @@ export const purchaseContainer = async (containerId) => {
 export const getContainerById = async (containerId) => {
   try {
     if (!containerId) {
-      throw new Error("Missing container ID");
+      throw new Error(translateErrorMessage("Missing container ID"));
     }
 
     const response = await axios.get(
@@ -90,7 +91,7 @@ export const getContainerById = async (containerId) => {
 
     // Handle non-2xx status codes
     if (response.status < 200 || response.status >= 300) {
-      throw new Error(response.data.message || "Request failed");
+      throw new Error(translateErrorMessage(response.data.message || "Request failed"));
     }
 
     return response.data;
@@ -107,7 +108,7 @@ export const getLectureAttachments = async (lectureId) => {
     if (!token) {
       return {
         status: "error",
-        message: "Authentication required",
+        message: translateErrorMessage("Authentication required"),
       };
     }
 
@@ -138,7 +139,7 @@ export const deleteLecture = async (lectureId) => {
     if (!token) {
       return {
         success: false,
-        message: "Authentication required",
+        message: translateErrorMessage("Authentication required"),
       }
     }
 
@@ -158,8 +159,8 @@ export const deleteLecture = async (lectureId) => {
 
     return {
       success: false,
-      message: error.response?.data?.message || "Failed to delete lecture",
-      error: error.message,
+      message: translateErrorMessage(error.response?.data?.message || "Failed to delete lecture"),
+      error: translateErrorMessage(error.message),
     }
   }
 }
@@ -170,7 +171,7 @@ export const downloadAttachmentById = async (attachmentId) => {
     const token = getToken();
 
     if (!token) {
-      throw new Error("Authentication required");
+      throw new Error(translateErrorMessage("Authentication required"));
     }
 
     const response = await axios.get(`${API_URL}/lectures/attachment/${attachmentId}/file`, {
@@ -196,7 +197,7 @@ export const downloadAttachmentById = async (attachmentId) => {
     };
   } catch (error) {
     console.error("Error downloading attachment:", error);
-    throw new Error(`Failed to download attachment: ${error.message}`);
+    throw new Error(translateErrorMessage(`Failed to download attachment: ${error.message}`));
   }
 };
 
@@ -219,7 +220,7 @@ export const createLecture = async (lectureData) => {
     // Return a structured error object instead of a string
     return {
       status: "error",
-      message: `Error creating lecture: ${error.message}`,
+      message: translateErrorMessage(`Error creating lecture: ${error.message}`),
       error,
     }
   }
@@ -241,7 +242,7 @@ export const updateLecture = async (lectureId, lectureData) => {
   } catch (error) {
     return {
       status: "error",
-      message: `Error updating lecture: ${error.message}`,
+      message: translateErrorMessage(`Error updating lecture: ${error.message}`),
       error,
     }
   }
@@ -353,7 +354,7 @@ export const getContainersByLecturerId = async (lecturerId) => {
 export const getLecturesByContainerId = async (containerId) => {
   try {
     if (!isLoggedIn()) {
-      throw new Error("User not authenticated")
+      throw new Error(translateErrorMessage("User not authenticated"))
     }
 
     const containerResponse = await getContainerById(containerId)
@@ -454,6 +455,6 @@ export const createLectureAttachment = async (lectureId, attachmentData, isFormD
     return response.data;
   } catch (error) {
     console.error("Error uploading lecture attachment:", error);
-    throw error;
+    throw new Error(translateErrorMessage(error.message || "Request failed"));
   }
 };

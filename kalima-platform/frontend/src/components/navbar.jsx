@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate } from "react-router-dom";
 import LanguageSwitcher from "./LanguageSwitcher";
-import NotificationCenter from "./NotificationCenter";
 import {
   isLoggedIn,
   getUserDashboard,
@@ -16,7 +15,6 @@ const NavBar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isHiddenOnScroll, setIsHiddenOnScroll] = useState(false);
   const [userRole, setUserRole] = useState(null);
-  const [userId, setUserId] = useState(null);
   const isAr = i18n.dir() === "rtl";
   const navbarRef = useRef(null);
   const menuRef = useRef(null);
@@ -30,19 +28,15 @@ const NavBar = () => {
         if (result.success) {
           const userInfo = result?.data?.data?.userInfo || result?.data?.userInfo;
           setUserRole(userInfo?.role || null);
-          setUserId(userInfo?.id || null);
         } else {
           setUserRole(null);
-          setUserId(null);
         }
       } catch (err) {
         setUserRole(null);
-        setUserId(null);
         console.error(err);
       }
     } else {
       setUserRole(null);
-      setUserId(null);
     }
   };
 
@@ -122,7 +116,6 @@ const NavBar = () => {
     try {
       await logoutUser();
       setUserRole(null);
-      setUserId(null);
       setMenuOpen(false);
       navigate("/");
     } catch (err) {
@@ -183,7 +176,6 @@ const NavBar = () => {
 
             <div className="hidden lg:flex items-center gap-2">
               <LanguageSwitcher />
-              {userId && <NotificationCenter userId={userId} />}
               {userRole ? (
                 <>
                   <Link to={getDashboardPath(userRole)} className="btn btn-sm border-none bg-[#CFE8ED] text-[#0F4F5B] hover:bg-[#BFDFE6] rounded-full">
@@ -273,12 +265,6 @@ const NavBar = () => {
               <div className="my-5">
                 <LanguageSwitcher />
               </div>
-
-              {userId && (
-                <div className="mb-4">
-                  <NotificationCenter userId={userId} />
-                </div>
-              )}
 
               {userRole ? (
                 <div className="space-y-2">

@@ -24,23 +24,44 @@ const studentExamSubmissionSchema = new mongoose.Schema(
     },
     score: {
       type: Number,
-      required: true,
       min: 0,
+      default: null,
     },
     maxScore: {
       type: Number,
-      required: true,
       min: 0,
+      default: null,
     },
     passingThreshold: {
       type: Number,
-      required: true,
       min: 0,
       max: 100,
+      default: null,
     },
     passed: {
       type: Boolean,
       required: true,
+      default: false,
+    },
+    syncStatus: {
+      type: String,
+      enum: ["pending", "synced", "failed"],
+      default: "synced",
+    },
+    syncSource: {
+      type: String,
+      enum: ["sheet", "webhook", "reconciliation", "manual"],
+      default: "sheet",
+    },
+    syncReference: {
+      type: String,
+      trim: true,
+      default: null,
+    },
+    syncError: {
+      type: String,
+      trim: true,
+      default: null,
     },
     submittedAt: {
       type: Date,
@@ -60,5 +81,6 @@ const studentExamSubmissionSchema = new mongoose.Schema(
 studentExamSubmissionSchema.index({ student: 1, lecture: 1, type: 1 }, { unique: true });
 studentExamSubmissionSchema.index({ lecture: 1, submittedAt: -1 });
 studentExamSubmissionSchema.index({ type: 1, passed: 1 });
+studentExamSubmissionSchema.index({ syncStatus: 1, updatedAt: -1 });
 
 module.exports = mongoose.model("StudentExamSubmission", studentExamSubmissionSchema);

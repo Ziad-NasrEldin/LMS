@@ -26,9 +26,6 @@ const levelRouter = require("./routes/levelRoutes.js");
 const StudentLectureAccessRouter = require("./routes/studentLectureAccessRoutes.js");
 const centerRouter = require("./routes/centerRoutes");
 const messageRouter = require("./routes/messageRoutes");
-const { createServer } = require("http");
-const { Server } = require("socket.io");
-const Notification = require("./models/notification");
 const adminDashboardRouter = require("./routes/adminDashboardRoutes.js");
 const codeRouter = require("./routes/codeRoutes");
 const adminRouter = require("./routes/adminRoutes.js");
@@ -59,9 +56,7 @@ const ExamConfigRouter = require("./routes/ExamConfigRoutes.js");
 const studentExamSubmissionRouter = require("./routes/studentExamSubmissionRoutes.js");
 const assistantHomeworkRouter = require("./routes/assistantHomeworkRoutes.js");
 const seedInitialAdminDirect = require("./utils/seeds/seedInitialAdminDirect");
-const seedNotificationTemplates = require("./utils/seeds/seedNotificationTemplates");
 const governmentRoutes = require("./routes/governmentRoutes");
-const notificationRoutes = require("./routes/notificationRoutes");
 const ecCouponRouter = require("./routes/ec.couponRoutes");
 const ecReferralRoutes = require("./routes/ec.referralRoutes");
 
@@ -69,7 +64,13 @@ const ecReferralRoutes = require("./routes/ec.referralRoutes");
 connectDB();
 
 app.use(cors(corsOptions));
-app.use(express.json({ limit: '120mb' }));
+const captureRawJsonBody = (req, _res, buf) => {
+  if (buf && buf.length > 0) {
+    req.rawBody = buf.toString("utf8");
+  }
+};
+
+app.use(express.json({ limit: "120mb", verify: captureRawJsonBody }));
 app.use(express.urlencoded({ limit: '120mb', extended: true }));
 
 app.use(mongoSanitize());
@@ -114,7 +115,6 @@ app.use("/api/v1/exam-configs", ExamConfigRouter);
 app.use("/api/v1/exam-submissions", studentExamSubmissionRouter);
 app.use("/api/v1/assistant-homework", assistantHomeworkRouter);
 app.use("/api/v1/governments", governmentRoutes);
-app.use("/api/v1/notifications", notificationRoutes);
 // Mount the new e-commerce product and book routes
 app.use("/api/v1/ec/sections", auditLogger, ecSectionRouter);
 app.use("/api/v1/ec/products", auditLogger, ecProductRouter);
@@ -134,140 +134,12 @@ mongoose.connection.once("open", async () => {
   try {
     // Seed required data before handling requests.
     await seedInitialAdminDirect();
-    await seedNotificationTemplates();
     console.log("Initial seed checks completed.");
   } catch (err) {
     console.error("Error during initialization:", err);
   }
 
-  const httpServer = createServer(app);
-  const io = new Server(httpServer, {
-    cors: {
-      origin: corsOptions.origin,
-      methods: ["GET", "POST"],
-      credentials: true,
-    },
-    pingTimeout: 60000, // Increase ping timeout for better connection stability
-  });
-
-  // Track connected users
-  const connectedUsers = new Map();
-
-  // Add middleware to handle authentication
-  io.use((socket, next) => {
-    const token = socket.handshake.auth.token;
-    const userId = socket.handshake.query.userId;
-
-    if (!token || !userId) {
-      console.log("Socket connection rejected: Missing token or userId");
-      return next(new Error("Authentication error"));
-    }
-
-    // Here you could verify the token if needed
-
-    // Store user information in socket object
-    socket.userId = userId;
-    next();
-  });
-
-  io.on("connection", (socket) => {
-    console.log("A client connected:", socket.id, "User ID:", socket.userId);
-
-    // Handle subscription to notifications
-    socket.on("subscribe", async (userId) => {
-      if (!userId) {
-        console.log("Invalid subscription attempt: No userId provided");
-        return;
-      }
-
-      console.log(
-        `User ${userId} subscribed to notifications with socket ID ${socket.id}`
-      );
-
-      // Add user to connected users map
-      connectedUsers.set(socket.id, userId);
-      socket.join(userId);
-      console.log(`Socket ${socket.id} joined room: ${userId}`);
-
-      try {
-        // Check if we should send pending notifications
-        const pendingNotifications = await Notification.find({
-          userId,
-          isSent: false,
-        })
-          .sort({ createdAt: -1 })
-          .limit(20);
-
-        console.log(
-          `Found ${pendingNotifications.length} pending notifications for user ${userId}`
-        );
-
-        if (pendingNotifications.length > 0) {
-          // Mark notifications as sent
-          await Notification.updateMany(
-            { userId, isSent: false },
-            { isSent: true }
-          );
-
-          // Send each notification to the client
-          pendingNotifications.forEach((notification) => {
-            // Determine event type based on notification type
-            const eventType =
-              notification.type === "new_homework"
-                ? "newHomework"
-                : notification.type === "new_lecture"
-                  ? "newLecture"
-                  : notification.type === "new_container"
-                    ? "newContainer"
-                    : notification.type === "new_attachment" ||
-                      notification.type === "new_attachment_assignment" ||
-                      notification.type === "new_exam"
-                      ? "newAttachment"
-                      : notification.type === "lecture_updated"
-                        ? "lectureUpdate"
-                        : "notification";
-
-            console.log(`Sending ${eventType} notification to user ${userId}`);
-
-            socket.emit(eventType, {
-              title: notification.title,
-              message: notification.message,
-              type: notification.type,
-              subjectId: notification.relatedId,
-              notificationId: notification._id,
-              createdAt: notification.createdAt,
-            });
-          });
-        }
-      } catch (error) {
-        console.error("Error processing notifications:", error);
-      }
-    });
-
-    // Handle client pings to keep connection alive
-    socket.on("ping", () => {
-      socket.emit("pong");
-    });
-
-    socket.on("disconnect", (reason) => {
-      // Remove from connected users map
-      const userId = connectedUsers.get(socket.id);
-      console.log(
-        `User ${userId} disconnected: ${reason}, socket ID ${socket.id}`
-      );
-      connectedUsers.delete(socket.id);
-    });
-
-    // Handle errors
-    socket.on("error", (error) => {
-      console.error(`Socket error for user ${socket.userId}:`, error);
-    });
-  });
-
-  // Make io accessible in routes
-  app.set("io", io);
-
-  httpServer.listen(PORT, () => {
+  app.listen(PORT, () => {
     console.log(`Server active and listening on port ${PORT}.`);
   });
 });

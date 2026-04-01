@@ -13,6 +13,7 @@ import BulkCreateUsers from "./BulkCreateUsers"
 import TeacherForm from "./TeacherForm"
 import { getAllGovernments, getGovernmentZones } from "../../../../routes/governments"
 import { designTokens } from "../../../../constants/designTokens"
+import { translateErrorMessage } from "../../../../utils/errorTranslator"
 
 const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
   const { t, i18n } = useTranslation("createUser")
@@ -112,7 +113,9 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
   // Display error from parent component
   useEffect(() => {
     if (error) {
-      setFormError(typeof error === "string" ? error : error.message || t("errors.failedToCreateUser"))
+      setFormError(
+        translateErrorMessage(typeof error === "string" ? error : error.message || t("errors.failedToCreateUser"))
+      )
     }
   }, [error, t])
 

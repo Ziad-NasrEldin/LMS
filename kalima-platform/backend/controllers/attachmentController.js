@@ -14,10 +14,7 @@ const Lecturer = require("../models/lecturerModel");
 const { result } = require("lodash");
 const QueryFeatures = require("../utils/queryFeatures");
 const Assistant = require("../models/assistantModel");
-const NotificationTemplate = require("../models/notificationTemplateModel");
-const Notification = require("../models/notification");
 const StudentLectureAccess = require("../models/studentLectureAccessModel");
-const Purchase = require("../models/purchaseModel");
 const { normalizeExternalUrl } = require("../utils/urlValidation");
 
 const ADMIN_ROLES = ["Admin", "SubAdmin", "Moderator"];
@@ -284,106 +281,6 @@ exports.uploadHomeWork = catchAsync(async (req, res, next) => {
     if (!savedAttachment) {
       await cloudinary.uploader.destroy(req.file.filename);
       throw new AppError("Error saving attachment", 500);
-    }
-
-    // Notification logic - notify all assistants assigned to this lecturer
-    const template = await NotificationTemplate.findOne({
-      type: "new_homework",
-    }).session(session);
-
-    console.log("Notification template found:", template ? "Yes" : "No");
-    console.log("Lecture creator found:", lecture.createdBy ? "Yes" : "No");
-
-    if (template && lecture.createdBy) {
-      const io = req.app.get("io");
-      const student = req.user;
-
-      console.log("Socket IO object:", io ? "Available" : "Not available");
-
-      // Create notification data object
-      const notificationData = {
-        title: template.title,
-        message: template.message
-          .replace("{student}", student.name)
-          .replace("{lecture}", lecture.name),
-        type: "new_homework",
-        relatedId: lecture._id,
-      };
-
-      console.log(
-        "Creating notification for lecturer:",
-        lecture.createdBy._id.toString()
-      );
-
-      // Create notification for the lecturer who created the lecture
-      const lecturerIsOnline = io.sockets.adapter.rooms.has(
-        lecture.createdBy._id.toString()
-      );
-      console.log("Lecturer is online:", lecturerIsOnline);
-      const lecturerIsSent = lecturerIsOnline;
-
-      // Create notification for the lecturer
-      const lecturerNotification = await Notification.create(
-        [
-          {
-            userId: lecture.createdBy._id,
-            ...notificationData,
-            isSent: lecturerIsSent,
-          },
-        ],
-        { session }
-      );
-
-      console.log(
-        "Lecturer notification created:",
-        lecturerNotification[0]._id.toString()
-      );
-
-      // Send immediately if lecturer is online
-      if (lecturerIsOnline) {
-        console.log("Emitting notification to lecturer via socket");
-        io.to(lecture.createdBy._id.toString()).emit("newHomework", {
-          ...notificationData,
-          notificationId: lecturerNotification[0]._id,
-        });
-      }
-
-      // Find all assistants assigned to this lecturer
-      const assistants = await Assistant.find({
-        assignedLecturer: lecture.createdBy._id,
-      }).session(session);
-
-      console.log(`Found ${assistants.length} assistants for this lecturer`);
-
-      await Promise.all(
-        assistants.map(async (assistant) => {
-          // Check if assistant is online
-          const isOnline = io.sockets.adapter.rooms.has(
-            assistant._id.toString()
-          );
-          const isSent = isOnline;
-
-          // Create notification
-          const notification = await Notification.create(
-            [
-              {
-                userId: assistant._id,
-                ...notificationData,
-                isSent,
-              },
-            ],
-            { session }
-          );
-
-          // Send immediately if online
-          if (isOnline) {
-            io.to(assistant._id.toString()).emit("newHomework", {
-              ...notificationData,
-              notificationId: notification[0]._id,
-            });
-          }
-        })
-      );
     }
 
     await session.commitTransaction();

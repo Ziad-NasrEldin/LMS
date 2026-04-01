@@ -4,6 +4,30 @@ import { getAuthHeader } from "./fetch-users";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
+export const extractExamConfigs = (payload) => {
+  if (!payload) return [];
+
+  if (Array.isArray(payload)) return payload;
+
+  if (Array.isArray(payload.examConfigs)) return payload.examConfigs;
+  if (Array.isArray(payload.data?.examConfigs)) return payload.data.examConfigs;
+  if (Array.isArray(payload.data?.data?.examConfigs)) return payload.data.data.examConfigs;
+
+  return [];
+};
+
+export const extractCreatedExamConfig = (payload) => {
+  if (!payload) return null;
+
+  if (payload._id) return payload;
+
+  if (payload.examConfig?._id) return payload.examConfig;
+  if (payload.data?.examConfig?._id) return payload.data.examConfig;
+  if (payload.data?.data?.examConfig?._id) return payload.data.data.examConfig;
+
+  return null;
+};
+
 export const getExamConfigs = async () => {
   try {
     const response = await axios.get(`${API_URL}/exam-configs`, {
@@ -16,7 +40,7 @@ export const getExamConfigs = async () => {
 
     return {
       success: true,
-      data: response.data,
+      data: extractExamConfigs(response.data),
     };
   } catch (error) {
     return {
@@ -36,9 +60,17 @@ export const createExamConfig = async (configData) => {
       withCredentials: true,
     });
 
+    const createdConfig = extractCreatedExamConfig(response.data);
+    if (!createdConfig?._id) {
+      return {
+        success: false,
+        message: "Failed to parse created exam configuration",
+      };
+    }
+
     return {
       success: true,
-      data: response.data.data.examConfig,
+      data: createdConfig,
     };
   } catch (error) {
     return {

@@ -21,13 +21,16 @@
           "phoneNumber": "Mobile Number",
           "email": "Email Address",
           "profession": "Profession / Work",
-          "idNumber": "ID Number"
+          "idNumber": "ID Number",
+          "level": "Level",
+          "hobby": "Hobby"
         },
         "placeholders": {
           "fullName": "Example: John Doe",
           "phoneNumber": "123-456-7890",  
           "email": "example@domain.com", 
-          "idNumber": "Enter ID number"
+          "idNumber": "Enter ID number",
+          "hobby": "Select a hobby"
         },
         "buttons": {
           "edit": "Edit",
@@ -41,6 +44,24 @@
         "noProfilePicHint": "Click the camera icon to upload a profile picture",
         "messages": {
           "updateSuccess": "Updated successfully"
+        },
+        "hobbyOptions": {
+          "math": "Math",
+          "programming": "Programming",
+          "languages": "Languages",
+          "montage": "Montage",
+          "designillustrating": "Design/Illustrating",
+          "marketing": "Marketing",
+          "other": "Other",
+          "reading": "Reading",
+          "sports": "Sports",
+          "music": "Music",
+          "cooking": "Cooking",
+          "gaming": "Gaming",
+          "art": "Art",
+          "technology": "Technology",
+          "bicycling": "Bicycling",
+          "photography": "Photography"
         }
       },
     "validation": {
@@ -89,23 +110,5 @@
           "newPassword": "New password",
           "confirmPassword": "Confirm new password"
         }
-    },
-    "notifications": {
-    "title": "Notifications",
-    "studentType": "Student Notifications",
-    "teacherType": "Teacher Notifications",
-    "types": {
-      "newAssignment": "New assignment added",
-      "assignmentCorrection": "Assignment corrected",
-      "newLesson": "New lesson available",
-      "examDate": "Upcoming exam date",
-      "notificationUpdate": "Notifications updated",
-      "teacherMessage": "Message from teacher",
-      "assignmentSubmission": "Assignment submitted by student",
-      "studentMessage": "Student message or inquiry",
-      "gradePosted": "Results published",
-      "deadlineReminder": "Deadline reminder"
     }
-  }
-    
   }

@@ -124,6 +124,51 @@ test("checkLectureAccess returns success when all required submissions are passe
   }
 })
 
+test("checkLectureAccess keeps restricted state when only one requirement is passed", async () => {
+  try {
+    const result = await runCheckLectureAccess({
+      lectureDoc: {
+        _id: "lecture-1",
+        requiresExam: true,
+        requiresHomework: true,
+        examConfig: { formUrl: "https://forms.google.com/exam" },
+        homeworkConfig: { formUrl: "https://forms.google.com/homework" },
+      },
+      examSubmission: { _id: "exam-sub-1", passed: true },
+      homeworkSubmission: null,
+    })
+
+    assert.equal(result.statusCode, 200)
+    assert.equal(result.payload.status, "restricted")
+    assert.equal(result.payload.data.exam.passed, true)
+    assert.equal(result.payload.data.homework.passed, false)
+  } finally {
+    restoreModelMethods()
+  }
+})
+
+test("checkLectureAccess returns legacy exam url when config url is unavailable", async () => {
+  try {
+    const result = await runCheckLectureAccess({
+      lectureDoc: {
+        _id: "lecture-1",
+        requiresExam: true,
+        requiresHomework: false,
+        examConfig: { defaultPassingThreshold: 60 },
+        examLink: "https://legacy.exam/form",
+      },
+      examSubmission: null,
+    })
+
+    assert.equal(result.statusCode, 200)
+    assert.equal(result.payload.status, "restricted")
+    assert.equal(result.payload.data.exam.url, "https://legacy.exam/form")
+    assert.equal(result.payload.data.exam.source, "legacy")
+  } finally {
+    restoreModelMethods()
+  }
+})
+
 test("checkLectureAccess returns success when lecture has no exam or homework requirements", async () => {
   try {
     const result = await runCheckLectureAccess({

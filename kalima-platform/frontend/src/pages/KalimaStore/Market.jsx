@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import { getAllSections, getAllProducts, getAllSubSections } from "../../routes/market"
 import { resolveUploadUrl } from "../../utils/uploadUrl"
+import { translateErrorMessage } from "../../utils/errorTranslator"
 
 const Market = () => {
   const { t, i18n } = useTranslation("kalimaStore-Market")
@@ -90,7 +91,7 @@ const Market = () => {
           setAllProducts(productsWithNewFlag)
         }
       } catch (err) {
-        setError(err.message)
+        setError(translateErrorMessage(err.message))
         console.error(t("errors.fetchErrorLog"), err)
       } finally {
         setLoading(false)

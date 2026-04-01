@@ -5,6 +5,7 @@ import { getRevenueBreakdown, getRevenueSummary } from "../../../../routes/reven
 import LecturerRevenue from "./LecturerRevenue";
 import { designTokens } from "../../../../constants/designTokens";
 import DashboardStatCard from "../../../../components/DashboardStatCard";
+import { translateErrorMessage } from "../../../../utils/errorTranslator";
 
 const FinancialDashboard = () => {
   const { t, i18n } = useTranslation("admin");
@@ -34,7 +35,9 @@ const FinancialDashboard = () => {
         setSummary(summaryData || {});
         setBreakdown(Array.isArray(breakdownData) ? breakdownData : []);
       } catch (err) {
-        setError(err.message || (isRTL ? "تعذر تحميل البيانات المالية" : "Failed to load financial data"));
+        setError(
+          translateErrorMessage(err.message || (isRTL ? "تعذر تحميل البيانات المالية" : "Failed to load financial data"))
+        );
       } finally {
         setLoading(false);
       }

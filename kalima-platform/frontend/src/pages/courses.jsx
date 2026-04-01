@@ -15,6 +15,7 @@ import { ErrorAlert } from "../components/ErrorAlert"
 import { CourseCard } from "../components/CourseCard"
 import { getAllLecturers } from "../routes/fetch-users"
 import { designTokens } from "../constants/designTokens"
+import { translateErrorMessage } from "../utils/errorTranslator"
 
 export default function CoursesPage() {
   const TOKENS = designTokens.colors
@@ -123,7 +124,7 @@ export default function CoursesPage() {
         setTotalResults(containers.length)
         setTotalPages(Math.ceil(containers.length / ITEMS_PER_PAGE))
       } else {
-        setError(result.error || "Failed to fetch containers")
+        setError(translateErrorMessage(result.error || "Failed to fetch containers"))
       }
     } catch (err) {
       console.error("Error fetching containers:", err)

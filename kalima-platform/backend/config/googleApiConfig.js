@@ -2,12 +2,21 @@ const { google } = require('googleapis');
 
 const configureGoogleSheets = () => {
   try {
+    const clientEmail = String(process.env.GOOGLE_CLIENT_EMAIL || "").trim();
+    const privateKey = String(process.env.GOOGLE_PRIVATE_KEY || "").trim();
+
+    if (!clientEmail || !privateKey) {
+      throw new Error(
+        "Google Sheets service account credentials are not configured"
+      );
+    }
+
     // Create a new JWT auth client using environment variables
     const auth = new google.auth.JWT(
-      process.env.GOOGLE_CLIENT_EMAIL,
+      clientEmail,
       null,
       // Replace escaped newlines with actual newlines in the private key
-      process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+      privateKey.replace(/\\n/g, '\n'),
       ['https://www.googleapis.com/auth/spreadsheets.readonly']
     );
 

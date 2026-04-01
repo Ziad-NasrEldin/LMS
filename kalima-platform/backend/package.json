@@ -12,7 +12,8 @@
     "seed:mock": "node scripts/seedMockData.js",
     "seed:governments": "node utils/seeds/seedGovernments.js",
     "migrate:lecture-access": "node scripts/reconcileStudentLectureAccess.js",
-    "migrate:lecture-access:apply": "node scripts/reconcileStudentLectureAccess.js --apply"
+    "migrate:lecture-access:apply": "node scripts/reconcileStudentLectureAccess.js --apply",
+    "reconcile:exam-submissions": "node scripts/reconcileExamSubmissions.js"
   },
   "keywords": [],
   "author": "",
@@ -46,7 +47,6 @@
     "nodemailer": "^6.10.1",
     "resend": "^4.4.1",
     "sendgrid": "^5.2.3",
-    "socket.io": "^4.8.1",
     "sparse-bitfield": "^3.0.3",
     "uuid": "^11.1.0",
     "xlsx": "^0.18.5"

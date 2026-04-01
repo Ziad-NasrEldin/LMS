@@ -6,11 +6,12 @@ import { useTranslation } from "react-i18next"
 import { getUserDashboard } from "../../../routes/auth-services"
 import { getAllSubjects } from "../../../routes/courses"
 import { getAllLevels } from "../../../routes/levels"
-import { createLecture, updateLecture, createLectureAttachment } from "../../../routes/lectures"
+import { createLecture, updateLecture, createLectureAttachment, getLectureById } from "../../../routes/lectures"
 import { getAllLectures } from "../../../routes/lectures"
 import LectureCreationModal from "../../../components/LectureCreationModal"
 import { designTokens } from "../../../constants/designTokens"
 import { resolveUploadUrl } from "../../../utils/uploadUrl"
+import { translateErrorMessage } from "../../../utils/errorTranslator"
 
 const MyLecturesPage = () => {
   const { t, i18n } = useTranslation("lecturesPage")
@@ -48,8 +49,44 @@ const MyLecturesPage = () => {
     setLectureModalState({ mode: "create", target: null })
   }
 
-  const openEditLectureModal = (lecture) => {
-    setLectureModalState({ mode: "edit", target: lecture })
+  const normalizeLectureEditTarget = (lecture) => {
+    if (!lecture) return null
+
+    const lectureData = lecture.container || lecture
+
+    return {
+      ...lectureData,
+      id: lectureData._id || lectureData.id,
+      _id: lectureData._id || lectureData.id,
+    }
+  }
+
+  const openEditLectureModal = async (lecture) => {
+    const lectureId = lecture?._id || lecture?.id
+
+    if (!lectureId) {
+      setError(translateErrorMessage("Missing lecture id for edit"))
+      return
+    }
+
+    try {
+      const response = await getLectureById(lectureId)
+      if (response.success && response.data?.container) {
+        setLectureModalState({
+          mode: "edit",
+          target: normalizeLectureEditTarget(response.data.container),
+        })
+        return
+      }
+    } catch (error) {
+      console.error("Failed to fetch full lecture data for edit:", error)
+    }
+
+    // Fallback to the already available row data if the detail request fails.
+    setLectureModalState({
+      mode: "edit",
+      target: normalizeLectureEditTarget(lecture),
+    })
   }
 
   const closeLectureModal = () => {
@@ -75,7 +112,7 @@ const MyLecturesPage = () => {
       return
     }
 
-    openEditLectureModal(matchedLecture)
+    void openEditLectureModal(matchedLecture)
     navigate(location.pathname, { replace: true, state: null })
   }, [allLectures, lectureModalState.mode, location.pathname, location.state, navigate])
 
@@ -94,7 +131,7 @@ const MyLecturesPage = () => {
         } else {
           console.error("Failed to fetch subjects:", subjectsRes.error);
           setSubjects([]);
-          setError("Failed to load subjects, but you can continue.");
+          setError(translateErrorMessage("Failed to load subjects, but you can continue."));
         }
 
         if (levelsRes.success) {
@@ -102,7 +139,7 @@ const MyLecturesPage = () => {
         } else {
           console.error("Failed to fetch levels:", levelsRes.error);
           setLevels([]);
-          setError(prev => prev ? `${prev}` : "Failed to load levels, but you can continue.");
+          setError(prev => prev ? `${prev}` : translateErrorMessage("Failed to load levels, but you can continue."));
         }
 
         // Then determine user role and fetch appropriate data
@@ -111,7 +148,7 @@ const MyLecturesPage = () => {
         });
 
         if (!userInfoResult.success) {
-          throw new Error("Failed to fetch user info");
+          throw new Error(translateErrorMessage("Failed to fetch user info"));
         }
 
         const userRole = userInfoResult.data.data.userInfo.role;
@@ -141,7 +178,7 @@ const MyLecturesPage = () => {
             }));
             setAllLectures(lecturesData.sort(sortLecturesNewestFirst));
           } else {
-            throw new Error(allLecturesResult.message || "Failed to fetch lectures");
+            throw new Error(translateErrorMessage(allLecturesResult.message || "Failed to fetch lectures"));
           }
         } else if (userRole === "Lecturer") {
           // Use getUserDashboard with specific fields for lecturers
@@ -187,7 +224,7 @@ const MyLecturesPage = () => {
             const allLecturesCombined = [...containerLectures, ...standaloneLectures].sort(sortLecturesNewestFirst);
             setAllLectures(allLecturesCombined);
           } else {
-            throw new Error(result.error || "Failed to fetch lecturer data");
+            throw new Error(translateErrorMessage(result.error || "Failed to fetch lecturer data"));
           }
         } else if (userRole === "Student" || userRole === "Parent") {
           // Handle student case
@@ -282,7 +319,7 @@ const MyLecturesPage = () => {
         }
       } catch (err) {
         console.error("Error in fetchInitialData:", err);
-        setError(err.message || "Failed to load data, but you can continue.");
+        setError(translateErrorMessage(err.message || "Failed to load data, but you can continue."));
       } finally {
         setLoading(false);
       }
@@ -342,7 +379,12 @@ const MyLecturesPage = () => {
     setCurrentPage(1)
   }
 
-  const uploadLectureAttachments = async (lectureId, attachmentFilesByCategory, attachmentLinksByCategory) => {
+  const uploadLectureAttachments = async (
+    lectureId,
+    attachmentFilesByCategory,
+    attachmentLinksByCategory,
+    existingAttachmentLinksByCategory = {},
+  ) => {
     const formData = new FormData()
     const categories = ["pdfsandimages", "booklets", "homeworks", "exams"]
 
@@ -355,11 +397,15 @@ const MyLecturesPage = () => {
     })
 
     if (attachmentLinksByCategory) {
-      if (attachmentLinksByCategory.homeworks && attachmentLinksByCategory.homeworks.trim() !== "") {
-        formData.append("homeworks", attachmentLinksByCategory.homeworks)
+      const nextHomeworkLink = attachmentLinksByCategory.homeworks?.trim() || ""
+      const existingHomeworkLink = existingAttachmentLinksByCategory.homeworks?.trim() || ""
+      if (nextHomeworkLink && nextHomeworkLink !== existingHomeworkLink) {
+        formData.append("homeworks", nextHomeworkLink)
       }
-      if (attachmentLinksByCategory.exams && attachmentLinksByCategory.exams.trim() !== "") {
-        formData.append("exams", attachmentLinksByCategory.exams)
+      const nextExamLink = attachmentLinksByCategory.exams?.trim() || ""
+      const existingExamLink = existingAttachmentLinksByCategory.exams?.trim() || ""
+      if (nextExamLink && nextExamLink !== existingExamLink) {
+        formData.append("exams", nextExamLink)
       }
     }
 
@@ -369,7 +415,15 @@ const MyLecturesPage = () => {
   }
 
   // Batch upload all attachments and links for all categories in one request
-  const handleLectureSubmit = async (lectureIdOrData, lectureDataOrUnused, _unused2, thumbnailFile, attachmentFilesByCategory, attachmentLinksByCategory) => {
+  const handleLectureSubmit = async (
+    lectureIdOrData,
+    lectureDataOrUnused,
+    _unused2,
+    thumbnailFile,
+    attachmentFilesByCategory,
+    attachmentLinksByCategory,
+    existingAttachmentLinksByCategory,
+  ) => {
     setCreationLoading(true)
     setError(null)
     setSuccessMessage("")
@@ -394,7 +448,9 @@ const MyLecturesPage = () => {
       }
 
       if (response.status !== "success" && response.success !== true) {
-        throw new Error(response.message || (isEditMode ? "Failed to update lecture" : "Failed to create lecture"))
+        throw new Error(
+          translateErrorMessage(response.message || (isEditMode ? "Failed to update lecture" : "Failed to create lecture"))
+        )
       }
 
       let lectureId = null
@@ -410,7 +466,12 @@ const MyLecturesPage = () => {
 
       if (lectureId) {
         try {
-          await uploadLectureAttachments(lectureId, attachmentFilesByCategory, attachmentLinksByCategory)
+          await uploadLectureAttachments(
+            lectureId,
+            attachmentFilesByCategory,
+            attachmentLinksByCategory,
+            existingAttachmentLinksByCategory,
+          )
         } catch (attachmentError) {
           console.error("Error uploading attachments:", attachmentError)
           setError(isEditMode
@@ -433,7 +494,9 @@ const MyLecturesPage = () => {
 
       return true
     } catch (err) {
-      setError((isEditMode ? "Failed to update lecture: " : "Failed to create lecture: ") + err.message)
+      setError(
+        `${translateErrorMessage(isEditMode ? "Failed to update lecture" : "Failed to create lecture")}: ${translateErrorMessage(err.message)}`
+      )
       return false
     } finally {
       setCreationLoading(false)

@@ -13,6 +13,7 @@ const StudentLectureAccess = require("../models/studentLectureAccessModel.js");
 const StudentExamSubmission = require("../models/studentExamSubmissionModel.js");
 const Container = require("../models/containerModel.js");
 const Lecture = require("../models/LectureModel.js");
+const Level = require("../models/levelModel.js");
 const Attachment = require("../models/attachmentModel.js");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
@@ -370,6 +371,7 @@ const getMyData = catchAsync(async (req, res, next) => {
   // Get user ID from authenticated user
   const userId = req.user._id;
   const userRole = req.user.role;
+  const normalizedUserRole = String(userRole || "").trim().toLowerCase();
 
   // Parse field selection (if provided)
   const fields = req.query.fields ? req.query.fields.split(",") : null;
@@ -388,11 +390,11 @@ const getMyData = catchAsync(async (req, res, next) => {
   };
 
   // Role-specific data retrieval
-  switch (userRole) {
-    case "Student":
+  switch (normalizedUserRole) {
+    case "student":
       // Find student with all related data
       const student = await Student.findById(userId)
-        .populate("level", "name")
+        .populate("level", "name nameAr")
         .populate({
           path: "lecturerPoints.lecturer",
           select: "name subject expertise",
@@ -408,6 +410,7 @@ const getMyData = catchAsync(async (req, res, next) => {
         ...responseData.userInfo,
         phoneNumber: student.phoneNumber,
         level: student.level,
+        hobby: student.hobby,
         generalPoints: student.generalPoints || 0,
         totalPoints: student.totalPoints || 0,
         faction: student.faction,
@@ -433,7 +436,7 @@ const getMyData = catchAsync(async (req, res, next) => {
       }
       break;
 
-    case "Parent":
+    case "parent":
       // Find parent with all related data
       const parent = await Parent.findById(userId)
         .populate({
@@ -479,7 +482,7 @@ const getMyData = catchAsync(async (req, res, next) => {
       }
       break;
 
-    case "Lecturer":
+    case "lecturer":
       // Find lecturer with relevant data
       const lecturer = await Lecturer.findById(userId).lean();
 
@@ -566,7 +569,7 @@ const getMyData = catchAsync(async (req, res, next) => {
       }
       break;
 
-    case "Teacher":
+    case "teacher":
       // Find teacher with relevant data
       const teacher = await Teacher.findById(userId).lean();
 
@@ -605,9 +608,9 @@ const getMyData = catchAsync(async (req, res, next) => {
 
       break;
 
-    case "Admin":
-    case "SubAdmin":
-    case "Moderator":
+    case "admin":
+    case "subadmin":
+    case "moderator":
       // For admin roles, just return basic profile info
       const admin = await User.findById(userId).select("-password").lean();
 
@@ -621,7 +624,7 @@ const getMyData = catchAsync(async (req, res, next) => {
       // No additional fields needed for admin roles
       break;
 
-    case "Assistant":
+    case "assistant":
       // Find assistant with related lecturer and all lecture data
       const assistant = await Assistant.findById(userId)
         .populate({
@@ -657,7 +660,9 @@ const getMyData = catchAsync(async (req, res, next) => {
         const lectures = await Lecture.find({ createdBy: assistant.assignedLecturer._id })
           .populate("subject", "name")
           .populate("level", "name")
-          .select("name description videoLink numberOfViews requiresExam requiresHomework lecture_type")
+          .select(
+            "name description videoLink numberOfViews requiresExam requiresHomework examConfig homeworkConfig lecture_type"
+          )
           .lean();
 
         // Also fetch from Container model
@@ -815,8 +820,9 @@ const getMyData = catchAsync(async (req, res, next) => {
 const getMyPurchasedCourseContainers = catchAsync(async (req, res, next) => {
   const userId = req.user._id;
   const userRole = req.user.role;
+  const normalizedUserRole = String(userRole || "").trim().toLowerCase();
 
-  if (userRole !== "Student") {
+  if (normalizedUserRole !== "student") {
     return next(new AppError("Only students can access purchased course containers", 403));
   }
 
@@ -975,7 +981,7 @@ const enrichPurchasesWithLectureData = async (purchaseHistory = []) => {
     const [lectureDocs, legacyLectureContainers] = await Promise.all([
       Lecture.find({ parent: { $in: allScopedContainerObjectIds } })
         .select(
-          "name price subject level videoLink lecture_type requiresExam examConfig createdBy thumbnail createdAt parent"
+          "name price subject level videoLink lecture_type requiresExam examConfig requiresHomework homeworkConfig createdBy thumbnail createdAt parent"
         )
         .populate("subject", "name")
         .populate("level", "name")
@@ -986,7 +992,7 @@ const enrichPurchasesWithLectureData = async (purchaseHistory = []) => {
         type: "lecture",
       })
         .select(
-          "name type price subject level videoLink lecture_type requiresExam examConfig createdBy thumbnail createdAt"
+          "name type price subject level videoLink lecture_type requiresExam examConfig requiresHomework homeworkConfig createdBy thumbnail createdAt"
         )
         .populate("subject", "name")
         .populate("level", "name")
@@ -1098,9 +1104,17 @@ const getStudentParentAdditionalData = async (
     // Add relevant populated fields, including lecture for standalone lecture purchases
     const purchaseHistory = await purchaseQuery
       .populate([
-        { path: "container", select: "name type price subject level videoLink lecture_type requiresExam examConfig createdBy thumbnail" },
+        {
+          path: "container",
+          select:
+            "name type price subject level videoLink lecture_type requiresExam examConfig requiresHomework homeworkConfig createdBy thumbnail",
+        },
         { path: "lecturer", select: "name expertise role" },
-        { path: "lecture", select: "name price subject level videoLink lecture_type requiresExam examConfig createdBy thumbnail" },
+        {
+          path: "lecture",
+          select:
+            "name price subject level videoLink lecture_type requiresExam examConfig requiresHomework homeworkConfig createdBy thumbnail",
+        },
       ])
       .lean();
 
@@ -1291,7 +1305,8 @@ const getParentChildrenData = catchAsync(async (req, res, next) => {
         })
         .populate({
           path: "lecture",
-          select: "name price subject level videoLink lecture_type requiresExam examConfig createdBy thumbnail",
+          select:
+            "name price subject level videoLink lecture_type requiresExam examConfig requiresHomework homeworkConfig createdBy thumbnail",
           populate: [
             { path: "subject", select: "name" },
             { path: "level", select: "name" }
@@ -1357,10 +1372,14 @@ const updateMe = catchAsync(async (req, res, next) => {
   // 2) Get user ID from authenticated user
   const userId = req.user._id;
   const userRole = req.user.role;
+  const normalizedUserRole = String(userRole || "").trim().toLowerCase();
 
   // 3) Filter out unwanted fields that shouldn't be updated
   const filteredBody = {};
   const allowedFields = ['name', 'email', 'phoneNumber', 'address', 'referralSerial', 'profilePic'];
+  if (normalizedUserRole === "student") {
+    allowedFields.push("hobby", "level");
+  }
 
   // Only copy allowed fields from req.body to filteredBody
   Object.keys(req.body).forEach(field => {
@@ -1368,6 +1387,20 @@ const updateMe = catchAsync(async (req, res, next) => {
       filteredBody[field] = req.body[field];
     }
   });
+
+  if (normalizedUserRole === "student" && typeof filteredBody.hobby === "string") {
+    filteredBody.hobby = filteredBody.hobby.trim().toLowerCase();
+  }
+
+  if (normalizedUserRole === "student" && filteredBody.level !== undefined) {
+    if (!mongoose.Types.ObjectId.isValid(filteredBody.level)) {
+      return next(new AppError("Invalid level id", 400));
+    }
+    const levelExists = await Level.exists({ _id: filteredBody.level });
+    if (!levelExists) {
+      return next(new AppError("There is no level with this id", 404));
+    }
+  }
 
   // Handle profile picture upload (if file is present)
   if (req.file && req.file.fieldname === "profilePic") {
@@ -1408,7 +1441,7 @@ const updateMe = catchAsync(async (req, res, next) => {
   }
 
   // Handle special case for Parent role - adding children by sequenced ID
-  if (userRole === "Parent" && req.body.children) {
+  if (normalizedUserRole === "parent" && req.body.children) {
     const childrenIds = req.body.children;
 
     // Get current children
@@ -1454,8 +1487,8 @@ const updateMe = catchAsync(async (req, res, next) => {
   // 4) Update user document based on their role
   let updatedUser;
 
-  switch (userRole) {
-    case "Student":
+  switch (normalizedUserRole) {
+    case "student":
       updatedUser = await Student.findByIdAndUpdate(userId, filteredBody, {
         new: true,
         runValidators: true,
@@ -1464,7 +1497,7 @@ const updateMe = catchAsync(async (req, res, next) => {
         .lean();
       break;
 
-    case "Parent":
+    case "parent":
       updatedUser = await Parent.findByIdAndUpdate(userId, filteredBody, {
         new: true,
         runValidators: true,
@@ -1477,7 +1510,7 @@ const updateMe = catchAsync(async (req, res, next) => {
         .lean();
       break;
 
-    case "Lecturer":
+    case "lecturer":
       // For lecturers, we might want to allow updating bio and expertise
       if (req.body.bio) filteredBody.bio = req.body.bio;
       if (req.body.expertise) filteredBody.expertise = req.body.expertise;
@@ -1490,7 +1523,7 @@ const updateMe = catchAsync(async (req, res, next) => {
         .lean();
       break;
 
-    case "Teacher":
+    case "teacher":
       updatedUser = await Teacher.findByIdAndUpdate(userId, filteredBody, {
         new: true,
         runValidators: true,
@@ -1499,7 +1532,7 @@ const updateMe = catchAsync(async (req, res, next) => {
         .lean();
       break;
 
-    case "Assistant":
+    case "assistant":
       updatedUser = await Assistant.findByIdAndUpdate(userId, filteredBody, {
         new: true,
         runValidators: true,
@@ -1508,9 +1541,9 @@ const updateMe = catchAsync(async (req, res, next) => {
         .lean();
       break;
 
-    case "Admin":
-    case "SubAdmin":
-    case "Moderator":
+    case "admin":
+    case "subadmin":
+    case "moderator":
     default:
       // For other roles, use the basic User model
       updatedUser = await User.findByIdAndUpdate(userId, filteredBody, {

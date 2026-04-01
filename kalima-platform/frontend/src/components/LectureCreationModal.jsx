@@ -2,11 +2,42 @@
 
 import { useState, useEffect } from "react"
 import { useTranslation } from "react-i18next"
-import { FiX, FiPaperclip, FiImage } from "react-icons/fi"
+import { FiX, FiPaperclip, FiImage, FiLink } from "react-icons/fi"
 import { getAllLevels } from "../routes/levels"
 import { getAllSubjects } from "../routes/courses"
+import { getLectureAttachments } from "../routes/lectures"
 import { resolveUploadUrl } from "../utils/uploadUrl"
 import ExamConfigSection from "./ExamConfigSection"
+import { translateErrorMessage } from "../utils/errorTranslator"
+
+const ATTACHMENT_BUCKET_KEYS = ["pdfsandimages", "booklets", "homeworks", "exams"]
+const FORM_LINK_KEYS = ["homeworks", "exams"]
+
+const createEmptyAttachmentBuckets = () =>
+  ATTACHMENT_BUCKET_KEYS.reduce(
+    (acc, key) => {
+      acc[key] = []
+      return acc
+    },
+    {},
+  )
+
+const createEmptyLinkBuckets = () =>
+  FORM_LINK_KEYS.reduce(
+    (acc, key) => {
+      acc[key] = ""
+      return acc
+    },
+    {},
+  )
+
+const flattenAttachmentBuckets = (attachmentBuckets) =>
+  ATTACHMENT_BUCKET_KEYS.flatMap((category) =>
+    (attachmentBuckets?.[category] || []).map((attachment) => ({
+      ...attachment,
+      category,
+    })),
+  )
 
 const SummaryRow = ({ label, value, loading = false }) => (
   <div className="flex items-center justify-between gap-4 rounded-2xl border border-base-300 bg-base-100/80 px-4 py-3">
@@ -40,30 +71,19 @@ const LectureCreationModal = ({
   const [newPrice, setNewPrice] = useState(0)
   const [newVideoLink, setNewVideoLink] = useState("")
   const [newLectureType, setNewLectureType] = useState("Revision")
-  // Tab-like attachment state
-  const attachmentCategories = [
-    { key: "pdfsandimages", label: t("attachmentTypes.pdfsAndImages") },
-    { key: "booklets", label: t("attachmentTypes.booklets") },
-    { key: "homeworks", label: t("attachmentTypes.homeworks") },
-    { key: "exams", label: t("attachmentTypes.exams") },
-  ]
-  const [activeAttachmentTab, setActiveAttachmentTab] = useState("pdfsandimages")
-  const [attachmentFilesByCategory, setAttachmentFilesByCategory] = useState({
-    pdfsandimages: [],
-    booklets: [],
-    homeworks: [],
-    exams: [],
+  const [attachmentFilesByCategory, setAttachmentFilesByCategory] = useState(createEmptyAttachmentBuckets())
+  const [existingAttachmentsByCategory, setExistingAttachmentsByCategory] = useState({
+    ...createEmptyAttachmentBuckets(),
   })
   const [thumbnailFile, setThumbnailFile] = useState(null)
   const [thumbnailPreview, setThumbnailPreview] = useState(null)
   const [creationLoading, setCreationLoading] = useState(false)
   const [creationError, setCreationError] = useState("")
   const [numberOfViews, setNumberOfViews] = useState(0)
-  // Store links for homework and exams
-  const [attachmentLinksByCategory, setAttachmentLinksByCategory] = useState({
-    homeworks: "",
-    exams: "",
-  })
+  const [attachmentLinksByCategory, setAttachmentLinksByCategory] = useState(createEmptyLinkBuckets())
+  const [existingAttachmentLinksByCategory, setExistingAttachmentLinksByCategory] = useState(createEmptyLinkBuckets())
+  const [selectedFormLinkType, setSelectedFormLinkType] = useState("homeworks")
+  const [googleFormLink, setGoogleFormLink] = useState("")
 
   // Exam related state
   const [requiresExam, setRequiresExam] = useState(false)
@@ -82,7 +102,38 @@ const LectureCreationModal = ({
   const [subjectsLoading, setSubjectsLoading] = useState(false)
   const [selectedLevel, setSelectedLevel] = useState("")
   const [selectedSubject, setSelectedSubject] = useState("")
-  const [attachmentType, setAttachmentType] = useState("homeworks")
+
+  const normalizeExistingAttachment = (attachment) => {
+    const filePath = attachment?.filePath || ""
+    const fileType = attachment?.fileType || "file"
+    const displayName =
+      attachment?.fileName ||
+      attachment?.name ||
+      attachment?.title ||
+      attachment?.originalName ||
+      filePath.split("/").pop() ||
+      "Attachment"
+
+    return {
+      id: attachment?._id || attachment?.id || `${displayName}-${attachment?.uploadedOn || attachment?.createdAt || ""}`,
+      fileName: displayName,
+      filePath: resolveUploadUrl(filePath) || filePath,
+      fileType,
+      uploadedOn: attachment?.uploadedOn || attachment?.createdAt || null,
+      isExisting: true,
+    }
+  }
+
+  const resetAttachmentState = () => {
+    const resetBuckets = createEmptyAttachmentBuckets()
+    const resetLinks = createEmptyLinkBuckets()
+    setAttachmentFilesByCategory(resetBuckets)
+    setExistingAttachmentsByCategory(resetBuckets)
+    setAttachmentLinksByCategory(resetLinks)
+    setExistingAttachmentLinksByCategory(resetLinks)
+    setSelectedFormLinkType("homeworks")
+    setGoogleFormLink("")
+  }
 
   const populateFromInitialData = () => {
     if (!initialData) {
@@ -110,13 +161,66 @@ const LectureCreationModal = ({
 
   // Fetch levels and subjects when modal opens
   useEffect(() => {
+    let cancelled = false
+
     if (isOpen) {
       fetchLevels()
       fetchSubjects()
 
       if (isEditMode) {
-        populateFromInitialData()
+        const loadEditData = async () => {
+          populateFromInitialData()
+          resetAttachmentState()
+
+          const lectureAttachmentsId = initialData?._id || initialData?.id || lectureId
+          if (!lectureAttachmentsId) return
+
+          try {
+            const result = await getLectureAttachments(lectureAttachmentsId)
+            if (cancelled || result?.status !== "success" || !result.data) {
+              return
+            }
+
+          const attachmentData = result.data
+            const nextExistingAttachments = createEmptyAttachmentBuckets()
+            const nextExistingLinks = createEmptyLinkBuckets()
+            const nextPrefilledLinks = createEmptyLinkBuckets()
+
+            ATTACHMENT_BUCKET_KEYS.forEach((category) => {
+              const rawItems = Array.isArray(attachmentData?.[category]) ? attachmentData[category] : []
+              const fileItems = rawItems.filter((item) => item?.fileType !== "link")
+              const normalizedItems = fileItems.map(normalizeExistingAttachment)
+
+              nextExistingAttachments[category] = normalizedItems
+
+              if (category === "homeworks" || category === "exams") {
+                const savedLink =
+                  rawItems.find((item) => item?.fileType === "link")?.filePath ||
+                  ""
+                nextExistingLinks[category] = savedLink
+                nextPrefilledLinks[category] = savedLink
+              }
+            })
+
+            setExistingAttachmentsByCategory(nextExistingAttachments)
+            setExistingAttachmentLinksByCategory(nextExistingLinks)
+            setAttachmentLinksByCategory(nextPrefilledLinks)
+            const initialLinkType = nextExistingLinks.homeworks
+              ? "homeworks"
+              : nextExistingLinks.exams
+                ? "exams"
+                : "homeworks"
+            setSelectedFormLinkType(initialLinkType)
+            setGoogleFormLink(nextExistingLinks[initialLinkType] || "")
+          } catch (error) {
+            console.error("Error fetching lecture attachments for edit modal:", error)
+          }
+        }
+
+        void loadEditData()
       } else {
+        resetAttachmentState()
+
         // Set default values from container if available
         if (containerLevel) {
           setSelectedLevel(containerLevel)
@@ -126,7 +230,11 @@ const LectureCreationModal = ({
         }
       }
     }
-  }, [isOpen, containerLevel, containerSubject, isEditMode, initialData])
+
+    return () => {
+      cancelled = true
+    }
+  }, [isOpen, containerLevel, containerSubject, isEditMode, initialData, lectureId])
 
   // Functions to fetch levels and subjects
   const fetchLevels = async () => {
@@ -168,13 +276,7 @@ const LectureCreationModal = ({
     setNewPrice(0)
     setNewVideoLink("")
     setNewLectureType("Revision")
-    setAttachmentFilesByCategory({
-      pdfsandimages: [],
-      booklets: [],
-      homeworks: [],
-      exams: [],
-    })
-    setActiveAttachmentTab("pdfsandimages")
+    resetAttachmentState()
     setThumbnailFile(null)
     setThumbnailPreview(null)
     setNumberOfViews(0)
@@ -191,7 +293,6 @@ const LectureCreationModal = ({
 
     setSelectedLevel(containerLevel || "")
     setSelectedSubject(containerSubject || "")
-    setAttachmentType("homeworks")
     setCreationError("")
     if (isEditMode && initialData?.thumbnail) {
       setThumbnailPreview(resolveUploadUrl(initialData.thumbnail, "lecture_thumbnails"))
@@ -259,12 +360,13 @@ const LectureCreationModal = ({
         thumbnailFile,
         attachmentFilesByCategory,
         attachmentLinksByCategory,
+        existingAttachmentLinksByCategory,
       )
 
       resetForm()
       onClose()
     } catch (err) {
-      setCreationError(err.message)
+      setCreationError(translateErrorMessage(err.message))
       console.error("Creation error:", err)
     } finally {
       setCreationLoading(false)
@@ -289,11 +391,53 @@ const LectureCreationModal = ({
   const selectedSubjectInfo = subjects.find((subject) => subject._id === selectedSubject)
   const selectedLevelLabel = selectedLevelInfo?.displayName || selectedLevelInfo?.name || ""
   const selectedSubjectLabel = selectedSubjectInfo?.name || ""
-  const totalAttachments = Object.values(attachmentFilesByCategory).reduce(
+  const attachmentCategoryLabels = {
+    pdfsandimages: t("attachmentTypes.pdfsAndImages"),
+    booklets: t("attachmentTypes.booklets"),
+    homeworks: t("attachmentTypes.homeworks"),
+    exams: t("attachmentTypes.exams"),
+  }
+  const savedAttachments = flattenAttachmentBuckets(existingAttachmentsByCategory)
+  const newAttachmentFiles = attachmentFilesByCategory.pdfsandimages || []
+  const existingAttachmentLinks = FORM_LINK_KEYS
+    .map((key) => ({
+      key,
+      label: key === "homeworks"
+        ? t("attachments.homeworkType", "Homework")
+        : t("attachments.examType", "Exam"),
+      url: existingAttachmentLinksByCategory[key],
+    }))
+    .filter((item) => Boolean(item.url))
+  const existingAttachmentsTotal = Object.values(existingAttachmentsByCategory).reduce(
     (count, files) => count + (files?.length || 0),
     0,
   )
+  const totalAttachments = Object.values(attachmentFilesByCategory).reduce(
+    (count, files) => count + (files?.length || 0),
+    0,
+  ) + existingAttachmentsTotal
   const lectureTypeLabel = newLectureType === "Revision" ? t("lectureTypes.revision") : t("lectureTypes.normal")
+
+  const handleUnifiedAttachmentFilesChange = (files) => {
+    setAttachmentFilesByCategory({
+      ...createEmptyAttachmentBuckets(),
+      pdfsandimages: files,
+    })
+  }
+
+  const handleFormLinkTypeChange = (nextType) => {
+    setSelectedFormLinkType(nextType)
+    const nextUrl = attachmentLinksByCategory[nextType] || existingAttachmentLinksByCategory[nextType] || ""
+    setGoogleFormLink(nextUrl)
+  }
+
+  const handleFormLinkChange = (value) => {
+    setGoogleFormLink(value)
+    setAttachmentLinksByCategory((prev) => ({
+      ...prev,
+      [selectedFormLinkType]: value,
+    }))
+  }
 
   return (
     <div className={`modal ${isOpen ? "modal-open" : ""}`} dir={isRTL ? "rtl" : "ltr"}>
@@ -538,64 +682,181 @@ const LectureCreationModal = ({
                       </div>
                     </div>
 
-                    <div className="tabs tabs-boxed mb-4 flex flex-wrap gap-2 bg-base-200/60 p-1">
-                      {attachmentCategories.map((cat) => (
-                        <button
-                          type="button"
-                          key={cat.key}
-                          className={`tab min-h-0 rounded-full px-4 py-2 text-sm font-medium ${activeAttachmentTab === cat.key ? "tab-active" : ""}`}
-                          onClick={() => setActiveAttachmentTab(cat.key)}
-                        >
-                          {cat.label}
-                        </button>
-                      ))}
-                    </div>
+                    <div className="grid gap-4 xl:grid-cols-2">
+                      <div className="rounded-[1.5rem] border border-base-300 bg-base-200/40 p-4">
+                        <div className="flex items-start justify-between gap-3">
+                          <div>
+                            <h5 className="font-semibold text-base-content">
+                              {t("attachments.uploadTitle", "Lecture files")}
+                            </h5>
+                            <p className="mt-1 text-sm text-base-content/60">
+                              {t(
+                                "attachments.uploadHelper",
+                                "Upload PDFs, PowerPoints, documents, images, or any other lecture files here.",
+                              )}
+                            </p>
+                          </div>
+                          <span className="badge badge-outline badge-primary">
+                            {newAttachmentFiles.length} {t("attachments.fileCount", "files")}
+                          </span>
+                        </div>
 
-                    <div className="space-y-3">
-                      <div className="relative">
-                        <input
-                          type="file"
-                          multiple
-                          onChange={(e) => {
-                            const files = Array.from(e.target.files)
-                            setAttachmentFilesByCategory((prev) => ({
-                              ...prev,
-                              [activeAttachmentTab]: files,
-                            }))
-                          }}
-                          className="file-input file-input-bordered w-full rounded-2xl"
-                          accept=".pdf,.jpg,.jpeg,.png"
-                        />
-                        <FiPaperclip className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-primary" />
+                        {savedAttachments.length > 0 && (
+                          <div className="mt-4 rounded-2xl border border-base-300 bg-base-100 p-4">
+                            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-base-content/50">
+                              {t("attachments.savedFiles", "Saved files")}
+                            </p>
+                            <ul className="space-y-2 text-sm text-base-content/75">
+                              {savedAttachments.map((attachment) => (
+                                <li key={attachment.id} className="flex flex-col gap-2 rounded-xl bg-base-200/40 px-3 py-2">
+                                  <div className="flex items-center justify-between gap-3">
+                                    <span className="font-medium text-base-content">{attachment.fileName}</span>
+                                    <span className="badge badge-outline badge-sm">
+                                      {attachmentCategoryLabels[attachment.category] || attachment.category}
+                                    </span>
+                                  </div>
+                                  <a
+                                    href={attachment.filePath}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="inline-flex items-center gap-2 break-all text-xs text-primary underline-offset-2 hover:underline"
+                                  >
+                                    <FiLink className="h-3 w-3" />
+                                    {t("attachments.openFile", "Open file")}
+                                  </a>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+
+                        <div className="relative mt-4">
+                          <input
+                            type="file"
+                            multiple
+                            onChange={(e) => {
+                              const files = Array.from(e.target.files || [])
+                              handleUnifiedAttachmentFilesChange(files)
+                            }}
+                            className="file-input file-input-bordered w-full rounded-2xl"
+                            accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.zip,.rar,image/*,application/*"
+                          />
+                          <FiPaperclip className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-primary" />
+                        </div>
+
+                        {newAttachmentFiles.length > 0 && (
+                          <ul className="mt-3 space-y-1 rounded-2xl bg-base-200/50 p-4 text-sm text-base-content/70">
+                            {newAttachmentFiles.map((file, idx) => (
+                              <li key={`${file.name}-${idx}`} className="break-all">
+                                {t("fields.selectedFile")}: {file.name}
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+
+                        <p className="mt-3 text-xs text-base-content/60">
+                          {t(
+                            "attachments.uploadHint",
+                            "This box is for lecture resources only. The files are unified on the lecture page.",
+                          )}
+                        </p>
                       </div>
 
-                      {attachmentFilesByCategory[activeAttachmentTab] && attachmentFilesByCategory[activeAttachmentTab].length > 0 && (
-                        <ul className="space-y-1 rounded-2xl bg-base-200/50 p-4 text-sm text-base-content/70">
-                          {attachmentFilesByCategory[activeAttachmentTab].map((file, idx) => (
-                            <li key={idx}>
-                              {t("fields.selectedFile")}: {file.name}
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-
-                      {(activeAttachmentTab === "homeworks" || activeAttachmentTab === "exams") && (
-                        <div className="space-y-2">
-                          <input
-                            type="url"
-                            className="input input-bordered w-full rounded-2xl"
-                            placeholder={t("fields.enterGoogleFormOrLink", "Enter Google Form or link")}
-                            value={attachmentLinksByCategory[activeAttachmentTab] || ""}
-                            onChange={(e) =>
-                              setAttachmentLinksByCategory((prev) => ({
-                                ...prev,
-                                [activeAttachmentTab]: e.target.value,
-                              }))
-                            }
-                          />
-                          <span className="text-xs text-base-content/60">{t("fields.orPasteLink", "Or paste a link instead of uploading a file.")}</span>
+                      <div className="rounded-[1.5rem] border border-base-300 bg-base-200/40 p-4">
+                        <div className="flex items-start justify-between gap-3">
+                          <div>
+                            <h5 className="font-semibold text-base-content">
+                              {t("attachments.googleFormTitle", "Google Form link")}
+                            </h5>
+                            <p className="mt-1 text-sm text-base-content/60">
+                              {t(
+                                "attachments.googleFormHelper",
+                                "Use one Google Form link for the after-lecture exam or homework.",
+                              )}
+                            </p>
+                          </div>
+                          <span className="badge badge-outline badge-primary">
+                            {selectedFormLinkType === "homeworks"
+                              ? t("attachments.homeworkType", "Homework")
+                              : t("attachments.examType", "Exam")}
+                          </span>
                         </div>
-                      )}
+
+                        <div className="mt-4 grid gap-3 sm:grid-cols-[160px_minmax(0,1fr)]">
+                          <div className="form-control">
+                            <label className="label px-0 pt-0">
+                              <span className="label-text font-semibold">
+                                {t("attachments.formType", "Form type")}
+                              </span>
+                            </label>
+                            <select
+                              className="select select-bordered w-full rounded-2xl"
+                              value={selectedFormLinkType}
+                              onChange={(e) => handleFormLinkTypeChange(e.target.value)}
+                            >
+                              <option value="homeworks">{t("attachments.homeworkType", "Homework")}</option>
+                              <option value="exams">{t("attachments.examType", "Exam")}</option>
+                            </select>
+                          </div>
+
+                          <div className="form-control">
+                            <label className="label px-0 pt-0">
+                              <span className="label-text font-semibold">
+                                {t("attachments.formUrl", "Google Form URL")}
+                              </span>
+                            </label>
+                            <div className="relative">
+                              <input
+                                type="url"
+                                className="input input-bordered w-full rounded-2xl"
+                                placeholder={t(
+                                  "attachments.formUrlPlaceholder",
+                                  "Paste the Google Form link here",
+                                )}
+                                value={googleFormLink}
+                                onChange={(e) => handleFormLinkChange(e.target.value)}
+                              />
+                              <FiLink className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-primary" />
+                            </div>
+                            <span className="mt-2 text-xs text-base-content/60">
+                              {t(
+                                "attachments.formUrlHint",
+                                "Switch the form type if the link is for homework instead of exam, or vice versa.",
+                              )}
+                            </span>
+                          </div>
+                        </div>
+
+                        {existingAttachmentLinks.length > 0 && (
+                          <div className="mt-4 rounded-2xl border border-base-300 bg-base-100 p-4">
+                            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-base-content/50">
+                              {t("attachments.savedLinks", "Saved links")}
+                            </p>
+                            <ul className="space-y-2 text-sm text-base-content/75">
+                              {existingAttachmentLinks.map((link) => (
+                                <li
+                                  key={link.key}
+                                  className="flex flex-col gap-2 rounded-xl bg-base-200/40 px-3 py-2"
+                                >
+                                  <div className="flex items-center justify-between gap-3">
+                                    <span className="font-medium text-base-content">{link.label}</span>
+                                    <span className="badge badge-outline badge-sm">{link.label}</span>
+                                  </div>
+                                  <a
+                                    href={link.url}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="inline-flex items-center gap-2 break-all text-xs text-primary underline-offset-2 hover:underline"
+                                  >
+                                    <FiLink className="h-3 w-3" />
+                                    {link.url}
+                                  </a>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </section>
                 </div>
