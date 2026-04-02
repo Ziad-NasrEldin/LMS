@@ -13,6 +13,7 @@ const corsOptions = {
   },
 
   credentials: true,
+  exposedHeaders: ["Content-Disposition", "X-Download-Filename"],
   optionsSuccessStatus: 200,
 };
 

@@ -9,6 +9,7 @@ import { getLectureAttachments } from "../routes/lectures"
 import { resolveUploadUrl } from "../utils/uploadUrl"
 import { translateErrorMessage } from "../utils/errorTranslator"
 import { buildLecturePayloadObject } from "../utils/contentCreationPayloads"
+import { buildLevelHierarchy } from "../utils/levelHierarchy"
 
 const ATTACHMENT_BUCKET_KEYS = ["pdfsandimages", "booklets", "homeworks", "exams"]
 const FORM_LINK_KEYS = ["homeworks", "exams"]
@@ -150,8 +151,18 @@ const LectureCreationModal = ({
     setRequiresHomework(Boolean(initialData.requiresHomework))
     setPassingThreshold(initialData.passingThreshold ?? 50)
     setHomeworkPassingThreshold(initialData.homeworkPassingThreshold ?? 50)
-    setExamFormUrl(initialData.examFormUrl || initialData.examConfig?.formUrl || "")
-    setHomeworkFormUrl(initialData.homeworkFormUrl || initialData.homeworkConfig?.formUrl || "")
+    setExamFormUrl(
+      initialData.examFormUrl ||
+      initialData.examLink ||
+      initialData.examConfig?.formUrl ||
+      "",
+    )
+    setHomeworkFormUrl(
+      initialData.homeworkFormUrl ||
+      initialData.homeworkLink ||
+      initialData.homeworkConfig?.formUrl ||
+      "",
+    )
     setSelectedLevel(initialData.level?._id || initialData.level || containerLevel || "")
     setSelectedSubject(initialData.subject?._id || initialData.subject || containerSubject || "")
     setThumbnailPreview(
@@ -242,7 +253,8 @@ const LectureCreationModal = ({
       setLevelsLoading(true)
       const response = await getAllLevels()
       if (response.success) {
-        setLevels(response.data)
+        const hierarchy = response.hierarchy || buildLevelHierarchy(response.data || [], i18n.language)
+        setLevels(hierarchy.gradeOptions || [])
       } else {
         console.error("Failed to fetch levels:", response.error)
       }
@@ -378,9 +390,9 @@ const LectureCreationModal = ({
     }
   }
 
-  const selectedLevelInfo = levels.find((level) => level._id === selectedLevel)
+  const selectedLevelInfo = levels.find((level) => (level.value || level._id) === selectedLevel)
   const selectedSubjectInfo = subjects.find((subject) => subject._id === selectedSubject)
-  const selectedLevelLabel = selectedLevelInfo?.displayName || selectedLevelInfo?.name || ""
+  const selectedLevelLabel = selectedLevelInfo?.label || selectedLevelInfo?.displayName || selectedLevelInfo?.name || ""
   const selectedSubjectLabel = selectedSubjectInfo?.name || ""
   const attachmentCategoryLabels = {
     pdfsandimages: t("attachmentTypes.pdfsAndImages"),
@@ -584,8 +596,8 @@ const LectureCreationModal = ({
                         >
                           <option value="">{t("placeholders.selectLevel")}</option>
                           {levels.map((level) => (
-                            <option key={level._id} value={level._id}>
-                              {level.displayName || level.name}
+                            <option key={level.value || level._id} value={level.value || level._id}>
+                              {level.label || level.displayName || level.name}
                             </option>
                           ))}
                         </select>

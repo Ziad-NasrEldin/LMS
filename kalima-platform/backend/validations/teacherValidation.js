@@ -51,9 +51,13 @@ const teacherValidation = userValidation.concat(
       }),
     subject: Joi.string().required(),
     level: Joi.array()
-      .items(Joi.string().valid("primary", "preparatory", "secondary"))
+      .items(Joi.string().regex(/^[0-9a-fA-F]{24}$/))
       .min(1)
-      .required(), teachesAtType: Joi.string().valid("Center", "School", "Both").required(),
+      .required()
+      .messages({
+        "string.pattern.base": "Each teaching level must be a valid MongoDB ObjectId.",
+      }),
+    teachesAtType: Joi.string().valid("Center", "School", "Both").required(),
     // Make centers conditionally required but more flexible for updates
     centers: Joi.alternatives().conditional('teachesAtType', {
       is: Joi.string().valid("Center", "Both"),
@@ -89,8 +93,22 @@ const teacherValidation = userValidation.concat(
         })
       )
       .optional(),
-    government: Joi.string().required(),
-    administrationZone: Joi.string().required(),
+    government: Joi.string()
+      .trim()
+      .empty("")
+      .required()
+      .messages({
+        "any.required": "Path `government` is required.",
+        "string.empty": "Path `government` is required.",
+      }),
+    administrationZone: Joi.string()
+      .trim()
+      .empty("")
+      .required()
+      .messages({
+        "any.required": "Path `administrationZone` is required.",
+        "string.empty": "Path `administrationZone` is required.",
+      }),
     referralSerial: Joi.string().allow("").optional(), // Allow referralSerial to be empty
   })
 );

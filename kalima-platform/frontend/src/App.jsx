@@ -8,6 +8,7 @@ import { LoadingSpinner } from "./components/LoadingSpinner";
 import { isMobile } from "./utils/isMobile";
 import UnifiedSidebar from "./components/UnifiedSidebar";
 import { useTranslation } from "react-i18next";
+import AuthNoindexController from "./seo/AuthNoindexController";
 import {
   getEffectiveUserRole,
   getImpersonationSession,
@@ -15,35 +16,35 @@ import {
 } from "./routes/auth-services";
 
 // Lazy load components
-const AdminDashboard = lazy(() => import("./pages/User Dashboard/Admin dashboard/home/adminDashboard"))
-const FinancialDashboard = lazy(() => import("./pages/User Dashboard/Admin dashboard/home/FinancialDashboard"))
-const CourseDetails = lazy(() => import("./pages/CourseDetails"))
-const TeacherLogin = lazy(() => import("./pages/Login/login"))
-const Footer = lazy(() => import("./components/footer"))
-const CoursesPage = lazy(() => import("./pages/courses"))
-const RegisterStudent = lazy(() => import("./pages/signup/StudentRegistration"))
-const Teachers = lazy(() => import("./pages/Teachers"))
-const TeacherDetails = lazy(() => import("./pages/teacher details/Teacher-details"))
-const PromoCodes = lazy(() => import("./pages/User Dashboard/promoCodes"))
-const SettingsPage = lazy(() => import("./pages/Settings/SettingsPage"))
-const Services = lazy(() => import("./pages/Services/Services"))
-const DashboardPage = lazy(() => import("./pages/Lecturer Dashboard/LecturerDashboard"))
-const LecturerPromoCodesPage = lazy(() => import("./pages/Lecturer Dashboard/LecturerPromoCodesPage"))
-const LecturerLinkedStudentsPage = lazy(() => import("./pages/Lecturer Dashboard/LecturerLinkedStudentsPage"))
-const ContainersPage = lazy(() => import("./pages/User Dashboard/Lecture Page/ContainerPage"))
-const ContainerDetails = lazy(() => import("./pages/User Dashboard/Lecture Page/ContainerDetails"))
-const LectureDisplay = lazy(() => import("./pages/User Dashboard/Lecture Page/LectureDisplay"))
-const AssistantPage = lazy(() => import("./pages/User Dashboard/assistantPage/assistantPage"))
-const CoursesForm = lazy(() => import("./pages/CoursesForm/CoursesForm"))
-const ForgotPassword = lazy(() => import("./pages/Login/ForgetPassword"))
-const VerifyOtp = lazy(() => import("./pages/Login/VerifyOTP"))
-const ResetPassword = lazy(() => import("./pages/Login/ResetPasswordPage"))
-const AdminCreate = lazy(() => import("./pages/User Dashboard/Admin dashboard/AddNewStuff"))
-const MyLecturesPage = lazy(() => import("./pages/User Dashboard/Lecture Page/LecturesPage"))
-const DetailedLectureView = lazy(() => import ("./pages/User Dashboard/Lecture Page/DetailedLectureViewing"))
-const PrivacyPolicy = lazy(() => import("./pages/privacyPolicy"));
-const SignedLecturers = lazy(() => import("./pages/User Dashboard/Admin dashboard/signed-lecturers"));
-const PromoCodesManagementPage = lazy(() => import("./pages/User Dashboard/Admin dashboard/promo-codes-management"));
+const AdminDashboard = lazy(() => import("./pages/User Dashboard/Admin dashboard/home/adminDashboard.jsx"))
+const FinancialDashboard = lazy(() => import("./pages/User Dashboard/Admin dashboard/home/FinancialDashboard.jsx"))
+const CourseDetails = lazy(() => import("./pages/CourseDetails.jsx"))
+const TeacherLogin = lazy(() => import("./pages/Login/login.jsx"))
+const Footer = lazy(() => import("./components/footer.jsx"))
+const CoursesPage = lazy(() => import("./pages/courses.jsx"))
+const RegisterStudent = lazy(() => import("./pages/signup/StudentRegistration.jsx"))
+const Teachers = lazy(() => import("./pages/Teachers.jsx"))
+const TeacherDetails = lazy(() => import("./pages/teacher details/Teacher-details.jsx"))
+const PromoCodes = lazy(() => import("./pages/User Dashboard/promoCodes.jsx"))
+const SettingsPage = lazy(() => import("./pages/Settings/SettingsPage.jsx"))
+const Services = lazy(() => import("./pages/Services/Services.jsx"))
+const DashboardPage = lazy(() => import("./pages/Lecturer Dashboard/LecturerDashboard.jsx"))
+const LecturerPromoCodesPage = lazy(() => import("./pages/Lecturer Dashboard/LecturerPromoCodesPage.jsx"))
+const LecturerLinkedStudentsPage = lazy(() => import("./pages/Lecturer Dashboard/LecturerLinkedStudentsPage.jsx"))
+const ContainersPage = lazy(() => import("./pages/User Dashboard/Lecture Page/ContainerPage.jsx"))
+const ContainerDetails = lazy(() => import("./pages/User Dashboard/Lecture Page/ContainerDetails.jsx"))
+const LectureDisplay = lazy(() => import("./pages/User Dashboard/Lecture Page/LectureDisplay.jsx"))
+const AssistantPage = lazy(() => import("./pages/User Dashboard/assistantPage/assistantPage.jsx"))
+const CoursesForm = lazy(() => import("./pages/CoursesForm/CoursesForm.jsx"))
+const ForgotPassword = lazy(() => import("./pages/Login/ForgetPassword.jsx"))
+const VerifyOtp = lazy(() => import("./pages/Login/VerifyOTP.jsx"))
+const ResetPassword = lazy(() => import("./pages/Login/ResetPasswordPage.jsx"))
+const AdminCreate = lazy(() => import("./pages/User Dashboard/Admin dashboard/AddNewStuff.jsx"))
+const MyLecturesPage = lazy(() => import("./pages/User Dashboard/Lecture Page/LecturesPage.jsx"))
+const DetailedLectureView = lazy(() => import ("./pages/User Dashboard/Lecture Page/DetailedLectureViewing.jsx"))
+const PrivacyPolicy = lazy(() => import("./pages/privacyPolicy.jsx"));
+const SignedLecturers = lazy(() => import("./pages/User Dashboard/Admin dashboard/signed-lecturers.jsx"));
+const PromoCodesManagementPage = lazy(() => import("./pages/User Dashboard/Admin dashboard/promo-codes-management.jsx"));
 
 function App() {
   const location = useLocation();
@@ -127,12 +128,29 @@ function App() {
       case "assistant":
         return "/dashboard/assistant-page";
       case "student":
-      case "parent":
       case "teacher":
-        return "/dashboard/student-dashboard/promo-codes";
+        return "/dashboard/student-dashboard/overview";
+      case "parent":
+        return "/dashboard/parent-dashboard/overview";
       default:
         return "/";
     }
+  };
+
+  const getOverviewPathByRole = (role) => {
+    const normalizedRole = String(role || "")
+      .toLowerCase()
+      .replace(/[^a-z]/g, "");
+
+    if (normalizedRole === "parent") {
+      return "/dashboard/parent-dashboard/overview";
+    }
+
+    if (normalizedRole === "student" || normalizedRole === "teacher") {
+      return "/dashboard/student-dashboard/overview";
+    }
+
+    return getDashboardFallbackByRole(role);
   };
 
   const normalizeRoleForMatch = (role) => {
@@ -207,8 +225,22 @@ function App() {
   const renderStudentRoute = (element) =>
     renderDashboardRoute(element, ["student", "parent", "teacher"]);
 
+  const renderParentRoute = (element) =>
+    renderDashboardRoute(element, ["parent"]);
+
+  const RoleAwareOverviewRedirect = () => {
+    const user = getUserFromToken();
+    if (!user || typeof user !== "object") {
+      return <Navigate to="/login" replace />;
+    }
+
+    const role = getCurrentUserRole();
+    return <Navigate to={getOverviewPathByRole(role)} replace />;
+  };
+
   return (
     <div className={`App ${isRTL ? "rtl" : "ltr"}`}>
+      <AuthNoindexController />
       <Toaster
         position="top-right"
         toastOptions={{
@@ -275,7 +307,16 @@ function App() {
             <Route path="/reset-password" element={<ResetPassword />} />
 
             {/* Content Routes */}
+            <Route path="/courses/:courseId/:slug" element={<CourseDetails />} />
             <Route path="/courses/:courseId" element={<CourseDetails />} />
+            <Route
+              path="/teachers/:userId/:slug"
+              element={<TeacherDetails />}
+            />
+            <Route
+              path="/teachers/:userId"
+              element={<TeacherDetails />}
+            />
             <Route
               path="/teacher-details/:userId"
               element={<TeacherDetails />}
@@ -287,8 +328,28 @@ function App() {
               element={renderStudentRoute(<ContainersPage />)}
             />
             <Route
+              path="/dashboard/student-dashboard/overview"
+              element={renderDashboardRoute(<PromoCodes />, ["student", "teacher"])}
+            />
+            <Route
+              path="/dashboard/parent-dashboard/overview"
+              element={renderParentRoute(<PromoCodes />)}
+            />
+            <Route
               path="/dashboard/student-dashboard/promo-codes"
-              element={renderStudentRoute(<PromoCodes />)}
+              element={<RoleAwareOverviewRedirect />}
+            />
+            <Route
+              path="/dashboard/student-dashboard"
+              element={<RoleAwareOverviewRedirect />}
+            />
+            <Route
+              path="/dashboard/parent-dashboard"
+              element={renderParentRoute(<Navigate to="/dashboard/parent-dashboard/overview" replace />)}
+            />
+            <Route
+              path="/dashboard/parent-dashboard/promo-codes"
+              element={<RoleAwareOverviewRedirect />}
             />
             <Route
               path="/dashboard/student-dashboard/container-details/:containerId"

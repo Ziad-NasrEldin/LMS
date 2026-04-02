@@ -1,0 +1,61 @@
+# Signup Error Matrix
+
+This matrix is generated from `backend/utils/signupErrors.js` and signup locale mappings in `frontend/public/locales/{en,ar}/register.json`.
+
+Generated at: 2026-04-02T13:34:49.089Z
+
+| Error Code | HTTP | Field | Student (EN/AR) | Parent (EN/AR) | Teacher (EN/AR) |
+| --- | --- | --- | --- | --- | --- |
+| SIGNUP_VALIDATION_FAILED | 400 | - | Some registration fields are invalid. Please review and try again. / بعض حقول التسجيل غير صالحة. يرجى المراجعة والمحاولة مرة أخرى. | Some registration fields are invalid. Please review and try again. / بعض حقول التسجيل غير صالحة. يرجى المراجعة والمحاولة مرة أخرى. | Some registration fields are invalid. Please review and try again. / بعض حقول التسجيل غير صالحة. يرجى المراجعة والمحاولة مرة أخرى. |
+| SIGNUP_FIELD_REQUIRED | 400 | - | A required registration field is missing. / يوجد حقل مطلوب مفقود في التسجيل. | A required registration field is missing. / يوجد حقل مطلوب مفقود في التسجيل. | A required registration field is missing. / يوجد حقل مطلوب مفقود في التسجيل. |
+| SIGNUP_FIELD_INVALID | 400 | - | A registration field contains an invalid value. / أحد حقول التسجيل يحتوي على قيمة غير صالحة. | A registration field contains an invalid value. / أحد حقول التسجيل يحتوي على قيمة غير صالحة. | A registration field contains an invalid value. / أحد حقول التسجيل يحتوي على قيمة غير صالحة. |
+| SIGNUP_FIELD_NOT_ALLOWED | 400 | - | A non-allowed field was sent in the registration request. / تم إرسال حقل غير مسموح به في طلب التسجيل. | A non-allowed field was sent in the registration request. / تم إرسال حقل غير مسموح به في طلب التسجيل. | A non-allowed field was sent in the registration request. / تم إرسال حقل غير مسموح به في طلب التسجيل. |
+| SIGNUP_FIELD_CONFLICT | 409 | - | A registration value conflicts with an existing account. / إحدى قيم التسجيل مستخدمة بالفعل. | A registration value conflicts with an existing account. / إحدى قيم التسجيل مستخدمة بالفعل. | A registration value conflicts with an existing account. / إحدى قيم التسجيل مستخدمة بالفعل. |
+| SIGNUP_INVALID_ROLE | 400 | role | Selected account role is invalid. / نوع الحساب المختار غير صالح. | Selected account role is invalid. / نوع الحساب المختار غير صالح. | Selected account role is invalid. / نوع الحساب المختار غير صالح. |
+| SIGNUP_EMAIL_REQUIRED | 400 | email | Email address is required. / البريد الإلكتروني مطلوب. | Email address is required. / البريد الإلكتروني مطلوب. | Email address is required. / البريد الإلكتروني مطلوب. |
+| SIGNUP_EMAIL_ALREADY_EXISTS | 409 | email | This email is already registered. / هذا البريد الإلكتروني مسجل بالفعل. | This email is already registered. / هذا البريد الإلكتروني مسجل بالفعل. | This email is already registered. / هذا البريد الإلكتروني مسجل بالفعل. |
+| SIGNUP_PASSWORD_TOO_SHORT | 400 | password | Password must be at least 8 characters long. / يجب أن تكون كلمة المرور 8 أحرف على الأقل. | Password must be at least 8 characters long. / يجب أن تكون كلمة المرور 8 أحرف على الأقل. | Password must be at least 8 characters long. / يجب أن تكون كلمة المرور 8 أحرف على الأقل. |
+| SIGNUP_PASSWORD_MISMATCH | 400 | confirmPassword | Password and confirmation do not match. / كلمة المرور وتأكيدها غير متطابقين. | Password and confirmation do not match. / كلمة المرور وتأكيدها غير متطابقين. | Password and confirmation do not match. / كلمة المرور وتأكيدها غير متطابقين. |
+| SIGNUP_PHONE_REQUIRED | 400 | phoneNumber | A valid phone number is required. / رقم هاتف صالح مطلوب. | A valid phone number is required. / رقم هاتف صالح مطلوب. | A valid phone number is required. / رقم هاتف صالح مطلوب. |
+| SIGNUP_PHONE_INVALID | 400 | phoneNumber | Phone number format is invalid. / صيغة رقم الهاتف غير صالحة. | Phone number format is invalid. / صيغة رقم الهاتف غير صالحة. | Phone number format is invalid. / صيغة رقم الهاتف غير صالحة. |
+| SIGNUP_PHONE_ALREADY_EXISTS | 409 | phoneNumber | This phone number is already registered. / رقم الهاتف هذا مسجل بالفعل. | This phone number is already registered. / رقم الهاتف هذا مسجل بالفعل. | This phone number is already registered. / رقم الهاتف هذا مسجل بالفعل. |
+| SIGNUP_PHONE2_INVALID | 400 | phoneNumber2 | Secondary phone number format is invalid. / صيغة رقم الهاتف الثاني غير صالحة. | Secondary phone number format is invalid. / صيغة رقم الهاتف الثاني غير صالحة. | Secondary phone number format is invalid. / صيغة رقم الهاتف الثاني غير صالحة. |
+| SIGNUP_PHONE2_DUPLICATE | 409 | phoneNumber2 | This secondary phone number is already registered. / رقم الهاتف الثاني هذا مسجل بالفعل. | This secondary phone number is already registered. / رقم الهاتف الثاني هذا مسجل بالفعل. | This secondary phone number is already registered. / رقم الهاتف الثاني هذا مسجل بالفعل. |
+| SIGNUP_GOVERNMENT_REQUIRED | 400 | government | Government is required. / المحافظة مطلوبة. | Government is required. / المحافظة مطلوبة. | Government is required. / المحافظة مطلوبة. |
+| SIGNUP_GOVERNMENT_INVALID | 400 | government | Selected government is invalid. / المحافظة المحددة غير صالحة. | Selected government is invalid. / المحافظة المحددة غير صالحة. | Selected government is invalid. / المحافظة المحددة غير صالحة. |
+| SIGNUP_ADMIN_ZONE_REQUIRED | 400 | administrationZone | Administration zone is required. / الإدارة التعليمية مطلوبة. | Administration zone is required. / الإدارة التعليمية مطلوبة. | Administration zone is required. / الإدارة التعليمية مطلوبة. |
+| SIGNUP_ADMIN_ZONE_INVALID | 400 | administrationZone | Selected administration zone is invalid for the selected government. / الإدارة التعليمية المحددة غير صالحة للمحافظة المختارة. | Selected administration zone is invalid for the selected government. / الإدارة التعليمية المحددة غير صالحة للمحافظة المختارة. | Selected administration zone is invalid for the selected government. / الإدارة التعليمية المحددة غير صالحة للمحافظة المختارة. |
+| SIGNUP_LOCATION_VALIDATION_FAILED | 500 | - | Government and administration zone could not be validated due to a server-side check failure. / تعذر التحقق من المحافظة والإدارة التعليمية بسبب فشل في التحقق من جهة الخادم. | Government and administration zone could not be validated due to a server-side check failure. / تعذر التحقق من المحافظة والإدارة التعليمية بسبب فشل في التحقق من جهة الخادم. | Government and administration zone could not be validated due to a server-side check failure. / تعذر التحقق من المحافظة والإدارة التعليمية بسبب فشل في التحقق من جهة الخادم. |
+| SIGNUP_PROFILE_PIC_INVALID_TYPE | 400 | profilePic | Profile picture must be a valid image file. / صورة الملف الشخصي يجب أن تكون ملف صورة صالح. | Profile picture must be a valid image file. / صورة الملف الشخصي يجب أن تكون ملف صورة صالح. | Profile picture must be a valid image file. / صورة الملف الشخصي يجب أن تكون ملف صورة صالح. |
+| SIGNUP_PROFILE_PIC_TOO_LARGE | 413 | profilePic | Profile picture is too large. / صورة الملف الشخصي أكبر من الحجم المسموح. | Profile picture is too large. / صورة الملف الشخصي أكبر من الحجم المسموح. | Profile picture is too large. / صورة الملف الشخصي أكبر من الحجم المسموح. |
+| SIGNUP_CHILD_REFERENCE_INVALID | 400 | children | One or more child references are invalid. / واحد أو أكثر من مراجع الأبناء غير صالحة. | One or more child references are invalid. / واحد أو أكثر من مراجع الأبناء غير صالحة. | One or more child references are invalid. / واحد أو أكثر من مراجع الأبناء غير صالحة. |
+| SIGNUP_TEACHER_SUBJECT_REQUIRED | 400 | subject | N/A | N/A | Subject is required for teacher registration. / المادة مطلوبة لتسجيل المعلم. |
+| SIGNUP_TEACHER_LEVEL_REQUIRED | 400 | level | N/A | N/A | At least one teaching stage is required. / يجب اختيار مرحلة تدريس واحدة على الأقل. |
+| SIGNUP_TEACHER_LEVEL_INVALID | 400 | level | N/A | N/A | One or more selected teaching stages are invalid. / واحد أو أكثر من المراحل المختارة للتدريس غير صالح. |
+| SIGNUP_TEACHER_LEVEL_INACTIVE | 400 | level | N/A | N/A | One or more selected teaching stages are inactive. / واحد أو أكثر من المراحل المختارة للتدريس غير نشط. |
+| SIGNUP_TEACHER_LEVEL_KIND_INVALID | 400 | level | N/A | N/A | Teachers can only select stage levels. / يمكن للمعلمين اختيار مراحل التدريس فقط. |
+| SIGNUP_TEACHER_TEACHES_AT_TYPE_REQUIRED | 400 | teachesAtType | N/A | N/A | Please select where you teach. / يرجى تحديد مكان التدريس. |
+| SIGNUP_TEACHER_CENTERS_REQUIRED | 400 | centers | N/A | N/A | Please add at least one center. / يرجى إضافة مركز واحد على الأقل. |
+| SIGNUP_TEACHER_SCHOOL_REQUIRED | 400 | school | N/A | N/A | School name is required for this teaching type. / اسم المدرسة مطلوب لنوع التدريس المحدد. |
+| SIGNUP_TEACHER_SOCIAL_MEDIA_NOT_ARRAY | 400 | socialMedia | N/A | N/A | Social media data format is invalid. / تنسيق بيانات وسائل التواصل الاجتماعي غير صالح. |
+| SIGNUP_TEACHER_SOCIAL_MEDIA_PLATFORM_INVALID | 400 | socialMedia | N/A | N/A | One or more social media platforms are invalid. / واحد أو أكثر من منصات التواصل الاجتماعي غير صالح. |
+| SIGNUP_TEACHER_PHONE2_SAME_AS_PHONE1 | 400 | phoneNumber2 | N/A | N/A | Secondary phone number must be different from primary phone number. / رقم الهاتف الثاني يجب أن يختلف عن الرقم الأساسي. |
+| SIGNUP_PARENT_PROFESSION_REQUIRED | 400 | profession | N/A | Profession is required for parent registration. / المهنة مطلوبة لتسجيل ولي الأمر. | N/A |
+| SIGNUP_PARENT_LEVEL_INVALID | 400 | level | N/A | Selected parent level is invalid. / المستوى المحدد لولي الأمر غير صالح. | N/A |
+| SIGNUP_PARENT_LEVEL_INACTIVE | 400 | level | N/A | Selected parent level is inactive. / المستوى المحدد لولي الأمر غير نشط. | N/A |
+| SIGNUP_STUDENT_STAGE_REQUIRED | 400 | stage | Stage is required for student registration. / المرحلة مطلوبة لتسجيل الطالب. | N/A | N/A |
+| SIGNUP_STUDENT_STAGE_INVALID | 400 | stage | Selected stage is invalid. / المرحلة المحددة غير صالحة. | N/A | N/A |
+| SIGNUP_STUDENT_LEVEL_REQUIRED | 400 | level | Level is required for student registration. / المستوى مطلوب لتسجيل الطالب. | N/A | N/A |
+| SIGNUP_STUDENT_LEVEL_INVALID | 400 | level | Selected level is invalid. / المستوى المحدد غير صالح. | N/A | N/A |
+| SIGNUP_STUDENT_LEVEL_STAGE_MISMATCH | 400 | level | Selected grade does not belong to the selected stage. / الصف المختار لا يتبع المرحلة المختارة. | N/A | N/A |
+| SIGNUP_STUDENT_HOBBY_REQUIRED | 400 | hobby | At least one hobby is required for student registration. / يجب اختيار هواية واحدة على الأقل لتسجيل الطالب. | N/A | N/A |
+| SIGNUP_STUDENT_HOBBY_INVALID | 400 | hobby | Selected hobby is invalid. / الهواية المحددة غير صالحة. | N/A | N/A |
+| SIGNUP_STUDENT_PARENT_PHONE_REQUIRED | 400 | parentPhoneNumber | Primary parent phone number is required. / رقم هاتف ولي الأمر الأساسي مطلوب. | N/A | N/A |
+| SIGNUP_STUDENT_PARENT_PHONE_INVALID | 400 | parentPhoneNumber | Primary parent phone number format is invalid. / صيغة رقم هاتف ولي الأمر الأساسي غير صالحة. | N/A | N/A |
+| SIGNUP_STUDENT_PARENT_RELATION_REQUIRED | 400 | parentPhoneRelation | Primary parent relation is required. / صلة ولي الأمر الأساسية مطلوبة. | N/A | N/A |
+| SIGNUP_STUDENT_PARENT_RELATION_INVALID | 400 | parentPhoneRelation | Primary parent relation must be Mother, Father, or Other. / صلة ولي الأمر الأساسية يجب أن تكون: الأم أو الأب أو أخرى. | N/A | N/A |
+| SIGNUP_STUDENT_PARENT2_PHONE_REQUIRED | 400 | parentPhoneNumber2 | Additional parent phone number is required when relation is provided. / رقم هاتف ولي الأمر الإضافي مطلوب عند تحديد الصلة. | N/A | N/A |
+| SIGNUP_STUDENT_PARENT2_PHONE_INVALID | 400 | parentPhoneNumber2 | Additional parent phone number format is invalid. / صيغة رقم هاتف ولي الأمر الإضافي غير صالحة. | N/A | N/A |
+| SIGNUP_STUDENT_PARENT2_RELATION_REQUIRED | 400 | parentPhoneRelation2 | Additional parent relation is required when additional phone is provided. / صلة ولي الأمر الإضافية مطلوبة عند إدخال رقم إضافي. | N/A | N/A |
+| SIGNUP_STUDENT_PARENT2_RELATION_INVALID | 400 | parentPhoneRelation2 | Additional parent relation must be Mother, Father, or Other. / صلة ولي الأمر الإضافية يجب أن تكون: الأم أو الأب أو أخرى. | N/A | N/A |
+| SIGNUP_UNKNOWN_ERROR | 500 | - | Signup could not be completed due to an internal server issue. / تعذر إكمال التسجيل بسبب مشكلة داخلية في الخادم. | Signup could not be completed due to an internal server issue. / تعذر إكمال التسجيل بسبب مشكلة داخلية في الخادم. | Signup could not be completed due to an internal server issue. / تعذر إكمال التسجيل بسبب مشكلة داخلية في الخادم. |

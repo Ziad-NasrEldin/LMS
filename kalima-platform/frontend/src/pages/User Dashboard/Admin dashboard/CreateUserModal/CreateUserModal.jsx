@@ -14,6 +14,11 @@ import TeacherForm from "./TeacherForm"
 import { getAllGovernments, getGovernmentZones } from "../../../../routes/governments"
 import { designTokens } from "../../../../constants/designTokens"
 import { translateErrorMessage } from "../../../../utils/errorTranslator"
+import { buildLevelHierarchy } from "../../../../utils/levelHierarchy"
+
+const PARENT_RELATIONS = ["mother", "father", "other"]
+
+const normalizeParentRelation = (value) => String(value || "").trim().toLowerCase()
 
 const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
   const { t, i18n } = useTranslation("createUser")
@@ -28,9 +33,16 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
     password: "",
     confirmPassword: "",
     gender: "male",
-    level: [],
+    stage: "",
+    level: "",
     phoneNumber: "",
     parentPhoneNumber: "",
+    parentPhoneRelation: "",
+    parentPhoneNumber2: "",
+    parentPhoneRelation2: "",
+    hasAdditionalParentPhone: false,
+    hobby: "",
+    profession: "",
     faction: "",
     school: "",
     parent: "",
@@ -53,6 +65,14 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
   const [formError, setFormError] = useState("")
   const [isBulkMode, setIsBulkMode] = useState(false)
   const [levels, setLevels] = useState([])
+  const [levelHierarchy, setLevelHierarchy] = useState({
+    levels: [],
+    stages: [],
+    grades: [],
+    gradesByStageId: {},
+    stageOptions: [],
+    gradeOptions: [],
+  })
   const [subjects, setSubjects] = useState([])
   const [lecturers, setLecturers] = useState([])
   const [loadingDropdowns, setLoadingDropdowns] = useState(false)
@@ -84,7 +104,9 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
 
       const levelsResult = await getAllLevels()
       if (levelsResult.success) {
-        setLevels(levelsResult.data || [])
+        const hierarchy = levelsResult.hierarchy || buildLevelHierarchy(levelsResult.data || [], i18n.language)
+        setLevelHierarchy(hierarchy)
+        setLevels(hierarchy.grades || [])
       } else {
         console.error("Failed to fetch levels:", levelsResult.error)
       }
@@ -121,7 +143,39 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target
-    setUserData((prev) => ({ ...prev, [name]: value }))
+    setUserData((prev) => {
+      const next = { ...prev, [name]: value }
+
+      if (name === "parentPhoneNumber" && !String(value || "").trim()) {
+        next.parentPhoneRelation = ""
+      }
+
+      if (name === "parentPhoneNumber2" && !String(value || "").trim()) {
+        next.parentPhoneRelation2 = ""
+      }
+
+      if (name === "hasAdditionalParentPhone" && !value) {
+        next.parentPhoneNumber2 = ""
+        next.parentPhoneRelation2 = ""
+      }
+
+      return next
+    })
+  }
+
+  const handleRoleChange = (e) => {
+    const role = e.target.value
+    setUserData((prev) => ({
+      ...prev,
+      role,
+      stage: "",
+      level: role === "teacher" ? [] : "",
+      parentPhoneNumber: "",
+      parentPhoneRelation: "",
+      parentPhoneNumber2: "",
+      parentPhoneRelation2: "",
+      hasAdditionalParentPhone: false,
+    }))
   }
 
   const validateForm = () => {
@@ -136,17 +190,58 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
       return t("validation.passwordsDoNotMatch")
     }
 
-    if (userData.password.length < 6) {
+    if (userData.password.length < 8) {
       return t("validation.passwordTooShort")
     }
 
     // Role-specific validations
     if (userData.role === "student") {
+      if (!userData.stage) {
+        return t("validation.stageRequired")
+      }
       if (!userData.level) {
         return t("validation.levelRequired")
       }
       if (!userData.phoneNumber || !/^\d{10,15}$/.test(userData.phoneNumber)) {
         return t("validation.invalidPhoneNumber")
+      }
+      if (!userData.parentPhoneNumber || !/^\d{10,15}$/.test(userData.parentPhoneNumber)) {
+        return t("validation.invalidParentPhoneNumber")
+      }
+      if (!userData.parentPhoneRelation) {
+        return t("validation.parentRelationRequired")
+      }
+      if (!PARENT_RELATIONS.includes(normalizeParentRelation(userData.parentPhoneRelation))) {
+        return t("validation.parentRelationInvalid")
+      }
+
+      const hasAdditionalParentContact =
+        userData.hasAdditionalParentPhone ||
+        Boolean(String(userData.parentPhoneNumber2 || "").trim()) ||
+        Boolean(String(userData.parentPhoneRelation2 || "").trim())
+
+      if (hasAdditionalParentContact) {
+        if (!userData.parentPhoneNumber2) {
+          return t("validation.additionalParentPhoneRequired")
+        }
+        if (!/^\d{10,15}$/.test(userData.parentPhoneNumber2)) {
+          return t("validation.invalidParentPhoneNumber")
+        }
+        if (!userData.parentPhoneRelation2) {
+          return t("validation.additionalParentRelationRequired")
+        }
+        if (!PARENT_RELATIONS.includes(normalizeParentRelation(userData.parentPhoneRelation2))) {
+          return t("validation.additionalParentRelationInvalid")
+        }
+      }
+      if (!userData.hobby) {
+        return t("validation.hobbyRequired")
+      }
+      if (!userData.government) {
+        return t("validation.governmentRequired")
+      }
+      if (!userData.administrationZone) {
+        return t("validation.administrationZoneRequired")
       }
     }
 
@@ -154,11 +249,26 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
       if (!userData.phoneNumber || !/^\d{10,15}$/.test(userData.phoneNumber)) {
         return t("validation.invalidPhoneNumber")
       }
+      if (!userData.profession?.trim()) {
+        return t("validation.professionRequired")
+      }
+      if (!userData.government) {
+        return t("validation.governmentRequired")
+      }
+      if (!userData.administrationZone) {
+        return t("validation.administrationZoneRequired")
+      }
     }
 
     if (userData.role === "lecturer") {
       if (!userData.subject || userData.subject.length === 0) {
         return t("validation.subjectsRequired")
+      }
+      if (!userData.bio?.trim()) {
+        return t("validation.bioRequired")
+      }
+      if (!userData.expertise?.trim()) {
+        return t("validation.expertiseRequired")
       }
     }
 
@@ -168,15 +278,20 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
       }
     }
 
-    if (userData.role === "Teacher") {
+    if (userData.role === "teacher") {
       if (!userData.phoneNumber || !/^\d{10,15}$/.test(userData.phoneNumber)) {
         return t("validation.invalidPhoneNumber")
       }
       if (!userData.subject) {
         return t("validation.subjectRequired")
       }
-      if (!userData.level || userData.level.length === 0) {
+      if (!Array.isArray(userData.level) || userData.level.length === 0) {
         return t("validation.levelRequired")
+      }
+      const validStageIds = new Set((levelHierarchy?.stageOptions || []).map((option) => option.value))
+      const hasInvalidLevel = userData.level.some((value) => !validStageIds.has(value))
+      if (hasInvalidLevel) {
+        return t("validation.invalidTeacherLevelSelection")
       }
       if (!userData.teachesAtType) {
         return t("validation.teachesAtTypeRequired")
@@ -230,10 +345,15 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
       case "student":
         return {
           ...commonFields,
+          stage: data.stage || undefined,
           level: data.level || undefined,
           phoneNumber: data.phoneNumber || undefined,
           sequencedId: data.sequencedId || undefined,
           parentPhoneNumber: data.parentPhoneNumber || undefined,
+          parentPhoneRelation: data.parentPhoneRelation || undefined,
+          parentPhoneNumber2: data.parentPhoneNumber2 || undefined,
+          parentPhoneRelation2: data.parentPhoneRelation2 || undefined,
+          hobby: data.hobby || undefined,
           faction: data.faction || undefined,
           school: data.school || undefined,
           parent: data.parent || undefined,
@@ -244,7 +364,9 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
       case "parent":
         return {
           ...commonFields,
+          level: data.level || undefined,
           phoneNumber: data.phoneNumber || undefined,
+          profession: data.profession?.trim() || undefined,
           government: data.government || undefined,
           administrationZone: data.administrationZone || undefined,
         }
@@ -266,7 +388,7 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
           assignedLecturer: data.assignedLecturer || undefined,
         }
 
-      case "Teacher":
+      case "teacher":
         return {
           ...commonFields,
           phoneNumber: data.phoneNumber || undefined,
@@ -381,7 +503,7 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
                     className="select w-full rounded-xl"
                     style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: TOKENS.spaceDark }}
                     value={userData.role}
-                    onChange={handleChange}
+                    onChange={handleRoleChange}
                     required
                   >
                     <option value="" disabled>
@@ -393,7 +515,7 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
                     <option value="student">{t("roles.student")}</option>
                     <option value="parent">{t("roles.parent")}</option>
                     <option value="lecturer">{t("roles.lecturer")}</option>
-                    <option value="Teacher">{t("roles.teacher")}</option>
+                    <option value="teacher">{t("roles.teacher")}</option>
                   </select>
                 </div>
               </div>
@@ -491,6 +613,7 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
                 handleChange={handleChange}
                 handleGovernmentChange={handleGovernmentChange}
                 levels={levels}
+                levelHierarchy={levelHierarchy}
                 governments={governments}
                 administrationZones={administrationZones}
                 loadingZones={loadingZones}
@@ -504,6 +627,7 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
                 userData={userData}
                 handleChange={handleChange}
                 handleGovernmentChange={handleGovernmentChange}
+                levelHierarchy={levelHierarchy}
                 governments={governments}
                 administrationZones={administrationZones}
                 loadingZones={loadingZones}
@@ -536,13 +660,14 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
               />
             )}
 
-            {userData.role === "Teacher" && (
+            {userData.role === "teacher" && (
               <TeacherForm
                 userData={userData}
                 handleChange={handleChange}
                 handleGovernmentChange={handleGovernmentChange}
                 subjects={subjects}
                 levels={levels}
+                levelHierarchy={levelHierarchy}
                 governments={governments}
                 administrationZones={administrationZones}
                 loadingZones={loadingZones}

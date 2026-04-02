@@ -8,30 +8,30 @@
     "femaleStudentAlt": "Female student"
   },
   "signIn": "Sign In",
-"hero": {
-      "title": "The shortest path to brilliant success",
-      "heading": "Welcome to the Fekra Platform",
-      "description": "Kelma Platform is an e-learning platform that provides resources for students from fourth grade primary to third grade secondary.",
-      "cta": "Login"
-    },
-    "about": {
-      "title": "About Us",
-      "heading": "Learn Smart, Score High ",
-      "description": "Kelma provides an effective e-learning platform for students from 4th grade primary to 12th grade secondary. We offer the best solutions to ensure student excellence.",
-      "features": {
-        "teachers": "Professional Teachers",
-        "tests": "Lesson-wise Tests",
-        "curriculum": "Comprehensive Curriculum Coverage"
-      }
-    },
-    "appDownload": {
-      "title": "Download Our App ",
-      "content1": "Best free learning app - get it ",
-      "content2": " on your mobile to learn ",
-      "now": "Now",
-      "everywhere": "Everywhere"
-    },
-    "teacherCount": {
+  "hero": {
+    "title": "The shortest path to brilliant success",
+    "heading": "Welcome to the Fekra Platform",
+    "description": "Fekra Platform is a digital learning platform that provides resources for students from fourth grade primary to third grade secondary.",
+    "cta": "Login"
+  },
+  "about": {
+    "title": "About Us",
+    "heading": "Learn Smart, Score High ",
+    "description": "Fekra provides an effective digital learning platform for students from 4th grade primary to 12th grade secondary. We offer high-quality solutions that support academic excellence.",
+    "features": {
+      "teachers": "Professional Teachers",
+      "tests": "Lesson-wise Tests",
+      "curriculum": "Comprehensive Curriculum Coverage"
+    }
+  },
+  "appDownload": {
+    "title": "Download Our App ",
+    "content1": "Best free learning app - get it ",
+    "content2": " on your mobile to learn ",
+    "now": "Now",
+    "everywhere": "Everywhere"
+  },
+  "teacherCount": {
     "title": "Teachers",
     "counter": "Teacher ",
     "add": "Add Teacher"
@@ -59,7 +59,6 @@
       "subtitle": "Official Recognition",
       "description": "Students receive certified certificates upon completion of each educational level"
     }
-  
   },
   "teachers": {
     "title": "Our Teachers",
@@ -77,20 +76,7 @@
       "expertise": "Expertise",
       "experience": "Years Experience",
       "gradeLevels": "All Grade Levels"
-    },
-    "subjects": {
-      "artificial intelligence": "Artificial Intelligence",  
-      "math": "Mathematics",
-      "science": "Science",
-      "english": "English",
-      "arabic": "Arabic",
-      "history": "History",
-      "geography": "Geography",
-      "physics": "Physics",
-      "chemistry": "Chemistry",
-      "biology": "Biology"
     }
-    
   },
   "courses": {
     "title": "Educational Courses",
@@ -146,11 +132,10 @@
     "yearly": "Yearly"
   },
   "Experienced lecturer in computer science.": "Experienced lecturer in computer science.",
-  "buttons":{
-    "viewAll":  "View All",
-    "viewDetails":  "View Details"
+  "buttons": {
+    "viewAll": "View All",
+    "viewDetails": "View Details"
   },
-  "priceUnavailable": "N/A" 
-  ,"containerType": "Container Type"
-  
+  "priceUnavailable": "N/A",
+  "containerType": "Container Type"
 }

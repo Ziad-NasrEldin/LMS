@@ -4,13 +4,13 @@ import { useState, useEffect, useRef } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import { getLectureById, getLectureAttachments, deleteLecture } from "../../../routes/lectures"
 import { getAllSubjects } from "../../../routes/courses"
-import { getAllLevels } from "../../../routes/levels"
 import { getUserDashboard } from "../../../routes/auth-services"
 import { getLectureHomeworks } from "../../../routes/homeworks"
 import { downloadAttachmentById } from "../../../routes/lectures"
 import { useTranslation } from "react-i18next"
 import { getAllStudentLectureAccess, updateStudentLectureAccess } from "../../../routes/student-lecture-access"
 import { translateErrorMessage } from "../../../utils/errorTranslator"
+import { resolveLevelDisplayName } from "../../../utils/levelHierarchy"
 import {
   FiArrowLeft,
   FiDownload,
@@ -49,7 +49,6 @@ const DetailedLectureView = () => {
     exams: [],
   })
   const [subjects, setSubjects] = useState([]) // Initialize as empty array
-  const [levels, setLevels] = useState([]) // Initialize as empty array
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [userRole, setUserRole] = useState(null)
@@ -117,19 +116,6 @@ const DetailedLectureView = () => {
           console.error("Failed to fetch subjects:", subjectsResult.error)
           setError((prev) =>
             prev ? `${prev}. ${t("failedToLoadSubjects")}` : t("failedToLoadSubjects"),
-          )
-        }
-
-        // Fetch levels
-        const levelsResult = await getAllLevels()
-        if (levelsResult.success) {
-          setLevels(levelsResult.data || [])
-        } else {
-          console.error("Failed to fetch levels:", levelsResult.error)
-          setError((prev) =>
-            prev
-              ? `${prev}. ${t("failedToLoadLevels")}`
-              : t("failedToLoadLevels"),
           )
         }
 
@@ -251,15 +237,7 @@ const DetailedLectureView = () => {
   // Helper function to get level name
   const getLevelName = () => {
     if (!lecture || !lecture.level) return t("notSpecified")
-
-    // If level is an object with name property
-    if (lecture.level.name) return lecture.level.name
-
-    // If level is an ID, find it in the levels array
-    const levelId = typeof lecture.level === "object" ? lecture.level._id : lecture.level
-    const foundLevel = levels.find((l) => l._id === levelId)
-
-    return foundLevel ? foundLevel.name : t("notSpecified")
+    return resolveLevelDisplayName(lecture.level, i18n.language) || t("notSpecified")
   }
 
   // Handle viewing a submission

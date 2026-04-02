@@ -3,7 +3,6 @@
 import { useTranslation } from "react-i18next"
 import PageHeader from "./PageHeader"
 import PersonalInfoSection from "./PersonalInfoSection"
-import LanguageAppearanceSection from "./LanguageAppearanceSection"
 import SecuritySection from "./SecuritySection"
 import { designTokens } from "../../constants/designTokens"
 
@@ -15,7 +14,7 @@ function SettingsPage() {
   const GRADIENTS = designTokens.gradients
 
   return (
-      <div
+    <div
       className="min-h-screen"
       style={{
         background: `${GRADIENTS.pageAtmosphere}, ${TOKENS.creamSurface}`,
@@ -36,14 +35,11 @@ function SettingsPage() {
 
           <div className="space-y-6">
             <PersonalInfoSection />
-
-            <LanguageAppearanceSection />
-
             <SecuritySection />
-            </div>
+          </div>
+        </div>
       </div>
     </div>
-      </div>
   )
 }
 

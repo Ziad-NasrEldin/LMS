@@ -30,6 +30,12 @@
     "phoneNumber2": "secondary phone number",
     "parentPhone": "Parent Phone",
     "parentPhoneNumber": "Parent Phone",
+    "parentPhoneRelation": "Parent relation",
+    "parentPhoneNumber2": "Additional parent phone",
+    "parentPhoneRelation2": "Additional parent relation",
+    "additionalParentPhone": "Additional parent phone",
+    "additionalParentRelation": "Additional parent relation",
+    "selectParentRelation": "Select relation",
     "email": "Email Address",
     "address": "Address",
     "selectGender": "Select Gender",
@@ -38,6 +44,9 @@
     "selectSchoolType": "Select School Type",
     "grade": "Grade",
     "selectGrade": "Select Grade",
+    "stage": "Stage",
+    "selectStage": "Select Stage",
+    "selectStageFirst": "Select a stage first",
     "hobby": "Hobby",
     "selectHobby": "Select a hobby",
     "variant": "Variant",
@@ -56,10 +65,11 @@
     "childSequenceId" :"Child Sequence ID",
     "childrenSequenceIdsHelp" :"Use commas to separate child sequence IDs",
     "childrenSequenceIds" : "Children Sequence IDs",
-    "level" : "Level",
+    "level" : "Grade Level",
     "profession": "Profession / Work",
     "optional" : "Optional",
-    "selectLevel" : "Select Level",
+    "selectLevel" : "Select Grade Level",
+    "selectGradeLevel" : "Select Grade Level",
     "validatepassword": "Confirm Password",
     "subject" : "Subject",
     "subjectPlaceholder" : "Enter Subject",
@@ -92,7 +102,6 @@
     "yourCustomHobbies": "Your Custom Hobbies",
     "otherHobbyLabel": "Other Hobby",
     "otherHobbyPlaceholder": "Type your hobby",
-    "referralSerial": "Referral Serial",
     "profilePic": "Profile Picture"
   },
   "gender": {
@@ -106,11 +115,11 @@
   "hobbies": {
     "math": "Math",
     "programming": "Programming",
-    "art": "Art",
+    "art": "Handicrafts",
     "languages": "Languages",
     "photography": "Photography",
     "montage": "Montage",
-    "designIllustrating": "Design/Illustrating",
+    "designIllustrating": "Graphic Design",
     "marketing": "Marketing",
     "other": "Other (open field)"
   },
@@ -123,12 +132,19 @@
     "previous": "Previous",
     "next": "Next",
     "submit": "Done",
-    "addAnotherChild": "Add Another Child"
+    "addAnotherChild": "Add Another Child",
+    "addAnotherParentPhone": "Add another parent phone",
+    "removeParentPhone": "Remove"
   },
   "role": {
     "student": "Student",
     "parent": "Parent",
     "teacher": "Teacher"
+  },
+  "parentRelations": {
+    "mother": "Mother",
+    "father": "Father",
+    "other": "Other"
   },
   "alreadyHaveAccount": "Already have an account?",
   "login": "Login",
@@ -187,7 +203,7 @@
     "passwordMismatch" : "Passwords do not match",
     "phoneFormat": "Invalid phone number format",
     "emailFormat": "Invalid email format",
-    "hobbies": "Select at least 2 hobbies",
+    "hobbies": "Select at least one hobby",
     "bioMinimum": "Bio must be at least 50 characters",
     "submissionError": "Please fix the following errors:",
     "children": "Invalid child sequence IDs",
@@ -196,6 +212,7 @@
     "subject": "At least one subject required",
     "confirmPassword": "Passwords do not match",
     "emailInvalid": "Invalid email format",
+    "invalidData": "Invalid value",
     "phoneInvalid": "Invalid phone number format",
     "passwordsMismatch": "Passwords do not match",
     "hobbiesRequired": "Select at least one hobby",
@@ -203,9 +220,15 @@
     "otherHobbyRequired": "Please enter your other hobby",
     "childIdInvalid": "Invalid child ID format (24 characters)",
     "subjectRequired": "Subject is required",
+    "stageRequired": "Stage is required",
     "levelRequired": "Level is required",
     "genderRequired": "Gender is required",
     "parentPhoneRequired": "Parent phone number is required",
+    "parentRelationRequired": "Parent relation is required",
+    "parentRelationInvalid": "Select a valid parent relation",
+    "additionalParentPhoneRequired": "Additional parent phone number is required",
+    "additionalParentRelationRequired": "Additional parent relation is required",
+    "additionalParentRelationInvalid": "Select a valid additional parent relation",
     "emailExists": "Email already registered",
     "phoneExists": "Phone number already registered",
     "invalidSequenceId": "Invalid child sequence ID format (24 characters)",
@@ -216,9 +239,179 @@
     "socialMediaAccount": "Account name is required",
     "governmentRequired": "Government is required",
     "administrationZoneRequired": "Administration zone is required",
-    "professionRequired": "Profession / work is required"
+    "professionRequired": "Profession / work is required",
+    "governmentInvalid": "Selected government is invalid",
+    "administrationZoneInvalid": "Selected administration zone is invalid for the selected government",
+    "stageInvalid": "Selected stage is invalid",
+    "levelInvalid": "Selected level is invalid",
+    "levelStageMismatch": "Selected grade does not belong to the selected stage",
+    "hobbyInvalid": "Selected hobby is invalid",
+    "profilePicInvalidType": "Profile picture must be an image file",
+    "profilePicTooLarge": "Profile picture is too large",
+    "phoneMustDiffer": "Secondary phone number must be different from primary phone number",
+    "invalidRole": "Selected account role is invalid"
   },
-  
+  "apiErrors": {
+    "SIGNUP_VALIDATION_FAILED": {
+      "default": "Some registration fields are invalid. Please review and try again."
+    },
+    "SIGNUP_FIELD_REQUIRED": {
+      "default": "A required registration field is missing."
+    },
+    "SIGNUP_FIELD_INVALID": {
+      "default": "A registration field contains an invalid value."
+    },
+    "SIGNUP_FIELD_NOT_ALLOWED": {
+      "default": "A non-allowed field was sent in the registration request."
+    },
+    "SIGNUP_FIELD_CONFLICT": {
+      "default": "A registration value conflicts with an existing account."
+    },
+    "SIGNUP_INVALID_ROLE": {
+      "default": "Selected account role is invalid."
+    },
+    "SIGNUP_EMAIL_REQUIRED": {
+      "default": "Email address is required."
+    },
+    "SIGNUP_EMAIL_ALREADY_EXISTS": {
+      "default": "This email is already registered."
+    },
+    "SIGNUP_PASSWORD_TOO_SHORT": {
+      "default": "Password must be at least 8 characters long."
+    },
+    "SIGNUP_PASSWORD_MISMATCH": {
+      "default": "Password and confirmation do not match."
+    },
+    "SIGNUP_PHONE_REQUIRED": {
+      "default": "A valid phone number is required."
+    },
+    "SIGNUP_PHONE_INVALID": {
+      "default": "Phone number format is invalid."
+    },
+    "SIGNUP_PHONE_ALREADY_EXISTS": {
+      "default": "This phone number is already registered."
+    },
+    "SIGNUP_PHONE2_INVALID": {
+      "default": "Secondary phone number format is invalid."
+    },
+    "SIGNUP_PHONE2_DUPLICATE": {
+      "default": "This secondary phone number is already registered."
+    },
+    "SIGNUP_GOVERNMENT_REQUIRED": {
+      "default": "Government is required."
+    },
+    "SIGNUP_GOVERNMENT_INVALID": {
+      "default": "Selected government is invalid."
+    },
+    "SIGNUP_ADMIN_ZONE_REQUIRED": {
+      "default": "Administration zone is required."
+    },
+    "SIGNUP_ADMIN_ZONE_INVALID": {
+      "default": "Selected administration zone is invalid for the selected government."
+    },
+    "SIGNUP_LOCATION_VALIDATION_FAILED": {
+      "default": "Government and administration zone could not be validated due to a server-side check failure."
+    },
+    "SIGNUP_PROFILE_PIC_INVALID_TYPE": {
+      "default": "Profile picture must be a valid image file."
+    },
+    "SIGNUP_PROFILE_PIC_TOO_LARGE": {
+      "default": "Profile picture is too large."
+    },
+    "SIGNUP_CHILD_REFERENCE_INVALID": {
+      "default": "One or more child references are invalid."
+    },
+    "SIGNUP_TEACHER_SUBJECT_REQUIRED": {
+      "teacher": "Subject is required for teacher registration."
+    },
+    "SIGNUP_TEACHER_LEVEL_REQUIRED": {
+      "teacher": "At least one teaching stage is required."
+    },
+    "SIGNUP_TEACHER_LEVEL_INVALID": {
+      "teacher": "One or more selected teaching stages are invalid."
+    },
+    "SIGNUP_TEACHER_LEVEL_INACTIVE": {
+      "teacher": "One or more selected teaching stages are inactive."
+    },
+    "SIGNUP_TEACHER_LEVEL_KIND_INVALID": {
+      "teacher": "Teachers can only select stage levels."
+    },
+    "SIGNUP_TEACHER_TEACHES_AT_TYPE_REQUIRED": {
+      "teacher": "Please select where you teach."
+    },
+    "SIGNUP_TEACHER_CENTERS_REQUIRED": {
+      "teacher": "Please add at least one center."
+    },
+    "SIGNUP_TEACHER_SCHOOL_REQUIRED": {
+      "teacher": "School name is required for this teaching type."
+    },
+    "SIGNUP_TEACHER_SOCIAL_MEDIA_NOT_ARRAY": {
+      "teacher": "Social media data format is invalid."
+    },
+    "SIGNUP_TEACHER_SOCIAL_MEDIA_PLATFORM_INVALID": {
+      "teacher": "One or more social media platforms are invalid."
+    },
+    "SIGNUP_TEACHER_PHONE2_SAME_AS_PHONE1": {
+      "teacher": "Secondary phone number must be different from primary phone number."
+    },
+    "SIGNUP_PARENT_PROFESSION_REQUIRED": {
+      "parent": "Profession is required for parent registration."
+    },
+    "SIGNUP_PARENT_LEVEL_INVALID": {
+      "parent": "Selected parent level is invalid."
+    },
+    "SIGNUP_PARENT_LEVEL_INACTIVE": {
+      "parent": "Selected parent level is inactive."
+    },
+    "SIGNUP_STUDENT_STAGE_REQUIRED": {
+      "student": "Stage is required for student registration."
+    },
+    "SIGNUP_STUDENT_STAGE_INVALID": {
+      "student": "Selected stage is invalid."
+    },
+    "SIGNUP_STUDENT_LEVEL_REQUIRED": {
+      "student": "Level is required for student registration."
+    },
+    "SIGNUP_STUDENT_LEVEL_INVALID": {
+      "student": "Selected level is invalid."
+    },
+    "SIGNUP_STUDENT_LEVEL_STAGE_MISMATCH": {
+      "student": "Selected grade does not belong to the selected stage."
+    },
+    "SIGNUP_STUDENT_HOBBY_REQUIRED": {
+      "student": "At least one hobby is required for student registration."
+    },
+    "SIGNUP_STUDENT_HOBBY_INVALID": {
+      "student": "Selected hobby is invalid."
+    },
+    "SIGNUP_STUDENT_PARENT_PHONE_REQUIRED": {
+      "student": "Primary parent phone number is required."
+    },
+    "SIGNUP_STUDENT_PARENT_PHONE_INVALID": {
+      "student": "Primary parent phone number format is invalid."
+    },
+    "SIGNUP_STUDENT_PARENT_RELATION_REQUIRED": {
+      "student": "Primary parent relation is required."
+    },
+    "SIGNUP_STUDENT_PARENT_RELATION_INVALID": {
+      "student": "Primary parent relation must be Mother, Father, or Other."
+    },
+    "SIGNUP_STUDENT_PARENT2_PHONE_REQUIRED": {
+      "student": "Additional parent phone number is required when relation is provided."
+    },
+    "SIGNUP_STUDENT_PARENT2_PHONE_INVALID": {
+      "student": "Additional parent phone number format is invalid."
+    },
+    "SIGNUP_STUDENT_PARENT2_RELATION_REQUIRED": {
+      "student": "Additional parent relation is required when additional phone is provided."
+    },
+    "SIGNUP_STUDENT_PARENT2_RELATION_INVALID": {
+      "student": "Additional parent relation must be Mother, Father, or Other."
+    },
+    "SIGNUP_UNKNOWN_ERROR": {
+      "default": "Signup could not be completed due to an internal server issue."
+    }
+  },
   "errors": {
     "errorTitle": "Registration Error",
     "apiError": "Server Error",
@@ -232,6 +425,7 @@
     "roleSelectFailed": "Failed to select role",
     "PasswordSpecialChar":"Password must contain at least one special character",
     "childIdInvalid":"Invalid child ID format (24 characters)",
-    "PasswordCapitalLetter":"Password must contain at least one capital letter"
+    "PasswordCapitalLetter":"Password must contain at least one capital letter",
+    "requestId": "Request ID"
   }
 }

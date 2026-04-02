@@ -19,6 +19,7 @@
     "i18next-browser-languagedetector": "^8.0.5",
     "i18next-http-backend": "^3.0.2",
     "jspdf": "^4.2.1",
+    "jszip": "^3.10.1",
     "jwt-decode": "^4.0.0",
     "lucide-react": "^0.503.0",
     "plyr": "^3.7.8",
@@ -39,10 +40,10 @@
   },
   "scripts": {
     "start": "vite",
-    "build": "vite build",
+    "build": "vite build && node scripts/prerender-seo.mjs",
     "serve": "vite preview",
     "audit:i18n": "node scripts/i18n-audit.js",
-    "build:android": "env-cmd -f .env.android vite build && cd .. && npx cap copy android"
+    "build:android": "env-cmd -f .env.android vite build --base ./ && cd .. && npx cap copy android"
   },
   "eslintConfig": {
     "extends": [

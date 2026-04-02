@@ -88,11 +88,11 @@
   },
   "alerts": {
     "orderConfirmed": "تم تأكيد الطلب بنجاح!",
-  "exportSuccess": "تم تصدير الطلبات بنجاح!",
-  "exportFailed": "فشل في تصدير الطلبات",
-    "failedToConfirm": "فشل في تأكيد الطلب: ",
+    "exportSuccess": "تم تصدير الطلبات بنجاح!",
+    "exportFailed": "فشل في تصدير الطلبات",
+    "failedToConfirm": "فشل في تأكيد الطلب:",
     "notesSaved": "تم حفظ الملاحظات بنجاح!",
-    "failedToSaveNotes": "فشل في حفظ الملاحظات: ",
+    "failedToSaveNotes": "فشل في حفظ الملاحظات:",
     "unsavedChanges": "لديك تغييرات غير محفوظة. هل أنت متأكد من أنك تريد الإغلاق؟"
   }
-} 
+}

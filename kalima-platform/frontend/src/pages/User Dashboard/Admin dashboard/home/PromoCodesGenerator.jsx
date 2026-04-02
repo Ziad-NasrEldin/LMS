@@ -2,7 +2,9 @@
 
 import { useState, useEffect, useRef } from "react"
 import { useTranslation } from "react-i18next"
+import toast from "react-hot-toast"
 import { Ticket, Copy, Check, AlertCircle, Download, Printer } from 'lucide-react'
+import JSZip from "jszip"
 import { generatePromoCodes, getPromoCodeTemplates, uploadPromoCodeTemplate } from "../../../../routes/codes"
 import { getAllLecturers } from "../../../../routes/fetch-users"
 import QRCode from "qrcode"
@@ -38,6 +40,7 @@ const PromoCodeGenerator = () => {
   const [templateUploading, setTemplateUploading] = useState(false)
   const [templateError, setTemplateError] = useState("")
   const [templateSuccess, setTemplateSuccess] = useState("")
+  const [isBulkDownloading, setIsBulkDownloading] = useState(false)
   const printFrameRef = useRef(null)
 
   useEffect(() => {
@@ -300,23 +303,70 @@ const PromoCodeGenerator = () => {
     })
   }
 
+  const sanitizeDownloadSegment = (value) => {
+    const cleaned = String(value || "code")
+      .replace(/[<>:"/\\|?*\x00-\x1F]/g, "-")
+      .trim()
+    return cleaned || "code"
+  }
+
   const downloadQRCode = (dataUrl, code) => {
     const downloadLink = document.createElement("a")
     downloadLink.href = dataUrl
-    downloadLink.download = `qrcode-${code}.png`
+    downloadLink.download = `qrcode-${sanitizeDownloadSegment(code)}.png`
     document.body.appendChild(downloadLink)
     downloadLink.click()
     document.body.removeChild(downloadLink)
   }
 
-  const downloadAllQRCodes = () => {
-    qrCodeUrls.forEach((url, index) => {
-      if (url && generatedCodes[index]) {
-        setTimeout(() => {
-          downloadQRCode(url, generatedCodes[index].code)
-        }, index * 500) // Add delay to prevent browser issues with multiple downloads
-      }
-    })
+  const downloadAllQRCodes = async () => {
+    if (!qrCodeUrls.length || !generatedCodes.length) {
+      toast.error(t("admin.errors.qrCodeGenerationFailed"))
+      return
+    }
+
+    setIsBulkDownloading(true)
+    try {
+      const zip = new JSZip()
+      const dateTag = new Date().toISOString().slice(0, 10)
+
+      await Promise.all(
+        generatedCodes.map(async (codeEntry, index) => {
+          const dataUrl = qrCodeUrls[index]
+          if (!dataUrl) return
+
+          const response = await fetch(dataUrl)
+          const blob = await response.blob()
+          const fileName = `qrcode-${sanitizeDownloadSegment(codeEntry?.code)}.png`
+          zip.file(fileName, blob)
+        }),
+      )
+
+      const zipBlob = await zip.generateAsync({ type: "blob" })
+      const objectUrl = URL.createObjectURL(zipBlob)
+      const link = document.createElement("a")
+      link.href = objectUrl
+      link.download = `qr-codes-${dateTag}.zip`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      URL.revokeObjectURL(objectUrl)
+
+      toast.success(
+        t("admin.bulkZipReady", {
+          defaultValue: isRTL ? "تم تحميل ملف ZIP بنجاح" : "ZIP file downloaded successfully",
+        }),
+      )
+    } catch (zipError) {
+      console.error("Failed to build QR ZIP:", zipError)
+      toast.error(
+        t("admin.bulkZipFailed", {
+          defaultValue: isRTL ? "تعذر إنشاء ملف ZIP للأكواد" : "Failed to create ZIP archive",
+        }),
+      )
+    } finally {
+      setIsBulkDownloading(false)
+    }
   }
 
   // Create a value for the QR code that includes relevant information
@@ -768,9 +818,18 @@ const PromoCodeGenerator = () => {
                     <Printer className={`w-4 h-4 ${iconInlineGap}`} />
                     {t("admin.printQrCodes")}
                   </button>
-                  <button type="button" className="btn btn-sm btn-outline" onClick={downloadAllQRCodes}>
-                    <Download className={`w-4 h-4 ${iconInlineGap}`} />
-                    {t("admin.downloadAllQrCodes")}
+                  <button type="button" className="btn btn-sm btn-outline" onClick={downloadAllQRCodes} disabled={isBulkDownloading}>
+                    {isBulkDownloading ? (
+                      <>
+                        <span className={`loading loading-spinner loading-xs ${spinnerInlineGap}`}></span>
+                        {t("admin.exporting", { defaultValue: isRTL ? "جاري التحضير..." : "Preparing..." })}
+                      </>
+                    ) : (
+                      <>
+                        <Download className={`w-4 h-4 ${iconInlineGap}`} />
+                        {t("admin.downloadAllQrCodes")}
+                      </>
+                    )}
                   </button>
                 </div>
               </div>

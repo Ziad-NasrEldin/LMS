@@ -75,6 +75,21 @@ export const getAllLecturers = async () => {
   }
 };
 
+export const getLecturerById = async (lecturerId) => {
+  try {
+    const response = await axios.get(`${API_URL}/lecturers/${lecturerId}`, {
+      headers: getAuthHeader(),
+    });
+
+    return {
+      success: true,
+      data: response.data?.data || response.data,
+    };
+  } catch (error) {
+    return normalizeApiError(error, "Failed to fetch lecturer");
+  }
+};
+
 export const getUserById = async (userId) => {
   try {
     const response = await axios.get(`${API_URL}/users/${userId}`, {
@@ -111,9 +126,45 @@ export const getAllUsers = async () => {
 // --------START CREATE USER--------
 export const createUser = async (userData) => {
   try {
-    const response = await axios.post(`${API_URL}/users/`, userData, {
-      headers: getAuthHeader(),
-    });
+    const isFileLike = (value) =>
+      (typeof File !== "undefined" && value instanceof File) ||
+      (typeof Blob !== "undefined" && value instanceof Blob)
+
+    const hasProfilePic = isFileLike(userData?.profilePic)
+    let payload = userData
+    let headers = getAuthHeader()
+
+    if (hasProfilePic) {
+      const formData = new FormData()
+      Object.entries(userData || {}).forEach(([key, value]) => {
+        if (value === undefined || value === null || value === "") return
+
+        if (Array.isArray(value)) {
+          if (value.length === 0) return
+          value.forEach((item) => {
+            if (item === undefined || item === null || item === "") return
+            if (typeof item === "object" && !isFileLike(item)) {
+              formData.append(key, JSON.stringify(item))
+            } else {
+              formData.append(key, item)
+            }
+          })
+          return
+        }
+
+        if (typeof value === "object" && !isFileLike(value)) {
+          formData.append(key, JSON.stringify(value))
+          return
+        }
+
+        formData.append(key, value)
+      })
+
+      payload = formData
+      headers = getAuthHeader()
+    }
+
+    const response = await axios.post(`${API_URL}/users/`, payload, { headers });
     return { success: true, data: response.data };
   } catch (error) {
     return normalizeApiError(error, "Failed to create user");

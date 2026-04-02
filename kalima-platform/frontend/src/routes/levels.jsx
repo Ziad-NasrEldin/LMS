@@ -1,5 +1,6 @@
 import axios from "axios";
 import { normalizeApiError } from "../utils/apiError";
+import { buildLevelHierarchy, normalizeLocale } from "../utils/levelHierarchy";
 const API_URL = import.meta.env.VITE_API_URL;
 
 // Helper function to get auth headers
@@ -11,40 +12,23 @@ const getAuthHeader = () => {
 export const getAllLevels = async () => {
   try {
     const currentLang = (localStorage.getItem("i18nextLng") || "en").toLowerCase();
-    const isArabic = currentLang.startsWith("ar");
+    const locale = normalizeLocale(currentLang);
 
     const response = await axios.get(`${API_URL}/levels/`, {
       headers: getAuthHeader(),
-      params: { lang: isArabic ? "ar" : "en" },
+      params: { lang: locale },
       withCredentials: true,
     });
 
-
-    const levels = response.data.data.levels;
-
-    const order = ["3rd Secondary", "2nd Secondary", "1st Secondary", "3rd Preparatory", "2nd Preparatory", "1st Preparatory", "6th Primary", "5th Primary", "4th Primary", "3rd Primary", "2nd Primary", "1st Primary",
-
-    ];
-
-    const sortedLevels = levels
-      .slice()
-      .sort((a, b) => {
-        const ai = order.indexOf(a.name);
-        const bi = order.indexOf(b.name);
-
-        if (ai === -1 && bi === -1) return a.name.localeCompare(b.name);
-        if (ai === -1) return 1;
-        if (bi === -1) return -1;
-        return ai - bi;
-      })
-      .map((level) => ({
-        ...level,
-        displayName: isArabic ? (level.nameAr || level.name) : (level.name || level.nameAr),
-      }));
+    const payload = response.data?.data || {};
+    const flatLevels = Array.isArray(payload.levels) ? payload.levels : [];
+    const hierarchy = buildLevelHierarchy(flatLevels, locale);
+    const sortedLevels = hierarchy.levels;
 
     return {
       success: true,
       data: sortedLevels,
+      hierarchy,
     };
   } catch (error) {
     return normalizeApiError(error, "Error fetching levels");
@@ -64,6 +48,22 @@ export const createLevel = async (levelData) => {
     };
   } catch (error) {
     return normalizeApiError(error, "Error creating level");
+  }
+};
+
+export const updateLevel = async (levelId, levelData) => {
+  try {
+    const response = await axios.patch(`${API_URL}/levels/${levelId}`, levelData, {
+      headers: getAuthHeader(),
+      withCredentials: true,
+    });
+
+    return {
+      success: true,
+      data: response.data,
+    };
+  } catch (error) {
+    return normalizeApiError(error, "Error updating level");
   }
 };
 

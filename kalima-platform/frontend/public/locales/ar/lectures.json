@@ -1,7 +1,7 @@
-{ 
+{
   "generalPoints": "الرصيد العام",
   "points": "جنيه",
-  "welcome": "مرحبا بك في موقع ",
+  "welcome": "مرحبًا بك في الموقع",
   "title": "المحاضرات",
   "discover": "اكتشف أحدث المحاضرات",
   "showLectures": "عرض المحاضرات",
@@ -18,7 +18,7 @@
     "success": "تم شراء المحاضرة بنجاح",
     "failed": "فشل شراء المحاضرة"
   },
-  "available : ": " المتاحة",
+  "available : ": "المتاحة",
   "availablePoints": "الرصيد:",
   "noPointsBalances": "لا يوجد رصيد متاح",
   "labels": {
@@ -53,37 +53,36 @@
     "options": "خيارات البحث"
   },
   "levels": {
-  "Primary": "الابتدائية",
-  "Middle": "المتوسطة",
-  "Upper Primary": "الابتدائية العليا",
-  "Higher Secondary": "الثانوية العليا",
-  "Fourth Elementary": "الابتدائي الرابع",
-  "First Primary": "الأول الابتدائي",
-  "Second Primary": "الثاني الابتدائي",
-  "Third Primary": "الثالث الابتدائي",
-  "First Secondary": "الأول الثانوي",
-  "Second Secondary": "الثاني الثانوي",
-  "Third Secondary": "الثالث الثانوي",
-  "2nd Primary": "الثاني الابتدائي",
-  "2nd Secondary": "الثاني الثانوي",
-  "3rd Primary": "الثالث الابتدائي",
-  "3rd Secondary": "الثالث الثانوي",
-  "4th Primary": "الرابع الابتدائي",
-  "4th Secondary": "الرابع الثانوي",
-  "5th Primary": "الخامس الابتدائي",
-  "1st Primary": "الأول الابتدائي",
-  "1st Secondary": "الأول الثانوي",
-  "1st Preparatory": "الأول الثانوي",
-  "2nd Preparatory": "الثاني الثانوي",
-  "3rd Preparatory": "الثالث الثانوي",
-  "4th Preparatory": "الرابع الثانوي",
-  "5th Preparatory": "الخامس الثانوي",
-  "6th Preparatory": "السادس الثانوي",
-  "7th Preparatory": "السابع الثانوي",
-  "8th Preparatory": "الثامن الثانوي",
-  "9th Preparatory": "التاسع الثانوي"
-},
-
+    "Primary": "الابتدائية",
+    "Middle": "المتوسطة",
+    "Upper Primary": "الابتدائية العليا",
+    "Higher Secondary": "الثانوية العليا",
+    "Fourth Elementary": "الابتدائي الرابع",
+    "First Primary": "الأول الابتدائي",
+    "Second Primary": "الثاني الابتدائي",
+    "Third Primary": "الثالث الابتدائي",
+    "First Secondary": "الأول الثانوي",
+    "Second Secondary": "الثاني الثانوي",
+    "Third Secondary": "الثالث الثانوي",
+    "2nd Primary": "الثاني الابتدائي",
+    "2nd Secondary": "الثاني الثانوي",
+    "3rd Primary": "الثالث الابتدائي",
+    "3rd Secondary": "الثالث الثانوي",
+    "4th Primary": "الرابع الابتدائي",
+    "4th Secondary": "الرابع الثانوي",
+    "5th Primary": "الخامس الابتدائي",
+    "1st Primary": "الأول الابتدائي",
+    "1st Secondary": "الأول الثانوي",
+    "1st Preparatory": "الأول الثانوي",
+    "2nd Preparatory": "الثاني الثانوي",
+    "3rd Preparatory": "الثالث الثانوي",
+    "4th Preparatory": "الرابع الثانوي",
+    "5th Preparatory": "الخامس الثانوي",
+    "6th Preparatory": "السادس الثانوي",
+    "7th Preparatory": "السابع الثانوي",
+    "8th Preparatory": "الثامن الثانوي",
+    "9th Preparatory": "التاسع الثانوي"
+  },
   "common": {
     "loading": "جاري التحميل..."
   },
@@ -152,7 +151,4 @@
     "page": "الصفحة",
     "of": "من"
   }
-
-
-
 }

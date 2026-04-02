@@ -12,6 +12,12 @@ const AppError = require("../utils/appError");
 const User = require("../models/userModel.js");
 const moderatorSchema = require("../validations/moderatorValidation.js");
 const subadminSchema  = require("../validations/subAdminValidation.js");
+const {
+  createSignupError,
+  createSignupValidationError,
+  isSignupRequest,
+  mapJoiDetailsToSignupItems,
+} = require("../utils/signupErrors");
 
 const roleSchemas = {
   teacher: teacherSchema,
@@ -24,6 +30,7 @@ const roleSchemas = {
 };
 
 const validateUser = catchAsync(async (req, res, next) => {
+  const signupFlow = isSignupRequest(req);
   let { confirmPassword, role, password, ...updatedBody } = req.body
 
   if (req.method === "PATCH") {
@@ -31,11 +38,19 @@ const validateUser = catchAsync(async (req, res, next) => {
     if (!user) return next(new AppError("Couldn't find user.", 404));
     role = user.role
   } else {
-    if (confirmPassword !== password) return res.status(400).json({ message: "Password and password confirmation don't match." });
+    if (confirmPassword !== password) {
+      if (signupFlow) {
+        return next(createSignupError("SIGNUP_PASSWORD_MISMATCH"));
+      }
+      return res.status(400).json({ message: "Password and password confirmation don't match." });
+    }
   }
 
   // Check if a valid role is provided.
   if (!role || !roleSchemas[role.toLowerCase()]) {
+    if (signupFlow) {
+      return next(createSignupError("SIGNUP_INVALID_ROLE"));
+    }
     return res.status(400).json({ message: "Invalid or missing role" });
   }
   req.body = updatedBody
@@ -47,7 +62,7 @@ const validateUser = catchAsync(async (req, res, next) => {
 
 
   let error;
-  schema = roleSchemas[role.toLowerCase()]
+  let schema = roleSchemas[role.toLowerCase()]
   if (req.method === "PATCH") {
     // Create a partial schema where all fields are optional
     const partialSchema = schema.fork(
@@ -71,6 +86,10 @@ const validateUser = catchAsync(async (req, res, next) => {
 
   // Validate request body based on the role schema and casts it to an error if one exists.
   if (error) {
+    if (signupFlow) {
+      const issues = mapJoiDetailsToSignupItems(error.details || [], role);
+      return next(createSignupValidationError(issues));
+    }
     return res.status(400).json({
       message: error.details.map((err) => err.message),
     });

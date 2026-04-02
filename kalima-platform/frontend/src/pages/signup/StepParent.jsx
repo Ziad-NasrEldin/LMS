@@ -1,15 +1,15 @@
-import { useState, useEffect } from "react";
-import { getAllLevels } from '../../routes/levels';
+import { useState } from "react";
 import { Eye, EyeOff } from 'lucide-react';
 import { useTranslation } from "react-i18next";
 
-export default function StepParent({ formData, handleChildrenChange, t, errors, handleInputChange , gradeLevels}) {
+export default function StepParent({ formData, handleChildrenChange, t, errors, handleInputChange, gradeLevels, levelHierarchy }) {
     const [childrenCount, setChildrenCount] = useState(1);
     const [loading, setLoading] = useState(true);
     const [apiError, setApiError] = useState(null);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const { i18n } = useTranslation();
+    const gradeOptions = levelHierarchy?.gradeOptions?.length ? levelHierarchy.gradeOptions : (gradeLevels || []);
     // Ensure we have enough empty slots for all children
     const safeChildren = [...formData.children, ...Array(childrenCount - formData.children.length).fill('')];
 
@@ -43,7 +43,7 @@ export default function StepParent({ formData, handleChildrenChange, t, errors, 
                     <input
                         type="email"
                         name="email"
-                        className={`input input-bordered input-sm ${errors.email ? 'input-error animate-shake' : ''}`}
+                        className={`input input-bordered w-full ${errors.email ? 'input-error animate-shake' : ''}`}
                         value={formData.email || ''}
                         onChange={handleInputChange}
                         placeholder="email@example.com"
@@ -67,7 +67,7 @@ export default function StepParent({ formData, handleChildrenChange, t, errors, 
                         <input
                             type={showPassword ? 'text' : 'password'}
                             name="password"
-                             className={`input input-bordered input-sm ${i18n.language === 'ar' ? 'pr-12' : 'pl-12'} ${errors.password ? 'input-error animate-shake' : ''}`}
+                             className={`input input-bordered w-full ${i18n.language === 'ar' ? 'pr-12' : 'pl-12'} ${errors.password ? 'input-error animate-shake' : ''}`}
                             value={formData.password || ''}
                             onChange={handleInputChange}
                             required
@@ -99,7 +99,7 @@ export default function StepParent({ formData, handleChildrenChange, t, errors, 
                         <input
                             type={showConfirmPassword ? 'text' : 'password'}
                             name="confirmPassword"
-                            className={`input input-bordered input-sm ${i18n.language === 'ar' ? 'pr-12' : 'pl-12'} ${errors.confirmPassword ? 'input-error animate-shake' : ''}`}
+                            className={`input input-bordered w-full ${i18n.language === 'ar' ? 'pr-12' : 'pl-12'} ${errors.confirmPassword ? 'input-error animate-shake' : ''}`}
                             value={formData.confirmPassword || ''}
                             onChange={handleInputChange}
                             required
@@ -129,15 +129,15 @@ export default function StepParent({ formData, handleChildrenChange, t, errors, 
                     </label>
                     <select
                         name="level"
-                        className={`select select-bordered select-sm ${errors.level ? 'select-error animate-shake' : ''}`}
+                        className={`select select-bordered w-full ${errors.level ? 'select-error animate-shake' : ''}`}
                         value={formData.level || ''}
                         onChange={handleInputChange}
                       
                     >
-                         <option value="">{t('form.selectGrade')}</option>
-              {gradeLevels.map(level => (
+                         <option value="">{t('form.selectGradeLevel') || t('form.selectGrade')}</option>
+              {gradeOptions.map((level) => (
                 <option key={level.value} value={level.value}>
-                                    {level.label}
+                  {level.label}
                 </option>
               ))}
                            
@@ -159,7 +159,7 @@ export default function StepParent({ formData, handleChildrenChange, t, errors, 
                     <input
                         type="text"
                         name="profession"
-                        className={`input input-bordered input-sm ${errors.profession ? 'input-error animate-shake' : ''}`}
+                        className={`input input-bordered w-full ${errors.profession ? 'input-error animate-shake' : ''}`}
                         value={formData.profession || ''}
                         onChange={handleInputChange}
                         required
@@ -183,7 +183,7 @@ export default function StepParent({ formData, handleChildrenChange, t, errors, 
                         </label>
                                 <input
                                 type="text"
-                                className={`input input-bordered input-sm ${errors.children?.[i] ? 'input-error animate-shake' : ''}`}
+                                className={`input input-bordered w-full ${errors.children?.[i] ? 'input-error animate-shake' : ''}`}
                                 value={child || ''}
                                 onChange={(e) => handleChildrenChange(i, e.target.value)}
                                 placeholder="5f7d8e3a1c9d440000d4a7b2"

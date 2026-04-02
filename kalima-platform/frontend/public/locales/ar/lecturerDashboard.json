@@ -11,10 +11,10 @@
   "exportCsv": "تصدير CSV",
   "csvDownloadFailed": "تعذر تنزيل ملف CSV.",
   "myCourses": "كورساتي",
-  "myCoursesDesc": "عدد الكورسات المنشورة حالياً.",
+  "myCoursesDesc": "عدد الكورسات المنشورة حاليًا.",
   "lecturesDesc": "إجمالي المحاضرات داخل كل الكورسات.",
   "totalRevenue": "إجمالي الإيراد",
-  "totalRevenueDesc": "إيرادك الفعلي من المبيعات.",
+  "totalRevenueDesc": "إيرادك الفعلى من المبيعات.",
   "totalPurchases": "إجمالي المشتريات",
   "totalPurchasesDesc": "عدد عمليات الشراء المنفذة.",
   "studentsBought": "الطلاب المشترون",
@@ -79,7 +79,6 @@
   "noCoursesTitle": "لا توجد كورسات",
   "noCoursesDescription": "لم تقم بإنشاء أي كورسات بعد. ابدأ بإضافة أول كورس لك.",
   "noCourses": "لم تقم بإنشاء أي كورسات بعد.",
-
   "assistants": "المساعدين",
   "assistantsDesc": "عدد المساعدين المضافين لحسابك.",
   "top_categories": "الفئات الأعلى",
@@ -114,7 +113,6 @@
   "createAssistantError": "فشل في إنشاء المساعد",
   "deleteAssistantError": "فشل في حذف المساعد",
   "updateAssistantError": "فشل في تحديث المساعد",
-
   "unknown": "غير معروف",
   "unspecified": "غير محدد",
   "currency": "جنيه",
@@ -125,7 +123,6 @@
   "lectures": "محاضرات",
   "minute": "دقيقة",
   "minutes": "دقائق",
-
   "containerTypes": {
     "course": "كورس",
     "year": "سنة دراسية",

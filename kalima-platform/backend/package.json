@@ -11,6 +11,7 @@
     "seed": "node scripts/seed.js",
     "seed:mock": "node scripts/seedMockData.js",
     "seed:governments": "node utils/seeds/seedGovernments.js",
+    "migrate:levels-hierarchy": "node scripts/migrateLevelsHierarchy.js",
     "migrate:lecture-access": "node scripts/reconcileStudentLectureAccess.js",
     "migrate:lecture-access:apply": "node scripts/reconcileStudentLectureAccess.js --apply",
     "reconcile:exam-submissions": "node scripts/reconcileExamSubmissions.js"

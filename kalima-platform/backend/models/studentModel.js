@@ -21,6 +21,7 @@ const mongoose = require("mongoose");
 const User = require("./userModel");
 const { required } = require("joi");
 const mongooseSequence = require("mongoose-sequence")(mongoose);
+const Level = require("./levelModel");
 
 const ALLOWED_HOBBIES = [
   "math",
@@ -41,6 +42,8 @@ const ALLOWED_HOBBIES = [
   "photography",
 ];
 
+const ALLOWED_PARENT_RELATIONS = ["mother", "father", "other"];
+
 const lecturerPointsSchema = new mongoose.Schema(
   {
     lecturer: {
@@ -58,6 +61,10 @@ const lecturerPointsSchema = new mongoose.Schema(
 
 const studentSchema = new mongoose.Schema(
   {
+    stage: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Level",
+    },
     level: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Level",
@@ -65,6 +72,25 @@ const studentSchema = new mongoose.Schema(
     parentPhoneNumber: {
       type: String,
       required: true,
+      trim: true,
+    },
+    parentPhoneRelation: {
+      type: String,
+      required: true,
+      enum: ALLOWED_PARENT_RELATIONS,
+      trim: true,
+    },
+    parentPhoneNumber2: {
+      type: String,
+      trim: true,
+    },
+    parentPhoneRelation2: {
+      type: String,
+      enum: ALLOWED_PARENT_RELATIONS,
+      trim: true,
+      required: function () {
+        return !!this.parentPhoneNumber2;
+      },
     },
     hobby: {
       type: String,
@@ -172,8 +198,20 @@ studentSchema.pre("save", async function (next) {
   if (this.phoneNumber) {
     this.phoneNumber = formatEgyptianPhoneNumber(this.phoneNumber);
   }
+  if (this.parentPhoneNumber) {
+    this.parentPhoneNumber = formatEgyptianPhoneNumber(this.parentPhoneNumber);
+  }
+  if (this.parentPhoneNumber2) {
+    this.parentPhoneNumber2 = formatEgyptianPhoneNumber(this.parentPhoneNumber2);
+  }
   if (this.phoneNumber2) {
     this.phoneNumber2 = formatEgyptianPhoneNumber(this.phoneNumber2);
+  }
+  if (this.parentPhoneRelation) {
+    this.parentPhoneRelation = String(this.parentPhoneRelation).trim().toLowerCase();
+  }
+  if (this.parentPhoneRelation2) {
+    this.parentPhoneRelation2 = String(this.parentPhoneRelation2).trim().toLowerCase();
   }
   if (this.isNew && !this.userSerial) {
     try {
@@ -208,18 +246,59 @@ studentSchema.pre("save", async function (next) {
 
 // Pre-validate hook to ensure the selected zone belongs to the selected government
 studentSchema.pre("validate", async function (next) {
-  if (this.government && this.zone) {
-    const Government = require("./governmentModel");
-    const gov = await Government.findOne({ name: this.government });
-    if (!gov) {
-      this.invalidate("government", "Selected government does not exist.");
-    } else if (!gov.administrationZone.includes(this.administrationZone)) {
-      this.invalidate(
-        "zone",
-        "Selected zone does not belong to the selected government."
-      );
+  try {
+    let stageDoc = null;
+    let levelDoc = null;
+
+    if (this.stage) {
+      if (!mongoose.Types.ObjectId.isValid(this.stage)) {
+        this.invalidate("stage", "Selected stage is invalid.");
+      } else {
+        stageDoc = await Level.findById(this.stage).select("kind isActive");
+        if (!stageDoc) {
+          this.invalidate("stage", "Selected stage does not exist.");
+        } else if (stageDoc.isActive === false || stageDoc.kind !== "stage") {
+          this.invalidate("stage", "Selected stage must be an active stage level.");
+        }
+      }
     }
+
+    if (this.level) {
+      if (!mongoose.Types.ObjectId.isValid(this.level)) {
+        this.invalidate("level", "Selected level is invalid.");
+      } else {
+        levelDoc = await Level.findById(this.level).select("kind parentLevel isActive");
+        if (!levelDoc) {
+          this.invalidate("level", "Selected level does not exist.");
+        } else if (levelDoc.isActive === false || levelDoc.kind !== "grade") {
+          this.invalidate("level", "Selected level must be an active grade level.");
+        }
+      }
+    }
+
+    if (
+      stageDoc &&
+      levelDoc &&
+      levelDoc.parentLevel?.toString() !== stageDoc._id.toString()
+    ) {
+      this.invalidate("level", "Selected grade does not belong to the selected stage.");
+    }
+  } catch (error) {
+    return next(error);
   }
+
+    if (this.government && this.administrationZone) {
+      const Government = require("./governmentModel");
+      const gov = await Government.findOne({ name: this.government });
+      if (!gov) {
+        this.invalidate("government", "Path `government` is invalid.");
+      } else if (!gov.administrationZone.includes(this.administrationZone)) {
+        this.invalidate(
+          "administrationZone",
+          "Path `administrationZone` is invalid."
+        );
+      }
+    }
   next();
 });
 

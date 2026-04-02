@@ -15,9 +15,12 @@
     "email": "البريد الإلكتروني",
     "password": "كلمة المرور",
     "confirmPassword": "تأكيد كلمة المرور",
-    "level": "المرحلة الدراسية",
+    "stage": "المرحلة",
+    "level": "الصف الدراسي",
     "phoneNumber": "رقم الهاتف",
     "parentPhoneNumber": "رقم هاتف ولي الأمر",
+    "profession": "المهنة",
+    "hobby": "الهواية",
     "sequencedId": "الرقم التسلسلي",
     "school": "المدرسة",
     "subjects": "المواد الدراسية",
@@ -28,24 +31,31 @@
     "parentPhoneNumberOptional": "رقم هاتف ولي الأمر (اختياري)",
     "hobbies": "الاهتمامات",
     "hobbiesOptional": "الاهتمامات (اختياري)",
-    "uploadCSV" :"تحميل ملف CSV",
-    "government" : "المحافظه",
-    "administrationZone" : "المناطق الادارية",
-    "selectGovernment" :"اختر المحافظه",
-    "selectAdministrationZone" :"اختر المناطق الادارية",
+    "uploadCSV": "تحميل ملف CSV",
+    "government": "المحافظه",
+    "administrationZone": "الإدارة التعليمية",
+    "selectGovernment": "اختر المحافظه",
+    "selectAdministrationZone": "اختر الإدارة التعليمية",
+    "loadingZones": "جاري تحميل الإدارة التعليمية...",
     "profilePic": "صورة الملف الشخصي",
     "referralSerial": "رقم التسلسل المرجعي",
     "phoneNumber2": "رقم الهاتف (اختياري)",
     "subject": "المادة",
-    "levels": "المراحل",
+    "levels": "مراحل التدريس",
     "teachesAtType": "أين تدرس؟",
     "socialMedia": "وسائل التواصل الاجتماعي"
   },
   "placeholders": {
     "selectAccountType": "اختر نوع الحساب",
     "selectLevel": "اختر المرحلة الدراسية",
+    "selectStage": "اختر المرحلة",
+    "selectStageFirst": "اختر المرحلة أولاً",
+    "selectGradeLevel": "اختر الصف الدراسي",
     "phoneNumber": "أدخل رقم الهاتف",
     "parentPhoneNumber": "أدخل رقم هاتف ولي الأمر",
+    "additionalParentPhone": "أدخل رقم هاتف ولي الأمر الإضافي",
+    "profession": "أدخل المهنة",
+    "selectHobby": "اختر الهواية",
     "sequencedId": "أدخل الرقم التسلسلي",
     "school": "أدخل اسم المدرسة",
     "expertise": "أدخل التخصص",
@@ -53,7 +63,7 @@
     "selectLecturer": "اختر المحاضر",
     "selectSubject": "اختر المواد الدراسية",
     "selectHobbies": "اختر الاهتمامات",
-    "addHobby": "اضافة اهتمام",
+    "addHobby": "إضافة اهتمام",
     "selectTeachesAt": "اختر مكان التدريس",
     "selectPlatform": "اختر المنصة",
     "accountName": "لينك الحساب",
@@ -70,11 +80,16 @@
     "student": "طالب",
     "parent": "ولي أمر",
     "lecturer": "محاضر",
-    "teacher" : "مدرس"
+    "teacher": "مدرس"
   },
   "gender": {
     "male": "ذكر",
     "female": "أنثى"
+  },
+  "parentRelations": {
+    "mother": "الأم",
+    "father": "الأب",
+    "other": "أخرى"
   },
   "buttons": {
     "cancel": "إلغاء",
@@ -87,7 +102,9 @@
     "next": "التالي",
     "previous": "السابق",
     "close": "إغلاق",
-    "add": "اضافة",
+    "add": "إضافة",
+    "addAnotherParentPhone": "إضافة هاتف ولي أمر آخر",
+    "removeParentPhone": "إزالة",
     "createUsers": "انشاء مستخدمين",
     "uploading": "جاري التحميل..."
   },
@@ -101,16 +118,23 @@
   "validation": {
     "invalidEmail": "البريد الإلكتروني غير صالح",
     "passwordsDoNotMatch": "كلمات المرور غير متطابقة",
-    "passwordTooShort": "كلمة المرور يجب أن تكون 6 أحرف على الأقل",
+    "passwordTooShort": "كلمة المرور يجب أن تكون 8 أحرف على الأقل",
+    "stageRequired": "الرجاء تحديد المرحلة",
     "levelRequired": "الرجاء تحديد المرحلة الدراسية",
     "invalidPhoneNumber": "رقم الهاتف غير صالح (10-15 أرقام)",
+    "invalidParentPhoneNumber": "رقم هاتف ولي الأمر غير صالح (10-15 رقمًا)",
+    "hobbyRequired": "يرجى اختيار هواية",
+    "professionRequired": "يرجى إدخال المهنة",
     "subjectsRequired": "الرجاء إدخال المواد الدراسية",
+    "bioRequired": "يرجى إدخال النبذة",
+    "expertiseRequired": "يرجى إدخال التخصص",
     "subjectRequired": "يرجى اختيار مادة",
+    "invalidTeacherLevelSelection": "يرجى اختيار مراحل تدريس صحيحة",
     "teachesAtTypeRequired": "يرجى اختيار جهة التدريس",
     "centersRequired": "يرجى اختيار مركز واحد على الأقل",
     "schoolRequired": "يرجى إدخال اسم المدرسة",
     "governmentRequired": "يرجى اختيار المحافظة",
-    "administrationZoneRequired": "يرجى اختيار المنطقة الإدارية",
+    "administrationZoneRequired": "يرجى اختيار الإدارة التعليمية",
     "lecturerRequired": "الرجاء تحديد المحاضر المسؤول",
     "invalidFileType": "يرجى تحميل ملف CSV صالح",
     "fileRequired": "يرجى تحميل ملف CSV",
@@ -134,13 +158,13 @@
   },
   "help": {
     "holdCtrlToSelectMultiple": "اضغط Ctrl (أو Cmd) لتحديد خيارات متعددة",
-    "selectAccountType": "حدد نوع الحسابات المراد انشاؤها",
+    "selectAccountType": "الإنشاء بالجملة يدعم فقط: طالب، ولي أمر، مدرس",
     "csvRequiredFields": "الملف CSV يجب ان يحتوي على الحقول المطلوبة لنوع الحساب المحدد",
     "uploadCSV": "تحميل ملف CSV",
     "csvFormat": "يجب ان يحتوي الملف CSV على الحقول التالية:"
   },
-  "csvFields" :{
-    "name":"الاسم",
-    "phone":"الرقم"
+  "csvFields": {
+    "name": "الاسم",
+    "phone": "الرقم"
   }
 }

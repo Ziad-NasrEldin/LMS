@@ -1,6 +1,7 @@
-import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { FiMail, FiShield, FiDatabase, FiGlobe, FiLock, FiCamera } from "react-icons/fi";
+import { useSeo } from "../seo/useSeo";
+import { buildBreadcrumbSchema } from "../seo/structuredData.mjs";
 
 const sectionOrder = [
   { id: "collection", icon: FiDatabase },
@@ -69,13 +70,21 @@ const SectionCard = ({ title, icon: Icon, summary, items, isRTL }) => (
 const PrivacyPolicy = () => {
   const { t, i18n } = useTranslation("privacyPolicy");
   const isRTL = i18n.dir() === "rtl";
+  const lang = i18n.language?.startsWith("ar") ? "ar" : "en";
 
-  useEffect(() => {
-    const lang = i18n.language?.startsWith("ar") ? "ar" : "en";
-    document.documentElement.lang = lang;
-    document.documentElement.dir = isRTL ? "rtl" : "ltr";
-    document.title = t("meta.title");
-  }, [i18n.language, isRTL, t]);
+  useSeo({
+    title: t("meta.title"),
+    description: t("meta.intro"),
+    canonicalPath: "/privacy-policy",
+    lang,
+    dir: isRTL ? "rtl" : "ltr",
+    schema: [
+      buildBreadcrumbSchema([
+        { name: isRTL ? "الرئيسية" : "Home", path: "/" },
+        { name: t("meta.title"), path: "/privacy-policy" },
+      ]),
+    ],
+  });
 
   const summaryCards = t("summaryCards", { returnObjects: true }) || [];
   const collectionItems = t("sections.collection.items", { returnObjects: true }) || [];

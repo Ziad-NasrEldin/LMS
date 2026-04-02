@@ -16,6 +16,10 @@ import { CourseCard } from "../components/CourseCard"
 import { getAllLecturers } from "../routes/fetch-users"
 import { designTokens } from "../constants/designTokens"
 import { translateErrorMessage } from "../utils/errorTranslator"
+import { buildLevelHierarchy, resolveLevelDisplayName } from "../utils/levelHierarchy"
+import { buildCoursePath } from "../seo/site.mjs"
+import { useSeo } from "../seo/useSeo"
+import { buildBreadcrumbSchema } from "../seo/structuredData.mjs"
 
 export default function CoursesPage() {
   const TOKENS = designTokens.colors
@@ -39,6 +43,24 @@ export default function CoursesPage() {
   const { t, i18n } = useTranslation("courses")
   const isRTL = i18n.language === "ar"
 
+  useSeo({
+    title: isRTL
+      ? "دورات فكرة التعليمية | اكتشف الدورات المناسبة لمرحلتك"
+      : "Fekra Courses | Discover Courses for Your Level",
+    description: isRTL
+      ? "استكشف الدورات التعليمية على منصة فكرة واختر ما يناسب مرحلتك الدراسية وأهدافك التعليمية."
+      : "Explore Fekra courses and choose the right learning path for your stage and goals.",
+    canonicalPath: "/courses",
+    lang: i18n.language?.startsWith("en") ? "en" : "ar",
+    dir: isRTL ? "rtl" : "ltr",
+    schema: [
+      buildBreadcrumbSchema([
+        { name: isRTL ? "الرئيسية" : "Home", path: "/" },
+        { name: isRTL ? "الدورات" : "Courses", path: "/courses" },
+      ]),
+    ],
+  })
+
   const sortByNewest = useCallback((list = []) => {
     return [...list].sort((left, right) => {
       const leftDate = new Date(left.createdAt || left._id || 0).getTime()
@@ -47,10 +69,42 @@ export default function CoursesPage() {
     })
   }, [])
 
+  const normalizeText = (value) =>
+    String(value || "")
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, " ")
+
+  const normalizeId = (value) => {
+    if (!value) return ""
+    if (typeof value === "string") return value
+    if (typeof value === "object") {
+      return value._id || value.id || ""
+    }
+    return String(value)
+  }
+
+  const getLevelRecord = (levelLike) => {
+    if (!levelLike) return null
+
+    const targetId = normalizeId(levelLike)
+    if (targetId) {
+      const matchedById = levels.find((level) => normalizeId(level._id) === targetId)
+      if (matchedById) return matchedById
+    }
+
+    const targetName = normalizeText(typeof levelLike === "object" ? levelLike?.name : levelLike)
+    if (!targetName) return null
+
+    return (
+      levels.find((level) => {
+        const displayName = normalizeText(resolveLevelDisplayName(level, i18n.language))
+        return normalizeText(level.name) === targetName || displayName === targetName
+      }) || null
+    )
+  }
+
   // Filter states
-  const [selectedStage, setSelectedStage] = useState("")
-  const [selectedGrade, setSelectedGrade] = useState("")
-  const [selectedTerm, setSelectedTerm] = useState("")
   const [selectedSubject, setSelectedSubject] = useState("")
   const [selectedCourseType, setSelectedCourseType] = useState("")
   const [selectedCourseStatus, setSelectedCourseStatus] = useState("")
@@ -73,7 +127,8 @@ export default function CoursesPage() {
         // Fetch levels
         const levelsResult = await getAllLevels()
         if (levelsResult.success) {
-          setLevels(levelsResult.data || [])
+          const hierarchy = levelsResult.hierarchy || buildLevelHierarchy(levelsResult.data || [], i18n.language)
+          setLevels(hierarchy.levels || [])
         } else {
           console.error("Failed to fetch levels:", levelsResult.error)
         }
@@ -135,9 +190,6 @@ export default function CoursesPage() {
   }
 
   const resetFilters = useCallback(() => {
-    setSelectedStage("")
-    setSelectedGrade("")
-    setSelectedTerm("")
     setSelectedSubject("")
     setSelectedCourseType("")
     setSelectedCourseStatus("")
@@ -159,27 +211,8 @@ export default function CoursesPage() {
     (sourceContainers = containers) => {
       let filtered = sortByNewest(sourceContainers.filter((container) => container.type === "course"))
 
-      if (selectedStage) {
-        filtered = filtered.filter((container) => {
-          const levelName = container.level?.name || ""
-          const translatedStage = t(`levels.${levelName}`, { defaultValue: levelName })
-          return translatedStage === selectedStage
-        })
-      }
-
       if (selectedSubject) {
         filtered = filtered.filter((container) => container.subject?.name === selectedSubject)
-      }
-
-      if (selectedGrade) {
-        const levelId = levels.find((level) => {
-          const translatedLevelName = t(`levels.${level.name}`, { defaultValue: level.name })
-          return translatedLevelName === selectedGrade
-        })?._id
-
-        if (levelId) {
-          filtered = filtered.filter((container) => container.level?._id === levelId)
-        }
       }
 
       if (selectedCourseType) {
@@ -223,11 +256,19 @@ export default function CoursesPage() {
         filtered = filtered.filter((container) => {
           const teacherId = container.createdBy?._id || container.createdBy
           const matchedLecturer = lecturers.find((lecturer) => lecturer._id === teacherId)
+          const levelRecord = getLevelRecord(container.level)
+          const stageRecord =
+            levelRecord?.kind === "stage"
+              ? levelRecord
+              : getLevelRecord(levelRecord?.parentLevelId || levelRecord?.parentLevel)
+          const gradeName = resolveLevelDisplayName(levelRecord || container.level, i18n.language)
+          const stageName = stageRecord ? resolveLevelDisplayName(stageRecord, i18n.language) : ""
 
           const searchableText = [
             container.name,
             container.subject?.name,
-            container.level?.name,
+            gradeName,
+            stageName,
             matchedLecturer?.name,
             matchedLecturer?.role,
           ]
@@ -241,7 +282,7 @@ export default function CoursesPage() {
 
       return filtered
     },
-    [containers, lecturers, levels, searchQuery, selectedCourseStatus, selectedCourseType, selectedGrade, selectedPrice, selectedStage, selectedSubject, sortByNewest, t],
+    [containers, lecturers, levels, searchQuery, selectedCourseStatus, selectedCourseType, selectedPrice, selectedSubject, sortByNewest, t],
   )
 
   useEffect(() => {
@@ -264,10 +305,13 @@ export default function CoursesPage() {
 
   const generateCourseData = (containersData) =>
     containersData.map((container, index) => {
-      const levelName = container.level?.name || ""
-
-      // Use the level name directly from the API and translate it
-      const stage = t(`levels.${levelName}`, { defaultValue: levelName })
+      const levelRecord = getLevelRecord(container.level)
+      const stageRecord =
+        levelRecord?.kind === "stage"
+          ? levelRecord
+          : getLevelRecord(levelRecord?.parentLevelId || levelRecord?.parentLevel)
+      const grade = resolveLevelDisplayName(levelRecord || container.level, i18n.language)
+      const stage = stageRecord ? resolveLevelDisplayName(stageRecord, i18n.language) : ""
 
       const isFree = container.price === 0
       const status = isFree ? t("status.free") : t("status.paid")
@@ -304,7 +348,7 @@ export default function CoursesPage() {
         subject: container.subject?.name || "",
         teacher: matchedLecturer?.name || t("unknownTeacher"),
         teacherRole: matchedLecturer?.role || t("lecturer"),
-        grade: levelName,
+        grade,
         rating: 4 + (index % 2) * 0.5,
         stage,
         type,
@@ -333,20 +377,6 @@ export default function CoursesPage() {
     }))
   }, [subjects])
 
-  // Create level options from fetched levels
-  const levelOptions = useMemo(() => {
-    return levels.map((level) => {
-      // Use translation for the level name
-      const displayName = t(`levels.${level.name}`, { defaultValue: level.name })
-
-      return {
-        label: displayName,
-        value: displayName,
-        id: level._id,
-      }
-    })
-  }, [levels, t])
-
   const priceOptions = [
     { label: t("priceRanges.free"), value: "0-0" },
     { label: t("priceRanges.under500"), value: "1-500" },
@@ -362,23 +392,6 @@ export default function CoursesPage() {
   ]
 
   const filterOptions = [
-    {
-      label: t("filters.stage"),
-      value: selectedStage,
-      options: [
-        { label: t("filters.all"), value: "" },
-        { label: t("stages.primary"), value: t("stages.primary") },
-        { label: t("stages.middle"), value: t("stages.middle") },
-        { label: t("stages.secondary"), value: t("stages.secondary") },
-      ],
-      onSelect: setSelectedStage,
-    },
-    {
-      label: t("filters.grade"),
-      value: selectedGrade,
-      options: [{ label: t("filters.all"), value: "" }, ...levelOptions],
-      onSelect: setSelectedGrade,
-    },
     {
       label: t("filters.subject"),
       value: selectedSubject,
@@ -410,8 +423,8 @@ export default function CoursesPage() {
   ]
 
   const activeFiltersCount = useMemo(() => {
-    return [selectedStage, selectedGrade, selectedSubject, selectedCourseType, selectedCourseStatus, selectedPrice, searchQuery].filter(Boolean).length
-  }, [selectedStage, selectedGrade, selectedSubject, selectedCourseType, selectedCourseStatus, selectedPrice, searchQuery])
+    return [selectedSubject, selectedCourseType, selectedCourseStatus, selectedPrice, searchQuery].filter(Boolean).length
+  }, [selectedSubject, selectedCourseType, selectedCourseStatus, selectedPrice, searchQuery])
 
   return (
     <main
@@ -570,10 +583,7 @@ export default function CoursesPage() {
             >
               <div className="px-6">
                 <p className="text-lg">{t("noCourses")}</p>
-                {(selectedStage ||
-                  selectedGrade ||
-                  selectedTerm ||
-                  selectedSubject ||
+                {(selectedSubject ||
                   selectedCourseType ||
                   selectedCourseStatus ||
                   selectedPrice ||
@@ -600,7 +610,7 @@ export default function CoursesPage() {
                       exit={{ opacity: 0, y: -20 }}
                       transition={{ duration: 0.4 }}
                     >
-                      <Link to={`/courses/${course.id}`}>
+                      <Link to={buildCoursePath({ _id: course.id, name: course.title })}>
                         <CourseCard {...course} isRTL={isRTL} />
                       </Link>
                     </motion.div>

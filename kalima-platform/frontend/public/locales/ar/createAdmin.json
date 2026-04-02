@@ -1,6 +1,6 @@
 {
   "pageTitle": "حسابات المستخدمين",
-  "pageSubtitle": "إنشاء وإدارة الكيانات الأساسية للحسابات (المواد والمراحل)",
+  "pageSubtitle": "إنشاء وإدارة الكيانات الأساسية للحسابات (المواد والمراحل والصفوف)",
   "createNew": "إنشاء جديد",
   "common": {
     "actions": "إجراءات",
@@ -10,7 +10,8 @@
   "actions": {
     "delete": "حذف",
     "dismiss": "إغلاق",
-    "remove": "إزالة"
+    "remove": "إزالة",
+    "edit": "تعديل"
   },
   "errors": {
     "verifyPermissions": "فشل في التحقق من صلاحيات المستخدم",
@@ -19,25 +20,26 @@
     "fetchLevels": "فشل في جلب المراحل",
     "createSubject": "فشل في إنشاء المادة",
     "createLevel": "فشل في إنشاء المرحلة",
+    "updateLevel": "فشل في تحديث المرحلة",
     "deleteSubject": "فشل في حذف المادة",
     "deleteLevel": "فشل في حذف المرحلة"
   },
   "success": {
     "subjectCreated": "تم إنشاء المادة بنجاح",
     "levelCreated": "تم إنشاء المرحلة بنجاح",
+    "levelUpdated": "تم تحديث المرحلة بنجاح",
     "subjectDeleted": "تم حذف المادة بنجاح",
-    "levelDeleted": "تم حذف المرحلة بنجاح"
+    "levelDeleted": "تم إلغاء تفعيل المرحلة بنجاح"
   },
   "confirmations": {
     "deleteSubject": "هل أنت متأكد من رغبتك في حذف هذه المادة؟",
-    "deleteLevel": "هل أنت متأكد من رغبتك في حذف هذه المرحلة؟"
+    "deleteLevel": "هل أنت متأكد من رغبتك في إلغاء تفعيل هذه المرحلة؟"
   },
   "forms": {
     "subject": {
       "title": "المادة",
       "createNew": "إنشاء مادة جديدة",
       "name": "اسم المادة",
-      "nameAR": "اسم المادة (عربي)",
       "namePlaceholder": "مثال: الجغرافيا",
       "create": "إنشاء مادة",
       "existing": "المواد الموجودة",
@@ -47,16 +49,38 @@
     "level": {
       "title": "المرحلة",
       "createNew": "إنشاء مرحلة جديدة",
+      "editExisting": "تعديل المرحلة",
       "name": "اسم المرحلة",
       "nameEn": "اسم المرحلة (إنجليزي)",
       "nameAr": "اسم المرحلة (عربي)",
       "namePlaceholder": "مثال: الثانوية العليا",
       "namePlaceholderEn": "مثال: Higher Secondary",
       "namePlaceholderAr": "مثال: الثانوية العليا",
+      "kind": "نوع المرحلة",
+      "kindStage": "مرحلة",
+      "kindGrade": "صف",
+      "parentStage": "المرحلة الرئيسية",
+      "selectParentStage": "اختر المرحلة الرئيسية",
+      "sortOrder": "ترتيب الظهور",
+      "sortOrderPlaceholder": "مثال: 1",
+      "active": "نشط",
+      "statusActive": "نشط",
+      "statusInactive": "غير نشط",
+      "topLevel": "مستوى رئيسي",
       "create": "إنشاء مرحلة",
+      "update": "تحديث المرحلة",
+      "cancelEdit": "إلغاء التعديل",
       "existing": "المراحل الموجودة",
       "nameColumn": "اسم المرحلة",
-      "noLevels": "لا توجد مراحل متاحة."
+      "kindColumn": "النوع",
+      "parentColumn": "المرحلة الرئيسية",
+      "statusColumn": "الحالة",
+      "noLevels": "لا توجد مراحل متاحة.",
+      "inactive": "غير نشط",
+      "stageNamePlaceholderEn": "مثال: Primary",
+      "stageNamePlaceholderAr": "مثال: الابتدائي",
+      "gradeNamePlaceholderEn": "مثال: First Preparatory",
+      "gradeNamePlaceholderAr": "مثال: الصف الأول الإعدادي"
     }
   }
 }

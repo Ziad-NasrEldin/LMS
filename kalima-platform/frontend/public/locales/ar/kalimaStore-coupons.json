@@ -49,9 +49,9 @@
   "alerts": {
     "fillAllFields": "يرجى ملء جميع الحقول",
     "couponCreated": "تم إنشاء الكوبون بنجاح!",
-    "createFailed": "فشل في إنشاء الكوبون: ",
+    "createFailed": "فشل في إنشاء الكوبون:",
     "couponDeleted": "تم حذف الكوبون بنجاح!",
-    "deleteFailed": "فشل في حذف الكوبون: ",
+    "deleteFailed": "فشل في حذف الكوبون:",
     "codeCopied": "تم نسخ كود الكوبون إلى الحافظة!"
   },
   "form": {
@@ -80,4 +80,4 @@
     "appliedTo": "مطبق على الشراء"
   },
   "close": "إغلاق"
-} 
+}

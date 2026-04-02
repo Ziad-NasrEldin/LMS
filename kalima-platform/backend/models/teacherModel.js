@@ -22,6 +22,7 @@ const User = require("./userModel");
 const { uniqueId } = require("lodash");
 const AppError = require("../utils/appError");
 const Government = require("./governmentModel");
+const Level = require("./levelModel");
 
 const lecturerPointsSchema = new mongoose.Schema(
   {
@@ -45,8 +46,8 @@ const teacherSchema = new mongoose.Schema(
     subject: { type: String, required: true },
     level: [
       {
-        type: String,
-        enum: ["primary", "preparatory", "secondary"],
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Level",
         required: true,
       },
     ],
@@ -212,6 +213,42 @@ teacherSchema.pre("validate", function (next) {
   }
   next();
 });
+
+teacherSchema.pre("validate", async function (next) {
+  try {
+    if (Array.isArray(this.level) && this.level.length > 0) {
+      const levelIds = this.level
+        .map((levelId) => String(levelId || "").trim())
+        .filter(Boolean);
+
+      if (levelIds.some((levelId) => !mongoose.Types.ObjectId.isValid(levelId))) {
+        this.invalidate("level", "One or more selected teaching levels are invalid.");
+        return next();
+      }
+
+      const levelDocs = await Level.find({ _id: { $in: levelIds } }).select("kind isActive");
+      if (levelDocs.length !== levelIds.length) {
+        this.invalidate("level", "One or more selected teaching levels are invalid.");
+      }
+
+      for (const levelDoc of levelDocs) {
+        if (levelDoc.isActive === false) {
+          this.invalidate("level", "One or more selected teaching levels are inactive.");
+          break;
+        }
+
+        if (levelDoc.kind !== "stage") {
+          this.invalidate("level", "Teachers can only select stage levels.");
+          break;
+        }
+      }
+    }
+  } catch (error) {
+    return next(error);
+  }
+
+  next();
+});
 teacherSchema.pre("save", function (next) {
   if (
     this.phoneNumber2 &&
@@ -232,11 +269,11 @@ teacherSchema.pre("validate", async function (next) {
   if (this.government && this.administrationZone) {
     const gov = await Government.findOne({ name: this.government });
     if (!gov) {
-      this.invalidate("government", "Selected government does not exist.");
+      this.invalidate("government", "Path `government` is invalid.");
     } else if (!gov.administrationZone.includes(this.administrationZone)) {
       this.invalidate(
-        "zone",
-        "Selected zone does not belong to the selected government."
+        "administrationZone",
+        "Path `administrationZone` is invalid."
       );
     }
   }

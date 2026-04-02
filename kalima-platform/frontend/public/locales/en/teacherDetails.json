@@ -1,9 +1,9 @@
 {
-    "teacherInfo": "Teacher Information",
+    "teacherInfo": "Teacher Profile",
     "rating": "Rating: ",
     "bioHeader": "Biography",
     "coursesHeader": "Teacher Courses",
-    "subject": " Teacher",
+    "subject": "Specialty",
     "defaultSubject": "Teacher",
     "courseType": "Course",
     "lecturer": "Lecturer",

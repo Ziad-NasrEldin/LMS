@@ -1,4 +1,5 @@
 const { Resend } = require('resend');
+const { EMAIL_TYPES, buildOtpEmailTemplate } = require('./emailTemplates');
 
 // Initialize Resend with API key from environment variables
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -15,12 +16,25 @@ const debugEmailLog = (...args) => {
 
 /**
  * Send an email using Resend
- * @param {string} to - Recipient email
- * @param {string} subject - Email subject
- * @param {string} html - HTML content of the email
+ * @param {object|string} payload - Email payload object OR recipient email string
+ * @param {string} payload.to - Recipient email
+ * @param {string} payload.subject - Email subject
+ * @param {string} payload.html - HTML content of the email
+ * @param {string} payload.text - Plain text content of the email
  * @returns {Promise} - Promise resolving to the sent message info
  */
-const sendEmail = async (to, subject, html) => {
+const sendEmail = async (payloadOrTo, maybeSubject, maybeHtml) => {
+  const payload =
+    typeof payloadOrTo === 'object' && payloadOrTo !== null
+      ? payloadOrTo
+      : {
+          to: payloadOrTo,
+          subject: maybeSubject,
+          html: maybeHtml,
+        };
+
+  const { to, subject, html, text } = payload;
+
   // If Resend API key is not set, skip sending.
   if (!process.env.RESEND_API_KEY) {
     debugEmailLog('Resend API key not set. Email send skipped for:', to);
@@ -28,8 +42,7 @@ const sendEmail = async (to, subject, html) => {
   }
 
   try {
-    // Using your verified domain directly
-    const fromEmail = 'Kalima Team <noreply@kalima-edu.com>';
+    const fromEmail = process.env.EMAIL_FROM || 'Kalima Team <noreply@kalima-edu.com>';
 
     debugEmailLog('Sending email from:', fromEmail);
     
@@ -38,6 +51,7 @@ const sendEmail = async (to, subject, html) => {
       to,
       subject,
       html,
+      text,
     });
     
     debugEmailLog('Email sent successfully', data?.id || 'ok');
@@ -52,23 +66,16 @@ const sendEmail = async (to, subject, html) => {
  * Send an OTP verification email
  * @param {string} to - Recipient email
  * @param {string} otp - The OTP code
+ * @param {object} options
+ * @param {('verification'|'password_reset')} options.type
  * @returns {Promise} - Promise resolving to the sent message info
  */
-const sendOTPEmail = async (to, otp) => {
-  const subject = 'Your Email Verification Code';
-  const html = `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
-      <h2 style="color: #333;">Email Verification</h2>
-      <p style="color: #555; font-size: 16px;">Thank you for registering with Kalima. Please use the following code to verify your email address:</p>
-      <div style="background-color: #f5f5f5; padding: 10px; text-align: center; font-size: 24px; letter-spacing: 5px; font-weight: bold; margin: 20px 0;">
-        ${otp}
-      </div>
-      <p style="color: #777; font-size: 14px;">This code will expire in 10 minutes.</p>
-    </div>
-  `;
+const sendOTPEmail = async (to, otp, options = {}) => {
+  const { type = EMAIL_TYPES.verification } = options;
+  const { subject, html, text } = buildOtpEmailTemplate({ type, otp });
 
   try {
-    return await sendEmail(to, subject, html);
+    return await sendEmail({ to, subject, html, text });
   } catch (error) {
     console.error('Error sending OTP email:', error);
     debugEmailLog('OTP email delivery failed for:', to);
@@ -78,5 +85,6 @@ const sendOTPEmail = async (to, otp) => {
 
 module.exports = {
   sendEmail,
-  sendOTPEmail
+  sendOTPEmail,
+  EMAIL_TYPES,
 };

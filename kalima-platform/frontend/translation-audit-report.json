@@ -4,15 +4,15 @@
     "namespaceCountAr": 32,
     "missingArNamespacesCount": 0,
     "missingEnNamespacesCount": 0,
-    "missingUsedKeysInEnCount": 0,
-    "missingUsedKeysInArCount": 0
+    "missingUsedKeysInEnCount": 35,
+    "missingUsedKeysInArCount": 40
   },
   "missingArNamespaces": [],
   "missingEnNamespaces": [],
   "byNamespace": {
     "admin": {
-      "enCount": 395,
-      "arCount": 395,
+      "enCount": 411,
+      "arCount": 411,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": [
@@ -36,15 +36,15 @@
       ]
     },
     "center": {
-      "enCount": 12,
-      "arCount": 12,
+      "enCount": 8,
+      "arCount": 8,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": []
     },
     "centerDashboard": {
-      "enCount": 273,
-      "arCount": 273,
+      "enCount": 268,
+      "arCount": 268,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": [
@@ -54,8 +54,8 @@
       ]
     },
     "common": {
-      "enCount": 120,
-      "arCount": 120,
+      "enCount": 260,
+      "arCount": 260,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": []
@@ -121,29 +121,42 @@
       ]
     },
     "createAdmin": {
-      "enCount": 52,
-      "arCount": 52,
+      "enCount": 76,
+      "arCount": 76,
       "missingInAr": [],
       "missingInEn": [],
-      "suspiciousSame": []
+      "suspiciousSame": [
+        "forms.level.stageNamePlaceholderAr",
+        "forms.level.gradeNamePlaceholderAr"
+      ]
     },
     "createUser": {
-      "enCount": 131,
-      "arCount": 131,
-      "missingInAr": [],
+      "enCount": 163,
+      "arCount": 154,
+      "missingInAr": [
+        "fields.parentPhoneRelation",
+        "fields.parentPhoneNumber2",
+        "fields.parentPhoneRelation2",
+        "placeholders.selectParentRelation",
+        "validation.parentRelationRequired",
+        "validation.parentRelationInvalid",
+        "validation.additionalParentPhoneRequired",
+        "validation.additionalParentRelationRequired",
+        "validation.additionalParentRelationInvalid"
+      ],
       "missingInEn": [],
       "suspiciousSame": []
     },
     "footer": {
-      "enCount": 9,
-      "arCount": 9,
+      "enCount": 10,
+      "arCount": 10,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": []
     },
     "home": {
-      "enCount": 127,
-      "arCount": 127,
+      "enCount": 116,
+      "arCount": 116,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": [
@@ -206,15 +219,15 @@
       "suspiciousSame": []
     },
     "lectureDisplay": {
-      "enCount": 164,
-      "arCount": 164,
+      "enCount": 175,
+      "arCount": 175,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": []
     },
     "lecturerDashboard": {
-      "enCount": 67,
-      "arCount": 67,
+      "enCount": 130,
+      "arCount": 130,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": []
@@ -227,15 +240,15 @@
       "suspiciousSame": []
     },
     "lecturesPage": {
-      "enCount": 174,
-      "arCount": 174,
+      "enCount": 192,
+      "arCount": 192,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": []
     },
     "login": {
-      "enCount": 94,
-      "arCount": 94,
+      "enCount": 91,
+      "arCount": 91,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": [
@@ -251,23 +264,32 @@
       "missingInEn": [],
       "suspiciousSame": []
     },
+    "privacyPolicy": {
+      "enCount": 56,
+      "arCount": 56,
+      "missingInAr": [],
+      "missingInEn": [],
+      "suspiciousSame": [
+        "contact.email"
+      ]
+    },
     "promoCodes": {
-      "enCount": 134,
-      "arCount": 134,
+      "enCount": 136,
+      "arCount": 136,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": []
     },
     "register": {
-      "enCount": 211,
-      "arCount": 211,
+      "enCount": 241,
+      "arCount": 241,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": []
     },
     "settings": {
-      "enCount": 89,
-      "arCount": 89,
+      "enCount": 95,
+      "arCount": 95,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": []
@@ -280,13 +302,465 @@
       "suspiciousSame": []
     },
     "teachers": {
-      "enCount": 48,
-      "arCount": 48,
+      "enCount": 42,
+      "arCount": 42,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": []
     }
   },
-  "missingUsedInEn": [],
-  "missingUsedInAr": []
+  "missingUsedInEn": [
+    {
+      "file": "pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.phone2",
+      "fn": "t"
+    },
+    {
+      "file": "pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.userSerial",
+      "fn": "t"
+    },
+    {
+      "file": "pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.stage",
+      "fn": "t"
+    },
+    {
+      "file": "pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.level",
+      "fn": "t"
+    },
+    {
+      "file": "pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.subject",
+      "fn": "t"
+    },
+    {
+      "file": "pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.profession",
+      "fn": "t"
+    },
+    {
+      "file": "pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.school",
+      "fn": "t"
+    },
+    {
+      "file": "pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.teachesAtType",
+      "fn": "t"
+    },
+    {
+      "file": "pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.centers",
+      "fn": "t"
+    },
+    {
+      "file": "pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.children",
+      "fn": "t"
+    },
+    {
+      "file": "pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.assignedLecturer",
+      "fn": "t"
+    },
+    {
+      "file": "pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.parentPhone",
+      "fn": "t"
+    },
+    {
+      "file": "pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.promoBalance",
+      "fn": "t"
+    },
+    {
+      "file": "pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.referredBy",
+      "fn": "t"
+    },
+    {
+      "file": "pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.updatedAt",
+      "fn": "t"
+    },
+    {
+      "file": "pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.noData",
+      "fn": "t"
+    },
+    {
+      "file": "pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.xlsxFormat",
+      "fn": "t"
+    },
+    {
+      "file": "pages/Login/login.jsx",
+      "ns": "login",
+      "key": "hidePassword",
+      "fn": "t"
+    },
+    {
+      "file": "pages/Login/login.jsx",
+      "ns": "login",
+      "key": "showPassword",
+      "fn": "t"
+    },
+    {
+      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
+      "ns": "lecturerDashboard",
+      "key": "purchaseBreakdown",
+      "fn": "t"
+    },
+    {
+      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
+      "ns": "lecturerDashboard",
+      "key": "promoCodes",
+      "fn": "t"
+    },
+    {
+      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
+      "ns": "lecturerDashboard",
+      "key": "redeemed",
+      "fn": "t"
+    },
+    {
+      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
+      "ns": "lecturerDashboard",
+      "key": "available",
+      "fn": "t"
+    },
+    {
+      "file": "pages/Lecturer Dashboard/LecturerPromoCodesPage.jsx",
+      "ns": "lecturerDashboard",
+      "key": "promoCodes",
+      "fn": "t"
+    },
+    {
+      "file": "pages/Lecturer Dashboard/LecturerPromoCodesPage.jsx",
+      "ns": "lecturerDashboard",
+      "key": "redeemed",
+      "fn": "t"
+    },
+    {
+      "file": "pages/Lecturer Dashboard/LecturerPromoCodesPage.jsx",
+      "ns": "lecturerDashboard",
+      "key": "available",
+      "fn": "t"
+    },
+    {
+      "file": "components/ExamConfigSection.jsx",
+      "ns": "lecturesPage",
+      "key": "examConfig.googleSheetFixedHelp",
+      "fn": "t"
+    },
+    {
+      "file": "components/ExamConfigSection.jsx",
+      "ns": "lecturesPage",
+      "key": "examConfig.googleSheetTabName",
+      "fn": "t"
+    },
+    {
+      "file": "components/ExamConfigSection.jsx",
+      "ns": "lecturesPage",
+      "key": "examConfig.googleSheetTabHelp",
+      "fn": "t"
+    },
+    {
+      "file": "components/LectureCreationModal.jsx",
+      "ns": "lecturesPage",
+      "key": "validation.examFormUrlRequired",
+      "fn": "t"
+    },
+    {
+      "file": "components/LectureCreationModal.jsx",
+      "ns": "lecturesPage",
+      "key": "validation.homeworkFormUrlRequired",
+      "fn": "t"
+    },
+    {
+      "file": "components/LectureCreationModal.jsx",
+      "ns": "lecturesPage",
+      "key": "lectureTypes.free",
+      "fn": "t"
+    },
+    {
+      "file": "components/LectureCreationModal.jsx",
+      "ns": "lecturesPage",
+      "key": "lectureTypes.teachersOnly",
+      "fn": "t"
+    },
+    {
+      "file": "components/LectureCreationModal.jsx",
+      "ns": "lecturesPage",
+      "key": "lectureTypes.free",
+      "fn": "t"
+    },
+    {
+      "file": "components/LectureCreationModal.jsx",
+      "ns": "lecturesPage",
+      "key": "lectureTypes.teachersOnly",
+      "fn": "t"
+    }
+  ],
+  "missingUsedInAr": [
+    {
+      "file": "pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.phone2",
+      "fn": "t"
+    },
+    {
+      "file": "pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.userSerial",
+      "fn": "t"
+    },
+    {
+      "file": "pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.stage",
+      "fn": "t"
+    },
+    {
+      "file": "pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.level",
+      "fn": "t"
+    },
+    {
+      "file": "pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.subject",
+      "fn": "t"
+    },
+    {
+      "file": "pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.profession",
+      "fn": "t"
+    },
+    {
+      "file": "pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.school",
+      "fn": "t"
+    },
+    {
+      "file": "pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.teachesAtType",
+      "fn": "t"
+    },
+    {
+      "file": "pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.centers",
+      "fn": "t"
+    },
+    {
+      "file": "pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.children",
+      "fn": "t"
+    },
+    {
+      "file": "pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.assignedLecturer",
+      "fn": "t"
+    },
+    {
+      "file": "pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.parentPhone",
+      "fn": "t"
+    },
+    {
+      "file": "pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.promoBalance",
+      "fn": "t"
+    },
+    {
+      "file": "pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.referredBy",
+      "fn": "t"
+    },
+    {
+      "file": "pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.updatedAt",
+      "fn": "t"
+    },
+    {
+      "file": "pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.noData",
+      "fn": "t"
+    },
+    {
+      "file": "pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
+      "ns": "admin",
+      "key": "admin.export.xlsxFormat",
+      "fn": "t"
+    },
+    {
+      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/CreateUserModal.jsx",
+      "ns": "createUser",
+      "key": "validation.parentRelationRequired",
+      "fn": "t"
+    },
+    {
+      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/CreateUserModal.jsx",
+      "ns": "createUser",
+      "key": "validation.parentRelationInvalid",
+      "fn": "t"
+    },
+    {
+      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/CreateUserModal.jsx",
+      "ns": "createUser",
+      "key": "validation.additionalParentPhoneRequired",
+      "fn": "t"
+    },
+    {
+      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/CreateUserModal.jsx",
+      "ns": "createUser",
+      "key": "validation.additionalParentRelationRequired",
+      "fn": "t"
+    },
+    {
+      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/CreateUserModal.jsx",
+      "ns": "createUser",
+      "key": "validation.additionalParentRelationInvalid",
+      "fn": "t"
+    },
+    {
+      "file": "pages/Login/login.jsx",
+      "ns": "login",
+      "key": "hidePassword",
+      "fn": "t"
+    },
+    {
+      "file": "pages/Login/login.jsx",
+      "ns": "login",
+      "key": "showPassword",
+      "fn": "t"
+    },
+    {
+      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
+      "ns": "lecturerDashboard",
+      "key": "purchaseBreakdown",
+      "fn": "t"
+    },
+    {
+      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
+      "ns": "lecturerDashboard",
+      "key": "promoCodes",
+      "fn": "t"
+    },
+    {
+      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
+      "ns": "lecturerDashboard",
+      "key": "redeemed",
+      "fn": "t"
+    },
+    {
+      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
+      "ns": "lecturerDashboard",
+      "key": "available",
+      "fn": "t"
+    },
+    {
+      "file": "pages/Lecturer Dashboard/LecturerPromoCodesPage.jsx",
+      "ns": "lecturerDashboard",
+      "key": "promoCodes",
+      "fn": "t"
+    },
+    {
+      "file": "pages/Lecturer Dashboard/LecturerPromoCodesPage.jsx",
+      "ns": "lecturerDashboard",
+      "key": "redeemed",
+      "fn": "t"
+    },
+    {
+      "file": "pages/Lecturer Dashboard/LecturerPromoCodesPage.jsx",
+      "ns": "lecturerDashboard",
+      "key": "available",
+      "fn": "t"
+    },
+    {
+      "file": "components/ExamConfigSection.jsx",
+      "ns": "lecturesPage",
+      "key": "examConfig.googleSheetFixedHelp",
+      "fn": "t"
+    },
+    {
+      "file": "components/ExamConfigSection.jsx",
+      "ns": "lecturesPage",
+      "key": "examConfig.googleSheetTabName",
+      "fn": "t"
+    },
+    {
+      "file": "components/ExamConfigSection.jsx",
+      "ns": "lecturesPage",
+      "key": "examConfig.googleSheetTabHelp",
+      "fn": "t"
+    },
+    {
+      "file": "components/LectureCreationModal.jsx",
+      "ns": "lecturesPage",
+      "key": "validation.examFormUrlRequired",
+      "fn": "t"
+    },
+    {
+      "file": "components/LectureCreationModal.jsx",
+      "ns": "lecturesPage",
+      "key": "validation.homeworkFormUrlRequired",
+      "fn": "t"
+    },
+    {
+      "file": "components/LectureCreationModal.jsx",
+      "ns": "lecturesPage",
+      "key": "lectureTypes.free",
+      "fn": "t"
+    },
+    {
+      "file": "components/LectureCreationModal.jsx",
+      "ns": "lecturesPage",
+      "key": "lectureTypes.teachersOnly",
+      "fn": "t"
+    },
+    {
+      "file": "components/LectureCreationModal.jsx",
+      "ns": "lecturesPage",
+      "key": "lectureTypes.free",
+      "fn": "t"
+    },
+    {
+      "file": "components/LectureCreationModal.jsx",
+      "ns": "lecturesPage",
+      "key": "lectureTypes.teachersOnly",
+      "fn": "t"
+    }
+  ]
 }

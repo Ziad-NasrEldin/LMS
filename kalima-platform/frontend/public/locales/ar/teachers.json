@@ -1,60 +1,53 @@
 {
-    "pageTitle": "معلمينا",
-    "discoverTeachers": "اكتشف مدرسيك المفضلين الآن!",
-    "defaultSubject": "مدرس",
-    "defaultExperience": "خبرة واسعة في التدريس",
-    "allGrades": "كل المراحل الدراسية",
-    "hero": {
-      "quickMatch": "اختر المدرس المناسب حسب الاسم أو المادة خلال ثوانٍ."
-    },
-    "labels": {
-      "teacherCount": "{{count}} مدرس",
-      "activeFilters": "{{count}} فلاتر مفعلة"
-    },
-    "filters": {
-      "stage": "المرحلة الدراسية",
-      "subject": "المادة",
-      "all": "الكل",
-      "select": "اختر"
-    },
-    "stages": {
-      "primary": "المرحلة الابتدائية",
-      "preparatory": "المرحلة الإعدادية",
-      "secondary": "المرحلة الثانوية"
-    },
-    "subjects": {
-      "math": "رياضيات",
-      "physics": "فيزياء",
-      "chemistry": "كيمياء",
-      "مدرس": "مدرس",
-      "teacher": "مدرس"
-    },
-    "buttons": {
-      "resetFilters": "إعادة ضبط الفلاتر",
-      "searchOptions": "اختيارات البحث",
-      "showTeachers": "لعرض المدرسين",
-      "showFilters": "إظهار الفلاتر",
-      "hideFilters": "إخفاء الفلاتر",
-      "tryAgain": "حاول مرة أخرى",
-      "loadMore": "عرض المزيد من المدرسين",
-      "viewDetails": "عرض التفاصيل"
-    },
-    "pagination": {
-      "previous": "السابق",
-      "next": "التالي",
-      "showingRange": "عرض {{start}} - {{end}} من {{total}} مدرس"
-    },
-    "placeholders": {
-      "searchName": "ابحث بالاسم"
-    },
-    "alts": {
-      "background": "نمط خلفية زخرفي",
-      "underline": "خط زينة تحت النص",
-      "teacherProfile": "صورة البروفيل لـ"
-    },
-    "noTeachers": "لا يوجد مدرسين متاحين حالياً",
-    "errors": {
-      "loadTeachers": "تعذر تحميل بيانات المدرسين",
-      "generic": "حدث خطأ ما"
-    }
+  "pageTitle": "المعلمون",
+  "discoverTeachers": "تعرّف على المعلمين المناسبين لك",
+  "defaultSubject": "مدرس",
+  "defaultExperience": "خبرة واسعة في التدريس",
+  "allGrades": "كل المراحل الدراسية",
+  "hero": {
+    "quickMatch": "اختر المعلم المناسب وفق الاسم أو المادة خلال ثوانٍ."
+  },
+  "labels": {
+    "teacherCount": "{{count}} معلم",
+    "activeFilters": "{{count}} فلاتر مفعلة"
+  },
+  "filters": {
+    "stage": "المرحلة الدراسية",
+    "subject": "المادة",
+    "all": "الكل",
+    "select": "اختر"
+  },
+  "stages": {
+    "primary": "المرحلة الابتدائية",
+    "preparatory": "المرحلة الإعدادية",
+    "secondary": "المرحلة الثانوية"
+  },
+  "buttons": {
+    "resetFilters": "إعادة ضبط الفلاتر",
+    "searchOptions": "اختيارات البحث",
+    "showTeachers": "عرض المعلمين",
+    "showFilters": "إظهار الفلاتر",
+    "hideFilters": "إخفاء الفلاتر",
+    "tryAgain": "حاول مرة أخرى",
+    "loadMore": "عرض المزيد من المعلمين",
+    "viewDetails": "عرض التفاصيل"
+  },
+  "pagination": {
+    "previous": "السابق",
+    "next": "التالي",
+    "showingRange": "عرض {{start}} - {{end}} من {{total}} مدرس"
+  },
+  "placeholders": {
+    "searchName": "ابحث بالاسم"
+  },
+  "alts": {
+    "background": "نمط خلفية زخرفي",
+    "underline": "خط زينة تحت النص",
+    "teacherProfile": "صورة البروفيل لـ"
+  },
+  "noTeachers": "لا يوجد معلمون متاحون حاليًا",
+  "errors": {
+    "loadTeachers": "تعذر تحميل بيانات المعلمين",
+    "generic": "حدث خطأ ما"
   }
+}

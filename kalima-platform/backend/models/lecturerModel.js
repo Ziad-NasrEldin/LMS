@@ -5,6 +5,7 @@ const { trim } = require('lodash');
 const lecturerSchema = new mongoose.Schema({
   bio: { type: String, required: true },
   expertise: { type: String, required: true },
+  isPublished: { type: Boolean, default: true, index: true },
   profilePic: {
     type: String,
     trim: true,

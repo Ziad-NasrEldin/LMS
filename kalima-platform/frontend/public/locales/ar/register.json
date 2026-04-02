@@ -1,238 +1,430 @@
 {
-  "studentRegister": "  تسجيل الطالب", 
+  "studentRegister": "تسجيل الطالب",
   "parentRegister": "تسجيل ولي الأمر",
   "childIdInvalid": "تنسيق معرف الطفل غير صالح (٢٤ حرفًا)",
   "dismiss": "إغلاق",
-  "teacherRegister" : "تسجيل المدرس",
-  "center" : "سنتر",
-  "school" : "مدرسة",
-  "both" : "كلاهما",
-    "steps": {
-      "personalInfo": "المعلومات الأساسية",
-      "parentInfo": "معلومات الاتصال",
-      "hobbies": "الهوايات",
-      "review": "المراجعة",
-      "childrenInfo": "معلومات الأبناء",
-      "professionalInfo": "معلومات المهنة"
-    },
-    "navigation": {
+  "teacherRegister": "تسجيل المعلم",
+  "center": "مركز",
+  "school": "مدرسة",
+  "both": "كلاهما",
+  "steps": {
+    "personalInfo": "المعلومات الأساسية",
+    "parentInfo": "معلومات الاتصال",
+    "hobbies": "الهوايات",
+    "review": "المراجعة",
+    "childrenInfo": "معلومات الأبناء",
+    "professionalInfo": "معلومات المهنة"
+  },
+  "navigation": {
     "fixHere": "إصلاح هنا"
   },
-    "form": {
-     
-      "studentId": "رقم الطالب",
-      "fullName": "الاسم الكامل",
-      "gender": "الجنس",
-      "role": "الدور",
-      "bio": "نبذة عنك",
-      "expertise": "الخبرات",
-      "phoneNumber": "الهاتف الشخصي",
-      "phoneNumber2": "الهاتف الشخصي الثاني",
-      "parentPhone": "هاتف ولي الأمر",
-      "parentPhoneNumber": "هاتف ولي الأمر",
-      "email": "البريد الإلكتروني",
-      "address": "العنوان",
-      "selectGender": "اختر الجنس",
-      "schoolName": "اسم المدرسة",
-      "schoolType": "نوع المدرسة",
-      "selectSchoolType": "اختر نوع المدرسة",
-      "grade": "الصف",
-      "selectGrade": "اختر الصف",
-      "hobby": "الهواية",
-      "selectHobby": "اختر هواية",
-      "variant": "الشعبة",
-      "selectVariant": "اختر الشعبة",
-      "selectHobbies": "اختر الهوايات",
-      "uploadAvatar": "رفع صورة شخصية",
-      "hobbies": "الهوايات",
-      "personalDetails": "البيانات الشخصية",
-      "accountDetails": "تفاصيل الحساب",
-      "parentDetails": "بيانات ولي الأ مر",
-      "schoolDetails" : "تفاصيل المدرسة ولي الأمرراسة",
-      "password": "كلمة المرور",
-      "confirmPassword": "تاكيد كلمة المرور",
-      "childrenDetails": "تفاصيل الأبناء",
-      "childId": "رقم الأبن",
-      "childSequenceId" : "رقم تسلسل الأبن",
-      "childrenSequenceIdsHelp" : "استخدم الفواصل لفصل أرقام تسلسل الأبناء",
-      "childrenSequenceIds"  : "رقم تسلسل الأبناء",
-      "level" : "المرحلة",
-      "profession": "المهنة / العمل",
-      "optional" : "اختياري",
-      "selectLevel" : "اختر المرحلة",
-      "validatepassword": "تاكيد كلمة المرور",
-     "subject" : "المادة",
-     "subjectPlaceholder" : "اكتب المادة",
-     "children" : "ابناء",
-     "addOtherHobby": "اضافة هواية",
-     "add" : "اضافة",
-     "cancel" : "الغاء",
-     "enterHobby" : "اكتب هواية",
-     "teachesAtType": "أين تدرس؟",
-      "selectTeachesAt": "حدد مكان التدريس",
-      "centers": "المراكز",
-      "centerName": "اسم المركز",
-      "school": "المدرسة",
-      "socialMedia": "وسائل التواصل الاجتماعي",
-      "selectPlatform": "اختر المنصة",
-      "accountName": "لينك الحساب",
-      "selectSubject": "اختر المادة",
-      "facebook": "فيسبوك",
-      "twitter": "تويتر",
-      "instagram": "إنستاغرام",
-      "linkedin": "لينكدين",
-      "tikTok": "تيك توك",
-      "youtube": "يوتيوب",
-      "telegram": "تيليجرام",
-      "whatsApp": "واتساب",
-      "government": "المحافظة",
+  "form": {
+    "studentId": "رقم الطالب",
+    "fullName": "الاسم الكامل",
+    "gender": "الجنس",
+    "role": "الدور",
+    "bio": "نبذة عنك",
+    "expertise": "الخبرات",
+    "phoneNumber": "الهاتف الشخصي",
+    "phoneNumber2": "الهاتف الشخصي الثاني",
+    "parentPhone": "هاتف ولي الأمر",
+    "parentPhoneNumber": "هاتف ولي الأمر",
+    "parentPhoneRelation": "صلة ولي الأمر",
+    "parentPhoneNumber2": "هاتف ولي الأمر الإضافي",
+    "parentPhoneRelation2": "صلة ولي الأمر الإضافية",
+    "additionalParentPhone": "هاتف ولي الأمر الإضافي",
+    "additionalParentRelation": "صلة ولي الأمر الإضافية",
+    "selectParentRelation": "اختر الصلة",
+    "email": "البريد الإلكتروني",
+    "address": "العنوان",
+    "selectGender": "اختر الجنس",
+    "schoolName": "اسم المدرسة",
+    "schoolType": "نوع المدرسة",
+    "selectSchoolType": "اختر نوع المدرسة",
+    "grade": "الصف",
+    "selectGrade": "اختر الصف",
+    "stage": "المرحلة",
+    "selectStage": "اختر المرحلة",
+    "selectStageFirst": "اختر المرحلة أولاً",
+    "hobby": "الهواية",
+    "selectHobby": "اختر هواية",
+    "variant": "الشعبة",
+    "selectVariant": "اختر الشعبة",
+    "selectHobbies": "اختر الهوايات",
+    "uploadAvatar": "رفع صورة شخصية",
+    "hobbies": "الهوايات",
+    "personalDetails": "البيانات الشخصية",
+    "accountDetails": "تفاصيل الحساب",
+    "parentDetails": "بيانات ولي الأمر",
+    "schoolDetails": "تفاصيل المدرسة",
+    "password": "كلمة المرور",
+    "confirmPassword": "تأكيد كلمة المرور",
+    "childrenDetails": "تفاصيل الأبناء",
+    "childId": "رقم الابن",
+    "childSequenceId": "رقم تسلسل الابن",
+    "childrenSequenceIdsHelp": "استخدم الفواصل لفصل أرقام تسلسل الأبناء",
+    "childrenSequenceIds": "رقم تسلسل الأبناء",
+    "level": "الصف الدراسي",
+    "profession": "المهنة / العمل",
+    "optional": "اختياري",
+    "selectLevel": "اختر الصف الدراسي",
+    "selectGradeLevel": "اختر الصف الدراسي",
+    "validatepassword": "تأكيد كلمة المرور",
+    "subject": "المادة",
+    "subjectPlaceholder": "اكتب المادة",
+    "children": "الأبناء",
+    "addOtherHobby": "إضافة هواية",
+    "add": "إضافة",
+    "cancel": "إلغاء",
+    "enterHobby": "اكتب هواية",
+    "teachesAtType": "أين تدرس؟",
+    "selectTeachesAt": "حدد مكان التدريس",
+    "centers": "المراكز",
+    "centerName": "اسم المركز",
+    "school": "المدرسة",
+    "socialMedia": "وسائل التواصل الاجتماعي",
+    "selectPlatform": "اختر المنصة",
+    "accountName": "رابط الحساب",
+    "selectSubject": "اختر المادة",
+    "facebook": "فيسبوك",
+    "twitter": "تويتر",
+    "instagram": "إنستاغرام",
+    "linkedin": "لينكدين",
+    "tikTok": "تيك توك",
+    "youtube": "يوتيوب",
+    "telegram": "تيليجرام",
+    "whatsApp": "واتساب",
+    "government": "المحافظة",
     "selectGovernment": "اختر المحافظة",
-    "administrationZone": "الاداره التعليميه",
-    "selectAdministrationZone": "اختر الاداره التعليميه",
+    "administrationZone": "الإدارة التعليمية",
+    "selectAdministrationZone": "اختر الإدارة التعليمية",
     "yourCustomHobbies": "هواياتك الخاصة",
     "otherHobbyLabel": "الهواية الأخرى",
     "otherHobbyPlaceholder": "اكتب هوايتك",
-    "referralSerial": "كود الدعوه",
     "profilePic": "صورة الملف الشخصي"
-
-    },
-    "gender": {
-      "male": "ذكر",
-      "female": "أنثى"
-    },
-    "schoolType": {
-      "arabic": "عربي",
-      "english": "انجليزي"
-    },
-    "hobbies": {
-      "math": "الرياضيات",
-      "programming": "البرمجة",
-      "art" : "الفن",
-      "languages": "اللغات",
-      "photography": "التصوير",
-      "montage": "المونتاج",
-      "designIllustrating": "التصميم/الرسم التوضيحي",
-      "marketing": "التسويق",
-      "other": "أخرى (حقل مفتوح)"
-    },
-    "review": {
-      "title": "مراجعة المعلومات",
-      "privacyAgreementPrefix": "بالتسجيل، فإنك توافق على",
-      "privacyPolicy": "سياسة الخصوصية"
-    },
-    "buttons": {
-      "previous": "السابق",
-      "next": "التالي",
-      "submit":" تم",
-      "addAnotherChild": "إضافة ابن آخر"
-    },
-    "role" : { 
-      "student": "طالب",
-      "parent": "ولي الأمر",
-      "teacher" : "مدرس"
-     },
-    "alreadyHaveAccount": "لديك حساب بالفعل؟",
-    "login": "تسجيل الدخول",
-    "signupHeroStart": "ابدأ",
-    "signupHeroMiddle": "رحلة التعلم",
-    "signupHeroEnd": "اليوم",
-    "signupHeroSub": "انضم إلى آلاف الطلاب والمعلمين في بيئة تعليمية ممتعة ومنظمة ومصممة للنمو.",
-    "interactiveLessons": "دروس تفاعلية",
-    "progress": "التقدم",
-    "earnBadges": "اكسب شارات أثناء التعلم!",
-    "createAccount": "إنشاء حساب",
-    "createAccountSub": "اختر دورك واملأ بياناتك.",
-    "iAmA": "أنا",
+  },
+  "gender": {
+    "male": "ذكر",
+    "female": "أنثى"
+  },
+  "schoolType": {
+    "arabic": "عربي",
+    "english": "إنجليزي"
+  },
+  "hobbies": {
+    "math": "الرياضيات",
+    "programming": "البرمجة",
+    "art": "أشغال يدوية",
+    "languages": "اللغات",
+    "photography": "التصوير",
+    "montage": "المونتاج",
+    "designIllustrating": "التصميم الجرافيكي",
+    "marketing": "التسويق",
+    "other": "أخرى (حقل مفتوح)"
+  },
+  "review": {
+    "title": "مراجعة المعلومات",
+    "privacyAgreementPrefix": "بالتسجيل، فإنك توافق على",
+    "privacyPolicy": "سياسة الخصوصية"
+  },
+  "buttons": {
+    "previous": "السابق",
+    "next": "التالي",
+    "submit": "تم",
+    "addAnotherChild": "إضافة ابن آخر",
+    "addAnotherParentPhone": "إضافة هاتف ولي أمر آخر",
+    "removeParentPhone": "إزالة"
+  },
+  "role": {
     "student": "طالب",
-    "parent": "ولي أمر",
-    "teacher": "معلم",
-    "gradeLevels": {
-      "1st Primary": "الصف الأول الابتدائي",
-      "2nd Primary": "الصف الثاني الابتدائي",
-      "3rd Primary": "الصف الثالث الابتدائي",
-      "4th Primary": "الصف الرابع الابتدائي",
-      "5th Primary": "الصف الخامس الابتدائي",
-      "6th Primary": "الصف السادس الابتدائي",
-      "1st Preparatory": "الصف الأول الإعدادي",
-      "2nd Preparatory": "الصف الثاني الإعدادي",
-      "3rd Preparatory": "الصف الثالث الإعدادي",
-      "1st Secondary": "الصف الأول الثانوي",
-      "2nd Secondary": "الصف الثاني الثانوي",
-      "3rd Secondary": "الصف الثالث الثانوي",
-      "first primary": "الصف الأول الابتدائي",
-      "second primary": "الصف الثاني الابتدائي",
-      "third primary": "الصف الثالث الابتدائي",
-      "fourth primary": "الصف الرابع الابتدائي",
-      "fifth primary": "الصف الخامس الابتدائي",
-      "sixth primary": "الصف السادس الابتدائي",
-      "first preparatory": "الصف الأول الإعدادي",
-      "second preparatory": "الصف الثاني الإعدادي",
-      "third preparatory": "الصف الثالث الإعدادي",
-      "first secondary": "الصف الأول الثانوي",
-      "second secondary": "الصف الثاني الثانوي",
-      "third secondary": "الصف الثالث الثانوي",
-      "primary": "ابتدائي",
-      "preparatory": "إعدادي",
-      "secondary": "ثانوي"
-},
-    "roleSelection": {
-     "title": "اختر دورك",
-     "description": "حدد الدور الذي يصفك بشكل أفضل",
-     "studentDesc": "الوصول إلى المواد التعليمية وتتبع تقدمك",
-     "parentDesc": "مراقبة الرحلة الأكاديمية لأطفالك",
-     "teacherDesc": "إنشاء الدورات وإدارة طلابك"
-      },
-      "validation": {
-        "required": "هذا الحقل مطلوب",
-        "passwordRequirements": "يجب أن تحتوي كلمة المرور على 8 أحرف على الأقل",
-        "passwordMismatch" : "كلمة المرور وتأكيد كلمة المرور لا تتطابق",
-        "phoneFormat": "صيغة رقم الهاتف غير صحيحة",
-        "emailFormat": "صيغة البريد الإلكتروني غير صحيحة",
-        "hobbies": "اختر هوايتان على الأقل",
-        "bioMinimum": " يجب أن تحتوي السيرة الذاتية على 50 حرفًا على الأقل",
-        "submissionError": "يرجى إصلاح الأخطاء التالية:",
-        "children": " تسلسل الأبناء غير صحيحة",
-        "bio": "السيرة الذاتية يجب أن تحتوي على 50 حرفًا على الأقل",
-        "expertise": "المجال المطلوب",
-        "subject": "المادة مطلوبة",
-        "confirmPassword": "تأكيد كلمة المرور غير صحيح",
-        "emailInvalid": "صيغة البريد الإلكتروني غير صالحة",
-        "phoneInvalid": "صيغة رقم الهاتف غير صالحة",
-        "passwordsMismatch": "كلمات المرور غير متطابقة",
-        "hobbiesRequired": "اختر هواية واحدة على الأقل",
-        "hobbyRequired": "اختر هواية",
-        "otherHobbyRequired": "يرجى كتابة الهواية الأخرى",
-        "childIdInvalid": "تنسيق معرف الطفل غير صالح (٢٤ حرفًا)",
-        "subjectRequired": "المادة مطلوبة",
-        "levelRequired": "المرحلة مطلوبة",
-        "genderRequired": "الجنس مطلوب",
-        "parentPhoneRequired": "رقم هاتف ولي الأمر مطلوب",
-        "emailExists": "البريد الإلكتروني مسجل مسبقًا",
-        "phoneExists": "رقم الهاتف مسجل مسبقًا",
-        "invalidSequenceId": "تنسيق معرف تسلسل الطفل غير صالح (٢٤ حرفًا)",
-        "teachesAtType": "الرجاء تحديد مكان التدريس",
-        "centers": "الرجاء إضافة مركز واحد على الأقل",
-        "school": "اسم المدرسة مطلوب",
-        "socialMediaPlatform": "المنصة مطلوبة",
-        "socialMediaAccount": "اسم الحساب مطلوب",
-        "governmentRequired": "المحافظة مطلوبة",
-    "administrationZoneRequired": "الاداره التعليميه مطلوبة",
-    "professionRequired": "المهنة / العمل مطلوب"
-        },
-        "errors": {
-          "apiError": "خطأ في الخادم",
-          "emailExists": "البريد الإلكتروني مسجل مسبقًا",
-          "invalidData": "بيانات غير صالحة",
-          "networkError": "خطأ في الشبكة - تحقق من الاتصال",
-          "unexpectedError": "حدث خطأ غير متوقع",
-          "hobbyUpdateFailed": "فشل تحديث الهوايات",
-          "childUpdateFailed": "فشل تحديث بيانات الطفل",
-          "roleSelectFailed": "فشل اختيار الدور",
-          "errorTitle": "خطأ في التسجيل",
-          "phoneExists": "رقم الهاتف مسجل مسبقاً",
-          "PasswordSpecialChar":" كلمة المرور يجب أن تحتوي على حرف خاص واحد على الأقل",
-          "childIdInvalid":"تنسيق معرف الطفل غير صالح (٢٤ حرفًا)",
-          "PasswordCapitalLetter":"كلمة المرور يجب أن تحتوي على حرف كبير واحد على الأقل"
-         
-        }      
-      }
+    "parent": "ولي الأمر",
+    "teacher": "مدرس"
+  },
+  "parentRelations": {
+    "mother": "الأم",
+    "father": "الأب",
+    "other": "أخرى"
+  },
+  "alreadyHaveAccount": "لديك حساب بالفعل؟",
+  "login": "تسجيل الدخول",
+  "signupHeroStart": "ابدأ",
+  "signupHeroMiddle": "رحلة التعلم",
+  "signupHeroEnd": "اليوم",
+  "signupHeroSub": "انضم إلى آلاف الطلاب والمعلمين في بيئة تعليمية ممتعة ومنظمة ومصممة للنمو.",
+  "interactiveLessons": "دروس تفاعلية",
+  "progress": "التقدم",
+  "earnBadges": "اكسب شارات أثناء التعلم!",
+  "createAccount": "إنشاء حساب",
+  "createAccountSub": "اختر دورك واملأ بياناتك.",
+  "iAmA": "أنا",
+  "student": "طالب",
+  "parent": "ولي أمر",
+  "teacher": "معلم",
+  "gradeLevels": {
+    "1st Primary": "الصف الأول الابتدائي",
+    "2nd Primary": "الصف الثاني الابتدائي",
+    "3rd Primary": "الصف الثالث الابتدائي",
+    "4th Primary": "الصف الرابع الابتدائي",
+    "5th Primary": "الصف الخامس الابتدائي",
+    "6th Primary": "الصف السادس الابتدائي",
+    "1st Preparatory": "الصف الأول الإعدادي",
+    "2nd Preparatory": "الصف الثاني الإعدادي",
+    "3rd Preparatory": "الصف الثالث الإعدادي",
+    "1st Secondary": "الصف الأول الثانوي",
+    "2nd Secondary": "الصف الثاني الثانوي",
+    "3rd Secondary": "الصف الثالث الثانوي",
+    "first primary": "الصف الأول الابتدائي",
+    "second primary": "الصف الثاني الابتدائي",
+    "third primary": "الصف الثالث الابتدائي",
+    "fourth primary": "الصف الرابع الابتدائي",
+    "fifth primary": "الصف الخامس الابتدائي",
+    "sixth primary": "الصف السادس الابتدائي",
+    "first preparatory": "الصف الأول الإعدادي",
+    "second preparatory": "الصف الثاني الإعدادي",
+    "third preparatory": "الصف الثالث الإعدادي",
+    "first secondary": "الصف الأول الثانوي",
+    "second secondary": "الصف الثاني الثانوي",
+    "third secondary": "الصف الثالث الثانوي",
+    "primary": "ابتدائي",
+    "preparatory": "إعدادي",
+    "secondary": "ثانوي"
+  },
+  "roleSelection": {
+    "title": "اختر دورك",
+    "description": "حدد الدور الذي يصفك بشكل أفضل",
+    "studentDesc": "الوصول إلى المواد التعليمية وتتبع تقدمك",
+    "parentDesc": "مراقبة الرحلة الأكاديمية لأطفالك",
+    "teacherDesc": "إنشاء الدورات وإدارة طلابك"
+  },
+  "validation": {
+    "required": "هذا الحقل مطلوب",
+    "passwordRequirements": "يجب أن تحتوي كلمة المرور على 8 أحرف على الأقل",
+    "passwordMismatch": "كلمة المرور وتأكيد كلمة المرور لا تتطابق",
+    "phoneFormat": "صيغة رقم الهاتف غير صحيحة",
+    "emailFormat": "صيغة البريد الإلكتروني غير صحيحة",
+    "hobbies": "اختر هواية واحدة على الأقل",
+    "bioMinimum": "يجب أن تحتوي السيرة الذاتية على 50 حرفًا على الأقل",
+    "submissionError": "يرجى إصلاح الأخطاء التالية:",
+    "children": "تسلسل الأبناء غير صحيح",
+    "bio": "السيرة الذاتية يجب أن تحتوي على 50 حرفًا على الأقل",
+    "expertise": "المجال المطلوب",
+    "subject": "المادة مطلوبة",
+    "confirmPassword": "تأكيد كلمة المرور غير صحيح",
+    "emailInvalid": "صيغة البريد الإلكتروني غير صالحة",
+    "invalidData": "قيمة غير صالحة",
+    "phoneInvalid": "صيغة رقم الهاتف غير صالحة",
+    "passwordsMismatch": "كلمات المرور غير متطابقة",
+    "hobbiesRequired": "اختر هواية واحدة على الأقل",
+    "hobbyRequired": "اختر هواية",
+    "otherHobbyRequired": "يرجى كتابة الهواية الأخرى",
+    "childIdInvalid": "تنسيق معرف الطفل غير صالح (٢٤ حرفًا)",
+    "subjectRequired": "المادة مطلوبة",
+    "stageRequired": "المرحلة مطلوبة",
+    "levelRequired": "المرحلة مطلوبة",
+    "genderRequired": "الجنس مطلوب",
+    "parentPhoneRequired": "رقم هاتف ولي الأمر مطلوب",
+    "parentRelationRequired": "صلة ولي الأمر مطلوبة",
+    "parentRelationInvalid": "اختر صلة صحيحة لولي الأمر",
+    "additionalParentPhoneRequired": "رقم هاتف ولي الأمر الإضافي مطلوب",
+    "additionalParentRelationRequired": "صلة ولي الأمر الإضافية مطلوبة",
+    "additionalParentRelationInvalid": "اختر صلة صحيحة لولي الأمر الإضافي",
+    "emailExists": "البريد الإلكتروني مسجل مسبقًا",
+    "phoneExists": "رقم الهاتف مسجل مسبقًا",
+    "invalidSequenceId": "تنسيق معرف تسلسل الطفل غير صالح (٢٤ حرفًا)",
+    "teachesAtType": "الرجاء تحديد مكان التدريس",
+    "centers": "الرجاء إضافة مركز واحد على الأقل",
+    "school": "اسم المدرسة مطلوب",
+    "socialMediaPlatform": "المنصة مطلوبة",
+    "socialMediaAccount": "اسم الحساب مطلوب",
+    "governmentRequired": "المحافظة مطلوبة",
+    "administrationZoneRequired": "الإدارة التعليمية مطلوبة",
+    "professionRequired": "المهنة / العمل مطلوب",
+    "governmentInvalid": "المحافظة المحددة غير صالحة",
+    "administrationZoneInvalid": "الإدارة التعليمية المحددة غير صالحة للمحافظة المختارة",
+    "stageInvalid": "المرحلة المحددة غير صالحة",
+    "levelInvalid": "المستوى المحدد غير صالح",
+    "levelStageMismatch": "الصف المختار لا يتبع المرحلة المختارة",
+    "hobbyInvalid": "الهواية المحددة غير صالحة",
+    "profilePicInvalidType": "صورة الملف الشخصي يجب أن تكون ملف صورة",
+    "profilePicTooLarge": "حجم صورة الملف الشخصي كبير جدًا",
+    "phoneMustDiffer": "رقم الهاتف الثاني يجب أن يختلف عن الرقم الأساسي",
+    "invalidRole": "نوع الحساب المختار غير صالح"
+  },
+  "apiErrors": {
+    "SIGNUP_VALIDATION_FAILED": {
+      "default": "بعض حقول التسجيل غير صالحة. يرجى المراجعة والمحاولة مرة أخرى."
+    },
+    "SIGNUP_FIELD_REQUIRED": {
+      "default": "يوجد حقل مطلوب مفقود في التسجيل."
+    },
+    "SIGNUP_FIELD_INVALID": {
+      "default": "أحد حقول التسجيل يحتوي على قيمة غير صالحة."
+    },
+    "SIGNUP_FIELD_NOT_ALLOWED": {
+      "default": "تم إرسال حقل غير مسموح به في طلب التسجيل."
+    },
+    "SIGNUP_FIELD_CONFLICT": {
+      "default": "إحدى قيم التسجيل مستخدمة بالفعل."
+    },
+    "SIGNUP_INVALID_ROLE": {
+      "default": "نوع الحساب المختار غير صالح."
+    },
+    "SIGNUP_EMAIL_REQUIRED": {
+      "default": "البريد الإلكتروني مطلوب."
+    },
+    "SIGNUP_EMAIL_ALREADY_EXISTS": {
+      "default": "هذا البريد الإلكتروني مسجل بالفعل."
+    },
+    "SIGNUP_PASSWORD_TOO_SHORT": {
+      "default": "يجب أن تكون كلمة المرور 8 أحرف على الأقل."
+    },
+    "SIGNUP_PASSWORD_MISMATCH": {
+      "default": "كلمة المرور وتأكيدها غير متطابقين."
+    },
+    "SIGNUP_PHONE_REQUIRED": {
+      "default": "رقم هاتف صالح مطلوب."
+    },
+    "SIGNUP_PHONE_INVALID": {
+      "default": "صيغة رقم الهاتف غير صالحة."
+    },
+    "SIGNUP_PHONE_ALREADY_EXISTS": {
+      "default": "رقم الهاتف هذا مسجل بالفعل."
+    },
+    "SIGNUP_PHONE2_INVALID": {
+      "default": "صيغة رقم الهاتف الثاني غير صالحة."
+    },
+    "SIGNUP_PHONE2_DUPLICATE": {
+      "default": "رقم الهاتف الثاني هذا مسجل بالفعل."
+    },
+    "SIGNUP_GOVERNMENT_REQUIRED": {
+      "default": "المحافظة مطلوبة."
+    },
+    "SIGNUP_GOVERNMENT_INVALID": {
+      "default": "المحافظة المحددة غير صالحة."
+    },
+    "SIGNUP_ADMIN_ZONE_REQUIRED": {
+      "default": "الإدارة التعليمية مطلوبة."
+    },
+    "SIGNUP_ADMIN_ZONE_INVALID": {
+      "default": "الإدارة التعليمية المحددة غير صالحة للمحافظة المختارة."
+    },
+    "SIGNUP_LOCATION_VALIDATION_FAILED": {
+      "default": "تعذر التحقق من المحافظة والإدارة التعليمية بسبب فشل في التحقق من جهة الخادم."
+    },
+    "SIGNUP_PROFILE_PIC_INVALID_TYPE": {
+      "default": "صورة الملف الشخصي يجب أن تكون ملف صورة صالح."
+    },
+    "SIGNUP_PROFILE_PIC_TOO_LARGE": {
+      "default": "صورة الملف الشخصي أكبر من الحجم المسموح."
+    },
+    "SIGNUP_CHILD_REFERENCE_INVALID": {
+      "default": "واحد أو أكثر من مراجع الأبناء غير صالحة."
+    },
+    "SIGNUP_TEACHER_SUBJECT_REQUIRED": {
+      "teacher": "المادة مطلوبة لتسجيل المعلم."
+    },
+    "SIGNUP_TEACHER_LEVEL_REQUIRED": {
+      "teacher": "يجب اختيار مرحلة تدريس واحدة على الأقل."
+    },
+    "SIGNUP_TEACHER_LEVEL_INVALID": {
+      "teacher": "واحد أو أكثر من المراحل المختارة للتدريس غير صالح."
+    },
+    "SIGNUP_TEACHER_LEVEL_INACTIVE": {
+      "teacher": "واحد أو أكثر من المراحل المختارة للتدريس غير نشط."
+    },
+    "SIGNUP_TEACHER_LEVEL_KIND_INVALID": {
+      "teacher": "يمكن للمعلمين اختيار مراحل التدريس فقط."
+    },
+    "SIGNUP_TEACHER_TEACHES_AT_TYPE_REQUIRED": {
+      "teacher": "يرجى تحديد مكان التدريس."
+    },
+    "SIGNUP_TEACHER_CENTERS_REQUIRED": {
+      "teacher": "يرجى إضافة مركز واحد على الأقل."
+    },
+    "SIGNUP_TEACHER_SCHOOL_REQUIRED": {
+      "teacher": "اسم المدرسة مطلوب لنوع التدريس المحدد."
+    },
+    "SIGNUP_TEACHER_SOCIAL_MEDIA_NOT_ARRAY": {
+      "teacher": "تنسيق بيانات وسائل التواصل الاجتماعي غير صالح."
+    },
+    "SIGNUP_TEACHER_SOCIAL_MEDIA_PLATFORM_INVALID": {
+      "teacher": "واحد أو أكثر من منصات التواصل الاجتماعي غير صالح."
+    },
+    "SIGNUP_TEACHER_PHONE2_SAME_AS_PHONE1": {
+      "teacher": "رقم الهاتف الثاني يجب أن يختلف عن الرقم الأساسي."
+    },
+    "SIGNUP_PARENT_PROFESSION_REQUIRED": {
+      "parent": "المهنة مطلوبة لتسجيل ولي الأمر."
+    },
+    "SIGNUP_PARENT_LEVEL_INVALID": {
+      "parent": "المستوى المحدد لولي الأمر غير صالح."
+    },
+    "SIGNUP_PARENT_LEVEL_INACTIVE": {
+      "parent": "المستوى المحدد لولي الأمر غير نشط."
+    },
+    "SIGNUP_STUDENT_STAGE_REQUIRED": {
+      "student": "المرحلة مطلوبة لتسجيل الطالب."
+    },
+    "SIGNUP_STUDENT_STAGE_INVALID": {
+      "student": "المرحلة المحددة غير صالحة."
+    },
+    "SIGNUP_STUDENT_LEVEL_REQUIRED": {
+      "student": "المستوى مطلوب لتسجيل الطالب."
+    },
+    "SIGNUP_STUDENT_LEVEL_INVALID": {
+      "student": "المستوى المحدد غير صالح."
+    },
+    "SIGNUP_STUDENT_LEVEL_STAGE_MISMATCH": {
+      "student": "الصف المختار لا يتبع المرحلة المختارة."
+    },
+    "SIGNUP_STUDENT_HOBBY_REQUIRED": {
+      "student": "يجب اختيار هواية واحدة على الأقل لتسجيل الطالب."
+    },
+    "SIGNUP_STUDENT_HOBBY_INVALID": {
+      "student": "الهواية المحددة غير صالحة."
+    },
+    "SIGNUP_STUDENT_PARENT_PHONE_REQUIRED": {
+      "student": "رقم هاتف ولي الأمر الأساسي مطلوب."
+    },
+    "SIGNUP_STUDENT_PARENT_PHONE_INVALID": {
+      "student": "صيغة رقم هاتف ولي الأمر الأساسي غير صالحة."
+    },
+    "SIGNUP_STUDENT_PARENT_RELATION_REQUIRED": {
+      "student": "صلة ولي الأمر الأساسية مطلوبة."
+    },
+    "SIGNUP_STUDENT_PARENT_RELATION_INVALID": {
+      "student": "صلة ولي الأمر الأساسية يجب أن تكون: الأم أو الأب أو أخرى."
+    },
+    "SIGNUP_STUDENT_PARENT2_PHONE_REQUIRED": {
+      "student": "رقم هاتف ولي الأمر الإضافي مطلوب عند تحديد الصلة."
+    },
+    "SIGNUP_STUDENT_PARENT2_PHONE_INVALID": {
+      "student": "صيغة رقم هاتف ولي الأمر الإضافي غير صالحة."
+    },
+    "SIGNUP_STUDENT_PARENT2_RELATION_REQUIRED": {
+      "student": "صلة ولي الأمر الإضافية مطلوبة عند إدخال رقم إضافي."
+    },
+    "SIGNUP_STUDENT_PARENT2_RELATION_INVALID": {
+      "student": "صلة ولي الأمر الإضافية يجب أن تكون: الأم أو الأب أو أخرى."
+    },
+    "SIGNUP_UNKNOWN_ERROR": {
+      "default": "تعذر إكمال التسجيل بسبب مشكلة داخلية في الخادم."
+    }
+  },
+  "errors": {
+    "apiError": "خطأ في الخادم",
+    "emailExists": "البريد الإلكتروني مسجل مسبقًا",
+    "invalidData": "بيانات غير صالحة",
+    "networkError": "خطأ في الشبكة - تحقق من الاتصال",
+    "unexpectedError": "حدث خطأ غير متوقع",
+    "hobbyUpdateFailed": "فشل تحديث الهوايات",
+    "childUpdateFailed": "فشل تحديث بيانات الطفل",
+    "roleSelectFailed": "فشل اختيار الدور",
+    "errorTitle": "خطأ في التسجيل",
+    "phoneExists": "رقم الهاتف مسجل مسبقاً",
+    "PasswordSpecialChar": "كلمة المرور يجب أن تحتوي على حرف خاص واحد على الأقل",
+    "childIdInvalid": "تنسيق معرف الطفل غير صالح (٢٤ حرفًا)",
+    "PasswordCapitalLetter": "كلمة المرور يجب أن تحتوي على حرف كبير واحد على الأقل",
+    "requestId": "رقم الطلب"
+  }
+}

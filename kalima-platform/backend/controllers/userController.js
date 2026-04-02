@@ -13,10 +13,10 @@ const StudentLectureAccess = require("../models/studentLectureAccessModel.js");
 const StudentExamSubmission = require("../models/studentExamSubmissionModel.js");
 const Container = require("../models/containerModel.js");
 const Lecture = require("../models/LectureModel.js");
-const Level = require("../models/levelModel.js");
 const Attachment = require("../models/attachmentModel.js");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
+const { validateStudentLevelSelection } = require("../utils/levelHierarchy");
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const handleCSV = require("../utils/upload files/handleCSV.js");
@@ -57,6 +57,8 @@ const extractStudentHobby = (studentDoc) => {
 
   return "";
 };
+
+const RESTRICTED_SELF_UPDATE_ROLES = new Set(["student", "parent", "teacher"]);
 
 const getAllUsers = catchAsync(async (req, res, next) => {
   const users = await User.find().select("-password").lean();
@@ -393,7 +395,8 @@ const getMyData = catchAsync(async (req, res, next) => {
     case "student":
       // Find student with all related data
       const student = await Student.findById(userId)
-        .populate("level", "name nameAr")
+        .populate("stage", "name nameAr kind sortOrder parentLevel isActive")
+        .populate("level", "name nameAr kind sortOrder parentLevel isActive")
         .populate({
           path: "lecturerPoints.lecturer",
           select: "name subject expertise",
@@ -409,6 +412,7 @@ const getMyData = catchAsync(async (req, res, next) => {
       responseData.userInfo = {
         ...responseData.userInfo,
         phoneNumber: student.phoneNumber,
+        stage: student.stage,
         level: student.level,
         hobby: resolvedStudentHobby,
         hobbies: resolvedStudentHobby ? [resolvedStudentHobby] : [],
@@ -442,8 +446,19 @@ const getMyData = catchAsync(async (req, res, next) => {
       const parent = await Parent.findById(userId)
         .populate({
           path: "children",
-          select: "name level sequencedId",
+          select: "name stage level sequencedId",
+          populate: [
+            {
+              path: "stage",
+              select: "name nameAr kind sortOrder parentLevel isActive",
+            },
+            {
+              path: "level",
+              select: "name nameAr kind sortOrder parentLevel isActive",
+            },
+          ],
         })
+        .populate("level", "name nameAr kind sortOrder parentLevel isActive")
         .populate({
           path: "lecturerPoints.lecturer",
           select: "name subject expertise",
@@ -506,7 +521,7 @@ const getMyData = catchAsync(async (req, res, next) => {
         let containerQuery = Container.find({ createdBy: userId })
           .select("name type price subject level createdAt")
           .populate("subject", "name")
-          .populate("level", "name");
+          .populate("level", "name nameAr kind sortOrder parentLevel isActive");
 
         // Apply query features for containers
         const containerFeatures = new QueryFeatures(containerQuery, req.query)
@@ -523,14 +538,14 @@ const getMyData = catchAsync(async (req, res, next) => {
       const lectures = await Lecture.find({ createdBy: userId })
         .select("name type price subject level createdAt lecture_type teacherAllowed thumbnail")
         .populate("subject", "name")
-        .populate("level", "name")
+        .populate("level", "name nameAr kind sortOrder parentLevel isActive")
         .lean();
 
       // Also fetch lectures from Container model
       const containerLectures = await Container.find({ createdBy: userId, type: "lecture" })
         .select("name type price subject level createdAt teacherAllowed image")
         .populate("subject", "name")
-        .populate("level", "name")
+        .populate("level", "name nameAr kind sortOrder parentLevel isActive")
         .lean();
 
       responseData.lectures = [...lectures, ...containerLectures];
@@ -572,7 +587,9 @@ const getMyData = catchAsync(async (req, res, next) => {
 
     case "teacher":
       // Find teacher with relevant data
-      const teacher = await Teacher.findById(userId).lean();
+      const teacher = await Teacher.findById(userId)
+        .populate("level", "name nameAr kind sortOrder parentLevel isActive")
+        .lean();
 
       if (!teacher) {
         return next(new AppError("Teacher not found", 404));
@@ -650,7 +667,7 @@ const getMyData = catchAsync(async (req, res, next) => {
         // Get containers (courses, terms, etc.) created by the assigned lecturer
         const containers = await Container.find({ createdBy: assistant.assignedLecturer._id })
           .populate("subject", "name")
-          .populate("level", "name")
+          .populate("level", "name nameAr kind sortOrder parentLevel isActive")
           .lean();
 
         responseData.lecturerContainers = containers;
@@ -660,7 +677,7 @@ const getMyData = catchAsync(async (req, res, next) => {
         // Get all lectures from the assigned lecturer
         const lectures = await Lecture.find({ createdBy: assistant.assignedLecturer._id })
           .populate("subject", "name")
-          .populate("level", "name")
+          .populate("level", "name nameAr kind sortOrder parentLevel isActive")
           .select(
             "name description videoLink numberOfViews requiresExam requiresHomework examConfig homeworkConfig lecture_type"
           )
@@ -669,7 +686,7 @@ const getMyData = catchAsync(async (req, res, next) => {
         // Also fetch from Container model
         const containerLectures = await Container.find({ createdBy: assistant.assignedLecturer._id, type: "lecture" })
           .populate("subject", "name")
-          .populate("level", "name")
+          .populate("level", "name nameAr kind sortOrder parentLevel isActive")
           .select("name description videoLink numberOfViews type")
           .lean();
 
@@ -840,7 +857,7 @@ const getMyPurchasedCourseContainers = catchAsync(async (req, res, next) => {
       select: "name type price subject level createdBy containerImage",
       populate: [
         { path: "subject", select: "name" },
-        { path: "level", select: "name" },
+        { path: "level", select: "name nameAr kind sortOrder parentLevel isActive" },
       ],
     })
     .populate({ path: "lecturer", select: "name" })
@@ -921,7 +938,7 @@ const enrichPurchasesWithLectureData = async (purchaseHistory = []) => {
       _id: { $in: lectureIdsToPopulate.map((id) => new mongoose.Types.ObjectId(id)) },
     })
       .populate("subject", "name")
-      .populate("level", "name")
+      .populate("level", "name nameAr kind sortOrder parentLevel isActive")
       .lean();
 
     lecturesMap = lectures.reduce((acc, lec) => {
@@ -985,7 +1002,7 @@ const enrichPurchasesWithLectureData = async (purchaseHistory = []) => {
           "name price subject level videoLink lecture_type requiresExam examConfig requiresHomework homeworkConfig createdBy thumbnail createdAt parent"
         )
         .populate("subject", "name")
-        .populate("level", "name")
+        .populate("level", "name nameAr kind sortOrder parentLevel isActive")
         .populate("createdBy", "name")
         .lean(),
       Container.find({
@@ -996,7 +1013,7 @@ const enrichPurchasesWithLectureData = async (purchaseHistory = []) => {
           "name type price subject level videoLink lecture_type requiresExam examConfig requiresHomework homeworkConfig createdBy thumbnail createdAt"
         )
         .populate("subject", "name")
-        .populate("level", "name")
+        .populate("level", "name nameAr kind sortOrder parentLevel isActive")
         .populate("createdBy", "name")
         .lean(),
     ]);
@@ -1287,8 +1304,9 @@ const getParentChildrenData = catchAsync(async (req, res, next) => {
     });
   }  // Find all children with detailed information
   const children = await Student.find({ _id: { $in: parent.children } })
-    .populate("level", "name")
-    .select("name level sequencedId faction generalPoints totalPoints")
+    .populate("stage", "name nameAr kind sortOrder parentLevel isActive")
+    .populate("level", "name nameAr kind sortOrder parentLevel isActive")
+    .select("name stage level sequencedId faction generalPoints totalPoints")
     .lean();
 
   // For each child, get additional data like purchase history
@@ -1301,7 +1319,7 @@ const getParentChildrenData = catchAsync(async (req, res, next) => {
           select: "name type price subject level",
           populate: [
             { path: "subject", select: "name" },
-            { path: "level", select: "name" }
+            { path: "level", select: "name nameAr kind sortOrder parentLevel isActive" }
           ]
         })
         .populate({
@@ -1310,7 +1328,7 @@ const getParentChildrenData = catchAsync(async (req, res, next) => {
             "name price subject level videoLink lecture_type requiresExam examConfig requiresHomework homeworkConfig createdBy thumbnail",
           populate: [
             { path: "subject", select: "name" },
-            { path: "level", select: "name" }
+            { path: "level", select: "name nameAr kind sortOrder parentLevel isActive" }
           ]
         })
         .sort({ createdAt: -1 })
@@ -1376,11 +1394,26 @@ const updateMe = catchAsync(async (req, res, next) => {
   const normalizedUserRole = String(userRole || "").trim().toLowerCase();
 
   // 3) Filter out unwanted fields that shouldn't be updated
-  const filteredBody = {};
-  const allowedFields = ['name', 'email', 'phoneNumber', 'address', 'referralSerial', 'profilePic'];
-  if (normalizedUserRole === "student") {
-    allowedFields.push("hobby", "level");
+  const allowedFields = RESTRICTED_SELF_UPDATE_ROLES.has(normalizedUserRole)
+    ? ["profilePic", "referralSerial", ...(normalizedUserRole === "parent" ? ["children"] : [])]
+    : ["name", "email", "phoneNumber", "address", "referralSerial", "profilePic"];
+
+  if (RESTRICTED_SELF_UPDATE_ROLES.has(normalizedUserRole)) {
+    const disallowedFields = Object.keys(req.body).filter(
+      (field) => !allowedFields.includes(field)
+    );
+
+    if (disallowedFields.length > 0) {
+      return next(
+        new AppError(
+          "Profile details are locked after signup. Only the profile picture can be updated here.",
+          403
+        )
+      );
+    }
   }
+
+  const filteredBody = {};
 
   // Only copy allowed fields from req.body to filteredBody
   Object.keys(req.body).forEach(field => {
@@ -1406,14 +1439,26 @@ const updateMe = catchAsync(async (req, res, next) => {
     }
   }
 
-  if (normalizedUserRole === "student" && filteredBody.level !== undefined) {
-    if (!mongoose.Types.ObjectId.isValid(filteredBody.level)) {
-      return next(new AppError("Invalid level id", 400));
+  if (normalizedUserRole === "student" && (filteredBody.stage !== undefined || filteredBody.level !== undefined)) {
+    const currentStudent = await Student.findById(userId).select("stage level").lean();
+    const resolvedStageId =
+      filteredBody.stage !== undefined ? filteredBody.stage : currentStudent?.stage;
+    const resolvedLevelId =
+      filteredBody.level !== undefined ? filteredBody.level : currentStudent?.level;
+
+    if (!resolvedStageId || !resolvedLevelId) {
+      return next(
+        new AppError("Both stage and level are required for student profile updates.", 400)
+      );
     }
-    const levelExists = await Level.exists({ _id: filteredBody.level });
-    if (!levelExists) {
-      return next(new AppError("There is no level with this id", 404));
-    }
+
+    const resolvedSelection = await validateStudentLevelSelection({
+      stageId: resolvedStageId,
+      levelId: resolvedLevelId,
+    });
+
+    filteredBody.stage = resolvedSelection.stage._id;
+    filteredBody.level = resolvedSelection.level._id;
   }
 
   // Handle profile picture upload (if file is present)
@@ -1453,6 +1498,8 @@ const updateMe = catchAsync(async (req, res, next) => {
       return next(new AppError("Referral code already set and cannot be changed.", 400));
     }
   }
+
+  delete filteredBody.referralSerial;
 
   // Handle special case for Parent role - adding children by sequenced ID
   if (normalizedUserRole === "parent" && req.body.children) {

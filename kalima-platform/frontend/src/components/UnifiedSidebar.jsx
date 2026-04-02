@@ -49,8 +49,11 @@ const getDashboardPathByRole = (role) => {
   if (normalized === "admin" || normalized === "subadmin") return "/dashboard/admin-dashboard";
   if (normalized === "lecturer") return "/dashboard/lecturer-dashboard";
   if (normalized === "assistant") return "/dashboard/assistant-page";
-  if (normalized === "student" || normalized === "parent" || normalized === "teacher") {
-    return "/dashboard/student-dashboard/promo-codes";
+  if (normalized === "parent") {
+    return "/dashboard/parent-dashboard/overview";
+  }
+  if (normalized === "student" || normalized === "teacher") {
+    return "/dashboard/student-dashboard/overview";
   }
   return "/";
 };
@@ -423,7 +426,7 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
         id: "student-dashboard",
         title: t("myDashboard") || "My Dashboard",
         icon: <FaUserGraduate className="h-5 w-5" />,
-        path: "/dashboard/student-dashboard/promo-codes",
+        path: "/dashboard/student-dashboard/overview",
       },
       {
         id: "courses",
@@ -444,7 +447,7 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
         id: "parent-dashboard",
         title: t("myDashboard") || "My Dashboard",
         icon: <FaUserGraduate className="h-5 w-5" />,
-        path: "/dashboard/student-dashboard/promo-codes",
+        path: "/dashboard/parent-dashboard/overview",
       },
       {
         id: "parent-courses",

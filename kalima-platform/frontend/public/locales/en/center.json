@@ -1,16 +1,11 @@
 {
-    "filters": {
-        "department": "By Section",
-        "group": "By Group",
-        "semester": "By Class",
-        "teacher": "By Teacher",
-        "select_section": "Select Section",
-        "select_group": "Select Group",
-        "section": "by Section"
-      },
-      "subjects": {
-        "math": "Mathematics",
-        "science": "Science",
-        "arabic": "Arabic"
-      }
+  "filters": {
+    "department": "By Section",
+    "group": "By Group",
+    "semester": "By Class",
+    "teacher": "By Teacher",
+    "select_section": "Select Section",
+    "select_group": "Select Group",
+    "section": "by Section"
+  }
 }

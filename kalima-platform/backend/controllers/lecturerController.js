@@ -15,7 +15,7 @@ exports.uploadLecturerPhoto = uploadProfilePicToDisk;
 
 // Create a new lecturer
 exports.createLecturer = catchAsync(async (req, res, next) => {
-    const { name, email, password, gender, role, bio, expertise } = req.body;
+    const { name, email, password, gender, role, bio, expertise, isPublished } = req.body;
 
     if (!bio || !expertise) {
         return next(new AppError("Bio and expertise are required.", 400));
@@ -31,6 +31,9 @@ exports.createLecturer = catchAsync(async (req, res, next) => {
         role,
         bio,
         expertise,
+        ...(isPublished !== undefined
+            ? { isPublished: isPublished === true || isPublished === "true" }
+            : {}),
         profilePic: req.file ? req.file.path : null,
     };
 
@@ -44,7 +47,9 @@ exports.createLecturer = catchAsync(async (req, res, next) => {
 
 // Get all lecturers
 exports.getAllLecturers = catchAsync(async (req, res, next) => {
-    const lecturers = await Lecturer.find();
+    const lecturers = await Lecturer.find(
+        !req.user ? { isPublished: { $ne: false } } : {}
+    );
     res.status(200).json({
         status: "success",
         data: lecturers,
@@ -60,6 +65,10 @@ exports.getLecturerById = catchAsync(async (req, res, next) => {
         return next(new AppError("Lecturer not found.", 404));
     }
 
+    if (!req.user && lecturer.isPublished === false) {
+        return next(new AppError("Lecturer not found.", 404));
+    }
+
     res.status(200).json({
         status: "success",
         data: lecturer,
@@ -69,7 +78,7 @@ exports.getLecturerById = catchAsync(async (req, res, next) => {
 // Update a lecturer by ID
 exports.updateLecturer = catchAsync(async (req, res, next) => {
     const { id } = req.params;
-    const { name, email, bio, expertise } = req.body;
+    const { name, email, bio, expertise, isPublished } = req.body;
 
     const lecturer = await Lecturer.findById(id);
     if (!lecturer) {
@@ -88,6 +97,9 @@ exports.updateLecturer = catchAsync(async (req, res, next) => {
     lecturer.email = email || lecturer.email;
     lecturer.bio = bio || lecturer.bio;
     lecturer.expertise = expertise || lecturer.expertise;
+    if (isPublished !== undefined) {
+        lecturer.isPublished = isPublished === true || isPublished === "true";
+    }
 
     await lecturer.save();
 
@@ -181,17 +193,17 @@ exports.getMyAnalytics = catchAsync(async (req, res, next) => {
             Container.find({ createdBy: lecturerId })
                 .select("name type price subject level parent children numberOfViews createdAt updatedAt")
                 .populate("subject", "name")
-                .populate("level", "name")
+                .populate("level", "name nameAr kind sortOrder parentLevel isActive")
                 .lean(),
             Lecture.find({ createdBy: lecturerId })
                 .select("name type price subject level numberOfViews createdAt updatedAt")
                 .populate("subject", "name")
-                .populate("level", "name")
+                .populate("level", "name nameAr kind sortOrder parentLevel isActive")
                 .lean(),
             Container.find({ createdBy: lecturerId, type: "lecture" })
                 .select("name type price subject level numberOfViews createdAt updatedAt")
                 .populate("subject", "name")
-                .populate("level", "name")
+                .populate("level", "name nameAr kind sortOrder parentLevel isActive")
                 .lean(),
             Purchase.find({
                 lecturer: lecturerId,

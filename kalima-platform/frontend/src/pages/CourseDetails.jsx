@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useMemo } from "react"
-import { useParams, useNavigate } from "react-router-dom"
+import { useParams, useNavigate, useLocation } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import { getContainerById, purchaseContainer } from "../routes/lectures"
 import { getUserDashboard } from "../routes/auth-services"
@@ -9,6 +9,10 @@ import { LoadingSpinner } from "../components/LoadingSpinner"
 import { ErrorAlert } from "../components/ErrorAlert"
 import { FaChalkboardTeacher, FaBook, FaGraduationCap, FaMoneyBillWave, FaUnlock, FaPlayCircle, FaChevronDown } from "react-icons/fa"
 import { designTokens } from "../constants/designTokens"
+import { resolveLevelDisplayName } from "../utils/levelHierarchy"
+import { buildCoursePath } from "../seo/site.mjs"
+import { useSeo } from "../seo/useSeo"
+import { buildBreadcrumbSchema, buildCourseSchema } from "../seo/structuredData.mjs"
 
 const normalizeId = (value) => {
   if (!value) return null
@@ -207,6 +211,7 @@ const ContainerItem = ({ container, isPurchased, onPurchase, purchaseInProgress,
 export default function CourseDetails() {
   const { courseId } = useParams()
   const navigate = useNavigate()
+  const location = useLocation()
   const { t, i18n } = useTranslation("courseDetails")
   const { t: tCommon } = useTranslation("common")
   const isRTL = i18n.language === "ar"
@@ -222,6 +227,65 @@ export default function CourseDetails() {
   const [purchaseSuccess, setPurchaseSuccess] = useState(false)
   const [showSuccessModal, setShowSuccessModal] = useState(false)
   const [remainingPoints, setRemainingPoints] = useState(null)
+  const courseName = String(courseData?.name || "").trim()
+  const canonicalPath = courseData ? buildCoursePath(courseData) : null
+  const seoDescription =
+    String(courseData?.description || "").trim() ||
+    (courseData?.subject?.name
+      ? isRTL
+        ? `اكتشف دورة ${courseName} في مادة ${courseData.subject.name} على منصة فكرة التعليمية.`
+        : `Discover the ${courseName} course in ${courseData.subject.name} on Fekra.`
+      : isRTL
+        ? `اكتشف دورة ${courseName} على منصة فكرة التعليمية.`
+        : `Discover ${courseData?.name || "this course"} on Fekra.`)
+  const seoImage =
+    courseData?.image?.url ||
+    courseData?.containerImage?.url ||
+    courseData?.inheritedImage?.image?.url ||
+    "/Kalima.png"
+  const levelName = courseData?.level
+    ? resolveLevelDisplayName(courseData.level, i18n.language)
+    : ""
+
+  useSeo(
+    courseData
+      ? {
+          title: isRTL
+            ? `${courseName} | دورات فكرة التعليمية`
+            : `${courseName} | Fekra Courses`,
+          description: seoDescription,
+          canonicalPath,
+          image: seoImage,
+          lang: i18n.language?.startsWith("en") ? "en" : "ar",
+          dir: isRTL ? "rtl" : "ltr",
+          schema: [
+            buildBreadcrumbSchema([
+              { name: isRTL ? "الرئيسية" : "Home", path: "/" },
+              { name: isRTL ? "الدورات" : "Courses", path: "/courses" },
+              { name: courseName, path: canonicalPath },
+            ]),
+            buildCourseSchema({
+              name: courseName,
+              description: seoDescription,
+              path: canonicalPath,
+              image: seoImage,
+              subject: courseData?.subject?.name,
+              instructor: courseData?.createdBy?.name,
+              level: levelName,
+              price: typeof courseData?.price === "number" ? courseData.price : 0,
+            }),
+          ],
+        }
+      : {
+          title: isRTL ? "تفاصيل الدورة | منصة فكرة التعليمية" : "Course Details | Fekra",
+          description: isRTL
+            ? "اطّلع على تفاصيل الدورات التعليمية المتاحة على منصة فكرة."
+            : "View course details on Fekra.",
+          canonicalPath: location.pathname,
+          lang: i18n.language?.startsWith("en") ? "en" : "ar",
+          dir: isRTL ? "rtl" : "ltr",
+        },
+  )
 
   // Fetch initial data
   useEffect(() => {
@@ -263,6 +327,17 @@ export default function CourseDetails() {
 
     fetchData()
   }, [courseId])
+
+  useEffect(() => {
+    if (!courseData || !canonicalPath) return
+
+    const normalizedCurrentPath = (location.pathname || "").replace(/\/+$/, "")
+    const normalizedCanonicalPath = canonicalPath.replace(/\/+$/, "")
+
+    if (normalizedCurrentPath !== normalizedCanonicalPath) {
+      navigate(canonicalPath, { replace: true })
+    }
+  }, [canonicalPath, courseData, location.pathname, navigate])
 
   // Check if a container is purchased
   const isContainerPurchased = useMemo(() => {
@@ -440,7 +515,7 @@ export default function CourseDetails() {
                   <DetailItem
                     icon={<FaGraduationCap className="text-primary" />}
                     label={t("courseInfo.level")}
-                    value={courseData?.level?.name ? tCommon(`gradeLevels.${courseData.level.name}`) : t("purchase.notDetermined")}
+                    value={courseData?.level ? resolveLevelDisplayName(courseData.level, i18n.language) : t("purchase.notDetermined")}
                     tokens={TOKENS}
                   />
                   <DetailItem

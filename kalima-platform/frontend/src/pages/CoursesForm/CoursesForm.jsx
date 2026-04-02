@@ -16,6 +16,7 @@ import CourseStructureVisualization from "./course-structure-visualization"
 import { Link } from "react-router-dom"
 import { designTokens } from "../../constants/designTokens"
 import { translateErrorMessage } from "../../utils/errorTranslator"
+import { buildLevelHierarchy } from "../../utils/levelHierarchy"
 
 function CourseCreationForm() {
   const { t, i18n } = useTranslation()
@@ -44,6 +45,14 @@ function CourseCreationForm() {
   // Data fetching states
   const [subjects, setSubjects] = useState([])
   const [levels, setLevels] = useState([])
+  const [levelHierarchy, setLevelHierarchy] = useState({
+    levels: [],
+    stages: [],
+    grades: [],
+    gradesByStageId: {},
+    stageOptions: [],
+    gradeOptions: [],
+  })
   const [teachers, setTeachers] = useState([])
   const [createdBy, setCreatedBy] = useState("")
   const [isLoading, setIsLoading] = useState(true)
@@ -65,7 +74,9 @@ function CourseCreationForm() {
         // Fetch levels from API
         const levelsResponse = await getAllLevels()
         if (levelsResponse.success) {
-          setLevels(levelsResponse.data)
+          const hierarchy = levelsResponse.hierarchy || buildLevelHierarchy(levelsResponse.data || [], i18n.language)
+          setLevelHierarchy(hierarchy)
+          setLevels(hierarchy.grades || [])
         } else {
           console.error("Failed to fetch levels:", levelsResponse)
         }
@@ -187,7 +198,8 @@ function CourseCreationForm() {
     [checklistItems]
   )
   const courseSnapshot = useMemo(() => {
-    const levelName = levels.find((level) => level._id === formData.gradeLevel)?.name
+    const levelName = levels.find((level) => level._id === formData.gradeLevel)?.displayName ||
+      levels.find((level) => level._id === formData.gradeLevel)?.name
     const subjectName = subjects.find((subject) => subject._id === formData.subject)?.name
 
     return {

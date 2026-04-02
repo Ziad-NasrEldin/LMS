@@ -1,19 +1,18 @@
 {
-    "title": "الإعدادات",
-    "save": "حفظ",
-    "cancel": "إلغاء",
-    "toggleSidebar": "تبديل القائمة الجانبية",
-    "dir": "rtl",
-    "General Points": "الرصيد العام",
-    "Total Points": "إجمالي الرصيد",
-    "passwordStrength": {
-      "label": "قوة كلمة المرور",
-      "weak": "ضعيفة",
-      "medium": "متوسطة",
-      "strong": "قوية"
-    },
-
-    "personalInfo": {
+  "title": "الإعدادات",
+  "save": "حفظ",
+  "cancel": "إلغاء",
+  "toggleSidebar": "تبديل القائمة الجانبية",
+  "dir": "rtl",
+  "General Points": "الرصيد العام",
+  "Total Points": "إجمالي الرصيد",
+  "passwordStrength": {
+    "label": "قوة كلمة المرور",
+    "weak": "ضعيفة",
+    "medium": "متوسطة",
+    "strong": "قوية"
+  },
+  "personalInfo": {
     "title": "المعلومات الشخصية",
     "subtitle": "المعلومات الشخصية",
     "labels": {
@@ -26,7 +25,7 @@
       "hobby": "الهواية"
     },
     "placeholders": {
-      "fullName": "مثال: يوسف بن محمد علي",
+      "fullName": "مثال: يوسف بن محمد على",
       "phoneNumber": "971-123-4567",
       "email": "example@yahoo.com",
       "idNumber": "أدخل رقم الهوية هنا",
@@ -50,7 +49,7 @@
       "programming": "البرمجة",
       "languages": "اللغات",
       "montage": "المونتاج",
-      "designillustrating": "التصميم/الرسم التوضيحي",
+      "designillustrating": "التصميم الجرافيكي",
       "marketing": "التسويق",
       "other": "أخرى",
       "reading": "القراءة",
@@ -58,19 +57,19 @@
       "music": "الموسيقى",
       "cooking": "الطبخ",
       "gaming": "الألعاب",
-      "art": "الفن",
+      "art": "أشغال يدوية",
       "technology": "التكنولوجيا",
       "bicycling": "ركوب الدراجات",
       "photography": "التصوير"
     }
   },
-    "validation": {
-      "invalidImageType": "يرجى اختيار صورة صحيحة (JPEG, PNG, GIF)",
-      "fileTooLarge": "يجب أن يكون حجم الملف أقل من 5 ميجابايت",
-      "invalidEmail": "صيغة البريد الإلكتروني غير صحيحة"
-    },
-    "retry": "إعادة المحاولة",
-    "languageAppearance": {
+  "validation": {
+    "invalidImageType": "يرجى اختيار صورة صحيحة (JPEG, PNG, GIF)",
+    "fileTooLarge": "يجب أن يكون حجم الملف أقل من 5 ميجابايت",
+    "invalidEmail": "صيغة البريد الإلكتروني غير صحيحة"
+  },
+  "retry": "إعادة المحاولة",
+  "languageAppearance": {
     "title": "اللغة والمظهر",
     "showThemes": "اظهار السمات",
     "hideThemes": "اغلق السمات",
@@ -87,28 +86,28 @@
       "selected": "محدد"
     }
   },
-    "security": {
-      "title": "الأمان",
-      "labels": {
-        "currentPassword": "كلمة المرور الحالية",
-        "newPassword": "كلمة المرور الجديدة",
-        "confirmPassword": "تأكيد كلمة المرور"
-      },
-      "errors": {
-        "mismatch": "كلمات المرور غير متطابقة",
-        "length": "كلمة المرور يجب أن تكون على الأقل 8 أحرف",
-        "general": "حدث خطأ أثناء تحديث كلمة المرور"
-      },
-      "success": "تم تحديث كلمة المرور بنجاح",
-      "changePassword": "تغيير كلمة السر",
-      "showPassword": "إظهار كلمة المرور",
-      "hidePassword": "إخفاء كلمة المرور",
-      "passwordRequirement": "كلمة المرور يجب أن تكون على الأقل 8 أحرف",
-      "updateButton": "تحديث كلمة السر",
-      "placeholders": {
-        "currentPassword": "أدخل كلمة المرور الحالية",
-        "newPassword": "كلمة السر الجديدة",
-        "confirmPassword": "تأكيد كلمة السر الجديدة"
-      }
+  "security": {
+    "title": "الأمان",
+    "labels": {
+      "currentPassword": "كلمة المرور الحالية",
+      "newPassword": "كلمة المرور الجديدة",
+      "confirmPassword": "تأكيد كلمة المرور"
+    },
+    "errors": {
+      "mismatch": "كلمات المرور غير متطابقة",
+      "length": "كلمة المرور يجب أن تكون على الأقل 8 أحرف",
+      "general": "حدث خطأ أثناء تحديث كلمة المرور"
+    },
+    "success": "تم تحديث كلمة المرور بنجاح",
+    "changePassword": "تغيير كلمة السر",
+    "showPassword": "إظهار كلمة المرور",
+    "hidePassword": "إخفاء كلمة المرور",
+    "passwordRequirement": "كلمة المرور يجب أن تكون على الأقل 8 أحرف",
+    "updateButton": "تحديث كلمة السر",
+    "placeholders": {
+      "currentPassword": "أدخل كلمة المرور الحالية",
+      "newPassword": "كلمة السر الجديدة",
+      "confirmPassword": "تأكيد كلمة السر الجديدة"
     }
   }
+}

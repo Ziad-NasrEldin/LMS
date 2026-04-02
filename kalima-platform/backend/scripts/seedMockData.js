@@ -12,6 +12,21 @@ const Container = require("../models/containerModel");
 const Lecture = require("../models/LectureModel");
 const { governmentsData } = require("../utils/seeds/seedGovernments");
 
+const STAGE_META = {
+  primary: { order: 1, en: "primary", ar: "الابتدائي" },
+  preparatory: { order: 2, en: "preparatory", ar: "الإعدادي" },
+  secondary: { order: 3, en: "secondary", ar: "الثانوي" },
+};
+
+const ORDINAL_META = [
+  { order: 1, en: "first", ar: "الأول" },
+  { order: 2, en: "second", ar: "الثاني" },
+  { order: 3, en: "third", ar: "الثالث" },
+  { order: 4, en: "fourth", ar: "الرابع" },
+  { order: 5, en: "fifth", ar: "الخامس" },
+  { order: 6, en: "sixth", ar: "السادس" },
+];
+
 const MOCK_LECTURERS = [
   {
     name: "Ahmed Hassan",
@@ -29,31 +44,65 @@ const MOCK_LECTURERS = [
   },
 ];
 
-const MOCK_LEVELS = [
-  "first secondary",
-  "second secondary",
-  "third secondary",
-];
+const STAGE_DEFINITIONS = Object.keys(STAGE_META).map((key, index) => ({
+  key,
+  name: STAGE_META[key].en,
+  nameAr: STAGE_META[key].ar,
+  kind: "stage",
+  sortOrder: index + 1,
+}));
+
+const GRADE_DEFINITIONS = Object.keys(STAGE_META).flatMap((stageKey) =>
+  ORDINAL_META.map((ordinal) => ({
+    key: `${stageKey}:${ordinal.order}`,
+    stageKey,
+    order: ordinal.order,
+    name: `${ordinal.en} ${STAGE_META[stageKey].en}`,
+    nameAr: `الصف ${ordinal.ar} ${STAGE_META[stageKey].ar}`,
+    kind: "grade",
+    sortOrder: ordinal.order,
+  }))
+);
 
 const MOCK_SUBJECTS = [
   {
     name: "Physics",
-    levels: ["first secondary", "second secondary", "third secondary"],
+    levels: ["secondary:1", "secondary:2", "secondary:3"],
   },
   {
     name: "Mathematics",
-    levels: ["first secondary", "second secondary", "third secondary"],
+    levels: ["secondary:1", "secondary:2", "secondary:3"],
   },
   {
     name: "Arabic",
-    levels: ["first secondary", "second secondary"],
+    levels: ["secondary:1", "secondary:2"],
   },
 ];
 
-async function upsertLevel(name) {
-  const existing = await Level.findOne({ name });
-  if (existing) return existing;
-  return Level.create({ name, nameAr: name });
+async function upsertLevel(definition, parentLevelId = null) {
+  const existing = await Level.findOne({
+    $or: [{ name: definition.name }, { nameAr: definition.nameAr }],
+  });
+
+  if (existing) {
+    existing.kind = definition.kind;
+    existing.sortOrder = definition.sortOrder;
+    existing.parentLevel = parentLevelId || null;
+    if (existing.isActive === undefined) {
+      existing.isActive = true;
+    }
+    await existing.save();
+    return existing;
+  }
+
+  return Level.create({
+    name: definition.name,
+    nameAr: definition.nameAr,
+    kind: definition.kind,
+    parentLevel: parentLevelId || null,
+    sortOrder: definition.sortOrder,
+    isActive: true,
+  });
 }
 
 async function upsertLecturer(lecturerInput, defaultPasswordHash) {
@@ -123,7 +172,13 @@ async function syncAdministrationZones(governments) {
   return uniqueZones.length;
 }
 
-async function upsertMockStudent({ levelId, defaultPasswordHash, governmentName, administrationZone }) {
+async function upsertMockStudent({
+  stageId,
+  levelId,
+  defaultPasswordHash,
+  governmentName,
+  administrationZone,
+}) {
   const studentEmail = "mock.student1@fekra-edu.com";
 
   const existing = await Student.findOne({ email: studentEmail });
@@ -134,6 +189,7 @@ async function upsertMockStudent({ levelId, defaultPasswordHash, governmentName,
     email: studentEmail,
     password: defaultPasswordHash,
     gender: "male",
+    stage: stageId,
     level: levelId,
     government: governmentName,
     administrationZone,
@@ -206,16 +262,23 @@ async function runSeedMockData() {
     console.log(`Governments ready: ${governments.length}`);
     console.log(`Administration zones ready: ${zoneCount}`);
 
-    const levelByName = {};
-    for (const levelName of MOCK_LEVELS) {
-      levelByName[levelName] = await upsertLevel(levelName);
+    const levelByKey = {};
+    for (const stageDefinition of STAGE_DEFINITIONS) {
+      const stageLevel = await upsertLevel(stageDefinition);
+      levelByKey[stageDefinition.key] = stageLevel;
     }
-    console.log(`Levels ready: ${Object.keys(levelByName).length}`);
+
+    for (const gradeDefinition of GRADE_DEFINITIONS) {
+      const stageLevel = levelByKey[gradeDefinition.stageKey];
+      const gradeLevel = await upsertLevel(gradeDefinition, stageLevel._id);
+      levelByKey[gradeDefinition.key] = gradeLevel;
+    }
+    console.log(`Levels ready: ${Object.keys(levelByKey).length}`);
 
     const subjectByName = {};
     for (const subjectInput of MOCK_SUBJECTS) {
       const levelIds = subjectInput.levels
-        .map((levelName) => levelByName[levelName])
+        .map((levelKey) => levelByKey[levelKey])
         .filter(Boolean)
         .map((levelDoc) => levelDoc._id);
       subjectByName[subjectInput.name] = await upsertSubject(subjectInput.name, levelIds);
@@ -229,11 +292,13 @@ async function runSeedMockData() {
     }
     console.log(`Lecturers ready: ${lecturers.length}`);
 
-    const studentLevel = levelByName["first secondary"];
+    const studentStage = levelByKey["secondary"];
+    const studentLevel = levelByKey["secondary:1"];
     const defaultGovernment = governments[0];
     const defaultZone = defaultGovernment.administrationZone[0];
 
     await upsertMockStudent({
+      stageId: studentStage._id,
       levelId: studentLevel._id,
       defaultPasswordHash: hashedPassword,
       governmentName: defaultGovernment.name,
@@ -244,7 +309,7 @@ async function runSeedMockData() {
     const courseA = await upsertCourseContainer({
       name: "Physics Basics Course",
       subjectId: subjectByName.Physics._id,
-      levelId: levelByName["first secondary"]._id,
+      levelId: levelByKey["secondary:1"]._id,
       lecturerId: lecturers[0]._id,
       description: "An introduction to physics concepts for first secondary students.",
     });
@@ -252,7 +317,7 @@ async function runSeedMockData() {
     const courseB = await upsertCourseContainer({
       name: "Arabic Grammar Course",
       subjectId: subjectByName.Arabic._id,
-      levelId: levelByName["second secondary"]._id,
+      levelId: levelByKey["secondary:2"]._id,
       lecturerId: lecturers[1]._id,
       description: "Core grammar and writing exercises for second secondary.",
     });
@@ -260,7 +325,7 @@ async function runSeedMockData() {
     const lectureA1 = await upsertLecture({
       name: "Introduction to Motion",
       subjectId: subjectByName.Physics._id,
-      levelId: levelByName["first secondary"]._id,
+      levelId: levelByKey["secondary:1"]._id,
       lecturerId: lecturers[0]._id,
       parentId: courseA._id,
       description: "Basic concepts of speed and motion.",
@@ -269,7 +334,7 @@ async function runSeedMockData() {
     const lectureA2 = await upsertLecture({
       name: "Forces and Newton Laws",
       subjectId: subjectByName.Physics._id,
-      levelId: levelByName["first secondary"]._id,
+      levelId: levelByKey["secondary:1"]._id,
       lecturerId: lecturers[0]._id,
       parentId: courseA._id,
       description: "Newton laws with practical examples.",
@@ -278,7 +343,7 @@ async function runSeedMockData() {
     const lectureB1 = await upsertLecture({
       name: "Sentence Structures",
       subjectId: subjectByName.Arabic._id,
-      levelId: levelByName["second secondary"]._id,
+      levelId: levelByKey["secondary:2"]._id,
       lecturerId: lecturers[1]._id,
       parentId: courseB._id,
       description: "How to build clear and correct Arabic sentences.",

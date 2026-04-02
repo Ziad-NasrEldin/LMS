@@ -18,7 +18,7 @@
     "giftsSection": "قسم الهدايا",
     "giftsDescription": "عناصر الهدايا والحزم",
     "printingSection": "قسم الطباعة",
-    "printingDescription": "خدمات ومواد الطباعة "
+    "printingDescription": "خدمات ومواد الطباعة"
   },
   "sectionsManagement": {
     "title": "إدارة الأقسام",
@@ -160,7 +160,7 @@
     }
   },
   "common": {
-    "cancel" : "الغاء",
+    "cancel": "إلغاء",
     "update": "نحديث"
   },
   "fileUpload": {
@@ -236,26 +236,26 @@
     "fillRequiredFields": "يرجى ملء جميع الحقول المطلوبة",
     "subSectionRequired": "يرجى اختيار قسم فرعي",
     "productCreatedSuccess": "تم إنشاء المنتج بنجاح!",
-    "productCreateError": "خطأ في إنشاء المنتج: ",
+    "productCreateError": "خطأ في إنشاء المنتج:",
     "productUpdatedSuccess": "تم تحديث المنتج بنجاح!",
-    "productUpdateError": "خطأ في تحديث المنتج: ",
+    "productUpdateError": "خطأ في تحديث المنتج:",
     "productDeletedSuccess": "تم حذف المنتج بنجاح!",
-    "productDeleteError": "خطأ في حذف المنتج: ",
-    "productFetchError": "خطأ في جلب المنتج: ",
+    "productDeleteError": "خطأ في حذف المنتج:",
+    "productFetchError": "خطأ في جلب المنتج:",
     "bookCreatedSuccess": "تم إنشاء الكتاب بنجاح!",
-    "bookCreateError": "خطأ في إنشاء الكتاب: ",
+    "bookCreateError": "خطأ في إنشاء الكتاب:",
     "sectionCreatedSuccess": "تم إنشاء القسم بنجاح!",
-    "sectionCreateError": "خطأ في إنشاء القسم: ",
+    "sectionCreateError": "خطأ في إنشاء القسم:",
     "sectionUpdatedSuccess": "تم تحديث القسم بنجاح!",
-    "sectionUpdateError": "خطأ في تحديث القسم: ",
+    "sectionUpdateError": "خطأ في تحديث القسم:",
     "sectionDeletedSuccess": "تم حذف القسم بنجاح!",
-    "sectionDeleteError": "خطأ في حذف القسم: ",
+    "sectionDeleteError": "خطأ في حذف القسم:",
     "subSectionCreatedSuccess": "تم إنشاء القسم الفرعي بنجاح!",
-    "subSectionCreateError": "خطأ في إنشاء القسم الفرعي: ",
+    "subSectionCreateError": "خطأ في إنشاء القسم الفرعي:",
     "subSectionUpdatedSuccess": "تم تحديث القسم الفرعي بنجاح!",
-    "subSectionUpdateError": "خطأ في تحديث القسم الفرعي: ",
+    "subSectionUpdateError": "خطأ في تحديث القسم الفرعي:",
     "subSectionDeletedSuccess": "تم حذف القسم الفرعي بنجاح!",
-    "subSectionDeleteError": "خطأ في حذف القسم الفرعي: "
+    "subSectionDeleteError": "خطأ في حذف القسم الفرعي:"
   },
   "error": {
     "title": "خطأ!",
@@ -306,8 +306,8 @@
     "export": "تصدير البيانات",
     "exporting": "جاري التصدير...",
     "csvFormat": "تنسيق CSV",
-    "jsonFormat": "تنسيق JSON"
-    ,"allProducts": "كل المنتجات",
+    "jsonFormat": "تنسيق JSON",
+    "allProducts": "كل المنتجات",
     "booksOnly": "الكتب فقط",
     "sections": "الأقسام"
   },

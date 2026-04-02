@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import toast from "react-hot-toast";
 import {
   AlertCircle,
   BarChart3,
@@ -29,6 +30,14 @@ import { getMyContainers, getLecturerAnalytics } from "../../routes/lectures";
 import { AssistantService } from "../../routes/assistants-services";
 import DashboardStatCard from "../../components/DashboardStatCard";
 import { translateErrorMessage } from "../../utils/errorTranslator";
+import {
+  buildExportFileDate,
+  exportCsvFile,
+  exportXlsxFile,
+  formatDateForExport,
+  formatDateTimeForExport,
+  getExportLocale,
+} from "../../utils/exportUtils";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Tooltip, Legend);
 
@@ -41,15 +50,10 @@ const safeDate = (value) => {
 const formatNumber = (value, locale) =>
   new Intl.NumberFormat(locale || "en").format(Number(value || 0));
 
-const formatCsvCell = (value) => {
-  const stringValue = String(value ?? "");
-  const escaped = stringValue.replace(/"/g, '""');
-  return /[",\n]/.test(escaped) ? `"${escaped}"` : escaped;
-};
-
 export default function LecturerOverviewPanel() {
   const { t, i18n } = useTranslation("lecturerDashboard");
   const isRTL = i18n.language === "ar";
+  const exportLocale = getExportLocale(i18n.language);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -365,84 +369,191 @@ export default function LecturerOverviewPanel() {
     setAppliedFilters({ dateFrom: "", dateTo: "" });
   };
 
-  const handleExportCsv = () => {
+  const buildSummaryRows = () => [
+    {
+      field: t("generatedAt", { defaultValue: isRTL ? "تاريخ التصدير" : "Exported At" }),
+      value: formatDateTimeForExport(new Date(), exportLocale),
+    },
+    {
+      field: t("dateFrom", { defaultValue: isRTL ? "من تاريخ" : "From date" }),
+      value: appliedFilters.dateFrom ? formatDateForExport(appliedFilters.dateFrom, exportLocale) : "-",
+    },
+    {
+      field: t("dateTo", { defaultValue: isRTL ? "إلى تاريخ" : "To date" }),
+      value: appliedFilters.dateTo ? formatDateForExport(appliedFilters.dateTo, exportLocale) : "-",
+    },
+    { field: t("myCourses", { defaultValue: isRTL ? "كورساتي" : "My courses" }), value: metrics.totalCourses },
+    { field: t("lectures", { defaultValue: isRTL ? "المحاضرات" : "Lectures" }), value: metrics.totalLectures },
+    { field: t("totalRevenue", { defaultValue: isRTL ? "إجمالي الإيراد" : "Total revenue" }), value: metrics.totalRevenue },
+    { field: t("totalPurchases", { defaultValue: isRTL ? "إجمالي المشتريات" : "Total purchases" }), value: metrics.totalPurchases },
+    { field: t("studentsBought", { defaultValue: isRTL ? "الطلاب المشترون" : "Students bought" }), value: metrics.totalStudentsBought },
+    { field: t("studentsEntered", { defaultValue: isRTL ? "الطلاب المرتبطون" : "Linked students" }), value: metrics.totalStudentsEntered },
+    { field: t("linkedAccessRecords", { defaultValue: isRTL ? "سجلات الربط" : "Linked access records" }), value: metrics.totalLinkedAccessRecords },
+    { field: t("studentViews", { defaultValue: isRTL ? "إجمالي المشاهدات" : "Total views consumed" }), value: metrics.totalViewsConsumed },
+    { field: t("promoCodesSold", { defaultValue: isRTL ? "الأكواد المباعة" : "Promo codes sold" }), value: metrics.totalPromoCodesSold },
+    { field: t("promoCodesValue", { defaultValue: isRTL ? "قيمة الأكواد" : "Promo codes value" }), value: metrics.promoCodesSoldValue },
+    { field: t("promoCodesApplied", { defaultValue: isRTL ? "الأكواد المطبقة" : "Promo codes applied" }), value: metrics.totalPromoCodesApplied },
+    { field: t("promoCodesAppliedValue", { defaultValue: isRTL ? "قيمة الأكواد المطبقة" : "Promo codes applied value" }), value: metrics.promoCodesAppliedValue },
+  ];
+
+  const buildPurchasesRows = () =>
+    (analytics?.purchasesByContent || []).map((item) => ({
+      contentId: item.contentId || "",
+      contentName: item.contentName || "",
+      contentType: t(`containerTypes.${item.contentType}`, { defaultValue: item.contentType || "" }),
+      purchaseCount: item.purchaseCount ?? 0,
+      revenue: item.revenue ?? 0,
+      uniqueStudents: item.uniqueStudents ?? 0,
+      promoPurchases: item.promoPurchases ?? 0,
+    }));
+
+  const buildPromoRows = () =>
+    (analytics?.promoCodes || []).map((code) => ({
+      promoId: code.id || "",
+      code: code.code || "",
+      amount: code.pointsAmount ?? 0,
+      redeemed: code.isRedeemed
+        ? t("yes", { defaultValue: isRTL ? "نعم" : "Yes" })
+        : t("no", { defaultValue: isRTL ? "لا" : "No" }),
+      createdAt: formatDateTimeForExport(code.createdAt, exportLocale),
+      redeemedAt: formatDateTimeForExport(code.redeemedAt, exportLocale),
+    }));
+
+  const buildAccessRows = () =>
+    (analytics?.accessRecords || []).map((record) => ({
+      studentId: record.studentId || "",
+      studentName: record.studentName || "",
+      lectureId: record.lectureId || "",
+      lectureName: record.lectureName || "",
+      remainingViews: record.remainingViews ?? "",
+      lastAccessed: formatDateTimeForExport(record.lastAccessed, exportLocale),
+      lastViewEventAt: formatDateTimeForExport(record.lastViewEventAt, exportLocale),
+    }));
+
+  const handleExport = (format = "xlsx") => {
     try {
-      const rows = [];
-      const pushRow = (values) => rows.push(values.map(formatCsvCell).join(","));
+      const summaryRows = buildSummaryRows();
+      const purchasesRows = buildPurchasesRows();
+      const promoRows = buildPromoRows();
+      const accessRows = buildAccessRows();
 
-      pushRow(["Section", "Field", "Value"]);
-      pushRow(["Filters", "From date", appliedFilters.dateFrom || "-"]);
-      pushRow(["Filters", "To date", appliedFilters.dateTo || "-"]);
-      pushRow(["Summary", "Total courses", metrics.totalCourses]);
-      pushRow(["Summary", "Total lectures", metrics.totalLectures]);
-      pushRow(["Summary", "Total revenue", metrics.totalRevenue]);
-      pushRow(["Summary", "Total purchases", metrics.totalPurchases]);
-      pushRow(["Summary", "Students bought", metrics.totalStudentsBought]);
-      pushRow(["Summary", "Linked students", metrics.totalStudentsEntered]);
-      pushRow(["Summary", "Linked access records", metrics.totalLinkedAccessRecords]);
-      pushRow(["Summary", "Total views consumed", metrics.totalViewsConsumed]);
-      pushRow(["Summary", "Promo codes sold", metrics.totalPromoCodesSold]);
-      pushRow(["Summary", "Promo codes sold value", metrics.promoCodesSoldValue]);
-      pushRow(["Summary", "Promo codes applied", metrics.totalPromoCodesApplied]);
-      pushRow(["Summary", "Promo codes applied value", metrics.promoCodesAppliedValue]);
-      pushRow([]);
+      const dateSuffix = buildExportFileDate();
+      const baseName = `lecturer-analytics-${dateSuffix}`;
 
-      pushRow(["PurchasesByContent", "Content", "Type", "Purchases", "Revenue", "Unique students", "Promo purchases"]);
-      (analytics?.purchasesByContent || []).forEach((item) => {
-        pushRow([
-          "PurchasesByContent",
-          item.contentName,
-          item.contentType,
-          item.purchaseCount,
-          item.revenue,
-          item.uniqueStudents,
-          item.promoPurchases,
-        ]);
-      });
-      pushRow([]);
+      const summaryColumns = [
+        { key: "field", label: t("field", { defaultValue: isRTL ? "الحقل" : "Field" }) },
+        { key: "value", label: t("value", { defaultValue: isRTL ? "القيمة" : "Value" }) },
+      ];
 
-      pushRow(["PromoCodes", "Code", "Amount (EGP)", "Redeemed", "Created at", "Redeemed at"]);
-      (analytics?.promoCodes || []).forEach((code) => {
-        pushRow([
-          "PromoCodes",
-          code.code,
-          code.pointsAmount,
-          code.isRedeemed ? "Yes" : "No",
-          code.createdAt ? new Date(code.createdAt).toISOString() : "",
-          code.redeemedAt ? new Date(code.redeemedAt).toISOString() : "",
-        ]);
-      });
-      pushRow([]);
+      const purchasesColumns = [
+        { key: "contentId", label: t("contentId", { defaultValue: isRTL ? "معرف المحتوى" : "Content ID" }) },
+        { key: "contentName", label: t("content", { defaultValue: isRTL ? "المحتوى" : "Content" }) },
+        { key: "contentType", label: t("type", { defaultValue: isRTL ? "النوع" : "Type" }) },
+        { key: "purchaseCount", label: t("purchases", { defaultValue: isRTL ? "المشتريات" : "Purchases" }) },
+        { key: "revenue", label: t("revenue", { defaultValue: isRTL ? "الإيراد" : "Revenue" }) },
+        { key: "uniqueStudents", label: t("uniqueStudents", { defaultValue: isRTL ? "طلاب فريدون" : "Unique students" }) },
+        { key: "promoPurchases", label: t("promoPurchases", { defaultValue: isRTL ? "مشتريات برمز" : "Promo purchases" }) },
+      ];
 
-      pushRow(["LinkedStudents", "Student name", "Lecture name", "Remaining views", "Last accessed"]);
-      (analytics?.accessRecords || []).forEach((record) => {
-        pushRow([
-          "LinkedStudents",
-          record.studentName || "",
-          record.lectureName || "",
-          record.remainingViews ?? "",
-          record.lastAccessed ? new Date(record.lastAccessed).toISOString() : "",
-        ]);
-      });
+      const promoColumns = [
+        { key: "promoId", label: t("promoId", { defaultValue: isRTL ? "معرف الكود" : "Promo ID" }) },
+        { key: "code", label: t("code", { defaultValue: isRTL ? "الكود" : "Code" }) },
+        { key: "amount", label: t("amount", { defaultValue: isRTL ? "القيمة" : "Amount" }) },
+        { key: "redeemed", label: t("status", { defaultValue: isRTL ? "الحالة" : "Status" }) },
+        { key: "createdAt", label: t("createdAt", { defaultValue: isRTL ? "تاريخ الإنشاء" : "Created at" }) },
+        { key: "redeemedAt", label: t("redeemedAt", { defaultValue: isRTL ? "تاريخ الاستخدام" : "Redeemed at" }) },
+      ];
 
-      const csvContent = rows.join("\n");
-      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", `lecturer-analytics-${new Date().toISOString().slice(0, 10)}.csv`);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-    } catch (csvError) {
-      setError(
-        translateErrorMessage(
-          t("csvDownloadFailed", {
-            defaultValue: isRTL ? "تعذر تنزيل ملف CSV." : "Failed to download CSV file.",
-          })
-        )
+      const accessColumns = [
+        { key: "studentId", label: t("studentId", { defaultValue: isRTL ? "معرف الطالب" : "Student ID" }) },
+        { key: "studentName", label: t("studentName", { defaultValue: isRTL ? "الطالب" : "Student name" }) },
+        { key: "lectureId", label: t("lectureId", { defaultValue: isRTL ? "معرف المحاضرة" : "Lecture ID" }) },
+        { key: "lectureName", label: t("lecture", { defaultValue: isRTL ? "المحاضرة" : "Lecture name" }) },
+        { key: "remainingViews", label: t("remainingViews", { defaultValue: isRTL ? "المشاهدات المتبقية" : "Remaining views" }) },
+        { key: "lastAccessed", label: t("lastAccessed", { defaultValue: isRTL ? "آخر مشاهدة" : "Last accessed" }) },
+        { key: "lastViewEventAt", label: t("lastViewEventAt", { defaultValue: isRTL ? "آخر تشغيل" : "Last view event" }) },
+      ];
+
+      if (format === "xlsx") {
+        exportXlsxFile({
+          fileName: `${baseName}.xlsx`,
+          sheets: [
+            {
+              name: t("summarySheet", { defaultValue: isRTL ? "الملخص" : "Summary" }),
+              rows: summaryRows,
+              columns: summaryColumns,
+            },
+            {
+              name: t("purchasesByContent", { defaultValue: isRTL ? "المشتريات حسب المحتوى" : "Purchases by content" }),
+              rows: purchasesRows,
+              columns: purchasesColumns,
+            },
+            {
+              name: t("promoCodes", { defaultValue: isRTL ? "الأكواد" : "Promo codes" }),
+              rows: promoRows,
+              columns: promoColumns,
+            },
+            {
+              name: t("linkedStudents", { defaultValue: isRTL ? "الطلاب المرتبطون" : "Linked students" }),
+              rows: accessRows,
+              columns: accessColumns,
+            },
+          ],
+        });
+      } else {
+        const flatColumns = [
+          { key: "section", label: t("section", { defaultValue: isRTL ? "القسم" : "Section" }) },
+          { key: "field", label: t("field", { defaultValue: isRTL ? "الحقل" : "Field" }) },
+          { key: "value", label: t("value", { defaultValue: isRTL ? "القيمة" : "Value" }) },
+          { key: "contentId", label: t("contentId", { defaultValue: isRTL ? "معرف المحتوى" : "Content ID" }) },
+          { key: "contentName", label: t("content", { defaultValue: isRTL ? "المحتوى" : "Content" }) },
+          { key: "contentType", label: t("type", { defaultValue: isRTL ? "النوع" : "Type" }) },
+          { key: "purchaseCount", label: t("purchases", { defaultValue: isRTL ? "المشتريات" : "Purchases" }) },
+          { key: "revenue", label: t("revenue", { defaultValue: isRTL ? "الإيراد" : "Revenue" }) },
+          { key: "uniqueStudents", label: t("uniqueStudents", { defaultValue: isRTL ? "طلاب فريدون" : "Unique students" }) },
+          { key: "promoPurchases", label: t("promoPurchases", { defaultValue: isRTL ? "مشتريات برمز" : "Promo purchases" }) },
+          { key: "promoId", label: t("promoId", { defaultValue: isRTL ? "معرف الكود" : "Promo ID" }) },
+          { key: "code", label: t("code", { defaultValue: isRTL ? "الكود" : "Code" }) },
+          { key: "amount", label: t("amount", { defaultValue: isRTL ? "القيمة" : "Amount" }) },
+          { key: "redeemed", label: t("status", { defaultValue: isRTL ? "الحالة" : "Status" }) },
+          { key: "createdAt", label: t("createdAt", { defaultValue: isRTL ? "تاريخ الإنشاء" : "Created at" }) },
+          { key: "redeemedAt", label: t("redeemedAt", { defaultValue: isRTL ? "تاريخ الاستخدام" : "Redeemed at" }) },
+          { key: "studentId", label: t("studentId", { defaultValue: isRTL ? "معرف الطالب" : "Student ID" }) },
+          { key: "studentName", label: t("studentName", { defaultValue: isRTL ? "الطالب" : "Student name" }) },
+          { key: "lectureId", label: t("lectureId", { defaultValue: isRTL ? "معرف المحاضرة" : "Lecture ID" }) },
+          { key: "lectureName", label: t("lecture", { defaultValue: isRTL ? "المحاضرة" : "Lecture name" }) },
+          { key: "remainingViews", label: t("remainingViews", { defaultValue: isRTL ? "المشاهدات المتبقية" : "Remaining views" }) },
+          { key: "lastAccessed", label: t("lastAccessed", { defaultValue: isRTL ? "آخر مشاهدة" : "Last accessed" }) },
+          { key: "lastViewEventAt", label: t("lastViewEventAt", { defaultValue: isRTL ? "آخر تشغيل" : "Last view event" }) },
+        ];
+
+        const flatRows = [
+          ...summaryRows.map((row) => ({ section: t("summary", { defaultValue: isRTL ? "الملخص" : "Summary" }), ...row })),
+          ...purchasesRows.map((row) => ({ section: t("purchasesByContent", { defaultValue: isRTL ? "المشتريات حسب المحتوى" : "Purchases by content" }), ...row })),
+          ...promoRows.map((row) => ({ section: t("promoCodes", { defaultValue: isRTL ? "الأكواد" : "Promo codes" }), ...row })),
+          ...accessRows.map((row) => ({ section: t("linkedStudents", { defaultValue: isRTL ? "الطلاب المرتبطون" : "Linked students" }), ...row })),
+        ];
+
+        exportCsvFile({
+          fileName: `${baseName}.csv`,
+          rows: flatRows,
+          columns: flatColumns,
+        });
+      }
+
+      toast.success(
+        t("exportSuccess", {
+          defaultValue: isRTL ? "تم التصدير بنجاح" : "Export completed successfully",
+        }),
       );
+    } catch (csvError) {
+      const message = translateErrorMessage(
+        t("csvDownloadFailed", {
+          defaultValue: isRTL ? "تعذر تنزيل ملف التصدير." : "Failed to download export file.",
+        }),
+      );
+      setError(message);
+      toast.error(message);
     }
   };
 
@@ -518,10 +629,24 @@ export default function LecturerOverviewPanel() {
             <button type="button" onClick={handleResetFilters} className="btn btn-ghost rounded-xl">
               {t("resetFilters", { defaultValue: isRTL ? "إعادة ضبط" : "Reset" })}
             </button>
-            <button type="button" onClick={handleExportCsv} className="btn btn-outline rounded-xl">
-              <Download className="w-4 h-4" />
-              {t("exportCsv", { defaultValue: isRTL ? "تصدير CSV" : "Export CSV" })}
-            </button>
+            <div className="dropdown dropdown-end">
+              <button type="button" tabIndex={0} className="btn btn-outline rounded-xl">
+                <Download className="w-4 h-4" />
+                {t("exportData", { defaultValue: isRTL ? "تصدير البيانات" : "Export Data" })}
+              </button>
+              <ul tabIndex={0} className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
+                <li>
+                  <button type="button" onClick={() => handleExport("xlsx")}>
+                    {t("exportXlsx", { defaultValue: isRTL ? "تصدير XLSX" : "Export XLSX" })}
+                  </button>
+                </li>
+                <li>
+                  <button type="button" onClick={() => handleExport("csv")}>
+                    {t("exportCsv", { defaultValue: isRTL ? "تصدير CSV" : "Export CSV" })}
+                  </button>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
       </form>

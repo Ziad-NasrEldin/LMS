@@ -536,14 +536,17 @@ exports.checkLectureAccess = catchAsync(async (req, res, next) => {
     return next(new AppError("Lecture not found", 404));
   }
 
+  const shouldEnforceExam = Boolean(lecture.requiresExam && lecture.examConfig);
+  const shouldEnforceHomework = Boolean(lecture.requiresHomework && lecture.homeworkConfig);
+
   if (lecture.requiresExam || lecture.requiresHomework) {
     const results = buildLectureRequirements(lecture);
 
-    if (lecture.requiresExam) {
+    if (shouldEnforceExam) {
       results.exam.passed = await hasPassedAssessment(studentId, lectureId, "exam");
     }
 
-    if (lecture.requiresHomework) {
+    if (shouldEnforceHomework) {
       results.homework.passed = await hasPassedAssessment(
         studentId,
         lectureId,
@@ -552,8 +555,8 @@ exports.checkLectureAccess = catchAsync(async (req, res, next) => {
     }
 
     if (
-      (lecture.requiresExam && !results.exam.passed) ||
-      (lecture.requiresHomework && !results.homework.passed)
+      (shouldEnforceExam && !results.exam.passed) ||
+      (shouldEnforceHomework && !results.homework.passed)
     ) {
       return res.status(200).json({
         status: "restricted",
@@ -571,8 +574,8 @@ exports.checkLectureAccess = catchAsync(async (req, res, next) => {
       hasAccess: true,
       requiresExam: lecture.requiresExam,
       requiresHomework: lecture.requiresHomework,
-      examPassed: lecture.requiresExam ? true : undefined,
-      homeworkPassed: lecture.requiresHomework ? true : undefined,
+      examPassed: lecture.requiresExam ? shouldEnforceExam : undefined,
+      homeworkPassed: lecture.requiresHomework ? shouldEnforceHomework : undefined,
     },
   });
 });

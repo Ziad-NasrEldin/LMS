@@ -43,8 +43,7 @@
     "noData": "لا توجد بيانات",
     "tryAdjustingFilters": "جرب تعديل المرشحات",
     "totalCouponValue": "قيمة الكوبون الإجمالية"
-  }
-  ,
+  },
   "exportCSV": "تصدير CSV",
   "dailyStats": "إحصاءات يومية",
   "exporting": "جارٍ التصدير...",
@@ -55,4 +54,4 @@
     "monthlyStats": "إحصاءات شهرية",
     "productStats": "إحصاءات المنتجات"
   }
-} 
+}

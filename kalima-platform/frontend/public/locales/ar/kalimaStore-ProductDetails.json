@@ -4,7 +4,7 @@
   },
   "navigation": {
     "back": "رجوع",
-    "goBack": "العودة "
+    "goBack": "العودة"
   },
   "product": {
     "details": "التفاصيل",
@@ -83,15 +83,15 @@
     "noFileSelected": "يرجى اختيار صورة الدفع.",
     "noTransferNumber": "يرجى إدخال رقم التحويل.",
     "fillBookFields": "يرجى ملء جميع حقول الكتاب.",
-    "purchaseSubmissionFailed": "فشل في إرسال الشراء: ",
+    "purchaseSubmissionFailed": "فشل في إرسال الشراء:",
     "title": "خطأ!",
     "productNotFound": "لم يتم العثور على المنتج.",
     "noCouponCode": "يرجى إدخال رمز الكوبون.",
     "invalidCoupon": "كوبون غير صالح أو منتهي الصلاحية.",
     "invalidDiscountValue": "قيمة الخصم المستلمة من الخادم غير صالحة.",
     "productDataNotLoaded": "بيانات المنتج غير محملة.",
-    "unknownError": "حدث خطأ غير معروف"
-    ,"copyFailed": "فشل النسخ"
+    "unknownError": "حدث خطأ غير معروف",
+    "copyFailed": "فشل النسخ"
   },
   "success": {
     "purchaseSubmitted": "تم إرسال الشراء بنجاح!",
@@ -107,11 +107,11 @@
     "transferNumberPlaceholder": "أدخل الرقم الذي حولت منه",
     "transferNumberHint": "رقم الهاتف أو الحساب الذي أرسلت منه الدفع",
     "bookPersonalization": "تخصيص الكتاب",
-    "nameOnBook": "اسم المدرس الذي تريد وضعه علي الكتاب*",
+    "nameOnBook": "اسم المدرس الذي تريد وضعه على الكتاب*",
     "nameOnBookPlaceholder": "أدخل الاسم الذي سيظهر على الكتاب",
-    "numberOnBook": "رقم الهاتف المراد وضعه علي الكتاب *",
+    "numberOnBook": "رقم الهاتف المراد وضعه على الكتاب *",
     "numberOnBookPlaceholder": "أدخل الرقم الذي سيظهر على الكتاب",
-    "seriesName": "اسم السلسلة المراد وضعه علي الكتاب*",
+    "seriesName": "اسم السلسلة المراد وضعه على الكتاب*",
     "seriesNamePlaceholder": "أدخل اسم السلسلة",
     "paymentScreenshot": "لقطة شاشة الدفع *",
     "fileUploaded": "تم رفع الملف بنجاح!",
@@ -122,7 +122,7 @@
     "chooseFile": "اختر ملفًا",
     "submit": "إرسال الشراء",
     "processingTimeTitle": "مدة المعالجة",
-    "processingTimeDesc": "بعد إرسال طلب الشراء الخاص بك، سيقوم فريقنا بمراجعة ومعالجة طلبك. يمكنك توقع الرد خلال ",
+    "processingTimeDesc": "بعد إرسال طلب الشراء الخاص بك، سيقوم فريقنا بمراجعة ومعالجة طلبك. يمكنك توقع الرد خلال",
     "hours": "ساعة في أوقات العمل",
     "couponCode": "رمز الكوبون",
     "couponCodePlaceholder": "أدخل الكوبون",

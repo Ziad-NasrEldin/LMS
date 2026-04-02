@@ -1,178 +1,177 @@
 {
-    "admin": { 
-      "pageTitle": "إدارة المستخدمين",
-      "quickAnalyticsSubtitle": "تحليلات سريعة للمستخدمين المُدارين",
-      "students": "الطلاب",
-      "teachers": "المعلمين",
-      "assignedLecturers": "المحاضرون المعينون",
-      "assistants": "المساعدين",
-      "parents": "أولياء الأمور",
-      "generatePromoCodes": "إنشاء أكواد ترويجية",
-      "sendOffer": "ارسل عرضك الان!",
-      "promo": "كود خاص",
-      "discount": "خصم",
-      "editUser": {
-        "title": "تعديل المستخدم",
-        "name": "الاسم",
-        "namePlaceholder": "الاسم",
-        "phone": "رقم الهاتف",
-        "phonePlaceholder": "رقم الهاتف",
-        "email": "البريد الالكتروني",
-        "emailPlaceholder": "البريد الإلكتروني",
-        "password": "كلمة المرور",
-        "passwordPlaceholder": "كلمة المرور",
-        "passwordHint": "يرجى ادخال كلمة المرور",
-        "save": "حفظ",
-        "cancel": "الغاء"
-      },
-      "userDetails": {
-  "name": "الاسم",
-  "email": "البريد الإلكتروني",
-  "gender": "النوع",
-  "phoneNumber": "رقم الهاتف",
-  "role": "الدور",
-  "joinedDate": "تاريخ الانضمام",
-  "government": "المحافظة",
-  "administrationZone": "المنطقة الإدارية",
-  "emailVerified": "تم التحقق من البريد الإلكتروني",
-  "successfulInvites": "الدعوات الناجحة",
-  "studentInfo": "معلومات الطالب",
-  "level": "المرحلة",
-  "sequenceId": "الرقم التسلسلي",
-  "parentPhone": "هاتف ولي الأمر",
-  "faction": "الفئة",
-  "hobbies": "الهوايات",
-  "generalPoints": "الرصيد العام",
-  "totalPoints": "إجمالي الرصيد",
+  "admin": {
+    "pageTitle": "إدارة المستخدمين",
+    "quickAnalyticsSubtitle": "تحليلات سريعة للمستخدمين المُدارين",
+    "students": "الطلاب",
+    "teachers": "المعلمين",
+    "assignedLecturers": "المحاضرون المعينون",
+    "assistants": "المساعدين",
+    "parents": "أولياء الأمور",
+    "generatePromoCodes": "إنشاء أكواد ترويجية",
+    "sendOffer": "ارسل عرضك الان!",
+    "promo": "كود خاص",
+    "discount": "خصم",
+    "editUser": {
+      "title": "تعديل المستخدم",
+      "name": "الاسم",
+      "namePlaceholder": "الاسم",
+      "phone": "رقم الهاتف",
+      "phonePlaceholder": "رقم الهاتف",
+      "email": "البريد الإلكتروني",
+      "emailPlaceholder": "البريد الإلكتروني",
+      "password": "كلمة المرور",
+      "passwordPlaceholder": "كلمة المرور",
+      "passwordHint": "يرجى ادخال كلمة المرور",
+      "save": "حفظ",
+      "cancel": "إلغاء"
+    },
+    "userDetails": {
+      "name": "الاسم",
+      "email": "البريد الإلكتروني",
+      "gender": "النوع",
+      "phoneNumber": "رقم الهاتف",
+      "role": "الدور",
+      "joinedDate": "تاريخ الانضمام",
+      "government": "المحافظة",
+      "administrationZone": "الإدارة التعليمية",
+      "emailVerified": "تم التحقق من البريد الإلكتروني",
+      "successfulInvites": "الدعوات الناجحة",
+      "studentInfo": "معلومات الطالب",
+      "level": "المرحلة",
+      "sequenceId": "الرقم التسلسلي",
+      "parentPhone": "هاتف ولي الأمر",
+      "faction": "الفئة",
+      "hobbies": "الهوايات",
+      "generalPoints": "الرصيد العام",
+      "totalPoints": "إجمالي الرصيد",
   "parentInfo": "معلومات ولي الأمر",
   "children": "الأبناء",
   "noChildren": "لا يوجد أبناء",
   "views": "عدد المشاهدات",
+  "profession": "المهنة",
   "teacherInfo": "معلومات المعلم",
-  "subject": "المادة",
-  "teachingLevel": "المرحلة التعليمية",
-  "school": "المدرسة",
-  "teachesAt": "يُدرّس في",
-  "centers": "المراكز",
-  "secondPhone": "رقم هاتف إضافي",
-  "socialMedia": "وسائل التواصل الاجتماعي",
-  "lecturerInfo": "معلومات المحاضر",
-  "bio": "نبذة",
-  "expertise": "الخبرة",
-  "assistantInfo": "معلومات المساعد",
-  "assignedLecturer": "المحاضر المعين",
-  "title": "تفاصيل المستخدم",
-  "close": "إغلاق"
-},
-"invites": {
-  "invite": "دعوة",
-  "invites": "دعوات",
-  "refreshSuccess": "تم تحديث الدعوات بنجاح!",
-  "refreshError": "حدث خطأ أثناء حساب بيانات الدعوات",
-  "calculating": "جاري الحساب...",
-  "refresh": "تحديث الدعوات"
-},
-"yes": "نعم",
-"no": "لا",
-"actions": {
-  "delete": "حذف",
-  "edit": "تعديل",
-  "cancel": "إلغاء",
-  "whatsapp": "إرسال رسالة واتساب",
-  "viewDetails": "عرض التفاصيل"
-},
-      "export": {
-        "export": "تصدير",
-        "exporting": "جاري التصدير...",
-        "csvFormat": "تنسيق CSV",
-        "jsonFormat": "تنسيق JSON",
-        "exportFiltered": "تصدير المفلتر",
-        "exportAll": "تصدير الكل",
-        "successAll": "تم تصدير {{count}} مستخدم بنجاح",
-        "successFiltered": "تم تصدير {{count}} مستخدم مفلتر بنجاح",
-        "error": "فشل في تصدير بيانات المستخدمين. يرجى المحاولة مرة أخرى.",
-        "filterInfo": "المرشحات المطبقة:",
-        "of": "من",
-        "usersShown": "مستخدم معروض",
-        "name": "الاسم",
-        "email": "البريد الإلكتروني",
-        "phone": "رقم الهاتف",
-        "role": "الصلاحية",
-        "status": "الحالة",
-        "government": "المحافظة",
-        "administrationZone": "المنطقة الإدارية",
-        "sequenceId": "الرقم التسلسلي",
-        "joinedDate": "تاريخ الانضمام"
-      },
-      "errors": {
-        "fetchLecturers": "فشل في جلب المحاضرين",
-        "pointsError": "يجب أن تكون القيمة أكبر من صفر",
-        "codesError": "يجب أن يكون عدد الأكواد أكبر من صفر",
-        "phoneRequired": "يرجى إدخال رقم الهاتف",
-        "lecturerRequired": "يرجى اختيار محاضر",
-        "generationFailed": "فشل في إنشاء أكواد الخصم",
-        "qrCodeGenerationFailed": "فشل في إنشاء رمز QR",
-        "fetchUsers": "فشل في جلب المستخدمين"
-      },
-      "download": "تحميل",
-      "success": {
-        "codesGenerated": "تم إنشاء أكواد الخصم بنجاح"
-      },
-      "form": {
-        "pointsAmount": "المبلغ",
-        "amountAfter": "المبلغ بعد",
-        "amountBefore": "المبلغ قبل",
-        "amountBeforePlaceholder": "أدخل المبلغ القديم",
-        "amountBeforeHint": "اختياري. يُستخدم فقط في قالب الطباعة كالمبلغ القديم المشطوب.",
-        "numCodes": "عدد الأكواد",
-        "codeType": "نوع الكود",
-        "general": "عام",
-        "specific": "مخصص",
-        "promo": "ترويجي",
-        "lecturer": "المحاضر",
-        "lecturerPlaceholder": "اختر محاضر",
-        "generateQrCodes": "إنشاء رموز QR",
-        "qrCodeDescription": "إنشاء رموز QR لاستخدام الأكواد بسهولة",
-        "qrCodeSize": "حجم رمز QR"
-      },
-      
-      "printQrCodes": "طباعة رموز QR",
-      "downloadAllQrCodes": "تحميل جميع رموز QR",
-      "template": {
-        "selectorLabel": "قالب الطباعة",
-        "uploadLabel": "رفع قالب جديد",
-        "requiredDimensions": "الأبعاد المطلوبة: {{width}} x {{height}} بكسل",
-        "invalidDimensions": "يجب أن تكون أبعاد الصورة {{width}}x{{height}} بكسل",
-        "uploadSuccess": "تم رفع القالب بنجاح",
-        "uploadFailed": "فشل في رفع صورة القالب",
-        "loadFailed": "فشل في تحميل قوالب أكواد الخصم",
-        "defaultOption": "القالب الافتراضي",
-        "invalidImage": "ملف الصورة غير صالح",
-        "imageOnly": "يُسمح فقط بملفات الصور"
-      },
-    
-      "points": "جنيه",
-      "userManagement": {
-        "title": "سجل الاجراءات",
-        "subtitle": "إدارة وتصدير بيانات المستخدمين",
-        "createUser": "إنشاء مستخدم جديد",
-        "delete": "حذف",
-        "edit": "تعديل"
-      },
-      "metrics": {
-        "totalFiltered": "المستخدمون بعد التصفية"
-      },
-      "whatsappModal": {
-        "title": "إرسال عرض عبر واتساب",
-        "phoneLabel": "رقم الهاتف",
-        "phonePlaceholder": "ادخل رقم الهاتف",
-        "messageLabel": "الرسالة (اختياري)",
-        "messagePlaceholder": "اكتب رسالتك هنا...",
-        "placeholder": "اكتب رسالتك هنا...",
-        "cancel": "إلغاء",
-        "send": "إرسال"
-      },
-      "generating": "جاري الإنشاء...",
+      "subject": "المادة",
+      "teachingLevel": "المرحلة التعليمية",
+      "school": "المدرسة",
+      "teachesAt": "يُدرّس في",
+      "centers": "المراكز",
+      "secondPhone": "رقم هاتف إضافي",
+      "socialMedia": "وسائل التواصل الاجتماعي",
+      "lecturerInfo": "معلومات المحاضر",
+      "bio": "نبذة",
+      "expertise": "الخبرة",
+      "assistantInfo": "معلومات المساعد",
+      "assignedLecturer": "المحاضر المعين",
+      "title": "تفاصيل المستخدم",
+      "close": "إغلاق"
+    },
+    "invites": {
+      "invite": "دعوة",
+      "invites": "دعوات",
+      "refreshSuccess": "تم تحديث الدعوات بنجاح!",
+      "refreshError": "حدث خطأ أثناء حساب بيانات الدعوات",
+      "calculating": "جاري الحساب...",
+      "refresh": "تحديث الدعوات"
+    },
+    "yes": "نعم",
+    "no": "لا",
+    "actions": {
+      "delete": "حذف",
+      "edit": "تعديل",
+      "cancel": "إلغاء",
+      "whatsapp": "إرسال رسالة واتساب",
+      "viewDetails": "عرض التفاصيل"
+    },
+    "export": {
+      "export": "تصدير",
+      "exporting": "جاري التصدير...",
+      "csvFormat": "تنسيق CSV",
+      "jsonFormat": "تنسيق JSON",
+      "exportFiltered": "تصدير المفلتر",
+      "exportAll": "تصدير الكل",
+      "successAll": "تم تصدير {{count}} مستخدم بنجاح",
+      "successFiltered": "تم تصدير {{count}} مستخدم مفلتر بنجاح",
+      "error": "فشل في تصدير بيانات المستخدمين. يرجى المحاولة مرة أخرى.",
+      "filterInfo": "المرشحات المطبقة:",
+      "of": "من",
+      "usersShown": "مستخدم معروض",
+      "name": "الاسم",
+      "email": "البريد الإلكتروني",
+      "phone": "رقم الهاتف",
+      "role": "الصلاحية",
+      "status": "الحالة",
+      "government": "المحافظة",
+      "administrationZone": "الإدارة التعليمية",
+      "sequenceId": "الرقم التسلسلي",
+      "joinedDate": "تاريخ الانضمام"
+    },
+    "errors": {
+      "fetchLecturers": "فشل في جلب المحاضرين",
+      "pointsError": "يجب أن تكون القيمة أكبر من صفر",
+      "codesError": "يجب أن يكون عدد الأكواد أكبر من صفر",
+      "phoneRequired": "يرجى إدخال رقم الهاتف",
+      "lecturerRequired": "يرجى اختيار محاضر",
+      "generationFailed": "فشل في إنشاء أكواد الخصم",
+      "qrCodeGenerationFailed": "فشل في إنشاء رمز QR",
+      "fetchUsers": "فشل في جلب المستخدمين"
+    },
+    "download": "تحميل",
+    "success": {
+      "codesGenerated": "تم إنشاء أكواد الخصم بنجاح"
+    },
+    "form": {
+      "pointsAmount": "المبلغ",
+      "amountAfter": "المبلغ بعد",
+      "amountBefore": "المبلغ قبل",
+      "amountBeforePlaceholder": "أدخل المبلغ القديم",
+      "amountBeforeHint": "اختياري. يُستخدم فقط في قالب الطباعة كالمبلغ القديم المشطوب.",
+      "numCodes": "عدد الأكواد",
+      "codeType": "نوع الكود",
+      "general": "عام",
+      "specific": "مخصص",
+      "promo": "ترويجي",
+      "lecturer": "المحاضر",
+      "lecturerPlaceholder": "اختر محاضر",
+      "generateQrCodes": "إنشاء رموز QR",
+      "qrCodeDescription": "إنشاء رموز QR لاستخدام الأكواد بسهولة",
+      "qrCodeSize": "حجم رمز QR"
+    },
+    "printQrCodes": "طباعة رموز QR",
+    "downloadAllQrCodes": "تحميل جميع رموز QR",
+    "template": {
+      "selectorLabel": "قالب الطباعة",
+      "uploadLabel": "رفع قالب جديد",
+      "requiredDimensions": "الأبعاد المطلوبة: {{width}} x {{height}} بكسل",
+      "invalidDimensions": "يجب أن تكون أبعاد الصورة {{width}}x{{height}} بكسل",
+      "uploadSuccess": "تم رفع القالب بنجاح",
+      "uploadFailed": "فشل في رفع صورة القالب",
+      "loadFailed": "فشل في تحميل قوالب أكواد الخصم",
+      "defaultOption": "القالب الافتراضي",
+      "invalidImage": "ملف الصورة غير صالح",
+      "imageOnly": "يُسمح فقط بملفات الصور"
+    },
+    "points": "جنيه",
+    "userManagement": {
+      "title": "سجل الاجراءات",
+      "subtitle": "إدارة وتصدير بيانات المستخدمين",
+      "createUser": "إنشاء مستخدم جديد",
+      "delete": "حذف",
+      "edit": "تعديل"
+    },
+    "metrics": {
+      "totalFiltered": "المستخدمون بعد التصفية"
+    },
+    "whatsappModal": {
+      "title": "إرسال عرض عبر واتساب",
+      "phoneLabel": "رقم الهاتف",
+      "phonePlaceholder": "ادخل رقم الهاتف",
+      "messageLabel": "الرسالة (اختياري)",
+      "messagePlaceholder": "اكتب رسالتك هنا...",
+      "placeholder": "اكتب رسالتك هنا...",
+      "cancel": "إلغاء",
+      "send": "إرسال"
+    },
+    "generating": "جاري الإنشاء...",
     "generateCodes": "إنشاء الأكواد",
     "generatedCodes": "الأكواد المنشأة",
     "promoTable": {
@@ -183,10 +182,9 @@
       "actions": "الإجراءات",
       "discount": "الخصم"
     },
-        "specific": "محدد",
-            "general": "عام",
-            "copy": "نسخ",
-            
+    "specific": "محدد",
+    "general": "عام",
+    "copy": "نسخ",
     "filters": {
       "name": "الاسم",
       "phone": "رقم الهاتف",
@@ -218,7 +216,6 @@
       "name": "الاسم",
       "successfulInvites": "الدعوات الناجحة"
     },
-
     "pagination": {
       "previous": "السابق",
       "next": "التالي",
@@ -231,7 +228,6 @@
     "noUsersFiltered": "لا يوجد مستخدمون يطابقون الفلاتر الحالية. حاول تعديل معايير البحث.",
     "noUsersYet": "لم يتم تسجيل أي مستخدمين بعد. تحقق لاحقًا.",
     "NA": "غير متوفر",
-
     "auditlog": {
       "title": "سجل العمليات",
       "subtitle": "عرض وتتبع جميع الأنشطة على النظام",
@@ -239,7 +235,6 @@
       "noRecords": "لا توجد سجلات متاحة",
       "noRecordsFiltered": "لا توجد سجلات عمليات تطابق المرشحات الحالية. جرب تعديل معايير البحث.",
       "noRecordsYet": "لم يتم تسجيل أي سجلات عمليات بعد. ستظهر الأنشطة هنا بمجرد بدء المستخدمين التفاعل مع النظام.",
-      
       "filters": {
         "all": "الكل",
         "user": "المستخدم",
@@ -250,10 +245,9 @@
         "date": "التاريخ",
         "to": "إلى",
         "apply": "تطبيق الفلتر",
-        "search" :"البحث في سجل العمليات...",
-        "email" :"البريد الإلكتروني"
+        "search": "البحث في سجل العمليات...",
+        "email": "البريد الإلكتروني"
       },
-      
       "columns": {
         "user": "المستخدم",
         "role": "الصلاحية",
@@ -261,7 +255,7 @@
         "resource": "العنصر",
         "datetime": "التاريخ والوقت",
         "status": "الحالة",
-        "email":"البريد الإلكتروني"
+        "email": "البريد الإلكتروني"
       },
       "table": {
         "user": "المستخدم",
@@ -272,7 +266,6 @@
         "resource": "العنصر",
         "status": "الحالة"
       },
-      
       "roles": {
         "admin": "مسؤول",
         "subadmin": "مسؤول فرعي",
@@ -281,7 +274,6 @@
         "teacher": "معلم",
         "assistant": "مساعد"
       },
-      
       "actions": {
         "create": "إنشاء",
         "read": "قراءة",
@@ -289,15 +281,14 @@
         "delete": "حذف",
         "cancel": "إلغاء"
       },
-      
       "resources": {
         "container": "كورس",
         "lecture": "درس",
         "user": "مستخدم",
         "timetable": "جدول زمني",
-        "center": "مركز" ,
+        "center": "مركز",
         "code": "كود",
-        "promoCode": "كود ترويجي", 
+        "promoCode": "كود ترويجي",
         "admin": "أدمن",
         "assistant": "مساعد",
         "parent": "ولي أمر",
@@ -309,24 +300,20 @@
         }
       },
       "idDisplay": "ID: {{id}}",
-      
       "status": {
         "success": "ناجح",
         "pending": "قيد الانتظار",
         "failed": "فشل",
         "unknown": "غير معروف"
       },
-      
       "errors": {
         "fetch": "فشل تحميل سجلات التدقيق",
         "general": "حدث خطأ"
       },
-      
       "pagination": {
         "previous": "السابق",
         "next": "التالي"
       },
-
       "export": {
         "export": "تصدير السجلات",
         "exporting": "جاري التصدير...",
@@ -348,7 +335,7 @@
         "email": "البريد الإلكتروني",
         "phone": "رقم الهاتف",
         "government": "المحافظة",
-        "administrationZone": "المنطقة الإدارية",
+        "administrationZone": "الإدارة التعليمية",
         "sequenceId": "الرقم التسلسلي",
         "joinedDate": "تاريخ الانضمام",
         "user": "المستخدم",
@@ -363,107 +350,105 @@
         "description": "الوصف"
       }
     }
-    },
-    "promoCodes": {
-      "title": "إدارة الأكواد الترويجية",
-      "subtitle": "إدارة دورة حياة أكواد الشحن واستخدامها",
-      "code": " كود الخصم",
-      "points": " الجنيه",
-      "status": " الحالة",
-      "redeemedAt": "تم استرداده في",
-      "redeemedBy": "تم الاسترداد بواسطة",
-      "noCodes": "لم يتم العثور على أكواد ترويجية",
-      "actions": "الإجراءات"
-    },
-    "filters": {
-      "allStatuses": "كل الحالات",
-      "redeemed": "مسترد",
-      "active": "نشط",
-      "redeemedBy": "تم استرداده بواسطة",
-      "apply": "تطبيق",
-      "allStudents": "كل الطلاب",
-      "all": "كل الانواع",
-      "general": "عام",
-      "specific": "مخصص",
-      "promo": "ترويجي"
-    },
-    "pagination": {
-      "previous": "السابق",
-      "next": "التالي",
-      "page": "صفحة",
-      "of": "من"
-    },
-    "status": {
-      "redeemed": "مسترد",
-      "active": "نشط"
-    },
-    "errors": {
-      "fetchPromo": "فشل في جلب الأكواد الترويجية",
-      "invalidResponse": "استجابة غير صالحة من الخادم",
-      "failedToFetchStudents": "فشل في جلب الطلاب",
-      "deleteFailed": "فشل طلب الحذف",
-      "unexpectedError": "حدث خطأ غير متوقع",
-      "bulkDeleteFailed": "فشل الحذف الجماعي"
-    },
-    "revenue": {
-      "errorLoadingRevenue": "خطأ في تحميل بيانات الإيرادات",
-      "lecturerRevenue": "إيرادات المحاضر",
-      "financialDashboardTitle": "رؤى المستخدمين",
-      "financialDashboardSubtitle": "مؤشرات الأداء والسلوك للمستخدمين المُدارين",
-      "revenueSummary": "ملخص الإيرادات",
-      "totalRevenue": "إجمالي الإيرادات",
-      "currency": "جنيه",
-      "totalPurchases": "إجمالي المشتريات",
-      "activeLecturers": "المحاضرون المُدارون",
-      "monthsWithRevenue": "أشهر بها إيرادات",
-      "purchaseCount": "عدد المشتريات",
-      "noRevenueData": "لا توجد بيانات إيرادات لهذا المحاضر",
-      "breakdownByLesson": "تفصيل الإيرادات حسب المحتوى",
-      "noBreakdownData": "لا توجد بيانات تفصيلية حالياً"
-    },
-     "modals" : {
-        "confirmDelete": " حذف هذا الكود؟",
-        "deleteCodeConfirm": "هل انت متاكد من رغبتك في حذف هذا الكود؟",
-        "confirmBulkDelete": "تأكيد الحذف الجماعي",
-        "bulkDeleteConfirm": "هل أنت متأكد من حذف أكواد الشحن المحددة؟"
-
-      },
-    "export": {
-      "export": "تصدير",
-      "exporting": "جاري التصدير...",
-      "csvFormat": "تنسيق CSV",
-      "jsonFormat": "تنسيق JSON",
-      "exportFiltered": "تصدير المفلتر",
-      "exportAll": "تصدير الكل",
-      "successAll": "تم تصدير {{count}} مستخدم بنجاح",
-      "successFiltered": "تم تصدير {{count}} مستخدم مفلتر بنجاح",
-      "error": "فشل في تصدير المستخدمين. يرجى المحاولة مرة أخرى.",
-      "filterInfo": "المرشحات المطبقة:",
-      "of": "من",
-      "usersShown": "مستخدم معروض",
-      "name": "الاسم",
-      "email": "البريد الإلكتروني",
-      "phone": "رقم الهاتف",
-      "role": "الدور",
-      "status": "الحالة",
-      "government": "المحافظة",
-      "administrationZone": "المنطقة الإدارية",
-      "sequenceId": "الرقم التسلسلي",
-      "joinedDate": "تاريخ الانضمام"
-    },
-
-    "noPhoneNumber": "لا يوجد رقم هاتف متاح",
-    "noUsers": "لم يتم العثور على مستخدمين",
-    "noUsersFiltered": "لا يوجد مستخدمين يطابقون المرشحات الحالية. جرب تعديل معايير البحث.",
-    "noUsersYet": "لم يسجل أي مستخدمين بعد. تحقق لاحقاً.",
-    "invites": {
-      "invite": "دعوة",
-      "invites": "دعوات"
-    },
-    "actions": {
-      "delete": "حذف",
-      "edit": "تعديل",
-      "cancel": "إلغاء",
-      "whatsapp": "إرسال رسالة واتساب"
-    }
+  },
+  "promoCodes": {
+    "title": "إدارة الأكواد الترويجية",
+    "subtitle": "إدارة دورة حياة أكواد الشحن واستخدامها",
+    "code": "كود الخصم",
+    "points": "الجنيه",
+    "status": "الحالة",
+    "redeemedAt": "تم استرداده في",
+    "redeemedBy": "تم الاسترداد بواسطة",
+    "noCodes": "لم يتم العثور على أكواد ترويجية",
+    "actions": "الإجراءات"
+  },
+  "filters": {
+    "allStatuses": "كل الحالات",
+    "redeemed": "مسترد",
+    "active": "نشط",
+    "redeemedBy": "تم استرداده بواسطة",
+    "apply": "تطبيق",
+    "allStudents": "كل الطلاب",
+    "all": "كل الانواع",
+    "general": "عام",
+    "specific": "مخصص",
+    "promo": "ترويجي"
+  },
+  "pagination": {
+    "previous": "السابق",
+    "next": "التالي",
+    "page": "صفحة",
+    "of": "من"
+  },
+  "status": {
+    "redeemed": "مسترد",
+    "active": "نشط"
+  },
+  "errors": {
+    "fetchPromo": "فشل في جلب الأكواد الترويجية",
+    "invalidResponse": "استجابة غير صالحة من الخادم",
+    "failedToFetchStudents": "فشل في جلب الطلاب",
+    "deleteFailed": "فشل طلب الحذف",
+    "unexpectedError": "حدث خطأ غير متوقع",
+    "bulkDeleteFailed": "فشل الحذف الجماعي"
+  },
+  "revenue": {
+    "errorLoadingRevenue": "خطأ في تحميل بيانات الإيرادات",
+    "lecturerRevenue": "إيرادات المحاضر",
+    "financialDashboardTitle": "رؤى المستخدمين",
+    "financialDashboardSubtitle": "مؤشرات الأداء والسلوك للمستخدمين المُدارين",
+    "revenueSummary": "ملخص الإيرادات",
+    "totalRevenue": "إجمالي الإيرادات",
+    "currency": "جنيه",
+    "totalPurchases": "إجمالي المشتريات",
+    "activeLecturers": "المحاضرون المُدارون",
+    "monthsWithRevenue": "أشهر بها إيرادات",
+    "purchaseCount": "عدد المشتريات",
+    "noRevenueData": "لا توجد بيانات إيرادات لهذا المحاضر",
+    "breakdownByLesson": "تفصيل الإيرادات حسب المحتوى",
+    "noBreakdownData": "لا توجد بيانات تفصيلية حاليًا"
+  },
+  "modals": {
+    "confirmDelete": "حذف هذا الكود؟",
+    "deleteCodeConfirm": "هل انت متاكد من رغبتك في حذف هذا الكود؟",
+    "confirmBulkDelete": "تأكيد الحذف الجماعي",
+    "bulkDeleteConfirm": "هل أنت متأكد من حذف أكواد الشحن المحددة؟"
+  },
+  "export": {
+    "export": "تصدير",
+    "exporting": "جاري التصدير...",
+    "csvFormat": "تنسيق CSV",
+    "jsonFormat": "تنسيق JSON",
+    "exportFiltered": "تصدير المفلتر",
+    "exportAll": "تصدير الكل",
+    "successAll": "تم تصدير {{count}} مستخدم بنجاح",
+    "successFiltered": "تم تصدير {{count}} مستخدم مفلتر بنجاح",
+    "error": "فشل في تصدير المستخدمين. يرجى المحاولة مرة أخرى.",
+    "filterInfo": "المرشحات المطبقة:",
+    "of": "من",
+    "usersShown": "مستخدم معروض",
+    "name": "الاسم",
+    "email": "البريد الإلكتروني",
+    "phone": "رقم الهاتف",
+    "role": "الدور",
+    "status": "الحالة",
+    "government": "المحافظة",
+    "administrationZone": "الإدارة التعليمية",
+    "sequenceId": "الرقم التسلسلي",
+    "joinedDate": "تاريخ الانضمام"
+  },
+  "noPhoneNumber": "لا يوجد رقم هاتف متاح",
+  "noUsers": "لم يتم العثور على مستخدمين",
+  "noUsersFiltered": "لا يوجد مستخدمين يطابقون المرشحات الحالية. جرب تعديل معايير البحث.",
+  "noUsersYet": "لم يسجل أي مستخدمين بعد. تحقق لاحقاً.",
+  "invites": {
+    "invite": "دعوة",
+    "invites": "دعوات"
+  },
+  "actions": {
+    "delete": "حذف",
+    "edit": "تعديل",
+    "cancel": "إلغاء",
+    "whatsapp": "إرسال رسالة واتساب"
   }
+}

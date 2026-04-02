@@ -1,4 +1,5 @@
 const bcrypt = require("bcrypt");
+const mongoose = require("mongoose");
 const User = require("../models/userModel.js");
 const Parent = require("../models/parentModel.js");
 const Lecturer = require("../models/lecturerModel.js");
@@ -7,25 +8,24 @@ const Teacher = require("../models/teacherModel.js");
 const Assistant = require("../models/assistantModel.js");
 const Moderator = require("../models/moderatorModel.js");
 const SubAdmin = require("../models/subAdminModel.js");
-const AppError = require("../utils/appError");
-const mongoose = require("mongoose");
 const catchAsync = require("../utils/catchAsync");
-const Level = require("../models/levelModel.js");
 const Government = require("../models/governmentModel.js");
 const AdministrationZone = require("../models/administrationZonesModel.js");
-const {
-  normalizeEgyptianPhoneNumber,
-} = require("../utils/phoneNumber.js");
-const validatePassword = (password) => {
-  const requiredLength = 8;
+const { validateOptionalLevel, validateStudentLevelSelection, validateTeacherLevels } = require("../utils/levelHierarchy");
+const { normalizeEgyptianPhoneNumber } = require("../utils/phoneNumber.js");
+const { createSignupError, mapLevelHierarchyAppError } = require("../utils/signupErrors");
 
-  if (password.length < requiredLength) {
-    throw new AppError(
-      `Password must be at least ${requiredLength} characters long`,
-      400
-    );
+const allowedParentRelations = ["mother", "father", "other"];
+
+const validatePassword = (password) => {
+  const value = String(password || "");
+  const requiredLength = 8;
+  if (value.length < requiredLength) {
+    throw createSignupError("SIGNUP_PASSWORD_TOO_SHORT");
   }
 };
+
+const isNonEmpty = (value) => String(value || "").trim().length > 0;
 
 const registerNewUser = catchAsync(async (req, res, next) => {
   const {
@@ -40,22 +40,26 @@ const registerNewUser = catchAsync(async (req, res, next) => {
     administrationZone,
     ...userData
   } = req.body;
+
+  const normalizedRole = String(role || "").trim().toLowerCase();
   const phoneRequiredRoles = ["teacher", "parent", "student"];
   const govAdminRequiredRoles = ["teacher", "parent", "student"];
-  const normalizedRole = role.toLowerCase();
   const normalizedPhoneNumber = phoneNumber ? normalizeEgyptianPhoneNumber(phoneNumber) : "";
   const normalizedPhoneNumber2 =
     userData.phoneNumber2 !== undefined && userData.phoneNumber2 !== ""
       ? normalizeEgyptianPhoneNumber(userData.phoneNumber2)
       : "";
 
-  // Only validate government and administration zone for specific roles
+  if (!normalizedRole) {
+    return next(createSignupError("SIGNUP_INVALID_ROLE"));
+  }
+
   if (govAdminRequiredRoles.includes(normalizedRole)) {
-    if (!government || !government.trim()) {
-      return next(new AppError("Government is required.", 400));
+    if (!isNonEmpty(government)) {
+      return next(createSignupError("SIGNUP_GOVERNMENT_REQUIRED"));
     }
-    if (!administrationZone || !administrationZone.trim()) {
-      return next(new AppError("Administration zone is required.", 400));
+    if (!isNonEmpty(administrationZone)) {
+      return next(createSignupError("SIGNUP_ADMIN_ZONE_REQUIRED"));
     }
 
     try {
@@ -67,65 +71,50 @@ const registerNewUser = catchAsync(async (req, res, next) => {
       });
 
       if (!govDoc) {
-        // Get all available governments for better error message  // ← Enhanced error message
         const availableGovs = await Government.find({}, "name").lean();
-        const govNames = availableGovs.map((g) => g.name).join(", ");
-
+        const govNames = availableGovs.map((g) => g.name);
         return next(
-          new AppError(
-            `Invalid government: ${normalizedGovernment}. Available governments: ${govNames}`, // ← Better error with options
-            400
-          )
+          createSignupError("SIGNUP_GOVERNMENT_INVALID", {
+            details: { providedGovernment: normalizedGovernment, availableGovernments: govNames },
+          })
         );
       }
 
-      // Handle case where administrationZone is missing in the Government document
-      if (
-        !govDoc.administrationZone ||
-        !Array.isArray(govDoc.administrationZone)
-      ) {
-        return next(
-          new AppError(
-            `No administration zones defined for government: ${government}.`,
-            400
-          )
-        );
+      if (!govDoc.administrationZone || !Array.isArray(govDoc.administrationZone)) {
+        return next(createSignupError("SIGNUP_ADMIN_ZONE_INVALID"));
       }
-      // First check if the zone exists in the Government document
+
       const zoneExistsInGov = govDoc.administrationZone.some(
         (zone) =>
           zone &&
-          zone.toLowerCase().trim() ===
-          normalizedAdministrationZone.toLowerCase() // ← Use normalized value
+          zone.toLowerCase().trim() === normalizedAdministrationZone.toLowerCase()
       );
 
       if (!zoneExistsInGov) {
-        // ← Simplified logic, removed console.log
-        // If not found in government, check AdministrationZone collection as fallback
         const zoneDoc = await AdministrationZone.findOne({
-          name: {
-            $regex: new RegExp(`^${normalizedAdministrationZone}$`, "i"),
-          }, // ← Use normalized value
+          name: { $regex: new RegExp(`^${normalizedAdministrationZone}$`, "i") },
         });
 
         if (!zoneDoc) {
           return next(
-            new AppError(
-              `Administration zone "${administrationZone}" not found for government: ${government}.`,
-              400
-            )
+            createSignupError("SIGNUP_ADMIN_ZONE_INVALID", {
+              details: {
+                providedAdministrationZone: normalizedAdministrationZone,
+                government: normalizedGovernment,
+              },
+            })
           );
         }
-
-        // Zone is valid, but not in government - could add it to government here if needed
       }
     } catch (error) {
       return next(
-        new AppError(`Error validating location data: ${error.message}`, 500)
+        createSignupError("SIGNUP_LOCATION_VALIDATION_FAILED", {
+          details: { cause: error.message },
+        })
       );
     }
   }
-  // Validate password
+
   try {
     validatePassword(password);
   } catch (error) {
@@ -133,84 +122,67 @@ const registerNewUser = catchAsync(async (req, res, next) => {
   }
 
   if (password !== confirmPassword) {
-    return next(new AppError("Passwords do not match", 400));
+    return next(createSignupError("SIGNUP_PASSWORD_MISMATCH"));
   }
-  if (!email) {
-    return next(new AppError("Email is required", 400));
+  if (!isNonEmpty(email)) {
+    return next(createSignupError("SIGNUP_EMAIL_REQUIRED"));
   }
 
   const duplicateEmail = await User.findOne({
     email: { $regex: new RegExp(`^${email}$`, "i") },
   });
-
   if (duplicateEmail) {
-    return next(
-      new AppError("This E-Mail is already associated with a user.", 409)
-    );
+    return next(createSignupError("SIGNUP_EMAIL_ALREADY_EXISTS"));
   }
 
   if (phoneRequiredRoles.includes(normalizedRole) && !normalizedPhoneNumber) {
-    return next(
-      new AppError(
-        "Phone number must be in +20XXXXXXXXXX format, or local 0XXXXXXXXXX/XXXXXXXXXX format which will be converted to +20XXXXXXXXXX.",
-        400
-      )
-    );
+    return next(createSignupError("SIGNUP_PHONE_INVALID"));
   }
 
   if (userData.phoneNumber2 !== undefined && userData.phoneNumber2 !== "" && !normalizedPhoneNumber2) {
-    return next(
-      new AppError(
-        "phoneNumber2 must be a valid Egyptian number (+20XXXXXXXXXX, 0XXXXXXXXXX, or XXXXXXXXXX).",
-        400
-      )
-    );
+    return next(createSignupError("SIGNUP_PHONE2_INVALID"));
   }
 
   const duplicatePhone = normalizedPhoneNumber
     ? await User.findOne({ phoneNumber: normalizedPhoneNumber })
     : null;
   if (phoneRequiredRoles.includes(normalizedRole) && duplicatePhone) {
-    return next(
-      new AppError("This phone number is already associated with a user.", 400)
-    );
+    return next(createSignupError("SIGNUP_PHONE_ALREADY_EXISTS"));
   }
 
   const childrenById = [];
-  if (!!children) {
-    for (let id of children) {
-      // Check if the id is a valid MongoDB ObjectId
-      const isMongoId = mongoose.Types.ObjectId.isValid(id);
-      if (isMongoId) {
-        childrenById.push(id);
+  const invalidChildren = [];
+  if (children) {
+    const requestedChildren = Array.isArray(children) ? children : [children];
+    for (const childValue of requestedChildren) {
+      const value = String(childValue || "").trim();
+      if (!value) continue;
+      if (mongoose.Types.ObjectId.isValid(value)) {
+        childrenById.push(value);
+        continue;
+      }
+
+      const student = await Student.findOne({ sequencedId: value }).lean();
+      if (student) {
+        childrenById.push(student._id);
       } else {
-        try {
-          const student = await Student.findOne({ sequencedId: id }).lean();
-          if (student) {
-            childrenById.push(student._id);
-          }
-        } catch (error) {
-          if (error.name === "CastError") {
-            return next(
-              new AppError(
-                "Not all children values are valid UserId or SequenceId.",
-                400
-              )
-            );
-          }
-        }
+        invalidChildren.push(value);
       }
     }
   }
+  if (invalidChildren.length > 0) {
+    return next(
+      createSignupError("SIGNUP_CHILD_REFERENCE_INVALID", {
+        details: { invalidChildren },
+      })
+    );
+  }
+
   const hashedPwd = await bcrypt.hash(password, 12);
 
   let profilePicPath = null;
   if (req.file && req.file.fieldname === "profilePic") {
     profilePicPath = req.file.path;
-  }
-  // Always set profilePic, null if not uploaded
-  if (!profilePicPath) {
-    profilePicPath = null;
   }
 
   const newUser = {
@@ -218,18 +190,15 @@ const registerNewUser = catchAsync(async (req, res, next) => {
     email: email.toLowerCase().trim(),
     password: hashedPwd,
     children: childrenById,
-    isEmailVerified: true, // Set users to already verified by default
+    isEmailVerified: true,
     ...userData,
   };
 
-  // Only include government and administrationZone for specific roles
   if (govAdminRequiredRoles.includes(normalizedRole)) {
     newUser.government = government;
     newUser.administrationZone = administrationZone;
   }
 
-
-  // Normalize phone numbers before saving
   if (normalizedPhoneNumber) {
     newUser.phoneNumber = normalizedPhoneNumber;
   }
@@ -237,78 +206,51 @@ const registerNewUser = catchAsync(async (req, res, next) => {
     newUser.phoneNumber2 = normalizedPhoneNumber2;
   }
 
-  if (profilePicPath !== undefined) {
-    newUser.profilePic = profilePicPath;
-  }
+  newUser.profilePic = profilePicPath;
 
-  // Referral logic: look up inviter by serial and set referredBy (ignore empty string)
   if (req.body.referralSerial !== undefined && req.body.referralSerial !== "") {
     const inviter = await User.findOne({ userSerial: req.body.referralSerial });
     if (inviter) {
       newUser.referredBy = inviter._id;
     }
-    // Optionally, handle the case where the serial is invalid (show error or ignore)
   }
 
   let user;
-
   switch (normalizedRole) {
     case "teacher": {
       if (!newUser.phoneNumber2) {
         delete newUser.phoneNumber2;
       }
-      // Validate level (must be an array of allowed values)
-      if (
-        !Array.isArray(newUser.level) ||
-        newUser.level.length === 0 ||
-        !newUser.level.every((l) =>
-          ["primary", "preparatory", "secondary"].includes(l)
-        )
-      ) {
-        return next(
-          new AppError(
-            "Level is required for teacher role and must be a non-empty array of: Primary, Preparatory, Secondary",
-            400
-          )
-        );
+
+      try {
+        const resolvedTeacherLevels = await validateTeacherLevels(newUser.level);
+        newUser.level = resolvedTeacherLevels.map((levelDoc) => levelDoc._id);
+      } catch (error) {
+        return next(mapLevelHierarchyAppError(error, "teacher"));
       }
-      // Validate teachesAtType
-      if (
-        !newUser.teachesAtType ||
-        !["Center", "School", "Both"].includes(newUser.teachesAtType)
-      ) {
-        return next(
-          new AppError(
-            "teachesAtType is required and must be 'Center', 'School', or 'Both'",
-            400
-          )
-        );
+
+      if (!newUser.teachesAtType || !["Center", "School", "Both"].includes(newUser.teachesAtType)) {
+        return next(createSignupError("SIGNUP_TEACHER_TEACHES_AT_TYPE_REQUIRED"));
       }
-      // Validate centers
+
       if (
-        newUser.teachesAtType === "Center" &&
-        (!Array.isArray(newUser.centers) || newUser.centers.length === 0)
+        (newUser.teachesAtType === "Center" || newUser.teachesAtType === "Both") &&
+        (!Array.isArray(newUser.centers) || newUser.centers.filter((center) => String(center || "").trim()).length === 0)
       ) {
-        return next(
-          new AppError(
-            "At least one center is required if teachesAtType is 'Center'",
-            400
-          )
-        );
+        return next(createSignupError("SIGNUP_TEACHER_CENTERS_REQUIRED"));
       }
-      // Validate school
+
       if (
-        newUser.teachesAtType === "School" &&
-        (!newUser.school || newUser.school.trim() === "")
+        (newUser.teachesAtType === "School" || newUser.teachesAtType === "Both") &&
+        !isNonEmpty(newUser.school)
       ) {
-        return next(
-          new AppError("School is required if teachesAtType is 'School'", 400)
-        );
+        return next(createSignupError("SIGNUP_TEACHER_SCHOOL_REQUIRED"));
       }
-      // Validate socialMedia (optional, but if present, must be array of {platform, account})
+
       if (newUser.socialMedia && !Array.isArray(newUser.socialMedia)) {
-        return next(new AppError("socialMedia must be an array", 400));
+        return next(createSignupError("SIGNUP_TEACHER_SOCIAL_MEDIA_NOT_ARRAY"));
       }
+
       if (Array.isArray(newUser.socialMedia)) {
         for (const sm of newUser.socialMedia) {
           if (typeof sm !== "object") continue;
@@ -326,40 +268,109 @@ const registerNewUser = catchAsync(async (req, res, next) => {
             ].includes(sm.platform)
           ) {
             return next(
-              new AppError(`Invalid social media platform: ${sm.platform}`, 400)
+              createSignupError("SIGNUP_TEACHER_SOCIAL_MEDIA_PLATFORM_INVALID", {
+                details: { invalidPlatform: sm.platform },
+              })
             );
           }
         }
       }
+
       user = await Teacher.create(newUser);
       break;
     }
-    case "student":
-      if (!newUser.level)
-        return next(new AppError("Level is required for student role", 400));
+    case "student": {
+      if (!newUser.stage) {
+        return next(createSignupError("SIGNUP_STUDENT_STAGE_REQUIRED"));
+      }
+      if (!newUser.level) {
+        return next(createSignupError("SIGNUP_STUDENT_LEVEL_REQUIRED"));
+      }
+
       if (newUser.hobby) {
         newUser.hobby = String(newUser.hobby).trim().toLowerCase();
       }
-      if (!newUser.parentPhoneNumber || !String(newUser.parentPhoneNumber).trim()) {
-        return next(new AppError("Parent phone number is required for student role", 400));
+
+      if (!isNonEmpty(newUser.parentPhoneNumber)) {
+        return next(createSignupError("SIGNUP_STUDENT_PARENT_PHONE_REQUIRED"));
       }
       newUser.parentPhoneNumber = normalizeEgyptianPhoneNumber(newUser.parentPhoneNumber);
       if (!newUser.parentPhoneNumber) {
-        return next(
-          new AppError(
-            "Parent phone number must be in +20XXXXXXXXXX format, or local 0XXXXXXXXXX/XXXXXXXXXX format which will be converted to +20XXXXXXXXXX.",
-            400
-          )
-        );
+        return next(createSignupError("SIGNUP_STUDENT_PARENT_PHONE_INVALID"));
       }
-      const level = await Level.findById(newUser.level);
-      if (!level)
-        return next(new AppError("There is no level with this id", 404));
+
+      if (!isNonEmpty(newUser.parentPhoneRelation)) {
+        return next(createSignupError("SIGNUP_STUDENT_PARENT_RELATION_REQUIRED"));
+      }
+      newUser.parentPhoneRelation = String(newUser.parentPhoneRelation).trim().toLowerCase();
+      if (!allowedParentRelations.includes(newUser.parentPhoneRelation)) {
+        return next(createSignupError("SIGNUP_STUDENT_PARENT_RELATION_INVALID"));
+      }
+
+      const hasSecondaryParentPhone =
+        newUser.parentPhoneNumber2 !== undefined &&
+        String(newUser.parentPhoneNumber2).trim() !== "";
+      const hasSecondaryParentRelation =
+        newUser.parentPhoneRelation2 !== undefined &&
+        String(newUser.parentPhoneRelation2).trim() !== "";
+
+      if (hasSecondaryParentRelation && !hasSecondaryParentPhone) {
+        return next(createSignupError("SIGNUP_STUDENT_PARENT2_PHONE_REQUIRED"));
+      }
+
+      if (hasSecondaryParentPhone) {
+        newUser.parentPhoneNumber2 = normalizeEgyptianPhoneNumber(newUser.parentPhoneNumber2);
+        if (!newUser.parentPhoneNumber2) {
+          return next(createSignupError("SIGNUP_STUDENT_PARENT2_PHONE_INVALID"));
+        }
+
+        if (!hasSecondaryParentRelation) {
+          return next(createSignupError("SIGNUP_STUDENT_PARENT2_RELATION_REQUIRED"));
+        }
+
+        newUser.parentPhoneRelation2 = String(newUser.parentPhoneRelation2).trim().toLowerCase();
+        if (!allowedParentRelations.includes(newUser.parentPhoneRelation2)) {
+          return next(createSignupError("SIGNUP_STUDENT_PARENT2_RELATION_INVALID"));
+        }
+      } else {
+        delete newUser.parentPhoneNumber2;
+        delete newUser.parentPhoneRelation2;
+      }
+
+      try {
+        const resolvedStudentSelection = await validateStudentLevelSelection({
+          stageId: newUser.stage,
+          levelId: newUser.level,
+        });
+        newUser.stage = resolvedStudentSelection.stage._id;
+        newUser.level = resolvedStudentSelection.level._id;
+      } catch (error) {
+        if (String(error?.message || "").includes("selected stage")) {
+          return next(createSignupError("SIGNUP_STUDENT_LEVEL_STAGE_MISMATCH"));
+        }
+        if (String(error?.message || "").includes("must be a stage")) {
+          return next(createSignupError("SIGNUP_STUDENT_STAGE_INVALID"));
+        }
+        return next(mapLevelHierarchyAppError(error, "student", "level"));
+      }
+
       user = await Student.create(newUser);
       break;
-    case "parent":
+    }
+    case "parent": {
+      if (newUser.level) {
+        try {
+          const resolvedParentLevel = await validateOptionalLevel(newUser.level);
+          if (resolvedParentLevel) {
+            newUser.level = resolvedParentLevel._id;
+          }
+        } catch (error) {
+          return next(mapLevelHierarchyAppError(error, "parent"));
+        }
+      }
       user = await Parent.create(newUser);
       break;
+    }
     case "lecturer":
       user = await Lecturer.create(newUser);
       break;
@@ -373,16 +384,16 @@ const registerNewUser = catchAsync(async (req, res, next) => {
       user = await SubAdmin.create(newUser);
       break;
     default:
-      return next(new AppError("Invalid role", 400));
+      return next(createSignupError("SIGNUP_INVALID_ROLE"));
   }
 
-  if (user) {
-    return res.status(201).json({
-      message: `User created successfully with name ${name}.`,
-    });
-  } else {
-    return next(new AppError("Invalid user data received", 400));
+  if (!user) {
+    return next(createSignupError("SIGNUP_VALIDATION_FAILED"));
   }
+
+  return res.status(201).json({
+    message: `User created successfully with name ${name}.`,
+  });
 });
 
 module.exports = { registerNewUser };

@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next"
 import { useState } from "react"
 import { designTokens } from "../constants/designTokens"
+import { resolveLevelDisplayName } from "../utils/levelHierarchy"
 
 export const CourseCard = ({
   image,
@@ -80,8 +81,8 @@ export const CourseCard = ({
         <h2 className="text-lg font-bold" style={{ color: TOKENS.inkText }}>{title || t("titleFallback")}</h2>
         <div className="flex flex-wrap gap-2 mt-1">
           {subject && <div className="rounded-full px-3 py-1 text-xs font-semibold" style={{ background: TOKENS.lightAquaMist, color: TOKENS.deepTeal }}>{subject}</div>}
-          {grade && <div className="rounded-full px-3 py-1 text-xs font-semibold" style={{ background: "#E8EEF7", color: TOKENS.slateText }}>{t(`gradeLevels.${grade}` ,{ ns: "common" })}</div>}
-          {stage && <div className="rounded-full px-3 py-1 text-xs font-semibold" style={{ background: "#F3F4F6", color: TOKENS.slateText }}>{stage}</div>}
+          {grade && <div className="rounded-full px-3 py-1 text-xs font-semibold" style={{ background: "#E8EEF7", color: TOKENS.slateText }}>{resolveLevelDisplayName(grade, i18n.language)}</div>}
+          {stage && <div className="rounded-full px-3 py-1 text-xs font-semibold" style={{ background: "#F3F4F6", color: TOKENS.slateText }}>{resolveLevelDisplayName(stage, i18n.language)}</div>}
           {type && <div className="rounded-full px-3 py-1 text-xs font-semibold" style={{ border: "1px solid rgba(17,24,39,0.14)", color: TOKENS.slateText }}>{type}</div>}
         </div>
 

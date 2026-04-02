@@ -331,7 +331,13 @@ const ContainerDetailsPage = () => {
           <h2 className="mb-2 text-2xl font-semibold" style={{ color: TOKENS.inkText }}>{t('containerDetails.error.title')}</h2>
           <p className="mb-6" style={{ color: TOKENS.slateText }}>{error}</p>
           <Link
-            to={userRole === "Lecturer" ? "/dashboard/lecturer-dashboard" : "/dashboard/student-dashboard/promo-codes"}
+            to={
+              userRole === "Lecturer"
+                ? "/dashboard/lecturer-dashboard"
+                : userRole === "Parent"
+                  ? "/dashboard/parent-dashboard/overview"
+                  : "/dashboard/student-dashboard/overview"
+            }
             className={`inline-flex items-center gap-2 rounded-full border px-6 py-2 font-semibold ${isRTL ? "flex-row-reverse" : ""}`}
             style={{
               background: "#FFFFFF",

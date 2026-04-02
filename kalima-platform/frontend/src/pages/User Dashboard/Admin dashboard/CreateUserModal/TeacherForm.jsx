@@ -1,6 +1,13 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { STAGE_KEYS, getStageDisplayName } from "../../../../utils/levelHierarchy"
+
+const EMPTY_STAGE_OPTIONS = STAGE_KEYS.map((stageKey) => ({
+  value: stageKey,
+  label: stageKey,
+  raw: { name: stageKey, kind: "stage" },
+}))
 
 const TeacherForm = ({
   userData,
@@ -8,17 +15,38 @@ const TeacherForm = ({
   handleGovernmentChange,
   subjects,
   levels,
+  levelHierarchy,
   governments,
   administrationZones,
   loadingZones,
   t,
   isRTL,
 }) => {
-  const [selectedLevels, setSelectedLevels] = useState(userData.level || [])
+  const [selectedLevels, setSelectedLevels] = useState(
+    Array.isArray(userData.level) ? userData.level : userData.level ? [userData.level] : [],
+  )
   const [selectedCenters, setSelectedCenters] = useState(userData.centers || [])
   const [socialMediaLinks, setSocialMediaLinks] = useState(userData.socialMedia || [])
 
-  // Handle level selection - use level values instead of IDs
+  const stageOptions = levelHierarchy?.stageOptions?.length
+    ? levelHierarchy.stageOptions
+    : EMPTY_STAGE_OPTIONS.map((stage) => ({
+        ...stage,
+        label: getStageDisplayName(stage.value, isRTL ? "ar" : "en"),
+      }))
+
+  useEffect(() => {
+    setSelectedLevels(Array.isArray(userData.level) ? userData.level : userData.level ? [userData.level] : [])
+  }, [userData.level])
+
+  useEffect(() => {
+    setSelectedCenters(Array.isArray(userData.centers) ? userData.centers : [])
+  }, [userData.centers])
+
+  useEffect(() => {
+    setSocialMediaLinks(Array.isArray(userData.socialMedia) ? userData.socialMedia : [])
+  }, [userData.socialMedia])
+
   const handleLevelSelect = (e) => {
     const levelValue = e.target.value
     if (!levelValue) return
@@ -26,59 +54,56 @@ const TeacherForm = ({
     if (!selectedLevels.includes(levelValue)) {
       const newLevels = [...selectedLevels, levelValue]
       setSelectedLevels(newLevels)
-      const syntheticEvent = {
+      handleChange({
         target: {
           name: "level",
           value: newLevels,
         },
-      }
-      handleChange(syntheticEvent)
+      })
     }
   }
 
   const removeLevel = (levelValue) => {
     const newLevels = selectedLevels.filter((level) => level !== levelValue)
     setSelectedLevels(newLevels)
-    const syntheticEvent = {
+    handleChange({
       target: {
         name: "level",
         value: newLevels,
       },
-    }
-    handleChange(syntheticEvent)
+    })
   }
 
-  // Handle centers
   const addCenter = () => {
     const centerInput = document.getElementById("centerInput")
-    const centerName = centerInput.value.trim()
+    const centerName = centerInput?.value?.trim()
     if (centerName && !selectedCenters.includes(centerName)) {
       const newCenters = [...selectedCenters, centerName]
       setSelectedCenters(newCenters)
-      centerInput.value = ""
-      const syntheticEvent = {
+      if (centerInput) {
+        centerInput.value = ""
+      }
+      handleChange({
         target: {
           name: "centers",
           value: newCenters,
         },
-      }
-      handleChange(syntheticEvent)
+      })
     }
   }
 
   const removeCenter = (centerName) => {
     const newCenters = selectedCenters.filter((center) => center !== centerName)
     setSelectedCenters(newCenters)
-    const syntheticEvent = {
+    handleChange({
       target: {
         name: "centers",
         value: newCenters,
       },
-    }
-    handleChange(syntheticEvent)
+    })
   }
 
-  const toEnglishDigits = (str) => str.replace(/[٠-٩]/g, (d) => "٠١٢٣٤٥٦٧٨٩".indexOf(d)).replace(/[^\d]/g, "")
+  const toEnglishDigits = (str) => String(str || "").replace(/[٠-٩]/g, (d) => "٠١٢٣٤٥٦٧٨٩".indexOf(d)).replace(/[^\d]/g, "")
 
   const handlePhoneInputChange = (e) => {
     const { name, value } = e.target
@@ -86,75 +111,51 @@ const TeacherForm = ({
     handleChange({ target: { name, value: cleanedValue } })
   }
 
-  // Handle social media - Fixed to use 'account' instead of 'link'
   const addSocialMedia = () => {
     const platformInput = document.getElementById("socialPlatform")
     const accountInput = document.getElementById("socialAccount")
-    const platform = platformInput.value
-    const account = accountInput.value.trim()
+    const platform = platformInput?.value || ""
+    const account = accountInput?.value?.trim() || ""
 
     if (platform && account) {
       const newSocialMedia = [...socialMediaLinks, { platform, account }]
       setSocialMediaLinks(newSocialMedia)
-      platformInput.value = ""
-      accountInput.value = ""
-      const syntheticEvent = {
+      if (platformInput) platformInput.value = ""
+      if (accountInput) accountInput.value = ""
+      handleChange({
         target: {
           name: "socialMedia",
           value: newSocialMedia,
         },
-      }
-      handleChange(syntheticEvent)
+      })
     }
   }
 
   const removeSocialMedia = (index) => {
     const newSocialMedia = socialMediaLinks.filter((_, i) => i !== index)
     setSocialMediaLinks(newSocialMedia)
-    const syntheticEvent = {
+    handleChange({
       target: {
         name: "socialMedia",
         value: newSocialMedia,
       },
-    }
-    handleChange(syntheticEvent)
+    })
   }
 
-  // Find subject name by ID
   const getSubjectNameById = (id) => {
     const subject = subjects.find((s) => s._id === id)
     return subject ? subject.name : id
   }
 
-  // Get level display name - handle both database objects and simple strings
-  const getLevelDisplayName = (levelValue) => {
-    // If levels is an array of objects with name/value properties
-    if (levels.length > 0 && typeof levels[0] === "object") {
-      const level = levels.find((l) => l.value === levelValue || l._id === levelValue)
-      return level ? level.name || level.value : levelValue
-    }
-    // If levels is an array of strings or simple values
-    return levelValue
-  }
-
   const handleGovernmentSelect = (e) => {
-    const governmentName = e.target.value
-    handleGovernmentChange(governmentName)
+    handleGovernmentChange(e.target.value)
   }
 
   const shouldShowCenters = userData.teachesAtType === "Both" || userData.teachesAtType === "Center"
   const shouldShowSchool = userData.teachesAtType === "Both" || userData.teachesAtType === "School"
 
-  // Define the allowed level values
-  const allowedLevels = [
-    { value: "primary", label: t("levels.primary") || "Primary" },
-    { value: "preparatory", label: t("levels.preparatory") || "Preparatory" },
-    { value: "secondary", label: t("levels.secondary") || "Secondary" },
-  ]
-
   return (
     <div className="space-y-4">
-      {/* Phone Numbers */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="form-control">
           <div className="flex flex-col gap-2">
@@ -174,6 +175,7 @@ const TeacherForm = ({
             />
           </div>
         </div>
+
         <div className="form-control">
           <div className="flex flex-col gap-2">
             <label className="label py-0">
@@ -193,7 +195,6 @@ const TeacherForm = ({
         </div>
       </div>
 
-      {/* Subject Selection */}
       <div className="form-control">
         <div className="flex flex-col gap-2">
           <label className="label py-0">
@@ -202,7 +203,7 @@ const TeacherForm = ({
           <select
             name="subject"
             className="select w-full rounded-xl"
-              style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
+            style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
             value={userData.subject || ""}
             onChange={handleChange}
             required
@@ -217,16 +218,19 @@ const TeacherForm = ({
         </div>
       </div>
 
-      {/* Level Selection (Multiple) - Use predefined level values */}
       <div className="form-control">
         <div className="flex flex-col gap-2">
           <label className="label py-0">
             <span className="label-text font-bold" style={{ color: "#1F2937" }}>{t("fields.levels") || "Teaching Levels"}</span>
           </label>
-          <select className="select w-full rounded-xl"
-              style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }} onChange={handleLevelSelect} value="">
+          <select
+            className="select w-full rounded-xl"
+            style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
+            onChange={handleLevelSelect}
+            value=""
+          >
             <option value="">{t("placeholders.selectLevel") || "Select Level"}</option>
-            {allowedLevels.map((level) => (
+            {stageOptions.map((level) => (
               <option key={level.value} value={level.value} disabled={selectedLevels.includes(level.value)}>
                 {level.label}
               </option>
@@ -234,20 +238,25 @@ const TeacherForm = ({
           </select>
           {selectedLevels.length > 0 && (
             <div className="flex flex-wrap gap-2 mt-2">
-              {selectedLevels.map((levelValue) => (
-                <div key={levelValue} className="badge badge-primary gap-2">
-                  {getLevelDisplayName(levelValue)}
-                  <button type="button" className="btn btn-ghost btn-xs" onClick={() => removeLevel(levelValue)}>
-                    ×
-                  </button>
-                </div>
-              ))}
+              {selectedLevels.map((levelValue) => {
+                const levelLabel =
+                  stageOptions.find((option) => option.value === levelValue)?.label ||
+                  getStageDisplayName(levelValue, isRTL ? "ar" : "en")
+
+                return (
+                  <div key={levelValue} className="badge badge-primary gap-2">
+                    {levelLabel}
+                    <button type="button" className="btn btn-ghost btn-xs" onClick={() => removeLevel(levelValue)}>
+                      ×
+                    </button>
+                  </div>
+                )
+              })}
             </div>
           )}
         </div>
       </div>
 
-      {/* Teaches At Type */}
       <div className="form-control">
         <div className="flex flex-col gap-2">
           <label className="label py-0">
@@ -256,7 +265,7 @@ const TeacherForm = ({
           <select
             name="teachesAtType"
             className="select w-full rounded-xl"
-              style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
+            style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
             value={userData.teachesAtType || ""}
             onChange={handleChange}
             required
@@ -269,7 +278,6 @@ const TeacherForm = ({
         </div>
       </div>
 
-      {/* Centers - Show if teachesAtType is "Both" or "Center" */}
       {shouldShowCenters && (
         <div className="form-control">
           <div className="flex flex-col gap-2">
@@ -282,7 +290,12 @@ const TeacherForm = ({
                 id="centerInput"
                 className="input input-bordered flex-1"
                 placeholder={t("placeholders.centerName") || "Enter center name"}
-                onKeyPress={(e) => e.key === "Enter" && (e.preventDefault(), addCenter())}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault()
+                    addCenter()
+                  }
+                }}
               />
               <button type="button" className="btn btn-secondary" onClick={addCenter}>
                 {t("buttons.add") || "Add"}
@@ -304,7 +317,6 @@ const TeacherForm = ({
         </div>
       )}
 
-      {/* School - Show if teachesAtType is "Both" or "School" */}
       {shouldShowSchool && (
         <div className="form-control">
           <div className="flex flex-col gap-2">
@@ -325,7 +337,6 @@ const TeacherForm = ({
         </div>
       )}
 
-      {/* Government Selection */}
       <div className="form-control">
         <div className="flex flex-col gap-2">
           <label className="label py-0">
@@ -348,11 +359,12 @@ const TeacherForm = ({
         </div>
       </div>
 
-      {/* Administration Zone Selection */}
       <div className="form-control">
         <div className="flex flex-col gap-2">
           <label className="label py-0">
-            <span className="label-text font-bold" style={{ color: "#1F2937" }}>{t("fields.administrationZone") || "Administration Zone"}</span>
+            <span className="label-text font-bold" style={{ color: "#1F2937" }}>
+              {t("fields.administrationZone") || (isRTL ? "الإدارة التعليمية" : "Administration Zone")}
+            </span>
           </label>
           <select
             disabled={!userData.government || loadingZones}
@@ -364,8 +376,8 @@ const TeacherForm = ({
           >
             <option value="">
               {loadingZones
-                ? t("fields.loadingZones") || "Loading zones..."
-                : t("fields.selectAdministrationZone") || "Select Administration Zone"}
+                ? t("fields.loadingZones") || (isRTL ? "جاري تحميل الإدارة التعليمية..." : "Loading administration zones...")
+                : t("fields.selectAdministrationZone") || (isRTL ? "اختر الإدارة التعليمية" : "Select Administration Zone")}
             </option>
             {administrationZones.map((zone, index) => (
               <option key={index} value={zone}>
@@ -377,22 +389,20 @@ const TeacherForm = ({
             <div className="flex items-center gap-2 mt-1">
               <span className="loading loading-spinner loading-xs"></span>
               <span className="text-xs text-gray-500">
-                {t("fields.loadingZones") || "Loading administration zones..."}
+                {t("fields.loadingZones") || (isRTL ? "جاري تحميل الإدارة التعليمية..." : "Loading administration zones...")}
               </span>
             </div>
           )}
         </div>
       </div>
 
-      {/* Social Media (Optional) - Updated to use 'account' */}
       <div className="form-control">
         <div className="flex flex-col gap-2">
           <label className="label py-0">
             <span className="label-text font-bold" style={{ color: "#1F2937" }}>{t("fields.socialMedia") || "Social Media (Optional)"}</span>
           </label>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-            <select id="socialPlatform" className="select w-full rounded-xl"
-              style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}>
+            <select id="socialPlatform" className="select w-full rounded-xl" style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}>
               <option value="">{t("placeholders.selectPlatform") || "Select Platform"}</option>
               <option value="Facebook">Facebook</option>
               <option value="Instagram">Instagram</option>
@@ -427,6 +437,29 @@ const TeacherForm = ({
               ))}
             </div>
           )}
+        </div>
+      </div>
+
+      <div className="form-control">
+        <div className="flex flex-col gap-2">
+          <label className="label py-0">
+            <span className="label-text font-bold" style={{ color: "#1F2937" }}>{t("fields.subject") || "Subject"}</span>
+          </label>
+          <select
+            name="subject"
+            className="select w-full rounded-xl"
+            style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
+            value={userData.subject || ""}
+            onChange={handleChange}
+            required
+          >
+            <option value="">{t("placeholders.selectSubject") || "Select Subject"}</option>
+            {subjects.map((subject) => (
+              <option key={subject._id} value={subject._id}>
+                {getSubjectNameById(subject._id)}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
     </div>

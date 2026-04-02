@@ -1,101 +1,109 @@
 {
-    "header": {
-      "title": "كورساتي"
-    },
-    "details": {
-      "title": "تفاصيل الكورس",
-      "teacher": "المدرس",
-      "teacherName": "أ.يوسف عثمان",
-      "lectures": "عدد المحاضرات",
-      "lecturesCount": "10",
-      "grade": "الصف الدراسي",
-      "gradeLevel": "الصف الثانوي",
-      "views": "المشاهدات",
-      "viewsCount": "1240 مشاهدة"
-    },
-    "courseDescription": {
-      "title": "اسم الدورة:",
-      "name": "اللغة الإنجليزية",
-      "description": "تهدف هذه الدورة إلى تطوير مهارات المتعلمين في اللغة الإنجليزية من حيث القراءة، الكتابة، الاستماع، والتحدث. تشمل الدورة قواعد اللغة الأساسية، المفردات، والنطق، مع التركيز على استخدام اللغة في المواقف اليومية.",
-      "level": "المرحلة: مبتدئ / متوسط / متقدم",
-      "duration": "المدة: 10 أسابيع",
-      "objectivesTitle": "أهداف الدورة:",
-      "imageAlt": "مدرس مع كتب",
-      "descriptionTitle": "وصف الدورة",
-      "objectives": [
-        "تنمية المفردات وتحسين استخدام القواعد",
-        "تعزيز مهارات التحدث والاستماع بثقة",
-        "تحسين مهارات القراءة والكتابة"
-      ]
-    },
-    "plan": {
-      "title": "خطة الكورس",
-      "decorationAlt": "صورة زخرفية",
-      "months": [
-        {
-          "month": "يناير",
-          "items": [
-            { "lesson": "الدرس الأول: مقدمة إلى React", "time": 30 },
-            { "lesson": "الدرس الثاني: مكونات React", "time": 45 }
-          ]
-        },
-        {
-          "month": "فبراير",
-          "items": [
-            { "lesson": "الدرس الأول: حالة المكونات", "time": 30 },
-            { "lesson": "الدرس الثاني: الأحداث في React", "time": 45 }
-          ]
-        }
-      ]
-    },
-    "buttons": {
-      "subscribe": "اشترك الآن"
-    },
-    "errors": {
-      "fetchError": "فشل تحميل تفاصيل الدورة",
-      "unexpected": "حدث خطأ غير متوقع"
-    },
-    "containerTypes": {
-      "course": "دورة",
-      "year": "سنة",
-      "term": "فصل دراسي",
-      "month": "شهر",
-      "lecture": "محاضرة"
-    },
-    "pricing": {
-      "points": "جنيه",
-      "free": "مجاني"
-    },
-    "purchase": {
-      "purchased": "تم الشراء",
-      "availableInCourse": "متاح ضمن الدورة",
-      "buy": "شراء",
-      "getFree": "الحصول مجاناً",
-      "purchaseStatus": "حالة الشراء",
-      "notPurchased": "غير مشتراة",
-      "notDetermined": "غير محدد",
-      "purchaseSuccess": "تم الشراء بنجاح!",
-      "purchaseError": "فشل في عملية الشراء. يرجى المحاولة مرة أخرى.",
-      "purchaseInProgress": "جاري الشراء...",
-      "getCourseFree": "الحصول على الدورة مجانًا",
-      "buyCourse": "شراء الدورة"
-    },
-    "courseInfo": {
-      "price": "السعر",
-      "level": "المرحلة",
-      "subject": "المادة",
-      "courseObjectives": "أهداف الدورة",
-      "courseContents": "محتويات الدورة"
-    },
-    "actions": {
-      "show": "إظهار",
-      "hide": "إخفاء"
-    },
-    "errors": {
-      "fetchError": "فشل في جلب بيانات الدورة",
-      "unexpected": "حدث خطأ غير متوقع",
-      "purchaseError": "فشل في عملية الشراء. يرجى المحاولة مرة أخرى.",
-      "purchaseProcessError": "حدث خطأ أثناء الشراء",
-      "courseNotFound": "لم يتم العثور على الدورة"
-    }
+  "header": {
+    "title": "دوراتي"
+  },
+  "details": {
+    "title": "تفاصيل الدورة",
+    "teacher": "المعلم",
+    "teacherName": "أ.يوسف عثمان",
+    "lectures": "عدد المحاضرات",
+    "lecturesCount": "10",
+    "grade": "الصف الدراسي",
+    "gradeLevel": "الصف الثانوي",
+    "views": "المشاهدات",
+    "viewsCount": "1240 مشاهدة"
+  },
+  "courseDescription": {
+    "title": "اسم الدورة:",
+    "name": "اللغة الإنجليزية",
+    "description": "تهدف هذه الدورة إلى تطوير مهارات المتعلمين في اللغة الإنجليزية من حيث القراءة، الكتابة، الاستماع، والتحدث. تشمل الدورة قواعد اللغة الأساسية، المفردات، والنطق، مع التركيز على استخدام اللغة في المواقف اليومية.",
+    "level": "المرحلة: مبتدئ / متوسط / متقدم",
+    "duration": "المدة: 10 أسابيع",
+    "objectivesTitle": "أهداف الدورة:",
+    "imageAlt": "مدرس مع كتب",
+    "descriptionTitle": "وصف الدورة",
+    "objectives": [
+      "تنمية المفردات وتحسين استخدام القواعد",
+      "تعزيز مهارات التحدث والاستماع بثقة",
+      "تحسين مهارات القراءة والكتابة"
+    ]
+  },
+  "plan": {
+    "title": "خطة الدورة",
+    "decorationAlt": "صورة زخرفية",
+    "months": [
+      {
+        "month": "يناير",
+        "items": [
+          {
+            "lesson": "الدرس الأول: مقدمة إلى React",
+            "time": 30
+          },
+          {
+            "lesson": "الدرس الثاني: مكونات React",
+            "time": 45
+          }
+        ]
+      },
+      {
+        "month": "فبراير",
+        "items": [
+          {
+            "lesson": "الدرس الأول: حالة المكونات",
+            "time": 30
+          },
+          {
+            "lesson": "الدرس الثاني: الأحداث في React",
+            "time": 45
+          }
+        ]
+      }
+    ]
+  },
+  "buttons": {
+    "subscribe": "اشترك الآن"
+  },
+  "errors": {
+    "fetchError": "فشل في جلب بيانات الدورة",
+    "unexpected": "حدث خطأ غير متوقع",
+    "purchaseError": "فشل في عملية الشراء. يرجى المحاولة مرة أخرى.",
+    "purchaseProcessError": "حدث خطأ أثناء الشراء",
+    "courseNotFound": "لم يتم العثور على الدورة"
+  },
+  "containerTypes": {
+    "course": "دورة",
+    "year": "سنة",
+    "term": "فصل دراسي",
+    "month": "شهر",
+    "lecture": "محاضرة"
+  },
+  "pricing": {
+    "points": "جنيه",
+    "free": "مجاني"
+  },
+  "purchase": {
+    "purchased": "تم الشراء",
+    "availableInCourse": "متاح ضمن الدورة",
+    "buy": "شراء",
+    "getFree": "الحصول مجاناً",
+    "purchaseStatus": "حالة الشراء",
+    "notPurchased": "غير مشتراة",
+    "notDetermined": "غير محدد",
+    "purchaseSuccess": "تم الشراء بنجاح!",
+    "purchaseError": "فشل في عملية الشراء. يرجى المحاولة مرة أخرى.",
+    "purchaseInProgress": "جاري الشراء...",
+    "getCourseFree": "الحصول على الدورة مجانًا",
+    "buyCourse": "شراء الدورة"
+  },
+  "courseInfo": {
+    "price": "السعر",
+    "level": "المرحلة",
+    "subject": "المادة",
+    "courseObjectives": "أهداف الدورة",
+    "courseContents": "محتويات الدورة"
+  },
+  "actions": {
+    "show": "إظهار",
+    "hide": "إخفاء"
   }
+}

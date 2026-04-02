@@ -310,18 +310,31 @@ exports.createLecture = catchAsync(async (req, res, next) => {
       validateThresholdRange(parsedHomeworkPassingThreshold, "Homework passing threshold")
 
       let resolvedExamConfigId = null
+      let normalizedExamFormUrl = null
       if (parsedRequiresExam) {
         if (examFormUrl) {
-          const managedExamConfig = await ensureManagedAssessmentConfig({
-            lecturerId,
-            lectureName: name,
-            assessmentType: "exam",
-            formUrl: examFormUrl,
-            passingThreshold: parsedPassingThreshold,
-            existingConfigId: examConfig,
-            session,
-          })
-          resolvedExamConfigId = managedExamConfig._id
+          normalizedExamFormUrl = normalizePublicFormUrl(examFormUrl, "Exam")
+
+          if (MASTER_ASSESSMENT_SHEET_ID) {
+            const managedExamConfig = await ensureManagedAssessmentConfig({
+              lecturerId,
+              lectureName: name,
+              assessmentType: "exam",
+              formUrl: normalizedExamFormUrl,
+              passingThreshold: parsedPassingThreshold,
+              existingConfigId: examConfig,
+              session,
+            })
+            resolvedExamConfigId = managedExamConfig._id
+          } else if (examConfig) {
+            const existingExamConfig = await validateLectureConfig({
+              configId: examConfig,
+              expectedType: "exam",
+              lecturerId,
+              session,
+            })
+            resolvedExamConfigId = existingExamConfig._id
+          }
         } else if (examConfig) {
           const existingExamConfig = await validateLectureConfig({
             configId: examConfig,
@@ -337,18 +350,31 @@ exports.createLecture = catchAsync(async (req, res, next) => {
       }
 
       let resolvedHomeworkConfigId = null
+      let normalizedHomeworkFormUrl = null
       if (parsedRequiresHomework) {
         if (homeworkFormUrl) {
-          const managedHomeworkConfig = await ensureManagedAssessmentConfig({
-            lecturerId,
-            lectureName: name,
-            assessmentType: "homework",
-            formUrl: homeworkFormUrl,
-            passingThreshold: parsedHomeworkPassingThreshold,
-            existingConfigId: homeworkConfig,
-            session,
-          })
-          resolvedHomeworkConfigId = managedHomeworkConfig._id
+          normalizedHomeworkFormUrl = normalizePublicFormUrl(homeworkFormUrl, "Homework")
+
+          if (MASTER_ASSESSMENT_SHEET_ID) {
+            const managedHomeworkConfig = await ensureManagedAssessmentConfig({
+              lecturerId,
+              lectureName: name,
+              assessmentType: "homework",
+              formUrl: normalizedHomeworkFormUrl,
+              passingThreshold: parsedHomeworkPassingThreshold,
+              existingConfigId: homeworkConfig,
+              session,
+            })
+            resolvedHomeworkConfigId = managedHomeworkConfig._id
+          } else if (homeworkConfig) {
+            const existingHomeworkConfig = await validateLectureConfig({
+              configId: homeworkConfig,
+              expectedType: "homework",
+              lecturerId,
+              session,
+            })
+            resolvedHomeworkConfigId = existingHomeworkConfig._id
+          }
         } else if (homeworkConfig) {
           const existingHomeworkConfig = await validateLectureConfig({
             configId: homeworkConfig,
@@ -383,10 +409,12 @@ exports.createLecture = catchAsync(async (req, res, next) => {
             // Add exam requirement fields
             requiresExam: parsedRequiresExam,
             examConfig: parsedRequiresExam ? resolvedExamConfigId : undefined,
+            examLink: parsedRequiresExam ? normalizedExamFormUrl : undefined,
             passingThreshold: parsedRequiresExam ? parsedPassingThreshold : undefined,
             // Homework requirement fields
             requiresHomework: parsedRequiresHomework,
             homeworkConfig: parsedRequiresHomework ? resolvedHomeworkConfigId : undefined,
+            homeworkLink: parsedRequiresHomework ? normalizedHomeworkFormUrl : undefined,
             homeworkPassingThreshold: parsedRequiresHomework ? parsedHomeworkPassingThreshold : undefined,
           },
         ],
@@ -455,7 +483,7 @@ exports.getLectureById = catchAsync(async (req, res, next) => {
   let container = await Lecture.findById(req.params.lectureId).populate([
     { path: "createdBy", select: "name" },
     { path: "subject", select: "name" },
-    { path: "level", select: "name" },
+    { path: "level", select: "name nameAr kind sortOrder parentLevel isActive" },
     { path: "examConfig", select: "name formUrl googleSheetId googleSheetTabName defaultPassingThreshold" },
     { path: "homeworkConfig", select: "name formUrl googleSheetId googleSheetTabName defaultPassingThreshold" },
   ])
@@ -465,7 +493,7 @@ exports.getLectureById = catchAsync(async (req, res, next) => {
     container = await Container.findOne({ _id: req.params.lectureId, type: "lecture" }).populate([
       { path: "createdBy", select: "name" },
       { path: "subject", select: "name" },
-      { path: "level", select: "name" },
+      { path: "level", select: "name nameAr kind sortOrder parentLevel isActive" },
     ]);
   }
 
@@ -473,10 +501,14 @@ exports.getLectureById = catchAsync(async (req, res, next) => {
 
   if (container?.examConfig?.formUrl) {
     container.examFormUrl = container.examConfig.formUrl
+  } else if (container?.examLink) {
+    container.examFormUrl = container.examLink
   }
 
   if (container?.homeworkConfig?.formUrl) {
     container.homeworkFormUrl = container.homeworkConfig.formUrl
+  } else if (container?.homeworkLink) {
+    container.homeworkFormUrl = container.homeworkLink
   }
 
   if (req.user.role === "Student" && (container.requiresExam || container.requiresHomework)) {
@@ -549,7 +581,7 @@ exports.getAllLecturesPublic = catchAsync(async (req, res, next) => {
   query = query.populate([
     { path: "createdBy", select: "name" },
     { path: "subject", select: "name" },
-    { path: "level", select: "name" },
+    { path: "level", select: "name nameAr kind sortOrder parentLevel isActive" },
     { path: "name", select: "name" },
     { path: "type", select: "name" },
   ])
@@ -566,7 +598,7 @@ exports.getAllLecturesPublic = catchAsync(async (req, res, next) => {
   containerQuery = containerQuery.populate([
     { path: "createdBy", select: "name" },
     { path: "subject", select: "name" },
-    { path: "level", select: "name" },
+    { path: "level", select: "name nameAr kind sortOrder parentLevel isActive" },
   ]);
   containerQuery = containerQuery.select("name type subject level createdBy price description teacherAllowed image");
 
@@ -590,7 +622,7 @@ exports.getAllLectures = catchAsync(async (req, res, next) => {
   const query = Lecture.find().populate([
     { path: "createdBy", select: "name" },
     { path: "subject", select: "name" },
-    { path: "level", select: "name" },
+    { path: "level", select: "name nameAr kind sortOrder parentLevel isActive" },
   ])
 
   // No need to check req.user here as this route requires authentication
@@ -604,7 +636,7 @@ exports.getAllLectures = catchAsync(async (req, res, next) => {
   const containerQuery = Container.find({ type: "lecture" }).populate([
     { path: "createdBy", select: "name" },
     { path: "subject", select: "name" },
-    { path: "level", select: "name" },
+    { path: "level", select: "name nameAr kind sortOrder parentLevel isActive" },
   ]);
 
   const containerFeatures = new QueryFeatures(containerQuery, req.query).filter().sort().paginate();
@@ -641,7 +673,7 @@ exports.getLecturerLectures = catchAsync(async (req, res, next) => {
   }).populate([
     { path: "createdBy", select: "name" },
     { path: "subject", select: "name" },
-    { path: "level", select: "name" },
+    { path: "level", select: "name nameAr kind sortOrder parentLevel isActive" },
   ]).lean();
 
   const containerLectures = await Container.find({
@@ -650,7 +682,7 @@ exports.getLecturerLectures = catchAsync(async (req, res, next) => {
   }).populate([
     { path: "createdBy", select: "name" },
     { path: "subject", select: "name" },
-    { path: "level", select: "name" },
+    { path: "level", select: "name nameAr kind sortOrder parentLevel isActive" },
   ]).lean();
 
   const allLectures = [...lectures, ...containerLectures];
@@ -770,17 +802,23 @@ exports.updatelectures = catchAsync(async (req, res, next) => {
 
       if (nextRequiresExam) {
         if (normalizedExamFormUrl !== undefined && normalizedExamFormUrl !== null) {
-          const managedExamConfig = await ensureManagedAssessmentConfig({
-            lecturerId: currentLecture.createdBy,
-            lectureName: name || currentLecture.name,
-            assessmentType: "exam",
-            formUrl: normalizedExamFormUrl,
-            passingThreshold: parsedPassingThreshold,
-            existingConfigId: currentLecture.examConfig || normalizedExamConfig,
-            session,
-          })
+          obj.examLink = normalizedExamFormUrl
 
-          obj.examConfig = managedExamConfig._id
+          if (MASTER_ASSESSMENT_SHEET_ID) {
+            const managedExamConfig = await ensureManagedAssessmentConfig({
+              lecturerId: currentLecture.createdBy,
+              lectureName: name || currentLecture.name,
+              assessmentType: "exam",
+              formUrl: normalizedExamFormUrl,
+              passingThreshold: parsedPassingThreshold,
+              existingConfigId: currentLecture.examConfig || normalizedExamConfig,
+              session,
+            })
+
+            obj.examConfig = managedExamConfig._id
+          } else {
+            obj.examConfig = null
+          }
         } else if (nextExamConfig) {
           const validatedExamConfig = await validateLectureConfig({
             configId: nextExamConfig,
@@ -804,22 +842,29 @@ exports.updatelectures = catchAsync(async (req, res, next) => {
         }
       } else {
         obj.examConfig = null
+        obj.examLink = null
         obj.passingThreshold = null
       }
 
       if (nextRequiresHomework) {
         if (normalizedHomeworkFormUrl !== undefined && normalizedHomeworkFormUrl !== null) {
-          const managedHomeworkConfig = await ensureManagedAssessmentConfig({
-            lecturerId: currentLecture.createdBy,
-            lectureName: name || currentLecture.name,
-            assessmentType: "homework",
-            formUrl: normalizedHomeworkFormUrl,
-            passingThreshold: parsedHomeworkPassingThreshold,
-            existingConfigId: currentLecture.homeworkConfig || normalizedHomeworkConfig,
-            session,
-          })
+          obj.homeworkLink = normalizedHomeworkFormUrl
 
-          obj.homeworkConfig = managedHomeworkConfig._id
+          if (MASTER_ASSESSMENT_SHEET_ID) {
+            const managedHomeworkConfig = await ensureManagedAssessmentConfig({
+              lecturerId: currentLecture.createdBy,
+              lectureName: name || currentLecture.name,
+              assessmentType: "homework",
+              formUrl: normalizedHomeworkFormUrl,
+              passingThreshold: parsedHomeworkPassingThreshold,
+              existingConfigId: currentLecture.homeworkConfig || normalizedHomeworkConfig,
+              session,
+            })
+
+            obj.homeworkConfig = managedHomeworkConfig._id
+          } else {
+            obj.homeworkConfig = null
+          }
         } else if (nextHomeworkConfig) {
           const validatedHomeworkConfig = await validateLectureConfig({
             configId: nextHomeworkConfig,
@@ -843,6 +888,7 @@ exports.updatelectures = catchAsync(async (req, res, next) => {
         }
       } else {
         obj.homeworkConfig = null
+        obj.homeworkLink = null
         obj.homeworkPassingThreshold = null
       }
 

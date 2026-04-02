@@ -9,6 +9,9 @@ import { useTranslation } from 'react-i18next';
 import { designTokens } from "../constants/designTokens";
 import { LoadingSpinner } from "../components/LoadingSpinner";
 import { ErrorAlert } from "../components/ErrorAlert";
+import { getStageDisplayName, resolveLevelDisplayName } from "../utils/levelHierarchy";
+import { useSeo } from "../seo/useSeo";
+import { buildBreadcrumbSchema } from "../seo/structuredData.mjs";
 
 export default function Teachers() {
   const TOKENS = designTokens.colors;
@@ -17,6 +20,23 @@ export default function Teachers() {
 
   const { t, i18n } = useTranslation("teachers");
   const isRTL = i18n.language === 'ar';
+  useSeo({
+    title: isRTL
+      ? "معلمو فكرة التعليمية | اختر المعلم المناسب"
+      : "Fekra Teachers | Choose the Right Teacher",
+    description: isRTL
+      ? "تعرّف على معلمي منصة فكرة التعليمية واختر المعلم المناسب وفق التخصص والخبرة والمرحلة الدراسية."
+      : "Meet Fekra teachers and choose the right one by subject, experience, and school stage.",
+    canonicalPath: "/teachers",
+    lang: i18n.language?.startsWith("en") ? "en" : "ar",
+    dir: isRTL ? "rtl" : "ltr",
+    schema: [
+      buildBreadcrumbSchema([
+        { name: isRTL ? "الرئيسية" : "Home", path: "/" },
+        { name: isRTL ? "المعلمون" : "Teachers", path: "/teachers" },
+      ]),
+    ],
+  });
   const [teachers, setTeachers] = useState([]);
   const [filteredTeachers, setFilteredTeachers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -52,7 +72,13 @@ export default function Teachers() {
           name: lecturer.name,
           subject: lecturer.expertise || t('defaultSubject'),
           experience: lecturer.bio || t('defaultExperience'),
-          grade: t('allGrades'),
+          stageLabels: (Array.isArray(lecturer.level) ? lecturer.level : lecturer.level ? [lecturer.level] : [])
+            .map((level) => resolveLevelDisplayName(level, i18n.language))
+            .filter(Boolean),
+          grade: (Array.isArray(lecturer.level) ? lecturer.level : lecturer.level ? [lecturer.level] : [])
+            .map((level) => resolveLevelDisplayName(level, i18n.language))
+            .filter(Boolean)
+            .join(", ") || t('allGrades'),
           rating: 5,
         }));
         setTeachers(lecturers);
@@ -94,7 +120,7 @@ export default function Teachers() {
 
     // Filter by المرحلة الدراسية
     if (selectedStage) {
-      filtered = filtered.filter((teacher) => teacher.grade === selectedStage);
+      filtered = filtered.filter((teacher) => Array.isArray(teacher.stageLabels) && teacher.stageLabels.includes(selectedStage));
     }
 
     setFilteredTeachers(filtered);
@@ -139,9 +165,9 @@ export default function Teachers() {
       value: selectedStage,
       options: [
         { label: t('filters.all'), value: "" },
-        { label: t('stages.primary'), value: "primary" },
-        { label: t('stages.preparatory'), value: "preparatory" },
-        { label: t('stages.secondary'), value: "secondary" },
+        { label: getStageDisplayName("primary", i18n.language), value: getStageDisplayName("primary", i18n.language) },
+        { label: getStageDisplayName("preparatory", i18n.language), value: getStageDisplayName("preparatory", i18n.language) },
+        { label: getStageDisplayName("secondary", i18n.language), value: getStageDisplayName("secondary", i18n.language) },
       ],
       onSelect: setSelectedStage,
     },

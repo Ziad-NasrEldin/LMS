@@ -28,8 +28,22 @@ const parentValidation = userValidation.concat(
 
       }),
     profession: Joi.string().trim().required(),
-    government: Joi.string().required(),
-    administrationZone: Joi.string().required(),
+    government: Joi.string()
+      .trim()
+      .empty("")
+      .required()
+      .messages({
+        "any.required": "Path `government` is required.",
+        "string.empty": "Path `government` is required.",
+      }),
+    administrationZone: Joi.string()
+      .trim()
+      .empty("")
+      .required()
+      .messages({
+        "any.required": "Path `administrationZone` is required.",
+        "string.empty": "Path `administrationZone` is required.",
+      }),
     referralSerial: Joi.string().optional(), // Allow referralSerial
   })
 );

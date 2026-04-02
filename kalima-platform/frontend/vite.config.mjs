@@ -11,7 +11,7 @@ export default defineConfig({
   build: {
     outDir: 'dist', // <- Important! Output outside frontend
     emptyOutDir: true,
-    base: './',
+    base: process.env.VITE_BASE_PATH || '/',
     cssMinify: 'lightningcss',
   },
   optimizeDeps: {

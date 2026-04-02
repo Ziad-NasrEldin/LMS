@@ -2,9 +2,20 @@ const Subject = require("../models/subjectModel");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 const Level = require("../models/levelModel");
+
+const getNormalizedSubjectName = (payload = {}) => {
+  if (typeof payload.name !== "string") return "";
+  return payload.name.trim();
+};
+
 // Create a new subject
 exports.createSubject = catchAsync(async (req, res, next) => {
-  const subject = await Subject.create(req.body);
+  const name = getNormalizedSubjectName(req.body);
+  if (!name) {
+    return next(new AppError("Name is required", 400));
+  }
+
+  const subject = await Subject.create({ name });
   if (!subject) {
     return next(new AppError("Subject could not be created", 400));
   }
@@ -21,7 +32,7 @@ exports.createSubject = catchAsync(async (req, res, next) => {
 exports.getAllSubjects = catchAsync(async (req, res, next) => {
   const subjects = await Subject.find().populate({
     path: "level",
-    select: "name",
+    select: "name nameAr kind sortOrder parentLevel isActive",
   });
   res.status(200).json({
     status: "success",
@@ -35,7 +46,7 @@ exports.getAllSubjects = catchAsync(async (req, res, next) => {
 exports.getSubjectById = catchAsync(async (req, res, next) => {
   const subject = await Subject.findById(req.params.id).populate({
     path: "level",
-    select: "name",
+    select: "name nameAr kind sortOrder parentLevel isActive",
   });
   if (!subject) {
     return next(new AppError("No subject found with that ID", 404));
@@ -50,7 +61,7 @@ exports.getSubjectById = catchAsync(async (req, res, next) => {
 
 // Update a subject by ID
 exports.updateSubjectById = catchAsync(async (req, res, next) => {
-  const { name } = req.body;
+  const name = getNormalizedSubjectName(req.body);
   if (!name) {
     return next(new AppError("Name is required", 400));
   }

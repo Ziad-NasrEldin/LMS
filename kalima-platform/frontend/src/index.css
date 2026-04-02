@@ -133,6 +133,16 @@ body[dir="rtl"],
   color: var(--fekra-error-button-text);
 }
 
+.password-toggle-input::-ms-reveal,
+.password-toggle-input::-ms-clear {
+  display: none;
+}
+
+.password-toggle-input::-webkit-credentials-auto-fill-button,
+.password-toggle-input::-webkit-strong-password-auto-fill-button {
+  display: none;
+}
+
 .text-error {
   color: #d64055 !important;
 }

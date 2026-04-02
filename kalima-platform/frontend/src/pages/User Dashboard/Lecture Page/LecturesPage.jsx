@@ -13,6 +13,7 @@ import { designTokens } from "../../../constants/designTokens"
 import { resolveUploadUrl } from "../../../utils/uploadUrl"
 import { translateErrorMessage } from "../../../utils/errorTranslator"
 import { objectToFormData } from "../../../utils/contentCreationPayloads"
+import { resolveLevelDisplayName } from "../../../utils/levelHierarchy"
 
 const MyLecturesPage = () => {
   const { t, i18n } = useTranslation("lecturesPage")
@@ -136,7 +137,8 @@ const MyLecturesPage = () => {
         }
 
         if (levelsRes.success) {
-          setLevels(levelsRes.data || []);
+          const gradeLevels = levelsRes.hierarchy?.grades || (levelsRes.data || []).filter((level) => level.kind !== "stage");
+          setLevels(gradeLevels);
         } else {
           console.error("Failed to fetch levels:", levelsRes.error);
           setLevels([]);
@@ -172,6 +174,8 @@ const MyLecturesPage = () => {
               lecture_type: lecture.lecture_type,
               requiresExam: lecture.requiresExam,
               examConfig: lecture.examConfig,
+              examLink: lecture.examLink,
+              homeworkLink: lecture.homeworkLink,
               lecturer: lecture.createdBy,
               thumbnail: lecture.thumbnail,
                 createdAt: lecture.createdAt,
@@ -202,6 +206,8 @@ const MyLecturesPage = () => {
                 lecture_type: lecture.lecture_type || "Unknown",
                 requiresExam: lecture.requiresExam || false,
                 examConfig: lecture.examConfig || null,
+                examLink: lecture.examLink || null,
+                homeworkLink: lecture.homeworkLink || null,
                 lecturer: result.data.data.userInfo,
                 thumbnail: lecture.thumbnail ? resolveUploadUrl(lecture.thumbnail, "lecture_thumbnails") : null,
                   createdAt: lecture.createdAt || null,
@@ -217,6 +223,8 @@ const MyLecturesPage = () => {
               lecture_type: lecture.lecture_type,
               requiresExam: lecture.requiresExam || false,
               examConfig: lecture.examConfig || null,
+              examLink: lecture.examLink || null,
+              homeworkLink: lecture.homeworkLink || null,
               lecturer: result.data.data.userInfo,
               thumbnail: lecture.thumbnail ? resolveUploadUrl(lecture.thumbnail, "lecture_thumbnails") : null,
               createdAt: lecture.createdAt || null,
@@ -514,6 +522,8 @@ const MyLecturesPage = () => {
             lecture_type: lecture.lecture_type,
             requiresExam: lecture.requiresExam,
             examConfig: lecture.examConfig,
+            examLink: lecture.examLink,
+            homeworkLink: lecture.homeworkLink,
             lecturer: lecture.createdBy,
             thumbnail: lecture.thumbnail,
             createdAt: lecture.createdAt,
@@ -540,6 +550,8 @@ const MyLecturesPage = () => {
               lecture_type: lecture.lecture_type || "Unknown",
               requiresExam: lecture.requiresExam || false,
               examConfig: lecture.examConfig || null,
+              examLink: lecture.examLink || null,
+              homeworkLink: lecture.homeworkLink || null,
               lecturer: { id: userId, name: result.data.data.userInfo?.name },
               thumbnail: lecture.thumbnail ? resolveUploadUrl(lecture.thumbnail, "lecture_thumbnails") : null,
               createdAt: lecture.createdAt || null,
@@ -554,6 +566,8 @@ const MyLecturesPage = () => {
             lecture_type: lecture.lecture_type,
             requiresExam: lecture.requiresExam || false,
             examConfig: lecture.examConfig || null,
+            examLink: lecture.examLink || null,
+            homeworkLink: lecture.homeworkLink || null,
             lecturer: { id: userId, name: result.data.data.userInfo?.name },
             thumbnail: lecture.thumbnail ? resolveUploadUrl(lecture.thumbnail, "lecture_thumbnails") : null,
             createdAt: lecture.createdAt || null,
@@ -659,7 +673,7 @@ const MyLecturesPage = () => {
               <option value="">{t("lecturesPage.filters.allLevels")}</option>
               {levels?.map((level) => (
                 <option key={level._id} value={level._id}>
-                  {t(`gradeLevels.${level.name}`, { ns: "common" })}
+                  {resolveLevelDisplayName(level, i18n.language)}
                 </option>
               ))}
             </select>
@@ -721,7 +735,7 @@ const MyLecturesPage = () => {
                       <p className="break-words"><span className="font-medium">{t("lecturesPage.tableHeaders.lecturer")}: </span>{lecture.lecturer?.name || t("lecturesPage.unknown")}</p>
                     )}
                     <p className="break-words"><span className="font-medium">{t("lecturesPage.tableHeaders.subject")}: </span>{lecture.subject?.name || t("lecturesPage.notSpecified")}</p>
-                    <p><span className="font-medium">{t("lecturesPage.tableHeaders.level")}: </span>{t(`gradeLevels.${lecture.level?.name}`, { ns: "common" }) || lecture.level?.name || t("lecturesPage.notSpecified")}</p>
+                    <p><span className="font-medium">{t("lecturesPage.tableHeaders.level")}: </span>{resolveLevelDisplayName(lecture.level, i18n.language) || t("lecturesPage.notSpecified")}</p>
                     <p><span className="font-medium">{t("lecturesPage.tableHeaders.price")}: </span>{lecture.price || 0} {t("lecturesPage.points")}</p>
                     {isStudentLikeRole && <p><span className="font-medium">{t("lecturesPage.tableHeaders.purchaseDate")}: </span>{lecture.purchasedAt}</p>}
                   </div>
@@ -807,9 +821,7 @@ const MyLecturesPage = () => {
                   )}
                   <td>{lecture.subject?.name || t("lecturesPage.notSpecified")}</td>
                   <td>
-                    {t(`gradeLevels.${lecture.level?.name}`, { ns: "common" }) ||
-                      lecture.level?.name ||
-                      t("lecturesPage.notSpecified")}
+                    {resolveLevelDisplayName(lecture.level, i18n.language) || t("lecturesPage.notSpecified")}
                   </td>
                   <td>
                     {lecture.lecture_type === "Paid"

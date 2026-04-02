@@ -1,6 +1,6 @@
 {
-  "title": "Account Dashboard",
-  "subtitle": "Manage your account, children, balances, and quick actions",
+  "title": "Overview Dashboard",
+  "subtitle": "Track your balance, learning activity, and family accounts in one place",
   "balance": {
     "title": "Balance",
     "currency": "EGP",

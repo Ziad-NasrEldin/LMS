@@ -19,6 +19,7 @@ function formatEgyptianPhoneNumber(number) {
 
 const mongoose = require('mongoose');
 const User = require('./userModel');
+const Level = require("./levelModel");
 
 const lecturerPointsSchema = new mongoose.Schema({
   lecturer: {
@@ -37,7 +38,7 @@ const parentSchema = new mongoose.Schema({
   views: { type: Number, default: 0 },
   phoneNumber: { type: String, required: true },
   profession: { type: String, required: true, trim: true },
-  level: { type: String, enum: User.levels, lowercase: true },
+  level: { type: mongoose.Schema.Types.ObjectId, ref: "Level" },
   // Array of lecturer-specific balance records
   lecturerPoints: [lecturerPointsSchema],
   government: { type: String, required: true },
@@ -133,17 +134,34 @@ parentSchema.pre('save', async function (next) {
 
 
 parentSchema.pre("validate", async function (next) {
-  if (this.government && this.zone) {
-    const Government = require("./governmentModel");
-    const gov = await Government.findOne({ name: this.government });
-    if (!gov) {
-      this.invalidate("government", "Selected government does not exist.");
-    } else if (!gov.administrationZone.includes(this.administrationZone)) {
-      this.invalidate(
-        "zone",
-        "Selected zone does not belong to the selected government."
-      );
+  try {
+    if (this.level) {
+      if (!mongoose.Types.ObjectId.isValid(this.level)) {
+        this.invalidate("level", "Selected level is invalid.");
+      } else {
+        const levelDoc = await Level.findById(this.level).select("isActive");
+        if (!levelDoc) {
+          this.invalidate("level", "Selected level does not exist.");
+        } else if (levelDoc.isActive === false) {
+          this.invalidate("level", "Selected level is inactive.");
+        }
+      }
     }
+
+    if (this.government && this.administrationZone) {
+      const Government = require("./governmentModel");
+      const gov = await Government.findOne({ name: this.government });
+      if (!gov) {
+        this.invalidate("government", "Path `government` is invalid.");
+      } else if (!gov.administrationZone.includes(this.administrationZone)) {
+        this.invalidate(
+          "administrationZone",
+          "Path `administrationZone` is invalid."
+        );
+      }
+    }
+  } catch (error) {
+    return next(error);
   }
   next();
 });

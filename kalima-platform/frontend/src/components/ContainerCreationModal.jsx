@@ -6,6 +6,7 @@ import { getAllLevels } from "../routes/levels"
 import { getAllSubjects } from "../routes/courses"
 import { translateErrorMessage } from "../utils/errorTranslator"
 import { buildContainerPayloadObject } from "../utils/contentCreationPayloads"
+import { buildLevelHierarchy } from "../utils/levelHierarchy"
 
 const ContainerCreationModal = ({
   isOpen,
@@ -76,7 +77,9 @@ const ContainerCreationModal = ({
       setLevelsLoading(true)
       const response = await getAllLevels()
       if (response.success) {
-        setLevels(response.data)
+        const locale = (localStorage.getItem("i18nextLng") || "en").toLowerCase()
+        const hierarchy = response.hierarchy || buildLevelHierarchy(response.data || [], locale)
+        setLevels(hierarchy.gradeOptions || [])
       } else {
         console.error("Failed to fetch levels:", response.error)
       }
@@ -230,8 +233,8 @@ const ContainerCreationModal = ({
             >
               <option value="">Select a level</option>
               {levels.map((level) => (
-                <option key={level._id} value={level._id}>
-                  {level.displayName || level.name}
+                <option key={level.value || level._id} value={level.value || level._id}>
+                  {level.label || level.displayName || level.name}
                 </option>
               ))}
             </select>

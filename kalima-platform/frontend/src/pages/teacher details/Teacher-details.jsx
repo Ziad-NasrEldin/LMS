@@ -3,9 +3,12 @@
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect } from "react"
 import { Loader, BookOpen, GraduationCap, Star, Award, Users } from "lucide-react"
-import { Link, useParams } from "react-router-dom"
-import { getUserById } from "../../routes/fetch-users"
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom"
+import { getLecturerById } from "../../routes/fetch-users"
 import { getContainersByLecturerId } from "../../routes/lectures"
+import { buildCoursePath, buildTeacherPath } from "../../seo/site.mjs"
+import { useSeo } from "../../seo/useSeo"
+import { buildBreadcrumbSchema, buildPersonSchema } from "../../seo/structuredData.mjs"
 
 const TeacherInfoHeader = () => {
   const { t } = useTranslation("teacherDetails");
@@ -65,7 +68,7 @@ const CourseCard = ({ course }) => {
             {course.type || t('courseType')}
           </span>
           <Link
-            to={`/courses/${course.id}`}
+            to={buildCoursePath({ _id: course.id, name: course.title })}
             className="btn btn-primary bg-accent border-none text-base-content hover:bg-accent/90 hover:scale-105 btn-sm h-10 rounded-full px-6 w-full sm:w-auto transition-transform"
           >
             {t('viewDetails', 'عرض التفاصيل')}
@@ -106,11 +109,61 @@ const TeacherProfileImage = ({ profileImage }) => (
 export default function TeacherDetails() {
   const { t, i18n } = useTranslation("teacherDetails");
   const isRTL = i18n.language === 'ar';
+  const navigate = useNavigate();
+  const location = useLocation();
   const [teacher, setTeacher] = useState(null);
   const [containers, setContainers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const { userId } = useParams();
+  const teacherName = String(teacher?.name || "").trim();
+  const canonicalPath = teacher ? buildTeacherPath(teacher) : null;
+  const seoDescription =
+    String(teacher?.bio || "").trim() ||
+    (teacher?.expertise
+      ? isRTL
+        ? `تعرّف على المعلم ${teacherName} المتخصص في ${teacher.expertise} على منصة فكرة التعليمية.`
+        : `Meet ${teacherName}, a ${teacher.expertise} teacher on Fekra.`
+      : isRTL
+        ? `تعرّف على المعلم ${teacherName} على منصة فكرة التعليمية.`
+        : `Meet ${teacher?.name || "this teacher"} on Fekra.`)
+
+  useSeo(
+    teacher
+      ? {
+          title: isRTL
+            ? `${teacherName} | معلمو فكرة التعليمية`
+            : `${teacherName} | Fekra Teachers`,
+          description: seoDescription,
+          canonicalPath,
+          image: teacher.profilePic || teacher.profilePicture || "/Kalima.png",
+          lang: i18n.language?.startsWith("en") ? "en" : "ar",
+          dir: isRTL ? "rtl" : "ltr",
+          schema: [
+            buildBreadcrumbSchema([
+              { name: isRTL ? "الرئيسية" : "Home", path: "/" },
+              { name: isRTL ? "المعلمون" : "Teachers", path: "/teachers" },
+              { name: teacherName, path: canonicalPath },
+            ]),
+            buildPersonSchema({
+              name: teacherName,
+              description: seoDescription,
+              path: canonicalPath,
+              image: teacher.profilePic || teacher.profilePicture || "/Kalima.png",
+              expertise: teacher.expertise,
+            }),
+          ],
+        }
+      : {
+          title: isRTL ? "الملف التعريفي للمعلم | منصة فكرة التعليمية" : "Teacher Profile | Fekra",
+          description: isRTL
+            ? "اطّلع على الملفات التعريفية للمعلمين في منصة فكرة التعليمية."
+            : "Browse teacher profiles on Fekra.",
+          canonicalPath: location.pathname,
+          lang: i18n.language?.startsWith("en") ? "en" : "ar",
+          dir: isRTL ? "rtl" : "ltr",
+        },
+  );
 
   useEffect(() => {
     const fetchData = async () => {
@@ -122,7 +175,7 @@ export default function TeacherDetails() {
 
       setLoading(true);
       try {
-        const teacherResult = await getUserById(userId);
+        const teacherResult = await getLecturerById(userId);
         
         if (teacherResult.success && teacherResult.data) {
           setTeacher(teacherResult.data);
@@ -144,6 +197,17 @@ export default function TeacherDetails() {
 
     fetchData();
   }, [userId, t]);
+
+  useEffect(() => {
+    if (!teacher || !canonicalPath) return;
+
+    const normalizedCurrentPath = (location.pathname || "").replace(/\/+$/, "");
+    const normalizedCanonicalPath = canonicalPath.replace(/\/+$/, "");
+
+    if (normalizedCurrentPath !== normalizedCanonicalPath) {
+      navigate(canonicalPath, { replace: true });
+    }
+  }, [canonicalPath, location.pathname, navigate, teacher]);
 
   if (loading) {
     return (
@@ -188,7 +252,7 @@ export default function TeacherDetails() {
             
             {/* Image & Socials */}
             <div className="flex flex-col items-center shrink-0">
-               <TeacherProfileImage profileImage={teacher.profilePicture} />
+               <TeacherProfileImage profileImage={teacher.profilePic || teacher.profilePicture} />
                <SocialMediaIcons />
             </div>
 

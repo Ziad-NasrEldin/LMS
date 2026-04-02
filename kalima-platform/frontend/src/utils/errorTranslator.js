@@ -59,6 +59,9 @@ const fieldLabels = {
   hobby: () => t("fields.hobby"),
   level: () => t("fields.level"),
   parentPhoneNumber: () => t("fields.parentPhoneNumber"),
+  parentPhoneRelation: () => t("fields.parentPhoneRelation"),
+  parentPhoneNumber2: () => t("fields.additionalParentPhone"),
+  parentPhoneRelation2: () => t("fields.additionalParentRelation"),
   phoneNumber: () => t("fields.phoneNumber"),
   government: () => t("fields.government"),
   administrationZone: () => t("fields.administrationZone"),
@@ -328,16 +331,26 @@ export const installAxiosErrorTranslation = () => {
   axios.interceptors.response.use(
     (response) => response,
     (error) => {
+      const rawMessage = normalizeMessageInput(
+        error?.response?.data?.message || error?.response?.data?.error || error?.message
+      );
       const translated = translateErrorMessage(
-        error?.response?.data?.message || error?.response?.data?.error || error?.message,
+        rawMessage,
         error?.message
       );
 
       if (error?.response?.data && typeof error.response.data === "object") {
-        error.response.data.message = translated;
-        error.response.data.error = translated;
+        if (typeof error.response.data.message === "string") {
+          error.response.data.rawMessage = error.response.data.message;
+        }
+        if (typeof error.response.data.error === "string") {
+          error.response.data.rawError = error.response.data.error;
+        }
+        error.response.data.translatedMessage = translated;
       }
 
+      error.rawMessage = rawMessage;
+      error.translatedMessage = translated;
       error.message = translated;
       error.error = translated;
       return Promise.reject(error);

@@ -10,6 +10,9 @@ import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 
 installAxiosErrorTranslation();
 
+document.documentElement.classList.add("js-enabled");
+document.getElementById("seo-prerender")?.remove();
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>

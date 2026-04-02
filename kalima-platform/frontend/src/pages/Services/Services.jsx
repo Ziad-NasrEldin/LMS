@@ -4,6 +4,8 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { CheckCircle, PlayCircle, RocketLaunch, Sparkle } from "@phosphor-icons/react";
 import { designTokens } from "../../constants/designTokens";
+import { useSeo } from "../../seo/useSeo";
+import { buildOrganizationSchema, buildWebsiteSchema } from "../../seo/structuredData.mjs";
 
 const TOKENS = designTokens.colors;
 const SHADOWS = designTokens.shadows;
@@ -29,38 +31,51 @@ const Services = () => {
   const { i18n } = useTranslation("home");
   const isRTL = i18n.language === "ar";
 
+  useSeo({
+    title: isRTL
+      ? "منصة فكرة التعليمية | تعلّم منظم وتقدّم حقيقي"
+      : "Fekra Educational Platform | Structured Learning and Real Progress",
+    description: isRTL
+      ? "فكرة منصة تعليمية رقمية تساعد الطلاب من الصف الرابع الابتدائي حتى الصف الثالث الثانوي على التعلّم المنظم ومتابعة التقدّم بوضوح."
+      : "Fekra is a digital learning platform that helps students learn in a structured way and track progress clearly.",
+    canonicalPath: "/",
+    lang: i18n.language?.startsWith("en") ? "en" : "ar",
+    dir: isRTL ? "rtl" : "ltr",
+    schema: [buildOrganizationSchema(), buildWebsiteSchema()],
+  });
+
   const text = useMemo(
     () => ({
       ar: {
         badge: "منصة تعليمية موثوقة",
-        title: "تعلم منظم. تقدم حقيقي.",
-        subtitle: "نساعد الطالب يفهم الدرس بسرعة، يطبّق مباشرة، ويتابع تقدمه بشكل واضح.",
+        title: "تعلّم منظم. تقدّم حقيقي.",
+        subtitle: "نساعد الطالب على فهم الدروس بسرعة، والتطبيق مباشرة، ومتابعة تقدّمه بوضوح.",
         primaryCta: "ابدأ الآن",
-        secondaryCta: "تسجيل الدخول",
+        secondaryCta: "سجّل الدخول",
         tertiaryCta: "استكشف الدورات",
-        proofTitle: "لماذا تختار فكرة؟",
+        proofTitle: "لماذا فكرة؟",
         features: [
           {
             title: "شرح واضح",
-            body: "محتوى مبسط يركز على الفهم بدون تعقيد.",
+            body: "محتوى مبسّط يركّز على الفهم من دون تعقيد.",
           },
           {
             title: "تدريب مباشر",
-            body: "تطبيق فوري بعد كل درس لتحويل المعرفة إلى مهارة.",
+            body: "تطبيق فوري بعد كل درس لتحويل المعرفة إلى مهارة عملية.",
           },
           {
             title: "نتائج قابلة للقياس",
-            body: "متابعة تقدم تساعد الطالب وولي الأمر على رؤية التحسن.",
+            body: "متابعة واضحة تساعد الطالب وولي الأمر على رؤية التحسّن.",
           },
         ],
         appTitle: "حمّل تطبيق فكرة",
-        appBody: "تعلّم من الجوال في أي وقت عبر تطبيق سريع وسهل الاستخدام.",
+        appBody: "تعلّم عبر الهاتف في أي وقت من خلال تطبيق سريع وسهل الاستخدام.",
         appScan: "امسح الكود للوصول السريع",
         appIos: "تحميل على App Store",
         appAndroid: "تحميل على Google Play",
-        ctaTitle: "جاهز تبدأ؟",
-        ctaBody: "سجل الآن وابدأ خطة تعلم مناسبة لمرحلتك.",
-        ctaButton: "انشئ حسابك",
+        ctaTitle: "هل أنت مستعد للبدء؟",
+        ctaBody: "أنشئ حسابك وابدأ مسارًا تعليميًا مناسبًا لمرحلتك.",
+        ctaButton: "أنشئ حسابك",
       },
       en: {
         badge: "Trusted learning platform",

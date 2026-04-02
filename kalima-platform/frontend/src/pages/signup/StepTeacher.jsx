@@ -4,13 +4,20 @@ import { useEffect, useState } from "react"
 import { Eye, EyeOff } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import { getAllSubjects } from "../../routes/courses"
+import { STAGE_KEYS, getStageDisplayName } from "../../utils/levelHierarchy"
 
 
-export default function StepTeacher({ formData, handleInputChange, t, errors, gradeLevels }) {
+export default function StepTeacher({ formData, handleInputChange, t, errors, levelHierarchy }) {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [subjects, setSubjects] = useState([])
   const { i18n } = useTranslation()
+  const stageOptions = levelHierarchy?.stageOptions?.length
+    ? levelHierarchy.stageOptions
+    : STAGE_KEYS.map((stageKey) => ({
+        value: stageKey,
+        label: getStageDisplayName(stageKey, i18n.language),
+      }))
 
   useEffect(() => {
     const fetchSubjects = async () => {
@@ -34,7 +41,7 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, gr
     <div className="space-y-3">
       <p className="text-xl sm:text-2xl font-semibold mb-2">{t('form.accountDetails') || 'Account Details'}</p>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
-      <div className="form-control">
+      <div className="form-control sm:col-span-2">
         <div className="flex flex-col gap-1">
           <label className="label py-1">
             <span className="label-text text-xs">{t("form.email")}</span>
@@ -42,15 +49,15 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, gr
           <input
             type="email"
             name="email"
-            className={`input input-bordered input-sm ${errors.email ? "input-error animate-shake" : ""}`}
+            className={`input input-bordered w-full ${errors.email ? "input-error animate-shake" : ""}`}
             value={formData.email}
             onChange={handleInputChange}
             required
           />
-          {errors.email && <span className="text-error text-sm mt-1">{t("validation.email")}</span>}
+          {errors.email && <span className="text-error text-sm mt-1">{t(`validation.${errors.email}`)}</span>}
         </div>
       </div>
-      <div className="grid gap-4 sm:grid-cols-2 sm:gap-6">
+      <div className="grid gap-4 sm:grid-cols-2 sm:col-span-2 sm:gap-6">
         <div className="form-control">
           <div className="flex flex-col gap-1">
             <label className="label py-1">
@@ -60,7 +67,7 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, gr
               <input
                 type={showPassword ? "text" : "password"}
                 name="password"
-                className={`input input-bordered input-sm ${i18n.language === "ar" ? "pr-12" : "pl-12"} ${errors.password ? "input-error animate-shake" : ""}`}
+                className={`input input-bordered w-full ${i18n.language === "ar" ? "pr-12" : "pl-12"} ${errors.password ? "input-error animate-shake" : ""}`}
                 value={formData.password || ""}
                 onChange={handleInputChange}
                 required
@@ -87,7 +94,7 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, gr
               <input
                 type={showConfirmPassword ? "text" : "password"}
                 name="confirmPassword"
-                className={`input input-bordered input-sm ${i18n.language === "ar" ? "pr-12" : "pl-12"} ${errors.confirmPassword ? "input-error animate-shake" : ""}`}
+                className={`input input-bordered w-full ${i18n.language === "ar" ? "pr-12" : "pl-12"} ${errors.confirmPassword ? "input-error animate-shake" : ""}`}
                 value={formData.confirmPassword || ""}
                 onChange={handleInputChange}
                 required
@@ -111,27 +118,32 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, gr
       <div className="form-control sm:col-span-2">
         <div className="flex flex-col gap-1">
           <label className="label py-1">
-            <span className="label-text text-xs">{t("form.level")}</span>
+            <span className="label-text text-xs">{t("form.stage") || t("form.level")}</span>
           </label>
           <div className="flex flex-wrap gap-x-4 gap-y-2">
-            {["primary", "preparatory", "secondary"].map((levelOption) => (
-              <label key={levelOption} className="flex items-center gap-2 cursor-pointer whitespace-nowrap">
+            {stageOptions.map((levelOption) => (
+              <label key={levelOption.value} className="flex cursor-pointer items-center gap-2 whitespace-nowrap">
                 <input
                   type="checkbox"
                   className="checkbox"
                   name="level"
-                  value={levelOption}
-                  checked={formData.level?.includes(levelOption) || false}
+                  value={levelOption.value}
+                  checked={Array.isArray(formData.level) ? formData.level.includes(levelOption.value) : false}
                   onChange={(e) => {
                     const value = e.target.value
                     const isChecked = e.target.checked
+                    const currentLevels = Array.isArray(formData.level)
+                      ? formData.level
+                      : formData.level
+                        ? [formData.level]
+                        : []
                     const updatedLevels = isChecked
-                      ? [...(formData.level || []), value]
-                      : (formData.level || []).filter((level) => level !== value)
+                      ? [...currentLevels, value]
+                      : currentLevels.filter((level) => level !== value)
                     handleInputChange({ target: { name: "level", value: updatedLevels } })
                   }}
                 />
-                <span>{t(`gradeLevels.${levelOption}`)}</span>
+                <span>{levelOption.label}</span>
               </label>
             ))}
           </div>
@@ -147,7 +159,7 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, gr
           </label>
           <select
             name="teachesAtType"
-            className={`select select-bordered select-sm ${errors.teachesAtType ? "select-error animate-shake" : ""}`}
+            className={`select select-bordered w-full ${errors.teachesAtType ? "select-error animate-shake" : ""}`}
             value={formData.teachesAtType || ""}
             onChange={handleInputChange}
             required
@@ -177,7 +189,7 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, gr
                 <div key={index} className="flex w-full gap-2 sm:w-2/3 lg:w-1/2">
                   <input
                     type="text"
-                    className={`input input-bordered input-sm flex-1 ${errors.centers?.[index] ? "input-error animate-shake" : ""}`}
+                    className={`input input-bordered w-full flex-1 ${errors.centers?.[index] ? "input-error animate-shake" : ""}`}
                     value={center}
                     onChange={(e) => {
                       const newCenters = [...(formData.centers || [""])]
@@ -231,7 +243,7 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, gr
             <input
               type="text"
               name="school"
-              className={`input input-bordered input-sm ${errors.school ? "input-error animate-shake" : ""}`}
+              className={`input input-bordered w-full ${errors.school ? "input-error animate-shake" : ""}`}
               value={formData.school || ""}
               onChange={handleInputChange}
               placeholder={`${t("form.schoolName") || "School name"}`}
@@ -259,7 +271,7 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, gr
                 className="grid grid-cols-1 gap-2 sm:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)_2.25rem] sm:items-center"
               >
                 <select
-                  className={`select select-bordered select-sm w-full ${errors.socialMedia?.[index]?.platform ? "select-error animate-shake" : ""}`}
+                  className={`select select-bordered w-full ${errors.socialMedia?.[index]?.platform ? "select-error animate-shake" : ""}`}
                   value={social.platform || ""}
                   onChange={(e) => {
                     const newSocialMedia = [...(formData.socialMedia || [{ platform: "", account: "" }])]
@@ -285,7 +297,7 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, gr
                 </select>
                 <input
                   type="text"
-                  className={`input input-bordered input-sm w-full placeholder:text-base-content/65 ${errors.socialMedia?.[index]?.account ? "input-error animate-shake" : ""}`}
+                  className={`input input-bordered w-full placeholder:text-base-content/65 ${errors.socialMedia?.[index]?.account ? "input-error animate-shake" : ""}`}
                   value={social.account || ""}
                   onChange={(e) => {
                     const newSocialMedia = [...(formData.socialMedia || [{ platform: "", account: "" }])]
@@ -328,22 +340,22 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, gr
         </div>
       </div>
       {/* Subject Input */}
-      <div className="form-control">
+      <div className="form-control sm:col-span-2">
         <div className="flex flex-col gap-1">
           <label className="label py-1">
             <span className="label-text text-xs">{t("form.subject")}</span>
           </label>
           <select
             name="subject"
-            className={`select select-bordered select-sm ${errors.subject ? "select-error animate-shake" : ""}`}
+            className={`select select-bordered w-full ${errors.subject ? "select-error animate-shake" : ""}`}
             value={formData.subject}
             onChange={handleSelectChange}
             required
           >
             <option value="">{t("form.selectSubject")}</option>
             {subjects.map((subject) => (
-              <option key={subject.id} value={subject.id}>
-                {t(`${subject.name}`)}
+              <option key={subject._id || subject.id || subject.name} value={subject._id || subject.id || subject.name}>
+                {subject.name}
               </option>
             ))}
           </select>

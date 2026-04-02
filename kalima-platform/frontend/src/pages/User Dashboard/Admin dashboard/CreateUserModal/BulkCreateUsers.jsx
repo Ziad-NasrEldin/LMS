@@ -126,11 +126,7 @@ const BulkCreateUsers = () => {
               >
                 <option value="student">{t("roles.student")}</option>
                 <option value="parent">{t("roles.parent")}</option>
-                <option value="lecturer">{t("roles.lecturer")}</option>
                 <option value="teacher">{t("roles.teacher")}</option>
-                <option value="assistant">{t("roles.assistant")}</option>
-                <option value="moderator">{t("roles.moderator")}</option>
-                <option value="subadmin">{t("roles.subadmin")}</option>
               </select>
               <label className="label py-0">
                 <span className="label-text-alt text-info">{t("help.selectAccountType")}</span>
