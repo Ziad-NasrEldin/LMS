@@ -1,10 +1,10 @@
 {
-  "centerSelector": {
-    "selectCenter": "اختر المركز",
-    "selectPlaceholder": "اختر مركزًا",
-    "noCenters": "لا توجد مراكز متاحة"
-  },
-  "centerOverview": {
+    "centerSelector": {
+      "selectCenter": "اختر المركز",
+       "selectPlaceholder": "اختر مركزًا",
+       "noCenters": "لا توجد مراكز متاحة"
+    },
+    "centerOverview": {
     "title": "نظرة عامة على المركز",
     "lecturers": "المحاضرون",
     "students": "الطلاب",
@@ -12,335 +12,319 @@
     "created": "تاريخ الإنشاء",
     "editCenter": "تعديل المركز",
     "addLecturer": "إضافة محاضر"
-  },
-  "lecturersList": {
-    "title": "المحاضرون",
-    "searchPlaceholder": "ابحث عن محاضرين...",
-    "addLecturer": "إضافة محاضر",
-    "noLecturers": "لا يوجد محاضرون",
-    "subjects": "المواد",
-    "noSubjects": "لا توجد مواد معينة",
-    "viewDetails": "عرض التفاصيل",
-    "lecturerAddedSuccess": "تم إضافة المحاضر بنجاح",
-    "lecturerAddedError": "فشل إضافة المحاضر",
-    "subjectAddedSuccess": "تم إضافة المادة بنجاح",
-    "subjectAddedError": "فشل إضافة المادة",
-    "lecturerName": "اسم المحاضر",
-    "lecturerNamePlaceholder": "أدخل اسم المحاضر",
-    "lecturerPhone": "رقم الهاتف",
-    "lecturerPhonePlaceholder": "أدخل رقم الهاتف",
-    "lecturerSubjects": "المواد",
-    "selectSubject": "اختر مادة",
-    "addNewSubject": "إضافة مادة جديدة",
-    "newSubjectPlaceholder": "أدخل اسم المادة",
-    "addSubjectButton": "إضافة المادة",
-    "submitLecturer": "إضافة المحاضر",
-    "cancel": "إلغاء"
-  },
-  "courseList": {
-    "title": "جدول المحاضرات",
-    "addLecture": "إضافة محاضرة",
-    "addCourse": "إضافة دورة",
-    "noLessons": "لا توجد دروس",
-    "noCourses": "لا توجد دورات",
-    "filters": {
-      "allLevels": "جميع المراحل",
-      "allLecturers": "جميع المحاضرين"
     },
-    "pagination": {
-      "previous": "السابق",
-      "next": "التالي"
+    "lecturersList": {
+       "title": "المحاضرون",
+      "searchPlaceholder": "ابحث عن محاضرين...",
+      "addLecturer": "إضافة محاضر",
+      "noLecturers": "لا يوجد محاضرون",
+      "subjects": "المواد",
+      "noSubjects": "لا توجد مواد معينة",
+      "viewDetails": "عرض التفاصيل",
+      
+      "lecturerAddedSuccess": "تم إضافة المحاضر بنجاح",
+      "lecturerAddedError": "فشل إضافة المحاضر",
+      "subjectAddedSuccess": "تم إضافة المادة بنجاح",
+      "subjectAddedError": "فشل إضافة المادة",
+      
+      "lecturerName": "اسم المحاضر",
+      "lecturerNamePlaceholder": "أدخل اسم المحاضر",
+      "lecturerPhone": "رقم الهاتف",
+      "lecturerPhonePlaceholder": "أدخل رقم الهاتف",
+      "lecturerSubjects": "المواد",
+      "selectSubject": "اختر مادة",
+      
+      "addNewSubject": "إضافة مادة جديدة",
+      "newSubjectPlaceholder": "أدخل اسم المادة",
+      "addSubjectButton": "إضافة المادة",
+      
+      "submitLecturer": "إضافة المحاضر",
+      "cancel": "إلغاء"
     },
-    "na": "غير متوفر"
-  },
-  "barCodeScanner": {
-    "title": "قارئ رمز الاستجابة السريعة",
-    "instructions": "امسح رموز الطلاب لتسجيل الحضور"
-  },
-  "activityTracker": {
-    "title": "نشاط الطلاب",
-    "columns": {
-      "student": "الطالب",
-      "lastActivity": "النشاط الأخير",
-      "status": "الحالة",
-      "studentName": "الاسم",
-      "passFail": "الحالة",
-      "score": "النتيجة",
-      "grade": "التقدير",
-      "timeSpent": "الوقت المستغرق",
-      "submissionTime": "وقت التسليم",
-      "showDetails": "التفاصيل"
+    
+     "courseList": {
+      "title": "جدول المحاضرات",
+      "addLecture": "إضافة محاضرة",
+      "addCourse": "إضافة دورة",
+      "noLessons": "لا توجد دروس",
+      "noCourses": "لا توجد دورات",
+      "filters": {
+        "allLevels": "جميع المراحل",
+        "allLecturers": "جميع المحاضرين"
+      },
+      "pagination": {
+        "previous": "السابق",
+        "next": "التالي"
+      },
+      "na": "غير متوفر"
+    
     },
-    "header": {
-      "title": "تتبع نشاط الطلاب"
+    "barCodeScanner": {
+      "title": "قارئ رمز الاستجابة السريعة",
+      "instructions": "امسح رموز الطلاب لتسجيل الحضور"
     },
-    "buttons": {
-      "publishResults": "نشر النتائج",
-      "viewDetails": "عرض"
-    },
-    "statusCounts": {
-      "present": "حاضر: {{count}}",
-      "absent": "غائب: {{count}}"
-    },
-    "search": {
-      "placeholder": "ابحث عن الطلاب..."
-    },
-    "filters": {
-      "status": {
-        "label": "الحالة",
-        "options": {
-          "present": "حاضر",
-          "absent": "غائب"
+    "activityTracker": {
+      "title": "نشاط الطلاب",
+      "columns": {
+        "student": "الطالب",
+        "lastActivity": "النشاط الأخير",
+        "status": "الحالة",
+        "studentName": "الاسم",
+        "passFail": "الحالة",
+        "score": "النتيجة",
+        "grade": "التقدير",
+        "timeSpent": "الوقت المستغرق",
+        "submissionTime": "وقت التسليم",
+        "showDetails": "التفاصيل"
+      },
+      "header": {
+        "title": "تتبع نشاط الطلاب"
+      },
+      "buttons": {
+        "publishResults": "نشر النتائج",
+        "viewDetails": "عرض"
+      },
+      "statusCounts": {
+        "present": "حاضر: {{count}}",
+        "absent": "غائب: {{count}}"
+      },
+      "search": {
+        "placeholder": "ابحث عن الطلاب..."
+      },
+      "filters": {
+        "status": {
+          "label": "الحالة",
+          "options": {
+            "present": "حاضر",
+            "absent": "غائب"
+          }
+        },
+        "grade": {
+          "label": "التقدير",
+          "options": {
+            "excellent": "ممتاز",
+            "average": "متوسط",
+            "poor": "ضعيف"
+          }
+        },
+        "time": {
+          "label": "الوقت المستغرق",
+          "options": {
+            "short": "<٣٠ دقيقة",
+            "medium": "٣٠-٦٠ دقيقة",
+            "long": ">٦٠ دقيقة"
+          }
+        },
+        "date": {
+          "label": "التاريخ",
+          "options": {
+            "today": "اليوم",
+            "week": "هذا الأسبوع",
+            "month": "هذا الشهر"
+          }
         }
+      },
+      "status": {
+        "pass": "حاضر",
+        "fail": "غائب",
+        "yes": "نعم",
+        "no": "لا"
       },
       "grade": {
-        "label": "التقدير",
-        "options": {
-          "excellent": "ممتاز",
-          "average": "متوسط",
-          "poor": "ضعيف"
-        }
+        "excellent": "ممتاز",
+        "average": "متوسط",
+        "poor": "ضعيف"
       },
       "time": {
-        "label": "الوقت المستغرق",
-        "options": {
-          "short": "<٣٠ دقيقة",
-          "medium": "٣٠-٦٠ دقيقة",
-          "long": ">٦٠ دقيقة"
-        }
+        "minutes": "دقيقة"
       },
-      "date": {
-        "label": "التاريخ",
-        "options": {
-          "today": "اليوم",
-          "week": "هذا الأسبوع",
-          "month": "هذا الشهر"
-        }
+      "noResults": "لا توجد نتائج مطابقة"
+    },
+    "addCourseForm": {
+      "title": "إضافة دورة جديدة",
+      "courseName": "اسم الدورة",
+      "selectLecturer": "اختر محاضر",
+      "submit": "إنشاء الدورة",
+      "labels": {
+        "subject": "المادة",
+        "lecturer": "المحاضر",
+        "level": "المرحلة",
+        "startDate": "تاريخ البدء",
+        "duration": "المدة (دقيقة)"
+      },
+      "selectPlaceholder": {
+        "subject": "اختر المادة",
+        "lecturer": "اختر المحاضر",
+        "level": "اختر المرحلة"
+      },
+      "submitButton": "إنشاء الدورة",
+      "saving": "جاري الحفظ...",
+      "successMessage": "تم إضافة الدورة بنجاح!",
+      "errors": {
+        "general": "فشل إضافة الدورة. يرجى المحاولة مرة أخرى.",
+        "courseNameRequired": "اسم الدورة مطلوب",
+        "lecturerRequired": "اختيار المحاضر مطلوب"
+      },
+      "cancel": "إلغاء",
+      "validation": {
+        "courseNameRequired": "اسم الدورة مطلوب",
+        "lecturerRequired": "يرجى اختيار محاضر"
       }
     },
-    "status": {
-      "pass": "حاضر",
-      "fail": "غائب",
-      "yes": "نعم",
-      "no": "لا"
+    "reportsSection": {
+      "title": "التقارير",
+      "generateReport": "إنشاء تقرير",
+      "noReports": "لا توجد تقارير متاحة"
     },
-    "grade": {
-      "excellent": "ممتاز",
-      "average": "متوسط",
-      "poor": "ضعيف"
-    },
-    "time": {
-      "minutes": "دقيقة"
-    },
-    "noResults": "لا توجد نتائج مطابقة"
-  },
-  "addCourseForm": {
-    "title": "إضافة دورة جديدة",
-    "courseName": "اسم الدورة",
-    "selectLecturer": "اختر محاضر",
-    "submit": "إنشاء الدورة",
-    "labels": {
-      "subject": "المادة",
-      "lecturer": "المحاضر",
-      "level": "المرحلة",
-      "startDate": "تاريخ البدء",
-      "duration": "المدة (دقيقة)"
-    },
-    "selectPlaceholder": {
-      "subject": "اختر المادة",
-      "lecturer": "اختر المحاضر",
-      "level": "اختر المرحلة"
-    },
-    "submitButton": "إنشاء الدورة",
-    "saving": "جاري الحفظ...",
-    "successMessage": "تم إضافة الدورة بنجاح!",
     "errors": {
-      "general": "فشل إضافة الدورة. يرجى المحاولة مرة أخرى.",
-      "courseNameRequired": "اسم الدورة مطلوب",
-      "lecturerRequired": "اختيار المحاضر مطلوب"
+      "fetchCentersFailed": "فشل تحميل المراكز",
+      "fetchLecturersFailed": "فشل تحميل المحاضرين",
+      "fetchStudentsFailed": "فشل تحميل الطلاب",
+      "fetchLessonsFailed": "فشل تحميل الدورات"
     },
-    "cancel": "إلغاء",
-    "validation": {
-      "courseNameRequired": "اسم الدورة مطلوب",
-      "lecturerRequired": "يرجى اختيار محاضر"
-    }
+    "contactForm": {
+  "category": "الفئة",
+  "content": "المحتوى",
+  "grade": "الصف",
+  "level": "المرحلة",
+  "description": "وصف الطلب",
+  "selectPlaceholder": "اختر",
+  "categories": {
+    "inquiry": "استفسار",
+    "complaint": "شكوى",
+    "suggestion": "اقتراح"
   },
-  "reportsSection": {
-    "title": "التقارير",
-    "generateReport": "إنشاء تقرير",
-    "noReports": "لا توجد تقارير متاحة"
+  "contentTypes": {
+    "material": "المادة التعليمية",
+    "teacher": "المدرس",
+    "platform": "المنصة"
   },
-  "errors": {
-    "fetchCentersFailed": "فشل تحميل المراكز",
-    "fetchLecturersFailed": "فشل تحميل المحاضرين",
-    "fetchStudentsFailed": "فشل تحميل الطلاب",
-    "fetchLessonsFailed": "فشل تحميل الدورات"
+  "grades": {
+    "first": "الأول",
+    "second": "الثاني",
+    "third": "الثالث"
   },
-  "contactForm": {
-    "category": "الفئة",
-    "content": "المحتوى",
-    "grade": "الصف",
+  "placeholders": {
     "level": "المرحلة",
-    "description": "وصف الطلب",
-    "selectPlaceholder": "اختر",
-    "categories": {
-      "inquiry": "استفسار",
-      "complaint": "شكوى",
-      "suggestion": "اقتراح"
-    },
-    "contentTypes": {
-      "material": "المادة التعليمية",
-      "teacher": "المدرس",
-      "platform": "المنصة"
-    },
-    "grades": {
-      "first": "الأول",
-      "second": "الثاني",
-      "third": "الثالث"
-    },
-    "placeholders": {
-      "level": "المرحلة",
-      "subLevel": "المرحلة الفرعية",
-      "details": "التفاصيل",
-      "description": "يرجى كتابة تفاصيل طلبك أو استفسارك هنا..."
-    },
-    "buttons": {
-      "cancel": "إلغاء",
-      "submit": "إرسال الطلب"
-    }
+    "subLevel": "المرحلة الفرعية",
+    "details": "التفاصيل",
+    "description": "يرجى كتابة تفاصيل طلبك أو استفسارك هنا..."
+  },
+  "buttons": {
+    "cancel": "إلغاء",
+    "submit": "إرسال الطلب"
+  }
   },
   "courseCard": {
-    "session": "الحصة {{session}}",
-    "showDetails": "اظهار التفاصيل",
+  "session": "الحصة {{session}}",
+  "showDetails" : "اظهار التفاصيل",
     "unknownSubject": "مادة غير معروفة",
     "unknownGroup": "مجموعة غير معروفة",
     "unknownLecturer": "محاضر غير معروف",
-    "types": {
-      "lecture": "محاضرة",
-      "tutorial": "تمرين",
-      "lab": "مختبر"
-    },
-    "lecturer": "المحاضر",
+  "types": {
+    "lecture": "محاضرة",
+    "tutorial": "تمرين",
+    "lab": "مختبر"
+  },
+  "lecturer": "المحاضر",
     "level": "المرحلة",
     "errors": {
       "invalidLessonId": "معرف الدرس غير صالح",
       "fetchLessonFailed": "فشل في جلب تفاصيل الدرس: {{message}}"
     }
-  },
-  "schedule": {
-    "title": "جدول الحصص"
-  },
-  "filters": {
-    "department": "القسم",
-    "group": "المجموعة",
-    "semester": "الفصل",
-    "teacher": "المعلم",
-    "section": "القسم",
-    "select_section": "اختر القسم",
-    "select_group": "اختر مجموعة",
-    "group_label": "المجموعة {{group}}",
-    "semesters": [
-      "الفصل الأول",
-      "الفصل الثاني",
-      "الفصل الصيفي"
-    ],
-    "allLevels": "جميع المراحل",
-    "allLecturers": "جميع المحاضرين"
-  },
-  "teacher": {
-    "name_format": "أ/ {{name}}"
-  },
-  "promoBanner": {
-    "title": "Do you have questions or found an error in the schedule?",
-    "contactText": "Contact us at 256 258",
-    "altText": "Contact us"
-  },
-  "barcodeScanner": {
-    "showAll": "عرض الكل",
-    "qrScanner": "مسح QR",
-    "scanInstruction": "اضغط هنا لمسح الكود",
-    "studentName": "الطالب محمد محمود",
-    "payment": "المدفوع {{amount}} جنيه",
-    "entryTime": "وقت الدخول {{time}}",
-    "registerEntry": "تسجيل الدخول",
-    "revenueSummary": "ملخص الإيرادات",
-    "mathLesson": "درس الرياضيات - الصف الخامس",
-    "studentsCount": "{{count}} طالباً",
-    "amount": "{{amount}} جنيه",
-    "totalRevenue": "إجمالي الإيرادات {{amount}} جنيه",
-    "downloadReport": "تحميل التقرير"
-  },
-  "recommendedCourses": {
-    "title": "إرسال تقارير الطلبة إلى الواتساب",
-    "selectGrade": "اختر الصف",
-    "selectSection": "اختر القسم",
-    "reportTitle": "تقارير الطالب الأسبوعي",
-    "sendButton": "إرسال إلي واتساب",
-    "noReports": "لا توجد تقارير مطابقة",
-    "gradeOptions": [
-      {
-        "value": "grade11",
-        "label": "الصف الثاني الثانوي"
-      },
-      {
-        "value": "grade10",
-        "label": "الصف الأول الثانوي"
-      },
-      {
-        "value": "grade12",
-        "label": "الصف الثالث الثانوي"
-      }
-    ],
-    "sectionOptions": [
-      {
-        "value": "science_math",
-        "label": "قسم علمي رياضة"
-      },
-      {
-        "value": "science_bio",
-        "label": "قسم علمي علوم"
-      },
-      {
-        "value": "literature",
-        "label": "قسم أدبي"
-      }
-    ],
-    "reports": [
-      {
-        "id": 1,
-        "name": "هدى أحمد",
-        "class": "الصف الثاني الثانوي",
-        "section": "القسم: علمي رياضة",
-        "improvements": [
-          {
-            "type": "improvement",
-            "textKey": "improvements.math",
-            "params": {
-              "subject": "الرياضيات",
-              "percentage": 12
-            }
-          },
-          {
-            "type": "behavior",
-            "textKey": "improvements.behavior"
-          },
-          {
-            "type": "support",
-            "textKey": "improvements.support",
-            "params": {
-              "subject": "القراءة"
-            }
-          }
-        ]
-      }
-    ],
-    "improvements": {
-      "math": "تحسنت في {{subject}} بنسبة {{percentage}}% !",
-      "behavior": "سلوك ممتاز في المحاضرة الأخيرة",
-      "support": "تحتاج دعم في {{subject}}"
+},
+"schedule": {
+  "title": "جدول الحصص"
+},
+"filters": {
+  "department": "القسم",
+  "group": "المجموعة",
+  "semester": "الفصل",
+  "teacher": "المعلم",
+  "section": "القسم",
+  "select_section": "اختر القسم",
+  "select_group": "اختر مجموعة",
+  "group_label": "المجموعة {{group}}",
+  "semesters": ["الفصل الأول", "الفصل الثاني", "الفصل الصيفي"],
+  "allLevels": "جميع المراحل",
+  "allLecturers": "جميع المحاضرين"
+},
+"subjects": {
+  "math": "الرياضيات",
+  "science": "العلوم",
+  "arabic": "اللغة العربية"
+},
+"teacher": {
+  "name_format": "أ/ {{name}}"
+},
+"promoBanner": {
+  "title": "Do you have questions or found an error in the schedule?",
+  "contactText": "Contact us at 256 258",
+  "altText": "Contact us"
+},
+"barcodeScanner": {
+  "showAll": "عرض الكل",
+  "qrScanner": "مسح QR",
+  "scanInstruction": "اضغط هنا لمسح الكود",
+  "studentName": "الطالب محمد محمود",
+  "payment": "المدفوع {{amount}} جنيه",
+  "entryTime": "وقت الدخول {{time}}",
+  "registerEntry": "تسجيل الدخول",
+  "revenueSummary": "ملخص الإيرادات",
+  "mathLesson": "درس الرياضيات - الصف الخامس",
+  "studentsCount": "{{count}} طالباً",
+  "amount": "{{amount}} جنيه",
+  "totalRevenue": "إجمالي الإيرادات {{amount}} جنيه",
+  "downloadReport": "تحميل التقرير"
+},
+"recommendedCourses": {
+  "title": "إرسال تقارير الطلبة إلى الواتساب",
+  "selectGrade": "اختر الصف",
+  "selectSection": "اختر القسم",
+  "reportTitle": "تقارير الطالب الأسبوعي",
+  "sendButton": "إرسال إلي واتساب",
+  "noReports": "لا توجد تقارير مطابقة",
+  "gradeOptions": [
+    { "value": "grade11", "label": "الصف الثاني الثانوي" },
+    { "value": "grade10", "label": "الصف الأول الثانوي" },
+    { "value": "grade12", "label": "الصف الثالث الثانوي" }
+  ],
+  "sectionOptions": [
+    { "value": "science_math", "label": "قسم علمي رياضة" },
+    { "value": "science_bio", "label": "قسم علمي علوم" },
+    { "value": "literature", "label": "قسم أدبي" }
+  ],
+  "reports": [
+    {
+      "id": 1,
+      "name": "هدى أحمد",
+      "class": "الصف الثاني الثانوي",
+      "section": "القسم: علمي رياضة",
+      "improvements": [
+        {
+          "type": "improvement",
+          "textKey": "improvements.math",
+          "params": { "subject": "الرياضيات", "percentage": 12 }
+        },
+        {
+          "type": "behavior",
+          "textKey": "improvements.behavior"
+        },
+        {
+          "type": "support",
+          "textKey": "improvements.support",
+          "params": { "subject": "القراءة" }
+        }
+      ]
     }
-  },
-  "statistics": {
+  ],
+  "improvements": {
+    "math": "تحسنت في {{subject}} بنسبة {{percentage}}% !",
+    "behavior": "سلوك ممتاز في المحاضرة الأخيرة",
+    "support": "تحتاج دعم في {{subject}}"
+  }
+},
+"statistics": {
     "examResults": "نتائج الامتحان",
     "avgGrades": "متوسط الدرجات",
     "testsCompleted": "الاختبارات المكتملة",
@@ -352,7 +336,8 @@
     "total": ":المجموع الكلي",
     "viewReport": "عرض التقرير"
   },
-  "revenue": {
+
+   "revenue": {
     "loading": "جاري التحميل...",
     "error": "فشل تحميل بيانات الإيرادات",
     "summary": {
@@ -375,8 +360,9 @@
       "bookletRev": "إيراد الكتيبات",
       "totalRev": "إجمالي الإيراد"
     }
-  },
-  "common": {
+  }
+  ,"common": {
     "na": "غير متوفر"
   }
+  
 }

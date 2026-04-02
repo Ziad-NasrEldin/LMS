@@ -15,7 +15,6 @@ import axios from "axios"
 import { getAllLevels } from "../../routes/levels"
 import { designTokens } from "../../constants/designTokens"
 import { translateErrorMessage } from "../../utils/errorTranslator"
-import { mapSignupApiError } from "./signupApiError"
 import {
   isValidEgyptianPhoneNumber,
   normalizeEgyptianPhoneNumber,
@@ -28,55 +27,14 @@ const GRADIENTS = designTokens.gradients
 const hobbiesList = [
   { id: "math", key: "math", value: "Math" },
   { id: "programming", key: "programming", value: "Programming" },
-  { id: "art", key: "art", value: "Handicrafts" },
+  { id: "art", key: "art", value: "Art" },
   { id: "languages", key: "languages", value: "Languages" },
   { id: "photography", key: "photography", value: "Photography" },
   { id: "montage", key: "montage", value: "Montage" },
-  { id: "designIllustrating", key: "designIllustrating", value: "Graphic Design" },
+  { id: "designIllustrating", key: "designIllustrating", value: "Design/Illustrating" },
   { id: "marketing", key: "marketing", value: "Marketing" },
   { id: "other", key: "other", value: "Other" },
 ]
-
-const PARENT_RELATIONS = ["mother", "father", "other"]
-
-const normalizeParentRelation = (value) => String(value || "").trim().toLowerCase()
-
-const validateParentContact = ({
-  phoneValue,
-  relationValue,
-  phoneErrorKey,
-  relationErrorKey,
-  phoneRequiredError,
-  relationRequiredError,
-  relationInvalidError,
-  required,
-  errors,
-}) => {
-  const phone = String(phoneValue || "").trim()
-  const relation = normalizeParentRelation(relationValue)
-  const hasPhone = phone.length > 0
-  const hasRelation = relation.length > 0
-
-  if (!hasPhone) {
-    if (required || hasRelation) {
-      errors[phoneErrorKey] = phoneRequiredError
-    }
-    return
-  }
-
-  if (!isValidEgyptianPhoneNumber(phoneValue)) {
-    errors[phoneErrorKey] = "phoneInvalid"
-  }
-
-  if (!hasRelation) {
-    errors[relationErrorKey] = relationRequiredError
-    return
-  }
-
-  if (!PARENT_RELATIONS.includes(relation)) {
-    errors[relationErrorKey] = relationInvalidError
-  }
-}
 
 const totalSteps = {
   student: 4,
@@ -100,15 +58,10 @@ export default function StudentRegistration() {
     phoneNumber2: "",
     gender: "",
     faction: "Alpha",
-    stage: "",
-    level: "",
+    level: [],
     hobbies: [],
     otherHobbyText: "",
     parentPhoneNumber: "",
-    parentPhoneRelation: "",
-    parentPhoneNumber2: "",
-    parentPhoneRelation2: "",
-    hasAdditionalParentPhone: false,
     profession: "",
     children: [""],
     subject: "",
@@ -118,21 +71,16 @@ export default function StudentRegistration() {
     socialMedia: [{ platform: "", account: "" }],
     government: "",
     administrationZone: "",
+    referralSerial: null,
+    profilePic: null,
   })
   const [errors, setErrors] = useState({})
-  const [apiErrors, setApiErrors] = useState([])
-  const [levelHierarchy, setLevelHierarchy] = useState({
-    levels: [],
-    stages: [],
-    grades: [],
-    gradesByStageId: {},
-    stageOptions: [],
-    gradeOptions: [],
-  })
+  const [apiError, setApiError] = useState(null)
+  const [gradeLevels, setGradeLevels] = useState([])
 
   useEffect(() => {
     setErrors({})
-    setApiErrors([])
+    setApiError(null)
   }, [currentStep])
 
   const getStepErrors = (step) => {
@@ -152,11 +100,7 @@ export default function StudentRegistration() {
         errors.phoneNumber = "phoneInvalid"
       }
 
-      if (role === "student" && !formData.stage) {
-        errors.stage = "required"
-      }
-
-      if (role === "student" && !formData.level) {
+      if (role === "student" && (!formData.level || (Array.isArray(formData.level) && formData.level.length === 0))) {
         errors.level = "required"
       }
     }
@@ -180,45 +124,18 @@ export default function StudentRegistration() {
         errors.confirmPassword = "passwordsMismatch"
       }
 
+      if (role === "student" && (formData.parentPhoneNumber === null || formData.parentPhoneNumber === "")) {
+        errors.parentPhoneNumber = "parentPhoneRequired"
+      } else if (role === "student" && !isValidEgyptianPhoneNumber(formData.parentPhoneNumber)) {
+        errors.parentPhoneNumber = "phoneInvalid"
+      }
+
       if (role === "teacher" && formData.phoneNumber2 && !isValidEgyptianPhoneNumber(formData.phoneNumber2)) {
         errors.phoneNumber2 = "phoneInvalid"
       }
 
       if (role === "parent" && !formData.profession?.trim()) {
         errors.profession = "professionRequired"
-      }
-
-      if (role === "student") {
-        validateParentContact({
-          phoneValue: formData.parentPhoneNumber,
-          relationValue: formData.parentPhoneRelation,
-          phoneErrorKey: "parentPhoneNumber",
-          relationErrorKey: "parentPhoneRelation",
-          phoneRequiredError: "parentPhoneRequired",
-          relationRequiredError: "parentRelationRequired",
-          relationInvalidError: "parentRelationInvalid",
-          required: true,
-          errors,
-        })
-
-        const hasSecondaryParentContact =
-          formData.hasAdditionalParentPhone ||
-          Boolean(String(formData.parentPhoneNumber2 || "").trim()) ||
-          Boolean(String(formData.parentPhoneRelation2 || "").trim())
-
-        if (hasSecondaryParentContact) {
-          validateParentContact({
-            phoneValue: formData.parentPhoneNumber2,
-            relationValue: formData.parentPhoneRelation2,
-            phoneErrorKey: "parentPhoneNumber2",
-            relationErrorKey: "parentPhoneRelation2",
-            phoneRequiredError: "additionalParentPhoneRequired",
-            relationRequiredError: "additionalParentRelationRequired",
-            relationInvalidError: "additionalParentRelationInvalid",
-            required: true,
-            errors,
-          })
-        }
       }
 
 
@@ -283,14 +200,11 @@ export default function StudentRegistration() {
       try {
         const response = await getAllLevels()
         if (response.success) {
-          setLevelHierarchy(response.hierarchy || {
-            levels: response.data || [],
-            stages: [],
-            grades: [],
-            gradesByStageId: {},
-            stageOptions: [],
-            gradeOptions: [],
-          })
+          const levels = response.data.map((level) => ({
+            value: level._id,
+            label: level.displayName || level.name
+          }));
+          setGradeLevels(levels);
         }
       } catch (error) {
         console.error("Error fetching levels:", error)
@@ -317,7 +231,7 @@ export default function StudentRegistration() {
       setErrors((prev) => ({ ...prev, hobbies: undefined, otherHobbyText: undefined }))
     } catch (error) {
       console.error("Error toggling hobby:", error)
-      setApiErrors([translateErrorMessage("Failed to update hobby selection")])
+      setApiError(translateErrorMessage("Failed to update hobby selection"))
     }
   }
 
@@ -330,7 +244,7 @@ export default function StudentRegistration() {
 
     if (Object.keys(stepErrors).length > 0) {
       setErrors(stepErrors)
-      setApiErrors([t("validation.submissionError")])
+      setApiError(t("validation.submissionError"))
       return
     }
 
@@ -344,7 +258,7 @@ export default function StudentRegistration() {
   const handleInputChange = (e) => {
     try {
       const { name, value, type, files } = e.target;
-      const nextValue = ["phoneNumber", "phoneNumber2", "parentPhoneNumber", "parentPhoneNumber2"].includes(name)
+      const nextValue = ["phoneNumber", "phoneNumber2", "parentPhoneNumber"].includes(name)
         ? sanitizeEgyptianPhoneInput(value)
         : value;
 
@@ -354,43 +268,14 @@ export default function StudentRegistration() {
           type === "file"
             ? files[0]
             : nextValue,
-        ...(name === "parentPhoneNumber" && !String(nextValue || "").trim()
-          ? { parentPhoneRelation: "" }
-          : {}),
-        ...(name === "parentPhoneNumber2" && !String(nextValue || "").trim()
-          ? { parentPhoneRelation2: "" }
-          : {}),
       }));
 
       setErrors((prev) => ({ ...prev, [name]: undefined }));
     } catch (error) {
       console.error("Error handling input change:", error);
-      setApiErrors([translateErrorMessage("Failed to process input")]);
+      setApiError(translateErrorMessage("Failed to process input"));
     }
   };
-
-  const handleAddAdditionalParentPhone = () => {
-    setFormData((prev) => ({ ...prev, hasAdditionalParentPhone: true }))
-    setErrors((prev) => ({
-      ...prev,
-      parentPhoneNumber2: undefined,
-      parentPhoneRelation2: undefined,
-    }))
-  }
-
-  const handleRemoveAdditionalParentPhone = () => {
-    setFormData((prev) => ({
-      ...prev,
-      hasAdditionalParentPhone: false,
-      parentPhoneNumber2: "",
-      parentPhoneRelation2: "",
-    }))
-    setErrors((prev) => ({
-      ...prev,
-      parentPhoneNumber2: undefined,
-      parentPhoneRelation2: undefined,
-    }))
-  }
 
 
   const handleChildrenChange = (index, value) => {
@@ -404,13 +289,13 @@ export default function StudentRegistration() {
       }))
     } catch (error) {
       console.error("Error handling children change:", error)
-      setApiErrors([translateErrorMessage("Failed to update child sequence ID")])
+      setApiError(translateErrorMessage("Failed to update child sequence ID"))
     }
   }
 
   const handleSubmit = async () => {
     try {
-      setApiErrors([]);
+      setApiError(null);
       setErrors({});
 
       const data = new FormData();
@@ -419,6 +304,9 @@ export default function StudentRegistration() {
       data.append("role", formData.role);
       data.append("name", formData.fullName.trim());
       data.append("email", formData.email.toLowerCase().trim());
+      if (formData.referralSerial) {
+        data.append("referralSerial", formData.referralSerial)
+      }
       data.append("password", formData.password);
       data.append("confirmPassword", formData.confirmPassword);
       data.append("gender", formData.gender);
@@ -429,26 +317,27 @@ export default function StudentRegistration() {
       data.append("government", formData.government);
       data.append("administrationZone", formData.administrationZone);
 
+      if (formData.profilePic) {
+        data.append("profilePic", formData.profilePic);
+      }
+
       // Role-specific fields
       switch (formData.role) {
         case "student":
-          data.append("stage", formData.stage);
-          data.append("level", formData.level);
+          // Handle level as single value for students
+          if (formData.level) {
+            if (Array.isArray(formData.level)) {
+              formData.level.forEach((levelValue, index) => {
+                data.append(`level[${index}]`, levelValue);
+              });
+            } else {
+              data.append("level", formData.level);
+            }
+          }
           data.append("faction", formData.faction || "Alpha");
           const normalizedParentPhoneNumber = normalizeEgyptianPhoneNumber(formData.parentPhoneNumber)
           if (normalizedParentPhoneNumber) {
             data.append("parentPhoneNumber", normalizedParentPhoneNumber)
-          }
-          if (formData.parentPhoneRelation) {
-            data.append("parentPhoneRelation", normalizeParentRelation(formData.parentPhoneRelation))
-          }
-
-          const normalizedParentPhoneNumber2 = normalizeEgyptianPhoneNumber(formData.parentPhoneNumber2)
-          if (normalizedParentPhoneNumber2) {
-            data.append("parentPhoneNumber2", normalizedParentPhoneNumber2)
-            if (formData.parentPhoneRelation2) {
-              data.append("parentPhoneRelation2", normalizeParentRelation(formData.parentPhoneRelation2))
-            }
           }
 
           const selectedHobbies = formData.hobbies
@@ -467,9 +356,6 @@ export default function StudentRegistration() {
 
         case "parent":
           data.append("profession", formData.profession.trim());
-          if (formData.level) {
-            data.append("level", formData.level);
-          }
           formData.children
             .filter((c) => c.trim() !== "")
             .forEach((child, index) => {
@@ -530,16 +416,55 @@ export default function StudentRegistration() {
       });
 
     } catch (error) {
-      const { summaryMessages, fieldErrors, requestId } = mapSignupApiError({
-        error,
-        role: formData.role,
-        t,
-      });
-      const uiSummary = requestId
-        ? [...summaryMessages, `${t("errors.requestId")}: ${requestId}`]
-        : summaryMessages;
-      console.error("Signup API error payload:", error.response?.data || error.message);
-      setApiErrors(uiSummary);
+      let errorMessage = t("errors.unexpectedError");
+      const fieldErrors = {};
+
+      if (error.response) {
+        const { status, data: errorData } = error.response;
+
+        switch (status) {
+          case 400:
+            errorMessage = errorData.message || t("errors.invalidData");
+
+            if (errorData.message?.includes("phone number")) {
+              errorMessage = t("errors.phoneExists");
+            }
+
+            if (errorData.message?.includes("at least one special character")) {
+              errorMessage = t("errors.PasswordSpecialChar");
+            }
+
+            if (errorData.message?.includes("at least one uppercase")) {
+              errorMessage = t("errors.PasswordCapitalLetter");
+            }
+
+            if (errorData.field) {
+              fieldErrors[errorData.field] = errorData.errorKey || "invalidInput";
+            }
+            break;
+
+          case 409:
+            errorMessage = errorData.message || t("errors.emailExists");
+
+            if (errorData.field) {
+              fieldErrors[errorData.field] = errorData.errorKey || "duplicate";
+            }
+
+            if (errorData.message?.includes("E-Mail")) {
+              errorMessage = t("errors.emailExists");
+            }
+            break;
+
+          case 500:
+            errorMessage = t("errors.apiError");
+            break;
+        }
+      } else if (error.request) {
+        errorMessage = t("errors.networkError");
+      }
+
+      console.error("Full error response:", error.response?.data || error.message);
+      setApiError(errorMessage);
       setErrors(fieldErrors);
     }
   };
@@ -561,20 +486,11 @@ export default function StudentRegistration() {
                   t={t}
                   errors={errors}
                   role={role}
-                  levelHierarchy={levelHierarchy}
+                  gradeLevels={gradeLevels}
                 />
               )
             case 2:
-              return (
-                <Step2
-                  formData={formData}
-                  handleInputChange={handleInputChange}
-                  handleAddAdditionalParentPhone={handleAddAdditionalParentPhone}
-                  handleRemoveAdditionalParentPhone={handleRemoveAdditionalParentPhone}
-                  t={t}
-                  errors={errors}
-                />
-              )
+              return <Step2 formData={formData} handleInputChange={handleInputChange} t={t} errors={errors} />
             case 3:
               return (
                 <Step3
@@ -587,7 +503,7 @@ export default function StudentRegistration() {
                 />
               )
             case 4:
-              return <Step4 formData={formData} t={t} hobbiesList={hobbiesList} levelHierarchy={levelHierarchy} />
+              return <Step4 formData={formData} t={t} hobbiesList={hobbiesList} gradeLevels={gradeLevels} />
             default:
               return null
           }
@@ -604,12 +520,12 @@ export default function StudentRegistration() {
                   handleChildrenChange={handleChildrenChange}
                   handleInputChange={handleInputChange}
                   t={t}
-                  levelHierarchy={levelHierarchy}
+                  gradeLevels={gradeLevels}
                   errors={errors}
                 />
               )
             case 3:
-              return <Step4 formData={formData} t={t} hobbiesList={hobbiesList} levelHierarchy={levelHierarchy} />
+              return <Step4 formData={formData} t={t} hobbiesList={hobbiesList} />
             default:
               return null
           }
@@ -626,11 +542,11 @@ export default function StudentRegistration() {
                   handleInputChange={handleInputChange}
                   t={t}
                   errors={errors}
-                  levelHierarchy={levelHierarchy}
+                  gradeLevels={gradeLevels}
                 />
               )
             case 3:
-              return <Step4 formData={formData} t={t} hobbiesList={hobbiesList} levelHierarchy={levelHierarchy} />
+              return <Step4 formData={formData} t={t} hobbiesList={hobbiesList} gradeLevels={gradeLevels} />
             default:
               return null
           }
@@ -639,7 +555,7 @@ export default function StudentRegistration() {
       }
     } catch (error) {
       console.error("Error rendering step content:", error)
-      setApiErrors([translateErrorMessage("Failed to render form content")])
+      setApiError(translateErrorMessage("Failed to render form content"))
       return null
     }
   }
@@ -648,27 +564,8 @@ export default function StudentRegistration() {
     setRole(selectedRole)
     setCurrentStep(1)
     setErrors({})
-    setApiErrors([])
-    setFormData((prev) => ({
-      ...prev,
-      role: selectedRole,
-      stage: "",
-      level: selectedRole === "teacher" ? [] : "",
-      hobbies: [],
-      otherHobbyText: "",
-      parentPhoneNumber: "",
-      parentPhoneRelation: "",
-      parentPhoneNumber2: "",
-      parentPhoneRelation2: "",
-      hasAdditionalParentPhone: false,
-      profession: "",
-      children: [""],
-      subject: "",
-      teachesAtType: "",
-      centers: [""],
-      school: "",
-      socialMedia: [{ platform: "", account: "" }],
-    }))
+    setApiError(null)
+    setFormData((prev) => ({ ...prev, role: selectedRole }))
   }
 
   return (
@@ -767,7 +664,7 @@ export default function StudentRegistration() {
                 </div>
               </div>
 
-              {apiErrors.length > 0 && (
+              {apiError && (
                 <div className="alert alert-error mt-5 animate-fade-in" dir={isRTL ? "rtl" : "ltr"}>
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
@@ -787,14 +684,7 @@ export default function StudentRegistration() {
                       </svg>
                       <div>
                         <h3 className="font-bold">{t("errors.errorTitle")}</h3>
-                        <p className="text-sm">{apiErrors[0]}</p>
-                        {apiErrors.length > 1 && (
-                          <ul className="mt-2 list-disc space-y-1 ps-5 text-sm">
-                            {apiErrors.slice(1).map((message) => (
-                              <li key={message}>{message}</li>
-                            ))}
-                          </ul>
-                        )}
+                        <p className="text-sm">{t(apiError)}</p>
                       </div>
                     </div>
 

@@ -16,66 +16,6 @@ const authConfig = ({ withCredentials = true, headers = {}, ...rest } = {}) => (
   headers: authHeaders(headers),
 })
 
-const FILE_EXTENSION_BY_CONTENT_TYPE = {
-  "application/pdf": "pdf",
-  "application/msword": "doc",
-  "application/vnd.openxmlformats-officedocument.wordprocessingml.document": "docx",
-  "application/vnd.ms-powerpoint": "ppt",
-  "application/vnd.openxmlformats-officedocument.presentationml.presentation": "pptx",
-  "application/vnd.ms-excel": "xls",
-  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": "xlsx",
-  "text/plain": "txt",
-  "application/zip": "zip",
-  "application/x-rar-compressed": "rar",
-  "image/jpeg": "jpg",
-  "image/png": "png",
-  "image/webp": "webp",
-};
-
-const parseContentDispositionFileName = (contentDisposition) => {
-  if (!contentDisposition) return "";
-
-  const utf8Match = contentDisposition.match(/filename\*\s*=\s*UTF-8''([^;]+)/i);
-  if (utf8Match?.[1]) {
-    try {
-      return decodeURIComponent(utf8Match[1]);
-    } catch (_error) {
-      return utf8Match[1];
-    }
-  }
-
-  const quotedMatch = contentDisposition.match(/filename\s*=\s*"([^"]+)"/i);
-  if (quotedMatch?.[1]) {
-    return quotedMatch[1];
-  }
-
-  const plainMatch = contentDisposition.match(/filename\s*=\s*([^;]+)/i);
-  if (plainMatch?.[1]) {
-    return plainMatch[1].trim();
-  }
-
-  return "";
-};
-
-const sanitizeDownloadName = (value, fallbackName) => {
-  const normalized = String(value || "")
-    .replace(/[\r\n]/g, "")
-    .replace(/[<>:"/\\|?*\x00-\x1F]/g, "-")
-    .trim();
-
-  return normalized || fallbackName;
-};
-
-const ensureExtension = (fileName, contentType) => {
-  if (/\.[a-z0-9]{2,8}$/i.test(fileName)) {
-    return fileName;
-  }
-
-  const extension = FILE_EXTENSION_BY_CONTENT_TYPE[String(contentType || "").toLowerCase()];
-  if (!extension) return fileName;
-  return `${fileName}.${extension}`;
-};
-
 // Function to get all containers
 export const getAllContainers = async (queryParams = {}) => {
   try {
@@ -242,28 +182,11 @@ export const downloadAttachmentById = async (attachmentId) => {
       responseType: "blob", // Important for handling binary data (PDF)
     });
 
-    const encodedHeaderName = response.headers?.["x-download-filename"];
-    let headerFileName = "";
-    if (encodedHeaderName) {
-      try {
-        headerFileName = decodeURIComponent(encodedHeaderName);
-      } catch (_error) {
-        headerFileName = encodedHeaderName;
-      }
-    } else {
-      headerFileName = parseContentDispositionFileName(response.headers?.["content-disposition"]);
-    }
-    const fallbackName = `attachment-${attachmentId}`;
-    const fileName = ensureExtension(
-      sanitizeDownloadName(headerFileName, fallbackName),
-      response.data?.type || response.headers?.["content-type"],
-    );
-
     // Create a blob URL and trigger download
-    const url = window.URL.createObjectURL(response.data);
+    const url = window.URL.createObjectURL(new Blob([response.data]));
     const link = document.createElement("a");
     link.href = url;
-    link.setAttribute("download", fileName);
+    link.setAttribute("download", `attachment_${attachmentId}.pdf`); // Default filename
     document.body.appendChild(link);
     link.click();
     link.remove();
@@ -272,7 +195,6 @@ export const downloadAttachmentById = async (attachmentId) => {
     return {
       status: "success",
       data: response.data,
-      fileName,
     };
   } catch (error) {
     console.error("Error downloading attachment:", error);

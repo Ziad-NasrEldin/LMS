@@ -47,10 +47,6 @@ const lectureSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
-    homeworkLink: {
-      type: String,
-      trim: true,
-    },
     description: {
       type: String,
       trim: true,

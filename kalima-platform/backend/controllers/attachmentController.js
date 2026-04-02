@@ -19,24 +19,6 @@ const { normalizeExternalUrl } = require("../utils/urlValidation");
 
 const ADMIN_ROLES = ["Admin", "SubAdmin", "Moderator"];
 
-const sanitizeAsciiFilename = (value) => {
-  const normalized = String(value || "attachment")
-    .replace(/[\r\n"]/g, "")
-    .replace(/[^\x20-\x7E]/g, "_")
-    .trim();
-
-  return normalized || "attachment";
-};
-
-const buildContentDispositionHeader = (fileName) => {
-  const normalized = String(fileName || "attachment")
-    .replace(/[\r\n]/g, "")
-    .trim();
-  const asciiFallback = sanitizeAsciiFilename(normalized);
-  const encodedUtf8Name = encodeURIComponent(normalized || asciiFallback);
-  return `attachment; filename="${asciiFallback}"; filename*=UTF-8''${encodedUtf8Name}`;
-};
-
 const canManageLectureAttachments = async (user, lecture) => {
   if (!user || !lecture) {
     return false;
@@ -154,10 +136,11 @@ exports.getAttachmentFile = catchAsync(async (req, res, next) => {
     maxRedirects: 3,
   });
 
-  const fileName = attachment.fileName || "attachment";
-  res.setHeader("Content-Type", attachment.fileType || "application/octet-stream");
-  res.setHeader("Content-Disposition", buildContentDispositionHeader(fileName));
-  res.setHeader("X-Download-Filename", encodeURIComponent(fileName));
+  res.setHeader("Content-Type", attachment.fileType);
+  res.setHeader(
+    "Content-Disposition",
+    `attachment; filename="${attachment.fileName}"`
+  );
 
   file.data.pipe(res);
 

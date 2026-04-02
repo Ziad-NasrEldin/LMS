@@ -166,7 +166,6 @@ exports.createContainer = catchAsync(async (req, res, next) => {
       createdBy,
       description,
       goal,
-      isPublished,
     } = req.body;
 
     // Check required documents exist
@@ -199,9 +198,6 @@ exports.createContainer = catchAsync(async (req, res, next) => {
       subject,
       parent,
       createdBy: createdBy || req.user._id,
-      ...(isPublished !== undefined
-        ? { isPublished: isPublished === true || isPublished === "true" }
-        : {}),
       description: type === "course" ? description : undefined,
       goal: type === "course" ? goal : undefined,
     };
@@ -277,7 +273,7 @@ exports.getContainerById = catchAsync(async (req, res, next) => {
   const container = await Container.findById(containerId).populate([
     { path: "createdBy", select: "name" },
     { path: "subject", select: "name" },
-    { path: "level", select: "name nameAr kind sortOrder parentLevel isActive" },
+    { path: "level", select: "name" },
   ]);
 
   if (!container) {
@@ -286,7 +282,7 @@ exports.getContainerById = catchAsync(async (req, res, next) => {
     const lecture = await Lecture.findById(containerId).populate([
       { path: "createdBy", select: "name" },
       { path: "subject", select: "name" },
-      { path: "level", select: "name nameAr kind sortOrder parentLevel isActive" },
+      { path: "level", select: "name" },
     ]);
 
     if (lecture) {
@@ -315,30 +311,25 @@ exports.getContainerById = catchAsync(async (req, res, next) => {
     return next(new AppError("Container not found.", 404));
   }
 
-  if (!req.user && container.isPublished === false) {
-    return next(new AppError("Container not found.", 404));
-  }
-
   // Resolve children from both models while preserving the original children order.
   const childIds = (container.children || []).map((childId) => childId.toString());
   let orderedChildren = [];
 
   if (childIds.length > 0) {
     const LectureModel = require("../models/LectureModel");
-    const childVisibilityFilter = !req.user ? { isPublished: { $ne: false } } : {};
     const [containerChildren, lectureChildren] = await Promise.all([
-      Container.find({ _id: { $in: childIds }, ...childVisibilityFilter })
+      Container.find({ _id: { $in: childIds } })
         .select("name type level subject image price description goal")
         .populate([
           { path: "subject", select: "name" },
-          { path: "level", select: "name nameAr kind sortOrder parentLevel isActive" },
+          { path: "level", select: "name" },
         ])
         .lean(),
       LectureModel.find({ _id: { $in: childIds } })
         .select("name type level subject price description numberOfViews lecture_type thumbnail")
         .populate([
           { path: "subject", select: "name" },
-          { path: "level", select: "name nameAr kind sortOrder parentLevel isActive" },
+          { path: "level", select: "name" },
         ])
         .lean(),
     ]);
@@ -417,26 +408,14 @@ exports.getContainerById = catchAsync(async (req, res, next) => {
 exports.getAllContainers = catchAsync(async (req, res, next) => {
   // Create base query
   let query = Container.find();
-  const queryParams = { ...req.query };
-
-  // Course catalog visibility should not be scoped by grade/level filters.
-  if (String(queryParams.type || "").toLowerCase() === "course") {
-    delete queryParams.level;
-    delete queryParams.levelId;
-    delete queryParams.grade;
-    delete queryParams.gradeLevel;
-    delete queryParams.stage;
-    delete queryParams.stageLevel;
-  }
-
   if (!req.user) {
-    if (queryParams.type && queryParams.type.toLowerCase() === "lecture") {
+    if (req.query.type && req.query.type.toLowerCase() === "lecture") {
       // Remove the type filter if it's lecture
-      delete queryParams.type;
+      delete req.query.type;
     }
-    query = query.where("type").ne("lecture").where("isPublished").ne(false);
+    query = query.where("type").ne("lecture");
   }
-  const features = new QueryFeatures(query, queryParams)
+  const features = new QueryFeatures(query, req.query)
     .filter()
     .sort()
     .paginate();
@@ -446,7 +425,7 @@ exports.getAllContainers = catchAsync(async (req, res, next) => {
   const containers = await query.populate([
     { path: "createdBy", select: "name" },
     { path: "subject", select: "name" },
-    { path: "level", select: "name nameAr kind sortOrder parentLevel isActive" },
+    { path: "level", select: "name" },
     { path: "parent", select: "name" },
   ]).lean();
 
@@ -492,8 +471,7 @@ exports.getLecturerContainers = catchAsync(async (req, res, next) => {
     return next(new AppError("Lecturer ID is required", 400));
   }
 
-  const visibilityFilter = !req.user ? { isPublished: { $ne: false } } : {};
-  let query = Container.find({ createdBy: lecturerId, ...visibilityFilter });
+  let query = Container.find({ createdBy: lecturerId });
 
   // If the user is not authenticated, select only basic fields
   if (!req.user) {
@@ -503,7 +481,7 @@ exports.getLecturerContainers = catchAsync(async (req, res, next) => {
   const containers = await query.populate([
     { path: "createdBy", select: "name" }, // Keep createdBy populated for context
     { path: "subject", select: "name" },
-    { path: "level", select: "name nameAr kind sortOrder parentLevel isActive" },
+    { path: "level", select: "name" },
   ]);
 
   res.status(200).json({
@@ -522,12 +500,12 @@ exports.getMyContainers = catchAsync(async (req, res, next) => {
     .sort({ createdAt: -1 })
     .populate([
     { path: "subject", select: "name" },
-    { path: "level", select: "name nameAr kind sortOrder parentLevel isActive" },
+    { path: "level", select: "name" },
     {
       path: "children",
       populate: [
         { path: "subject", select: "name" },
-        { path: "level", select: "name nameAr kind sortOrder parentLevel isActive" },
+        { path: "level", select: "name" },
       ],
     },
     { path: "parent", select: "name type" },
@@ -542,7 +520,7 @@ exports.getMyContainers = catchAsync(async (req, res, next) => {
 });
 
 exports.updateContainer = catchAsync(async (req, res, next) => {
-  const { name, type, price, level, subject, description, goal, teacherAllowed, removeImage, isPublished } =
+  const { name, type, price, level, subject, description, goal, teacherAllowed, removeImage } =
     req.body;
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -572,10 +550,6 @@ exports.updateContainer = catchAsync(async (req, res, next) => {
 
     if (teacherAllowed !== undefined) {
       obj.teacherAllowed = teacherAllowed === true || teacherAllowed === "true";
-    }
-
-    if (isPublished !== undefined) {
-      obj.isPublished = isPublished === true || isPublished === "true";
     }
 
     if (type === "course") {
@@ -643,7 +617,7 @@ exports.updateContainer = catchAsync(async (req, res, next) => {
       { path: "children", select: "name" },
       { path: "createdBy", select: "name" },
       { path: "subject", select: "name" },
-      { path: "level", select: "name nameAr kind sortOrder parentLevel isActive" },
+      { path: "level", select: "name" },
     ]);
 
     await session.commitTransaction();
@@ -711,7 +685,7 @@ exports.UpdateChildOfContainer = catchAsync(async (req, res, next) => {
         select: "name type level subject image price description goal",
       },
       { path: "subject", select: "name" },
-      { path: "level", select: "name nameAr kind sortOrder parentLevel isActive" },
+      { path: "level", select: "name" },
       { path: "createdBy", select: "name" },
     ]);
 

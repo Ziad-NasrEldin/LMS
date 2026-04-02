@@ -3,7 +3,6 @@ import { useState, useEffect } from "react"
 import { getAllUsers, deleteUser, createUser } from "../../../../routes/fetch-users"
 import { useTranslation } from "react-i18next"
 import { FaSync, FaWhatsapp, FaEdit, FaDownload, FaFileExport, FaEye, FaTimes, FaCalculator } from "react-icons/fa"
-import toast from "react-hot-toast"
 import Pagination from "../../../../components/Pagination"
 import CreateUserModal from "../CreateUserModal/CreateUserModal"
 import EditUserModal from "../CreateUserModal/EditUserModal"
@@ -11,20 +10,10 @@ import { getUserDashboard } from "../../../../routes/auth-services"
 import { RecalculateInvites } from "../../../../routes/market"
 import { designTokens } from "../../../../constants/designTokens"
 import { translateErrorMessage } from "../../../../utils/errorTranslator"
-import {
-  buildExportFileDate,
-  exportCsvFile,
-  exportXlsxFile,
-  formatDateForExport,
-  formatDateTimeForExport,
-  getExportLocale,
-  normalizeExportValue,
-} from "../../../../utils/exportUtils"
 
 const UserManagementTable = () => {
   const { t, i18n } = useTranslation("admin")
   const isRTL = i18n.language === "ar"
-  const exportLocale = getExportLocale(i18n.language)
   const dir = isRTL ? "rtl" : "ltr"
   
   const TOKENS = designTokens.colors;
@@ -251,141 +240,110 @@ const UserManagementTable = () => {
   }
 
   // Export functionality
-  const formatObjectDisplay = (value) => {
-    if (!value) return ""
-    if (Array.isArray(value)) {
-      return value.map((item) => formatObjectDisplay(item)).filter(Boolean).join(" | ")
-    }
-    if (typeof value === "object") {
-      return value.nameAr || value.name || value.label || value._id || ""
-    }
-    return String(value)
+  const convertToCSV = (data) => {
+    const headers = [
+      t("admin.export.name"),
+      t("admin.export.email"),
+      t("admin.export.phone"),
+      t("admin.export.role"),
+      t("admin.export.status"),
+      t("admin.export.government"),
+      t("admin.export.administrationZone"),
+      t("admin.export.sequenceId"),
+      t("admin.export.joinedDate"),
+    ]
+    const csvContent = [
+      headers.join(","),
+      ...data.map((user) =>
+        [
+          `"${user.name || ""}"`,
+          `"${user.email || ""}"`,
+          `"${user.phoneNumber || ""}"`,
+          `"${getRoleLabel(user.role || "")}"`,
+          `"${getStatus(user)}"`,
+          `"${user.government || ""}"`,
+          `"${user.administrationZone || ""}"`,
+          `"${user.sequencedId || ""}"`,
+          `"${user.createdAt ? new Date(user.createdAt).toLocaleDateString() : ""}"`,
+        ].join(","),
+      ),
+    ].join("\n")
+    return csvContent
   }
 
-  const formatBooleanLabel = (value) => (value ? t("admin.yes", { defaultValue: isRTL ? "نعم" : "Yes" }) : t("admin.no", { defaultValue: isRTL ? "لا" : "No" }))
-
-  const exportColumns = [
-    { key: "name", label: t("admin.export.name", { defaultValue: isRTL ? "الاسم" : "Name" }) },
-    { key: "email", label: t("admin.export.email", { defaultValue: isRTL ? "البريد الإلكتروني" : "Email" }) },
-    { key: "role", label: t("admin.export.role", { defaultValue: isRTL ? "الدور" : "Role" }) },
-    { key: "status", label: t("admin.export.status", { defaultValue: isRTL ? "الحالة" : "Status" }) },
-    { key: "gender", label: t("admin.userDetails.gender", { defaultValue: isRTL ? "النوع" : "Gender" }) },
-    { key: "phoneNumber", label: t("admin.export.phone", { defaultValue: isRTL ? "رقم الهاتف" : "Phone Number" }) },
-    { key: "phoneNumber2", label: t("admin.export.phone2", { defaultValue: isRTL ? "رقم هاتف إضافي" : "Secondary Phone" }) },
-    { key: "emailVerified", label: t("admin.userDetails.emailVerified", { defaultValue: isRTL ? "تم التحقق من البريد" : "Email Verified" }) },
-    { key: "government", label: t("admin.export.government", { defaultValue: isRTL ? "المحافظة" : "Government" }) },
-    { key: "administrationZone", label: t("admin.export.administrationZone", { defaultValue: isRTL ? "الإدارة التعليمية" : "Administration Zone" }) },
-    { key: "userSerial", label: t("admin.export.userSerial", { defaultValue: isRTL ? "الرقم التعريفي" : "User Serial" }) },
-    { key: "sequencedId", label: t("admin.export.sequenceId", { defaultValue: isRTL ? "الرقم التسلسلي" : "Sequence ID" }) },
-    { key: "stage", label: t("admin.export.stage", { defaultValue: isRTL ? "المرحلة" : "Stage" }) },
-    { key: "level", label: t("admin.export.level", { defaultValue: isRTL ? "المستوى" : "Level" }) },
-    { key: "subject", label: t("admin.export.subject", { defaultValue: isRTL ? "المادة" : "Subject" }) },
-    { key: "profession", label: t("admin.export.profession", { defaultValue: isRTL ? "المهنة" : "Profession" }) },
-    { key: "school", label: t("admin.export.school", { defaultValue: isRTL ? "المدرسة" : "School" }) },
-    { key: "teachesAtType", label: t("admin.export.teachesAtType", { defaultValue: isRTL ? "مكان التدريس" : "Teaches At" }) },
-    { key: "centers", label: t("admin.export.centers", { defaultValue: isRTL ? "المراكز" : "Centers" }) },
-    { key: "children", label: t("admin.export.children", { defaultValue: isRTL ? "الأبناء" : "Children" }) },
-    { key: "assignedLecturer", label: t("admin.export.assignedLecturer", { defaultValue: isRTL ? "المحاضر المعين" : "Assigned Lecturer" }) },
-    { key: "parentPhoneNumber", label: t("admin.export.parentPhone", { defaultValue: isRTL ? "هاتف ولي الأمر" : "Parent Phone" }) },
-    { key: "hobbies", label: t("admin.userDetails.hobbies", { defaultValue: isRTL ? "الهوايات" : "Hobbies" }) },
-    { key: "faction", label: t("admin.userDetails.faction", { defaultValue: isRTL ? "الفئة" : "Faction" }) },
-    { key: "bio", label: t("admin.userDetails.bio", { defaultValue: isRTL ? "نبذة" : "Bio" }) },
-    { key: "expertise", label: t("admin.userDetails.expertise", { defaultValue: isRTL ? "الخبرة" : "Expertise" }) },
-    { key: "generalPoints", label: t("admin.userDetails.generalPoints", { defaultValue: isRTL ? "الرصيد العام" : "General Balance" }) },
-    { key: "totalPoints", label: t("admin.userDetails.totalPoints", { defaultValue: isRTL ? "إجمالي الرصيد" : "Total Balance" }) },
-    { key: "promoPoints", label: t("admin.export.promoBalance", { defaultValue: isRTL ? "رصيد الأكواد" : "Promo Balance" }) },
-    { key: "views", label: t("admin.userDetails.views", { defaultValue: isRTL ? "عدد المشاهدات" : "Views" }) },
-    { key: "successfulInvites", label: t("admin.userDetails.successfulInvites", { defaultValue: isRTL ? "الدعوات الناجحة" : "Successful Invites" }) },
-    { key: "referredBy", label: t("admin.export.referredBy", { defaultValue: isRTL ? "تمت الإحالة بواسطة" : "Referred By" }) },
-    { key: "createdAt", label: t("admin.export.joinedDate", { defaultValue: isRTL ? "تاريخ الانضمام" : "Joined Date" }) },
-    { key: "updatedAt", label: t("admin.export.updatedAt", { defaultValue: isRTL ? "آخر تحديث" : "Last Updated" }) },
-  ]
-
-  const mapUserForExport = (user) => ({
-    name: user.name || "",
-    email: user.email || "",
-    role: getRoleLabel(user.role || ""),
-    status: getStatus(user),
-    gender: user.gender || "",
-    phoneNumber: user.phoneNumber || "",
-    phoneNumber2: user.phoneNumber2 || "",
-    emailVerified: user.isEmailVerified === undefined ? "" : formatBooleanLabel(Boolean(user.isEmailVerified)),
-    government: user.government || "",
-    administrationZone: user.administrationZone || "",
-    userSerial: user.userSerial || "",
-    sequencedId: user.sequencedId || "",
-    stage: formatObjectDisplay(user.stage),
-    level: formatObjectDisplay(user.level),
-    subject: formatObjectDisplay(user.subject),
-    profession: user.profession || "",
-    school: user.school || "",
-    teachesAtType: user.teachesAtType || "",
-    centers: normalizeExportValue(user.centers),
-    children: normalizeExportValue(
-      Array.isArray(user.children)
-        ? user.children.map((child) => child?.name || child?.sequencedId || child?._id || child)
-        : user.children,
-    ),
-    assignedLecturer: formatObjectDisplay(user.assignedLecturer),
-    parentPhoneNumber: user.parentPhoneNumber || "",
-    hobbies: normalizeExportValue(user.hobbies || user.hobby || ""),
-    faction: user.faction || "",
-    bio: user.bio || "",
-    expertise: user.expertise || "",
-    generalPoints: user.generalPoints ?? "",
-    totalPoints: user.totalPoints ?? "",
-    promoPoints: user.promoPoints ?? "",
-    views: user.views ?? "",
-    successfulInvites: user.successfulInvites ?? "",
-    referredBy: formatObjectDisplay(user.referredBy),
-    createdAt: formatDateForExport(user.createdAt, exportLocale),
-    updatedAt: formatDateTimeForExport(user.updatedAt, exportLocale),
-  })
-
-  const exportUsers = async ({ format = "xlsx", exportAll = false }) => {
+  const exportToCSV = async (exportAll = false) => {
     setIsExporting(true)
     try {
       const dataToExport = exportAll ? users : filteredUsers
-
-      if (!dataToExport.length) {
-        toast.error(
-          t("admin.export.noData", {
-            defaultValue: isRTL ? "لا توجد بيانات للتصدير" : "No data available for export",
-          }),
-        )
-        return
+      const csvContent = convertToCSV(dataToExport)
+      // Create blob and download
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })
+      const link = document.createElement("a")
+      if (link.download !== undefined) {
+        const url = URL.createObjectURL(blob)
+        link.setAttribute("href", url)
+        const timestamp = new Date().toISOString().split("T")[0]
+        const filename = exportAll ? `all-users-${timestamp}.csv` : `filtered-users-${timestamp}.csv`
+        link.setAttribute("download", filename)
+        link.style.visibility = "hidden"
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        // Show success message
+        const successMessage = exportAll
+          ? t("admin.export.successAll", { count: dataToExport.length })
+          : t("admin.export.successFiltered", { count: dataToExport.length })
+        alert(successMessage)
       }
+    } catch (error) {
+      console.error("Export error:", error)
+      alert(t("admin.export.error"))
+    } finally {
+      setIsExporting(false)
+    }
+  }
 
-      const rows = dataToExport.map(mapUserForExport)
-      const dateSuffix = buildExportFileDate()
-      const scope = exportAll ? "all-users" : "filtered-users"
-
-      if (format === "xlsx") {
-        exportXlsxFile({
-          fileName: `${scope}-${dateSuffix}.xlsx`,
-          sheets: [
-            {
-              name: t("admin.userManagement.title", { defaultValue: isRTL ? "المستخدمون" : "Users" }),
-              rows,
-              columns: exportColumns,
-            },
-          ],
-        })
-      } else {
-        exportCsvFile({
-          fileName: `${scope}-${dateSuffix}.csv`,
-          rows,
-          columns: exportColumns,
-        })
+  const exportToJSON = async (exportAll = false) => {
+    setIsExporting(true)
+    try {
+      const dataToExport = exportAll ? users : filteredUsers
+      // Clean and format data for JSON export
+      const jsonData = dataToExport.map((user) => ({
+        name: user.name || "",
+        email: user.email || "",
+        phoneNumber: user.phoneNumber || "",
+        role: user.role || "",
+        status: getStatus(user),
+        government: user.government || "",
+        administrationZone: user.administrationZone || "",
+        sequenceId: user.sequencedId || "",
+        joinedDate: user.createdAt ? new Date(user.createdAt).toISOString() : "",
+        level: user.level || "",
+        expertise: user.expertise || "",
+      }))
+      const jsonContent = JSON.stringify(jsonData, null, 2)
+      // Create blob and download
+      const blob = new Blob([jsonContent], { type: "application/json;charset=utf-8;" })
+      const link = document.createElement("a")
+      if (link.download !== undefined) {
+        const url = URL.createObjectURL(blob)
+        link.setAttribute("href", url)
+        const timestamp = new Date().toISOString().split("T")[0]
+        const filename = exportAll ? `all-users-${timestamp}.json` : `filtered-users-${timestamp}.json`
+        link.setAttribute("download", filename)
+        link.style.visibility = "hidden"
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        // Show success message
+        const successMessage = exportAll
+          ? t("admin.export.successAll", { count: dataToExport.length })
+          : t("admin.export.successFiltered", { count: dataToExport.length })
+        alert(successMessage)
       }
-
-      const successMessage = exportAll
-        ? t("admin.export.successAll", { count: dataToExport.length })
-        : t("admin.export.successFiltered", { count: dataToExport.length })
-      toast.success(successMessage)
-    } catch (exportError) {
-      console.error("Export error:", exportError)
-      toast.error(t("admin.export.error"))
+    } catch (error) {
+      console.error("Export error:", error)
+      alert(t("admin.export.error"))
     } finally {
       setIsExporting(false)
     }
@@ -565,14 +523,6 @@ const UserManagementTable = () => {
                       {t("admin.userDetails.views")}
                     </label>
                     <p className="text-sm text-gray-900 bg-green-50 p-2 rounded">{user.views || 0}</p>
-                  </div>
-                )}
-                {user.profession && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      {t("admin.userDetails.profession")}
-                    </label>
-                    <p className="text-sm text-gray-900 bg-green-50 p-2 rounded">{user.profession}</p>
                   </div>
                 )}
               </div>
@@ -772,32 +722,32 @@ const UserManagementTable = () => {
           </div>
           <ul tabIndex={0} className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-64">
             <li className="menu-title">
-              <span>{t("admin.export.xlsxFormat", { defaultValue: isRTL ? "تنسيق XLSX" : "XLSX Format" })}</span>
+              <span>{t("admin.export.csvFormat")}</span>
             </li>
             <li>
-              <button onClick={() => exportUsers({ format: "xlsx", exportAll: false })} disabled={isExporting || filteredUsers.length === 0}>
+              <button onClick={() => exportToCSV(false)} disabled={isExporting || filteredUsers.length === 0}>
                 <FaFileExport className="mr-2" />
                 {t("admin.export.exportFiltered")} ({filteredUsers.length})
               </button>
             </li>
             <li>
-              <button onClick={() => exportUsers({ format: "xlsx", exportAll: true })} disabled={isExporting || users.length === 0}>
+              <button onClick={() => exportToCSV(true)} disabled={isExporting || users.length === 0}>
                 <FaFileExport className="mr-2" />
                 {t("admin.export.exportAll")} ({users.length})
               </button>
             </li>
             <div className="divider my-1"></div>
             <li className="menu-title">
-              <span>{t("admin.export.csvFormat")}</span>
+              <span>{t("admin.export.jsonFormat")}</span>
             </li>
             <li>
-              <button onClick={() => exportUsers({ format: "csv", exportAll: false })} disabled={isExporting || filteredUsers.length === 0}>
+              <button onClick={() => exportToJSON(false)} disabled={isExporting || filteredUsers.length === 0}>
                 <FaFileExport className="mr-2" />
                 {t("admin.export.exportFiltered")} ({filteredUsers.length})
               </button>
             </li>
             <li>
-              <button onClick={() => exportUsers({ format: "csv", exportAll: true })} disabled={isExporting || users.length === 0}>
+              <button onClick={() => exportToJSON(true)} disabled={isExporting || users.length === 0}>
                 <FaFileExport className="mr-2" />
                 {t("admin.export.exportAll")} ({users.length})
               </button>

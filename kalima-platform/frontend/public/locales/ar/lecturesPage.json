@@ -1,11 +1,12 @@
 {
   "types": {
-    "course": "دورة",
-    "year": "سنة",
-    "term": "فصل",
-    "month": "شهر",
-    "lecture": "محاضرة"
-  },
+      "course": "دورة",
+      "year": "سنة",
+      "term": "فصل",
+      "month": "شهر",
+      "lecture": "محاضرة"
+      
+    },
   "lecturesPage": {
     "pageTitle": {
       "manage": "إدارة المحاضرات",
@@ -71,6 +72,7 @@
       "term": "فصل",
       "month": "شهر",
       "lecture": "محاضرة"
+      
     },
     "error": {
       "title": "حدث خطأ ما!"
@@ -101,7 +103,7 @@
     },
     "itemsPerPage": "{{count}} لكل صفحة",
     "emptyStates": {
-      "lecturer": "لا توجد دورات متاحة حاليًا.",
+      "lecturer": "لا توجد دورات متاحة حالياً.",
       "student": "لم تقم بشراء أي دورات بعد."
     },
     "pagination": {
@@ -109,7 +111,7 @@
       "next": "التالي"
     }
   },
-  "mobileOnly": {
+   "mobileOnly": {
     "title": "محتوى للهاتف المحمول فقط",
     "message": "هذا المحتوى متاح فقط على الأجهزة المحمولة.",
     "backButton": "العودة إلى الصفحة الرئيسية"
@@ -224,7 +226,8 @@
   "defaults": {
     "lectureDescription": "محاضرة لـ"
   },
-  "options": {
+  
+   "options": {
     "yes": "نعم",
     "no": "لا"
   }

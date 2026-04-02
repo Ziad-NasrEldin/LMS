@@ -2,7 +2,10 @@ const bcrypt = require("bcrypt");
 const User = require("../models/userModel.js");
 const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
-const { sendOTPEmail, EMAIL_TYPES } = require("../utils/emailVerification/emailService");
+const { Resend } = require('resend');
+
+// Initialize Resend with API key from environment variables
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 // Store OTP codes temporarily (in production, consider using a database)
 const otpStore = new Map();
@@ -49,12 +52,27 @@ exports.requestPasswordReset = catchAsync(async (req, res, next) => {
     attempts: 0
   });
   
-  // Send password reset OTP email through the shared email pipeline
+  // Send email using Resend
   try {
+    const fromEmail = 'Kalima Team <noreply@kalima-edu.com>';
+
     otpDebugLog('Sending password reset OTP to:', email);
     
-    await sendOTPEmail(email, otp, {
-      type: EMAIL_TYPES.password_reset,
+    await resend.emails.send({
+      from: fromEmail,
+      to: email,
+      subject: 'Password Reset Verification Code',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
+          <h2 style="color: #333;">Password Reset Request</h2>
+          <p style="color: #555; font-size: 16px;">We received a request to reset your password. Please use the following code to verify your identity:</p>
+          <div style="background-color: #f5f5f5; padding: 10px; text-align: center; font-size: 24px; letter-spacing: 5px; font-weight: bold; margin: 20px 0;">
+            ${otp}
+          </div>
+          <p style="color: #777; font-size: 14px;">This code will expire in 10 minutes.</p>
+          <p style="color: #777; font-size: 14px;">If you did not request a password reset, please ignore this email or contact support if you have concerns.</p>
+        </div>
+      `,
     });
     
     otpDebugLog(`Password reset OTP sent to ${email}`);

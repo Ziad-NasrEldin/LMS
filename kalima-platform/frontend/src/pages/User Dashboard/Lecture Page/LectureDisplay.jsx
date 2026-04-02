@@ -26,14 +26,11 @@ import {
   FiX,
   FiCheck,
   FiEye,
-  FiDownload,
   FiLink,
   FiAlertTriangle,
   FiExternalLink,
   FiAward,
   FiClock,
-  FiCopy,
-  FiCheckCircle,
   FiPlay,
   FiPause,
   FiVolume2,
@@ -75,11 +72,9 @@ const LectureDisplay = () => {
   const [userRole, setUserRole] = useState(null);
   const [userId, setUserId] = useState(null);
   const [studentFullName, setStudentFullName] = useState("");
-  const [studentEmail, setStudentEmail] = useState("");
   const [studentSequenceId, setStudentSequenceId] = useState("");
   const [purchaseId, setPurchaseId] = useState(null);
   const [currentPurchase, setCurrentPurchase] = useState(null);
-  const [emailCopied, setEmailCopied] = useState(false);
 
   // Add this state to track if we should show the exit confirmation
   const [showExitConfirmation, setShowExitConfirmation] = useState(false)       
@@ -162,7 +157,6 @@ const LectureDisplay = () => {
   const pendingViewEventIdRef = useRef(null)
   const viewSyncRetryTimeoutRef = useRef(null)
   const redirectTimeoutRef = useRef(null)
-  const emailCopyFeedbackTimeoutRef = useRef(null)
   const accessResolvedForLectureRef = useRef(null)
   const fileInputRef = useRef(null)
   const videoContainerRef = useRef(null)
@@ -230,25 +224,8 @@ const LectureDisplay = () => {
 
         const dashboardData = dashboardResult.data.data || {};
         const userInfo = dashboardData.userInfo || {};
-        const resolvedStudentEmail = (
-          [
-            userInfo.email,
-            userInfo.userEmail,
-            dashboardData.email,
-            dashboardData.user?.email,
-            userInfo.username && userInfo.username.includes("@")
-              ? userInfo.username
-              : "",
-          ].find(
-            (value) =>
-              typeof value === "string" &&
-              value.trim().length > 0 &&
-              value.includes("@"),
-          ) || ""
-        ).trim();
         setUserRole(userInfo.role);
         setUserId(userInfo.id);
-        setStudentEmail(resolvedStudentEmail);
         setStudentSequenceId(userInfo.sequencedId || "");
         const computedFullName =
           [
@@ -1116,63 +1093,6 @@ const LectureDisplay = () => {
       }
     };
 
-    const handleCopyStudentEmail = async () => {
-      const normalizedEmail = typeof studentEmail === "string" ? studentEmail.trim() : "";
-
-      if (!normalizedEmail) {
-        toast.error(
-          t(
-            "studentEmailUnavailableToast",
-            "We could not find your account email. Refresh or contact support before taking the exam.",
-          ),
-        );
-        return;
-      }
-
-      let copied = false;
-
-      try {
-        if (navigator?.clipboard?.writeText) {
-          await navigator.clipboard.writeText(normalizedEmail);
-          copied = true;
-        }
-      } catch (error) {
-        copied = false;
-      }
-
-      if (!copied) {
-        try {
-          const helperTextArea = document.createElement("textarea");
-          helperTextArea.value = normalizedEmail;
-          helperTextArea.setAttribute("readonly", "");
-          helperTextArea.style.position = "fixed";
-          helperTextArea.style.opacity = "0";
-          document.body.appendChild(helperTextArea);
-          helperTextArea.select();
-          copied = document.execCommand("copy");
-          document.body.removeChild(helperTextArea);
-        } catch (error) {
-          copied = false;
-        }
-      }
-
-      if (!copied) {
-        toast.error(t("copyEmailFailedToast", "Could not copy email. Please copy it manually."));
-        return;
-      }
-
-      setEmailCopied(true);
-      toast.success(t("emailCopiedToast", "Email copied. Paste it into the Google Form."));
-
-      if (emailCopyFeedbackTimeoutRef.current) {
-        clearTimeout(emailCopyFeedbackTimeoutRef.current);
-      }
-
-      emailCopyFeedbackTimeoutRef.current = setTimeout(() => {
-        setEmailCopied(false);
-      }, 2400);
-    };
-
     // Cleanup
     useEffect(() => {
       return () => {
@@ -1182,10 +1102,6 @@ const LectureDisplay = () => {
 
         if (viewSyncRetryTimeoutRef.current) {
           clearTimeout(viewSyncRetryTimeoutRef.current)
-        }
-
-        if (emailCopyFeedbackTimeoutRef.current) {
-          clearTimeout(emailCopyFeedbackTimeoutRef.current)
         }
       };
     }, []);
@@ -1370,72 +1286,6 @@ const LectureDisplay = () => {
                 {examVerificationLoading ? t("loading") : t("recheckAccess", "Recheck Access")}
               </button>
             </div>
-
-            {examRequired && (
-              <div className="mb-5 rounded-2xl border-2 border-error/40 bg-error/10 p-4 shadow-sm">
-                <div className="flex items-start gap-3">
-                  <div className="mt-0.5 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-error/20 text-error">
-                    <FiAlertTriangle className="h-5 w-5" />
-                  </div>
-
-                  <div className="min-w-0 flex-1">
-                    <p className="text-xs font-black uppercase tracking-[0.12em] text-error">
-                      {t("examEmailImportantLabel", "Important")}
-                    </p>
-                    <h3 className="mt-1 text-lg font-extrabold leading-tight text-base-content md:text-xl">
-                      {t(
-                        "examEmailTitle",
-                        "Submit the exam using the exact same email as your Fekra account.",
-                      )}
-                    </h3>
-                    <p className="mt-1 text-sm font-medium text-base-content/90">
-                      {t(
-                        "examEmailDescription",
-                        "If you enter a different email in Google Form, your exam score will not link to your account and your lecture may stay locked.",
-                      )}
-                    </p>
-
-                    <div className="mt-3 rounded-xl border border-base-300 bg-base-100 p-3">
-                      <p className="text-xs font-bold uppercase tracking-[0.08em] text-base-content/70">
-                        {t("examEmailAccountLabel", "Your Fekra account email")}
-                      </p>
-
-                      <div className="mt-2 flex flex-wrap items-center gap-2">
-                        <code
-                          className="min-w-0 flex-1 break-all rounded-lg bg-base-200 px-3 py-2 text-sm font-extrabold text-base-content md:text-base"
-                          title={studentEmail || ""}
-                        >
-                          {studentEmail || t("examEmailUnavailable", "Email not available")}
-                        </code>
-
-                        <button
-                          type="button"
-                          className="btn btn-error btn-sm min-w-[9rem]"
-                          onClick={handleCopyStudentEmail}
-                          disabled={!studentEmail}
-                        >
-                          {emailCopied ? (
-                            <FiCheckCircle className={isRTL ? "ml-1" : "mr-1"} />
-                          ) : (
-                            <FiCopy className={isRTL ? "ml-1" : "mr-1"} />
-                          )}
-                          {emailCopied
-                            ? t("examEmailCopiedButton", "Copied")
-                            : t("examEmailCopyButton", "Copy Email")}
-                        </button>
-                      </div>
-                    </div>
-
-                    <p className="mt-3 rounded-xl border border-warning/40 bg-warning/15 px-3 py-2 text-sm font-bold text-base-content">
-                      {t(
-                        "examEmailPasteHint",
-                        "Paste this exact email into the Google Form email field before you submit.",
-                      )}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
 
             <div className="grid gap-4 md:grid-cols-2">
               {requirementCards.map((item) => (
@@ -1935,38 +1785,6 @@ const LectureDisplay = () => {
           </div>
         </div>
 
-        {((lecture?.requiresExam || lecture?.requiresHomework) && (legacyExamFormUrl || legacyHomeworkFormUrl)) && (
-          <div className="card bg-base-100 shadow-lg mb-4 border border-base-300/60 rounded-2xl">
-            <div className="card-body p-4 md:p-5">
-              <h2 className="card-title">{t("googleForm")}</h2>
-              <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-                {legacyExamFormUrl && (
-                  <a
-                    href={legacyExamFormUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn btn-primary btn-sm"
-                  >
-                    <FiExternalLink className="mr-1" />
-                    {t("completeGoogleForm", "Complete Google Form")}
-                  </a>
-                )}
-                {legacyHomeworkFormUrl && (
-                  <a
-                    href={legacyHomeworkFormUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn btn-outline btn-primary btn-sm"
-                  >
-                    <FiExternalLink className="mr-1" />
-                    {t("openGoogleForm", "Open Google Form")}
-                  </a>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
-
         {/* IMPROVED RESPONSIVE ATTACHMENTS DISPLAY */}
         <div className="card bg-base-100 shadow-lg mb-4 border border-base-300/60 rounded-2xl">
           <div className="card-body p-4 md:p-5">
@@ -2040,21 +1858,6 @@ const LectureDisplay = () => {
                             >
                               <FiEye className="mr-1" /> {t("view")}
                             </a>
-                          )}
-                          {attachment?._id && attachment?.fileType !== "link" && (
-                            <button
-                              type="button"
-                              className="btn btn-sm btn-outline"
-                              onClick={() => handleDownload(attachment)}
-                              disabled={isDownloading}
-                            >
-                              {isDownloading ? (
-                                <span className="loading loading-spinner loading-xs"></span>
-                              ) : (
-                                <FiDownload className="mr-1" />
-                              )}
-                              {t("download")}
-                            </button>
                           )}
                         </div>
                       </div>
