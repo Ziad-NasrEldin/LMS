@@ -3,7 +3,7 @@
   "discoverTeachers": "تعرّف على المعلمين المناسبين لك",
   "defaultSubject": "مدرس",
   "defaultExperience": "خبرة واسعة في التدريس",
-  "allGrades": "كل المراحل الدراسية",
+  "allGrades": "جميع المستويات",
   "hero": {
     "quickMatch": "اختر المعلم المناسب وفق الاسم أو المادة خلال ثوانٍ."
   },
@@ -12,7 +12,7 @@
     "activeFilters": "{{count}} فلاتر مفعلة"
   },
   "filters": {
-    "stage": "المرحلة الدراسية",
+    "stage": "المستوى التعليمي",
     "subject": "المادة",
     "all": "الكل",
     "select": "اختر"

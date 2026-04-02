@@ -1,15 +1,18 @@
 import { useState } from "react";
 import { Eye, EyeOff } from 'lucide-react';
 import { useTranslation } from "react-i18next";
+import { getGradeOptionsForStage } from "../../utils/levelHierarchy";
 
-export default function StepParent({ formData, handleChildrenChange, t, errors, handleInputChange, gradeLevels, levelHierarchy }) {
+export default function StepParent({ formData, handleChildrenChange, t, errors, handleInputChange, levelHierarchy, levelsLoading }) {
     const [childrenCount, setChildrenCount] = useState(1);
     const [loading, setLoading] = useState(true);
     const [apiError, setApiError] = useState(null);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const { i18n } = useTranslation();
-    const gradeOptions = levelHierarchy?.gradeOptions?.length ? levelHierarchy.gradeOptions : (gradeLevels || []);
+    const isRTL = i18n.language === "ar";
+    const stageOptions = levelHierarchy?.stageOptions || [];
+    const gradeOptions = formData.stage ? getGradeOptionsForStage(levelHierarchy, formData.stage) : [];
     // Ensure we have enough empty slots for all children
     const safeChildren = [...formData.children, ...Array(childrenCount - formData.children.length).fill('')];
 
@@ -121,23 +124,93 @@ export default function StepParent({ formData, handleChildrenChange, t, errors, 
                 </div>
             </div>
 
-            {/* Optional Level Field */}
             <div className="form-control">
                 <div className="flex flex-col gap-1">
                     <label className="label py-1">
-                        <span className="label-text text-xs">{t('form.level')} ({t('form.optional')})</span>
+                        <span className="label-text text-xs">
+                            {t('form.stage', { defaultValue: isRTL ? 'المرحلة' : 'Stage' })}
+                        </span>
+                    </label>
+                    <select
+                        name="stage"
+                        className={`select select-bordered w-full ${errors.stage ? 'select-error animate-shake' : ''}`}
+                        value={formData.stage || ''}
+                        onChange={(e) => {
+                            handleInputChange(e);
+                            if (formData.level) {
+                                handleInputChange({
+                                    target: {
+                                        name: 'level',
+                                        value: '',
+                                    },
+                                });
+                            }
+                        }}
+                        disabled={levelsLoading || stageOptions.length === 0}
+                        required
+                    >
+                        <option value="">
+                            {levelsLoading
+                                ? t('form.loadingStages', {
+                                      defaultValue: isRTL ? 'جاري تحميل المراحل...' : 'Loading stages...',
+                                  })
+                                : stageOptions.length === 0
+                                  ? t('form.noStagesAvailable', {
+                                        defaultValue: isRTL ? 'لا توجد مراحل متاحة' : 'No stages available',
+                                    })
+                                  : t('form.selectStage', {
+                                        defaultValue: isRTL ? 'اختر المرحلة' : 'Select Stage',
+                                    })}
+                        </option>
+                        {stageOptions.map((stage) => (
+                            <option key={stage.value} value={stage.value}>
+                                {stage.label}
+                            </option>
+                        ))}
+                    </select>
+                    {errors.stage && (
+                        <span className="text-error text-sm mt-1">
+                            {t(`validation.${errors.stage}`)}
+                        </span>
+                    )}
+                </div>
+            </div>
+
+            <div className="form-control">
+                <div className="flex flex-col gap-1">
+                    <label className="label py-1">
+                        <span className="label-text text-xs">{t('form.level')}</span>
                     </label>
                     <select
                         name="level"
                         className={`select select-bordered w-full ${errors.level ? 'select-error animate-shake' : ''}`}
                         value={formData.level || ''}
                         onChange={handleInputChange}
-                      
+                        disabled={levelsLoading || !formData.stage || gradeOptions.length === 0}
+                        required
                     >
-                         <option value="">{t('form.selectGradeLevel') || t('form.selectGrade')}</option>
+                         <option value="">
+                           {levelsLoading
+                             ? t('form.loadingGrades', {
+                                 defaultValue: isRTL ? "جاري تحميل الصفوف..." : "Loading grades...",
+                               })
+                             : !formData.stage
+                               ? t('form.selectStageFirst', {
+                                   defaultValue: isRTL ? "اختر المرحلة أولاً" : "Select a stage first",
+                                 })
+                               : gradeOptions.length === 0
+                                 ? t('form.noGradesAvailable', {
+                                     defaultValue: isRTL ? "لا توجد صفوف متاحة" : "No grades available",
+                                   })
+                                 : t('form.selectGradeLevel', {
+                                     defaultValue: t('form.selectGrade', {
+                                       defaultValue: isRTL ? "اختر الصف الدراسي" : "Select Grade Level",
+                                     }),
+                                   })}
+                         </option>
               {gradeOptions.map((level) => (
-                <option key={level.value} value={level.value}>
-                  {level.label}
+                <option key={level.value || level._id} value={level.value || level._id}>
+                  {level.label || level.displayName || level.name}
                 </option>
               ))}
                            

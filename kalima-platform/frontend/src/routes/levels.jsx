@@ -1,4 +1,5 @@
 import axios from "axios";
+import i18n from "../components/i18n";
 import { normalizeApiError } from "../utils/apiError";
 import { buildLevelHierarchy, normalizeLocale } from "../utils/levelHierarchy";
 const API_URL = import.meta.env.VITE_API_URL;
@@ -11,8 +12,10 @@ const getAuthHeader = () => {
 
 export const getAllLevels = async () => {
   try {
-    const currentLang = (localStorage.getItem("i18nextLng") || "en").toLowerCase();
-    const locale = normalizeLocale(currentLang);
+    const currentLang = normalizeLocale(
+      i18n.language || localStorage.getItem("lng") || localStorage.getItem("i18nextLng") || "en",
+    );
+    const locale = currentLang;
 
     const response = await axios.get(`${API_URL}/levels/`, {
       headers: getAuthHeader(),

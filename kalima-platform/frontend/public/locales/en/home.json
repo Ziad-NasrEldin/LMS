@@ -2,7 +2,7 @@
   "welcome": {
     "title": "Welcome to {{highlight}}Fekra{{/highlight}} Platform",
     "kalima": "Fekra",
-    "description": "Fekra Platform is an e-learning platform providing resources for students from 4th grade through 12th grade.",
+    "description": "Fekra is a global e-learning platform offering courses and learning resources for learners everywhere.",
     "Fekra": "Fekra",
     "maleStudentAlt": "Male student",
     "femaleStudentAlt": "Female student"
@@ -11,13 +11,13 @@
   "hero": {
     "title": "The shortest path to brilliant success",
     "heading": "Welcome to the Fekra Platform",
-    "description": "Fekra Platform is a digital learning platform that provides resources for students from fourth grade primary to third grade secondary.",
+    "description": "Fekra is a digital learning platform that helps learners discover courses, practice with confidence, and grow at their own pace.",
     "cta": "Login"
   },
   "about": {
     "title": "About Us",
-    "heading": "Learn Smart, Score High ",
-    "description": "Fekra provides an effective digital learning platform for students from 4th grade primary to 12th grade secondary. We offer high-quality solutions that support academic excellence.",
+    "heading": "Learn with Confidence, Grow with Purpose",
+    "description": "Fekra provides a flexible e-learning experience with expert educators, practical tools, and high-quality courses across many subjects.",
     "features": {
       "teachers": "Professional Teachers",
       "tests": "Lesson-wise Tests",
@@ -38,26 +38,26 @@
   },
   "services": {
     "title": "Our Services",
-    "subtitle": "Our goal is to simplify information to ensure your academic excellence",
+    "subtitle": "Our goal is to make learning clear, accessible, and effective for every learner",
     "learnAnytime": {
       "title": "Learn Anytime",
       "subtitle": "Complete Flexibility",
-      "description": "24/7 access to lessons with replay options whenever it suits you"
+      "description": "24/7 access to lessons with replay options whenever it suits your schedule"
     },
     "teachers": {
       "title": "Certified Expert Teachers",
       "subtitle": "High Expertise",
-      "description": "Team of qualified teachers with extensive experience in educational curricula"
+      "description": "A network of qualified educators who simplify complex ideas and guide learners through each step"
     },
     "curriculum": {
       "title": "Premium Curriculum",
       "subtitle": "Outstanding Content",
-      "description": "Carefully designed curriculum covering all student needs with guaranteed high quality"
+      "description": "Carefully designed learning paths that support different goals, interests, and skill levels"
     },
     "certificates": {
       "title": "Certified Certificates",
       "subtitle": "Official Recognition",
-      "description": "Students receive certified certificates upon completion of each educational level"
+      "description": "Learners receive certified certificates upon completion of each course or learning path"
     }
   },
   "teachers": {
@@ -75,7 +75,7 @@
     "labels": {
       "expertise": "Expertise",
       "experience": "Years Experience",
-      "gradeLevels": "All Grade Levels"
+      "gradeLevels": "All Levels"
     }
   },
   "courses": {

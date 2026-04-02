@@ -45,11 +45,11 @@ export default function CoursesPage() {
 
   useSeo({
     title: isRTL
-      ? "دورات فكرة التعليمية | اكتشف الدورات المناسبة لمرحلتك"
-      : "Fekra Courses | Discover Courses for Your Level",
+      ? "دورات منصة فكرة التعليمية | اكتشف المسارات التعليمية المناسبة"
+      : "Fekra Courses | Discover Learning Paths",
     description: isRTL
-      ? "استكشف الدورات التعليمية على منصة فكرة واختر ما يناسب مرحلتك الدراسية وأهدافك التعليمية."
-      : "Explore Fekra courses and choose the right learning path for your stage and goals.",
+      ? "استكشف الدورات التعليمية على منصة فكرة التعليمية، واختر المسار المناسب لمرحلتك الدراسية وأهدافك التعليمية."
+      : "Explore Fekra courses and choose the learning path that fits your goals.",
     canonicalPath: "/courses",
     lang: i18n.language?.startsWith("en") ? "en" : "ar",
     dir: isRTL ? "rtl" : "ltr",

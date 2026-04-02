@@ -33,11 +33,11 @@ const Services = () => {
 
   useSeo({
     title: isRTL
-      ? "منصة فكرة التعليمية | تعلّم منظم وتقدّم حقيقي"
-      : "Fekra Educational Platform | Structured Learning and Real Progress",
+      ? "منصة فكرة التعليمية | دورات تعليمية ومعلمون متخصصون"
+      : "Fekra | Global E-Learning Platform",
     description: isRTL
-      ? "فكرة منصة تعليمية رقمية تساعد الطلاب من الصف الرابع الابتدائي حتى الصف الثالث الثانوي على التعلّم المنظم ومتابعة التقدّم بوضوح."
-      : "Fekra is a digital learning platform that helps students learn in a structured way and track progress clearly.",
+      ? "منصة فكرة التعليمية منصة تعليم إلكتروني للطلاب من الصف الرابع الابتدائي حتى الصف الثالث الثانوي، وتوفر دورات منظمة ومعلمين متخصصين ومسارات تعلم واضحة."
+      : "Fekra is a global e-learning platform that helps learners discover courses, practice consistently, and track progress clearly.",
     canonicalPath: "/",
     lang: i18n.language?.startsWith("en") ? "en" : "ar",
     dir: isRTL ? "rtl" : "ltr",
@@ -48,8 +48,8 @@ const Services = () => {
     () => ({
       ar: {
         badge: "منصة تعليمية موثوقة",
-        title: "تعلّم منظم. تقدّم حقيقي.",
-        subtitle: "نساعد الطالب على فهم الدروس بسرعة، والتطبيق مباشرة، ومتابعة تقدّمه بوضوح.",
+        title: "منصة فكرة التعليمية",
+        subtitle: "منصة تعليم إلكتروني للطلاب من الصف الرابع الابتدائي حتى الصف الثالث الثانوي، وتوفر دورات منظمة ومعلمين متخصصين ومسارات تعلم واضحة.",
         primaryCta: "ابدأ الآن",
         secondaryCta: "سجّل الدخول",
         tertiaryCta: "استكشف الدورات",
@@ -65,7 +65,7 @@ const Services = () => {
           },
           {
             title: "نتائج قابلة للقياس",
-            body: "متابعة واضحة تساعد الطالب وولي الأمر على رؤية التحسّن.",
+            body: "متابعة واضحة تساعد المتعلم على رؤية التحسّن خطوة بخطوة.",
           },
         ],
         appTitle: "حمّل تطبيق فكرة",
@@ -74,13 +74,13 @@ const Services = () => {
         appIos: "تحميل على App Store",
         appAndroid: "تحميل على Google Play",
         ctaTitle: "هل أنت مستعد للبدء؟",
-        ctaBody: "أنشئ حسابك وابدأ مسارًا تعليميًا مناسبًا لمرحلتك.",
+        ctaBody: "أنشئ حسابك وابدأ مسارًا تعليميًا يناسب أهدافك.",
         ctaButton: "أنشئ حسابك",
       },
       en: {
         badge: "Trusted learning platform",
         title: "Structured learning. Real progress.",
-        subtitle: "Students understand faster, practice immediately, and track progress clearly.",
+        subtitle: "Learners understand faster, practice immediately, and track progress clearly.",
         primaryCta: "Start now",
         secondaryCta: "Sign in",
         tertiaryCta: "Browse courses",
@@ -96,7 +96,7 @@ const Services = () => {
           },
           {
             title: "Measurable outcomes",
-            body: "Progress visibility for learners and parents at every step.",
+            body: "Progress visibility for learners at every step.",
           },
         ],
         appTitle: "Download Fekra App",
@@ -105,7 +105,7 @@ const Services = () => {
         appIos: "Download on App Store",
         appAndroid: "Get it on Google Play",
         ctaTitle: "Ready to begin?",
-        ctaBody: "Create your account and start a plan tailored to your level.",
+        ctaBody: "Create your account and start a learning path that matches your goals.",
         ctaButton: "Create account",
       },
     }),
@@ -113,7 +113,7 @@ const Services = () => {
   )[i18n.language] || {
     badge: "Trusted learning platform",
     title: "Structured learning. Real progress.",
-    subtitle: "Students understand faster, practice immediately, and track progress clearly.",
+    subtitle: "Learners understand faster, practice immediately, and track progress clearly.",
     primaryCta: "Start now",
     secondaryCta: "Sign in",
     tertiaryCta: "Browse courses",
@@ -129,7 +129,7 @@ const Services = () => {
       },
       {
         title: "Measurable outcomes",
-        body: "Progress visibility for learners and parents at every step.",
+        body: "Progress visibility for learners at every step.",
       },
     ],
     appTitle: "Download Fekra App",
@@ -138,7 +138,7 @@ const Services = () => {
     appIos: "Download on App Store",
     appAndroid: "Get it on Google Play",
     ctaTitle: "Ready to begin?",
-    ctaBody: "Create your account and start a plan tailored to your level.",
+    ctaBody: "Create your account and start a learning path that matches your goals.",
     ctaButton: "Create account",
   };
 

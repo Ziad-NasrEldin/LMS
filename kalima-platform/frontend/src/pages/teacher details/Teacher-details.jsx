@@ -122,17 +122,17 @@ export default function TeacherDetails() {
     String(teacher?.bio || "").trim() ||
     (teacher?.expertise
       ? isRTL
-        ? `تعرّف على المعلم ${teacherName} المتخصص في ${teacher.expertise} على منصة فكرة التعليمية.`
+        ? `تعرّف على المعلم ${teacherName} المتخصص في ${teacher.expertise} على منصة فكرة التعليمية، واطّلع على تخصصه والدورات المرتبطة به.`
         : `Meet ${teacherName}, a ${teacher.expertise} teacher on Fekra.`
       : isRTL
-        ? `تعرّف على المعلم ${teacherName} على منصة فكرة التعليمية.`
+        ? `تعرّف على المعلم ${teacherName} على منصة فكرة التعليمية، واطّلع على تخصصه والدورات المرتبطة به.`
         : `Meet ${teacher?.name || "this teacher"} on Fekra.`)
 
   useSeo(
     teacher
       ? {
           title: isRTL
-            ? `${teacherName} | معلمو فكرة التعليمية`
+            ? `${teacherName} | معلمو منصة فكرة التعليمية`
             : `${teacherName} | Fekra Teachers`,
           description: seoDescription,
           canonicalPath,

@@ -12,6 +12,7 @@ const ReviewItem = ({ label, value }) => (
 
 export default function Step4({ formData, t, hobbiesList = [], levelHierarchy }) {
   const { i18n } = useTranslation()
+  const isRTL = i18n.language === "ar"
 
   const getLevelName = (levelId) => {
     if (!levelId) return "-"
@@ -80,16 +81,29 @@ export default function Step4({ formData, t, hobbiesList = [], levelHierarchy })
           <ReviewItem label={t("form.fullName")} value={formData.fullName} />
           <ReviewItem label={t("form.gender")} value={t(`gender.${formData.gender}`)} />
           <ReviewItem label={t("form.phoneNumber")} value={formData.phoneNumber} />
-          <ReviewItem label={t("form.government") || "Government"} value={formData.government || "-"} />
           <ReviewItem
-            label={t("form.administrationZone") || (i18n.language === "ar" ? "الإدارة التعليمية" : "Administration Zone")}
+            label={t("form.government", { defaultValue: isRTL ? "المحافظة" : "Government" })}
+            value={formData.government || "-"}
+          />
+          <ReviewItem
+            label={t("form.administrationZone", {
+              defaultValue: isRTL ? "الإدارة التعليمية" : "Administration Zone",
+            })}
             value={formData.administrationZone || "-"}
           />
 
           {formData.role === "student" && (
             <>
-              <ReviewItem label={t("form.stage")} value={getLevelName(formData.stage)} />
-              <ReviewItem label={t("form.gradeLevel") || t("form.grade")} value={getLevelName(formData.level)} />
+              <ReviewItem
+                label={t("form.stage", { defaultValue: isRTL ? "المرحلة" : "Stage" })}
+                value={getLevelName(formData.stage)}
+              />
+              <ReviewItem
+                label={t("form.level", {
+                  defaultValue: isRTL ? "المستوى التعليمي" : "Learning Level",
+                })}
+                value={getLevelName(formData.level)}
+              />
               <ReviewItem label={t("form.parentPhone")} value={formData.parentPhoneNumber} />
               <ReviewItem label={t("form.parentPhoneRelation")} value={formatParentRelation(formData.parentPhoneRelation)} />
               {hasAdditionalParentContact && (
@@ -108,24 +122,32 @@ export default function Step4({ formData, t, hobbiesList = [], levelHierarchy })
           {formData.role === "teacher" && (
             <>
               <ReviewItem label={t("form.phoneNumber2")} value={formData.phoneNumber2} />
-              <ReviewItem label={t("form.stage") || t("form.level")} value={formatTeacherLevels(formData.level)} />
+              <ReviewItem
+                label={t("form.stage", {
+                  defaultValue: t("form.level", { defaultValue: isRTL ? "المرحلة" : "Stage" }),
+                })}
+                value={formatTeacherLevels(formData.level)}
+              />
               <ReviewItem label={t("form.subject")} value={formData.subject} />
               <ReviewItem
-                label={t("form.teachesAtType") || "Teaches At"}
-                value={t(formData.teachesAtType?.toLowerCase()) || "-"}
+                label={t("form.teachesAtType", { defaultValue: isRTL ? "أين تدرس؟" : "Teaches At" })}
+                value={t(formData.teachesAtType?.toLowerCase(), { defaultValue: formData.teachesAtType || "-" })}
               />
 
               {(formData.teachesAtType === "Center" || formData.teachesAtType === "Both") && (
-                <ReviewItem label={t("form.centers") || "Centers"} value={formatCenters(formData.centers)} />
+                <ReviewItem
+                  label={t("form.centers", { defaultValue: isRTL ? "المراكز" : "Centers" })}
+                  value={formatCenters(formData.centers)}
+                />
               )}
 
               {(formData.teachesAtType === "School" || formData.teachesAtType === "Both") && (
-                <ReviewItem label={t("form.school") || "School"} value={formData.school || "-"} />
+                <ReviewItem label={t("form.school", { defaultValue: isRTL ? "المدرسة" : "School" })} value={formData.school || "-"} />
               )}
 
               <div className="col-span-2">
                 <ReviewItem
-                  label={t("form.socialMedia") || "Social Media"}
+                  label={t("form.socialMedia", { defaultValue: isRTL ? "وسائل التواصل الاجتماعي" : "Social Media" })}
                   value={formatSocialMedia(formData.socialMedia)}
                 />
               </div>
@@ -135,7 +157,20 @@ export default function Step4({ formData, t, hobbiesList = [], levelHierarchy })
           {formData.role === "parent" && (
             <>
               <ReviewItem label={t("form.profession")} value={formData.profession} />
-              <ReviewItem label={t("form.level") || t("form.gradeLevel")} value={getLevelName(formData.level)} />
+              {formData.stage && (
+                <ReviewItem
+                  label={t("form.stage", {
+                    defaultValue: isRTL ? "المرحلة" : "Stage",
+                  })}
+                  value={getLevelName(formData.stage)}
+                />
+              )}
+              <ReviewItem
+                label={t("form.level", {
+                  defaultValue: isRTL ? "المستوى التعليمي" : "Learning Level",
+                })}
+                value={getLevelName(formData.level)}
+              />
               <ReviewItem label={t("form.children")} value={formData.children.join(", ")} />
             </>
           )}

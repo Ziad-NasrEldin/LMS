@@ -12,14 +12,14 @@ export const SITE_URL = normalizeBaseUrl(
   processSiteUrl || viteSiteUrl || "https://fekra-edu.com",
 );
 
-export const SITE_NAME_AR = "فكرة التعليمية";
+export const SITE_NAME_AR = "منصة فكرة التعليمية";
 export const SITE_NAME_EN = "Fekra Educational Platform";
 export const SITE_TITLE_AR = "منصة فكرة التعليمية";
 export const DEFAULT_SOCIAL_IMAGE = "/Kalima.png";
 export const DEFAULT_DESCRIPTION_AR =
-  "فكرة منصة تعليمية رقمية تساعد الطلاب من الصف الرابع الابتدائي حتى الصف الثالث الثانوي على التعلّم المنظم ومتابعة التقدّم بوضوح.";
+  "منصة فكرة التعليمية منصة تعليم إلكتروني للطلاب من الصف الرابع الابتدائي حتى الصف الثالث الثانوي، وتوفر دورات منظمة ومعلمين متخصصين ومسارات تعلم واضحة.";
 export const DEFAULT_DESCRIPTION_EN =
-  "Fekra is a digital learning platform that helps students from fourth grade through the end of secondary school learn in a structured way and track progress clearly.";
+  "Fekra is a global e-learning platform offering courses, resources, and learning tools for learners across subjects and skill levels.";
 
 export function normalizeBaseUrl(url) {
   return String(url || "").trim().replace(/\/+$/, "");

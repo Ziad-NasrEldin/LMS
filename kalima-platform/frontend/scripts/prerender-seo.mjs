@@ -45,6 +45,36 @@ function isPublishedRecord(record) {
   return record?.isPublished !== false;
 }
 
+function hasArabicCharacters(value) {
+  return /[\u0600-\u06FF]/.test(cleanText(value));
+}
+
+function hasMultipleWords(value) {
+  return cleanText(value).split(/\s+/).filter(Boolean).length >= 2;
+}
+
+function isPlaceholderName(value) {
+  return /^(test|demo|sample|temp|tmp|null|undefined)(?:[\s-_]*\d+)?$/i.test(cleanText(value));
+}
+
+function hasMeaningfulSummary(value) {
+  return cleanText(value).length >= 20;
+}
+
+function isSeoEligibleCourse(container) {
+  const name = cleanText(container?.name);
+  if (!name || isPlaceholderName(name)) return false;
+  if (hasArabicCharacters(name) || hasMultipleWords(name)) return true;
+  return hasMeaningfulSummary(container?.description);
+}
+
+function isSeoEligibleTeacher(lecturer) {
+  const name = cleanText(lecturer?.name);
+  if (!name || isPlaceholderName(name)) return false;
+  if (hasArabicCharacters(name) || hasMultipleWords(name)) return true;
+  return hasMeaningfulSummary(lecturer?.bio) || hasMeaningfulSummary(lecturer?.expertise);
+}
+
 function buildSeoHead({
   title,
   description,
@@ -79,7 +109,7 @@ function buildSeoHead({
   `.trim();
 }
 
-function buildPrerenderBody({ heading, description, sections = [] }) {
+function buildPrerenderBody({ heading, description, links = [], sections = [] }) {
   return `
     <style>
       #seo-prerender { font-family: "Cairo", "Noto Sans Arabic", Tahoma, sans-serif; background: #f8f3e9; color: #16212b; min-height: 100vh; }
@@ -91,12 +121,32 @@ function buildPrerenderBody({ heading, description, sections = [] }) {
       #seo-prerender h2 { margin: 0 0 12px; font-size: 24px; color: #0e5563; }
       #seo-prerender ul { margin: 0; padding-right: 18px; }
       #seo-prerender li { margin: 8px 0; line-height: 1.8; }
+      #seo-prerender .seo-links { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-top: 28px; }
+      #seo-prerender .seo-link { display: block; padding: 18px; border-radius: 20px; background: rgba(255,255,255,.92); box-shadow: 0 10px 30px rgba(14,85,99,.08); color: #16212b; text-decoration: none; }
+      #seo-prerender .seo-link strong { display: block; margin-bottom: 6px; color: #0e5563; font-size: 18px; }
+      #seo-prerender .seo-link span { display: block; line-height: 1.8; color: #344255; font-size: 15px; }
     </style>
     <main id="seo-prerender" dir="rtl">
       <div class="seo-shell">
-        <span class="seo-badge">فكرة التعليمية</span>
+        <span class="seo-badge">منصة فكرة التعليمية</span>
         <h1>${escapeHtml(cleanText(heading))}</h1>
         <p>${escapeHtml(cleanText(description))}</p>
+        ${
+          links.length > 0
+            ? `<nav class="seo-links" aria-label="روابط أساسية">
+                ${links
+                  .map(
+                    (link) => `
+                      <a class="seo-link" href="${escapeHtml(link.href)}">
+                        <strong>${escapeHtml(cleanText(link.label))}</strong>
+                        <span>${escapeHtml(cleanText(link.description || ""))}</span>
+                      </a>
+                    `,
+                  )
+                  .join("")}
+              </nav>`
+            : ""
+        }
         ${sections
           .map(
             (section) => `
@@ -195,7 +245,7 @@ async function loadPublicData() {
 }
 
 function buildHomePage() {
-  const title = "منصة فكرة التعليمية | تعلّم منظم وتقدّم حقيقي";
+  const title = "منصة فكرة التعليمية | دورات تعليمية ومعلمون متخصصون";
   const description = DEFAULT_DESCRIPTION_AR;
   const schema = [buildOrganizationSchema(), buildWebsiteSchema()];
 
@@ -205,13 +255,30 @@ function buildHomePage() {
     seoBody: buildPrerenderBody({
       heading: "منصة فكرة التعليمية",
       description,
+      links: [
+        {
+          href: "/courses",
+          label: "الدورات التعليمية",
+          description: "استكشف الدورات المتاحة بحسب المرحلة الدراسية والمادة.",
+        },
+        {
+          href: "/teachers",
+          label: "المعلمون",
+          description: "تعرّف على المعلمين المتخصصين واختر المعلم المناسب.",
+        },
+        {
+          href: "/privacy-policy",
+          label: "سياسة الخصوصية",
+          description: "اطّلع على كيفية جمع البيانات واستخدامها وحمايتها.",
+        },
+      ],
       sections: [
         {
           title: "ما الذي تقدمه فكرة؟",
           items: [
             "دروس منظمة لطلاب الصف الرابع الابتدائي حتى الصف الثالث الثانوي.",
-            "تتبع واضح للتقدّم الدراسي ومحتوى مناسب للمراحل المختلفة.",
-            "دورات تعليمية ومعلمون متخصصون وتجربة استخدام بسيطة.",
+            "معلمون متخصصون ومسارات تعلم واضحة لكل مرحلة دراسية.",
+            "تجربة استخدام بسيطة تساعد على المتابعة والتقدم بثبات.",
           ],
         },
       ],
@@ -220,13 +287,20 @@ function buildHomePage() {
 }
 
 function buildCoursesListing(containers = []) {
-  const title = "دورات فكرة التعليمية | اكتشف الدورات المناسبة لمرحلتك";
+  const title = "دورات منصة فكرة التعليمية | اكتشف المسارات التعليمية المناسبة";
   const description =
-    "استكشف الدورات التعليمية على منصة فكرة واختر ما يناسب مرحلتك الدراسية وأهدافك التعليمية.";
-  const highlights = containers
+    "استكشف الدورات التعليمية على منصة فكرة التعليمية، واختر المسار المناسب لمرحلتك الدراسية وأهدافك التعليمية.";
+  const highlightedCourses = containers
     .slice(0, 8)
-    .map((container) => cleanText(container.name))
-    .filter(Boolean);
+    .filter((container) => container?._id && container?.name)
+    .map((container) => ({
+      href: buildCoursePath(container),
+      label: cleanText(container.name),
+      description:
+        cleanText(container.subject?.name) ||
+        cleanText(container.level?.nameAr || container.level?.name) ||
+        "عرض تفاصيل الدورة",
+    }));
 
   return {
     routePath: "/courses",
@@ -244,12 +318,13 @@ function buildCoursesListing(containers = []) {
     seoBody: buildPrerenderBody({
       heading: "الدورات التعليمية",
       description,
+      links: highlightedCourses,
       sections: [
         {
           title: "أبرز الدورات",
           items:
-            highlights.length > 0
-              ? highlights
+            highlightedCourses.length > 0
+              ? highlightedCourses.map((course) => course.label)
               : ["تتوفر على المنصة دورات تعليمية متنوعة بحسب المرحلة الدراسية والمادة."],
         },
       ],
@@ -258,13 +333,17 @@ function buildCoursesListing(containers = []) {
 }
 
 function buildTeachersListing(lecturers = []) {
-  const title = "معلمو فكرة التعليمية | اختر المعلم المناسب";
+  const title = "معلمو منصة فكرة التعليمية | اختر المعلم المناسب";
   const description =
-    "تعرّف على معلمي منصة فكرة التعليمية واختر المعلم المناسب وفق التخصص والخبرة والمرحلة الدراسية.";
-  const highlights = lecturers
+    "تعرّف على معلمي منصة فكرة التعليمية، واختر المعلم المناسب وفق التخصص والخبرة والمرحلة الدراسية.";
+  const highlightedTeachers = lecturers
     .slice(0, 8)
-    .map((lecturer) => cleanText(lecturer.name))
-    .filter(Boolean);
+    .filter((lecturer) => lecturer?._id && lecturer?.name)
+    .map((lecturer) => ({
+      href: buildTeacherPath(lecturer),
+      label: cleanText(lecturer.name),
+      description: cleanText(lecturer.expertise || "معلم متخصص"),
+    }));
 
   return {
     routePath: "/teachers",
@@ -282,13 +361,14 @@ function buildTeachersListing(lecturers = []) {
     seoBody: buildPrerenderBody({
       heading: "المعلمون",
       description,
+      links: highlightedTeachers,
       sections: [
         {
           title: "نخبة من المعلمين",
           items:
-            highlights.length > 0
-              ? highlights
-              : ["تضم منصة فكرة معلمين متخصصين في مختلف المواد والمراحل الدراسية."],
+            highlightedTeachers.length > 0
+              ? highlightedTeachers.map((teacher) => teacher.label)
+              : ["تضم منصة فكرة التعليمية معلمين متخصصين في مختلف المواد والمراحل الدراسية."],
         },
       ],
     }),
@@ -338,7 +418,7 @@ function buildCourseDetailPages(containers = []) {
       const cleanName = cleanText(container.name);
       const description =
         cleanText(container.description) ||
-        `اكتشف دورة ${cleanName} على منصة فكرة التعليمية وتعرّف على محتواها الدراسي ومتطلباتها.`;
+        `اطّلع على تفاصيل دورة ${cleanName} على منصة فكرة التعليمية، بما يشمل المحتوى الدراسي والمعلم والمرحلة التعليمية.`;
       const image =
         container.image?.url ||
         container.containerImage?.url ||
@@ -347,7 +427,7 @@ function buildCourseDetailPages(containers = []) {
       const levelName = cleanText(container.level?.nameAr || container.level?.name || "");
       const subjectName = cleanText(container.subject?.name || "");
       const instructorName = cleanText(container.createdBy?.name || "");
-      const seoTitle = `${cleanName} | دورات فكرة التعليمية`;
+      const seoTitle = `${cleanName} | دورات منصة فكرة التعليمية`;
 
       const schema = [
         buildBreadcrumbSchema([
@@ -417,10 +497,10 @@ function buildTeacherDetailPages(lecturers = [], containers = []) {
       const courseNames = (containersByTeacherId.get(lecturer._id) || []).map(cleanText);
       const description =
         cleanText(lecturer.bio) ||
-        `تعرّف على المعلم ${cleanName} على منصة فكرة التعليمية واكتشف تخصصه والدورات المرتبطة به.`;
+        `تعرّف على المعلم ${cleanName} على منصة فكرة التعليمية، واطّلع على تخصصه والدورات المرتبطة به.`;
       const image = lecturer.profilePic || DEFAULT_SOCIAL_IMAGE;
       const expertise = cleanText(lecturer.expertise || "التعليم");
-      const seoTitle = `${cleanName} | معلمو فكرة التعليمية`;
+      const seoTitle = `${cleanName} | معلمو منصة فكرة التعليمية`;
 
       const schema = [
         buildBreadcrumbSchema([
@@ -473,7 +553,7 @@ function buildRedirectPages(containers = [], lecturers = []) {
 
     const canonicalPath = buildCoursePath(container);
       const cleanName = cleanText(container.name);
-      const title = `${cleanName} | دورات فكرة التعليمية`;
+      const title = `${cleanName} | دورات منصة فكرة التعليمية`;
       const description =
         cleanText(container.description) ||
         `يتم تحويلك إلى الرابط المعتمد للدورة ${cleanName} على منصة فكرة التعليمية.`;
@@ -495,7 +575,7 @@ function buildRedirectPages(containers = [], lecturers = []) {
 
     const canonicalPath = buildTeacherPath(lecturer);
       const cleanName = cleanText(lecturer.name);
-      const title = `${cleanName} | معلمو فكرة التعليمية`;
+      const title = `${cleanName} | معلمو منصة فكرة التعليمية`;
       const description =
         cleanText(lecturer.bio) ||
         `يتم تحويلك إلى الرابط المعتمد للملف التعريفي للمعلم ${cleanName}.`;
@@ -547,15 +627,17 @@ ${uniquePages
 async function main() {
   const template = await readTemplate();
   const { containers, lecturers } = await loadPublicData();
+  const seoReadyContainers = containers.filter(isSeoEligibleCourse);
+  const seoReadyLecturers = lecturers.filter(isSeoEligibleTeacher);
 
   const pages = [
     buildHomePage(),
-    buildCoursesListing(containers),
-    buildTeachersListing(lecturers),
+    buildCoursesListing(seoReadyContainers),
+    buildTeachersListing(seoReadyLecturers),
     buildPrivacyPage(),
-    ...buildCourseDetailPages(containers),
-    ...buildTeacherDetailPages(lecturers, containers),
-    ...buildRedirectPages(containers, lecturers),
+    ...buildCourseDetailPages(seoReadyContainers),
+    ...buildTeacherDetailPages(seoReadyLecturers, seoReadyContainers),
+    ...buildRedirectPages(seoReadyContainers, seoReadyLecturers),
   ];
 
   for (const page of pages) {

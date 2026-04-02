@@ -1,25 +1,16 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import SectionHeader from "./SectionHeader"
+import { useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
+import { Camera, Check, Upload, X } from "lucide-react"
+import SectionHeader from "./SectionHeader"
 import { getUserDashboard } from "../../routes/auth-services"
 import { updateCurrentUser } from "../../routes/update-user"
-import { Check, X, Camera, Upload, Pencil } from "lucide-react"
 import { resolveProfileImageUrl } from "../../utils/profileImage"
 import { designTokens } from "../../constants/designTokens"
 
-const SIGNUP_HOBBY_OPTIONS = [
-  "math",
-  "programming",
-  "art",
-  "languages",
-  "photography",
-  "montage",
-  "designillustrating",
-  "marketing",
-  "other",
-]
+const COLORS = designTokens.colors
+const SHADOWS = designTokens.shadows
 
 const HOBBY_ALIASES = {
   "design/illustrating": "designillustrating",
@@ -36,187 +27,205 @@ const normalizeHobbyValue = (value) => {
   return HOBBY_ALIASES[raw] || raw
 }
 
-const extractStudentHobby = (source) => {
-  if (!source) return ""
+const isEmptyValue = (value) =>
+  value === null || value === undefined || (typeof value === "string" && value.trim() === "")
 
-  const directHobby = normalizeHobbyValue(source.hobby)
-  if (directHobby) return directHobby
-
-  if (Array.isArray(source.hobbies) && source.hobbies.length > 0) {
-    const firstHobby = normalizeHobbyValue(source.hobbies[0])
-    if (firstHobby) return firstHobby
+const getObjectLabel = (value, isRTL) => {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return ""
   }
 
-  if (typeof source.hobbies === "string") {
-    return normalizeHobbyValue(source.hobbies)
+  if (isRTL) {
+    return value.nameAr || value.name || value.title || value.label || ""
   }
 
-  return ""
+  return value.name || value.nameAr || value.title || value.label || ""
+}
+
+const formatLevelValue = (value, isRTL, t) => {
+  if (isEmptyValue(value)) {
+    return ""
+  }
+
+  if (typeof value === "object") {
+    return getObjectLabel(value, isRTL)
+  }
+
+  const raw = String(value).trim()
+  if (!raw) {
+    return ""
+  }
+
+  const normalized = raw.replace(/\s+level$/i, "").replace(/\s+/g, " ").trim()
+  const translated = t(`gradeLevels.${normalized}`, { ns: "common", defaultValue: "" })
+  if (translated) {
+    return translated
+  }
+
+  const lowerTranslated = t(`gradeLevels.${normalized.toLowerCase()}`, { ns: "common", defaultValue: "" })
+  return lowerTranslated || raw
+}
+
+const formatHobbyValue = (value, t) => {
+  if (isEmptyValue(value)) {
+    return ""
+  }
+
+  const raw = String(value).trim()
+  if (!raw) {
+    return ""
+  }
+
+  const normalized = normalizeHobbyValue(raw)
+  const translated = t(`personalInfo.hobbyOptions.${normalized}`, { defaultValue: "" })
+  return translated || raw
+}
+
+const formatChildrenValue = (children, isRTL) => {
+  if (!Array.isArray(children) || children.length === 0) {
+    return ""
+  }
+
+  return children
+    .map((child) => {
+      if (!child) return ""
+      if (typeof child === "string") return child
+      if (typeof child !== "object") return String(child)
+
+      const childName = isRTL ? child.nameAr || child.name : child.name || child.nameAr
+      const childId = child.sequencedId ? `#${child.sequencedId}` : ""
+      const childLevel = child.level
+        ? `(${
+            typeof child.level === "object"
+              ? isRTL
+                ? child.level.nameAr || child.level.name || ""
+                : child.level.name || child.level.nameAr || ""
+              : child.level
+          })`
+        : ""
+
+      return [childName || childId, childId && childName ? childId : "", childLevel]
+        .filter(Boolean)
+        .join(" ")
+        .trim()
+    })
+    .filter(Boolean)
+    .join("\n")
+}
+
+const formatNumberValue = (value, locale) => {
+  if (isEmptyValue(value)) {
+    return ""
+  }
+
+  const numberValue = Number(value)
+  if (Number.isNaN(numberValue)) {
+    return String(value)
+  }
+
+  return new Intl.NumberFormat(locale).format(numberValue)
+}
+
+function ProfileField({ label, value, isRTL, multiline = false, className = "" }) {
+  const hasValue = !isEmptyValue(value)
+
+  return (
+    <div className={`space-y-2 ${className}`}>
+      <div className="text-sm font-medium" style={{ color: COLORS.slateText }}>
+        {label}
+      </div>
+      <div
+        className="rounded-2xl border px-4 py-3"
+        style={{
+          background: "rgba(248,243,233,0.82)",
+          borderColor: "rgba(17,24,39,0.10)",
+        }}
+      >
+        <p
+          className={[
+            "text-sm md:text-base leading-6 break-words",
+            isRTL ? "text-right" : "text-left",
+            multiline ? "whitespace-pre-wrap" : "whitespace-normal",
+          ].join(" ")}
+          style={{ color: COLORS.inkText }}
+        >
+          {hasValue ? value : "-"}
+        </p>
+      </div>
+    </div>
+  )
 }
 
 function PersonalInfoSection() {
   const { t, i18n } = useTranslation("settings")
   const isRTL = i18n.language === "ar"
-  const TOKENS = designTokens.colors
-  const SHADOWS = designTokens.shadows
+  const numberLocale = isRTL ? "ar-EG" : "en-US"
 
-  // State for user data
   const [userData, setUserData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-
-  // Single edit mode for compact UX
-  const [isEditing, setIsEditing] = useState(false)
-
-  // Form data for editing
-  const [formData, setFormData] = useState({
-    fullName: "",
-    phoneNumber: "",
-    email: "",
-    hobby: "",
-    profilePic: null,
-  })
-
-  // Profile picture upload states
+  const [selectedProfilePic, setSelectedProfilePic] = useState(null)
   const [profilePicPreview, setProfilePicPreview] = useState(null)
   const [profilePicUploading, setProfilePicUploading] = useState(false)
+  const [profilePicStatus, setProfilePicStatus] = useState({ type: null, message: "" })
 
-  // Email validation state
-  const [emailError, setEmailError] = useState("")
+  const fileInputRef = useRef(null)
+  const successTimerRef = useRef(null)
+  const mountedRef = useRef(true)
 
-  // State for update status
-  const [updateStatus, setUpdateStatus] = useState({
-    loading: false,
-    success: false,
-    error: null,
-  })
-
-  const handleProfilePicChange = (e) => {
-    const file = e.target.files[0]
-    if (file) {
-      // Validate file type
-      const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/gif"]
-      if (!allowedTypes.includes(file.type)) {
-        alert(t("validation.invalidImageType") || "Please select a valid image file (JPEG, PNG, GIF)")
-        return
-      }
-
-      // Validate file size (5MB limit)
-      const maxSize = 5 * 1024 * 1024 // 5MB in bytes
-      if (file.size > maxSize) {
-        alert(t("validation.fileTooLarge") || "File size must be less than 5MB")
-        return
-      }
-
-      setFormData((prev) => ({ ...prev, profilePic: file }))
-
-      // Create preview URL
-      const previewUrl = URL.createObjectURL(file)
-      setProfilePicPreview(previewUrl)
+  const clearSuccessTimer = () => {
+    if (successTimerRef.current) {
+      clearTimeout(successTimerRef.current)
+      successTimerRef.current = null
     }
   }
 
-  const handleProfilePicUpload = async () => {
-    if (!formData.profilePic) return
+  const queueSuccessMessage = (message) => {
+    clearSuccessTimer()
+    setProfilePicStatus({ type: "success", message })
+    successTimerRef.current = setTimeout(() => {
+      setProfilePicStatus((current) =>
+        current.type === "success" ? { type: null, message: "" } : current
+      )
+    }, 3000)
+  }
 
-    setProfilePicUploading(true)
-    setUpdateStatus({
-      loading: true,
-      success: false,
-      error: null,
-    })
+  const loadUserData = async () => {
+    setLoading(true)
+    setError(null)
 
     try {
-      // Create FormData for file upload
-      const uploadData = new FormData()
-      uploadData.append("profilePic", formData.profilePic)
-
-      const result = await updateCurrentUser(uploadData)
+      const result = await getUserDashboard()
+      if (!mountedRef.current) return
 
       if (result.success) {
-        // Update local userData state with new profile picture
-        setUserData((prev) => ({
-          ...prev,
-          profilePic: result.data.data?.profilePic || result.data.profilePic,
-        }))
-
-        // Clear the form data and preview
-        setFormData((prev) => ({ ...prev, profilePic: null }))
-        setProfilePicPreview(null)
-
-        // Set success status
-        setUpdateStatus({
-          loading: false,
-          success: true,
-          error: null,
-        })
-
-        // Clear success message after 3 seconds
-        setTimeout(() => {
-          setUpdateStatus((prev) => ({
-            ...prev,
-            success: false,
-          }))
-        }, 3000)
+        setUserData(result.data?.data?.userInfo || null)
       } else {
-        setUpdateStatus({
-          loading: false,
-          success: false,
-          error: result.error || "Failed to upload profile picture",
-        })
+        setError(result.error || "Failed to fetch user data")
       }
-    } catch (error) {
-      console.error("Error uploading profile picture:", error)
-      setUpdateStatus({
-        loading: false,
-        success: false,
-        error: "An unexpected error occurred while uploading",
-      })
-    } finally {
-      setProfilePicUploading(false)
-    }
-  }
-
-  const cancelProfilePicUpload = () => {
-    setFormData((prev) => ({ ...prev, profilePic: null }))
-    if (profilePicPreview) {
-      URL.revokeObjectURL(profilePicPreview)
-      setProfilePicPreview(null)
-    }
-  }
-
-  // Fetch user data on component mount
-  useEffect(() => {
-    const fetchUserData = async () => {
-      setLoading(true)
-      try {
-        const result = await getUserDashboard()
-        if (result.success) {
-          const userInfo = result.data.data.userInfo
-          setUserData(userInfo)
-          // Initialize form data with user info
-          setFormData({
-            fullName: userInfo.name || "",
-            phoneNumber: userInfo.phoneNumber || "",
-            email: userInfo.email || "",
-            hobby: extractStudentHobby(userInfo),
-            profilePic: null,
-          })
-        } else {
-          setError(result.error || "Failed to fetch user data")
-        }
-      } catch (error) {
-        console.error("Error fetching user data:", error)
+    } catch (fetchError) {
+      console.error("Error fetching user data:", fetchError)
+      if (mountedRef.current) {
         setError("An error occurred while fetching your information")
-      } finally {
+      }
+    } finally {
+      if (mountedRef.current) {
         setLoading(false)
       }
     }
+  }
 
-    fetchUserData()
+  useEffect(() => {
+    mountedRef.current = true
+    void loadUserData()
+
+    return () => {
+      mountedRef.current = false
+      clearSuccessTimer()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // Cleanup preview URL on unmount
   useEffect(() => {
     return () => {
       if (profilePicPreview) {
@@ -225,173 +234,320 @@ function PersonalInfoSection() {
     }
   }, [profilePicPreview])
 
-  // Handle input changes
-  const handleInputChange = (e) => {
-    const { name, value } = e.target
+  const role = String(userData?.role || "").trim().toLowerCase()
+  const isStudentRole = role === "student"
+  const isParentRole = role === "parent"
+  const isTeacherRole = role === "teacher"
+  const isLecturerRole = role === "lecturer"
+  const roleLabel = t(`role.${role}`, {
+    ns: "common",
+    defaultValue: role ? role.charAt(0).toUpperCase() + role.slice(1) : "",
+  })
+  const currentProfilePicUrl = resolveProfileImageUrl(userData?.profilePic)
 
-    // Email validation
-    if (name === "email") {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-      if (!emailRegex.test(value)) {
-        setEmailError(t("validation.invalidEmail") || "Invalid email address")
-      } else {
-        setEmailError("")
-      }
+  const formatFieldValue = (fieldName, value) => {
+    switch (fieldName) {
+      case "level":
+        return formatLevelValue(value, isRTL, t)
+      case "hobby":
+        return formatHobbyValue(value, t)
+      case "children":
+        return formatChildrenValue(value, isRTL)
+      case "generalPoints":
+      case "totalPoints":
+        return formatNumberValue(value, numberLocale)
+      default:
+        if (typeof value === "object" && value !== null) {
+          return getObjectLabel(value, isRTL)
+        }
+        if (typeof value === "number" || typeof value === "boolean") {
+          return String(value)
+        }
+        return isEmptyValue(value) ? "" : String(value).trim()
+    }
+  }
+
+  const handleProfilePicChange = (event) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp"]
+    if (!allowedTypes.includes(file.type)) {
+      event.target.value = ""
+      setProfilePicStatus({
+        type: "error",
+        message: t("validation.invalidImageType", {
+          defaultValue: "Please select a valid image file (JPEG, PNG, GIF).",
+        }),
+      })
+      return
     }
 
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }))
+    const maxSize = 5 * 1024 * 1024
+    if (file.size > maxSize) {
+      event.target.value = ""
+      setProfilePicStatus({
+        type: "error",
+        message: t("validation.fileTooLarge", {
+          defaultValue: "File size must be less than 5MB.",
+        }),
+      })
+      return
+    }
+
+    setProfilePicStatus({ type: null, message: "" })
+    setSelectedProfilePic(file)
+    setProfilePicPreview(URL.createObjectURL(file))
   }
 
-  const startEditing = () => {
-    setFormData((prev) => ({
-      ...prev,
-      fullName: userData?.name || "",
-      phoneNumber: userData?.phoneNumber || "",
-      email: userData?.email || "",
-      hobby: extractStudentHobby(userData),
-    }))
-    setIsEditing(true)
+  const resetProfilePicSelection = () => {
+    setSelectedProfilePic(null)
+    setProfilePicPreview(null)
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ""
+    }
   }
 
-  const cancelEditing = () => {
-    setFormData((prev) => ({
-      ...prev,
-      fullName: userData?.name || "",
-      phoneNumber: userData?.phoneNumber || "",
-      email: userData?.email || "",
-      hobby: extractStudentHobby(userData),
-    }))
-    setEmailError("")
-    setIsEditing(false)
-    setUpdateStatus({ loading: false, success: false, error: null })
-  }
+  const handleProfilePicUpload = async () => {
+    if (!selectedProfilePic) return
 
-  const handleSaveAll = async () => {
-    if (emailError) return
-
-    const isStudentRole = String(userData?.role || "").trim().toLowerCase() === "student"
-
-    // Set update status to loading
-    setUpdateStatus({
-      loading: true,
-      success: false,
-      error: null,
-    })
+    setProfilePicUploading(true)
+    setProfilePicStatus({ type: null, message: "" })
 
     try {
-      const updateData = {
-        name: formData.fullName,
-        phoneNumber: formData.phoneNumber,
-        email: formData.email,
-      }
+      const uploadData = new FormData()
+      uploadData.append("profilePic", selectedProfilePic)
 
-      if (isStudentRole) {
-        const nextHobby = extractStudentHobby({ hobby: formData.hobby })
-        if (nextHobby) {
-          updateData.hobby = nextHobby
-        }
-      }
-
-      const result = await updateCurrentUser(updateData)
+      const result = await updateCurrentUser(uploadData)
+      if (!mountedRef.current) return
 
       if (result.success) {
-        const updatedUserFromPatch = result.data?.data?.user || null
-        const updatedHobbyFromPatch = extractStudentHobby(updatedUserFromPatch)
+        const updatedProfilePic =
+          result.data?.data?.profilePic ||
+          result.data?.profilePic ||
+          result.data?.data?.userInfo?.profilePic ||
+          result.data?.userInfo?.profilePic
 
-        if (updatedUserFromPatch) {
-          setUserData((prev) => ({
-            ...(prev || {}),
-            ...updatedUserFromPatch,
-            hobby: updatedHobbyFromPatch || extractStudentHobby(prev) || extractStudentHobby({ hobby: formData.hobby }),
-          }))
+        if (updatedProfilePic) {
+          setUserData((current) => (current ? { ...current, profilePic: updatedProfilePic } : current))
         }
 
-        const refreshResult = await getUserDashboard()
-
-        if (refreshResult.success) {
-          const refreshedUserInfo = refreshResult.data?.data?.userInfo || null
-
-          if (refreshedUserInfo) {
-            const refreshedHobby = extractStudentHobby(refreshedUserInfo)
-            const fallbackHobby =
-              refreshedHobby ||
-              updatedHobbyFromPatch ||
-              extractStudentHobby({ hobby: formData.hobby }) ||
-              extractStudentHobby(userData)
-
-            setUserData((prev) => ({
-              ...(prev || {}),
-              ...refreshedUserInfo,
-              hobby: fallbackHobby,
-            }))
-            setFormData((prev) => ({
-              ...prev,
-              fullName: refreshedUserInfo.name || "",
-              phoneNumber: refreshedUserInfo.phoneNumber || "",
-              email: refreshedUserInfo.email || "",
-              hobby: fallbackHobby,
-            }))
-          }
-        } else {
-          setUserData((prev) => ({
-            ...prev,
-            name: formData.fullName,
-            phoneNumber: formData.phoneNumber,
-            email: formData.email,
-            hobby: isStudentRole ? extractStudentHobby({ hobby: formData.hobby }) || extractStudentHobby(prev) : prev.hobby,
-          }))
-        }
-
-        setUpdateStatus({
-          loading: false,
-          success: true,
-          error: null,
-        })
-        setIsEditing(false)
-
-        setTimeout(() => {
-          setUpdateStatus((prev) => ({
-            ...prev,
-            success: false,
-          }))
-        }, 3000)
+        resetProfilePicSelection()
+        queueSuccessMessage(
+          t("personalInfo.profilePicUpdated", {
+            defaultValue: "Profile picture updated successfully!",
+          }),
+        )
       } else {
-        setUpdateStatus({
-          loading: false,
-          success: false,
-          error: result.error || "Failed to update",
+        setProfilePicStatus({
+          type: "error",
+          message:
+            result.error ||
+            t("personalInfo.errors.profilePicUploadFailed", {
+              defaultValue: "Failed to upload profile picture.",
+            }),
         })
       }
-    } catch (error) {
-      console.error("Error updating user data:", error)
-      setUpdateStatus({
-        loading: false,
-        success: false,
-        error: "An unexpected error occurred",
-      })
+    } catch (uploadError) {
+      console.error("Error uploading profile picture:", uploadError)
+      if (mountedRef.current) {
+        setProfilePicStatus({
+          type: "error",
+          message: t("personalInfo.errors.profilePicUploadFailed", {
+            defaultValue: "An unexpected error occurred while uploading.",
+          }),
+        })
+      }
+    } finally {
+      if (mountedRef.current) {
+        setProfilePicUploading(false)
+      }
     }
   }
 
-  // Get all translations under personalInfo namespace
-  const personalInfo = t("personalInfo", { returnObjects: true })
+  const handleCancelProfilePic = () => {
+    resetProfilePicSelection()
+    setProfilePicStatus({ type: null, message: "" })
+  }
+
+  const readOnlyNotice = isRTL
+    ? "بيانات التسجيل للقراءة فقط. يمكنك تغيير صورة الملف الشخصي فقط من هنا."
+    : "Registration details are read-only. You can only change your profile picture here."
+
+  const baseFields = [
+    {
+      key: "fullName",
+      label: t("personalInfo.labels.fullName", {
+        defaultValue: isRTL ? "الاسم الكامل" : "Full Name",
+      }),
+      value: formatFieldValue("fullName", userData?.name),
+      className: "md:col-span-2",
+    },
+    {
+      key: "phoneNumber",
+      label: t("personalInfo.labels.phoneNumber", {
+        defaultValue: isRTL ? "رقم الجوال" : "Mobile Number",
+      }),
+      value: formatFieldValue("phoneNumber", userData?.phoneNumber),
+    },
+    {
+      key: "email",
+      label: t("personalInfo.labels.email", {
+        defaultValue: isRTL ? "البريد الإلكتروني" : "Email Address",
+      }),
+      value: formatFieldValue("email", userData?.email),
+      className: "md:col-span-2",
+    },
+  ]
+
+  const roleFields = []
+
+  if (isStudentRole) {
+    roleFields.push(
+      {
+        key: "level",
+        label: t("personalInfo.labels.level", {
+          defaultValue: isRTL ? "المرحلة" : "Level",
+        }),
+        value: formatFieldValue("level", userData?.level),
+      },
+      {
+        key: "hobby",
+        label: t("personalInfo.labels.hobby", {
+          defaultValue: isRTL ? "الهواية" : "Hobby",
+        }),
+        value: formatFieldValue("hobby", userData?.hobby || userData?.hobbies),
+      },
+      {
+        key: "sequencedId",
+        label: t("personalInfo.labels.sequencedId", {
+          defaultValue: isRTL ? "الرقم التعريفي" : "Student ID",
+        }),
+        value: formatFieldValue("sequencedId", userData?.sequencedId),
+      },
+      {
+        key: "generalPoints",
+        label: t("personalInfo.labels.generalPoints", {
+          defaultValue: isRTL ? "النقاط العامة" : "General Points",
+        }),
+        value: formatFieldValue("generalPoints", userData?.generalPoints),
+      },
+      {
+        key: "totalPoints",
+        label: t("personalInfo.labels.totalPoints", {
+          defaultValue: isRTL ? "إجمالي النقاط" : "Total Points",
+        }),
+        value: formatFieldValue("totalPoints", userData?.totalPoints),
+      },
+    )
+  }
+
+  if (isParentRole) {
+    roleFields.push(
+      {
+        key: "profession",
+        label: t("personalInfo.labels.profession", {
+          defaultValue: isRTL ? "المهنة / العمل" : "Profession / Work",
+        }),
+        value: formatFieldValue("profession", userData?.profession),
+      },
+      {
+        key: "level",
+        label: t("personalInfo.labels.level", {
+          defaultValue: isRTL ? "المرحلة" : "Level",
+        }),
+        value: formatFieldValue("level", userData?.level),
+      },
+      {
+        key: "children",
+        label: t("personalInfo.labels.children", {
+          defaultValue: isRTL ? "الأبناء" : "Children",
+        }),
+        value: formatFieldValue("children", userData?.children),
+        multiline: true,
+        className: "md:col-span-2",
+      },
+      {
+        key: "generalPoints",
+        label: t("personalInfo.labels.generalPoints", {
+          defaultValue: isRTL ? "النقاط العامة" : "General Points",
+        }),
+        value: formatFieldValue("generalPoints", userData?.generalPoints),
+      },
+    )
+  }
+
+  if (isTeacherRole) {
+    roleFields.push(
+      {
+        key: "subject",
+        label: t("personalInfo.labels.subject", {
+          defaultValue: isRTL ? "المادة" : "Subject",
+        }),
+        value: formatFieldValue("subject", userData?.subject),
+      },
+      {
+        key: "level",
+        label: t("personalInfo.labels.level", {
+          defaultValue: isRTL ? "المرحلة" : "Level",
+        }),
+        value: formatFieldValue("level", userData?.level),
+      },
+      {
+        key: "faction",
+        label: t("personalInfo.labels.faction", {
+          defaultValue: isRTL ? "الفرع" : "Faction",
+        }),
+        value: formatFieldValue("faction", userData?.faction),
+      },
+      {
+        key: "school",
+        label: t("personalInfo.labels.school", {
+          defaultValue: isRTL ? "المدرسة" : "School",
+        }),
+        value: formatFieldValue("school", userData?.school),
+        className: "md:col-span-2",
+      },
+    )
+  }
+
+  if (isLecturerRole) {
+    roleFields.push(
+      {
+        key: "bio",
+        label: t("personalInfo.labels.bio", {
+          defaultValue: isRTL ? "نبذة" : "Bio",
+        }),
+        value: formatFieldValue("bio", userData?.bio),
+        multiline: true,
+        className: "md:col-span-2",
+      },
+      {
+        key: "expertise",
+        label: t("personalInfo.labels.expertise", {
+          defaultValue: isRTL ? "الخبرة" : "Expertise",
+        }),
+        value: formatFieldValue("expertise", userData?.expertise),
+        multiline: true,
+        className: "md:col-span-2",
+      },
+    )
+  }
 
   if (loading) {
     return (
-      <section>
-        <SectionHeader title={personalInfo.title} />
+      <section className="space-y-4">
+        <SectionHeader title={t("personalInfo.title")} />
         <div
           className="rounded-3xl border p-4 md:p-5"
           style={{
-            background: "rgba(255,255,255,0.75)",
+            background: "rgba(255,255,255,0.8)",
             borderColor: "rgba(17,24,39,0.08)",
             boxShadow: SHADOWS.level1,
           }}
         >
-          <div className="flex items-center justify-center p-8">
-            <div className="loading loading-spinner loading-lg text-primary"></div>
+          <div className="flex min-h-[280px] items-center justify-center">
+            <span className="loading loading-spinner loading-lg" style={{ color: COLORS.deepTeal }} />
           </div>
         </div>
       </section>
@@ -400,367 +556,212 @@ function PersonalInfoSection() {
 
   if (error) {
     return (
-      <section>
-        <SectionHeader title={personalInfo.title} />
+      <section className="space-y-4">
+        <SectionHeader title={t("personalInfo.title")} />
         <div
           className="rounded-3xl border p-4 md:p-5"
           style={{
-            background: "rgba(255,255,255,0.75)",
+            background: "rgba(255,255,255,0.8)",
             borderColor: "rgba(17,24,39,0.08)",
             boxShadow: SHADOWS.level1,
           }}
         >
-          <div>
-            <div className="alert alert-error">
-              <span>{error}</span>
-              <button className="btn btn-sm btn-outline" onClick={() => window.location.reload()}>
-                {t("retry")}
-              </button>
-            </div>
+          <div className="alert alert-error items-start">
+            <span>{error}</span>
+            <button
+              type="button"
+              className="btn btn-sm btn-outline"
+              onClick={() => void loadUserData()}
+            >
+              {t("retry")}
+            </button>
           </div>
         </div>
       </section>
     )
   }
 
-  const hasProfilePic = userData?.profilePic
-  const currentProfilePicUrl = resolveProfileImageUrl(userData?.profilePic)
-
-  const studentLevelLabel = (() => {
-    if (String(userData?.role || "").trim().toLowerCase() !== "student") return ""
-
-    const levelValue = userData?.level
-    if (!levelValue) {
-      return t("gradeLevels.undefined", { ns: "common", defaultValue: "" })
-    }
-
-    if (isRTL && typeof levelValue === "object" && levelValue?.nameAr) {
-      return String(levelValue.nameAr).trim()
-    }
-
-    const rawLevelName = String(typeof levelValue === "string" ? levelValue : levelValue?.name || "").trim()
-    if (!rawLevelName) {
-      return t("gradeLevels.undefined", { ns: "common", defaultValue: "" })
-    }
-
-    const typoAliases = {
-      "fiest preparatory": "first preparatory",
-      "frist preparatory": "first preparatory",
-      "fierst preparatory": "first preparatory",
-    }
-
-    const normalizedLevelName = rawLevelName
-      .replace(/\s+level$/i, "")
-      .replace(/\s+/g, " ")
-      .trim()
-      .toLowerCase()
-
-    const canonicalLevelName = typoAliases[normalizedLevelName] || normalizedLevelName
-    return t(`gradeLevels.${canonicalLevelName}`, {
-      ns: "common",
-      defaultValue: rawLevelName,
-    })
-  })()
-
-  const studentHobbyLabel = (() => {
-    const normalizedHobby = extractStudentHobby(userData) || extractStudentHobby({ hobby: formData.hobby })
-    if (!normalizedHobby) return ""
-    return t(`personalInfo.hobbyOptions.${normalizedHobby}`, { defaultValue: normalizedHobby })
-  })()
-
-  const studentHobbyOptions = (() => {
-    const currentHobby = extractStudentHobby({ hobby: formData.hobby }) || extractStudentHobby(userData)
-    if (!currentHobby || SIGNUP_HOBBY_OPTIONS.includes(currentHobby)) {
-      return SIGNUP_HOBBY_OPTIONS
-    }
-    return [...SIGNUP_HOBBY_OPTIONS, currentHobby]
-  })()
-
-  const isStudentRole = String(userData?.role || "").trim().toLowerCase() === "student"
+  const hasProfilePic = Boolean(userData?.profilePic)
+  const displayProfilePic = profilePicPreview || currentProfilePicUrl
 
   return (
-    <section>
-      <SectionHeader title={personalInfo.title} />
+    <section className="space-y-4">
+      <SectionHeader title={t("personalInfo.title")} />
       <div
         className="rounded-3xl border p-4 md:p-5"
         style={{
-          background: "rgba(255,255,255,0.75)",
+          background: "rgba(255,255,255,0.78)",
           borderColor: "rgba(17,24,39,0.08)",
           boxShadow: SHADOWS.level1,
         }}
       >
-        <div className="mx-auto max-w-4xl">
-          <h3 className={`mb-4 text-base font-semibold md:text-lg ${isRTL ? "text-right" : "text-left"}`} style={{ color: TOKENS.slateText }}>
-            {personalInfo.subtitle}
-          </h3>
-
-          {/* User Avatar with Upload Functionality */}
-          <div className="mb-6 flex flex-col items-center">
-            <div className="relative">
-              <div className="avatar">
-                <div className="w-24 h-24 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
-                  <img
-                    src={profilePicPreview || currentProfilePicUrl}
-                    alt={userData?.name || "User Avatar"}
-                    className="object-cover"
-                    style={{ objectFit: "cover" }}
-                    onError={(event) => {
-                      event.currentTarget.src = "/person.png"
-                    }}
-                  />
+        <div className="mx-auto max-w-5xl space-y-6">
+          <div
+            className={`flex flex-col gap-6 lg:flex-row ${isRTL ? "lg:flex-row-reverse" : ""}`}
+          >
+            <div className={`flex flex-1 flex-col items-center gap-4 ${isRTL ? "lg:items-end" : "lg:items-start"}`}>
+              <div className="relative">
+                <div className="avatar">
+                  <div className="w-28 h-28 rounded-full ring-2 ring-primary/40 ring-offset-2 ring-offset-base-100">
+                    <img
+                      src={displayProfilePic}
+                      alt={userData?.name || "Profile picture"}
+                      className="h-full w-full object-cover"
+                      onError={(event) => {
+                        event.currentTarget.src = "/person.png"
+                      }}
+                    />
+                  </div>
                 </div>
-              </div>
 
-              {/* Camera icon overlay for upload */}
-              {!formData.profilePic && (
-                <label
-                  htmlFor="profilePicInput"
-                  className="absolute bottom-0 right-0 btn btn-circle btn-sm btn-primary cursor-pointer"
-                  title={t("personalInfo.uploadProfilePic") || "Upload Profile Picture"}
-                >
-                  <Camera className="w-4 h-4" />
-                </label>
-              )}
-            </div>
-
-            {/* Hidden file input */}
-            <input
-              id="profilePicInput"
-              type="file"
-              accept="image/*"
-              onChange={handleProfilePicChange}
-              className="hidden"
-            />
-
-            {/* Upload controls when file is selected */}
-            {formData.profilePic && (
-              <div className="mt-4 flex flex-col items-center gap-2">
-                <div className="text-sm text-gray-600">
-                  {t("personalInfo.selectedFile") || "Selected:"} {formData.profilePic.name}
-                </div>
-                <div className="flex gap-2">
-                  <button
-                    className={`btn btn-primary btn-sm ${profilePicUploading ? "loading" : ""}`}
-                    onClick={handleProfilePicUpload}
-                    disabled={profilePicUploading}
-                  >
-                    {!profilePicUploading && <Upload className="w-4 h-4" />}
-                    {t("personalInfo.uploadButton") || "Upload"}
-                  </button>
-                  <button
-                    className="btn btn-outline btn-sm"
-                    onClick={cancelProfilePicUpload}
-                    disabled={profilePicUploading}
-                  >
-                    <X className="w-4 h-4" />
-                    {t("personalInfo.cancelButton") || "Cancel"}
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* Upload status messages */}
-            {updateStatus.error && !isEditing && (
-              <div className="mt-2 text-error text-sm text-center">{updateStatus.error}</div>
-            )}
-            {updateStatus.success && !isEditing && (
-              <div className="mt-2 text-success text-sm text-center">
-                {t("personalInfo.profilePicUpdated") || "Profile picture updated successfully!"}
-              </div>
-            )}
-
-            {/* Upload hint for users without profile picture */}
-            {!hasProfilePic && !formData.profilePic && (
-              <div className="mt-2 text-sm text-gray-500 text-center">
-                {t("personalInfo.noProfilePicHint") || "Click the camera icon to upload a profile picture"}
-              </div>
-            )}
-          </div>
-
-          {/* User Role Badge */}
-          <div className="mb-4 flex justify-end">
-            <div className="badge badge-primary badge-lg">
-              {t(`role.${userData?.role?.toLowerCase()}`, { ns: "common" })}
-            </div>
-          </div>
-
-          <div className={`mb-4 flex gap-2 ${isRTL ? "justify-start" : "justify-end"}`}>
-            {!isEditing ? (
-              <button className="btn btn-sm btn-outline" onClick={startEditing}>
-                <Pencil className="h-4 w-4" />
-                {personalInfo.buttons.edit}
-              </button>
-            ) : (
-              <>
                 <button
-                  className={`btn btn-sm btn-primary ${updateStatus.loading ? "loading" : ""}`}
-                  onClick={handleSaveAll}
-                  disabled={updateStatus.loading || !!emailError}
+                  type="button"
+                  className="btn btn-circle btn-sm absolute bottom-0 end-0 shadow-md"
+                  style={{
+                    background: COLORS.deepTeal,
+                    borderColor: COLORS.deepTeal,
+                    color: "#fff",
+                  }}
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={profilePicUploading}
+                  title={t("personalInfo.uploadProfilePic", {
+                    defaultValue: "Upload Profile Picture",
+                  })}
                 >
-                  {!updateStatus.loading && <Check className="h-4 w-4" />}
-                  {t("save") || "Save"}
+                  <Camera className="h-4 w-4" />
                 </button>
-                <button className="btn btn-sm btn-outline" onClick={cancelEditing} disabled={updateStatus.loading}>
-                  <X className="h-4 w-4" />
-                  {t("cancel") || "Cancel"}
-                </button>
-              </>
-            )}
-          </div>
+              </div>
 
-          {updateStatus.error && isEditing && <div className="mb-3 text-sm text-error">{updateStatus.error}</div>}
-          {updateStatus.success && <div className="mb-3 text-sm text-success">{personalInfo.messages?.updateSuccess || "Updated successfully"}</div>}
-
-          {/* Full Name Field */}
-          <div className="form-control mb-4">
-            <label className={`label pb-1 ${isRTL ? "justify-end" : "justify-start"}`}>
-              <span className="label-text">
-                {personalInfo.labels.fullName}
-                <span className="text-error">*</span>
-              </span>
-            </label>
-            <div className="w-full">
-              <input
-                type="text"
-                name="fullName"
-                value={isEditing ? formData.fullName : userData?.name || ""}
-                onChange={handleInputChange}
-                placeholder={personalInfo.placeholders.fullName}
-                className={`input input-bordered w-full max-w-2xl ${isRTL ? "text-right" : "text-left"}`}
-                dir={isRTL ? "rtl" : "ltr"}
-                readOnly={!isEditing}
-              />
-            </div>
-          </div>
-
-          {/* Phone Number Field */}
-          <div className="form-control mb-4">
-            <label className={`label pb-1 ${isRTL ? "justify-end" : "justify-start"}`}>
-              <span className="label-text">
-                {personalInfo.labels.phoneNumber}
-                <span className="text-error">*</span>
-              </span>
-            </label>
-            <div className="w-full">
-              <input
-                type="text"
-                name="phoneNumber"
-                value={isEditing ? formData.phoneNumber : userData?.phoneNumber || ""}
-                onChange={handleInputChange}
-                placeholder={personalInfo.placeholders.phoneNumber}
-                className={`input input-bordered w-full max-w-2xl ${isRTL ? "text-right" : "text-left"}`}
-                dir={isRTL ? "rtl" : "ltr"}
-                readOnly={!isEditing}
-              />
-            </div>
-          </div>
-
-          {/* Email Field */}
-          <div className="form-control mb-4">
-            <label className={`label pb-1 ${isRTL ? "justify-end" : "justify-start"}`}>
-              <span className="label-text">
-                {personalInfo.labels.email}
-                <span className="text-error">*</span>
-              </span>
-            </label>
-            <div className="w-full">
-              <input
-                type="email"
-                name="email"
-                value={isEditing ? formData.email : userData?.email || ""}
-                onChange={handleInputChange}
-                placeholder={personalInfo.placeholders.email}
-                className={`input input-bordered w-full max-w-2xl ${isRTL ? "text-right" : "text-left"} ${emailError && isEditing ? "input-error animate-shake" : ""}`}
-                dir={isRTL ? "rtl" : "ltr"}
-                readOnly={!isEditing}
-              />
-            </div>
-            {emailError && isEditing && <div className="mt-2 text-error text-sm">{emailError}</div>}
-          </div>
-
-          {userData?.role === "Parent" && (
-            <div className="form-control mb-4">
-              <label className={`label pb-1 ${isRTL ? "justify-end" : "justify-start"}`}>
-                <span className="label-text">{personalInfo.labels.profession || "Profession"}</span>
-              </label>
-              <div className="w-full">
-                <input
-                  type="text"
-                  value={userData?.profession || ""}
-                  className={`input input-bordered w-full max-w-2xl ${isRTL ? "text-right" : "text-left"}`}
-                  dir={isRTL ? "rtl" : "ltr"}
-                  readOnly
-                />
+              <div className="space-y-3 text-center lg:text-start">
+                <div className="inline-flex items-center rounded-full px-4 py-1 text-sm font-semibold text-white shadow-sm" style={{ background: COLORS.deepTeal }}>
+                  {roleLabel || "-"}
+                </div>
+                {userData?.userSerial && (
+                  <div className="text-xs text-base-content/60">
+                    {t("personalInfo.userSerial", {
+                      defaultValue: isRTL ? "الرقم التعريفي" : "User Serial",
+                    })}
+                    : {userData.userSerial}
+                  </div>
+                )}
+                <p className="max-w-xl text-sm leading-6" style={{ color: COLORS.slateText }}>
+                  {readOnlyNotice}
+                </p>
               </div>
             </div>
-          )}
 
-          {/* Student-specific fields */}
-          {isStudentRole && (
-            <div className="form-control mb-4">
-              <label className={`label pb-1 ${isRTL ? "justify-end" : "justify-start"}`}>
-                <span className="label-text">{personalInfo.labels.hobby || "Hobby"}</span>
-              </label>
-
-              <div className="w-full">
-                {isEditing ? (
-                  <select
-                    name="hobby"
-                    value={formData.hobby || ""}
-                    onChange={handleInputChange}
-                    className={`select select-bordered w-full max-w-2xl ${isRTL ? "text-right" : "text-left"}`}
-                    dir={isRTL ? "rtl" : "ltr"}
-                  >
-                    <option value="">{personalInfo.placeholders?.hobby || "Select a hobby"}</option>
-                    {studentHobbyOptions.map((option) => (
-                      <option key={option} value={option}>
-                        {t(`personalInfo.hobbyOptions.${option}`, { defaultValue: option })}
-                      </option>
-                    ))}
-                  </select>
-                ) : (
-                  <input
-                    type="text"
-                    value={studentHobbyLabel}
-                    className={`input input-bordered w-full max-w-2xl ${isRTL ? "text-right" : "text-left"}`}
-                    dir={isRTL ? "rtl" : "ltr"}
-                    readOnly
-                  />
+            <div className="flex-1 rounded-[1.5rem] border px-4 py-4 md:px-5 md:py-5" style={{ background: "rgba(241,243,246,0.65)", borderColor: "rgba(17,24,39,0.08)" }}>
+              <div className="mb-3 flex items-center justify-between gap-3">
+                <h3 className="text-base font-semibold md:text-lg" style={{ color: COLORS.deepTeal }}>
+                  {t("personalInfo.subtitle")}
+                </h3>
+                {!hasProfilePic && !profilePicPreview && (
+                  <div className="badge badge-outline text-xs">
+                    {t("personalInfo.noProfilePicHint", {
+                      defaultValue:
+                        isRTL
+                          ? "اضغط على أيقونة الكاميرا لرفع صورة الملف الشخصي"
+                          : "Click the camera icon to upload a profile picture",
+                    })}
+                  </div>
                 )}
               </div>
-            </div>
-          )}
 
-          {isStudentRole && userData?.level && (
-            <div className="form-control mb-4">
-              <label className={`label pb-1 ${isRTL ? "justify-end" : "justify-start"}`}>
-                <span className="label-text">{personalInfo.labels.level || "Level"}</span>
-              </label>
-              <div className="w-full">
-                <input
-                  type="text"
-                  value={studentLevelLabel}
-                  className={`input input-bordered w-full max-w-2xl ${isRTL ? "text-right" : "text-left"}`}
-                  dir={isRTL ? "rtl" : "ltr"}
-                  readOnly
-                />
-              </div>
-            </div>
-          )}
+              <input
+                ref={fileInputRef}
+                id="profilePicInput"
+                type="file"
+                accept="image/*"
+                onChange={handleProfilePicChange}
+                className="hidden"
+              />
 
-          {/* Balance display for students */}
-          {isStudentRole && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-              <div className="stat rounded-box" style={{ background: TOKENS.neutralCloud }}>
-                <div className="stat-title">{personalInfo.labels.generalPoints || t("General Points")}</div>
-                <div className="stat-value">{userData.generalPoints || 0}</div>
+              {selectedProfilePic && (
+                <div
+                  className="mb-4 flex flex-col gap-3 rounded-2xl border px-4 py-3 md:flex-row md:items-center md:justify-between"
+                  style={{
+                    background: "rgba(255,255,255,0.85)",
+                    borderColor: "rgba(17,24,39,0.10)",
+                  }}
+                >
+                  <div className="flex items-center gap-2 text-sm" style={{ color: COLORS.slateText }}>
+                    <Upload className="h-4 w-4" />
+                    <span className="break-all">
+                      {t("personalInfo.selectedFile", { defaultValue: "Selected:" })} {selectedProfilePic.name}
+                    </span>
+                  </div>
+
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      className={`btn btn-primary btn-sm ${profilePicUploading ? "loading" : ""}`}
+                      onClick={handleProfilePicUpload}
+                      disabled={profilePicUploading}
+                    >
+                      {!profilePicUploading && <Check className="h-4 w-4" />}
+                      {t("personalInfo.uploadButton", { defaultValue: "Upload" })}
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-outline btn-sm"
+                      onClick={handleCancelProfilePic}
+                      disabled={profilePicUploading}
+                    >
+                      <X className="h-4 w-4" />
+                      {t("personalInfo.cancelButton", { defaultValue: "Cancel" })}
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {profilePicStatus.message && (
+                <div
+                  className={`mb-4 rounded-2xl border px-4 py-3 text-sm ${
+                    profilePicStatus.type === "success"
+                      ? "border-success/30 bg-success/10 text-success"
+                      : "border-error/30 bg-error/10 text-error"
+                  }`}
+                >
+                  {profilePicStatus.type === "success" && (
+                    <Check className={`${isRTL ? "ml-2" : "mr-2"} inline-block h-4 w-4`} />
+                  )}
+                  {profilePicStatus.message}
+                </div>
+              )}
+
+              <div className="grid gap-4 md:grid-cols-2">
+                {baseFields.map((field) => (
+                  <ProfileField
+                    key={field.key}
+                    label={field.label}
+                    value={field.value}
+                    isRTL={isRTL}
+                    className={field.className}
+                  />
+                ))}
               </div>
-              <div className="stat rounded-box" style={{ background: TOKENS.neutralCloud }}>
-                <div className="stat-title">{personalInfo.labels.totalPoints || t("Total Points")}</div>
-                <div className="stat-value">{userData.totalPoints || 0}</div>
-              </div>
+
+              {roleFields.length > 0 && (
+                <div className="mt-6">
+                  <div className="mb-3 text-base font-semibold" style={{ color: COLORS.deepTeal }}>
+                    {t("personalInfo.subtitle")}
+                  </div>
+                  <div className="grid gap-4 md:grid-cols-2">
+                    {roleFields.map((field) => (
+                      <ProfileField
+                        key={field.key}
+                        label={field.label}
+                        value={field.value}
+                        isRTL={isRTL}
+                        multiline={Boolean(field.multiline)}
+                        className={field.className}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
-          )}
+          </div>
         </div>
       </div>
     </section>

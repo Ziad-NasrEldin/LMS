@@ -4,20 +4,15 @@ import { useEffect, useState } from "react"
 import { Eye, EyeOff } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import { getAllSubjects } from "../../routes/courses"
-import { STAGE_KEYS, getStageDisplayName } from "../../utils/levelHierarchy"
 
 
-export default function StepTeacher({ formData, handleInputChange, t, errors, levelHierarchy }) {
+export default function StepTeacher({ formData, handleInputChange, t, errors, levelHierarchy, levelsLoading }) {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [subjects, setSubjects] = useState([])
   const { i18n } = useTranslation()
-  const stageOptions = levelHierarchy?.stageOptions?.length
-    ? levelHierarchy.stageOptions
-    : STAGE_KEYS.map((stageKey) => ({
-        value: stageKey,
-        label: getStageDisplayName(stageKey, i18n.language),
-      }))
+  const isRTL = i18n.language === "ar"
+  const stageOptions = levelHierarchy?.stageOptions || []
 
   useEffect(() => {
     const fetchSubjects = async () => {
@@ -39,7 +34,9 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, le
 
   return (
     <div className="space-y-3">
-      <p className="text-xl sm:text-2xl font-semibold mb-2">{t('form.accountDetails') || 'Account Details'}</p>
+      <p className="text-xl sm:text-2xl font-semibold mb-2">
+        {t("form.accountDetails", { defaultValue: isRTL ? "تفاصيل الحساب" : "Account Details" })}
+      </p>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
       <div className="form-control sm:col-span-2">
         <div className="flex flex-col gap-1">
@@ -118,35 +115,51 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, le
       <div className="form-control sm:col-span-2">
         <div className="flex flex-col gap-1">
           <label className="label py-1">
-            <span className="label-text text-xs">{t("form.stage") || t("form.level")}</span>
+            <span className="label-text text-xs">
+              {t("form.stage", {
+                defaultValue: t("form.level", { defaultValue: isRTL ? "المرحلة" : "Stage" }),
+              })}
+            </span>
           </label>
-          <div className="flex flex-wrap gap-x-4 gap-y-2">
-            {stageOptions.map((levelOption) => (
-              <label key={levelOption.value} className="flex cursor-pointer items-center gap-2 whitespace-nowrap">
-                <input
-                  type="checkbox"
-                  className="checkbox"
-                  name="level"
-                  value={levelOption.value}
-                  checked={Array.isArray(formData.level) ? formData.level.includes(levelOption.value) : false}
-                  onChange={(e) => {
-                    const value = e.target.value
-                    const isChecked = e.target.checked
-                    const currentLevels = Array.isArray(formData.level)
-                      ? formData.level
-                      : formData.level
-                        ? [formData.level]
-                        : []
-                    const updatedLevels = isChecked
-                      ? [...currentLevels, value]
-                      : currentLevels.filter((level) => level !== value)
-                    handleInputChange({ target: { name: "level", value: updatedLevels } })
-                  }}
-                />
-                <span>{levelOption.label}</span>
-              </label>
-            ))}
-          </div>
+          {levelsLoading ? (
+            <div className="rounded-lg border border-base-300 bg-base-100 px-4 py-3 text-sm text-base-content/70">
+              {t("form.loadingStages", { defaultValue: isRTL ? "جاري تحميل المراحل..." : "Loading stages..." })}
+            </div>
+          ) : stageOptions.length === 0 ? (
+            <div className="rounded-lg border border-base-300 bg-base-100 px-4 py-3 text-sm text-base-content/70">
+              {t("form.noStagesAvailable", {
+                defaultValue: isRTL ? "لا توجد مراحل متاحة" : "No stages available",
+              })}
+            </div>
+          ) : (
+            <div className="flex flex-wrap gap-x-4 gap-y-2">
+              {stageOptions.map((levelOption) => (
+                <label key={levelOption.value} className="flex cursor-pointer items-center gap-2 whitespace-nowrap">
+                  <input
+                    type="checkbox"
+                    className="checkbox"
+                    name="level"
+                    value={levelOption.value}
+                    checked={Array.isArray(formData.level) ? formData.level.includes(levelOption.value) : false}
+                    onChange={(e) => {
+                      const value = e.target.value
+                      const isChecked = e.target.checked
+                      const currentLevels = Array.isArray(formData.level)
+                        ? formData.level
+                        : formData.level
+                          ? [formData.level]
+                          : []
+                      const updatedLevels = isChecked
+                        ? [...currentLevels, value]
+                        : currentLevels.filter((level) => level !== value)
+                      handleInputChange({ target: { name: "level", value: updatedLevels } })
+                    }}
+                  />
+                  <span>{levelOption.label}</span>
+                </label>
+              ))}
+            </div>
+          )}
           {errors.level && <span className="text-error text-sm mt-1">{t(`validation.${errors.level}`)}</span>}
         </div>
       </div>
@@ -155,7 +168,9 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, le
       <div className="form-control">
         <div className="flex flex-col gap-1">
           <label className="label py-1">
-            <span className="label-text text-xs">{t("form.teachesAtType") || "Teaches At"}</span>
+            <span className="label-text text-xs">
+              {t("form.teachesAtType", { defaultValue: isRTL ? "أين تدرس؟" : "Teaches At" })}
+            </span>
           </label>
           <select
             name="teachesAtType"
@@ -164,14 +179,20 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, le
             onChange={handleInputChange}
             required
           >
-            <option value="">{t("form.selectTeachesAt") || "Select where you teach"}</option>
-            <option value="Center">{t("center")}</option>
-            <option value="School">{t("school")}</option>
-            <option value="Both">{t("both")}</option>
+            <option value="">
+              {t("form.selectTeachesAt", {
+                defaultValue: isRTL ? "اختر مكان التدريس" : "Select where you teach",
+              })}
+            </option>
+            <option value="Center">{t("center", { defaultValue: isRTL ? "مركز" : "Center" })}</option>
+            <option value="School">{t("school", { defaultValue: isRTL ? "مدرسة" : "School" })}</option>
+            <option value="Both">{t("both", { defaultValue: isRTL ? "كلاهما" : "Both" })}</option>
           </select>
           {errors.teachesAtType && (
             <span className="text-error text-sm mt-1">
-              {t(`validation.${errors.teachesAtType}`) || "This field is required"}
+              {t(`validation.${errors.teachesAtType}`, {
+                defaultValue: isRTL ? "هذا الحقل مطلوب" : "This field is required",
+              })}
             </span>
           )}
         </div>
@@ -182,7 +203,9 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, le
         <div className="form-control">
           <div className="flex flex-col gap-1">
             <label className="label py-1">
-              <span className="label-text text-xs">{t("form.centers") || "Centers"}</span>
+              <span className="label-text text-xs">
+                {t("form.centers", { defaultValue: isRTL ? "المراكز" : "Centers" })}
+              </span>
             </label>
             <div className="flex flex-col gap-1">
               {(formData.centers || [""]).map((center, index) => (
@@ -196,7 +219,9 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, le
                       newCenters[index] = e.target.value
                       handleInputChange({ target: { name: "centers", value: newCenters } })
                     }}
-                    placeholder={`${t("form.centerName") || "Center name"}`}
+                    placeholder={t("form.centerName", {
+                      defaultValue: isRTL ? "اسم المركز" : "Center name",
+                    })}
                   />
                   {index === (formData.centers || [""]).length - 1 ? (
                     <button
@@ -226,7 +251,9 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, le
             </div>
             {errors.centers && (
               <span className="text-error text-sm mt-1">
-                {t(`validation.${errors.centers}`) || "Please add at least one center"}
+                {t(`validation.${errors.centers}`, {
+                  defaultValue: isRTL ? "الرجاء إضافة مركز واحد على الأقل" : "Please add at least one center",
+                })}
               </span>
             )}
           </div>
@@ -238,7 +265,9 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, le
         <div className="form-control">
           <div className="flex flex-col gap-1">
             <label className="label py-1">
-              <span className="label-text text-xs">{t("form.school") || "School"}</span>
+              <span className="label-text text-xs">
+                {t("form.school", { defaultValue: isRTL ? "المدرسة" : "School" })}
+              </span>
             </label>
             <input
               type="text"
@@ -246,12 +275,14 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, le
               className={`input input-bordered w-full ${errors.school ? "input-error animate-shake" : ""}`}
               value={formData.school || ""}
               onChange={handleInputChange}
-              placeholder={`${t("form.schoolName") || "School name"}`}
+              placeholder={t("form.schoolName", { defaultValue: isRTL ? "اسم المدرسة" : "School name" })}
               required
             />
             {errors.school && (
               <span className="text-error text-sm mt-1">
-                {t(`validation.${errors.school}`) || "School name is required"}
+                {t(`validation.${errors.school}`, {
+                  defaultValue: isRTL ? "اسم المدرسة مطلوب" : "School name is required",
+                })}
               </span>
             )}
           </div>
@@ -259,10 +290,12 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, le
       )}
 
       {/* Social Media */}
-      <div className="form-control sm:col-span-2">
-        <div className="flex flex-col gap-1">
-          <label className="label py-1">
-            <span className="label-text text-xs">{t("form.socialMedia") || "Social Media"}</span>
+        <div className="form-control sm:col-span-2">
+          <div className="flex flex-col gap-1">
+            <label className="label py-1">
+            <span className="label-text text-xs">
+              {t("form.socialMedia", { defaultValue: isRTL ? "وسائل التواصل الاجتماعي" : "Social Media" })}
+            </span>
           </label>
           <div className="flex flex-col gap-1">
             {(formData.socialMedia || [{ platform: "", account: "" }]).map((social, index) => (
@@ -279,16 +312,20 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, le
                     handleInputChange({ target: { name: "socialMedia", value: newSocialMedia } })
                   }}
                 >
-                 <option value="">{t("form.selectPlatform") || "Select platform"}</option>
+                 <option value="">
+                   {t("form.selectPlatform", {
+                     defaultValue: isRTL ? "اختر المنصة" : "Select platform",
+                   })}
+                 </option>
                   {[
-                    { value: "Facebook", label: t("form.facebook") || "Facebook" },
-                    { value: "Instagram", label: t("form.instagram") || "Instagram" },
-                    { value: "Twitter", label: t("form.twitter") || "Twitter" },
-                    { value: "LinkedIn", label: t("form.linkedin") || "LinkedIn" },
-                    { value: "TikTok", label: t("form.tikTok") || "TikTok" },
-                    { value: "YouTube", label: t("form.youtube") || "YouTube" },
-                    { value: "WhatsApp", label: t("form.whatsApp") || "WhatsApp" },
-                    { value: "Telegram", label: t("form.telegram") || "Telegram" }
+                    { value: "Facebook", label: t("form.facebook", { defaultValue: "Facebook" }) },
+                    { value: "Instagram", label: t("form.instagram", { defaultValue: "Instagram" }) },
+                    { value: "Twitter", label: t("form.twitter", { defaultValue: "Twitter" }) },
+                    { value: "LinkedIn", label: t("form.linkedin", { defaultValue: "LinkedIn" }) },
+                    { value: "TikTok", label: t("form.tikTok", { defaultValue: "TikTok" }) },
+                    { value: "YouTube", label: t("form.youtube", { defaultValue: "YouTube" }) },
+                    { value: "WhatsApp", label: t("form.whatsApp", { defaultValue: "WhatsApp" }) },
+                    { value: "Telegram", label: t("form.telegram", { defaultValue: "Telegram" }) }
                   ].map((platform) => (
                     <option key={platform.value} value={platform.value}>
                       {platform.label}
@@ -304,7 +341,9 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, le
                     newSocialMedia[index] = { ...newSocialMedia[index], account: e.target.value }
                     handleInputChange({ target: { name: "socialMedia", value: newSocialMedia } })
                   }}
-                  placeholder={`${t("form.accountName") || "Account name/handle"}`}
+                  placeholder={t("form.accountName", {
+                    defaultValue: isRTL ? "رابط الحساب" : "Account name/handle",
+                  })}
                 />
                 {index === (formData.socialMedia || [{ platform: "", account: "" }]).length - 1 ? (
                   <button
@@ -340,10 +379,12 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, le
         </div>
       </div>
       {/* Subject Input */}
-      <div className="form-control sm:col-span-2">
-        <div className="flex flex-col gap-1">
-          <label className="label py-1">
-            <span className="label-text text-xs">{t("form.subject")}</span>
+        <div className="form-control sm:col-span-2">
+          <div className="flex flex-col gap-1">
+            <label className="label py-1">
+            <span className="label-text text-xs">
+              {t("form.subject", { defaultValue: isRTL ? "المادة" : "Subject" })}
+            </span>
           </label>
           <select
             name="subject"
@@ -352,7 +393,9 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, le
             onChange={handleSelectChange}
             required
           >
-            <option value="">{t("form.selectSubject")}</option>
+            <option value="">
+              {t("form.selectSubject", { defaultValue: isRTL ? "اختر المادة" : "Select subject" })}
+            </option>
             {subjects.map((subject) => (
               <option key={subject._id || subject.id || subject.name} value={subject._id || subject.id || subject.name}>
                 {subject.name}

@@ -2,19 +2,9 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { getAllGovernments, getGovernmentZones } from "../../routes/governments";
 import { translateErrorMessage } from "../../utils/errorTranslator";
-import {
-  STAGE_KEYS,
-  getGradeOptionsForStage,
-  getStageDisplayName,
-} from "../../utils/levelHierarchy";
+import { getGradeOptionsForStage } from "../../utils/levelHierarchy";
 
-const EMPTY_STAGE_OPTIONS = STAGE_KEYS.map((stageKey) => ({
-  value: stageKey,
-  label: stageKey,
-  raw: { name: stageKey, kind: "stage" },
-}));
-
-export default function Step1({ formData, handleInputChange, t, errors, role, levelHierarchy }) {
+export default function Step1({ formData, handleInputChange, t, errors, role, levelHierarchy, levelsLoading }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [governments, setGovernments] = useState([]);
@@ -23,12 +13,7 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
   const { i18n } = useTranslation();
   const isRTL = i18n.language === "ar";
 
-  const stageOptions = levelHierarchy?.stageOptions?.length
-    ? levelHierarchy.stageOptions
-    : EMPTY_STAGE_OPTIONS.map((stage) => ({
-        ...stage,
-        label: getStageDisplayName(stage.value, i18n.language),
-      }));
+  const stageOptions = levelHierarchy?.stageOptions || [];
 
   const gradeOptions = formData.stage
     ? getGradeOptionsForStage(levelHierarchy, formData.stage)
@@ -113,7 +98,7 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
         <p className="text-xl sm:text-2xl font-semibold mb-2">{t("form.personalDetails")}</p>
         <div className="alert alert-error">
           <span>
-            {t("errors.loadingFailed") || "Failed to load data:"} {error}
+            {t("errors.loadingFailed", { defaultValue: "Failed to load data:" })} {error}
           </span>
         </div>
       </div>
@@ -225,7 +210,9 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
         <div className="form-control relative">
           <div className="flex flex-col gap-1">
             <label className="label py-1">
-              <span className="label-text text-xs">{t("form.government") || "Government"}</span>
+              <span className="label-text text-xs">
+                {t("form.government", { defaultValue: isRTL ? "المحافظة" : "Government" })}
+              </span>
             </label>
             <select
               name="government"
@@ -235,7 +222,13 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
               value={formData.government || ""}
               onChange={handleGovernmentChange}
             >
-              <option value="">{t("form.selectGovernment") || "Select Government"}</option>
+              <option
+                value=""
+              >
+                {t("form.selectGovernment", {
+                  defaultValue: isRTL ? "اختر المحافظة" : "Select Government",
+                })}
+              </option>
               {(Array.isArray(governments) ? governments : []).map((government) => (
                 <option key={government._id} value={government.name}>
                   {government.name}
@@ -244,7 +237,9 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
             </select>
             {errors.government && (
               <span className="absolute bottom-0 text-error text-sm mt-1">
-                {t(`validation.${errors.government}`) || "Government is required"}
+                {t(`validation.${errors.government}`, {
+                  defaultValue: isRTL ? "المحافظة مطلوبة" : "Government is required",
+                })}
               </span>
             )}
           </div>
@@ -254,7 +249,9 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
           <div className="flex flex-col gap-1">
             <label className="label py-1">
               <span className="label-text text-xs">
-                {t("form.administrationZone") || (isRTL ? "الإدارة التعليمية" : "Administration Zone")}
+                {t("form.administrationZone", {
+                  defaultValue: isRTL ? "الإدارة التعليمية" : "Administration Zone",
+                })}
               </span>
             </label>
             <select
@@ -268,8 +265,10 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
             >
               <option value="">
                 {zonesLoading
-                  ? t("common.loading") || "Loading..."
-                  : t("form.selectAdministrationZone") || (isRTL ? "اختر الإدارة التعليمية" : "Select Administration Zone")}
+                  ? t("common.loading", { defaultValue: "Loading..." })
+                  : t("form.selectAdministrationZone", {
+                      defaultValue: isRTL ? "اختر الإدارة التعليمية" : "Select Administration Zone",
+                    })}
               </option>
               {(Array.isArray(administrationZones) ? administrationZones : []).map((zone) => (
                 <option key={zone} value={zone}>
@@ -279,7 +278,9 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
             </select>
             {errors.administrationZone && (
               <span className="absolute bottom-0 text-error text-sm mt-1">
-                {t(`validation.${errors.administrationZone}`) || (isRTL ? "الإدارة التعليمية مطلوبة" : "Administration Zone is required")}
+                {t(`validation.${errors.administrationZone}`, {
+                  defaultValue: isRTL ? "الإدارة التعليمية مطلوبة" : "Administration Zone is required",
+                })}
               </span>
             )}
           </div>
@@ -290,7 +291,9 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
             <div className="form-control relative">
               <div className="flex flex-col gap-1">
                 <label className="label py-1">
-                  <span className="label-text text-xs">{t("form.stage")}</span>
+                  <span className="label-text text-xs">
+                    {t("form.stage", { defaultValue: isRTL ? "المرحلة" : "Stage" })}
+                  </span>
                 </label>
                 <select
                   name="stage"
@@ -309,9 +312,14 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
                       });
                     }
                   }}
+                  disabled={levelsLoading || stageOptions.length === 0}
                   required
                 >
-                  <option value="">{t("form.selectStage")}</option>
+                  <option value="">
+                    {levelsLoading
+                      ? t("form.loadingStages", { defaultValue: isRTL ? "جاري تحميل المراحل..." : "Loading stages..." })
+                      : t("form.selectStage", { defaultValue: isRTL ? "اختر المرحلة" : "Select Stage" })}
+                  </option>
                   {stageOptions.map((stage) => (
                     <option key={stage.value} value={stage.value}>
                       {stage.label}
@@ -329,7 +337,11 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
             <div className="form-control relative">
               <div className="flex flex-col gap-1">
                 <label className="label py-1">
-                  <span className="label-text text-xs">{t("form.gradeLevel") || t("form.grade")}</span>
+                  <span className="label-text text-xs">
+                    {t("form.level", {
+                      defaultValue: isRTL ? "المستوى التعليمي" : "Learning Level",
+                    })}
+                  </span>
                 </label>
                 <select
                   name="level"
@@ -338,13 +350,25 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
                   }`}
                   value={formData.level || ""}
                   onChange={handleInputChange}
-                  disabled={!formData.stage}
+                  disabled={levelsLoading || !formData.stage || gradeOptions.length === 0}
                   required
                 >
                   <option value="">
-                    {!formData.stage
-                      ? t("form.selectStageFirst") || "Select a stage first"
-                      : t("form.selectGradeLevel") || t("form.selectGrade")}
+                    {levelsLoading
+                      ? t("form.loadingGrades", { defaultValue: isRTL ? "جاري تحميل الصفوف..." : "Loading grades..." })
+                      : !formData.stage
+                        ? t("form.selectStageFirst", {
+                            defaultValue: isRTL ? "اختر المرحلة أولاً" : "Select a stage first",
+                          })
+                        : gradeOptions.length === 0
+                          ? t("form.noGradesAvailable", {
+                              defaultValue: isRTL ? "لا توجد صفوف متاحة" : "No grades available",
+                            })
+                          : t("form.selectGradeLevel", {
+                              defaultValue: t("form.selectGrade", {
+                                defaultValue: isRTL ? "اختر المستوى التعليمي" : "Select Learning Level",
+                              }),
+                            })}
                   </option>
                   {gradeOptions.map((level) => (
                     <option key={level.value} value={level.value}>

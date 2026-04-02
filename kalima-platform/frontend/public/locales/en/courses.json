@@ -1,7 +1,7 @@
 {
-    "title": "Platform Courses",
-    "subtitle": "Browse all courses available across the Fekra platform.",
-    "discover": "Discover courses that match your level and goals.",
+    "title": "Explore Courses",
+    "subtitle": "Browse courses available across the Fekra platform.",
+    "discover": "Discover courses that match your goals and pace.",
     "catalogTitle": "Available Courses",
     "noCourses": "No courses available currently",
     "showCourses": "Apply Filters",
@@ -16,8 +16,8 @@
     "lecturer": "Lecturer",
     "filters": {
       "reset": "Reset Filters",
-      "stage": "Academic Stage",
-      "grade": "Grade",
+      "stage": "Learning Level",
+      "grade": "Level",
       "term": "Term",
       "type": "Course Type",
       "status": "Course Status",

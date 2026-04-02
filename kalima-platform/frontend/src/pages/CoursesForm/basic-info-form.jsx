@@ -168,7 +168,7 @@ function BasicInfoForm({
                 />
               </div>
               <div className="relative">
-                <label className="block text-sm font-medium mb-1">{isRTL ? "المرحلة الدراسية" : "Grade Level"}</label>
+                <label className="block text-sm font-medium mb-1">{isRTL ? "المستوى التعليمي" : "Learning Level"}</label>
                 <select
                   name="gradeLevel"
                   value={formData.gradeLevel}

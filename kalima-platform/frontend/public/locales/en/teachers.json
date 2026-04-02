@@ -1,9 +1,9 @@
 {
   "pageTitle": "Our Teachers",
-  "discoverTeachers": "Discover Your Favorite Teachers Now!",
+  "discoverTeachers": "Discover the right educators for you",
   "defaultSubject": "Teacher",
   "defaultExperience": "Extensive teaching experience",
-  "allGrades": "All Grade Levels",
+  "allGrades": "All Levels",
   "hero": {
     "quickMatch": "Find the right teacher quickly by name and subject."
   },
@@ -12,7 +12,7 @@
     "activeFilters": "{{count}} active filters"
   },
   "filters": {
-    "stage": "Educational Stage",
+    "stage": "Learning Level",
     "subject": "Subject",
     "all": "All",
     "select": "Select"

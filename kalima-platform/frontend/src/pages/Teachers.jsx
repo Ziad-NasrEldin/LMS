@@ -22,11 +22,11 @@ export default function Teachers() {
   const isRTL = i18n.language === 'ar';
   useSeo({
     title: isRTL
-      ? "معلمو فكرة التعليمية | اختر المعلم المناسب"
+      ? "معلمو منصة فكرة التعليمية | اختر المعلم المناسب"
       : "Fekra Teachers | Choose the Right Teacher",
     description: isRTL
-      ? "تعرّف على معلمي منصة فكرة التعليمية واختر المعلم المناسب وفق التخصص والخبرة والمرحلة الدراسية."
-      : "Meet Fekra teachers and choose the right one by subject, experience, and school stage.",
+      ? "تعرّف على معلمي منصة فكرة التعليمية، واختر المعلم المناسب وفق التخصص والخبرة والمرحلة الدراسية."
+      : "Meet Fekra teachers and choose the right educator by subject and experience.",
     canonicalPath: "/teachers",
     lang: i18n.language?.startsWith("en") ? "en" : "ar",
     dir: isRTL ? "rtl" : "ltr",

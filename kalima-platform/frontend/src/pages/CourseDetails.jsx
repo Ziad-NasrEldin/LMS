@@ -233,10 +233,10 @@ export default function CourseDetails() {
     String(courseData?.description || "").trim() ||
     (courseData?.subject?.name
       ? isRTL
-        ? `اكتشف دورة ${courseName} في مادة ${courseData.subject.name} على منصة فكرة التعليمية.`
+        ? `اطّلع على تفاصيل دورة ${courseName} في مادة ${courseData.subject.name} على منصة فكرة التعليمية، بما يشمل المحتوى الدراسي والمعلم والمرحلة التعليمية.`
         : `Discover the ${courseName} course in ${courseData.subject.name} on Fekra.`
       : isRTL
-        ? `اكتشف دورة ${courseName} على منصة فكرة التعليمية.`
+        ? `اطّلع على تفاصيل دورة ${courseName} على منصة فكرة التعليمية، بما يشمل المحتوى الدراسي والمعلم والمرحلة التعليمية.`
         : `Discover ${courseData?.name || "this course"} on Fekra.`)
   const seoImage =
     courseData?.image?.url ||
@@ -251,7 +251,7 @@ export default function CourseDetails() {
     courseData
       ? {
           title: isRTL
-            ? `${courseName} | دورات فكرة التعليمية`
+            ? `${courseName} | دورات منصة فكرة التعليمية`
             : `${courseName} | Fekra Courses`,
           description: seoDescription,
           canonicalPath,
@@ -279,7 +279,7 @@ export default function CourseDetails() {
       : {
           title: isRTL ? "تفاصيل الدورة | منصة فكرة التعليمية" : "Course Details | Fekra",
           description: isRTL
-            ? "اطّلع على تفاصيل الدورات التعليمية المتاحة على منصة فكرة."
+            ? "اطّلع على تفاصيل الدورات التعليمية المتاحة على منصة فكرة التعليمية."
             : "View course details on Fekra.",
           canonicalPath: location.pathname,
           lang: i18n.language?.startsWith("en") ? "en" : "ar",

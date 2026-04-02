@@ -22,7 +22,7 @@ export default function Step3({ formData, toggleHobby, handleOtherHobbyChange, t
                 ${isSelected ? "border-primary bg-primary/10 shadow-sm" : "border-base-300 bg-base-100 hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md"}`}
             >
               <p className="text-sm font-semibold leading-snug text-base-content">
-                {t(`hobbies.${hobby.key}`) || hobby.value}
+                {t(`hobbies.${hobby.key}`, { defaultValue: hobby.value })}
               </p>
             </button>
           )

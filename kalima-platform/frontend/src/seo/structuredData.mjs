@@ -10,6 +10,7 @@ export function buildOrganizationSchema() {
     "@context": "https://schema.org",
     "@type": "Organization",
     name: SITE_NAME_AR,
+    alternateName: "فكرة التعليمية",
     url: SITE_URL,
     logo: buildAbsoluteUrl(DEFAULT_SOCIAL_IMAGE),
   };
@@ -20,6 +21,7 @@ export function buildWebsiteSchema() {
     "@context": "https://schema.org",
     "@type": "WebSite",
     name: SITE_NAME_AR,
+    alternateName: ["فكرة التعليمية", "Fekra"],
     url: SITE_URL,
     inLanguage: "ar",
   };
