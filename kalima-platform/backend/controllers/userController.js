@@ -13,6 +13,7 @@ const StudentLectureAccess = require("../models/studentLectureAccessModel.js");
 const StudentExamSubmission = require("../models/studentExamSubmissionModel.js");
 const Container = require("../models/containerModel.js");
 const Lecture = require("../models/LectureModel.js");
+const Level = require("../models/levelModel.js");
 const Attachment = require("../models/attachmentModel.js");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
@@ -56,8 +57,6 @@ const extractStudentHobby = (studentDoc) => {
 
   return "";
 };
-
-const RESTRICTED_SELF_UPDATE_ROLES = new Set(["student", "parent", "teacher"]);
 
 const getAllUsers = catchAsync(async (req, res, next) => {
   const users = await User.find().select("-password").lean();
@@ -1361,8 +1360,7 @@ const getParentChildrenData = catchAsync(async (req, res, next) => {
 
 /**
  * Update the currently logged in user information
- * Restricts student, parent, and teacher accounts to profile image changes
- * plus the small set of post-signup actions that remain supported here.
+ * Allows users to update their own profile information (except password)
  */
 const updateMe = catchAsync(async (req, res, next) => {
   // 1) Check if password is being updated
@@ -1376,46 +1374,52 @@ const updateMe = catchAsync(async (req, res, next) => {
   const userId = req.user._id;
   const userRole = req.user.role;
   const normalizedUserRole = String(userRole || "").trim().toLowerCase();
-  const isRestrictedSelfUpdateRole = RESTRICTED_SELF_UPDATE_ROLES.has(normalizedUserRole);
 
   // 3) Filter out unwanted fields that shouldn't be updated
-  const allowedFields = new Set(["profilePic", "referralSerial"]);
-  if (!isRestrictedSelfUpdateRole) {
-    ["name", "email", "phoneNumber", "address"].forEach((field) => allowedFields.add(field));
-  }
-  if (normalizedUserRole === "parent") {
-    allowedFields.add("children");
-  }
-  if (normalizedUserRole === "lecturer") {
-    allowedFields.add("bio");
-    allowedFields.add("expertise");
-  }
-
-  const disallowedFields = Object.keys(req.body).filter((field) => !allowedFields.has(field));
-  if (disallowedFields.length > 0) {
-    return next(
-      new AppError(
-        "This account cannot edit registration details from this page.",
-        400
-      )
-    );
-  }
-
   const filteredBody = {};
-  allowedFields.forEach((field) => {
-    if (req.body[field] !== undefined) {
+  const allowedFields = ['name', 'email', 'phoneNumber', 'address', 'referralSerial', 'profilePic'];
+  if (normalizedUserRole === "student") {
+    allowedFields.push("hobby", "level");
+  }
+
+  // Only copy allowed fields from req.body to filteredBody
+  Object.keys(req.body).forEach(field => {
+    if (allowedFields.includes(field)) {
       filteredBody[field] = req.body[field];
     }
   });
 
-  const currentUser = await User.findById(userId).select("profilePic referredBy userSerial").lean();
-  if (!currentUser) {
-    return next(new AppError("User not found", 404));
+  if (normalizedUserRole === "student" && filteredBody.hobby === undefined && req.body.hobbies !== undefined) {
+    if (Array.isArray(req.body.hobbies)) {
+      filteredBody.hobby = req.body.hobbies[0];
+    } else {
+      filteredBody.hobby = req.body.hobbies;
+    }
+  }
+
+  if (normalizedUserRole === "student" && filteredBody.hobby !== undefined) {
+    const normalizedHobby = normalizeStudentHobby(filteredBody.hobby);
+    if (!normalizedHobby) {
+      delete filteredBody.hobby;
+    } else {
+      filteredBody.hobby = normalizedHobby;
+    }
+  }
+
+  if (normalizedUserRole === "student" && filteredBody.level !== undefined) {
+    if (!mongoose.Types.ObjectId.isValid(filteredBody.level)) {
+      return next(new AppError("Invalid level id", 400));
+    }
+    const levelExists = await Level.exists({ _id: filteredBody.level });
+    if (!levelExists) {
+      return next(new AppError("There is no level with this id", 404));
+    }
   }
 
   // Handle profile picture upload (if file is present)
   if (req.file && req.file.fieldname === "profilePic") {
     // Delete old profile picture if it exists
+    const currentUser = await User.findById(userId).select('profilePic referredBy userSerial');
     if (currentUser && currentUser.profilePic && fs.existsSync(currentUser.profilePic)) {
       try {
         fs.unlinkSync(currentUser.profilePic);
@@ -1425,6 +1429,9 @@ const updateMe = catchAsync(async (req, res, next) => {
       }
     }
     filteredBody.profilePic = req.file.path;
+  } else {
+    // If not uploading a new profilePic, still need currentUser for referral logic
+    var currentUser = await User.findById(userId).select('referredBy userSerial');
   }
 
   // Handle referralSerial update: allow user to set referredBy if not already set
@@ -1446,8 +1453,6 @@ const updateMe = catchAsync(async (req, res, next) => {
       return next(new AppError("Referral code already set and cannot be changed.", 400));
     }
   }
-
-  delete filteredBody.referralSerial;
 
   // Handle special case for Parent role - adding children by sequenced ID
   if (normalizedUserRole === "parent" && req.body.children) {

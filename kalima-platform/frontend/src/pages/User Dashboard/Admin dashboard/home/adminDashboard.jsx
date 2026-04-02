@@ -52,16 +52,6 @@ const AdminDashboard = () => {
 
         <Hero />
         <UserManagementTable />
-
-        {/* Decorative elements */}
-        <div className="pointer-events-none">
-          <img alt="" src="/rDots.png" 
-               className="absolute h-32 w-20 left-16 bottom-20 max-sm:left-0 animate-float-up-dottedball opacity-40 mix-blend-multiply" />
-        </div>
-        <div className="pointer-events-none">
-          <img alt="" src="/bDots.png" 
-               className="absolute h-32 w-20 right-16 bottom-44 max-sm:bottom-72 max-sm:right-0 animate-float-down-dottedball opacity-40 mix-blend-multiply" />
-        </div>
       </div>
     </div>
   );

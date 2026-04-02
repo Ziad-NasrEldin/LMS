@@ -13,7 +13,7 @@ import NavigationButtons from "./NavigationButtons"
 import { Link, useNavigate } from "react-router-dom"
 import axios from "axios"
 import { getAllLevels } from "../../routes/levels"
-import { buildLevelHierarchy, getGradeOptionsForStage } from "../../utils/levelHierarchy"
+import { buildLevelHierarchy } from "../../utils/levelHierarchy"
 import { designTokens } from "../../constants/designTokens"
 import { translateErrorMessage } from "../../utils/errorTranslator"
 import {
@@ -59,7 +59,6 @@ export default function StudentRegistration() {
     phoneNumber2: "",
     gender: "",
     faction: "Alpha",
-    stage: "",
     level: [],
     hobbies: [],
     otherHobbyText: "",
@@ -78,7 +77,7 @@ export default function StudentRegistration() {
   })
   const [errors, setErrors] = useState({})
   const [apiError, setApiError] = useState(null)
-  const [levelsLoading, setLevelsLoading] = useState(true)
+  const [gradeLevels, setGradeLevels] = useState([])
   const [levelHierarchy, setLevelHierarchy] = useState({
     levels: [],
     activeLevels: [],
@@ -115,7 +114,6 @@ export default function StudentRegistration() {
       if (role === "student" && (!formData.level || (Array.isArray(formData.level) && formData.level.length === 0))) {
         errors.level = "required"
       }
-
     }
 
     if (step === 2) {
@@ -149,24 +147,6 @@ export default function StudentRegistration() {
 
       if (role === "parent" && !formData.profession?.trim()) {
         errors.profession = "professionRequired"
-      }
-
-      if (role === "parent") {
-        if (!formData.stage) {
-          errors.stage = "stageRequired"
-        }
-
-        if (!formData.level) {
-          errors.level = "levelRequired"
-        } else if (formData.stage) {
-          const parentGradeOptions = getGradeOptionsForStage(levelHierarchy, formData.stage)
-          if (
-            parentGradeOptions.length > 0 &&
-            !parentGradeOptions.some((option) => String(option.value) === String(formData.level))
-          ) {
-            errors.level = "levelStageMismatch"
-          }
-        }
       }
 
 
@@ -229,16 +209,14 @@ export default function StudentRegistration() {
   useEffect(() => {
     const fetchLevels = async () => {
       try {
-        setLevelsLoading(true)
         const response = await getAllLevels()
         if (response.success) {
           const hierarchy = response.hierarchy || buildLevelHierarchy(response.data || [], i18n.language)
           setLevelHierarchy(hierarchy)
+          setGradeLevels(hierarchy.gradeOptions || [])
         }
       } catch (error) {
         console.error("Error fetching levels:", error)
-      } finally {
-        setLevelsLoading(false)
       }
     }
 
@@ -518,7 +496,6 @@ export default function StudentRegistration() {
                   errors={errors}
                   role={role}
                   levelHierarchy={levelHierarchy}
-                  levelsLoading={levelsLoading}
                 />
               )
             case 2:
@@ -550,7 +527,6 @@ export default function StudentRegistration() {
                   errors={errors}
                   role={role}
                   levelHierarchy={levelHierarchy}
-                  levelsLoading={levelsLoading}
                 />
               )
             case 2:
@@ -560,8 +536,8 @@ export default function StudentRegistration() {
                   handleChildrenChange={handleChildrenChange}
                   handleInputChange={handleInputChange}
                   t={t}
+                  gradeLevels={gradeLevels}
                   levelHierarchy={levelHierarchy}
-                  levelsLoading={levelsLoading}
                   errors={errors}
                 />
               )
@@ -581,7 +557,6 @@ export default function StudentRegistration() {
                   errors={errors}
                   role={role}
                   levelHierarchy={levelHierarchy}
-                  levelsLoading={levelsLoading}
                 />
               )
             case 2:
@@ -591,8 +566,8 @@ export default function StudentRegistration() {
                   handleInputChange={handleInputChange}
                   t={t}
                   errors={errors}
+                  gradeLevels={gradeLevels}
                   levelHierarchy={levelHierarchy}
-                  levelsLoading={levelsLoading}
                 />
               )
             case 3:
@@ -615,12 +590,7 @@ export default function StudentRegistration() {
     setCurrentStep(1)
     setErrors({})
     setApiError(null)
-    setFormData((prev) => ({
-      ...prev,
-      role: selectedRole,
-      stage: "",
-      level: selectedRole === "teacher" ? [] : "",
-    }))
+    setFormData((prev) => ({ ...prev, role: selectedRole }))
   }
 
   return (

@@ -1,6 +1,6 @@
 import * as XLSX from "xlsx";
 
-const CSV_BOM = "\uFEFF";
+const CSV_BOM_BYTES = new Uint8Array([0xef, 0xbb, 0xbf]);
 
 export const isArabicLanguage = (language) =>
   String(language || "").toLowerCase().startsWith("ar");
@@ -87,8 +87,12 @@ const downloadBlob = (blob, fileName) => {
 export const exportCsvFile = ({ rows = [], columns = [], fileName }) => {
   const [header, ...body] = rowsToAoa({ rows, columns });
   const csvRows = [header, ...body].map((row) => row.map(escapeCsvCell).join(","));
-  const csvContent = `${CSV_BOM}${csvRows.join("\n")}`;
-  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  const csvContent = csvRows.join("\r\n");
+  const encodedCsv = new TextEncoder().encode(csvContent);
+  const csvBytes = new Uint8Array(CSV_BOM_BYTES.length + encodedCsv.length);
+  csvBytes.set(CSV_BOM_BYTES, 0);
+  csvBytes.set(encodedCsv, CSV_BOM_BYTES.length);
+  const blob = new Blob([csvBytes], { type: "text/csv;charset=utf-8;" });
   downloadBlob(blob, fileName);
 };
 
