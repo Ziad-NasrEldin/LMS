@@ -14,6 +14,9 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
   const isRTL = i18n.language === "ar";
 
   const stageOptions = levelHierarchy?.stageOptions || [];
+  const fieldClass = "h-12 min-h-12 w-full rounded-xl text-base";
+  const inputClass = `input input-bordered ${fieldClass}`;
+  const selectClass = `select select-bordered ${fieldClass} ps-4 pe-10`;
 
   const gradeOptions = formData.stage
     ? getGradeOptionsForStage(levelHierarchy, formData.stage)
@@ -108,7 +111,7 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
   return (
     <div className="space-y-2">
       <p className="text-xl sm:text-2xl font-semibold mb-2">{t("form.personalDetails")}</p>
-      <div className="grid grid-cols-1 gap-x-4 gap-y-1 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-x-4 gap-y-3 sm:grid-cols-2">
         <div className="form-control relative">
           <div className="flex flex-col gap-1">
             <label className="label py-1">
@@ -117,7 +120,7 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
             <input
               type="text"
               name="fullName"
-              className={`input input-bordered w-full ${
+              className={`${inputClass} ${
                 errors.fullName ? "input-error animate-shake" : ""
               }`}
               value={formData.fullName}
@@ -125,7 +128,7 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
               required
             />
             {errors.fullName && (
-              <span className="absolute bottom-0 text-error text-sm mt-1">
+              <span className="text-error text-sm mt-1">
                 {t(`validation.${errors.fullName}`)}
               </span>
             )}
@@ -139,7 +142,7 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
             </label>
             <select
               name="gender"
-              className={`select select-bordered w-full ${
+              className={`${selectClass} ${
                 errors.gender ? "select-error animate-shake" : ""
               }`}
               value={formData.gender}
@@ -163,7 +166,7 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
               name="phoneNumber"
               value={formData.phoneNumber}
               onChange={handleInputChange}
-              className={`input input-bordered w-full ${
+              className={`${inputClass} ${
                 errors.phoneNumber ? "input-error animate-shake" : ""
               }`}
               inputMode="tel"
@@ -172,7 +175,7 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
               required
             />
             {errors.phoneNumber && (
-              <span className="absolute bottom-0 text-error text-sm mt-1">
+              <span className="text-error text-sm mt-1">
                 {t(`validation.${errors.phoneNumber}`)}
               </span>
             )}
@@ -190,7 +193,7 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
                 name="phoneNumber2"
                 value={formData.phoneNumber2}
                 onChange={handleInputChange}
-                className="input input-bordered w-full"
+                className={inputClass}
                 inputMode="tel"
                 dir="ltr"
                 autoComplete="tel"
@@ -216,7 +219,7 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
             </label>
             <select
               name="government"
-              className={`select select-bordered w-full ${
+              className={`${selectClass} ${
                 errors.government ? "select-error animate-shake" : ""
               }`}
               value={formData.government || ""}
@@ -236,7 +239,7 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
               ))}
             </select>
             {errors.government && (
-              <span className="absolute bottom-0 text-error text-sm mt-1">
+              <span className="text-error text-sm mt-1">
                 {t(`validation.${errors.government}`, {
                   defaultValue: isRTL ? "المحافظة مطلوبة" : "Government is required",
                 })}
@@ -257,7 +260,7 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
             <select
               disabled={!formData.government || zonesLoading}
               name="administrationZone"
-              className={`select select-bordered w-full ${
+              className={`${selectClass} ${
                 errors.administrationZone ? "select-error animate-shake" : ""
               }`}
               value={formData.administrationZone || ""}
@@ -277,7 +280,7 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
               ))}
             </select>
             {errors.administrationZone && (
-              <span className="absolute bottom-0 text-error text-sm mt-1">
+              <span className="text-error text-sm mt-1">
                 {t(`validation.${errors.administrationZone}`, {
                   defaultValue: isRTL ? "الإدارة التعليمية مطلوبة" : "Administration Zone is required",
                 })}
@@ -297,7 +300,7 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
                 </label>
                 <select
                   name="stage"
-                  className={`select select-bordered w-full ${
+                  className={`${selectClass} ${
                     errors.stage ? "select-error animate-shake" : ""
                   }`}
                   value={formData.stage || ""}
@@ -327,7 +330,7 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
                   ))}
                 </select>
                 {errors.stage && (
-                  <span className="absolute bottom-0 text-error text-sm mt-1">
+                  <span className="text-error text-sm mt-1">
                     {t(`validation.${errors.stage}`)}
                   </span>
                 )}
@@ -345,7 +348,7 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
                 </label>
                 <select
                   name="level"
-                  className={`select select-bordered w-full ${
+                  className={`${selectClass} ${
                     errors.level ? "select-error animate-shake" : ""
                   }`}
                   value={formData.level || ""}
@@ -377,7 +380,7 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
                   ))}
                 </select>
                 {errors.level && (
-                  <span className="absolute bottom-0 text-error text-sm mt-1">
+                  <span className="text-error text-sm mt-1">
                     {t(`validation.${errors.level}`)}
                   </span>
                 )}

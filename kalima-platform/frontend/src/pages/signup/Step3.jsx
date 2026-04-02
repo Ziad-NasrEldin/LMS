@@ -2,6 +2,7 @@
 
 export default function Step3({ formData, toggleHobby, handleOtherHobbyChange, t, hobbiesList, errors }) {
   const isOtherSelected = formData.hobbies.includes("other")
+  const inputClass = "input input-bordered h-12 min-h-12 w-full rounded-xl text-base"
 
   return (
     <div className="space-y-4">
@@ -42,7 +43,7 @@ export default function Step3({ formData, toggleHobby, handleOtherHobbyChange, t
             value={formData.otherHobbyText}
             onChange={(e) => handleOtherHobbyChange(e.target.value)}
             placeholder={t("form.otherHobbyPlaceholder")}
-            className={`input input-bordered w-full ${errors?.otherHobbyText ? "input-error" : ""}`}
+            className={`${inputClass} ${errors?.otherHobbyText ? "input-error" : ""}`}
           />
           {errors?.otherHobbyText && <p className="text-error text-sm">{t(`validation.${errors.otherHobbyText}`)}</p>}
         </div>

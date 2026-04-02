@@ -13,6 +13,9 @@ export default function StepParent({ formData, handleChildrenChange, t, errors, 
     const isRTL = i18n.language === "ar";
     const stageOptions = levelHierarchy?.stageOptions || [];
     const gradeOptions = formData.stage ? getGradeOptionsForStage(levelHierarchy, formData.stage) : [];
+    const fieldClass = "h-12 min-h-12 w-full rounded-xl text-base";
+    const inputClass = `input input-bordered ${fieldClass}`;
+    const selectClass = `select select-bordered ${fieldClass} ps-4 pe-10`;
     // Ensure we have enough empty slots for all children
     const safeChildren = [...formData.children, ...Array(childrenCount - formData.children.length).fill('')];
 
@@ -46,7 +49,7 @@ export default function StepParent({ formData, handleChildrenChange, t, errors, 
                     <input
                         type="email"
                         name="email"
-                        className={`input input-bordered w-full ${errors.email ? 'input-error animate-shake' : ''}`}
+                        className={`${inputClass} ${errors.email ? 'input-error animate-shake' : ''}`}
                         value={formData.email || ''}
                         onChange={handleInputChange}
                         placeholder="email@example.com"
@@ -70,7 +73,7 @@ export default function StepParent({ formData, handleChildrenChange, t, errors, 
                         <input
                             type={showPassword ? 'text' : 'password'}
                             name="password"
-                             className={`input input-bordered w-full ${i18n.language === 'ar' ? 'pr-12' : 'pl-12'} ${errors.password ? 'input-error animate-shake' : ''}`}
+                             className={`${inputClass} ${i18n.language === 'ar' ? 'pr-12' : 'pl-12'} ${errors.password ? 'input-error animate-shake' : ''}`}
                             value={formData.password || ''}
                             onChange={handleInputChange}
                             required
@@ -102,7 +105,7 @@ export default function StepParent({ formData, handleChildrenChange, t, errors, 
                         <input
                             type={showConfirmPassword ? 'text' : 'password'}
                             name="confirmPassword"
-                            className={`input input-bordered w-full ${i18n.language === 'ar' ? 'pr-12' : 'pl-12'} ${errors.confirmPassword ? 'input-error animate-shake' : ''}`}
+                            className={`${inputClass} ${i18n.language === 'ar' ? 'pr-12' : 'pl-12'} ${errors.confirmPassword ? 'input-error animate-shake' : ''}`}
                             value={formData.confirmPassword || ''}
                             onChange={handleInputChange}
                             required
@@ -133,7 +136,7 @@ export default function StepParent({ formData, handleChildrenChange, t, errors, 
                     </label>
                     <select
                         name="stage"
-                        className={`select select-bordered w-full ${errors.stage ? 'select-error animate-shake' : ''}`}
+                        className={`${selectClass} ${errors.stage ? 'select-error animate-shake' : ''}`}
                         value={formData.stage || ''}
                         onChange={(e) => {
                             handleInputChange(e);
@@ -183,7 +186,7 @@ export default function StepParent({ formData, handleChildrenChange, t, errors, 
                     </label>
                     <select
                         name="level"
-                        className={`select select-bordered w-full ${errors.level ? 'select-error animate-shake' : ''}`}
+                        className={`${selectClass} ${errors.level ? 'select-error animate-shake' : ''}`}
                         value={formData.level || ''}
                         onChange={handleInputChange}
                         disabled={levelsLoading || !formData.stage || gradeOptions.length === 0}
@@ -217,7 +220,7 @@ export default function StepParent({ formData, handleChildrenChange, t, errors, 
                         
                     </select>
                     {errors.level && (
-              <span className="absolute bottom-0  text-error text-sm mt-1">
+              <span className="text-error text-sm mt-1">
                  {t(`validation.${errors.level}`)}
               </span>
             )}
@@ -232,7 +235,7 @@ export default function StepParent({ formData, handleChildrenChange, t, errors, 
                     <input
                         type="text"
                         name="profession"
-                        className={`input input-bordered w-full ${errors.profession ? 'input-error animate-shake' : ''}`}
+                        className={`${inputClass} ${errors.profession ? 'input-error animate-shake' : ''}`}
                         value={formData.profession || ''}
                         onChange={handleInputChange}
                         required
@@ -256,7 +259,7 @@ export default function StepParent({ formData, handleChildrenChange, t, errors, 
                         </label>
                                 <input
                                 type="text"
-                                className={`input input-bordered w-full ${errors.children?.[i] ? 'input-error animate-shake' : ''}`}
+                                className={`${inputClass} ${errors.children?.[i] ? 'input-error animate-shake' : ''}`}
                                 value={child || ''}
                                 onChange={(e) => handleChildrenChange(i, e.target.value)}
                                 placeholder="5f7d8e3a1c9d440000d4a7b2"
@@ -276,7 +279,7 @@ export default function StepParent({ formData, handleChildrenChange, t, errors, 
 
             <button
                 type="button"
-                className="btn btn-sm btn-outline"
+                className="btn btn-outline h-12 min-h-12 rounded-xl px-5 text-base font-semibold"
                 onClick={() => setChildrenCount(prev => prev + 1)}
                 disabled={childrenCount >= 10} // Reasonable limit
             >

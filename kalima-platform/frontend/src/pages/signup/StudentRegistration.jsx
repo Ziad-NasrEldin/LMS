@@ -36,6 +36,7 @@ const hobbiesList = [
   { id: "marketing", key: "marketing", value: "Marketing" },
   { id: "other", key: "other", value: "Other" },
 ]
+const PARENT_RELATIONS = ["mother", "father", "other"]
 
 const totalSteps = {
   student: 4,
@@ -63,6 +64,10 @@ export default function StudentRegistration() {
     hobbies: [],
     otherHobbyText: "",
     parentPhoneNumber: "",
+    parentPhoneRelation: "",
+    parentPhoneNumber2: "",
+    parentPhoneRelation2: "",
+    hasAdditionalParentPhone: false,
     profession: "",
     children: [""],
     subject: "",
@@ -139,6 +144,45 @@ export default function StudentRegistration() {
         errors.parentPhoneNumber = "parentPhoneRequired"
       } else if (role === "student" && !isValidEgyptianPhoneNumber(formData.parentPhoneNumber)) {
         errors.parentPhoneNumber = "phoneInvalid"
+      }
+
+      const hasPrimaryParentPhone = Boolean(String(formData.parentPhoneNumber || "").trim())
+
+      if (role === "student" && hasPrimaryParentPhone && !formData.parentPhoneRelation) {
+        errors.parentPhoneRelation = "parentRelationRequired"
+      } else if (
+        role === "student" &&
+        hasPrimaryParentPhone &&
+        !PARENT_RELATIONS.includes(String(formData.parentPhoneRelation || "").trim().toLowerCase())
+      ) {
+        errors.parentPhoneRelation = "parentRelationInvalid"
+      }
+
+      const hasAdditionalParentPhoneValue = Boolean(String(formData.parentPhoneNumber2 || "").trim())
+      const hasAdditionalParentRelationValue = Boolean(String(formData.parentPhoneRelation2 || "").trim())
+      const hasAdditionalParentContact =
+        role === "student" &&
+        Boolean(
+          formData.hasAdditionalParentPhone ||
+            hasAdditionalParentPhoneValue ||
+            hasAdditionalParentRelationValue,
+        )
+
+      if (hasAdditionalParentContact) {
+        if (!hasAdditionalParentPhoneValue) {
+          errors.parentPhoneNumber2 = "additionalParentPhoneRequired"
+        } else if (!isValidEgyptianPhoneNumber(formData.parentPhoneNumber2)) {
+          errors.parentPhoneNumber2 = "phoneInvalid"
+        }
+
+        if (hasAdditionalParentPhoneValue && !formData.parentPhoneRelation2) {
+          errors.parentPhoneRelation2 = "additionalParentRelationRequired"
+        } else if (
+          hasAdditionalParentPhoneValue &&
+          !PARENT_RELATIONS.includes(String(formData.parentPhoneRelation2 || "").trim().toLowerCase())
+        ) {
+          errors.parentPhoneRelation2 = "additionalParentRelationInvalid"
+        }
       }
 
       if (role === "teacher" && formData.phoneNumber2 && !isValidEgyptianPhoneNumber(formData.phoneNumber2)) {
@@ -266,25 +310,61 @@ export default function StudentRegistration() {
 
   const handleInputChange = (e) => {
     try {
-      const { name, value, type, files } = e.target;
-      const nextValue = ["phoneNumber", "phoneNumber2", "parentPhoneNumber"].includes(name)
+      const { name, value, type, files } = e.target
+      const nextValue = ["phoneNumber", "phoneNumber2", "parentPhoneNumber", "parentPhoneNumber2"].includes(name)
         ? sanitizeEgyptianPhoneInput(value)
-        : value;
+        : value
 
-      setFormData((prev) => ({
-        ...prev,
-        [name]:
-          type === "file"
-            ? files[0]
-            : nextValue,
-      }));
+      setFormData((prev) => {
+        const resolvedValue = type === "file" ? files[0] : nextValue
+        const next = {
+          ...prev,
+          [name]: resolvedValue,
+        }
 
-      setErrors((prev) => ({ ...prev, [name]: undefined }));
+        if (name === "parentPhoneNumber" && !String(resolvedValue || "").trim()) {
+          next.parentPhoneRelation = ""
+        }
+
+        if (name === "parentPhoneNumber2" && !String(resolvedValue || "").trim()) {
+          next.parentPhoneRelation2 = ""
+        }
+
+        return next
+      })
+
+      setErrors((prev) => ({ ...prev, [name]: undefined }))
     } catch (error) {
-      console.error("Error handling input change:", error);
+      console.error("Error handling input change:", error)
       setApiError(translateErrorMessage("Failed to process input"));
     }
-  };
+  }
+
+  const handleAddAdditionalParentPhone = () => {
+    setFormData((prev) => ({
+      ...prev,
+      hasAdditionalParentPhone: true,
+    }))
+    setErrors((prev) => ({
+      ...prev,
+      parentPhoneNumber2: undefined,
+      parentPhoneRelation2: undefined,
+    }))
+  }
+
+  const handleRemoveAdditionalParentPhone = () => {
+    setFormData((prev) => ({
+      ...prev,
+      hasAdditionalParentPhone: false,
+      parentPhoneNumber2: "",
+      parentPhoneRelation2: "",
+    }))
+    setErrors((prev) => ({
+      ...prev,
+      parentPhoneNumber2: undefined,
+      parentPhoneRelation2: undefined,
+    }))
+  }
 
 
   const handleChildrenChange = (index, value) => {
@@ -347,6 +427,27 @@ export default function StudentRegistration() {
           const normalizedParentPhoneNumber = normalizeEgyptianPhoneNumber(formData.parentPhoneNumber)
           if (normalizedParentPhoneNumber) {
             data.append("parentPhoneNumber", normalizedParentPhoneNumber)
+          }
+          const normalizedParentRelation = String(formData.parentPhoneRelation || "").trim().toLowerCase()
+          if (normalizedParentRelation) {
+            data.append("parentPhoneRelation", normalizedParentRelation)
+          }
+
+          const hasAdditionalParentContact = Boolean(
+            formData.hasAdditionalParentPhone ||
+              String(formData.parentPhoneNumber2 || "").trim() ||
+              String(formData.parentPhoneRelation2 || "").trim(),
+          )
+          if (hasAdditionalParentContact) {
+            const normalizedParentPhoneNumber2 = normalizeEgyptianPhoneNumber(formData.parentPhoneNumber2)
+            if (normalizedParentPhoneNumber2) {
+              data.append("parentPhoneNumber2", normalizedParentPhoneNumber2)
+            }
+
+            const normalizedParentRelation2 = String(formData.parentPhoneRelation2 || "").trim().toLowerCase()
+            if (normalizedParentRelation2) {
+              data.append("parentPhoneRelation2", normalizedParentRelation2)
+            }
           }
 
           const selectedHobbies = formData.hobbies
@@ -499,7 +600,16 @@ export default function StudentRegistration() {
                 />
               )
             case 2:
-              return <Step2 formData={formData} handleInputChange={handleInputChange} t={t} errors={errors} />
+              return (
+                <Step2
+                  formData={formData}
+                  handleInputChange={handleInputChange}
+                  handleAddAdditionalParentPhone={handleAddAdditionalParentPhone}
+                  handleRemoveAdditionalParentPhone={handleRemoveAdditionalParentPhone}
+                  t={t}
+                  errors={errors}
+                />
+              )
             case 3:
               return (
                 <Step3
@@ -732,7 +842,7 @@ export default function StudentRegistration() {
                 </div>
               )}
 
-              <div className="mt-5 max-h-none overflow-visible pe-0 lg:mt-6 lg:max-h-[46vh] lg:overflow-y-auto lg:pe-1 scrollbar-hide">
+              <div className="mt-5 max-h-[50vh] overflow-y-auto pe-1 sm:max-h-[54vh] lg:mt-6 lg:max-h-[46vh]">
                 {renderStepContent()}
               </div>
 

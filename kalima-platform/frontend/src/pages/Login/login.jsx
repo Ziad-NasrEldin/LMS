@@ -332,7 +332,7 @@ const TeacherLogin = () => {
                         value={formData.email}
                         onChange={handleInputChange}
                         placeholder={t("emailPlaceholder", "youremail@example.com")}
-                        className={`input input-bordered input-sm w-full bg-base-200/70 ${
+                        className={`input input-bordered input-md w-full bg-base-200/70 text-base ${
                           isRTL ? "pr-12" : "pl-12"
                         }`}
                         required
@@ -358,7 +358,7 @@ const TeacherLogin = () => {
                         value={formData.phoneNumber}
                         onChange={handleInputChange}
                         placeholder={t("phonePlaceholder", "01234567890")}
-                        className={`input input-bordered input-sm w-full bg-base-200/70 ${
+                        className={`input input-bordered input-md w-full bg-base-200/70 text-base ${
                           isRTL ? "pr-12" : "pl-12"
                         }`}
                         required
@@ -393,23 +393,23 @@ const TeacherLogin = () => {
                       value={formData.password}
                       onChange={handleInputChange}
                       placeholder={t("passwordPlaceholder", "••••••••")}
-                      className={`input input-bordered input-sm w-full bg-base-200/70 ${
+                      className={`password-toggle-input relative z-0 input input-bordered input-md w-full bg-base-200/70 text-base ${
                         isRTL ? "pr-24" : "pl-12"
                       } ${isRTL ? "pl-12" : "pr-24"}`}
                       required
                     />
                     <Lock
-                      className={`pointer-events-none absolute top-1/2 h-4 w-4 -translate-y-1/2 text-base-content/50 ${
+                      className={`pointer-events-none absolute top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-base-content/50 ${
                         isRTL ? "right-4" : "left-4"
                       }`}
                     />
                     <button
                       type="button"
-                      className={`absolute top-1/2 -translate-y-1/2 text-base-content/60 hover:text-base-content ${
+                      className={`password-toggle-button absolute top-1/2 z-20 -translate-y-1/2 rounded-full p-1 text-base-content/60 hover:text-base-content ${
                         isRTL ? "left-4" : "right-4"
                       }`}
                       onClick={() => setShowPassword((prev) => !prev)}
-                      tabIndex={-1}
+                      aria-label={showPassword ? t("hidePassword", "Hide password") : t("showPassword", "Show password")}
                     >
                       {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                     </button>
@@ -432,21 +432,6 @@ const TeacherLogin = () => {
                 >
                   {loading ? t("loggingIn", "Logging in...") : t("login", "Log In")}
                 </button>
-
-                <div className="flex items-center gap-3 text-xs uppercase tracking-widest text-base-content/45">
-                  <span className="h-px flex-1 bg-base-300" />
-                  {t("continueWith", "Or continue with")}
-                  <span className="h-px flex-1 bg-base-300" />
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <button type="button" className="btn btn-outline rounded-full">
-                    {t("googleLogin", "Google")}
-                  </button>
-                  <button type="button" className="btn btn-outline rounded-full">
-                    {t("appleLogin", "Apple")}
-                  </button>
-                </div>
 
                 <p className="pt-1 text-center text-sm text-base-content/70">
                   {t("needAccount", "Don't have an account?")} {" "}

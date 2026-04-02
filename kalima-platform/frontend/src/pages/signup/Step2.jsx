@@ -3,6 +3,9 @@ import { Eye, EyeOff, Trash2 } from "lucide-react"
 import { useTranslation } from "react-i18next"
 
 const PARENT_RELATION_OPTIONS = ["mother", "father", "other"]
+const fieldClass = "h-12 min-h-12 w-full rounded-xl text-base"
+const inputClass = `input input-bordered ${fieldClass}`
+const selectClass = `select select-bordered ${fieldClass} ps-4 pe-10`
 
 function ParentContactField({
   title,
@@ -38,7 +41,7 @@ function ParentContactField({
           <button
             type="button"
             onClick={onRemove}
-            className="btn btn-ghost btn-xs gap-2 text-error"
+            className="btn btn-ghost h-10 min-h-10 rounded-xl gap-2 px-3 text-error"
           >
             <Trash2 size={14} />
             {t("buttons.removeParentPhone")}
@@ -55,7 +58,7 @@ function ParentContactField({
             <input
               type="text"
               name={phoneName}
-              className={`input input-bordered w-full ${phoneError ? "input-error animate-shake" : ""}`}
+              className={`${inputClass} ${phoneError ? "input-error animate-shake" : ""}`}
               value={phoneValue || ""}
               onChange={handleInputChange}
               placeholder={phonePlaceholder}
@@ -77,7 +80,7 @@ function ParentContactField({
               </label>
               <select
                 name={relationName}
-                className={`select select-bordered w-full ${relationError ? "select-error animate-shake" : ""}`}
+                className={`${selectClass} ${relationError ? "select-error animate-shake" : ""}`}
                 value={relationValue || ""}
                 onChange={handleInputChange}
                 required
@@ -103,8 +106,8 @@ function ParentContactField({
 export default function Step2({
   formData,
   handleInputChange,
-  handleAddAdditionalParentPhone,
-  handleRemoveAdditionalParentPhone,
+  handleAddAdditionalParentPhone = () => {},
+  handleRemoveAdditionalParentPhone = () => {},
   t,
   errors,
 }) {
@@ -143,7 +146,7 @@ export default function Step2({
           <button
             type="button"
             onClick={handleAddAdditionalParentPhone}
-            className="btn btn-sm btn-outline w-full sm:w-auto"
+            className="btn btn-outline h-12 min-h-12 rounded-xl px-5 text-base font-semibold w-full sm:w-auto"
           >
             {t("buttons.addAnotherParentPhone")}
           </button>
@@ -168,7 +171,7 @@ export default function Step2({
         )}
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-x-4 sm:gap-y-3">
         {/* Email */}
         <div className="form-control">
           <div className="flex flex-col gap-1">
@@ -178,7 +181,7 @@ export default function Step2({
             <input
               type="email"
               name="email"
-              className={`input input-bordered w-full ${errors.email ? "input-error animate-shake" : ""}`}
+              className={`${inputClass} ${errors.email ? "input-error animate-shake" : ""}`}
               value={formData.email || ""}
               onChange={handleInputChange}
               required
@@ -199,7 +202,7 @@ export default function Step2({
               <input
                 type={showPassword ? "text" : "password"}
                 name="password"
-                className={`input input-bordered w-full ${
+                className={`${inputClass} ${
                   i18n.language === "ar" ? "pr-12" : "pl-12"
                 } ${errors.password ? "input-error animate-shake" : ""}`}
                 value={formData.password || ""}
@@ -224,7 +227,7 @@ export default function Step2({
         </div>
 
         {/* Confirm Password */}
-        <div className="form-control relative">
+        <div className="form-control relative sm:col-span-2">
           <div className="flex flex-col gap-1">
             <label className="label py-1">
               <span className="label-text text-xs">{t("form.confirmPassword")}</span>
@@ -233,7 +236,7 @@ export default function Step2({
               <input
                 type={showConfirmPassword ? "text" : "password"}
                 name="confirmPassword"
-                className={`input input-bordered w-full ${
+                className={`${inputClass} ${
                   i18n.language === "ar" ? "pr-12" : "pl-12"
                 } ${errors.confirmPassword ? "input-error animate-shake" : ""}`}
                 value={formData.confirmPassword || ""}

@@ -13,6 +13,10 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, le
   const { i18n } = useTranslation()
   const isRTL = i18n.language === "ar"
   const stageOptions = levelHierarchy?.stageOptions || []
+  const fieldClass = "h-12 min-h-12 w-full rounded-xl text-base"
+  const inputClass = `input input-bordered ${fieldClass}`
+  const selectClass = `select select-bordered ${fieldClass} ps-4 pe-10`
+  const actionButtonClass = "btn btn-outline h-12 min-h-12 w-12 rounded-xl p-0 text-lg leading-none"
 
   useEffect(() => {
     const fetchSubjects = async () => {
@@ -46,7 +50,7 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, le
           <input
             type="email"
             name="email"
-            className={`input input-bordered w-full ${errors.email ? "input-error animate-shake" : ""}`}
+            className={`${inputClass} ${errors.email ? "input-error animate-shake" : ""}`}
             value={formData.email}
             onChange={handleInputChange}
             required
@@ -64,7 +68,7 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, le
               <input
                 type={showPassword ? "text" : "password"}
                 name="password"
-                className={`input input-bordered w-full ${i18n.language === "ar" ? "pr-12" : "pl-12"} ${errors.password ? "input-error animate-shake" : ""}`}
+                className={`${inputClass} ${i18n.language === "ar" ? "pr-12" : "pl-12"} ${errors.password ? "input-error animate-shake" : ""}`}
                 value={formData.password || ""}
                 onChange={handleInputChange}
                 required
@@ -91,7 +95,7 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, le
               <input
                 type={showConfirmPassword ? "text" : "password"}
                 name="confirmPassword"
-                className={`input input-bordered w-full ${i18n.language === "ar" ? "pr-12" : "pl-12"} ${errors.confirmPassword ? "input-error animate-shake" : ""}`}
+                className={`${inputClass} ${i18n.language === "ar" ? "pr-12" : "pl-12"} ${errors.confirmPassword ? "input-error animate-shake" : ""}`}
                 value={formData.confirmPassword || ""}
                 onChange={handleInputChange}
                 required
@@ -174,7 +178,7 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, le
           </label>
           <select
             name="teachesAtType"
-            className={`select select-bordered w-full ${errors.teachesAtType ? "select-error animate-shake" : ""}`}
+            className={`${selectClass} ${errors.teachesAtType ? "select-error animate-shake" : ""}`}
             value={formData.teachesAtType || ""}
             onChange={handleInputChange}
             required
@@ -209,10 +213,10 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, le
             </label>
             <div className="flex flex-col gap-1">
               {(formData.centers || [""]).map((center, index) => (
-                <div key={index} className="flex w-full gap-2 sm:w-2/3 lg:w-1/2">
+                <div key={index} className="flex w-full gap-2">
                   <input
                     type="text"
-                    className={`input input-bordered w-full flex-1 ${errors.centers?.[index] ? "input-error animate-shake" : ""}`}
+                    className={`${inputClass} flex-1 ${errors.centers?.[index] ? "input-error animate-shake" : ""}`}
                     value={center}
                     onChange={(e) => {
                       const newCenters = [...(formData.centers || [""])]
@@ -226,7 +230,7 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, le
                   {index === (formData.centers || [""]).length - 1 ? (
                     <button
                       type="button"
-                      className="btn btn-sm btn-outline h-8 min-h-8 w-9 p-0"
+                      className={actionButtonClass}
                       onClick={() => {
                         const newCenters = [...(formData.centers || [""]), ""]
                         handleInputChange({ target: { name: "centers", value: newCenters } })
@@ -237,7 +241,7 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, le
                   ) : (
                     <button
                       type="button"
-                      className="btn btn-sm btn-outline btn-error h-8 min-h-8 w-9 p-0"
+                      className={`${actionButtonClass} btn-error`}
                       onClick={() => {
                         const newCenters = (formData.centers || [""]).filter((_, i) => i !== index)
                         handleInputChange({ target: { name: "centers", value: newCenters } })
@@ -272,7 +276,7 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, le
             <input
               type="text"
               name="school"
-              className={`input input-bordered w-full ${errors.school ? "input-error animate-shake" : ""}`}
+              className={`${inputClass} ${errors.school ? "input-error animate-shake" : ""}`}
               value={formData.school || ""}
               onChange={handleInputChange}
               placeholder={t("form.schoolName", { defaultValue: isRTL ? "اسم المدرسة" : "School name" })}
@@ -301,10 +305,10 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, le
             {(formData.socialMedia || [{ platform: "", account: "" }]).map((social, index) => (
               <div
                 key={index}
-                className="grid grid-cols-1 gap-2 sm:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)_2.25rem] sm:items-center"
+                className="grid grid-cols-1 gap-2 sm:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)_3rem] sm:items-center"
               >
                 <select
-                  className={`select select-bordered w-full ${errors.socialMedia?.[index]?.platform ? "select-error animate-shake" : ""}`}
+                  className={`${selectClass} ${errors.socialMedia?.[index]?.platform ? "select-error animate-shake" : ""}`}
                   value={social.platform || ""}
                   onChange={(e) => {
                     const newSocialMedia = [...(formData.socialMedia || [{ platform: "", account: "" }])]
@@ -334,7 +338,7 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, le
                 </select>
                 <input
                   type="text"
-                  className={`input input-bordered w-full placeholder:text-base-content/65 ${errors.socialMedia?.[index]?.account ? "input-error animate-shake" : ""}`}
+                  className={`${inputClass} placeholder:text-base-content/65 ${errors.socialMedia?.[index]?.account ? "input-error animate-shake" : ""}`}
                   value={social.account || ""}
                   onChange={(e) => {
                     const newSocialMedia = [...(formData.socialMedia || [{ platform: "", account: "" }])]
@@ -348,7 +352,7 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, le
                 {index === (formData.socialMedia || [{ platform: "", account: "" }]).length - 1 ? (
                   <button
                     type="button"
-                    className="btn btn-sm btn-outline h-8 min-h-8 w-9 p-0"
+                    className={actionButtonClass}
                     onClick={() => {
                       const newSocialMedia = [
                         ...(formData.socialMedia || [{ platform: "", account: "" }]),
@@ -362,7 +366,7 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, le
                 ) : (
                   <button
                     type="button"
-                    className="btn btn-sm btn-outline btn-error h-8 min-h-8 w-9 p-0"
+                    className={`${actionButtonClass} btn-error`}
                     onClick={() => {
                       const newSocialMedia = (formData.socialMedia || [{ platform: "", account: "" }]).filter(
                         (_, i) => i !== index,
@@ -388,7 +392,7 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, le
           </label>
           <select
             name="subject"
-            className={`select select-bordered w-full ${errors.subject ? "select-error animate-shake" : ""}`}
+            className={`${selectClass} ${errors.subject ? "select-error animate-shake" : ""}`}
             value={formData.subject}
             onChange={handleSelectChange}
             required

@@ -249,6 +249,25 @@ export default function AdminCreate() {
     }
   }
 
+  const handleDeleteSubject = async (subjectId) => {
+    if (window.confirm(t("confirmations.deleteSubject"))) {
+      try {
+        const response = await deleteSubject(subjectId)
+        if (response.success) {
+          setSuccess(t("success.subjectDeleted"))
+          const updatedSubjects = await getAllSubjects()
+          if (updatedSubjects.success) {
+            setSubjects(updatedSubjects.data || [])
+          }
+        } else {
+          setError(translateErrorMessage(response.error || t("errors.deleteSubject")))
+        }
+      } catch (err) {
+        setError(t("errors.deleteSubject"))
+      }
+    }
+  }
+
   const handleDeleteLevel = async (levelId) => {
     if (window.confirm(t("confirmations.deleteLevel"))) {
       try {

@@ -12,7 +12,7 @@ export default function NavigationButtons({
     <button
       onClick={handlePrev}
       disabled={currentStep === 1 || isLoading}
-      className="btn btn-outline btn-sm sm:btn-md"
+      className="btn btn-outline h-12 min-h-12 rounded-xl px-7 text-base font-semibold"
       type="button"
     >
       {t('buttons.previous')}
@@ -22,7 +22,7 @@ export default function NavigationButtons({
   const nextOrSubmitButton = (
     <button
       onClick={handleNext}
-      className="btn btn-primary btn-sm sm:btn-md"
+      className="btn btn-primary h-12 min-h-12 rounded-xl px-7 text-base font-semibold"
       disabled={isLoading}
       type="button"
     >
