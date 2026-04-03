@@ -242,7 +242,7 @@ export default function CourseDetails() {
     courseData?.image?.url ||
     courseData?.containerImage?.url ||
     courseData?.inheritedImage?.image?.url ||
-    "/Kalima.png"
+    "/Fekra.png"
   const levelName = courseData?.level
     ? resolveLevelDisplayName(courseData.level, i18n.language)
     : ""

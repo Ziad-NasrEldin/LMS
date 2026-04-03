@@ -225,7 +225,7 @@ const NavBar = () => {
             >
               {t("logoText")}
               <img
-                src="/Kalima.png"
+                src="/Fekra.png"
                 alt="Fekra Logo"
                 className="h-4 w-4 shrink-0 scale-[2] object-contain"
               />

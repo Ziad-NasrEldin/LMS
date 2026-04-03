@@ -3,17 +3,17 @@
   "name": "Fekra Educational Platform",
   "icons": [
     {
-      "src": "Kalima.png",
+      "src": "Fekra.png",
       "sizes": "64x64 32x32 24x24 16x16",
       "type": "image/x-icon"
     },
     {
-      "src": "Kalima.png",
+      "src": "Fekra.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "Kalima.png",
+      "src": "Fekra.png",
       "type": "image/png",
       "sizes": "512x512"
     }

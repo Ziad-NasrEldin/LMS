@@ -15,7 +15,7 @@ export const SITE_URL = normalizeBaseUrl(
 export const SITE_NAME_AR = "منصة فكرة التعليمية";
 export const SITE_NAME_EN = "Fekra Educational Platform";
 export const SITE_TITLE_AR = "منصة فكرة التعليمية";
-export const DEFAULT_SOCIAL_IMAGE = "/Kalima.png";
+export const DEFAULT_SOCIAL_IMAGE = "/Fekra.png";
 export const DEFAULT_DESCRIPTION_AR =
   "فكرة منصة تعليم إلكتروني عالمية تقدم دورات وموارد وأدوات تعلم للمتعلمين في مختلف المجالات والمستويات.";
 export const DEFAULT_DESCRIPTION_EN =

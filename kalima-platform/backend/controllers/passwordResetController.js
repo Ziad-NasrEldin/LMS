@@ -55,7 +55,7 @@ exports.requestPasswordReset = catchAsync(async (req, res, next) => {
   
   // Send email using Resend
   try {
-    const fromEmail = 'Kalima Team <noreply@kalima-edu.com>';
+    const fromEmail = 'Fekra Team <noreply@kalima-edu.com>';
 
     otpDebugLog('Sending password reset OTP to:', email);
     

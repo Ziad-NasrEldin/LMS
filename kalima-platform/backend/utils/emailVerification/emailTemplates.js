@@ -10,12 +10,12 @@ const EMAIL_CONTENT = {
     subject: "رمز التحقق من البريد الإلكتروني",
     headerTitle: "تأكيد البريد الإلكتروني",
     intro:
-      "أهلًا بك في منصة كلمة. استخدم الرمز التالي لإكمال تأكيد بريدك الإلكتروني.",
+      "أهلًا بك في منصة فكرة. استخدم الرمز التالي لإكمال تأكيد بريدك الإلكتروني.",
     otpLabel: "رمز التحقق",
     expiry: "هذا الرمز صالح لمدة 10 دقائق فقط.",
     help:
       "إذا لم تقم بطلب هذا الرمز، يمكنك تجاهل الرسالة بأمان ولن يتم إجراء أي تغيير على حسابك.",
-    footer: "فريق كلمة",
+    footer: "فريق فكرة",
   },
   [EMAIL_TYPES.password_reset]: {
     subject: "رمز إعادة تعيين كلمة المرور",
@@ -26,7 +26,7 @@ const EMAIL_CONTENT = {
     expiry: "هذا الرمز صالح لمدة 10 دقائق فقط.",
     help:
       "إذا لم تقم بطلب إعادة التعيين، يرجى تجاهل هذه الرسالة. يمكنك التواصل مع الدعم إذا لاحظت أي نشاط غير معتاد.",
-    footer: "فريق كلمة",
+    footer: "فريق فكرة",
   },
 };
 
@@ -51,7 +51,7 @@ const buildOtpEmailTemplate = ({ type = EMAIL_TYPES.verification, otp }) => {
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:620px;background:${tokens.colors.white};border-radius:${tokens.radius.section};overflow:hidden;box-shadow:${tokens.shadows.level1};">
             <tr>
               <td style="background:${tokens.gradients.hero};padding:26px 28px;text-align:right;">
-                <p style="margin:0;color:${tokens.colors.lightAquaMist};font-size:13px;line-height:1.4;font-family:${tokens.typography.body};">Kalima</p>
+                <p style="margin:0;color:${tokens.colors.lightAquaMist};font-size:13px;line-height:1.4;font-family:${tokens.typography.body};">Fekra</p>
                 <h1 style="margin:8px 0 0;color:${tokens.colors.white};font-size:30px;line-height:1.25;font-family:${tokens.typography.heading};font-weight:800;">
                   ${content.headerTitle}
                 </h1>

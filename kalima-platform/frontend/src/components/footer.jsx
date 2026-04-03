@@ -25,7 +25,7 @@ export default function Footer() {
           {/* Brand & About */}
           <div className={`col-span-1 space-y-6 ${isRTL ? 'lg:pl-8' : 'lg:pr-8'} md:col-span-2 lg:col-span-1`}>
             <div className={`flex items-center ${isRTL ? 'justify-start' : 'justify-start'}`}>
-              <img src="/Kalima.png" alt="Fekra Logo" className="h-12 w-auto object-contain" />
+              <img src="/Fekra.png" alt="Fekra Logo" className="h-12 w-auto object-contain" />
             </div>
             <p className="text-sm leading-relaxed opacity-80 max-w-sm">
               {t('aboutText')}

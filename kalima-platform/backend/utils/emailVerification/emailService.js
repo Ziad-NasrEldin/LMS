@@ -30,7 +30,7 @@ const sendEmail = async (to, subject, html) => {
 
   try {
     // Using your verified domain directly
-    const fromEmail = 'Kalima Team <noreply@kalima-edu.com>';
+    const fromEmail = 'Fekra Team <noreply@kalima-edu.com>';
 
     debugEmailLog('Sending email from:', fromEmail);
     
