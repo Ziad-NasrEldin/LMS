@@ -482,7 +482,18 @@ exports.getLecturerContainers = catchAsync(async (req, res, next) => {
     filter.parent = null;
   }
 
+<<<<<<< Updated upstream
   const containers = await Container.find(filter).populate([
+=======
+  let query = Container.find(filter);
+
+  // If the user is not authenticated, select only basic fields
+  if (!req.user) {
+    query = query.select("name type subject level createdBy image containerImage"); // Select basic fields + createdBy for context
+  }
+
+  const containers = await query.populate([
+>>>>>>> Stashed changes
     { path: "createdBy", select: "name" }, // Keep createdBy populated for context
     { path: "subject", select: "name" },
     { path: "level", select: "name" },
