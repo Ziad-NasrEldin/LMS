@@ -8,6 +8,7 @@ const exactMessages = new Map([
   ["Unauthorized", () => t("errors.unauthorized")],
   ["Forbidden", () => t("errors.forbidden")],
   ["Access token expired", () => t("errors.sessionExpired")],
+  ["Session has been replaced by a newer login. Please login again.", () => t("errors.sessionExpired")],
   ["Authentication required", () => t("errors.authenticationRequired")],
   ["User not authenticated", () => t("errors.authenticationRequired")],
   ["Not authenticated", () => t("errors.authenticationRequired")],
@@ -229,6 +230,10 @@ const translatePattern = (message) => {
     {
       regex: /(?:Authentication required|User not authenticated|Not authenticated|Access token required|Access token expired|Refresh token is expired|Refresh token not found)/i,
       run: () => t("errors.authenticationRequired"),
+    },
+    {
+      regex: /Session has been replaced by a newer login/i,
+      run: () => t("errors.sessionExpired"),
     },
     {
       regex: /Password(?: and password confirmation don't match|s do not match)/i,

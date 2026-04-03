@@ -1,6 +1,11 @@
 const jwt = require("jsonwebtoken");
 const AppError = require("../utils/appError");
 const User = require("../models/userModel");
+const RefreshToken = require("../models/refreshTokenModel");
+const {
+  SESSION_REVOKED_MESSAGE,
+  shouldEnforceSingleSession,
+} = require("../utils/auth/sessionPolicy.js");
 
 const verifyJWT = async (req, res, next) => {
   const authHeader = req.headers.authorization || req.headers.Authorization;
@@ -42,6 +47,29 @@ const verifyJWT = async (req, res, next) => {
       )
     );
   }
+
+  const enforceSingleSession = shouldEnforceSingleSession({
+    role: decoded.UserInfo?.role,
+    impersonation: decoded.UserInfo?.impersonation,
+  });
+
+  if (enforceSingleSession) {
+    const tokenSessionId = decoded.UserInfo?.sessionId;
+
+    if (!tokenSessionId) {
+      return next(new AppError(SESSION_REVOKED_MESSAGE, 401));
+    }
+
+    const activeSession = await RefreshToken.findOne({
+      user: decoded.UserInfo.id,
+      sessionId: tokenSessionId,
+    }).select("_id");
+
+    if (!activeSession) {
+      return next(new AppError(SESSION_REVOKED_MESSAGE, 401));
+    }
+  }
+
   //logging the logged in user's information
   req.user = currentUser;
   // console.log("Authenticated User:", {

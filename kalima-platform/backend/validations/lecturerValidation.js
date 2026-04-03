@@ -10,6 +10,25 @@ const lecturerValidation = userValidation.concat(
     }),
     bio: Joi.string().required(),
     expertise: Joi.string().required(),
+    socialMedia: Joi.array()
+      .items(
+        Joi.object({
+          platform: Joi.string()
+            .valid(
+              "Facebook",
+              "Instagram",
+              "Twitter",
+              "LinkedIn",
+              "TikTok",
+              "YouTube",
+              "WhatsApp",
+              "Telegram"
+            )
+            .optional(),
+          account: Joi.string().optional(),
+        })
+      )
+      .optional(),
     profilePic: Joi.string().trim().allow("").optional()
   })
 );

@@ -23,18 +23,22 @@
           "profession": "Profession / Work",
           "idNumber": "ID Number",
           "level": "Level",
-          "hobby": "Hobby"
+          "hobby": "Hobby",
+          "socialMedia": "Social Media Links"
         },
         "placeholders": {
           "fullName": "Example: John Doe",
           "phoneNumber": "123-456-7890",  
           "email": "example@domain.com", 
           "idNumber": "Enter ID number",
-          "hobby": "Select a hobby"
+          "hobby": "Select a hobby",
+          "socialPlatform": "Select platform",
+          "socialLink": "Profile URL or @username"
         },
         "buttons": {
           "edit": "Edit",
-          "add": "Add"
+          "add": "Add",
+          "addSocialMedia": "Add link"
         },
         "uploadProfilePic": "Upload Profile Picture",
         "selectedFile": "Selected:",
@@ -43,7 +47,8 @@
         "profilePicUpdated": "Profile picture updated successfully!",
         "noProfilePicHint": "Click the camera icon to upload a profile picture",
         "messages": {
-          "updateSuccess": "Updated successfully"
+          "updateSuccess": "Updated successfully",
+          "noSocialMedia": "No links added yet"
         },
         "hobbyOptions": {
           "math": "Math",

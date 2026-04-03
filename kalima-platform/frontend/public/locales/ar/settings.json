@@ -23,18 +23,22 @@
       "profession": "المهنة / العمل",
       "idNumber": "رقم الهوية",
       "level": "المرحلة",
-      "hobby": "الهواية"
+      "hobby": "الهواية",
+      "socialMedia": "روابط وسائل التواصل الاجتماعي"
     },
     "placeholders": {
       "fullName": "مثال: يوسف بن محمد علي",
       "phoneNumber": "971-123-4567",
       "email": "example@yahoo.com",
       "idNumber": "أدخل رقم الهوية هنا",
-      "hobby": "اختر هواية"
+      "hobby": "اختر هواية",
+      "socialPlatform": "اختر المنصة",
+      "socialLink": "رابط الحساب أو اسم المستخدم"
     },
     "buttons": {
       "edit": "تعديل",
-      "add": "إضافة"
+      "add": "إضافة",
+      "addSocialMedia": "إضافة رابط"
     },
     "uploadProfilePic": "رفع صورة الملف الشخصي",
     "selectedFile": "الملف المحدد:",
@@ -43,7 +47,8 @@
     "profilePicUpdated": "تم تحديث صورة الملف الشخصي بنجاح",
     "noProfilePicHint": "اضغط على أيقونة الكاميرا لرفع صورة الملف الشخصي",
     "messages": {
-      "updateSuccess": "تم التحديث بنجاح"
+      "updateSuccess": "تم التحديث بنجاح",
+      "noSocialMedia": "لا توجد روابط مضافة"
     },
     "hobbyOptions": {
       "math": "الرياضيات",

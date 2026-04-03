@@ -55,6 +55,78 @@ const extractStudentHobby = (source) => {
   return ""
 }
 
+const LECTURER_SOCIAL_PLATFORM_OPTIONS = [
+  "Facebook",
+  "Instagram",
+  "Twitter",
+  "LinkedIn",
+  "TikTok",
+  "YouTube",
+  "WhatsApp",
+  "Telegram",
+]
+
+const createEmptySocialMediaEntry = () => ({ platform: "", account: "" })
+
+const normalizeSocialMediaEntries = (socialMedia) => {
+  if (!Array.isArray(socialMedia)) return []
+
+  return socialMedia
+    .map((entry) => {
+      if (!entry || typeof entry !== "object") return null
+      return {
+        platform: String(entry.platform || "").trim(),
+        account: String(entry.account || "").trim(),
+      }
+    })
+    .filter(Boolean)
+}
+
+const sanitizeLecturerSocialMediaForSave = (socialMedia) => {
+  const normalizedEntries = normalizeSocialMediaEntries(socialMedia)
+    .filter((entry) => entry.platform && entry.account)
+    .filter((entry) => LECTURER_SOCIAL_PLATFORM_OPTIONS.includes(entry.platform))
+
+  const byPlatform = new Map()
+  normalizedEntries.forEach((entry) => {
+    byPlatform.set(entry.platform, entry)
+  })
+
+  return Array.from(byPlatform.values())
+}
+
+const resolveSocialMediaPreviewUrl = (platform, account) => {
+  const rawAccount = String(account || "").trim()
+  if (!rawAccount) return ""
+  if (/^https?:\/\//i.test(rawAccount)) return rawAccount
+
+  const cleanedAccount = rawAccount.replace(/^@/, "")
+  if (!cleanedAccount) return ""
+
+  switch (platform) {
+    case "Facebook":
+      return `https://www.facebook.com/${cleanedAccount}`
+    case "Instagram":
+      return `https://www.instagram.com/${cleanedAccount}`
+    case "Twitter":
+      return `https://x.com/${cleanedAccount}`
+    case "LinkedIn":
+      return cleanedAccount.startsWith("in/") || cleanedAccount.startsWith("company/")
+        ? `https://www.linkedin.com/${cleanedAccount}`
+        : `https://www.linkedin.com/in/${cleanedAccount}`
+    case "TikTok":
+      return `https://www.tiktok.com/@${cleanedAccount}`
+    case "YouTube":
+      return `https://www.youtube.com/${cleanedAccount}`
+    case "WhatsApp":
+      return `https://wa.me/${cleanedAccount.replace(/\D/g, "")}`
+    case "Telegram":
+      return `https://t.me/${cleanedAccount}`
+    default:
+      return ""
+  }
+}
+
 function PersonalInfoSection() {
   const { t, i18n } = useTranslation("settings")
   const isRTL = i18n.language === "ar"
@@ -75,6 +147,7 @@ function PersonalInfoSection() {
     phoneNumber: "",
     email: "",
     hobby: "",
+    socialMedia: [],
     profilePic: null,
   })
 
@@ -201,6 +274,7 @@ function PersonalInfoSection() {
             phoneNumber: userInfo.phoneNumber || "",
             email: userInfo.email || "",
             hobby: extractStudentHobby(userInfo),
+            socialMedia: normalizeSocialMediaEntries(userInfo.socialMedia),
             profilePic: null,
           })
         } else {
@@ -246,6 +320,50 @@ function PersonalInfoSection() {
     }))
   }
 
+  const handleSocialMediaChange = (index, field, value) => {
+    setFormData((prev) => {
+      const currentLinks =
+        Array.isArray(prev.socialMedia) && prev.socialMedia.length > 0
+          ? [...prev.socialMedia]
+          : [createEmptySocialMediaEntry()]
+
+      currentLinks[index] = {
+        ...(currentLinks[index] || createEmptySocialMediaEntry()),
+        [field]: value,
+      }
+
+      return {
+        ...prev,
+        socialMedia: currentLinks,
+      }
+    })
+  }
+
+  const addSocialMediaEntry = () => {
+    setFormData((prev) => ({
+      ...prev,
+      socialMedia: [...normalizeSocialMediaEntries(prev.socialMedia), createEmptySocialMediaEntry()],
+    }))
+  }
+
+  const removeSocialMediaEntry = (indexToRemove) => {
+    setFormData((prev) => {
+      const currentLinks = normalizeSocialMediaEntries(prev.socialMedia)
+
+      if (currentLinks.length <= 1) {
+        return {
+          ...prev,
+          socialMedia: [createEmptySocialMediaEntry()],
+        }
+      }
+
+      return {
+        ...prev,
+        socialMedia: currentLinks.filter((_, index) => index !== indexToRemove),
+      }
+    })
+  }
+
   const startEditing = () => {
     const normalizedRole = String(userData?.role || "").trim().toLowerCase()
     const isRestrictedSettingsRole = ["student", "parent", "teacher"].includes(normalizedRole)
@@ -257,6 +375,7 @@ function PersonalInfoSection() {
       phoneNumber: userData?.phoneNumber || "",
       email: userData?.email || "",
       hobby: extractStudentHobby(userData),
+      socialMedia: normalizeSocialMediaEntries(userData?.socialMedia),
     }))
     setIsEditing(true)
   }
@@ -268,6 +387,7 @@ function PersonalInfoSection() {
       phoneNumber: userData?.phoneNumber || "",
       email: userData?.email || "",
       hobby: extractStudentHobby(userData),
+      socialMedia: normalizeSocialMediaEntries(userData?.socialMedia),
     }))
     setEmailError("")
     setIsEditing(false)
@@ -282,6 +402,7 @@ function PersonalInfoSection() {
     if (emailError) return
 
     const isStudentRole = normalizedRole === "student"
+    const isLecturerRole = normalizedRole === "lecturer"
 
     // Set update status to loading
     setUpdateStatus({
@@ -302,6 +423,10 @@ function PersonalInfoSection() {
         if (nextHobby) {
           updateData.hobby = nextHobby
         }
+      }
+
+      if (isLecturerRole) {
+        updateData.socialMedia = sanitizeLecturerSocialMediaForSave(formData.socialMedia)
       }
 
       const result = await updateCurrentUser(updateData)
@@ -342,6 +467,7 @@ function PersonalInfoSection() {
               phoneNumber: refreshedUserInfo.phoneNumber || "",
               email: refreshedUserInfo.email || "",
               hobby: fallbackHobby,
+              socialMedia: normalizeSocialMediaEntries(refreshedUserInfo.socialMedia),
             }))
           }
         } else {
@@ -351,6 +477,9 @@ function PersonalInfoSection() {
             phoneNumber: formData.phoneNumber,
             email: formData.email,
             hobby: isStudentRole ? extractStudentHobby({ hobby: formData.hobby }) || extractStudentHobby(prev) : prev.hobby,
+            socialMedia: isLecturerRole
+              ? sanitizeLecturerSocialMediaForSave(formData.socialMedia)
+              : normalizeSocialMediaEntries(prev?.socialMedia),
           }))
         }
 
@@ -487,7 +616,13 @@ function PersonalInfoSection() {
 
   const normalizedRole = String(userData?.role || "").trim().toLowerCase()
   const isStudentRole = normalizedRole === "student"
+  const isLecturerRole = normalizedRole === "lecturer"
   const isRestrictedSettingsRole = ["student", "parent", "teacher"].includes(normalizedRole)
+  const lecturerSavedSocialMedia = normalizeSocialMediaEntries(userData?.socialMedia)
+  const lecturerEditingSocialMedia =
+    Array.isArray(formData.socialMedia) && formData.socialMedia.length > 0
+      ? formData.socialMedia
+      : [createEmptySocialMediaEntry()]
 
   return (
     <section>
@@ -690,6 +825,110 @@ function PersonalInfoSection() {
             </div>
             {emailError && isEditing && <div className="mt-2 text-error text-sm">{emailError}</div>}
           </div>
+
+          {isLecturerRole && (
+            <div className="form-control mb-4">
+              <label className={`label pb-1 ${isRTL ? "justify-end" : "justify-start"}`}>
+                <span className="label-text">
+                  {personalInfo.labels.socialMedia || "Social Media Links"}
+                </span>
+              </label>
+
+              <div className="w-full max-w-2xl">
+                {isEditing ? (
+                  <div className="space-y-3">
+                    {lecturerEditingSocialMedia.map((social, index) => (
+                      <div
+                        key={`${social.platform}-${index}`}
+                        className="grid grid-cols-1 gap-2 sm:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)_3rem] sm:items-center"
+                      >
+                        <DSSelect
+                          value={social.platform || ""}
+                          onChange={(event) => handleSocialMediaChange(index, "platform", event.target.value)}
+                          className={`select select-bordered w-full ${isRTL ? "text-right" : "text-left"}`}
+                          dir={isRTL ? "rtl" : "ltr"}
+                        >
+                          <option value="">
+                            {personalInfo.placeholders?.socialPlatform ||
+                              (isRTL ? "اختر المنصة" : "Select platform")}
+                          </option>
+                          {LECTURER_SOCIAL_PLATFORM_OPTIONS.map((platform) => (
+                            <option key={platform} value={platform}>
+                              {platform}
+                            </option>
+                          ))}
+                        </DSSelect>
+
+                        <input
+                          type="text"
+                          value={social.account || ""}
+                          onChange={(event) => handleSocialMediaChange(index, "account", event.target.value)}
+                          placeholder={
+                            personalInfo.placeholders?.socialLink ||
+                            (isRTL ? "رابط الحساب" : "Profile URL or @username")
+                          }
+                          className={`input input-bordered w-full ${isRTL ? "text-right" : "text-left"}`}
+                          dir={isRTL ? "rtl" : "ltr"}
+                        />
+
+                        <button
+                          type="button"
+                          className="btn btn-outline btn-square"
+                          onClick={() => removeSocialMediaEntry(index)}
+                          title={t("remove") || "Remove"}
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      </div>
+                    ))}
+
+                    <button type="button" className="btn btn-outline btn-sm" onClick={addSocialMediaEntry}>
+                      {personalInfo.buttons?.addSocialMedia || personalInfo.buttons?.add || "Add link"}
+                    </button>
+                  </div>
+                ) : lecturerSavedSocialMedia.length > 0 ? (
+                  <div className="space-y-2">
+                    {lecturerSavedSocialMedia.map((social, index) => {
+                      const href = resolveSocialMediaPreviewUrl(social.platform, social.account)
+
+                      if (!href) {
+                        return (
+                          <div
+                            key={`${social.platform}-${index}`}
+                            className="flex items-center justify-between gap-2 rounded-xl border border-base-300 bg-base-100 px-3 py-2 text-sm"
+                          >
+                            <span className="font-semibold">{social.platform}</span>
+                            <span className="truncate text-base-content/75">{social.account}</span>
+                          </div>
+                        )
+                      }
+
+                      return (
+                        <a
+                          key={`${social.platform}-${index}`}
+                          href={href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center justify-between gap-2 rounded-xl border border-base-300 bg-base-100 px-3 py-2 text-sm hover:bg-base-200 transition-colors"
+                        >
+                          <span className="font-semibold">{social.platform}</span>
+                          <span className="truncate text-base-content/75">{social.account}</span>
+                        </a>
+                      )
+                    })}
+                  </div>
+                ) : (
+                  <input
+                    type="text"
+                    value={personalInfo.messages?.noSocialMedia || (isRTL ? "لا توجد روابط مضافة" : "No links added yet")}
+                    className={`input input-bordered w-full ${isRTL ? "text-right" : "text-left"}`}
+                    dir={isRTL ? "rtl" : "ltr"}
+                    readOnly
+                  />
+                )}
+              </div>
+            </div>
+          )}
 
           {userData?.role === "Parent" && (
             <div className="form-control mb-4">

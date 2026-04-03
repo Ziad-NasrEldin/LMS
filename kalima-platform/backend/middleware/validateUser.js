@@ -82,6 +82,7 @@ const normalizeRolePayload = (payload, role) => {
 
   if (normalizedRole === "lecturer") {
     normalizeArrayField(payload, "subject");
+    normalizeArrayField(payload, "socialMedia", { parseJsonItems: true });
   }
 
   if (normalizedRole === "teacher") {

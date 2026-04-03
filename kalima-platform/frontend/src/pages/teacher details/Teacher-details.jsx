@@ -84,6 +84,7 @@ const CourseCard = ({ course }) => {
 
 const socialIcons = [
   {
+    key: "facebook",
     label: "Facebook",
     svg: (
       <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current" xmlns="http://www.w3.org/2000/svg">
@@ -92,6 +93,7 @@ const socialIcons = [
     ),
   },
   {
+    key: "twitter",
     label: "X (Twitter)",
     svg: (
       <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current" xmlns="http://www.w3.org/2000/svg">
@@ -100,6 +102,7 @@ const socialIcons = [
     ),
   },
   {
+    key: "instagram",
     label: "Instagram",
     svg: (
       <svg viewBox="0 0 24 24" className="w-5 h-5 fill-none stroke-current stroke-2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
@@ -110,6 +113,7 @@ const socialIcons = [
     ),
   },
   {
+    key: "linkedin",
     label: "LinkedIn",
     svg: (
       <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current" xmlns="http://www.w3.org/2000/svg">
@@ -120,13 +124,94 @@ const socialIcons = [
   },
 ];
 
-const SocialMediaIcons = () => (
+const SOCIAL_PLATFORM_ALIASES = {
+  facebook: "facebook",
+  fb: "facebook",
+  instagram: "instagram",
+  twitter: "twitter",
+  x: "twitter",
+  "x (twitter)": "twitter",
+  linkedin: "linkedin",
+  "linked in": "linkedin",
+};
+
+const normalizeSocialPlatform = (platform) => {
+  const normalized = String(platform || "").trim().toLowerCase();
+  return SOCIAL_PLATFORM_ALIASES[normalized] || null;
+};
+
+const resolveSocialMediaHref = (platform, account) => {
+  const rawAccount = String(account || "").trim();
+  if (!rawAccount) return null;
+
+  if (/^https?:\/\//i.test(rawAccount)) return rawAccount;
+
+  const cleanedAccount = rawAccount.replace(/^@/, "");
+  if (!cleanedAccount) return null;
+
+  switch (platform) {
+    case "facebook":
+      return `https://www.facebook.com/${cleanedAccount}`;
+    case "instagram":
+      return `https://www.instagram.com/${cleanedAccount}`;
+    case "twitter":
+      return `https://x.com/${cleanedAccount}`;
+    case "linkedin":
+      return cleanedAccount.startsWith("in/") || cleanedAccount.startsWith("company/")
+        ? `https://www.linkedin.com/${cleanedAccount}`
+        : `https://www.linkedin.com/in/${cleanedAccount}`;
+    default:
+      return null;
+  }
+};
+
+const buildSocialMediaLinksMap = (socialMedia) => {
+  const linksByPlatform = {};
+  (Array.isArray(socialMedia) ? socialMedia : []).forEach((socialItem) => {
+    const platform = normalizeSocialPlatform(socialItem?.platform);
+    if (!platform || linksByPlatform[platform]) return;
+
+    const resolvedHref = resolveSocialMediaHref(platform, socialItem?.account);
+    if (resolvedHref) {
+      linksByPlatform[platform] = resolvedHref;
+    }
+  });
+  return linksByPlatform;
+};
+
+const SocialMediaIcons = ({ linksByPlatform }) => (
   <div className="flex flex-row gap-3 mt-6 justify-center md:justify-start">
-    {socialIcons.map(({ label, svg }) => (
-      <button key={label} className="btn border-none btn-circle bg-base-200 shadow-sm hover:bg-info/20 hover:scale-110 transition-all duration-200 h-10 w-10 min-h-0 flex items-center justify-center text-base-content/60 hover:text-info">
-        {svg}
-      </button>
-    ))}
+    {socialIcons.map(({ key, label, svg }) => {
+      const href = linksByPlatform?.[key];
+      const baseClassName = "btn border-none btn-circle bg-base-200 shadow-sm h-10 w-10 min-h-0 flex items-center justify-center";
+
+      if (!href) {
+        return (
+          <span
+            key={label}
+            className={`${baseClassName} cursor-not-allowed text-base-content/30`}
+            aria-label={label}
+            title={label}
+          >
+            {svg}
+          </span>
+        );
+      }
+
+      return (
+        <a
+          key={label}
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={label}
+          title={label}
+          className={`${baseClassName} text-base-content/60 hover:bg-info/20 hover:scale-110 hover:text-info transition-all duration-200`}
+        >
+          {svg}
+        </a>
+      );
+    })}
   </div>
 )
 
@@ -161,6 +246,10 @@ export default function TeacherDetails() {
   const canonicalPath = teacher ? buildTeacherPath(teacher) : null;
   const resolvedTeacherImage = resolveProfileImageUrl(
     teacher?.profilePic || teacher?.profilePicture?.url || teacher?.profilePicture || null
+  );
+  const socialLinksByPlatform = useMemo(
+    () => buildSocialMediaLinksMap(teacher?.socialMedia),
+    [teacher?.socialMedia]
   );
   const seoDescription =
     String(teacher?.bio || "").trim() ||
@@ -309,7 +398,7 @@ export default function TeacherDetails() {
             {/* Image & Socials */}
             <div className="flex flex-col items-center shrink-0">
                <TeacherProfileImage profileImage={resolvedTeacherImage} />
-               <SocialMediaIcons />
+               <SocialMediaIcons linksByPlatform={socialLinksByPlatform} />
             </div>
 
             {/* Text details */}

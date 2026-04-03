@@ -22,6 +22,7 @@ const handleCSV = require("../utils/upload files/handleCSV.js");
 const handleExcel = require("../utils/upload files/handleEXCEL.js");
 const QueryFeatures = require("../utils/queryFeatures");
 const { hasLectureAccessFromPurchase } = require("../utils/purchaseHistoryUtils");
+const cleanupLecturerContent = require("../utils/cleanupLecturerContent.js");
 const fs = require("fs");
 
 const STUDENT_HOBBY_ALIASES = {
@@ -55,6 +56,74 @@ const extractStudentHobby = (studentDoc) => {
   }
 
   return "";
+};
+
+const LECTURER_SOCIAL_MEDIA_PLATFORMS = new Set([
+  "Facebook",
+  "Instagram",
+  "Twitter",
+  "LinkedIn",
+  "TikTok",
+  "YouTube",
+  "WhatsApp",
+  "Telegram",
+]);
+
+const normalizeLecturerSocialMedia = (rawValue) => {
+  if (rawValue === undefined) return undefined;
+
+  let candidateValue = rawValue;
+
+  if (typeof candidateValue === "string") {
+    const trimmedValue = candidateValue.trim();
+    if (!trimmedValue) return [];
+
+    try {
+      candidateValue = JSON.parse(trimmedValue);
+    } catch (_error) {
+      return [];
+    }
+  }
+
+  if (!Array.isArray(candidateValue)) {
+    return [];
+  }
+
+  const normalized = [];
+
+  candidateValue.forEach((entry) => {
+    let item = entry;
+
+    if (typeof item === "string") {
+      const trimmedItem = item.trim();
+      if (!trimmedItem) return;
+
+      try {
+        item = JSON.parse(trimmedItem);
+      } catch (_error) {
+        throw new AppError("Invalid social media payload.", 400);
+      }
+    }
+
+    if (!item || typeof item !== "object") return;
+
+    const platform = String(item.platform || "").trim();
+    const account = String(item.account || "").trim();
+
+    if (!platform && !account) return;
+
+    if (!platform || !account) {
+      throw new AppError("Each social media entry must include both platform and account.", 400);
+    }
+
+    if (!LECTURER_SOCIAL_MEDIA_PLATFORMS.has(platform)) {
+      throw new AppError(`Invalid social media platform: ${platform}`, 400);
+    }
+
+    normalized.push({ platform, account });
+  });
+
+  return normalized;
 };
 
 const RESTRICTED_SELF_UPDATE_ROLES = new Set(["student", "parent", "teacher"]);
@@ -236,6 +305,12 @@ const deleteUser = catchAsync(async (req, res, next) => {
     (foundUser.role === "Admin" || foundUser.role === "SubAdmin")
   ) {
     return next(new AppError("You are not allowed to delete this user", 403));
+  }
+
+  const normalizedRole = String(foundUser.role || "").toLowerCase();
+
+  if (normalizedRole === "lecturer") {
+    await cleanupLecturerContent(foundUser._id);
   }
 
   await foundUser.deleteOne();
@@ -497,6 +572,7 @@ const getMyData = catchAsync(async (req, res, next) => {
         ...responseData.userInfo,
         bio: lecturer.bio,
         expertise: lecturer.expertise,
+        socialMedia: Array.isArray(lecturer.socialMedia) ? lecturer.socialMedia : [],
         profilePic: lecturer.profilePic || responseData.userInfo.profilePic || null,
       };
 
@@ -1389,6 +1465,7 @@ const updateMe = catchAsync(async (req, res, next) => {
   if (normalizedUserRole === "lecturer") {
     allowedFields.add("bio");
     allowedFields.add("expertise");
+    allowedFields.add("socialMedia");
   }
 
   const disallowedFields = Object.keys(req.body).filter((field) => !allowedFields.has(field));
@@ -1407,6 +1484,10 @@ const updateMe = catchAsync(async (req, res, next) => {
       filteredBody[field] = req.body[field];
     }
   });
+
+  if (normalizedUserRole === "lecturer" && req.body.socialMedia !== undefined) {
+    filteredBody.socialMedia = normalizeLecturerSocialMedia(req.body.socialMedia);
+  }
 
   const currentUser = await User.findById(userId).select("profilePic referredBy userSerial").lean();
   if (!currentUser) {

@@ -8,6 +8,10 @@ const catchAsync = require("../utils/catchAsync");
 const { generateAccessToken } = require("../utils/tokens/generateTokens.js");
 const { sendToken } = require("../utils/tokens/sendToken.js");
 const RefreshToken = require("../models/refreshTokenModel.js");
+const {
+  SESSION_REVOKED_MESSAGE,
+  shouldEnforceSingleSession,
+} = require("../utils/auth/sessionPolicy.js");
 
 const normalizeRole = (role) =>
   String(role || "")
@@ -209,13 +213,30 @@ const refresh = catchAsync(async (req, res, next) => {
   const refreshUserRole = isImpersonating
     ? impersonation.actorRole
     : decoded.UserInfo.role;
-
-  const refreshToken = await RefreshToken.findOne({
-    user: refreshUserId,
+  const enforceSingleSession = shouldEnforceSingleSession({
+    role: refreshUserRole,
+    impersonation,
   });
+  const tokenSessionId = decoded.UserInfo?.sessionId;
+
+  if (enforceSingleSession && !tokenSessionId) {
+    return next(new AppError(SESSION_REVOKED_MESSAGE, 401));
+  }
+
+  const refreshTokenQuery = enforceSingleSession
+    ? { user: refreshUserId, sessionId: tokenSessionId }
+    : { user: refreshUserId };
+
+  const refreshToken = await RefreshToken.findOne(refreshTokenQuery);
 
   if (!refreshToken?.token) {
-    return next(new AppError("Refresh token not found, please login again", 401));
+    if (enforceSingleSession) {
+      return next(new AppError(SESSION_REVOKED_MESSAGE, 401));
+    }
+
+    return next(
+      new AppError("Refresh token not found, please login again", 401)
+    );
   }
 
   const currentUserRefreshToken = refreshToken.token;
@@ -228,7 +249,7 @@ const refresh = catchAsync(async (req, res, next) => {
     );
   } catch (err) {
     if (err.name === "TokenExpiredError" || !decodedRefreshToken) {
-      await RefreshToken.deleteOne({ user: refreshUserId });
+      await RefreshToken.deleteMany(refreshTokenQuery);
       return next(
         new AppError("Refresh token is expired, plese login again", 401)
       );
@@ -241,7 +262,11 @@ const refresh = catchAsync(async (req, res, next) => {
         ...impersonation,
       },
     })
-    : generateAccessToken(refreshUserId, refreshUserRole);
+    : enforceSingleSession
+      ? generateAccessToken(refreshUserId, refreshUserRole, {
+        sessionId: tokenSessionId,
+      })
+      : generateAccessToken(refreshUserId, refreshUserRole);
 
   return res.status(200).json({ accessToken: newAccessToken });
 });

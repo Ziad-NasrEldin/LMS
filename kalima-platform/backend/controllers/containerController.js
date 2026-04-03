@@ -286,6 +286,10 @@ exports.getContainerById = catchAsync(async (req, res, next) => {
     ]);
 
     if (lecture) {
+      if (!lecture.createdBy) {
+        return next(new AppError("Container not found.", 404));
+      }
+
       // Role-specific logic for authenticated users
       if (req.user && req.user.role?.toLowerCase() === "teacher") {
         if (!lecture.teacherAllowed) {
@@ -308,6 +312,10 @@ exports.getContainerById = catchAsync(async (req, res, next) => {
       });
     }
 
+    return next(new AppError("Container not found.", 404));
+  }
+
+  if (!container.createdBy) {
     return next(new AppError("Container not found.", 404));
   }
 
@@ -429,10 +437,12 @@ exports.getAllContainers = catchAsync(async (req, res, next) => {
     { path: "parent", select: "name" },
   ]).lean();
 
+  const activeContainers = containers.filter((container) => Boolean(container.createdBy));
+
   // Role-specific logic for authenticated users
   if (req.user && req.user.role?.toLowerCase() === "teacher") {
     // Filter containers based on `teacherAllowed` property
-    const filteredContainers = containers.map((container) => {
+    const filteredContainers = activeContainers.map((container) => {
       if (!container.teacherAllowed) {
         return {
           id: container._id,
@@ -457,9 +467,9 @@ exports.getAllContainers = catchAsync(async (req, res, next) => {
   // Default response for all roles and unauthenticated users
   return res.status(200).json({
     status: "success",
-    results: containers.length,
+    results: activeContainers.length,
     data: {
-      containers,
+      containers: activeContainers,
     },
   });
 });

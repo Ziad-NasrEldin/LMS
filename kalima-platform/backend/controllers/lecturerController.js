@@ -5,17 +5,62 @@ const Code = require("../models/codeModel");
 const StudentLectureAccess = require("../models/studentLectureAccessModel");
 const Container = require("../models/containerModel");
 const Lecture = require("../models/LectureModel");
+const cleanupLecturerContent = require("../utils/cleanupLecturerContent");
 const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
 const bcrypt = require("bcrypt");
 const { uploadProfilePicToDisk } = require("./../utils/upload files/uploadFiles");
+
+const SOCIAL_MEDIA_PLATFORMS = new Set([
+    "Facebook",
+    "Instagram",
+    "Twitter",
+    "LinkedIn",
+    "TikTok",
+    "YouTube",
+    "WhatsApp",
+    "Telegram",
+]);
+
+const normalizeSocialMediaInput = (rawValue) => {
+    if (rawValue === undefined) return undefined;
+
+    let parsedValue = rawValue;
+    if (typeof parsedValue === "string") {
+        const trimmedValue = parsedValue.trim();
+        if (!trimmedValue) return [];
+
+        try {
+            parsedValue = JSON.parse(trimmedValue);
+        } catch (_error) {
+            return [];
+        }
+    }
+
+    if (!Array.isArray(parsedValue)) return [];
+
+    return parsedValue
+        .map((item) => {
+            if (!item || typeof item !== "object") return null;
+
+            const platform = String(item.platform || "").trim();
+            const account = String(item.account || "").trim();
+
+            if (!platform && !account) return null;
+            if (!platform || !account) return null;
+            if (!SOCIAL_MEDIA_PLATFORMS.has(platform)) return null;
+
+            return { platform, account };
+        })
+        .filter(Boolean);
+};
 
 // Upload middleware for lecturer profile picture
 exports.uploadLecturerPhoto = uploadProfilePicToDisk;
 
 // Create a new lecturer
 exports.createLecturer = catchAsync(async (req, res, next) => {
-    const { name, email, password, gender, role, bio, expertise, isPublished } = req.body;
+    const { name, email, password, gender, role, bio, expertise, socialMedia, isPublished } = req.body;
 
     if (!bio || !expertise) {
         return next(new AppError("Bio and expertise are required.", 400));
@@ -34,6 +79,7 @@ exports.createLecturer = catchAsync(async (req, res, next) => {
         ...(isPublished !== undefined
             ? { isPublished: isPublished === true || isPublished === "true" }
             : {}),
+        socialMedia: normalizeSocialMediaInput(socialMedia) || [],
         profilePic: req.file ? req.file.path : null,
     };
 
@@ -78,7 +124,7 @@ exports.getLecturerById = catchAsync(async (req, res, next) => {
 // Update a lecturer by ID
 exports.updateLecturer = catchAsync(async (req, res, next) => {
     const { id } = req.params;
-    const { name, email, bio, expertise, isPublished } = req.body;
+    const { name, email, bio, expertise, socialMedia, isPublished } = req.body;
 
     const lecturer = await Lecturer.findById(id);
     if (!lecturer) {
@@ -97,6 +143,9 @@ exports.updateLecturer = catchAsync(async (req, res, next) => {
     lecturer.email = email || lecturer.email;
     lecturer.bio = bio || lecturer.bio;
     lecturer.expertise = expertise || lecturer.expertise;
+    if (socialMedia !== undefined) {
+        lecturer.socialMedia = normalizeSocialMediaInput(socialMedia);
+    }
     if (isPublished !== undefined) {
         lecturer.isPublished = isPublished === true || isPublished === "true";
     }
@@ -112,11 +161,14 @@ exports.updateLecturer = catchAsync(async (req, res, next) => {
 // Delete a lecturer by ID
 exports.deleteLecturer = catchAsync(async (req, res, next) => {
     const { id } = req.params;
-    const lecturer = await Lecturer.findByIdAndDelete(id);
+    const lecturer = await Lecturer.findById(id);
 
     if (!lecturer) {
         return next(new AppError("Lecturer not found.", 404));
     }
+
+    await cleanupLecturerContent(lecturer._id);
+    await lecturer.deleteOne();
 
     // Delete profile picture if exists
     if (lecturer.profilePic && fs.existsSync(lecturer.profilePic)) {
