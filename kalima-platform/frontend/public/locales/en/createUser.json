@@ -81,7 +81,8 @@
     "facebook": "Facebook",
     "twitter": "Twitter",
     "instagram": "Instagram",
-    "phoneNumber2": "Phone Number (Optional)"
+    "phoneNumber2": "Phone Number (Optional)",
+    "noFileSelected": "No file selected"
   },
   "roles": {
     "subadmin": "Sub Admin",
@@ -116,7 +117,8 @@
     "previous": "Previous",
     "close": "Close",
     "addAnotherParentPhone": "Add another parent phone",
-    "removeParentPhone": "Remove"
+    "removeParentPhone": "Remove",
+    "chooseFile": "Choose File"
   },
   "messages": {
     "loading": "Loading...",

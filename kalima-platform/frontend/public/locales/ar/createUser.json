@@ -81,7 +81,8 @@
     "facebook": "فيسبوك",
     "twitter": "تويتر",
     "instagram": "إنستاغرام",
-    "phoneNumber2": "رقم الهاتف (اختياري)"
+    "phoneNumber2": "رقم الهاتف (اختياري)",
+    "noFileSelected": "لم يتم اختيار ملف"
   },
   "roles": {
     "subadmin": "مدير فرعي",
@@ -115,6 +116,7 @@
     "add": "إضافة",
     "addAnotherParentPhone": "إضافة هاتف ولي أمر آخر",
     "removeParentPhone": "إزالة",
+    "chooseFile": "اختر ملف",
     "createUsers": "إنشاء مستخدمين",
     "uploading": "جاري التحميل..."
   },

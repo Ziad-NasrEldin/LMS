@@ -29,6 +29,74 @@ const roleSchemas = {
   subadmin:  subadminSchema
 };
 
+const tryParseJson = (value) => {
+  if (typeof value !== "string") return value;
+  const trimmed = value.trim();
+  if (!trimmed) return value;
+
+  const isLikelyJson =
+    (trimmed.startsWith("{") && trimmed.endsWith("}")) ||
+    (trimmed.startsWith("[") && trimmed.endsWith("]"));
+
+  if (!isLikelyJson) return value;
+
+  try {
+    return JSON.parse(trimmed);
+  } catch {
+    return value;
+  }
+};
+
+const normalizeArrayField = (payload, fieldName, { parseJsonItems = false } = {}) => {
+  const rawValue = payload[fieldName];
+  if (rawValue === undefined || rawValue === null) return;
+
+  let normalizedArray;
+  if (Array.isArray(rawValue)) {
+    normalizedArray = rawValue;
+  } else if (typeof rawValue === "string") {
+    const parsedValue = tryParseJson(rawValue);
+    if (Array.isArray(parsedValue)) {
+      normalizedArray = parsedValue;
+    } else if (parsedValue !== rawValue) {
+      normalizedArray = [parsedValue];
+    } else {
+      const trimmedValue = rawValue.trim();
+      if (!trimmedValue) return;
+      normalizedArray = [rawValue];
+    }
+  } else {
+    normalizedArray = [rawValue];
+  }
+
+  if (parseJsonItems) {
+    normalizedArray = normalizedArray.map((item) => tryParseJson(item));
+  }
+
+  payload[fieldName] = normalizedArray;
+};
+
+const normalizeRolePayload = (payload, role) => {
+  if (!payload || !role) return payload;
+  const normalizedRole = String(role).trim().toLowerCase();
+
+  if (normalizedRole === "lecturer") {
+    normalizeArrayField(payload, "subject");
+  }
+
+  if (normalizedRole === "teacher") {
+    normalizeArrayField(payload, "level");
+    normalizeArrayField(payload, "centers");
+    normalizeArrayField(payload, "socialMedia", { parseJsonItems: true });
+  }
+
+  if (normalizedRole === "parent") {
+    normalizeArrayField(payload, "children");
+  }
+
+  return payload;
+};
+
 const validateUser = catchAsync(async (req, res, next) => {
   const signupFlow = isSignupRequest(req);
   let { confirmPassword, role, password, ...updatedBody } = req.body
@@ -57,6 +125,8 @@ const validateUser = catchAsync(async (req, res, next) => {
   req.body.password = password
   req.body.role = role
   req.body.confirmPassword = confirmPassword // Add confirmPassword back to the request body
+
+  req.body = normalizeRolePayload(req.body, role);
   /* Depending if the request was a patch to update a user
   A copy of the schema is made with optional fields.  */
 
