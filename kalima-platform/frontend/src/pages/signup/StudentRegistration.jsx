@@ -52,6 +52,7 @@ export default function StudentRegistration() {
     phoneNumber2: "",
     gender: "",
     faction: "Alpha",
+    stage: "",
     level: [],
     hobbies: [],
     otherHobbyText: "",
@@ -106,6 +107,10 @@ export default function StudentRegistration() {
         errors.phoneNumber = "required"
       } else if (!isValidEgyptianPhoneNumber(formData.phoneNumber)) {
         errors.phoneNumber = "phoneInvalid"
+      }
+
+      if (role === "student" && !formData.stage) {
+        errors.stage = "required"
       }
 
       if (role === "student" && (!formData.level || (Array.isArray(formData.level) && formData.level.length === 0))) {
@@ -405,6 +410,10 @@ export default function StudentRegistration() {
       // Role-specific fields
       switch (formData.role) {
         case "student":
+          if (formData.stage) {
+            data.append("stage", formData.stage)
+          }
+
           // Handle level as single value for students
           if (formData.level) {
             if (Array.isArray(formData.level)) {

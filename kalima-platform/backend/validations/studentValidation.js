@@ -23,8 +23,16 @@ const allowedHobbies = [
   "photography",
 ];
 
+const allowedParentRelations = ["mother", "father", "other"];
+
 const studentValidation = userValidation.concat(
   Joi.object({
+    stage: Joi.string()
+      .regex(/^[0-9a-fA-F]{24}$/)
+      .required()
+      .messages({
+        "string.pattern.base": "stage must be a valid MongoDB ObjectId.",
+      }),
     level: Joi.string()
       .regex(/^[0-9a-fA-F]{24}$/)
       .required()
@@ -42,6 +50,51 @@ const studentValidation = userValidation.concat(
       })
       .messages({
         "string.pattern.base": "parentPhoneNumber must be a valid Egyptian number (+20XXXXXXXXXX, 0XXXXXXXXXX, or XXXXXXXXXX).",
+      }),
+    parentPhoneRelation: Joi.string()
+      .trim()
+      .lowercase()
+      .valid(...allowedParentRelations)
+      .required()
+      .messages({
+        "any.required": "parentPhoneRelation is required for student role.",
+        "any.only": "parentPhoneRelation must be one of: mother, father, other.",
+      }),
+    parentPhoneNumber2: Joi.string()
+      .trim()
+      .allow(null, "")
+      .optional()
+      .custom((value, helpers) => {
+        if (value === null || value === "") {
+          return value;
+        }
+
+        if (!isValidEgyptianPhoneNumber(value)) {
+          return helpers.error("string.pattern.base");
+        }
+
+        return value;
+      })
+      .messages({
+        "string.pattern.base":
+          "parentPhoneNumber2 must be a valid Egyptian number (+20XXXXXXXXXX, 0XXXXXXXXXX, or XXXXXXXXXX).",
+      }),
+    parentPhoneRelation2: Joi.string()
+      .trim()
+      .lowercase()
+      .allow(null, "")
+      .optional()
+      .custom((value, helpers) => {
+        if (value === null || value === "") {
+          return value;
+        }
+        if (!allowedParentRelations.includes(value)) {
+          return helpers.error("any.only");
+        }
+        return value;
+      })
+      .messages({
+        "any.only": "parentPhoneRelation2 must be one of: mother, father, other.",
       }),
     hobby: Joi.string()
       .valid(...allowedHobbies)
