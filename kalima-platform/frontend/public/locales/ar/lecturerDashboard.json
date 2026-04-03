@@ -2,6 +2,7 @@
   "courseManagement": "إدارة الكورسات",
   "dashboardOverview": "ملخص لوحة التحكم",
   "dashboardOverviewHint": "ملخص سريع للمقررات والمحاضرات والمساعدين والإيرادات",
+  "dashboardManagementHint": "أدر الكورسات والمساعدين من مكان واحد.",
   "analyticsFilters": "مرشحات التحليلات",
   "analyticsFiltersHint": "اختَر نطاقًا زمنيًا لتحديث الأرقام.",
   "dateFrom": "من تاريخ",

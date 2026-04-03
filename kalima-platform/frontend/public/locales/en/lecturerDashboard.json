@@ -2,6 +2,7 @@
   "courseManagement": "Course Management",
   "dashboardOverview": "Dashboard Overview",
   "dashboardOverviewHint": "A quick summary of your courses, lectures, assistants, and revenue",
+  "dashboardManagementHint": "Manage your courses and assistants from one place.",
   "analyticsFilters": "Analytics Filters",
   "analyticsFiltersHint": "Choose a date range to refresh the analytics numbers.",
   "dateFrom": "From date",

@@ -10,6 +10,7 @@ import { designTokens } from "../constants/designTokens";
 import { LoadingSpinner } from "../components/LoadingSpinner";
 import { ErrorAlert } from "../components/ErrorAlert";
 import { getStageDisplayName, resolveLevelDisplayName } from "../utils/levelHierarchy";
+import { resolveProfileImageUrl } from "../utils/profileImage";
 import { useSeo } from "../seo/useSeo";
 import { buildBreadcrumbSchema } from "../seo/structuredData.mjs";
 
@@ -66,9 +67,26 @@ export default function Teachers() {
     try {
       const result = await getAllLecturers();
       if (result.success) {
+        const getLecturerProfileImage = (lecturer) => {
+          const profilePic = lecturer?.profilePic;
+          if (typeof profilePic === "string" && profilePic.trim()) {
+            return resolveProfileImageUrl(profilePic);
+          }
+
+          const profilePicture = lecturer?.profilePicture;
+          if (typeof profilePicture === "string" && profilePicture.trim()) {
+            return resolveProfileImageUrl(profilePicture);
+          }
+          if (profilePicture && typeof profilePicture?.url === "string" && profilePicture.url.trim()) {
+            return resolveProfileImageUrl(profilePicture.url);
+          }
+
+          return resolveProfileImageUrl(null);
+        };
+
         const lecturers = result.data.map((lecturer) => ({
           id: lecturer._id,
-          image: "/course-1.png",
+          image: getLecturerProfileImage(lecturer),
           name: lecturer.name,
           subject: lecturer.expertise || t('defaultSubject'),
           experience: lecturer.bio || t('defaultExperience'),

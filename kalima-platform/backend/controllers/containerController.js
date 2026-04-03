@@ -471,7 +471,18 @@ exports.getLecturerContainers = catchAsync(async (req, res, next) => {
     return next(new AppError("Lecturer ID is required", 400));
   }
 
-  let query = Container.find({ createdBy: lecturerId });
+  const filter = {
+    createdBy: lecturerId,
+    isPublished: { $ne: false },
+  };
+
+  filter.type = req.query?.type || "course";
+
+  if (req.query?.parent === "null" || req.query?.parent === "root") {
+    filter.parent = null;
+  }
+
+  let query = Container.find(filter);
 
   // If the user is not authenticated, select only basic fields
   if (!req.user) {

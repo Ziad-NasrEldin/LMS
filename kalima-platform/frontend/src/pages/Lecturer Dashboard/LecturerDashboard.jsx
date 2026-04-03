@@ -3,7 +3,6 @@
 import { useTranslation } from "react-i18next"
 import { designTokens } from "../../constants/designTokens"
 // Components
-import LecturerOverviewPanel from "./LecturerOverviewPanel"
 import CourseGrid from "./CourseGrid"
 import InstructorsList from "./InstructorsList"
 
@@ -26,15 +25,9 @@ export default function LecturerDashboard() {
               {t("courseManagement")}
             </h1>
             <p className="mt-3 max-w-2xl text-sm md:text-base" style={{ color: TOKENS.slateText }}>
-              {t("dashboardOverviewHint", {
-                defaultValue: isRTL
-                  ? "نظرة سريعة على المقررات والمساعدين من خلال نفس اللغة البصرية المستخدمة في باقي النظام"
-                  : "A quick view of your courses and assistants, framed with the same visual language used across the system.",
-              })}
+              {t("dashboardManagementHint")}
             </p>
           </div>
-
-          <LecturerOverviewPanel />
 
           {/* Course Grid Section */}
           <section className="rounded-[2rem] border p-5 md:p-6" style={{ background: TOKENS.neutralCloud, borderColor: "rgba(17,24,39,0.08)" }}>

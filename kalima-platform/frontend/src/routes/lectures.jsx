@@ -330,9 +330,12 @@ export const getAllLectures = async (queryParams = {}) => {
   }
 };
 
-export const getContainersByLecturerId = async (lecturerId) => {
+export const getContainersByLecturerId = async (lecturerId, queryParams = {}) => {
   try {
-    const response = await axios.get(`${API_URL}/containers/lecturer/${lecturerId}`, authConfig());
+    const response = await axios.get(
+      `${API_URL}/containers/lecturer/${lecturerId}`,
+      authConfig({ params: queryParams })
+    );
     return response.data;
   } catch (error) {
     return normalizeApiError(error, `Error fetching containers for lecturer ${lecturerId}`);

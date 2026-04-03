@@ -1,7 +1,7 @@
 "use client"
 
 import { useTranslation } from 'react-i18next';
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { Loader, BookOpen, GraduationCap, Star, Award, Users } from "lucide-react"
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom"
 import { getLecturerById } from "../../routes/fetch-users"
@@ -9,6 +9,8 @@ import { getContainersByLecturerId } from "../../routes/lectures"
 import { buildCoursePath, buildTeacherPath } from "../../seo/site.mjs"
 import { useSeo } from "../../seo/useSeo"
 import { buildBreadcrumbSchema, buildPersonSchema } from "../../seo/structuredData.mjs"
+import { resolveProfileImageUrl } from "../../utils/profileImage"
+import { resolveUploadUrl } from "../../utils/uploadUrl"
 
 const TeacherInfoHeader = () => {
   const { t } = useTranslation("teacherDetails");
@@ -36,9 +38,10 @@ const CourseCard = ({ course }) => {
     <div className={`card bg-base-100 shadow-[0_6px_16px_rgba(0,0,0,0.10)] hover:shadow-[0_12px_28px_rgba(0,0,0,0.14)] hover:-translate-y-1 duration-300 transition-all rounded-3xl w-full max-w-[22rem] mx-auto overflow-hidden ${isRTL ? 'text-right' : 'text-left'}`}>
       <figure className="relative h-48 bg-base-200 w-full p-2">
         <img
-          src={`/course-4.png`}
+          src={course.thumbnail || `/course-4.png`}
           alt={course.title}
           className="w-full h-full object-cover rounded-2xl"
+          onError={(e) => { e.currentTarget.src = `/course-4.png` }}
         />
         {/* Floating badge for rating */}
         <div className="absolute top-5 right-5 bg-base-100/95 backdrop-blur-sm px-3 py-1.5 rounded-full text-sm font-semibold flex items-center gap-1 shadow-sm">
@@ -79,11 +82,49 @@ const CourseCard = ({ course }) => {
   )
 }
 
+const socialIcons = [
+  {
+    label: "Facebook",
+    svg: (
+      <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current" xmlns="http://www.w3.org/2000/svg">
+        <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
+      </svg>
+    ),
+  },
+  {
+    label: "X (Twitter)",
+    svg: (
+      <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current" xmlns="http://www.w3.org/2000/svg">
+        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+      </svg>
+    ),
+  },
+  {
+    label: "Instagram",
+    svg: (
+      <svg viewBox="0 0 24 24" className="w-5 h-5 fill-none stroke-current stroke-2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
+        <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+        <circle cx="12" cy="12" r="4"/>
+        <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor" stroke="none"/>
+      </svg>
+    ),
+  },
+  {
+    label: "LinkedIn",
+    svg: (
+      <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current" xmlns="http://www.w3.org/2000/svg">
+        <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6zM2 9h4v12H2z"/>
+        <circle cx="4" cy="4" r="2"/>
+      </svg>
+    ),
+  },
+];
+
 const SocialMediaIcons = () => (
   <div className="flex flex-row gap-3 mt-6 justify-center md:justify-start">
-    {[76, 77, 78, 79].map((num) => (
-      <button key={num} className="btn border-none btn-circle bg-base-200 shadow-sm hover:bg-info/20 hover:scale-110 transition-all duration-200 h-10 w-10 min-h-0 flex items-center justify-center">
-        <img src={`/Frame ${num}.png`} alt={`Social media ${num}`} className="w-5 h-5 object-contain" />
+    {socialIcons.map(({ label, svg }) => (
+      <button key={label} className="btn border-none btn-circle bg-base-200 shadow-sm hover:bg-info/20 hover:scale-110 transition-all duration-200 h-10 w-10 min-h-0 flex items-center justify-center text-base-content/60 hover:text-info">
+        {svg}
       </button>
     ))}
   </div>
@@ -98,9 +139,9 @@ const TeacherProfileImage = ({ profileImage }) => (
     <div className="w-full h-full rounded-full overflow-hidden border-[6px] border-base-100 shadow-[0_12px_28px_rgba(0,0,0,0.12)] relative z-10 bg-base-200">
       <img 
         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
-        src={profileImage || "/Ellipse 103.png"} 
+        src={profileImage || resolveProfileImageUrl(null)} 
         alt="Teacher Profile"
-        onError={(e) => { e.target.src = "/Ellipse 103.png" }}
+        onError={(e) => { e.currentTarget.src = resolveProfileImageUrl(null) }}
       />
     </div>
   </div>
@@ -118,6 +159,9 @@ export default function TeacherDetails() {
   const { userId } = useParams();
   const teacherName = String(teacher?.name || "").trim();
   const canonicalPath = teacher ? buildTeacherPath(teacher) : null;
+  const resolvedTeacherImage = resolveProfileImageUrl(
+    teacher?.profilePic || teacher?.profilePicture?.url || teacher?.profilePicture || null
+  );
   const seoDescription =
     String(teacher?.bio || "").trim() ||
     (teacher?.expertise
@@ -136,7 +180,7 @@ export default function TeacherDetails() {
             : `${teacherName} | Fekra Teachers`,
           description: seoDescription,
           canonicalPath,
-          image: teacher.profilePic || teacher.profilePicture || "/Kalima.png",
+          image: resolvedTeacherImage,
           lang: i18n.language?.startsWith("en") ? "en" : "ar",
           dir: isRTL ? "rtl" : "ltr",
           schema: [
@@ -149,7 +193,7 @@ export default function TeacherDetails() {
               name: teacherName,
               description: seoDescription,
               path: canonicalPath,
-              image: teacher.profilePic || teacher.profilePicture || "/Kalima.png",
+              image: resolvedTeacherImage,
               expertise: teacher.expertise,
             }),
           ],
@@ -163,6 +207,15 @@ export default function TeacherDetails() {
           lang: i18n.language?.startsWith("en") ? "en" : "ar",
           dir: isRTL ? "rtl" : "ltr",
         },
+  );
+
+  const activeContainers = useMemo(
+    () =>
+      (Array.isArray(containers) ? containers : []).filter((container) => {
+        const type = String(container?.type || "").toLowerCase();
+        return container?.isPublished !== false && type === "course";
+      }),
+    [containers]
   );
 
   useEffect(() => {
@@ -180,7 +233,7 @@ export default function TeacherDetails() {
         if (teacherResult.success && teacherResult.data) {
           setTeacher(teacherResult.data);
           
-          const containersData = await getContainersByLecturerId(userId);
+          const containersData = await getContainersByLecturerId(userId, { type: "course" });
           if (containersData?.data?.containers) {
             setContainers(containersData.data.containers);
           }
@@ -252,7 +305,7 @@ export default function TeacherDetails() {
             
             {/* Image & Socials */}
             <div className="flex flex-col items-center shrink-0">
-               <TeacherProfileImage profileImage={teacher.profilePic || teacher.profilePicture} />
+               <TeacherProfileImage profileImage={resolvedTeacherImage} />
                <SocialMediaIcons />
             </div>
 
@@ -301,8 +354,8 @@ export default function TeacherDetails() {
 
           {/* Card grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 xl:gap-10">
-            {containers.length > 0 ? (
-              containers.map((container) => (
+            {activeContainers.length > 0 ? (
+              activeContainers.map((container) => (
                 <CourseCard 
                   key={container._id}
                   course={{
@@ -314,7 +367,14 @@ export default function TeacherDetails() {
                     rating: 5,
                     duration: 12,
                     type: container.type,
-                  }} 
+                    thumbnail: resolveUploadUrl(
+                      container?.image?.url ||
+                      container?.containerImage?.url ||
+                      container?.inheritedImage?.image?.url ||
+                      container?.thumbnail,
+                      "product_thumbnails"
+                    ),
+                  }}
                 />
               ))
             ) : (

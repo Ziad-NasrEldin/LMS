@@ -193,17 +193,28 @@ select.select option:hover {
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
+  border: 1px solid rgba(17, 24, 39, 0.12);
+  border-radius: var(--radius-field, 0.5rem);
+  background-color: rgba(17, 24, 39, 0.03);
+  color: #111827;
+  min-height: var(--size, calc(var(--size-field, 0.25rem) * 10));
+  padding-inline: 1rem;
+  box-shadow: 0 1px color-mix(in oklab, rgba(17, 24, 39, 0.12) calc(var(--depth) * 10%), #0000) inset;
   text-align: start;
   cursor: pointer;
+  transition: border-color 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
 }
 
-.ds-select-trigger.select {
-  background-image: none !important;
-  padding-inline-end: 1rem;
+.ds-select-trigger:focus,
+.ds-select-trigger:focus-visible {
+  outline: none;
+  border-color: rgba(14, 85, 99, 0.46);
+  box-shadow: 0 0 0 3px rgba(77, 179, 194, 0.22);
 }
 
-[dir="rtl"] .ds-select-trigger.select {
-  padding-inline-start: 1rem;
+.ds-select-trigger.ds-select-error {
+  border-color: var(--color-error, #d64055);
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--color-error, #d64055) 22%, transparent);
 }
 
 .ds-select-trigger:disabled {

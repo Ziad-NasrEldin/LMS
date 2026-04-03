@@ -363,9 +363,15 @@ export default function CourseGrid() {
   // Memoized container image getter
   const getContainerImage = useCallback((container, index) => {
     const thumbnailFolder = container.type === "lecture" ? "lecture_thumbnails" : "product_thumbnails"
-    const resolvedThumbnail = resolveUploadUrl(container.thumbnail, thumbnailFolder)
-    if (resolvedThumbnail) {
-      return resolvedThumbnail
+    const imagePath =
+      container?.image?.url ||
+      container?.containerImage?.url ||
+      container?.inheritedImage?.image?.url ||
+      container?.thumbnail
+
+    const resolvedImage = resolveUploadUrl(imagePath, thumbnailFolder)
+    if (resolvedImage) {
+      return resolvedImage
     }
     return COURSE_CARD_FALLBACK_IMAGES[index % COURSE_CARD_FALLBACK_IMAGES.length]
   }, [])

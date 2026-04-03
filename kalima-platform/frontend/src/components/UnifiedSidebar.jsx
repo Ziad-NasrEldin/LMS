@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
+  FaChartLine,
   FaChevronLeft,
   FaChevronRight,
   FaCog,
@@ -415,6 +416,12 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
         title: t("myDashboard") || "My Dashboard",
         icon: <FaUserTie className="h-5 w-5" />,
         path: "/dashboard/lecturer-dashboard",
+      },
+      {
+        id: "lecturer-analytics",
+        title: t("Analytics") || "Analytics",
+        icon: <FaChartLine className="h-5 w-5" />,
+        path: "/dashboard/lecturer-dashboard/analytics",
       },
       {
         id: "course-builder",

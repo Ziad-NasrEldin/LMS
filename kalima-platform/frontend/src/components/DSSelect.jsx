@@ -3,6 +3,41 @@ import { Check, ChevronDown } from "lucide-react"
 
 const normalizeValue = (value) => (value === undefined || value === null ? "" : String(value))
 
+const sanitizeClassName = (className = "") => {
+  const tokens = String(className)
+    .split(/\s+/)
+    .map((token) => token.trim())
+    .filter(Boolean)
+
+  const sanitized = tokens.map((token) => {
+    if (token === "select-error") return "ds-select-error"
+    if (/^[a-z]+:select-error$/.test(token)) return token.replace(/select-error$/, "ds-select-error")
+    return token
+  }).filter((token) => {
+    if (token === "select") return false
+    if (/^[a-z]+:select$/.test(token)) return false
+    if (token === "select-bordered") return false
+    if (/^[a-z]+:select-bordered$/.test(token)) return false
+    if (token === "select-ghost") return false
+    if (/^[a-z]+:select-ghost$/.test(token)) return false
+    if (
+      token === "select-neutral" ||
+      token === "select-primary" ||
+      token === "select-secondary" ||
+      token === "select-accent" ||
+      token === "select-info" ||
+      token === "select-success" ||
+      token === "select-warning" ||
+      token === "select-error"
+    ) {
+      return false
+    }
+    return true
+  })
+
+  return sanitized.join(" ")
+}
+
 const textFromNode = (node) => {
   if (node === undefined || node === null || typeof node === "boolean") return ""
   if (typeof node === "string" || typeof node === "number") return String(node)
@@ -108,6 +143,7 @@ export default function DSSelect({
   const selectedValue = isControlled ? normalizeValue(value) : internalValue
   const selectedOption = options.find((option) => option.value === selectedValue) || null
   const enabledOptions = options.filter((option) => !option.disabled && !option.hidden)
+  const triggerClassName = sanitizeClassName(className)
 
   useEffect(() => {
     if (isControlled) return
@@ -254,7 +290,7 @@ export default function DSSelect({
         ref={triggerRef}
         id={controlId}
         type="button"
-        className={`ds-select-trigger ${className}`.trim()}
+        className={`ds-select-trigger ${triggerClassName}`.trim()}
         style={style}
         disabled={disabled}
         aria-haspopup="listbox"

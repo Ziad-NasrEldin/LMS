@@ -29,6 +29,7 @@ const PromoCodes = lazy(() => import("./pages/User Dashboard/promoCodes.jsx"))
 const SettingsPage = lazy(() => import("./pages/Settings/SettingsPage.jsx"))
 const Services = lazy(() => import("./pages/Services/Services.jsx"))
 const DashboardPage = lazy(() => import("./pages/Lecturer Dashboard/LecturerDashboard.jsx"))
+const LecturerAnalyticsPage = lazy(() => import("./pages/Lecturer Dashboard/LecturerAnalyticsPage.jsx"))
 const LecturerPromoCodesPage = lazy(() => import("./pages/Lecturer Dashboard/LecturerPromoCodesPage.jsx"))
 const LecturerLinkedStudentsPage = lazy(() => import("./pages/Lecturer Dashboard/LecturerLinkedStudentsPage.jsx"))
 const ContainersPage = lazy(() => import("./pages/User Dashboard/Lecture Page/ContainerPage.jsx"))
@@ -238,6 +239,29 @@ function App() {
     return <Navigate to={getOverviewPathByRole(role)} replace />;
   };
 
+  const TeacherOverviewPlaceholder = () => (
+    <div className="mx-auto mt-6 w-full max-w-5xl px-4 sm:px-6 lg:px-8">
+      <div className="rounded-2xl border border-slate-200 bg-white px-6 py-16 text-center shadow-sm">
+        <p className="text-xl font-semibold text-slate-800">
+          {isRTL ? "مزايا أكثر قادمة لك قريبًا" : "More Features Coming For you soon"}
+        </p>
+      </div>
+    </div>
+  );
+
+  const StudentDashboardOverviewRoute = () => {
+    const role = getCurrentUserRole();
+    const normalizedRole = String(role || "")
+      .toLowerCase()
+      .replace(/[^a-z]/g, "");
+
+    if (normalizedRole === "teacher") {
+      return <TeacherOverviewPlaceholder />;
+    }
+
+    return <PromoCodes />;
+  };
+
   return (
     <div className={`App ${isRTL ? "rtl" : "ltr"}`}>
       <AuthNoindexController />
@@ -329,7 +353,7 @@ function App() {
             />
             <Route
               path="/dashboard/student-dashboard/overview"
-              element={renderDashboardRoute(<PromoCodes />, ["student", "teacher"])}
+              element={renderDashboardRoute(<StudentDashboardOverviewRoute />, ["student", "teacher"])}
             />
             <Route
               path="/dashboard/parent-dashboard/overview"
@@ -411,6 +435,10 @@ function App() {
             <Route
               path="/dashboard/lecturer-dashboard"
               element={renderLecturerRoute(<DashboardPage />)}
+            />
+            <Route
+              path="/dashboard/lecturer-dashboard/analytics"
+              element={renderLecturerRoute(<LecturerAnalyticsPage />)}
             />
             <Route
               path="/dashboard/lecturer-dashboard/courses-page"

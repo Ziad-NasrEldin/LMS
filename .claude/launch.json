@@ -1,0 +1,19 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "Frontend (Vite)",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "start"],
+      "cwd": "kalima-platform/frontend",
+      "port": 5173
+    },
+    {
+      "name": "Backend (Express/Nodemon)",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "start"],
+      "cwd": "kalima-platform/backend",
+      "port": 5000
+    }
+  ]
+}
