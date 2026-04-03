@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { Eye, EyeOff, Trash2 } from "lucide-react"
 import { useTranslation } from "react-i18next"
+import DSSelect from "../../components/DSSelect"
 
 const PARENT_RELATION_OPTIONS = ["mother", "father", "other"]
 const fieldClass = "h-12 min-h-12 w-full rounded-xl text-base"
@@ -78,7 +79,7 @@ function ParentContactField({
               <label className="label py-1">
                 <span className="label-text text-xs">{relationLabel}</span>
               </label>
-              <select
+              <DSSelect
                 name={relationName}
                 className={`${selectClass} ${relationError ? "select-error animate-shake" : ""}`}
                 value={relationValue || ""}
@@ -91,7 +92,7 @@ function ParentContactField({
                     {option.label}
                   </option>
                 ))}
-              </select>
+              </DSSelect>
               {relationError && (
                 <span className="text-error text-sm mt-1">{t(`validation.${relationError}`)}</span>
               )}

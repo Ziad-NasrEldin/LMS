@@ -1,11 +1,13 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { motion } from "framer-motion"
 import { ImageIcon, Video, ChevronDown } from "lucide-react"
 import toast from "react-hot-toast"
 import { createContainer, updateContainer } from "../../routes/lectures"
 import { buildContainerPayloadObject, objectToFormData } from "../../utils/contentCreationPayloads"
+import { resolveUploadUrl } from "../../utils/uploadUrl"
+import DSSelect from "../../components/DSSelect"
 
 function BasicInfoForm({
   formData,
@@ -19,18 +21,41 @@ function BasicInfoForm({
   courseSnapshot,
   isEditMode = false,
   editContainerId = null,
+  initialImageUrl = null,
 }) {
   const compactInput = "w-full input input-bordered input-sm h-10 min-h-10 bg-base-200/80 placeholder-base-content/50"
   const compactSelect = "w-full select select-bordered select-sm h-10 min-h-10 bg-base-200/80 appearance-none"
   const compactTextArea = "w-full textarea textarea-bordered textarea-sm bg-base-200/80 placeholder-base-content/50"
   const [courseImage, setCourseImage] = useState(null)
+  const [courseImagePreview, setCourseImagePreview] = useState(null)
   const [courseVideo, setCourseVideo] = useState(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const isPaidCourse = formData.courseType === "paid"
+  const existingCourseImagePreview = useMemo(
+    () => (initialImageUrl ? resolveUploadUrl(initialImageUrl, "product_thumbnails") || initialImageUrl : null),
+    [initialImageUrl],
+  )
+  const displayedCourseImage = courseImagePreview || existingCourseImagePreview
+
+  useEffect(() => {
+    if (!courseImage) {
+      setCourseImagePreview(null)
+      return
+    }
+
+    const previewUrl = URL.createObjectURL(courseImage)
+    setCourseImagePreview(previewUrl)
+
+    return () => {
+      URL.revokeObjectURL(previewUrl)
+    }
+  }, [courseImage])
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0]
-    if (file && file.size <= 1024 * 1024 * 1024) {
+    if (!file) return
+
+    if (file.size <= 1024 * 1024 * 1024) {
       setCourseImage(file)
     } else {
       toast.error(isRTL ? "حجم الملف يجب أن يكون أقل من 1 جيجابايت" : "File size must be less than 1GB")
@@ -169,7 +194,7 @@ function BasicInfoForm({
               </div>
               <div className="relative">
                 <label className="block text-sm font-medium mb-1">{isRTL ? "المستوى التعليمي" : "Learning Level"}</label>
-                <select
+                <DSSelect
                   name="gradeLevel"
                   value={formData.gradeLevel}
                   onChange={handleChange}
@@ -184,14 +209,14 @@ function BasicInfoForm({
                       {level.name}
                     </option>
                   ))}
-                </select>
+                </DSSelect>
                 <ChevronDown
                   className={`h-4 w-4 absolute top-9 ${isRTL ? "left-3" : "right-3"} pointer-events-none`}
                 />
               </div>
               <div className="relative">
                 <label className="block text-sm font-medium mb-1">{isRTL ? "المادة الدراسية" : "Subject"}</label>
-                <select
+                <DSSelect
                   name="subject"
                   value={formData.subject}
                   onChange={handleChange}
@@ -206,7 +231,7 @@ function BasicInfoForm({
                       {subject.name}
                     </option>
                   ))}
-                </select>
+                </DSSelect>
                 <ChevronDown
                   className={`h-4 w-4 absolute top-9 ${isRTL ? "left-3" : "right-3"} pointer-events-none`}
                 />
@@ -258,12 +283,31 @@ function BasicInfoForm({
                 <h2 className="block text-base text-primary font-semibold mb-2">
                   {isRTL ? "صورة الكورس" : "Course Image"}
                 </h2>
-                <label className="border border-dashed border-primary/25 rounded-xl p-4 flex flex-col items-center justify-center h-36 cursor-pointer bg-white">
-                  <ImageIcon className="w-8 h-8 mb-2 text-primary" />
-                  <span className="btn text-primary btn-sm btn-ghost border-primary border-2 mb-2">
-                    {isRTL ? "اضف صورة" : "Add Image"}
-                  </span>
-                  <p className="text-xs text-base-content/50">{isRTL ? "المساحة القصوى 1 Gb" : "Max size 1 Gb"}</p>
+                <label className="relative border border-dashed border-primary/25 rounded-xl p-4 flex flex-col items-center justify-center h-36 cursor-pointer bg-white overflow-hidden">
+                  {displayedCourseImage && (
+                    <>
+                      <img
+                        src={displayedCourseImage}
+                        alt={isRTL ? "معاينة صورة الكورس" : "Course image preview"}
+                        className="absolute inset-0 h-full w-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-black/35" />
+                    </>
+                  )}
+
+                  <div className="relative z-10 flex flex-col items-center">
+                    <ImageIcon className={`w-8 h-8 mb-2 ${displayedCourseImage ? "text-white" : "text-primary"}`} />
+                    <span
+                      className={`btn btn-sm btn-ghost border-2 mb-2 ${
+                        displayedCourseImage ? "text-white border-white hover:bg-white/15" : "text-primary border-primary"
+                      }`}
+                    >
+                      {isRTL ? "اضف صورة" : "Add Image"}
+                    </span>
+                    <p className={`text-xs ${displayedCourseImage ? "text-white/90" : "text-base-content/50"}`}>
+                      {isRTL ? "المساحة القصوى 1 Gb" : "Max size 1 Gb"}
+                    </p>
+                  </div>
                   <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
                 </label>
                 {courseImage && (

@@ -3,6 +3,7 @@ import { useState, useEffect } from "react"
 import { useTranslation } from "react-i18next"
 import SectionHeader from "./SectionHeader"
 import { designTokens } from "../../constants/designTokens"
+import DSSelect from "../../components/DSSelect"
 
 function LanguageAppearanceSection() {
   const { t, i18n } = useTranslation("settings")
@@ -43,14 +44,14 @@ function LanguageAppearanceSection() {
               <span className="label-text">{t("languageAppearance.options.language")}</span>
             </label>
             <div className={`flex ${isRTL ? "justify-end" : "justify-start"}`}>
-              <select
+              <DSSelect
                 className="select select-bordered w-full max-w-xs"
                 value={i18n.language}
                 onChange={e => changeLanguage(e.target.value)}
               >
                 <option value="ar">{t("languageAppearance.languages.ar")}  🇸🇦</option>
                 <option value="en">{t("languageAppearance.languages.en")}  🇺🇸</option>
-              </select>
+              </DSSelect>
             </div>
           </div>
         </div>

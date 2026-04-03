@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useTranslation } from "react-i18next"
+import { Eye, EyeOff } from "lucide-react"
 import { getAllLecturers } from "../../../../routes/fetch-users"
 import { getAllLevels } from "../../../../routes/levels"
 import { getAllSubjects } from "../../../../routes/courses"
@@ -13,11 +14,12 @@ import BulkCreateUsers from "./BulkCreateUsers"
 import TeacherForm from "./TeacherForm"
 import { getAllGovernments, getGovernmentZones } from "../../../../routes/governments"
 import { designTokens } from "../../../../constants/designTokens"
+import { normalizeStudentHobby } from "../../../../constants/studentHobbies"
 import { translateErrorMessage } from "../../../../utils/errorTranslator"
 import { buildLevelHierarchy } from "../../../../utils/levelHierarchy"
+import DSSelect from "../../../../components/DSSelect"
 
 const PARENT_RELATIONS = ["mother", "father", "other"]
-
 const normalizeParentRelation = (value) => String(value || "").trim().toLowerCase()
 
 const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
@@ -79,6 +81,8 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
   const [governments, setGovernments] = useState([])
   const [administrationZones, setAdministrationZones] = useState([])
   const [loadingZones, setLoadingZones] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
   // Reset form when modal opens/closes
   useEffect(() => {
@@ -86,6 +90,8 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
       setUserData(initialUserState)
       setFormError("")
       setIsBulkMode(false)
+      setShowPassword(false)
+      setShowConfirmPassword(false)
       fetchDropdownData()
     }
   }, [isOpen])
@@ -353,7 +359,7 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
           parentPhoneRelation: data.parentPhoneRelation || undefined,
           parentPhoneNumber2: data.parentPhoneNumber2 || undefined,
           parentPhoneRelation2: data.parentPhoneRelation2 || undefined,
-          hobby: data.hobby || undefined,
+          hobby: data.hobby ? normalizeStudentHobby(data.hobby) : undefined,
           faction: data.faction || undefined,
           school: data.school || undefined,
           parent: data.parent || undefined,
@@ -451,7 +457,7 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
           boxShadow: SHADOWS.level2 
         }}
       >
-        <h3 className="font-extrabold text-2xl mb-6" style={{ color: TOKENS.spaceDark }}>
+        <h3 className="font-extrabold text-2xl mb-6" style={{ color: TOKENS.inkText }}>
           {isBulkMode ? t("titles.bulkCreate") : t("titles.createNewUser")}
         </h3>
 
@@ -496,12 +502,12 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
               <div className="form-control">
                 <div className="flex flex-col gap-2">
                   <label className="label py-0">
-                    <span className="label-text font-bold" style={{ color: TOKENS.spaceDark }}>{t("fields.accountType")}</span>
+                    <span className="label-text font-bold" style={{ color: TOKENS.inkText }}>{t("fields.accountType")}</span>
                   </label>
-                  <select
+                  <DSSelect
                     name="role"
                     className="select w-full rounded-xl"
-                    style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: TOKENS.spaceDark }}
+                    style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: TOKENS.inkText }}
                     value={userData.role}
                     onChange={handleRoleChange}
                     required
@@ -516,26 +522,26 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
                     <option value="parent">{t("roles.parent")}</option>
                     <option value="lecturer">{t("roles.lecturer")}</option>
                     <option value="teacher">{t("roles.teacher")}</option>
-                  </select>
+                  </DSSelect>
                 </div>
               </div>
 
               <div className="form-control">
                 <div className="flex flex-col gap-2">
                   <label className="label py-0">
-                    <span className="label-text font-bold" style={{ color: TOKENS.spaceDark }}>{t("fields.gender")}</span>
+                    <span className="label-text font-bold" style={{ color: TOKENS.inkText }}>{t("fields.gender")}</span>
                   </label>
-                  <select
+                  <DSSelect
                     name="gender"
                     className="select w-full rounded-xl"
-                    style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: TOKENS.spaceDark }}
+                    style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: TOKENS.inkText }}
                     value={userData.gender}
                     onChange={handleChange}
                     required
                   >
                     <option value="male">{t("gender.male")}</option>
                     <option value="female">{t("gender.female")}</option>
-                  </select>
+                  </DSSelect>
                 </div>
               </div>
             </div>
@@ -543,13 +549,13 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
             <div className="form-control">
               <div className="flex flex-col gap-2">
                 <label className="label py-0">
-                  <span className="label-text font-bold" style={{ color: TOKENS.spaceDark }}>{t("fields.name")}</span>
+                  <span className="label-text font-bold" style={{ color: TOKENS.inkText }}>{t("fields.name")}</span>
                 </label>
                 <input
                   type="text"
                   name="name"
                   className="input w-full rounded-xl"
-                  style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: TOKENS.spaceDark }}
+                  style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: TOKENS.inkText }}
                   value={userData.name}
                   onChange={handleChange}
                   required
@@ -579,14 +585,24 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
                   <label className="label">
                     <span className="label-text">{t("fields.password")}</span>
                   </label>
-                  <input
-                    type="password"
-                    name="password"
-                    className="input input-bordered"
-                    value={userData.password}
-                    onChange={handleChange}
-                    required
-                  />
+                  <div className="relative">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      name="password"
+                      className={`input input-bordered w-full ${isRTL ? "pr-12" : "pl-12"}`}
+                      value={userData.password}
+                      onChange={handleChange}
+                      required
+                    />
+                    <button
+                      type="button"
+                      className={`absolute top-1/2 ${isRTL ? "right-3" : "left-3"} -translate-y-1/2 z-10`}
+                      onClick={() => setShowPassword((prev) => !prev)}
+                      aria-label={showPassword ? "Hide password" : "Show password"}
+                    >
+                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  </div>
                 </div>
               </div>
 
@@ -595,14 +611,24 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
                   <label className="label">
                     <span className="label-text">{t("fields.confirmPassword")}</span>
                   </label>
-                  <input
-                    type="password"
-                    name="confirmPassword"
-                    className="input input-bordered"
-                    value={userData.confirmPassword}
-                    onChange={handleChange}
-                    required
-                  />
+                  <div className="relative">
+                    <input
+                      type={showConfirmPassword ? "text" : "password"}
+                      name="confirmPassword"
+                      className={`input input-bordered w-full ${isRTL ? "pr-12" : "pl-12"}`}
+                      value={userData.confirmPassword}
+                      onChange={handleChange}
+                      required
+                    />
+                    <button
+                      type="button"
+                      className={`absolute top-1/2 ${isRTL ? "right-3" : "left-3"} -translate-y-1/2 z-10`}
+                      onClick={() => setShowConfirmPassword((prev) => !prev)}
+                      aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                    >
+                      {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>

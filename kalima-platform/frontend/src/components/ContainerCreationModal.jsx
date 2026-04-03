@@ -7,6 +7,7 @@ import { getAllSubjects } from "../routes/courses"
 import { translateErrorMessage } from "../utils/errorTranslator"
 import { buildContainerPayloadObject } from "../utils/contentCreationPayloads"
 import { buildLevelHierarchy } from "../utils/levelHierarchy"
+import DSSelect from "./DSSelect"
 
 const ContainerCreationModal = ({
   isOpen,
@@ -225,7 +226,7 @@ const ContainerCreationModal = ({
             <label className="label">
               <span className="label-text">Level</span>
             </label>
-            <select
+            <DSSelect
               className="select select-bordered w-full"
               value={selectedLevel}
               onChange={(e) => setSelectedLevel(e.target.value)}
@@ -237,7 +238,7 @@ const ContainerCreationModal = ({
                   {level.label || level.displayName || level.name}
                 </option>
               ))}
-            </select>
+            </DSSelect>
             {levelsLoading && <span className="loading loading-spinner mt-2"></span>}
           </div>
 
@@ -246,7 +247,7 @@ const ContainerCreationModal = ({
             <label className="label">
               <span className="label-text">Subject</span>
             </label>
-            <select
+            <DSSelect
               className="select select-bordered w-full"
               value={selectedSubject}
               onChange={(e) => setSelectedSubject(e.target.value)}
@@ -258,7 +259,7 @@ const ContainerCreationModal = ({
                   {subject.name}
                 </option>
               ))}
-            </select>
+            </DSSelect>
             {subjectsLoading && <span className="loading loading-spinner mt-2"></span>}
           </div>
 

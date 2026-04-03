@@ -7,6 +7,7 @@ import { getMyPurchasedCourseContainers, getUserDashboard } from "../../../route
 import { FiArrowLeft, FiArrowRight, FiChevronDown } from "react-icons/fi"
 import { designTokens } from "../../../constants/designTokens"
 import { translateErrorMessage } from "../../../utils/errorTranslator"
+import DSSelect from "../../../components/DSSelect"
 
 const ContainersPage = () => {
   const { t, i18n } = useTranslation('lecturesPage');
@@ -202,7 +203,7 @@ const ContainersPage = () => {
           {/* Items per page selector */}
           <div className={`mb-4 mt-4 flex flex-col gap-2 sm:mt-0 sm:flex-row ${isRTL ? "sm:justify-start" : "sm:justify-end"}`}>
             <div className="relative w-full sm:w-auto">
-              <select
+              <DSSelect
                 className={`h-11 w-full appearance-none rounded-full border px-4 text-base font-semibold shadow-sm transition focus:outline-none focus:ring-2 focus:ring-cyan-200/70 sm:min-w-[168px] ${isRTL ? "pl-10 pr-4 text-right" : "pr-10 text-left"}`}
                 style={{
                   borderColor: "rgba(17,24,39,0.14)",
@@ -216,7 +217,7 @@ const ContainersPage = () => {
                 <option value={5}>{t('containersPage.itemsPerPage', { count: 5 })}</option>
                 <option value={10}>{t('containersPage.itemsPerPage', { count: 10 })}</option>
                 <option value={20}>{t('containersPage.itemsPerPage', { count: 20 })}</option>
-              </select>
+              </DSSelect>
               <FiChevronDown
                 className={`pointer-events-none absolute top-1/2 -translate-y-1/2 text-sm ${isRTL ? "left-4" : "right-4"}`}
                 style={{ color: TOKENS.deepTeal }}

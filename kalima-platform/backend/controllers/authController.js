@@ -9,22 +9,55 @@ const { generateAccessToken } = require("../utils/tokens/generateTokens.js");
 const { sendToken } = require("../utils/tokens/sendToken.js");
 const RefreshToken = require("../models/refreshTokenModel.js");
 
-const normalizeRole = (role) => String(role || "").trim().toLowerCase();
+const normalizeRole = (role) =>
+  String(role || "")
+    .replace(/[_-]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toLowerCase();
+
+const normalizePolicyTargetRole = (role) => {
+  const normalized = normalizeRole(role);
+
+  if (["lecturer", "teacher assistant"].includes(normalized)) return "lecturer";
+  if (["student", "pupil"].includes(normalized)) return "student";
+  if (["parent", "guardian"].includes(normalized)) return "parent";
+  if (["teacher", "instructor", "educator", "معلم", "المعلم"].includes(normalized)) {
+    return "teacher";
+  }
+
+  return normalized;
+};
 
 const normalizeActorRoleForPolicy = (role) => {
   const normalized = normalizeRole(role);
-  if (normalized === "admin" || normalized === "subadmin") return "admin";
+  const adminAliases = new Set([
+    "admin",
+    "subadmin",
+    "sub-admin",
+    "superadmin",
+    "super admin",
+    "administrator",
+    "moderator",
+  ]);
+  if (
+    adminAliases.has(normalized) ||
+    normalized.includes("admin") ||
+    normalized.includes("super")
+  ) {
+    return "admin";
+  }
   return normalized;
 };
 
 const canImpersonate = (actorRole, targetRole) => {
   const matrix = {
-    admin: new Set(["lecturer", "student", "parent"]),
+    admin: new Set(["lecturer", "student", "parent", "teacher"]),
     lecturer: new Set(["student", "parent"]),
     assistant: new Set(["student"]),
   };
   const actor = normalizeActorRoleForPolicy(actorRole);
-  const target = normalizeRole(targetRole);
+  const target = normalizePolicyTargetRole(targetRole);
   return matrix[actor]?.has(target) || false;
 };
 
@@ -248,10 +281,12 @@ const startImpersonation = catchAsync(async (req, res, next) => {
   }
 
   const actor = req.user;
+  const normalizedActorRole = normalizeActorRoleForPolicy(actor.role);
+  const normalizedRequestedTargetRole = normalizePolicyTargetRole(targetRole);
   if (!canImpersonate(actor.role, targetRole)) {
     return next(
       new AppError(
-        `Forbidden. ${actor.role} cannot impersonate ${targetRole}.`,
+        `Forbidden. ${actor.role} cannot impersonate ${targetRole}. (policy actor:${normalizedActorRole} target:${normalizedRequestedTargetRole})`,
         403
       )
     );
@@ -262,7 +297,10 @@ const startImpersonation = catchAsync(async (req, res, next) => {
     return next(new AppError("Target user not found", 404));
   }
 
-  if (normalizeRole(target.role) !== normalizeRole(targetRole)) {
+  if (
+    normalizePolicyTargetRole(target.role) !==
+    normalizePolicyTargetRole(targetRole)
+  ) {
     return next(
       new AppError(
         `Target user role mismatch. Requested ${targetRole}, but user is ${target.role}.`,

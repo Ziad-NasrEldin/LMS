@@ -10,6 +10,7 @@ import { resolveUploadUrl } from "../utils/uploadUrl"
 import { translateErrorMessage } from "../utils/errorTranslator"
 import { buildLecturePayloadObject } from "../utils/contentCreationPayloads"
 import { buildLevelHierarchy } from "../utils/levelHierarchy"
+import DSSelect from "./DSSelect"
 
 const ATTACHMENT_BUCKET_KEYS = ["pdfsandimages", "booklets", "homeworks", "exams"]
 const FORM_LINK_KEYS = ["homeworks", "exams"]
@@ -558,7 +559,7 @@ const LectureCreationModal = ({
                         <label className="label">
                           <span className="label-text font-semibold">{t("fields.lectureType")}</span>
                         </label>
-                        <select
+                        <DSSelect
                           className="select select-bordered w-full rounded-2xl"
                           value={newLectureType}
                           onChange={(e) => setNewLectureType(e.target.value)}
@@ -567,7 +568,7 @@ const LectureCreationModal = ({
                           <option value="Teachers Only">{t("lectureTypes.teachersOnly", "Teachers Only")}</option>
                           <option value="Revision">{t("lectureTypes.revision")}</option>
                           <option value="Paid">{t("lectureTypes.normal")}</option>
-                        </select>
+                        </DSSelect>
                       </div>
                     </div>
                   </section>
@@ -588,7 +589,7 @@ const LectureCreationModal = ({
                         <label className="label">
                           <span className="label-text font-semibold">{t("fields.level")}</span>
                         </label>
-                        <select
+                        <DSSelect
                           className="select select-bordered w-full rounded-2xl"
                           value={selectedLevel}
                           onChange={(e) => setSelectedLevel(e.target.value)}
@@ -600,7 +601,7 @@ const LectureCreationModal = ({
                               {level.label || level.displayName || level.name}
                             </option>
                           ))}
-                        </select>
+                        </DSSelect>
                         {levelsLoading && <span className="loading loading-spinner loading-sm mt-2"></span>}
                       </div>
 
@@ -608,7 +609,7 @@ const LectureCreationModal = ({
                         <label className="label">
                           <span className="label-text font-semibold">{t("fields.subject")}</span>
                         </label>
-                        <select
+                        <DSSelect
                           className="select select-bordered w-full rounded-2xl"
                           value={selectedSubject}
                           onChange={(e) => setSelectedSubject(e.target.value)}
@@ -620,7 +621,7 @@ const LectureCreationModal = ({
                               {subject.name}
                             </option>
                           ))}
-                        </select>
+                        </DSSelect>
                         {subjectsLoading && <span className="loading loading-spinner loading-sm mt-2"></span>}
                       </div>
                     </div>
@@ -629,14 +630,14 @@ const LectureCreationModal = ({
                       <div className="rounded-[1.5rem] border border-base-300 bg-base-200/40 p-4">
                         <div className="mb-3 flex items-center justify-between gap-3">
                           <h5 className="font-semibold text-base-content">{t("fields.requiresExam")}</h5>
-                          <select
+                          <DSSelect
                             className="select select-bordered select-sm rounded-xl"
                             value={requiresExam}
                             onChange={(e) => setRequiresExam(e.target.value === "true")}
                           >
                             <option value={false}>{t("options.no")}</option>
                             <option value={true}>{t("options.yes")}</option>
-                          </select>
+                          </DSSelect>
                         </div>
                         {requiresExam && (
                           <div className="space-y-3">
@@ -676,14 +677,14 @@ const LectureCreationModal = ({
                       <div className="rounded-[1.5rem] border border-base-300 bg-base-200/40 p-4">
                         <div className="mb-3 flex items-center justify-between gap-3">
                           <h5 className="font-semibold text-base-content">{t("fields.requiresHomework")}</h5>
-                          <select
+                          <DSSelect
                             className="select select-bordered select-sm rounded-xl"
                             value={requiresHomework}
                             onChange={(e) => setRequiresHomework(e.target.value === "true")}
                           >
                             <option value={false}>{t("options.no")}</option>
                             <option value={true}>{t("options.yes")}</option>
-                          </select>
+                          </DSSelect>
                         </div>
                         {requiresHomework && (
                           <div className="space-y-3">
@@ -840,14 +841,14 @@ const LectureCreationModal = ({
                                 {t("attachments.formType", "Form type")}
                               </span>
                             </label>
-                            <select
+                            <DSSelect
                               className="select select-bordered w-full rounded-2xl"
                               value={selectedFormLinkType}
                               onChange={(e) => handleFormLinkTypeChange(e.target.value)}
                             >
                               <option value="homeworks">{t("attachments.homeworkType", "Homework")}</option>
                               <option value="exams">{t("attachments.examType", "Exam")}</option>
-                            </select>
+                            </DSSelect>
                           </div>
 
                           <div className="form-control">

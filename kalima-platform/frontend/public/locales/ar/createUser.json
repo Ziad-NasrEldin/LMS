@@ -17,8 +17,12 @@
     "confirmPassword": "تأكيد كلمة المرور",
     "stage": "المرحلة",
     "level": "الصف الدراسي",
+    "levelOptional": "الصف الدراسي (اختياري)",
     "phoneNumber": "رقم الهاتف",
     "parentPhoneNumber": "رقم هاتف ولي الأمر",
+    "parentPhoneRelation": "صلة ولي الأمر",
+    "parentPhoneNumber2": "رقم هاتف ولي أمر إضافي",
+    "parentPhoneRelation2": "صلة ولي الأمر الإضافي",
     "profession": "المهنة",
     "hobby": "الهواية",
     "sequencedId": "الرقم التسلسلي",
@@ -59,6 +63,7 @@
     "phoneNumber": "أدخل رقم الهاتف",
     "parentPhoneNumber": "أدخل رقم هاتف ولي الأمر",
     "additionalParentPhone": "أدخل رقم هاتف ولي الأمر الإضافي",
+    "selectParentRelation": "اختر الصلة",
     "profession": "أدخل المهنة",
     "selectHobby": "اختر الهواية",
     "sequencedId": "أدخل الرقم التسلسلي",
@@ -110,7 +115,7 @@
     "add": "إضافة",
     "addAnotherParentPhone": "إضافة هاتف ولي أمر آخر",
     "removeParentPhone": "إزالة",
-    "createUsers": "انشاء مستخدمين",
+    "createUsers": "إنشاء مستخدمين",
     "uploading": "جاري التحميل..."
   },
   "messages": {
@@ -128,6 +133,11 @@
     "levelRequired": "الرجاء تحديد الصف الدراسي",
     "invalidPhoneNumber": "رقم الهاتف غير صالح (10-15 أرقام)",
     "invalidParentPhoneNumber": "رقم هاتف ولي الأمر غير صالح (10-15 رقمًا)",
+    "parentRelationRequired": "يرجى اختيار صلة ولي الأمر",
+    "parentRelationInvalid": "يرجى اختيار صلة ولي أمر صحيحة",
+    "additionalParentPhoneRequired": "يرجى إدخال رقم هاتف ولي الأمر الإضافي",
+    "additionalParentRelationRequired": "يرجى اختيار صلة ولي الأمر الإضافي",
+    "additionalParentRelationInvalid": "يرجى اختيار صلة ولي أمر إضافية صحيحة",
     "hobbyRequired": "يرجى اختيار هواية",
     "professionRequired": "يرجى إدخال المهنة",
     "subjectsRequired": "الرجاء إدخال المواد الدراسية",
@@ -155,18 +165,18 @@
   "errors": {
     "failedToLoadDropdowns": "فشل في تحميل بيانات القوائم المنسدلة",
     "failedToCreateUser": "فشل في إنشاء المستخدم",
-    "failedToCreateUsers": "فشل في إنشاء المستخدمين. يرجى المحاولة مجددا.",
-    "unexpectedError": "حدث خطاء غير متوقع. يرجى المحاولة مجددا."
+    "failedToCreateUsers": "فشل في إنشاء المستخدمين. يرجى المحاولة مجددًا.",
+    "unexpectedError": "حدث خطأ غير متوقع. يرجى المحاولة مجددًا."
   },
   "success": {
-    "usersCreated": "تم انشاء المستخدمين بنجاح!"
+    "usersCreated": "تم إنشاء المستخدمين بنجاح!"
   },
   "help": {
     "holdCtrlToSelectMultiple": "اضغط Ctrl (أو Cmd) لتحديد خيارات متعددة",
     "selectAccountType": "الإنشاء بالجملة يدعم فقط: طالب، ولي أمر، مدرس",
-    "csvRequiredFields": "الملف CSV يجب ان يحتوي على الحقول المطلوبة لنوع الحساب المحدد",
+    "csvRequiredFields": "يجب أن يحتوي ملف CSV على الحقول المطلوبة لنوع الحساب المحدد",
     "uploadCSV": "تحميل ملف CSV",
-    "csvFormat": "يجب ان يحتوي الملف CSV على الحقول التالية:"
+    "csvFormat": "يجب أن يحتوي ملف CSV على الحقول التالية:"
   },
   "csvFields": {
     "name": "الاسم",

@@ -407,12 +407,24 @@ export const deleteContainerById = async (containerId) => {
   try {
     const response = await axios.delete(
       `${API_URL}/containers/${containerId}`,
-      authConfig({ withCredentials: false })
+      authConfig()
     )
-    if (response.status === 200) {
-      alert(`Container ${containerId} deleted successfully`)
+
+    // Backend may return 204 (no content) on successful delete.
+    if (response.status === 200 || response.status === 204) {
+      return {
+        status: "success",
+        success: true,
+        data: response.data ?? null,
+      }
     }
-    return response.data
+
+    return {
+      status: "error",
+      success: false,
+      message: "Failed to delete container",
+      data: response.data ?? null,
+    }
   } catch (error) {
     return normalizeApiError(error, `Error deleting container ${containerId}`);
   }

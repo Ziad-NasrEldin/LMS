@@ -1,3 +1,5 @@
+import { translateErrorMessage } from "../../utils/errorTranslator";
+
 const CODE_TO_FIELD_VALIDATION_KEY = {
   SIGNUP_EMAIL_REQUIRED: "required",
   SIGNUP_EMAIL_ALREADY_EXISTS: "emailExists",
@@ -49,10 +51,25 @@ const CODE_TO_FIELD_VALIDATION_KEY = {
 
 const codeToValidationKey = (code) => CODE_TO_FIELD_VALIDATION_KEY[code] || "invalidData";
 
+const LEGACY_ERROR_KEY_TO_VALIDATION_KEY = {
+  required: "required",
+  invalid: "invalidInput",
+  invalidInput: "invalidInput",
+  duplicate: "duplicate",
+  emailExists: "emailExists",
+  phoneExists: "phoneExists",
+};
+
+const FIELD_ALIASES = {
+  name: "fullName",
+  zone: "administrationZone",
+};
+
 const toFieldName = (field) => {
   const value = String(field || "").trim();
   if (!value) return "";
-  return value.split(".")[0];
+  const topLevelField = value.split(".")[0];
+  return FIELD_ALIASES[topLevelField] || topLevelField;
 };
 
 const translateSignupCode = ({ code, role, message, t }) => {
@@ -68,22 +85,39 @@ const translateSignupCode = ({ code, role, message, t }) => {
   return t("errors.unexpectedError");
 };
 
+const toLegacyValidationKey = (errorKey, field) => {
+  const normalized = String(errorKey || "").trim().replace(/^validation\./i, "");
+  if (!normalized) return "";
+
+  if (normalized === "duplicate") {
+    if (field === "email") return "emailExists";
+    if (["phoneNumber", "phoneNumber2", "parentPhoneNumber", "parentPhoneNumber2"].includes(field)) {
+      return "phoneExists";
+    }
+  }
+
+  return LEGACY_ERROR_KEY_TO_VALIDATION_KEY[normalized] || normalized;
+};
+
 export const mapSignupApiError = ({ error, role, t }) => {
   const normalizedRole = String(role || "").trim().toLowerCase();
   const responseData = error?.response?.data || {};
   const fallbackMessage =
+    responseData?.translatedMessage ||
     responseData?.rawMessage ||
     responseData?.message ||
+    error?.translatedMessage ||
     error?.rawMessage ||
     error?.message ||
     "";
 
   const explicitIssues = Array.isArray(responseData?.errors) ? responseData.errors : [];
-  const fallbackIssue = responseData?.code
+  const fallbackIssue = responseData?.code || responseData?.field || responseData?.errorKey
     ? [
         {
           code: responseData.code,
           field: responseData.field,
+          errorKey: responseData.errorKey,
           message: fallbackMessage,
         },
       ]
@@ -98,25 +132,40 @@ export const mapSignupApiError = ({ error, role, t }) => {
     for (const issue of issues) {
       const code = String(issue?.code || responseData?.code || "").trim();
       const field = toFieldName(issue?.field || responseData?.field);
-      const summaryMessage = translateSignupCode({
-        code,
-        role: normalizedRole,
-        message: issue?.message || fallbackMessage,
-        t,
-      });
+      const legacyValidationKey = toLegacyValidationKey(issue?.errorKey || responseData?.errorKey, field);
+
+      let summaryMessage = "";
+      if (code) {
+        summaryMessage = translateSignupCode({
+          code,
+          role: normalizedRole,
+          message: issue?.message || fallbackMessage,
+          t,
+        });
+      } else if (legacyValidationKey) {
+        summaryMessage = t(`validation.${legacyValidationKey}`);
+      } else {
+        summaryMessage = translateErrorMessage(issue?.message || fallbackMessage, t("errors.unexpectedError"));
+      }
 
       if (summaryMessage && !summaryMessages.includes(summaryMessage)) {
         summaryMessages.push(summaryMessage);
       }
 
       if (field) {
-        fieldErrors[field] = codeToValidationKey(code);
+        if (code) {
+          fieldErrors[field] = codeToValidationKey(code);
+        } else if (legacyValidationKey) {
+          fieldErrors[field] = legacyValidationKey;
+        } else {
+          fieldErrors[field] = "invalidInput";
+        }
       }
     }
   } else {
     const summaryMessage =
       fallbackMessage && fallbackMessage !== "Network Error"
-        ? fallbackMessage
+        ? translateErrorMessage(fallbackMessage, t("errors.unexpectedError"))
         : t("errors.networkError");
     summaryMessages.push(summaryMessage);
   }

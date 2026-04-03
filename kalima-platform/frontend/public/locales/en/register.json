@@ -253,7 +253,9 @@
     "profilePicInvalidType": "Profile picture must be an image file",
     "profilePicTooLarge": "Profile picture is too large",
     "phoneMustDiffer": "Secondary phone number must be different from primary phone number",
-    "invalidRole": "Selected account role is invalid"
+    "invalidRole": "Selected account role is invalid",
+    "duplicate": "This value is already in use",
+    "genericError": "Please review the highlighted fields and try again"
   },
   "apiErrors": {
     "SIGNUP_VALIDATION_FAILED": {

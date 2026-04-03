@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { Eye, EyeOff } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import { getAllSubjects } from "../../routes/courses"
+import DSSelect from "../../components/DSSelect"
 
 
 export default function StepTeacher({ formData, handleInputChange, t, errors, levelHierarchy, levelsLoading }) {
@@ -176,7 +177,7 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, le
               {t("form.teachesAtType", { defaultValue: isRTL ? "أين تدرس؟" : "Teaches At" })}
             </span>
           </label>
-          <select
+          <DSSelect
             name="teachesAtType"
             className={`${selectClass} ${errors.teachesAtType ? "select-error animate-shake" : ""}`}
             value={formData.teachesAtType || ""}
@@ -191,7 +192,7 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, le
             <option value="Center">{t("center", { defaultValue: isRTL ? "مركز" : "Center" })}</option>
             <option value="School">{t("school", { defaultValue: isRTL ? "مدرسة" : "School" })}</option>
             <option value="Both">{t("both", { defaultValue: isRTL ? "كلاهما" : "Both" })}</option>
-          </select>
+          </DSSelect>
           {errors.teachesAtType && (
             <span className="text-error text-sm mt-1">
               {t(`validation.${errors.teachesAtType}`, {
@@ -307,7 +308,7 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, le
                 key={index}
                 className="grid grid-cols-1 gap-2 sm:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)_3rem] sm:items-center"
               >
-                <select
+                <DSSelect
                   className={`${selectClass} ${errors.socialMedia?.[index]?.platform ? "select-error animate-shake" : ""}`}
                   value={social.platform || ""}
                   onChange={(e) => {
@@ -335,7 +336,7 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, le
                       {platform.label}
                     </option>
                   ))}
-                </select>
+                </DSSelect>
                 <input
                   type="text"
                   className={`${inputClass} placeholder:text-base-content/65 ${errors.socialMedia?.[index]?.account ? "input-error animate-shake" : ""}`}
@@ -390,7 +391,7 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, le
               {t("form.subject", { defaultValue: isRTL ? "المادة" : "Subject" })}
             </span>
           </label>
-          <select
+          <DSSelect
             name="subject"
             className={`${selectClass} ${errors.subject ? "select-error animate-shake" : ""}`}
             value={formData.subject}
@@ -405,7 +406,7 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, le
                 {subject.name}
               </option>
             ))}
-          </select>
+          </DSSelect>
           {errors.subject && <span className="text-error text-sm mt-1">{t(`validation.${errors.subject}`)}</span>}
         </div>
       </div>

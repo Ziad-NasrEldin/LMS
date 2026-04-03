@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Eye, EyeOff } from 'lucide-react';
 import { useTranslation } from "react-i18next";
 import { getGradeOptionsForStage } from "../../utils/levelHierarchy";
+import DSSelect from "../../components/DSSelect"
 
 export default function StepParent({ formData, handleChildrenChange, t, errors, handleInputChange, levelHierarchy, levelsLoading }) {
     const [childrenCount, setChildrenCount] = useState(1);
@@ -134,7 +135,7 @@ export default function StepParent({ formData, handleChildrenChange, t, errors, 
                             {t('form.stage', { defaultValue: isRTL ? 'المرحلة' : 'Stage' })}
                         </span>
                     </label>
-                    <select
+                    <DSSelect
                         name="stage"
                         className={`${selectClass} ${errors.stage ? 'select-error animate-shake' : ''}`}
                         value={formData.stage || ''}
@@ -170,7 +171,7 @@ export default function StepParent({ formData, handleChildrenChange, t, errors, 
                                 {stage.label}
                             </option>
                         ))}
-                    </select>
+                    </DSSelect>
                     {errors.stage && (
                         <span className="text-error text-sm mt-1">
                             {t(`validation.${errors.stage}`)}
@@ -184,7 +185,7 @@ export default function StepParent({ formData, handleChildrenChange, t, errors, 
                     <label className="label py-1">
                         <span className="label-text text-xs">{t('form.level')}</span>
                     </label>
-                    <select
+                    <DSSelect
                         name="level"
                         className={`${selectClass} ${errors.level ? 'select-error animate-shake' : ''}`}
                         value={formData.level || ''}
@@ -218,7 +219,7 @@ export default function StepParent({ formData, handleChildrenChange, t, errors, 
               ))}
                            
                         
-                    </select>
+                    </DSSelect>
                     {errors.level && (
               <span className="text-error text-sm mt-1">
                  {t(`validation.${errors.level}`)}

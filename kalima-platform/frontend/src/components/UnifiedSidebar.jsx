@@ -39,7 +39,7 @@ const normalizePolicyRole = (role) => {
 };
 
 const ALLOWED_IMPERSONATION_TARGETS = {
-  admin: ["lecturer", "student", "parent"],
+  admin: ["lecturer", "student", "parent", "teacher"],
   lecturer: ["student", "parent"],
   assistant: ["student"],
 };
@@ -105,6 +105,7 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
         lecturer: t("lecturerView", { defaultValue: "Lecturer View" }),
         student: t("studentView", { defaultValue: "Student View" }),
         parent: t("parentView", { defaultValue: "Parent View" }),
+        teacher: t("teacherView", { defaultValue: "Teacher View" }),
       };
       return labels[normalized] || role;
     },
@@ -122,6 +123,15 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
         });
       }
       if (normalizedMessage.includes("cannot impersonate")) {
+        return t("impersonationPermissionError", {
+          defaultValue: "You are not allowed to switch to this view",
+        });
+      }
+      if (
+        normalizedMessage.includes("forbidden") ||
+        normalizedMessage.includes("bidden") ||
+        normalizedMessage.includes("permission")
+      ) {
         return t("impersonationPermissionError", {
           defaultValue: "You are not allowed to switch to this view",
         });
@@ -287,9 +297,16 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
       });
 
       if (!result.success) {
+        const impersonationErrorMessage =
+          result?.rawMessage ||
+          result?.details?.rawMessage ||
+          result?.details?.message ||
+          result?.error ||
+          result?.message;
+
         setTargetsError(
           translateImpersonationError(
-            result.error,
+            impersonationErrorMessage,
             "impersonationStartError",
             "Failed to start role view",
           ),
@@ -318,9 +335,16 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
     try {
       const result = await stopImpersonation();
       if (!result.success) {
+        const impersonationErrorMessage =
+          result?.rawMessage ||
+          result?.details?.rawMessage ||
+          result?.details?.message ||
+          result?.error ||
+          result?.message;
+
         setViewActionError(
           translateImpersonationError(
-            result.error,
+            impersonationErrorMessage,
             "impersonationStopError",
             "Failed to exit role view",
           ),

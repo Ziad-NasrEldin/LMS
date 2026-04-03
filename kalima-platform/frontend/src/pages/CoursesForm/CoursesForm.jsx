@@ -55,6 +55,7 @@ function CourseCreationForm() {
   })
   const [teachers, setTeachers] = useState([])
   const [createdBy, setCreatedBy] = useState("")
+  const [initialCourseImageUrl, setInitialCourseImageUrl] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)
 
@@ -111,6 +112,13 @@ function CourseCreationForm() {
             throw new Error(translateErrorMessage("Failed to load the selected course"))
           }
 
+          setInitialCourseImageUrl(
+            containerData?.image?.url ||
+              containerData?.containerImage?.url ||
+              containerData?.inheritedImage?.image?.url ||
+              null,
+          )
+
           setFormData((prev) => ({
             ...prev,
             courseName: containerData.name || "",
@@ -132,6 +140,8 @@ function CourseCreationForm() {
             containers: [],
             lectures: [],
           })
+        } else {
+          setInitialCourseImageUrl(null)
         }
       } catch (err) {
         console.error("Error fetching data:", err)
@@ -393,6 +403,7 @@ function CourseCreationForm() {
               isEditMode={Boolean(containerId)}
               editContainerId={containerId}
               courseSnapshot={courseSnapshot}
+              initialImageUrl={initialCourseImageUrl}
             />
 
             {/* Container Creation Panel */}

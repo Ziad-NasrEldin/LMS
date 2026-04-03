@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { getAllGovernments, getGovernmentZones } from "../../routes/governments";
 import { translateErrorMessage } from "../../utils/errorTranslator";
 import { getGradeOptionsForStage } from "../../utils/levelHierarchy";
+import DSSelect from "../../components/DSSelect"
 
 export default function Step1({ formData, handleInputChange, t, errors, role, levelHierarchy, levelsLoading }) {
   const [loading, setLoading] = useState(true);
@@ -140,7 +141,7 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
             <label className="label py-1">
               <span className="label-text text-xs">{t("form.gender")}</span>
             </label>
-            <select
+            <DSSelect
               name="gender"
               className={`${selectClass} ${
                 errors.gender ? "select-error animate-shake" : ""
@@ -152,7 +153,7 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
               <option value="">{t("form.selectGender")}</option>
               <option value="male">{t("gender.male")}</option>
               <option value="female">{t("gender.female")}</option>
-            </select>
+            </DSSelect>
           </div>
         </div>
 
@@ -217,7 +218,7 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
                 {t("form.government", { defaultValue: isRTL ? "المحافظة" : "Government" })}
               </span>
             </label>
-            <select
+            <DSSelect
               name="government"
               className={`${selectClass} ${
                 errors.government ? "select-error animate-shake" : ""
@@ -237,7 +238,7 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
                   {government.name}
                 </option>
               ))}
-            </select>
+            </DSSelect>
             {errors.government && (
               <span className="text-error text-sm mt-1">
                 {t(`validation.${errors.government}`, {
@@ -257,7 +258,7 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
                 })}
               </span>
             </label>
-            <select
+            <DSSelect
               disabled={!formData.government || zonesLoading}
               name="administrationZone"
               className={`${selectClass} ${
@@ -278,7 +279,7 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
                   {zone}
                 </option>
               ))}
-            </select>
+            </DSSelect>
             {errors.administrationZone && (
               <span className="text-error text-sm mt-1">
                 {t(`validation.${errors.administrationZone}`, {
@@ -298,7 +299,7 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
                     {t("form.stage", { defaultValue: isRTL ? "المرحلة" : "Stage" })}
                   </span>
                 </label>
-                <select
+                <DSSelect
                   name="stage"
                   className={`${selectClass} ${
                     errors.stage ? "select-error animate-shake" : ""
@@ -328,7 +329,7 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
                       {stage.label}
                     </option>
                   ))}
-                </select>
+                </DSSelect>
                 {errors.stage && (
                   <span className="text-error text-sm mt-1">
                     {t(`validation.${errors.stage}`)}
@@ -346,7 +347,7 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
                     })}
                   </span>
                 </label>
-                <select
+                <DSSelect
                   name="level"
                   className={`${selectClass} ${
                     errors.level ? "select-error animate-shake" : ""
@@ -378,7 +379,7 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
                       {level.label}
                     </option>
                   ))}
-                </select>
+                </DSSelect>
                 {errors.level && (
                   <span className="text-error text-sm mt-1">
                     {t(`validation.${errors.level}`)}

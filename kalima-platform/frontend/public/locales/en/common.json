@@ -114,6 +114,7 @@
   "lecturerView": "Lecturer View",
   "studentView": "Student View",
   "parentView": "Parent View",
+  "teacherView": "Teacher View",
   "exitView": "Exit View",
   "chooseUser": "Choose User",
   "searchUsers": "Search by name, email, or phone",

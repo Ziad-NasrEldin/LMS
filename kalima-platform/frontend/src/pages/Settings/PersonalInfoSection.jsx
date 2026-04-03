@@ -8,6 +8,7 @@ import { updateCurrentUser } from "../../routes/update-user"
 import { Check, X, Camera, Upload, Pencil } from "lucide-react"
 import { resolveProfileImageUrl } from "../../utils/profileImage"
 import { designTokens } from "../../constants/designTokens"
+import DSSelect from "../../components/DSSelect"
 
 const SIGNUP_HOBBY_OPTIONS = [
   "math",
@@ -246,6 +247,10 @@ function PersonalInfoSection() {
   }
 
   const startEditing = () => {
+    const normalizedRole = String(userData?.role || "").trim().toLowerCase()
+    const isRestrictedSettingsRole = ["student", "parent", "teacher"].includes(normalizedRole)
+    if (isRestrictedSettingsRole) return
+
     setFormData((prev) => ({
       ...prev,
       fullName: userData?.name || "",
@@ -270,9 +275,13 @@ function PersonalInfoSection() {
   }
 
   const handleSaveAll = async () => {
+    const normalizedRole = String(userData?.role || "").trim().toLowerCase()
+    const isRestrictedSettingsRole = ["student", "parent", "teacher"].includes(normalizedRole)
+    if (isRestrictedSettingsRole) return
+
     if (emailError) return
 
-    const isStudentRole = String(userData?.role || "").trim().toLowerCase() === "student"
+    const isStudentRole = normalizedRole === "student"
 
     // Set update status to loading
     setUpdateStatus({
@@ -476,7 +485,9 @@ function PersonalInfoSection() {
     return [...SIGNUP_HOBBY_OPTIONS, currentHobby]
   })()
 
-  const isStudentRole = String(userData?.role || "").trim().toLowerCase() === "student"
+  const normalizedRole = String(userData?.role || "").trim().toLowerCase()
+  const isStudentRole = normalizedRole === "student"
+  const isRestrictedSettingsRole = ["student", "parent", "teacher"].includes(normalizedRole)
 
   return (
     <section>
@@ -584,32 +595,34 @@ function PersonalInfoSection() {
             </div>
           </div>
 
-          <div className={`mb-4 flex gap-2 ${isRTL ? "justify-start" : "justify-end"}`}>
-            {!isEditing ? (
-              <button className="btn btn-sm btn-outline" onClick={startEditing}>
-                <Pencil className="h-4 w-4" />
-                {personalInfo.buttons.edit}
-              </button>
-            ) : (
-              <>
-                <button
-                  className={`btn btn-sm btn-primary ${updateStatus.loading ? "loading" : ""}`}
-                  onClick={handleSaveAll}
-                  disabled={updateStatus.loading || !!emailError}
-                >
-                  {!updateStatus.loading && <Check className="h-4 w-4" />}
-                  {t("save") || "Save"}
+          {!isRestrictedSettingsRole && (
+            <div className={`mb-4 flex gap-2 ${isRTL ? "justify-start" : "justify-end"}`}>
+              {!isEditing ? (
+                <button className="btn btn-sm btn-outline" onClick={startEditing}>
+                  <Pencil className="h-4 w-4" />
+                  {personalInfo.buttons.edit}
                 </button>
-                <button className="btn btn-sm btn-outline" onClick={cancelEditing} disabled={updateStatus.loading}>
-                  <X className="h-4 w-4" />
-                  {t("cancel") || "Cancel"}
-                </button>
-              </>
-            )}
-          </div>
+              ) : (
+                <>
+                  <button
+                    className={`btn btn-sm btn-primary ${updateStatus.loading ? "loading" : ""}`}
+                    onClick={handleSaveAll}
+                    disabled={updateStatus.loading || !!emailError}
+                  >
+                    {!updateStatus.loading && <Check className="h-4 w-4" />}
+                    {t("save") || "Save"}
+                  </button>
+                  <button className="btn btn-sm btn-outline" onClick={cancelEditing} disabled={updateStatus.loading}>
+                    <X className="h-4 w-4" />
+                    {t("cancel") || "Cancel"}
+                  </button>
+                </>
+              )}
+            </div>
+          )}
 
           {updateStatus.error && isEditing && <div className="mb-3 text-sm text-error">{updateStatus.error}</div>}
-          {updateStatus.success && <div className="mb-3 text-sm text-success">{personalInfo.messages?.updateSuccess || "Updated successfully"}</div>}
+          {updateStatus.success && isEditing && <div className="mb-3 text-sm text-success">{personalInfo.messages?.updateSuccess || "Updated successfully"}</div>}
 
           {/* Full Name Field */}
           <div className="form-control mb-4">
@@ -628,7 +641,7 @@ function PersonalInfoSection() {
                 placeholder={personalInfo.placeholders.fullName}
                 className={`input input-bordered w-full max-w-2xl ${isRTL ? "text-right" : "text-left"}`}
                 dir={isRTL ? "rtl" : "ltr"}
-                readOnly={!isEditing}
+                readOnly={!isEditing || isRestrictedSettingsRole}
               />
             </div>
           </div>
@@ -650,7 +663,7 @@ function PersonalInfoSection() {
                 placeholder={personalInfo.placeholders.phoneNumber}
                 className={`input input-bordered w-full max-w-2xl ${isRTL ? "text-right" : "text-left"}`}
                 dir={isRTL ? "rtl" : "ltr"}
-                readOnly={!isEditing}
+                readOnly={!isEditing || isRestrictedSettingsRole}
               />
             </div>
           </div>
@@ -672,7 +685,7 @@ function PersonalInfoSection() {
                 placeholder={personalInfo.placeholders.email}
                 className={`input input-bordered w-full max-w-2xl ${isRTL ? "text-right" : "text-left"} ${emailError && isEditing ? "input-error animate-shake" : ""}`}
                 dir={isRTL ? "rtl" : "ltr"}
-                readOnly={!isEditing}
+                readOnly={!isEditing || isRestrictedSettingsRole}
               />
             </div>
             {emailError && isEditing && <div className="mt-2 text-error text-sm">{emailError}</div>}
@@ -704,7 +717,7 @@ function PersonalInfoSection() {
 
               <div className="w-full">
                 {isEditing ? (
-                  <select
+                  <DSSelect
                     name="hobby"
                     value={formData.hobby || ""}
                     onChange={handleInputChange}
@@ -717,7 +730,7 @@ function PersonalInfoSection() {
                         {t(`personalInfo.hobbyOptions.${option}`, { defaultValue: option })}
                       </option>
                     ))}
-                  </select>
+                  </DSSelect>
                 ) : (
                   <input
                     type="text"

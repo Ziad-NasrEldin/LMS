@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { bulkCreateUsers } from "../../../../routes/fetch-users"
+import DSSelect from "../../../../components/DSSelect"
 
 const BulkCreateUsers = () => {
   const { t, i18n } = useTranslation("createUser")
@@ -116,7 +117,7 @@ const BulkCreateUsers = () => {
               <label className="label py-0">
                 <span className="label-text font-medium">{t("fields.accountType")}</span>
               </label>
-              <select
+              <DSSelect
                 name="accountType"
                 className="select w-full rounded-xl"
               style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
@@ -127,7 +128,7 @@ const BulkCreateUsers = () => {
                 <option value="student">{t("roles.student")}</option>
                 <option value="parent">{t("roles.parent")}</option>
                 <option value="teacher">{t("roles.teacher")}</option>
-              </select>
+              </DSSelect>
               <label className="label py-0">
                 <span className="label-text-alt text-info">{t("help.selectAccountType")}</span>
               </label>

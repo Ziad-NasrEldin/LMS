@@ -17,6 +17,7 @@
     "confirmPassword": "Confirm Password",
     "stage": "Stage",
     "level": "Grade Level",
+    "levelOptional": "Grade Level (Optional)",
     "phoneNumber": "Phone Number",
     "parentPhoneNumber": "Parent Phone Number",
     "parentPhoneNumberOptional": "Parent Phone Number (Optional)",

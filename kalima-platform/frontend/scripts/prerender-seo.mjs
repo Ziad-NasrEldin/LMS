@@ -245,7 +245,7 @@ async function loadPublicData() {
 }
 
 function buildHomePage() {
-  const title = "منصة فكرة التعليمية | دورات تعليمية ومعلمون متخصصون";
+  const title = "فكرة | منصة تعليم إلكتروني عالمية";
   const description = DEFAULT_DESCRIPTION_AR;
   const schema = [buildOrganizationSchema(), buildWebsiteSchema()];
 
@@ -259,7 +259,7 @@ function buildHomePage() {
         {
           href: "/courses",
           label: "الدورات التعليمية",
-          description: "استكشف الدورات المتاحة بحسب المرحلة الدراسية والمادة.",
+          description: "استكشف الدورات المتاحة بحسب مجالات الاهتمام والأهداف التعليمية.",
         },
         {
           href: "/teachers",
@@ -276,9 +276,9 @@ function buildHomePage() {
         {
           title: "ما الذي تقدمه فكرة؟",
           items: [
-            "دروس منظمة لطلاب الصف الرابع الابتدائي حتى الصف الثالث الثانوي.",
-            "معلمون متخصصون ومسارات تعلم واضحة لكل مرحلة دراسية.",
-            "تجربة استخدام بسيطة تساعد على المتابعة والتقدم بثبات.",
+            "دورات تعليمية وموارد عملية للمتعلمين في مختلف المجالات.",
+            "مسارات واضحة تساعدك على التقدم بالوتيرة التي تناسبك.",
+            "خبراء ومحتوى عالي الجودة وتجربة استخدام بسيطة.",
           ],
         },
       ],
@@ -287,9 +287,9 @@ function buildHomePage() {
 }
 
 function buildCoursesListing(containers = []) {
-  const title = "دورات منصة فكرة التعليمية | اكتشف المسارات التعليمية المناسبة";
+  const title = "دورات فكرة التعليمية | اكتشف المسارات التعليمية";
   const description =
-    "استكشف الدورات التعليمية على منصة فكرة التعليمية، واختر المسار المناسب لمرحلتك الدراسية وأهدافك التعليمية.";
+    "استكشف الدورات التعليمية على منصة فكرة واختر ما يناسب أهدافك وتعلّمك.";
   const highlightedCourses = containers
     .slice(0, 8)
     .filter((container) => container?._id && container?.name)
@@ -325,7 +325,7 @@ function buildCoursesListing(containers = []) {
           items:
             highlightedCourses.length > 0
               ? highlightedCourses.map((course) => course.label)
-              : ["تتوفر على المنصة دورات تعليمية متنوعة بحسب المرحلة الدراسية والمادة."],
+              : ["تتوفر على المنصة دورات تعليمية متنوعة بحسب مجالات متعددة ومسارات تعلم مختلفة."],
         },
       ],
     }),
@@ -333,9 +333,9 @@ function buildCoursesListing(containers = []) {
 }
 
 function buildTeachersListing(lecturers = []) {
-  const title = "معلمو منصة فكرة التعليمية | اختر المعلم المناسب";
+  const title = "معلمو فكرة التعليمية | اختر الموجّه المناسب";
   const description =
-    "تعرّف على معلمي منصة فكرة التعليمية، واختر المعلم المناسب وفق التخصص والخبرة والمرحلة الدراسية.";
+    "تعرّف على معلمي فكرة التعليمية واختر الموجّه المناسب وفق التخصص والخبرة.";
   const highlightedTeachers = lecturers
     .slice(0, 8)
     .filter((lecturer) => lecturer?._id && lecturer?.name)

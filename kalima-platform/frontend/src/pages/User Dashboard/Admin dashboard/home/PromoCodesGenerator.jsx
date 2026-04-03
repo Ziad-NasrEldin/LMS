@@ -10,6 +10,7 @@ import { getAllLecturers } from "../../../../routes/fetch-users"
 import QRCode from "qrcode"
 import { designTokens } from "../../../../constants/designTokens"
 import { translateErrorMessage } from "../../../../utils/errorTranslator"
+import DSSelect from "../../../../components/DSSelect"
 
 const PROMO_TEMPLATE_WIDTH = 392
 const PROMO_TEMPLATE_HEIGHT = 210
@@ -677,7 +678,7 @@ const PromoCodeGenerator = () => {
             <label className="label pt-0 pb-1">
               <span className="label-text font-medium">{t("admin.form.codeType")}</span>
             </label>
-            <select
+            <DSSelect
               name="type"
               className="select select-bordered w-full"
               value={formData.type}
@@ -687,14 +688,14 @@ const PromoCodeGenerator = () => {
               <option value="general">{t("admin.form.general")}</option>
               <option value="specific">{t("admin.form.specific")}</option>
               <option value="promo">{t("admin.form.promo")}</option>
-            </select>
+            </DSSelect>
           </div>
 
           <div className="form-control xl:col-span-3 rounded-2xl border p-3 bg-white/70" style={{ borderColor: "rgba(17,24,39,0.08)" }}>
             <label className="label pt-0 pb-1">
               <span className="label-text font-medium">{t("admin.form.lecturer")}</span>
             </label>
-            <select
+            <DSSelect
               name="lecturerId"
               className="select select-bordered w-full"
               value={formData.lecturerId}
@@ -708,7 +709,7 @@ const PromoCodeGenerator = () => {
                   {lecturer.name}
                 </option>
               ))}
-            </select>
+            </DSSelect>
           </div>
         </div>
 
@@ -772,7 +773,7 @@ const PromoCodeGenerator = () => {
                     <label className="label py-0">
                       <span className="label-text text-xs">{t("admin.template.selectorLabel")}</span>
                     </label>
-                    <select
+                    <DSSelect
                       className="select select-bordered select-sm min-w-[220px]"
                       value={selectedTemplateUrl}
                       onChange={(e) => {
@@ -787,7 +788,7 @@ const PromoCodeGenerator = () => {
                           {template.name}
                         </option>
                       ))}
-                    </select>
+                    </DSSelect>
                   </div>
 
                   <div className="form-control">

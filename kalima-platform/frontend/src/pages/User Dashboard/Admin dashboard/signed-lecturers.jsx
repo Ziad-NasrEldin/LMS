@@ -8,6 +8,7 @@ import { FaEnvelope, FaPhone, FaGraduationCap, FaMapMarkerAlt, FaCalendarAlt } f
 import { getAllLecturers } from "../../../routes/fetch-users"
 import { getUserDashboard } from "../../../routes/auth-services"
 import { designTokens } from "../../../constants/designTokens"
+import DSSelect from "../../../components/DSSelect"
 
 const SignedLecturers = () => {
   const { t, i18n } = useTranslation("admin-signedLecturers")
@@ -278,7 +279,7 @@ const SignedLecturers = () => {
 
             {/* Filter Dropdowns */}
             <div className="flex flex-wrap gap-3 items-center">
-              <select
+              <DSSelect
                 className="select select-sm rounded-xl h-12 px-4"
                 style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: TOKENS.spaceDark }}
                 value={filters.expertise}
@@ -290,7 +291,7 @@ const SignedLecturers = () => {
                     {expertise}
                   </option>
                 ))}
-              </select>
+              </DSSelect>
 
               <button className="btn btn-sm rounded-xl h-12 px-6 font-bold" onClick={clearFilters} style={{ backgroundColor: TOKENS.coralAccent, color: "white", border: "none" }}>
                 {t("filters.clear") || "Clear"}

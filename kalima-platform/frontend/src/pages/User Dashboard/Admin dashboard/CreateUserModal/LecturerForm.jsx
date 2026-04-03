@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import DSSelect from "../../../../components/DSSelect"
 
 const LecturerForm = ({ userData, handleChange, subjects, t }) => {
   const [selectedSubjects, setSelectedSubjects] = useState(userData.subject || [])
@@ -40,7 +41,7 @@ const LecturerForm = ({ userData, handleChange, subjects, t }) => {
             <span className="label-text font-bold" style={{ color: "#1F2937" }}>{t("fields.subjects")}</span>
           </label>
           <div className="flex gap-2">
-            <select
+            <DSSelect
               className="select select-bordered flex-1"
               onChange={handleSubjectSelect}
               value=""
@@ -55,7 +56,7 @@ const LecturerForm = ({ userData, handleChange, subjects, t }) => {
                   {subject.name}
                 </option>
               ))}
-            </select>
+            </DSSelect>
           </div>
         </div>
 

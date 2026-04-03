@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { STAGE_KEYS, getStageDisplayName } from "../../../../utils/levelHierarchy"
+import DSSelect from "../../../../components/DSSelect"
 
 const EMPTY_STAGE_OPTIONS = STAGE_KEYS.map((stageKey) => ({
   value: stageKey,
@@ -200,7 +201,7 @@ const TeacherForm = ({
           <label className="label py-0">
             <span className="label-text font-bold" style={{ color: "#1F2937" }}>{t("fields.subject") || "Subject"}</span>
           </label>
-          <select
+          <DSSelect
             name="subject"
             className="select w-full rounded-xl"
             style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
@@ -214,7 +215,7 @@ const TeacherForm = ({
                 {subject.name}
               </option>
             ))}
-          </select>
+          </DSSelect>
         </div>
       </div>
 
@@ -223,7 +224,7 @@ const TeacherForm = ({
           <label className="label py-0">
             <span className="label-text font-bold" style={{ color: "#1F2937" }}>{t("fields.levels") || "Teaching Levels"}</span>
           </label>
-          <select
+          <DSSelect
             className="select w-full rounded-xl"
             style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
             onChange={handleLevelSelect}
@@ -235,7 +236,7 @@ const TeacherForm = ({
                 {level.label}
               </option>
             ))}
-          </select>
+          </DSSelect>
           {selectedLevels.length > 0 && (
             <div className="flex flex-wrap gap-2 mt-2">
               {selectedLevels.map((levelValue) => {
@@ -262,7 +263,7 @@ const TeacherForm = ({
           <label className="label py-0">
             <span className="label-text font-bold" style={{ color: "#1F2937" }}>{t("fields.teachesAtType") || "Teaches At"}</span>
           </label>
-          <select
+          <DSSelect
             name="teachesAtType"
             className="select w-full rounded-xl"
             style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
@@ -274,7 +275,7 @@ const TeacherForm = ({
             <option value="Both">{t("options.both") || "Both Center & School"}</option>
             <option value="Center">{t("options.center") || "Center Only"}</option>
             <option value="School">{t("options.school") || "School Only"}</option>
-          </select>
+          </DSSelect>
         </div>
       </div>
 
@@ -342,7 +343,7 @@ const TeacherForm = ({
           <label className="label py-0">
             <span className="label-text font-bold" style={{ color: "#1F2937" }}>{t("fields.government") || "Government"}</span>
           </label>
-          <select
+          <DSSelect
             name="government"
             className="select select-bordered w-2/3 lg:w-1/2"
             value={userData.government || ""}
@@ -355,7 +356,7 @@ const TeacherForm = ({
                 {government.name}
               </option>
             ))}
-          </select>
+          </DSSelect>
         </div>
       </div>
 
@@ -366,7 +367,7 @@ const TeacherForm = ({
               {t("fields.administrationZone") || (isRTL ? "الإدارة التعليمية" : "Administration Zone")}
             </span>
           </label>
-          <select
+          <DSSelect
             disabled={!userData.government || loadingZones}
             name="administrationZone"
             className="select select-bordered w-2/3 lg:w-1/2"
@@ -384,7 +385,7 @@ const TeacherForm = ({
                 {zone}
               </option>
             ))}
-          </select>
+          </DSSelect>
           {loadingZones && (
             <div className="flex items-center gap-2 mt-1">
               <span className="loading loading-spinner loading-xs"></span>
@@ -402,7 +403,7 @@ const TeacherForm = ({
             <span className="label-text font-bold" style={{ color: "#1F2937" }}>{t("fields.socialMedia") || "Social Media (Optional)"}</span>
           </label>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-            <select id="socialPlatform" className="select w-full rounded-xl" style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}>
+            <DSSelect id="socialPlatform" className="select w-full rounded-xl" style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}>
               <option value="">{t("placeholders.selectPlatform") || "Select Platform"}</option>
               <option value="Facebook">Facebook</option>
               <option value="Instagram">Instagram</option>
@@ -410,7 +411,7 @@ const TeacherForm = ({
               <option value="LinkedIn">LinkedIn</option>
               <option value="YouTube">YouTube</option>
               <option value="TikTok">TikTok</option>
-            </select>
+            </DSSelect>
             <input
               type="text"
               id="socialAccount"
@@ -445,7 +446,7 @@ const TeacherForm = ({
           <label className="label py-0">
             <span className="label-text font-bold" style={{ color: "#1F2937" }}>{t("fields.subject") || "Subject"}</span>
           </label>
-          <select
+          <DSSelect
             name="subject"
             className="select w-full rounded-xl"
             style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
@@ -459,7 +460,7 @@ const TeacherForm = ({
                 {getSubjectNameById(subject._id)}
               </option>
             ))}
-          </select>
+          </DSSelect>
         </div>
       </div>
     </div>

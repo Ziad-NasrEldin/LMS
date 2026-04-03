@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { useTranslation } from "react-i18next"
 import { getExamConfigs, createExamConfig } from "../routes/examConfigs"
 import { translateErrorMessage } from "../utils/errorTranslator"
+import DSSelect from "./DSSelect"
 
 const ExamConfigSection = ({
   requiresExam,
@@ -151,7 +152,7 @@ const ExamConfigSection = ({
         </label>
         <div className="flex flex-col gap-4">
           <div className="flex items-center gap-2">
-            <select
+            <DSSelect
               className="select select-bordered flex-grow"
               value={isCreatingNewExamConfig ? "new" : selectedExamConfigId}
               onChange={(e) => {
@@ -179,7 +180,7 @@ const ExamConfigSection = ({
                 </option>
               )}
               <option value="new">{t("examConfig.createNew", `Create New ${configType.charAt(0).toUpperCase() + configType.slice(1)} Config`)}</option>
-            </select>
+            </DSSelect>
             {examConfigsLoading && <span className="loading loading-spinner"></span>}
           </div>
           {examConfigsError && <div className="text-error text-sm">{examConfigsError}</div>}
@@ -215,7 +216,7 @@ const ExamConfigSection = ({
             <label className="label">
               <span className="label-text">{t("examConfig.type", "Type")}</span>
             </label>
-            <select
+            <DSSelect
               className="select select-bordered w-full"
               value={newExamConfig.type}
               onChange={(e) => handleInputChange("type", e.target.value)}
@@ -224,7 +225,7 @@ const ExamConfigSection = ({
             >
               <option value="exam">{t("examConfig.exam", "Exam")}</option>
               <option value="homework">{t("examConfig.homework", "Homework")}</option>
-            </select>
+            </DSSelect>
             <label className="label">
               <span className="label-text-alt">{t("examConfig.typeHelp", "Select whether this is for an exam or homework")}</span>
             </label>

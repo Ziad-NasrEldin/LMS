@@ -252,7 +252,9 @@
     "profilePicInvalidType": "صورة الملف الشخصي يجب أن تكون ملف صورة",
     "profilePicTooLarge": "حجم صورة الملف الشخصي كبير جدًا",
     "phoneMustDiffer": "رقم الهاتف الثاني يجب أن يختلف عن الرقم الأساسي",
-    "invalidRole": "نوع الحساب المختار غير صالح"
+    "invalidRole": "نوع الحساب المختار غير صالح",
+    "duplicate": "هذه القيمة مستخدمة بالفعل",
+    "genericError": "يرجى مراجعة الحقول المظللة ثم إعادة المحاولة"
   },
   "apiErrors": {
     "SIGNUP_VALIDATION_FAILED": {

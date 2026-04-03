@@ -25,7 +25,7 @@ export default function Teachers() {
       ? "معلمو منصة فكرة التعليمية | اختر المعلم المناسب"
       : "Fekra Teachers | Choose the Right Teacher",
     description: isRTL
-      ? "تعرّف على معلمي منصة فكرة التعليمية، واختر المعلم المناسب وفق التخصص والخبرة والمرحلة الدراسية."
+      ? "تعرّف على معلمي منصة فكرة التعليمية، واختر المعلم المناسب وفق التخصص والخبرة."
       : "Meet Fekra teachers and choose the right educator by subject and experience.",
     canonicalPath: "/teachers",
     lang: i18n.language?.startsWith("en") ? "en" : "ar",

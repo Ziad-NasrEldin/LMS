@@ -7,6 +7,7 @@ import { createContainer, createLecture, createLectureAttachment } from "../../r
 import { getAllSubjects } from "../../routes/courses"
 import ContainerList from "./container-list"
 import { translateErrorMessage } from "../../utils/errorTranslator"
+import DSSelect from "../../components/DSSelect"
 import {
   buildContainerPayloadObject,
   buildLecturePayloadObject,
@@ -389,7 +390,7 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
         <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
           <div>
             <label className="block text-sm font-medium mb-1">{isRTL ? "نوع المحتوى" : "Content Type"}</label>
-            <select
+            <DSSelect
               value={containerType}
               onChange={(e) => handleContainerTypeChange(e.target.value)}
               className={compactSelect}
@@ -408,7 +409,7 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
               <option value={CONTAINER_TYPES.LECTURE} disabled={!getSuggestedParentIdForType(CONTAINER_TYPES.LECTURE)}>
                 {isRTL ? "محاضرة" : "Lecture"}
               </option>
-            </select>
+            </DSSelect>
             <p className="mt-1 text-xs text-base-content/55">
               {containerType === CONTAINER_TYPES.LECTURE
                 ? (isRTL ? "المحاضرة ستظهر داخل الشهر المختار." : "The lecture will live under the selected month.")
@@ -425,7 +426,7 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
 
           <div>
             <label className="block text-sm font-medium mb-1">{isRTL ? "الحاوية الأب" : "Parent Container"}</label>
-            <select
+            <DSSelect
               value={selectedParentId || ""}
               onChange={(e) => handleParentSelection(e.target.value)}
               className={compactSelect}
@@ -439,7 +440,7 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
                   {container.name}
                 </option>
               ))}
-            </select>
+            </DSSelect>
             <p className="mt-1 text-xs text-base-content/55">
               {isRTL
                 ? "اختيار الأب يملأ نوع المحتوى تلقائياً."
@@ -462,7 +463,7 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
 
         <div className="mt-3">
           <label className="block text-sm font-medium mb-1">{isRTL ? "الموضوع" : "Subject"}</label>
-          <select
+          <DSSelect
             value={formData.subject || ""}
             onChange={(e) => {
               updateCourseStructure({ ...courseStructure, formData: { ...formData, subject: e.target.value } })
@@ -478,7 +479,7 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
                 {subject.name}
               </option>
             ))}
-          </select>
+          </DSSelect>
         </div>
 
             <div className="mt-3">
@@ -509,7 +510,7 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
             <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-2">
               <div>
                 <label className="block text-sm font-medium mb-1">{isRTL ? "نوع المحاضرة" : "Lecture Type"}</label>
-                <select
+                <DSSelect
                   value={lectureType}
                   onChange={(e) => setLectureType(e.target.value)}
                   className={compactSelect}
@@ -518,7 +519,7 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
                   <option value="Paid">{isRTL ? "مدفوع" : "Paid"}</option>
                   <option value="Revision">{isRTL ? "مراجعة" : "Revision"}</option>
                   <option value="Teachers Only">{isRTL ? "للمعلمين فقط" : "Teachers Only"}</option>
-                </select>
+                </DSSelect>
               </div>
               <div>
               <label className="block text-sm font-medium mb-1">{isRTL ? "سعر المحاضرة" : "Lecture Price"}</label>
@@ -559,14 +560,14 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
               <label className="block text-sm font-medium mb-1">
                 {isRTL ? "هل تحتاج إلى امتحان؟" : "Requires Exam?"}
               </label>
-              <select
+              <DSSelect
                 value={requiresExam}
                 onChange={(e) => setRequiresExam(e.target.value === "true")}
                 className={compactSelect}
               >
                 <option value={false}>{isRTL ? "لا" : "No"}</option>
                 <option value={true}>{isRTL ? "نعم" : "Yes"}</option>
-              </select>
+              </DSSelect>
             </div>
 
             {requiresExam && (
@@ -606,14 +607,14 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
               <label className="block text-sm font-medium mb-1">
                 {isRTL ? "هل تحتاج إلى واجب منزلي؟" : "Requires Homework?"}
               </label>
-              <select
+              <DSSelect
                 value={requiresHomework}
                 onChange={(e) => setRequiresHomework(e.target.value === "true")}
                 className={compactSelect}
               >
                 <option value={false}>{isRTL ? "لا" : "No"}</option>
                 <option value={true}>{isRTL ? "نعم" : "Yes"}</option>
-              </select>
+              </DSSelect>
             </div>
 
             {requiresHomework && (
@@ -651,7 +652,7 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
 
             <div className="mt-3">
               <label className="block text-sm font-medium mb-1">{isRTL ? "نوع المرفق" : "Attachment Type"}</label>
-              <select
+              <DSSelect
                 className={compactSelect}
                 value={attachmentType}
                 onChange={(e) => setAttachmentType(e.target.value)}
@@ -660,7 +661,7 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
                 <option value="booklets">{isRTL ? "كتيبات" : "Booklets"}</option>
                 <option value="homeworks">{isRTL ? "واجبات منزلية" : "Homeworks"}</option>
                 <option value="exams">{isRTL ? "امتحانات" : "Exams"}</option>
-              </select>
+              </DSSelect>
             </div>
 
             <div className="mt-3">

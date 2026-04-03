@@ -2,6 +2,8 @@
 
 import { Trash2 } from "lucide-react"
 import { STAGE_KEYS, getGradeOptionsForStage, getStageDisplayName } from "../../../../utils/levelHierarchy"
+import { STUDENT_HOBBIES } from "../../../../constants/studentHobbies"
+import DSSelect from "../../../../components/DSSelect"
 
 const EMPTY_STAGE_OPTIONS = STAGE_KEYS.map((stageKey) => ({
   value: stageKey,
@@ -29,6 +31,7 @@ const ParentContactField = ({
   onRemove,
 }) => {
   const hasPhone = Boolean(String(phoneValue || "").trim())
+  const showPhoneLabel = Boolean(phoneLabel && phoneLabel !== title)
 
   return (
     <div className="rounded-2xl border border-gray-200 bg-white/70 p-4">
@@ -50,11 +53,13 @@ const ParentContactField = ({
       <div className="mt-4 space-y-3">
         <div className="form-control">
           <div className="flex flex-col gap-2">
-            <label className="label py-0">
-              <span className="label-text font-bold" style={{ color: "#1F2937" }}>
-                {phoneLabel}
-              </span>
-            </label>
+            {showPhoneLabel && (
+              <label className="label py-0">
+                <span className="label-text font-bold" style={{ color: "#1F2937" }}>
+                  {phoneLabel}
+                </span>
+              </label>
+            )}
             <input
               type="text"
               inputMode="numeric"
@@ -78,7 +83,7 @@ const ParentContactField = ({
                   {relationLabel}
                 </span>
               </label>
-              <select
+              <DSSelect
                 name={relationName}
                 className="select w-full rounded-xl"
                 style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
@@ -92,7 +97,7 @@ const ParentContactField = ({
                     {t(`parentRelations.${relation}`)}
                   </option>
                 ))}
-              </select>
+              </DSSelect>
               {relationError && <p className="text-sm text-error">{t(`validation.${relationError}`)}</p>}
             </div>
           </div>
@@ -174,7 +179,7 @@ const StudentForm = ({
                 {t("fields.stage") || t("fields.level")}
               </span>
             </label>
-            <select
+            <DSSelect
               name="stage"
               className="select w-full rounded-xl"
               style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
@@ -188,7 +193,7 @@ const StudentForm = ({
                   {stage.label}
                 </option>
               ))}
-            </select>
+            </DSSelect>
           </div>
         </div>
 
@@ -199,7 +204,7 @@ const StudentForm = ({
                 {t("fields.level")}
               </span>
             </label>
-            <select
+            <DSSelect
               name="level"
               className="select w-full rounded-xl"
               style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
@@ -218,7 +223,7 @@ const StudentForm = ({
                   {level.label || level.displayName || level.name}
                 </option>
               ))}
-            </select>
+            </DSSelect>
           </div>
         </div>
       </div>
@@ -319,7 +324,7 @@ const StudentForm = ({
                 {t("fields.government") || "Government"}
               </span>
             </label>
-            <select
+            <DSSelect
               name="government"
               className="select w-full rounded-xl"
               style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
@@ -333,7 +338,7 @@ const StudentForm = ({
                   {government.name}
                 </option>
               ))}
-            </select>
+            </DSSelect>
           </div>
         </div>
 
@@ -344,7 +349,7 @@ const StudentForm = ({
                 {t("fields.administrationZone") || (isRTL ? "الإدارة التعليمية" : "Administration Zone")}
               </span>
             </label>
-            <select
+            <DSSelect
               disabled={!userData.government || loadingZones}
               name="administrationZone"
               className="select w-full rounded-xl"
@@ -363,7 +368,7 @@ const StudentForm = ({
                   {zone}
                 </option>
               ))}
-            </select>
+            </DSSelect>
             {loadingZones && (
               <div className="flex items-center gap-2 mt-1">
                 <span className="loading loading-spinner loading-xs"></span>
@@ -383,7 +388,7 @@ const StudentForm = ({
               {t("fields.hobby") || t("fields.hobbies")}
             </span>
           </label>
-          <select
+          <DSSelect
             name="hobby"
             className="select w-full rounded-xl"
             style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
@@ -392,29 +397,12 @@ const StudentForm = ({
             required
           >
             <option value="">{t("placeholders.selectHobby") || "Select hobby"}</option>
-            {[
-              { value: "math", en: "Math", ar: "رياضيات" },
-              { value: "programming", en: "Programming", ar: "برمجة" },
-              { value: "languages", en: "Languages", ar: "لغات" },
-              { value: "montage", en: "Montage", ar: "مونتاج" },
-              { value: "designillustrating", en: "Design & Illustrating", ar: "تصميم ورسوم" },
-              { value: "marketing", en: "Marketing", ar: "تسويق" },
-              { value: "reading", en: "Reading", ar: "قراءة" },
-              { value: "sports", en: "Sports", ar: "رياضة" },
-              { value: "music", en: "Music", ar: "موسيقى" },
-              { value: "cooking", en: "Cooking", ar: "طبخ" },
-              { value: "gaming", en: "Gaming", ar: "ألعاب" },
-              { value: "art", en: "Art", ar: "فن" },
-              { value: "technology", en: "Technology", ar: "تقنية" },
-              { value: "bicycling", en: "Bicycling", ar: "دراجات" },
-              { value: "photography", en: "Photography", ar: "تصوير" },
-              { value: "other", en: "Other", ar: "أخرى" },
-            ].map((hobby) => (
-              <option key={hobby.value} value={hobby.value}>
-                {isRTL ? hobby.ar : hobby.en}
+            {STUDENT_HOBBIES.map((hobby) => (
+              <option key={hobby.id} value={hobby.id}>
+                {isRTL ? hobby.labelAr : hobby.labelEn}
               </option>
             ))}
-          </select>
+          </DSSelect>
         </div>
       </div>
     </>

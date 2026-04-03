@@ -13,6 +13,7 @@ import { designTokens } from "../../../constants/designTokens"
 import { resolveUploadUrl } from "../../../utils/uploadUrl"
 import { translateErrorMessage } from "../../../utils/errorTranslator"
 import { objectToFormData } from "../../../utils/contentCreationPayloads"
+import DSSelect from "../../../components/DSSelect"
 
 const MyLecturesPage = () => {
   const { t, i18n } = useTranslation("lecturesPage")
@@ -630,7 +631,7 @@ const MyLecturesPage = () => {
                 setCurrentPage(1)
               }}
             />
-            <select
+            <DSSelect
               className="select w-full md:w-64 font-medium border-2 focus:outline-none focus:ring-0 rounded-full transition-colors font-sans"
               style={{ backgroundColor: TOKENS.neutralCloud, borderColor: "transparent", color: TOKENS.deepTeal }} onFocus={(e) => { e.target.style.borderColor = TOKENS.softCyanTeal; e.target.style.backgroundColor = "#fff"; }} onBlur={(e) => { e.target.style.borderColor = "transparent"; e.target.style.backgroundColor = TOKENS.neutralCloud; }}
               value={selectedSubjectFilter}
@@ -645,9 +646,9 @@ const MyLecturesPage = () => {
                   {subject.name}
                 </option>
               ))}
-            </select>
+            </DSSelect>
 
-            <select
+            <DSSelect
               className="select w-full md:w-64 font-medium border-2 focus:outline-none focus:ring-0 rounded-full transition-colors font-sans"
               style={{ backgroundColor: TOKENS.neutralCloud, borderColor: "transparent", color: TOKENS.deepTeal }} onFocus={(e) => { e.target.style.borderColor = TOKENS.softCyanTeal; e.target.style.backgroundColor = "#fff"; }} onBlur={(e) => { e.target.style.borderColor = "transparent"; e.target.style.backgroundColor = TOKENS.neutralCloud; }}
               value={selectedLevelFilter}
@@ -662,7 +663,7 @@ const MyLecturesPage = () => {
                   {t(`gradeLevels.${level.name}`, { ns: "common" })}
                 </option>
               ))}
-            </select>
+            </DSSelect>
           </div>
           {["Lecturer", "Admin"].includes(userRole) && (
             <button
@@ -674,7 +675,7 @@ const MyLecturesPage = () => {
             </button>
           )}
 
-          <select
+          <DSSelect
             className="select w-full md:w-48 font-medium border-2 focus:outline-none focus:ring-0 rounded-[1.4rem] transition-colors font-sans"
             style={{ backgroundColor: TOKENS.neutralCloud, borderColor: "transparent", color: TOKENS.deepTeal }} onFocus={(e) => { e.target.style.borderColor = TOKENS.softCyanTeal; e.target.style.backgroundColor = "#fff"; }} onBlur={(e) => { e.target.style.borderColor = "transparent"; e.target.style.backgroundColor = TOKENS.neutralCloud; }}
             value={itemsPerPage}
@@ -683,7 +684,7 @@ const MyLecturesPage = () => {
             <option value={8}>{t("lecturesPage.itemsPerPage", { count: 8 })}</option>
 
 
-          </select>
+          </DSSelect>
         </div>
 
         <LectureCreationModal

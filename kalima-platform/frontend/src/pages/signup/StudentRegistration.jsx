@@ -21,21 +21,13 @@ import {
   normalizeEgyptianPhoneNumber,
   sanitizeEgyptianPhoneInput,
 } from "../../utils/phoneNumber"
+import { STUDENT_HOBBIES, normalizeStudentHobby } from "../../constants/studentHobbies"
+import { mapSignupApiError } from "./signupApiError"
 const apiUrl = import.meta.env.VITE_API_URL
 const TOKENS = designTokens.colors
 const SHADOWS = designTokens.shadows
 const GRADIENTS = designTokens.gradients
-const hobbiesList = [
-  { id: "math", key: "math", value: "Math" },
-  { id: "programming", key: "programming", value: "Programming" },
-  { id: "art", key: "art", value: "Art" },
-  { id: "languages", key: "languages", value: "Languages" },
-  { id: "photography", key: "photography", value: "Photography" },
-  { id: "montage", key: "montage", value: "Montage" },
-  { id: "designIllustrating", key: "designIllustrating", value: "Design/Illustrating" },
-  { id: "marketing", key: "marketing", value: "Marketing" },
-  { id: "other", key: "other", value: "Other" },
-]
+const hobbiesList = STUDENT_HOBBIES
 const PARENT_RELATIONS = ["mother", "father", "other"]
 
 const totalSteps = {
@@ -455,7 +447,7 @@ export default function StudentRegistration() {
               const hobby = hobbiesList.find((h) => h.id === id)
               if (!hobby) return null
               if (hobby.id === "other") return "other"
-              return String(hobby.id).trim().toLowerCase()
+              return normalizeStudentHobby(hobby.id)
             })
             .filter(Boolean)
 
@@ -526,52 +518,12 @@ export default function StudentRegistration() {
       });
 
     } catch (error) {
-      let errorMessage = t("errors.unexpectedError");
-      const fieldErrors = {};
-
-      if (error.response) {
-        const { status, data: errorData } = error.response;
-
-        switch (status) {
-          case 400:
-            errorMessage = errorData.message || t("errors.invalidData");
-
-            if (errorData.message?.includes("phone number")) {
-              errorMessage = t("errors.phoneExists");
-            }
-
-            if (errorData.message?.includes("at least one special character")) {
-              errorMessage = t("errors.PasswordSpecialChar");
-            }
-
-            if (errorData.message?.includes("at least one uppercase")) {
-              errorMessage = t("errors.PasswordCapitalLetter");
-            }
-
-            if (errorData.field) {
-              fieldErrors[errorData.field] = errorData.errorKey || "invalidInput";
-            }
-            break;
-
-          case 409:
-            errorMessage = errorData.message || t("errors.emailExists");
-
-            if (errorData.field) {
-              fieldErrors[errorData.field] = errorData.errorKey || "duplicate";
-            }
-
-            if (errorData.message?.includes("E-Mail")) {
-              errorMessage = t("errors.emailExists");
-            }
-            break;
-
-          case 500:
-            errorMessage = t("errors.apiError");
-            break;
-        }
-      } else if (error.request) {
-        errorMessage = t("errors.networkError");
-      }
+      const { summaryMessages, fieldErrors } = mapSignupApiError({
+        error,
+        role: formData.role,
+        t,
+      })
+      const errorMessage = summaryMessages[0] || t("errors.unexpectedError")
 
       console.error("Full error response:", error.response?.data || error.message);
       setApiError(errorMessage);
@@ -819,7 +771,7 @@ export default function StudentRegistration() {
                       </svg>
                       <div>
                         <h3 className="font-bold">{t("errors.errorTitle")}</h3>
-                        <p className="text-sm">{t(apiError)}</p>
+                        <p className="text-sm">{apiError}</p>
                       </div>
                     </div>
 
@@ -830,8 +782,14 @@ export default function StudentRegistration() {
                             ([field, message]) =>
                               typeof message === "string" && (
                                 <li key={field} className="text-sm">
-                                  <span className="font-medium">{t(`form.${field}`)}:</span>{" "}
-                                  <span className="text-opacity-80">{t(`validation.${message}`)}</span>
+                                  <span className="font-medium">
+                                    {t(`form.${field}`) === `form.${field}` ? field : t(`form.${field}`)}:
+                                  </span>{" "}
+                                  <span className="text-opacity-80">
+                                    {t(`validation.${message}`) === `validation.${message}`
+                                      ? message
+                                      : t(`validation.${message}`)}
+                                  </span>
                                 </li>
                               ),
                           )}

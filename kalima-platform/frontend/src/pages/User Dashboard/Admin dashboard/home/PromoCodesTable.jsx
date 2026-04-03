@@ -7,6 +7,7 @@ import { FaTrash } from "react-icons/fa"
 import { getPromoCodes, deletePromoCode, deleteBulkPromoCodes } from "../../../../routes/codes"
 import { getAllStudents } from "../../../../routes/fetch-users"
 import { designTokens } from "../../../../constants/designTokens"
+import DSSelect from "../../../../components/DSSelect"
 
 const TOKENS = designTokens.colors
 const SHADOWS = designTokens.shadows
@@ -263,7 +264,7 @@ const PromoCodesTable = () => {
             )}
 
             <div className="flex flex-wrap gap-4 mb-4 rounded-[1.4rem] p-4" style={insetCardStyle}>
-              <select
+              <DSSelect
                 className="select select-bordered"
                 value={filters.isRedeemed}
                 onChange={(e) => setFilters((prev) => ({ ...prev, isRedeemed: e.target.value }))}
@@ -271,10 +272,10 @@ const PromoCodesTable = () => {
                 <option value="">{t("filters.allStatuses")}</option>
                 <option value="false">{t("filters.active")}</option>
                 <option value="true">{t("filters.redeemed")}</option>
-              </select>
+              </DSSelect>
 
 
-              <select
+              <DSSelect
                 className="select select-bordered"
                 value={filters.type}
                 onChange={(e) => setFilters((prev) => ({ ...prev, type: e.target.value }))}
@@ -283,7 +284,7 @@ const PromoCodesTable = () => {
                 <option value="specific">{t("filters.specific")}</option>
                 <option value="general">{t("filters.general")}</option>
                 <option value="promo">{t("filters.promo")}</option>
-              </select>
+              </DSSelect>
 
               <button className="btn border-none text-white" style={{ background: TOKENS.deepTeal }} onClick={handleApplyFilters}>
                 {t("filters.apply")}

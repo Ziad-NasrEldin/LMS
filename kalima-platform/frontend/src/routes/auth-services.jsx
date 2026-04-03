@@ -16,13 +16,19 @@ const TOKEN_KEY = "accessToken"
 const IMPERSONATION_STORAGE_KEY = "impersonationSession"
 
 const normalizeRole = (role) => String(role || "").trim().toLowerCase()
-const createFailureResponse = (message, extra = {}) => ({
-  success: false,
-  ...extra,
-  status: extra.status ?? "error",
-  message: translateErrorMessage(message),
-  error: translateErrorMessage(message),
-})
+const createFailureResponse = (message, extra = {}) => {
+  const rawMessage = String(message || "").trim()
+  const translated = translateErrorMessage(rawMessage || extra?.details?.message || "")
+
+  return {
+    success: false,
+    ...extra,
+    status: extra.status ?? "error",
+    message: translated,
+    error: translated,
+    rawMessage,
+  }
+}
 
 const emitImpersonationChange = () => {
   if (typeof window !== "undefined") {
@@ -380,7 +386,14 @@ export const startImpersonation = async ({ targetUserId, targetRole }) => {
       headers: response.headers,
     }
   } catch (error) {
-    return createFailureResponse(error.response?.data?.message || error.message || "Failed to start impersonation", {
+    const rawErrorMessage =
+      error?.response?.data?.rawMessage ||
+      error?.response?.data?.message ||
+      error?.rawMessage ||
+      error?.message ||
+      "Failed to start impersonation"
+
+    return createFailureResponse(rawErrorMessage, {
       status: error.response?.status,
       details: error.response?.data,
     })
@@ -423,7 +436,14 @@ export const stopImpersonation = async () => {
     if (error.response?.status === 400) {
       clearImpersonationSession()
     }
-    return createFailureResponse(error.response?.data?.message || error.message || "Failed to stop impersonation", {
+    const rawErrorMessage =
+      error?.response?.data?.rawMessage ||
+      error?.response?.data?.message ||
+      error?.rawMessage ||
+      error?.message ||
+      "Failed to stop impersonation"
+
+    return createFailureResponse(rawErrorMessage, {
       status: error.response?.status,
       details: error.response?.data,
     })

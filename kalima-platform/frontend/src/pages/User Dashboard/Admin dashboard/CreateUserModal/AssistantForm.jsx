@@ -1,5 +1,7 @@
 "use client"
 
+import DSSelect from "../../../../components/DSSelect"
+
 const AssistantForm = ({ userData, handleChange, lecturers, t, isRTL }) => {
   return (
     <div className="form-control">
@@ -7,7 +9,7 @@ const AssistantForm = ({ userData, handleChange, lecturers, t, isRTL }) => {
         <label className="label py-0">
           <span className="label-text font-bold" style={{ color: "#1F2937" }}>{t("fields.assignedLecturer")}</span>
         </label>
-        <select
+        <DSSelect
           name="assignedLecturer"
           className="select w-full rounded-xl"
               style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
@@ -21,7 +23,7 @@ const AssistantForm = ({ userData, handleChange, lecturers, t, isRTL }) => {
               {lecturer.name}
             </option>
           ))}
-        </select>
+        </DSSelect>
       </div>
     </div>
   )

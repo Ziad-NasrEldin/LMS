@@ -7,6 +7,7 @@ import { getLecturerMonthlyRevenue } from "../../../../routes/revenue"
 import { BookOpen, Trophy } from "lucide-react"
 import { designTokens } from "../../../../constants/designTokens"
 import { translateErrorMessage } from "../../../../utils/errorTranslator"
+import DSSelect from "../../../../components/DSSelect"
 
 export default function LecturerRevenue() {
   const { t, i18n } = useTranslation("admin")
@@ -93,7 +94,7 @@ export default function LecturerRevenue() {
     <div className="space-y-6 md:space-y-8" dir={isRTL ? "rtl" : "ltr"}>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h2 className="text-2xl font-bold md:text-3xl" style={{ color: TOKENS.deepTeal }}>{t("revenue.lecturerRevenue")}</h2>
-        <select
+        <DSSelect
           className="select select-bordered w-full sm:w-64 font-bold bg-white"
           style={{ 
             color: TOKENS.inkText,
@@ -108,7 +109,7 @@ export default function LecturerRevenue() {
               {lecturer.name}
             </option>
           ))}
-        </select>
+        </DSSelect>
       </div>
 
       {revenueData && (

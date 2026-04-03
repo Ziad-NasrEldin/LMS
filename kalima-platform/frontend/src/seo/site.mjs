@@ -17,7 +17,7 @@ export const SITE_NAME_EN = "Fekra Educational Platform";
 export const SITE_TITLE_AR = "منصة فكرة التعليمية";
 export const DEFAULT_SOCIAL_IMAGE = "/Kalima.png";
 export const DEFAULT_DESCRIPTION_AR =
-  "منصة فكرة التعليمية منصة تعليم إلكتروني للطلاب من الصف الرابع الابتدائي حتى الصف الثالث الثانوي، وتوفر دورات منظمة ومعلمين متخصصين ومسارات تعلم واضحة.";
+  "فكرة منصة تعليم إلكتروني عالمية تقدم دورات وموارد وأدوات تعلم للمتعلمين في مختلف المجالات والمستويات.";
 export const DEFAULT_DESCRIPTION_EN =
   "Fekra is a global e-learning platform offering courses, resources, and learning tools for learners across subjects and skill levels.";
 
