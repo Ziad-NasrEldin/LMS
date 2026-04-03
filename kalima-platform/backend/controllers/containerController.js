@@ -482,14 +482,7 @@ exports.getLecturerContainers = catchAsync(async (req, res, next) => {
     filter.parent = null;
   }
 
-  let query = Container.find(filter);
-
-  // If the user is not authenticated, select only basic fields
-  if (!req.user) {
-    query = query.select("name type subject level createdBy"); // Select basic fields + createdBy for context
-  }
-
-  const containers = await query.populate([
+  const containers = await Container.find(filter).populate([
     { path: "createdBy", select: "name" }, // Keep createdBy populated for context
     { path: "subject", select: "name" },
     { path: "level", select: "name" },

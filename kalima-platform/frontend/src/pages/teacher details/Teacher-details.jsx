@@ -5,7 +5,7 @@ import { useState, useEffect, useMemo } from "react"
 import { Loader, BookOpen, GraduationCap, Star, Award, Users } from "lucide-react"
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom"
 import { getLecturerById } from "../../routes/fetch-users"
-import { getContainersByLecturerId } from "../../routes/lectures"
+import { getContainersByLecturerId, getContainerById } from "../../routes/lectures"
 import { buildCoursePath, buildTeacherPath } from "../../seo/site.mjs"
 import { useSeo } from "../../seo/useSeo"
 import { buildBreadcrumbSchema, buildPersonSchema } from "../../seo/structuredData.mjs"
@@ -235,7 +235,10 @@ export default function TeacherDetails() {
           
           const containersData = await getContainersByLecturerId(userId, { type: "course" });
           if (containersData?.data?.containers) {
-            setContainers(containersData.data.containers);
+            const fullContainers = await Promise.all(
+              containersData.data.containers.map(c => getContainerById(c._id).then(r => r?.data ?? c))
+            );
+            setContainers(fullContainers);
           }
         } else {
           setError(teacherResult.error || t('error.failed'));

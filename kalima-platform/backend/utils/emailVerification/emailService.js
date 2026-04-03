@@ -1,4 +1,5 @@
 const { Resend } = require('resend');
+const { buildOtpEmailTemplate, EMAIL_TYPES } = require('./emailTemplates');
 
 // Initialize Resend with API key from environment variables
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -55,17 +56,7 @@ const sendEmail = async (to, subject, html) => {
  * @returns {Promise} - Promise resolving to the sent message info
  */
 const sendOTPEmail = async (to, otp) => {
-  const subject = 'Your Email Verification Code';
-  const html = `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
-      <h2 style="color: #333;">Email Verification</h2>
-      <p style="color: #555; font-size: 16px;">Thank you for registering with Kalima. Please use the following code to verify your email address:</p>
-      <div style="background-color: #f5f5f5; padding: 10px; text-align: center; font-size: 24px; letter-spacing: 5px; font-weight: bold; margin: 20px 0;">
-        ${otp}
-      </div>
-      <p style="color: #777; font-size: 14px;">This code will expire in 10 minutes.</p>
-    </div>
-  `;
+  const { subject, html } = buildOtpEmailTemplate({ type: EMAIL_TYPES.verification, otp });
 
   try {
     return await sendEmail(to, subject, html);
