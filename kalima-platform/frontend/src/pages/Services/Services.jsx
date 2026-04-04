@@ -174,6 +174,15 @@ const Services = () => {
             <div className="pointer-events-none absolute -left-10 -top-8 h-40 w-40 rounded-full opacity-70" style={{ background: "rgba(77,179,194,0.42)" }} />
             <div className="pointer-events-none absolute -bottom-12 right-6 h-36 w-36 rounded-full opacity-75" style={{ background: "rgba(243,154,63,0.35)" }} />
 
+            {/* Fekra Logo - Positioned in top left bubble */}
+            <div className="absolute top-4 left-4 md:top-6 md:left-6 z-20">
+              <img
+                src="/Fekra.png"
+                alt="Fekra Logo"
+                className="h-16 md:h-24 w-auto object-contain drop-shadow-lg"
+              />
+            </div>
+
             <span
               className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[11px] uppercase tracking-[0.08em]"
               style={{

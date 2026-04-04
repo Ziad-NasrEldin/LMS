@@ -965,7 +965,7 @@ const UserManagementTable = () => {
       <div className="w-full overflow-x-auto bg-white rounded-[1.4rem] border" style={{ borderColor: "rgba(17,24,39,0.08)", boxShadow: SHADOWS.level1 }}>
         <table className="table w-full border-collapse">
           <thead style={{ background: "rgba(77, 179, 194, 0.05)" }}>
-            <tr className={`${isRTL ? "text-right" : "text-left"}`}>
+            <tr>
               {["name", "phone", "accountType", "status", "successfulInvites", "actions"].map((header) => (
                 <th key={header} className="p-4 text-sm md:text-base font-bold whitespace-nowrap" style={{ color: TOKENS.deepTeal, borderBottom: "2px solid rgba(17,24,39,0.05)" }}>
                   {t(`admin.table.${header}`)}
@@ -975,7 +975,7 @@ const UserManagementTable = () => {
           </thead>
           <tbody>
             {currentUsers.map((user) => (
-              <tr key={user._id} className={`${isRTL ? "text-right" : "text-left"} transition-colors hover:bg-gray-50`} style={{ borderBottom: "1px solid rgba(17,24,39,0.05)" }}>
+              <tr key={user._id} className="transition-colors hover:bg-gray-50" style={{ borderBottom: "1px solid rgba(17,24,39,0.05)" }}>
                 <td className="p-4 whitespace-nowrap font-medium" style={{ color: TOKENS.inkText }}>{user.name || t("admin.NA")}</td>
                 <td className="p-4 whitespace-nowrap font-medium font-mono" style={{ color: TOKENS.slateText }}>{user.phoneNumber || t("admin.NA")}</td>
                 <td className="p-4 whitespace-nowrap">
@@ -986,7 +986,7 @@ const UserManagementTable = () => {
                 <td className="p-4 whitespace-nowrap font-medium" style={{ color: getStatus(user) === t("admin.status.valid") ? "#10B981" : TOKENS.vibrantCoral }}>{getStatus(user)}</td>
                 <td className="p-4 whitespace-nowrap font-bold" style={{ color: TOKENS.slateText }}>{user.successfulInvites || 0}</td>
                 <td className="p-4 whitespace-nowrap">
-                  <div className={`flex items-center gap-2 ${isRTL ? "text-right" : "text-left"}`}>
+                  <div className="flex items-center gap-2">
                     <button
                       className="btn btn-sm btn-circle btn-ghost"
                       style={{ color: TOKENS.deepTeal }}

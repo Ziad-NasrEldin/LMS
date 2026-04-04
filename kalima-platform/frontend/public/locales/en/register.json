@@ -22,7 +22,8 @@
   "form": {
     "studentId": "Student ID",
     "fullName": "Full Name",
-    "gender": "Gender",
+    "unknownUser": "Unknown User",
+    "remove": "Remove",
     "role": "Role",
     "bio": "Bio",
     "expertise": "Expertise",
@@ -135,10 +136,11 @@
   "buttons": {
     "previous": "Previous",
     "next": "Next",
-    "submit": "Done",
+    "submit": "Submit",
     "addAnotherChild": "Add Another Child",
     "addAnotherParentPhone": "Add another parent phone",
-    "removeParentPhone": "Remove"
+    "removeParentPhone": "Remove",
+    "remove": "Remove"
   },
   "role": {
     "student": "Student",

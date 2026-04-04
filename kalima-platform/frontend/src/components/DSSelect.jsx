@@ -138,6 +138,7 @@ export default function DSSelect({
 
   const [internalValue, setInternalValue] = useState(() => findDefaultValue(options, defaultValue))
   const [isOpen, setIsOpen] = useState(false)
+  const [isClosing, setIsClosing] = useState(false)
   const [activeIndex, setActiveIndex] = useState(-1)
 
   const selectedValue = isControlled ? normalizeValue(value) : internalValue
@@ -155,17 +156,17 @@ export default function DSSelect({
   }, [defaultValue, internalValue, isControlled, options])
 
   useEffect(() => {
-    if (!isOpen) return undefined
+    if (!isOpen && !isClosing) return undefined
 
     const handlePointerDown = (event) => {
       if (!wrapperRef.current?.contains(event.target)) {
-        setIsOpen(false)
+        closeMenu()
       }
     }
 
     const handleEscape = (event) => {
       if (event.key === "Escape") {
-        setIsOpen(false)
+        closeMenu()
         triggerRef.current?.focus()
       }
     }
@@ -177,7 +178,7 @@ export default function DSSelect({
       document.removeEventListener("mousedown", handlePointerDown)
       document.removeEventListener("keydown", handleEscape)
     }
-  }, [isOpen])
+  }, [isOpen, isClosing])
 
   useEffect(() => {
     if (!isOpen || activeIndex < 0) return
@@ -190,7 +191,7 @@ export default function DSSelect({
     }
 
     onChange?.(buildSyntheticEvent({ name, id: controlId, value: nextValue, type: "change" }))
-    setIsOpen(false)
+    closeMenu()
     triggerRef.current?.focus()
   }
 
@@ -201,10 +202,105 @@ export default function DSSelect({
     const selectedEnabledIndex = enabledOptions.findIndex((option) => option.value === selectedValue)
     setActiveIndex(selectedEnabledIndex >= 0 ? selectedEnabledIndex : 0)
     setIsOpen(true)
+    
+    // Add opening animation after menu is rendered
+    setTimeout(() => {
+      if (wrapperRef.current) {
+        const menuElement = wrapperRef.current.querySelector('.ds-select-menu')
+        if (menuElement) {
+          // Start from hidden state
+          menuElement.style.opacity = '0'
+          menuElement.style.transform = 'translateY(-12px) scale(0.92)'
+          menuElement.style.transition = 'opacity 280ms cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 280ms cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+          
+          // Animate to visible state
+          requestAnimationFrame(() => {
+            menuElement.style.opacity = '1'
+            menuElement.style.transform = 'translateY(0) scale(1)'
+          })
+        }
+      }
+    }, 10)
+    
+    // Simple fixed scroll based on number of options
+    setTimeout(() => {
+      if (wrapperRef.current) {
+        const scrollContainer = wrapperRef.current.closest('.custom-scrollbar') || 
+                              wrapperRef.current.closest('[class*="overflow-y"]') ||
+                              document.documentElement
+        
+        // Calculate scroll distance: 40px per option
+        const scrollDistance = enabledOptions.length * 40
+        
+        if (scrollContainer !== document.documentElement) {
+          // For custom scroll container - try smooth scroll first
+          if (scrollContainer.scrollTo) {
+            scrollContainer.scrollTo({
+              top: scrollContainer.scrollTop + scrollDistance,
+              behavior: 'smooth'
+            })
+          } else {
+            // Fallback - animate manually
+            const startScroll = scrollContainer.scrollTop
+            const targetScroll = startScroll + scrollDistance
+            const duration = 300 // ms
+            const startTime = performance.now()
+            
+            const animateScroll = (currentTime) => {
+              const elapsed = currentTime - startTime
+              const progress = Math.min(elapsed / duration, 1)
+              const easeProgress = 1 - Math.pow(1 - progress, 3) // Ease out cubic
+              
+              scrollContainer.scrollTop = startScroll + (targetScroll - startScroll) * easeProgress
+              
+              if (progress < 1) {
+                requestAnimationFrame(animateScroll)
+              }
+            }
+            
+            requestAnimationFrame(animateScroll)
+          }
+        } else {
+          // For document scrolling
+          window.scrollBy({
+            top: scrollDistance,
+            behavior: 'smooth'
+          })
+        }
+      }
+    }, 50)
   }
 
   const closeMenu = () => {
-    setIsOpen(false)
+    if (!isOpen || isClosing) return
+    
+    setIsClosing(true)
+    
+    // Add closing animation
+    if (wrapperRef.current) {
+      const menuElement = wrapperRef.current.querySelector('.ds-select-menu')
+      if (menuElement) {
+        menuElement.style.transition = 'opacity 220ms cubic-bezier(0.55, 0.055, 0.675, 0.19), transform 220ms cubic-bezier(0.55, 0.055, 0.675, 0.19)'
+        menuElement.style.opacity = '0'
+        menuElement.style.transform = 'translateY(-8px) scale(0.96)'
+      }
+    }
+    
+    // Actually close after animation
+    setTimeout(() => {
+      setIsOpen(false)
+      setIsClosing(false)
+      
+      // Reset animation styles
+      if (wrapperRef.current) {
+        const menuElement = wrapperRef.current.querySelector('.ds-select-menu')
+        if (menuElement) {
+          menuElement.style.transition = ''
+          menuElement.style.opacity = ''
+          menuElement.style.transform = ''
+        }
+      }
+    }, 220)
   }
 
   const handleTriggerKeyDown = (event) => {
@@ -296,7 +392,7 @@ export default function DSSelect({
         aria-haspopup="listbox"
         aria-expanded={isOpen}
         aria-controls={listboxId}
-        onClick={() => (isOpen ? closeMenu() : openMenu())}
+        onClick={() => (isOpen || isClosing ? closeMenu() : openMenu())}
         onKeyDown={handleTriggerKeyDown}
         onFocus={onFocus}
         onBlur={(event) => {
@@ -315,10 +411,10 @@ export default function DSSelect({
         <ChevronDown size={16} className={`ds-select-chevron ${isOpen ? "ds-select-chevron-open" : ""}`} />
       </button>
 
-      {isOpen ? (
+      {(isOpen || isClosing) ? (
         <ul
           id={listboxId}
-          className="ds-select-menu"
+          className={`ds-select-menu ${isClosing ? 'ds-select-menu-closing' : ''}`}
           role="listbox"
           aria-labelledby={controlId}
           tabIndex={-1}

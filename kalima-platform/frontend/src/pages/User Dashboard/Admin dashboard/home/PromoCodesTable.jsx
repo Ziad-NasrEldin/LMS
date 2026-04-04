@@ -296,7 +296,7 @@ const PromoCodesTable = () => {
                 <thead style={{ background: "rgba(77,179,194,0.06)" }}>
                   <tr>
                     {hasUnredeemedCodes && (
-                      <th>
+                      <th className="text-center">
                         <input
                           type="checkbox"
                           className="checkbox"
@@ -321,7 +321,7 @@ const PromoCodesTable = () => {
                   {paginatedCodes.map((code) => (
                     <tr key={code._id} className="hover:bg-base-200/40 transition-colors">
                       {hasUnredeemedCodes && (
-                        <td>
+                        <td className="text-center">
                           {!code.isRedeemed && (
                             <input
                               type="checkbox"

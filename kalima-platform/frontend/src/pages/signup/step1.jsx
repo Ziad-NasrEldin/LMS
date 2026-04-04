@@ -15,11 +15,11 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
   const isRTL = i18n.language === "ar";
 
   const stageOptions = levelHierarchy?.stageOptions || [];
-  const fieldClass = "h-12 min-h-12 w-full rounded-xl text-base";
+  const fieldClass = "w-full rounded-xl text-base";
   const inputClass = `input ${fieldClass}`;
   const selectClass = `select ${fieldClass}`;
-  const exactHeightStyle = { height: '48px', minHeight: '48px', maxHeight: '48px' };
-
+  const exactHeight = { height: '48px', minHeight: '48px', maxHeight: '48px', boxSizing: 'border-box' };
+  
   // Section header component
   const SectionHeader = ({ title, subtitle }) => (
     <div className="mb-4 mt-6 first:mt-0">
@@ -146,13 +146,13 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
         </div>
 
         {/* Row 2: Gender + Phone - 2 columns */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem', alignItems: 'start' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+        <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'start' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem', width: '48%' }}>
             <label style={{ fontSize: '0.875rem', fontWeight: 600, minHeight: '1.5rem' }}>{t("form.gender")}</label>
             <DSSelect
               name="gender"
               className={`${selectClass} ${errors.gender ? "select-error" : ""}`}
-              style={exactHeightStyle}
+              style={exactHeight}
               value={formData.gender}
               onChange={handleInputChange}
               required
@@ -163,7 +163,7 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
             </DSSelect>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem', width: '48%' }}>
             <label style={{ fontSize: '0.875rem', fontWeight: 600, minHeight: '1.5rem' }}>{t("form.phoneNumber")}</label>
             <input
               type="text"
@@ -171,7 +171,7 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
               value={formData.phoneNumber}
               onChange={handleInputChange}
               className={`${inputClass} ${errors.phoneNumber ? "input-error" : ""}`}
-              style={exactHeightStyle}
+              style={exactHeight}
               inputMode="tel"
               dir="ltr"
               autoComplete="tel"
@@ -212,13 +212,13 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
         />
         
         {/* Row 3: Government + Administration Zone - 2 columns */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem', alignItems: 'start' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+        <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'start' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem', width: '48%' }}>
             <label style={{ fontSize: '0.875rem', fontWeight: 600, minHeight: '1.5rem' }}>{t("form.government", { defaultValue: isRTL ? "المحافظة" : "Government" })}</label>
             <DSSelect
               name="government"
               className={`${selectClass} ${errors.government ? "select-error" : ""}`}
-              style={exactHeightStyle}
+              style={exactHeight}
               value={formData.government || ""}
               onChange={handleGovernmentChange}
             >
@@ -242,7 +242,7 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
               disabled={!formData.government || zonesLoading}
               name="administrationZone"
               className={`${selectClass} ${errors.administrationZone ? "select-error" : ""}`}
-              style={exactHeightStyle}
+              style={exactHeight}
               value={formData.administrationZone || ""}
               onChange={handleInputChange}
             >
@@ -277,7 +277,7 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
                 <DSSelect
                   name="stage"
                   className={`${selectClass} ${errors.stage ? "select-error" : ""}`}
-                  style={exactHeightStyle}
+                  style={exactHeight}
                   value={formData.stage || ""}
                   onChange={(e) => {
                     handleInputChange(e);
@@ -309,7 +309,7 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
                 <DSSelect
                   name="level"
                   className={`${selectClass} ${errors.level ? "select-error" : ""}`}
-                  style={exactHeightStyle}
+                  style={exactHeight}
                   value={formData.level || ""}
                   onChange={handleInputChange}
                   disabled={levelsLoading || !formData.stage || gradeOptions.length === 0}

@@ -702,7 +702,11 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
               <div className="relative border-t border-gray-300/70 p-3">
                 <button
                   type="button"
-                  className="btn w-full rounded-xl border-0 bg-[linear-gradient(140deg,#0E5563_0%,#146A78_100%)] text-primary-content"
+                  className="btn w-full rounded-xl border-0 text-white"
+                  style={{ 
+                    background: "linear-gradient(140deg, #0E5563 0%, #146A78 100%)",
+                    color: "#FFFFFF"
+                  }}
                   onClick={handleExitView}
                   disabled={isExitingView}
                 >

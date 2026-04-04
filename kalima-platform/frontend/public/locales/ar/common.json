@@ -262,7 +262,8 @@
     "studentId": "معرّف الطالب",
     "purchaseId": "معرّف الشراء",
     "eventId": "معرّف الحدث",
-    "price": "السعر"
+    "price": "السعر",
+    "remove": "إزالة"
   },
   "entities": {
     "users": "المستخدمين",

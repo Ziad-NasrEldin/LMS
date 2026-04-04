@@ -599,7 +599,7 @@ const AssistantPage = () => {
           <div className="flex-1">
             <h1 className="text-2xl font-bold">{dashboardData.userInfo.name}</h1>
             <p className="text-base-content/70">{dashboardData.userInfo.email}</p>
-            <div className="badge badge-primary mt-1">{t(`roles.${dashboardData.userInfo.role.toLowerCase()}`)}</div>
+              <div className="badge badge-primary mt-1 text-white">{t(`roles.${dashboardData.userInfo.role.toLowerCase()}`)}</div>
           </div>
           {dashboardData.userInfo.assignedLecturer && (
             <div className="bg-base-200/50 p-4 rounded-lg flex flex-col md:flex-row items-start md:items-center gap-3">

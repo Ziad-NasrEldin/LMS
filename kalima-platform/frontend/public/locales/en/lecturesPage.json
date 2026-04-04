@@ -37,6 +37,7 @@
       "level": "Level",
       "type": "Type",
       "price": "Price",
+      "points": "Points",
       "purchaseDate": "Purchase Date",
       "actions": "Actions"
     },

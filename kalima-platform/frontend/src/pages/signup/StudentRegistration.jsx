@@ -689,7 +689,7 @@ export default function StudentRegistration() {
         }}
       >
         <div className="grid min-h-[auto] lg:min-h-[760px] lg:grid-cols-[1fr_1.2fr]">
-          {/* Left Side - Hero/Progress */}
+          {/* Left Side - Dynamic: Hero on step 1, Form fields on other steps */}
           <section className="relative overflow-hidden p-6 lg:p-8" style={{ background: GRADIENTS.appPanel }}>
             <div className="absolute -left-12 top-6 h-48 w-48 rounded-full bg-secondary/20 blur-3xl" />
             <div className="absolute bottom-12 right-8 h-44 w-44 rounded-full bg-primary/15 blur-3xl" />
@@ -710,23 +710,6 @@ export default function StudentRegistration() {
                       "Join thousands of students and educators in a playful, structured learning environment designed for growth.",
                     )}
                   </p>
-
-                  <div className="mt-auto pt-8">
-                    <div className="w-full max-w-sm rounded-[1.5rem] border border-base-300 bg-base-100 p-5 shadow-xl">
-                      <p className="text-sm font-semibold text-base-content">{t("interactiveLessons", "Interactive Lessons")}</p>
-                      <div className="mt-3 h-2.5 rounded-full bg-base-200">
-                        <div className="h-full w-3/4 rounded-full bg-primary" />
-                      </div>
-                      <p className="mt-2 text-xs text-base-content/60">{t("progress", "Progress")}</p>
-                    </div>
-
-                    <div
-                      className={`mt-3 w-fit rounded-2xl px-4 py-3 text-sm font-bold text-info-content shadow-lg inline-flex ${isRTL ? "me-4" : "ms-4"}`}
-                      style={{ background: TOKENS.softCyanTeal }}
-                    >
-                      {t("earnBadges", "Earn badges while you learn!")}
-                    </div>
-                  </div>
                 </>
               ) : (
                 /* Form summary/progress on other steps */
@@ -794,7 +777,7 @@ export default function StudentRegistration() {
           </section>
 
           {/* Right Side - Form */}
-          <section className="flex flex-col p-4 sm:p-6 lg:p-8" style={{ background: GRADIENTS.appPanel }}>
+          <section className="flex flex-col p-4 sm:p-6 lg:p-8 bg-base-100">
             <div className="flex-1 overflow-hidden flex flex-col">
               {/* Header */}
               <div className="mb-4">

@@ -24,7 +24,9 @@
           "idNumber": "ID Number",
           "level": "Level",
           "hobby": "Hobby",
-          "socialMedia": "Social Media Links"
+          "socialMedia": "Social Media Links",
+          "generalPoints": "General Balance",
+          "totalPoints": "Total Balance"
         },
         "placeholders": {
           "fullName": "Example: John Doe",
@@ -75,6 +77,7 @@
       "invalidEmail": "Invalid email address"
     },
     "retry": "Retry",
+    "remove": "Remove",
     "languageAppearance": {
     "title": "Language & Appearance",
     "showThemes": "Show themes",

@@ -262,7 +262,8 @@
     "studentId": "student ID",
     "purchaseId": "purchase ID",
     "eventId": "event ID",
-    "price": "price"
+    "price": "price",
+    "remove": "Remove"
   },
   "entities": {
     "users": "users",

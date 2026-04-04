@@ -15,16 +15,18 @@
 
     "personalInfo": {
     "title": "المعلومات الشخصية",
-    "subtitle": "المعلومات الشخصية",
+    "subtitle": "التفاصيل الشخصية",
     "labels": {
-      "fullName": "اسم الطالب بالكامل",
-      "phoneNumber": "رقم هاتف الجوال",
+      "fullName": "الاسم الكامل",
+      "phoneNumber": "رقم الهاتف",
       "email": "البريد الإلكتروني",
       "profession": "المهنة / العمل",
       "idNumber": "رقم الهوية",
       "level": "المرحلة",
       "hobby": "الهواية",
-      "socialMedia": "روابط وسائل التواصل الاجتماعي"
+      "socialMedia": "روابط وسائل التواصل الاجتماعي",
+      "generalPoints": "الرصيد العام",
+      "totalPoints": "إجمالي الرصيد"
     },
     "placeholders": {
       "fullName": "مثال: يوسف بن محمد علي",
@@ -75,6 +77,7 @@
       "invalidEmail": "صيغة البريد الإلكتروني غير صحيحة"
     },
     "retry": "إعادة المحاولة",
+    "remove": "إزالة",
     "languageAppearance": {
     "title": "اللغة والمظهر",
     "showThemes": "اظهار السمات",

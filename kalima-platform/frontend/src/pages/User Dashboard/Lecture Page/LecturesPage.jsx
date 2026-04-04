@@ -849,103 +849,104 @@ const MyLecturesPage = () => {
           ))}
         </div>
 
-        <div
-          className="hidden md:block overflow-x-auto rounded-[1.6rem] border"
-          style={{ background: "rgba(255,255,255,0.82)", borderColor: "rgba(17,24,39,0.08)", boxShadow: SHADOWS.level1 }}
-        >
-          <table className="table table-zebra w-full">
-            <thead>
-              <tr>
-                <th className="w-24">{t("lecturesPage.tableHeaders.thumbnail")}</th>
-                <th>{t("lecturesPage.tableHeaders.name")}</th>
-                {(isStudentLikeRole || isAdminLikeRole) && (
-                  <th>{t("lecturesPage.tableHeaders.lecturer")}</th>
-                )}
-                <th>{t("lecturesPage.tableHeaders.subject")}</th>
-                <th>{t("lecturesPage.tableHeaders.level")}</th>
-                <th>{t("lecturesPage.tableHeaders.type")}</th>
-                <th>{t("lecturesPage.tableHeaders.price")}</th>
-                {isStudentLikeRole && <th>{t("lecturesPage.tableHeaders.purchaseDate")}</th>}
-                {!isStudentLikeRole && <th>{t("lecturesPage.tableHeaders.actions")}</th>}
-              </tr>
-            </thead>
-            <tbody>
-              {lectures?.map((lecture) => (
-                <tr key={lecture.id}>
-                  <td>
-                    {lecture.thumbnail ? (
-                      <div className="avatar">
-                        <div className="w-12 h-12 rounded-xl overflow-hidden border" style={{ borderColor: "rgba(17,24,39,0.12)" }}>
-                          <img
-                            src={resolveUploadUrl(lecture.thumbnail, "lecture_thumbnails") || "/placeholder.svg"}
-                            alt={lecture.name}
-                            className="object-cover w-full h-full"
-                            onError={(e) => {
-                              e.currentTarget.src = "/registration-image.png"
-                            }}
-                          />
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="avatar placeholder">
-                        <div
-                          className="w-12 h-12 rounded-xl flex items-center justify-center text-xs"
-                          style={{ background: TOKENS.lightAquaMist, color: TOKENS.deepTeal }}
-                        >
-                          {lecture.name?.charAt(0)?.toUpperCase() || "?"}
-                        </div>
-                      </div>
-                    )}
-                  </td>
-
-                  <td>{lecture.name}</td>
+        <div className="hidden md:block overflow-x-auto rounded-[1.4rem] border" style={{ background: "rgba(255,255,255,0.72)", borderColor: "rgba(17,24,39,0.08)" }}>
+          <div className="table-responsive">
+            <table className="table table-zebra w-full" style={{ tableLayout: "auto" }}>
+              <thead>
+                <tr>
+                  <th className="w-16 min-w-[4rem] text-center">{t("lecturesPage.tableHeaders.thumbnail")}</th>
+                  <th className="min-w-[200px]">{t("lecturesPage.tableHeaders.name")}</th>
                   {(isStudentLikeRole || isAdminLikeRole) && (
-                    <td>{lecture.lecturer?.name || t("lecturesPage.unknown")}</td>
+                    <th>{t("lecturesPage.tableHeaders.lecturer")}</th>
                   )}
-                  <td>{lecture.subject?.name || t("lecturesPage.notSpecified")}</td>
-                  <td>
-                    {t(`gradeLevels.${lecture.level?.name}`, { ns: "common" }) ||
-                      lecture.level?.name ||
-                      t("lecturesPage.notSpecified")}
-                  </td>
-                  <td>
-                    {getLecturePricingLabel(lecture)}
-                  </td>
-                  <td>
-                    {lecture.price || 0} {t("lecturesPage.points")}
-                  </td>
-                  {isStudentLikeRole && <td>{lecture.purchasedAt}</td>}
+                  <th>{t("lecturesPage.tableHeaders.subject")}</th>
+                  <th>{t("lecturesPage.tableHeaders.level")}</th>
+                  <th>{t("lecturesPage.tableHeaders.price")}</th>
+                  <th>{t("lecturesPage.tableHeaders.points")}</th>
+                  {isStudentLikeRole && <th>{t("lecturesPage.tableHeaders.purchaseDate")}</th>}
                   {!isStudentLikeRole && (
-                    <td>
-                      <div className="flex flex-wrap gap-2">
-                        <Link
-                          to={`/dashboard/${isStudentLikeRole ? "student" : "lecturer"}-dashboard/${isStudentLikeRole ? "lecture-display" : "detailed-lecture-view"
-                            }/${lecture.id}`}
-                        >
-                          <button
-                            className="btn btn-sm border-none"
-                            style={{ background: TOKENS.deepTeal, color: "#F8FCFF" }}
-                          >
-                            {t("lecturesPage.buttons.details")}
-                          </button>
-                        </Link>
-                        {!isStudentLikeRole && (
-                          <button
-                            type="button"
-                            className="btn btn-sm border-none"
-                            style={{ background: TOKENS.warmMango, color: "#fff" }}
-                            onClick={() => openEditLectureModal(lecture)}
-                          >
-                            {t("lecturesPage.buttons.edit", "Edit")}
-                          </button>
-                        )}
-                      </div>
-                    </td>
+                    <th>{t("lecturesPage.tableHeaders.actions")}</th>
                   )}
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {lectures?.map((lecture) => (
+                  <tr key={lecture.id}>
+                    <td className="text-center">
+                      {lecture.thumbnail ? (
+                        <div className="avatar">
+                          <div className="w-12 h-12 rounded-xl overflow-hidden border" style={{ borderColor: "rgba(17,24,39,0.12)" }}>
+                            <img
+                              src={resolveUploadUrl(lecture.thumbnail, "lecture_thumbnails") || "/placeholder.svg"}
+                              alt={lecture.name}
+                              className="object-cover w-full h-full"
+                              onError={(e) => {
+                                e.currentTarget.src = "/registration-image.png"
+                              }}
+                            />
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="avatar placeholder">
+                          <div
+                            className="w-12 h-12 rounded-xl flex items-center justify-center text-xs"
+                            style={{ background: TOKENS.lightAquaMist, color: TOKENS.deepTeal }}
+                          >
+                            {lecture.name?.charAt(0)?.toUpperCase() || "?"}
+                          </div>
+                        </div>
+                      )}
+                    </td>
+
+                    <td>{lecture.name}</td>
+                    {(isStudentLikeRole || isAdminLikeRole) && (
+                      <td>{lecture.lecturer?.name || t("lecturesPage.unknown")}</td>
+                    )}
+                    <td>{lecture.subject?.name || t("lecturesPage.notSpecified")}</td>
+                    <td>
+                      {t(`gradeLevels.${lecture.level?.name}`, { ns: "common" }) ||
+                        lecture.level?.name ||
+                        t("lecturesPage.notSpecified")}
+                    </td>
+                    <td>
+                      {getLecturePricingLabel(lecture)}
+                    </td>
+                    <td>
+                      {lecture.price || 0} {t("lecturesPage.points")}
+                    </td>
+                    {isStudentLikeRole && <td>{lecture.purchasedAt}</td>}
+                    {!isStudentLikeRole && (
+                      <td>
+                        <div className="flex gap-2">
+                          <Link
+                            to={`/dashboard/${isStudentLikeRole ? "student" : "lecturer"}-dashboard/${isStudentLikeRole ? "lecture-display" : "detailed-lecture-view"
+                              }/${lecture.id}`}
+                          >
+                            <button
+                              className="btn btn-sm border-none"
+                              style={{ background: TOKENS.deepTeal, color: "#F8FCFF" }}
+                            >
+                              {t("lecturesPage.buttons.details")}
+                            </button>
+                          </Link>
+                          {!isStudentLikeRole && (
+                            <button
+                              type="button"
+                              className="btn btn-sm border-none"
+                              style={{ background: TOKENS.warmMango, color: "#fff" }}
+                              onClick={() => openEditLectureModal(lecture)}
+                            >
+                              {t("lecturesPage.buttons.edit", "Edit")}
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    )}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
         {lectures.length === 0 && (
           <div className="alert alert-info mt-4">
