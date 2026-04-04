@@ -18,7 +18,8 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
   const fieldClass = "h-12 min-h-12 w-full rounded-xl text-base";
   const inputClass = `input ${fieldClass}`;
   const selectClass = `select ${fieldClass}`;
-  
+  const exactHeightStyle = { height: '48px', minHeight: '48px', maxHeight: '48px' };
+
   // Section header component
   const SectionHeader = ({ title, subtitle }) => (
     <div className="mb-4 mt-6 first:mt-0">
@@ -118,40 +119,40 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
   }
 
   return (
-      <div className="space-y-1">
+      <div className="space-y-5">
         {/* Section: Basic Info */}
         <SectionHeader 
           title={t("form.personalDetails")} 
           subtitle={t("form.personalDetailsSubtitle", "Enter your basic information")}
         />
         
-        {/* Row 1: Name (2/3) + Gender (1/3) */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
-          <div className="form-control sm:col-span-2">
-            <label className="label">
-              <span className="label-text">{t("form.fullName")}</span>
-            </label>
-            <input
-              type="text"
-              name="fullName"
-              className={`${inputClass} ${errors.fullName ? "input-error" : ""}`}
-              value={formData.fullName}
-              onChange={handleInputChange}
-              required
-              placeholder={t("form.fullNamePlaceholder", "Enter your full name")}
-            />
-            {errors.fullName && (
-              <span className="text-error text-sm mt-1">{t(`validation.${errors.fullName}`)}</span>
-            )}
-          </div>
+        {/* Row 1: Full Name */}
+        <div className="form-control">
+          <label className="label">
+            <span className="label-text">{t("form.fullName")}</span>
+          </label>
+          <input
+            type="text"
+            name="fullName"
+            className={`${inputClass} ${errors.fullName ? "input-error" : ""}`}
+            value={formData.fullName}
+            onChange={handleInputChange}
+            required
+            placeholder={t("form.fullNamePlaceholder", "Enter your full name")}
+          />
+          {errors.fullName && (
+            <span className="text-error text-sm mt-1">{t(`validation.${errors.fullName}`)}</span>
+          )}
+        </div>
 
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text">{t("form.gender")}</span>
-            </label>
+        {/* Row 2: Gender + Phone - 2 columns */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem', alignItems: 'start' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+            <label style={{ fontSize: '0.875rem', fontWeight: 600, minHeight: '1.5rem' }}>{t("form.gender")}</label>
             <DSSelect
               name="gender"
               className={`${selectClass} ${errors.gender ? "select-error" : ""}`}
+              style={exactHeightStyle}
               value={formData.gender}
               onChange={handleInputChange}
               required
@@ -161,20 +162,16 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
               <option value="female">{t("gender.female")}</option>
             </DSSelect>
           </div>
-        </div>
 
-        {/* Row 2: Phone Numbers */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text">{t("form.phoneNumber")}</span>
-            </label>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+            <label style={{ fontSize: '0.875rem', fontWeight: 600, minHeight: '1.5rem' }}>{t("form.phoneNumber")}</label>
             <input
               type="text"
               name="phoneNumber"
               value={formData.phoneNumber}
               onChange={handleInputChange}
               className={`${inputClass} ${errors.phoneNumber ? "input-error" : ""}`}
+              style={exactHeightStyle}
               inputMode="tel"
               dir="ltr"
               autoComplete="tel"
@@ -185,27 +182,28 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
               <span className="text-error text-sm mt-1">{t(`validation.${errors.phoneNumber}`)}</span>
             )}
           </div>
-
-          {role === "teacher" && (
-            <div className="form-control">
-              <label className="label">
-                <span className="label-text">{t("form.phoneNumber2")}</span>
-                <span className="label-text-alt text-xs text-slate-400">{t("form.optional")}</span>
-              </label>
-              <input
-                type="text"
-                name="phoneNumber2"
-                value={formData.phoneNumber2}
-                onChange={handleInputChange}
-                className={inputClass}
-                inputMode="tel"
-                dir="ltr"
-                autoComplete="tel"
-                placeholder={t("form.phonePlaceholder", "01xxxxxxxxx")}
-              />
-            </div>
-          )}
         </div>
+
+        {/* Teacher second phone */}
+        {role === "teacher" && (
+          <div className="form-control">
+            <label className="label">
+              <span className="label-text">{t("form.phoneNumber2")}</span>
+              <span className="label-text-alt text-xs text-slate-400">{t("form.optional")}</span>
+            </label>
+            <input
+              type="text"
+              name="phoneNumber2"
+              value={formData.phoneNumber2}
+              onChange={handleInputChange}
+              className={inputClass}
+              inputMode="tel"
+              dir="ltr"
+              autoComplete="tel"
+              placeholder={t("form.phonePlaceholder", "01xxxxxxxxx")}
+            />
+          </div>
+        )}
 
         {/* Section: Location */}
         <SectionHeader 
@@ -213,15 +211,14 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
           subtitle={t("form.locationSubtitle", "Select your governorate and educational zone")}
         />
         
-        {/* Row 3: Government + Administration Zone */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text">{t("form.government", { defaultValue: isRTL ? "المحافظة" : "Government" })}</span>
-            </label>
+        {/* Row 3: Government + Administration Zone - 2 columns */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem', alignItems: 'start' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+            <label style={{ fontSize: '0.875rem', fontWeight: 600, minHeight: '1.5rem' }}>{t("form.government", { defaultValue: isRTL ? "المحافظة" : "Government" })}</label>
             <DSSelect
               name="government"
               className={`${selectClass} ${errors.government ? "select-error" : ""}`}
+              style={exactHeightStyle}
               value={formData.government || ""}
               onChange={handleGovernmentChange}
             >
@@ -239,14 +236,13 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
             )}
           </div>
 
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text">{t("form.administrationZone", { defaultValue: isRTL ? "الإدارة التعليمية" : "Administration Zone" })}</span>
-            </label>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+            <label style={{ fontSize: '0.875rem', fontWeight: 600, minHeight: '1.5rem' }}>{t("form.administrationZone", { defaultValue: isRTL ? "الإدارة التعليمية" : "Administration Zone" })}</label>
             <DSSelect
               disabled={!formData.government || zonesLoading}
               name="administrationZone"
               className={`${selectClass} ${errors.administrationZone ? "select-error" : ""}`}
+              style={exactHeightStyle}
               value={formData.administrationZone || ""}
               onChange={handleInputChange}
             >
@@ -275,14 +271,13 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
               subtitle={t("form.educationSubtitle", "Select your academic stage and grade")}
             />
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text">{t("form.stage", { defaultValue: isRTL ? "المرحلة" : "Stage" })}</span>
-                </label>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem', alignItems: 'start' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+                <label style={{ fontSize: '0.875rem', fontWeight: 600, minHeight: '1.5rem' }}>{t("form.stage", { defaultValue: isRTL ? "المرحلة" : "Stage" })}</label>
                 <DSSelect
                   name="stage"
                   className={`${selectClass} ${errors.stage ? "select-error" : ""}`}
+                  style={exactHeightStyle}
                   value={formData.stage || ""}
                   onChange={(e) => {
                     handleInputChange(e);
@@ -309,13 +304,12 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
                 )}
               </div>
 
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text">{t("form.level", { defaultValue: isRTL ? "المستوى التعليمي" : "Learning Level" })}</span>
-                </label>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+                <label style={{ fontSize: '0.875rem', fontWeight: 600, minHeight: '1.5rem' }}>{t("form.level", { defaultValue: isRTL ? "المستوى التعليمي" : "Learning Level" })}</label>
                 <DSSelect
                   name="level"
                   className={`${selectClass} ${errors.level ? "select-error" : ""}`}
+                  style={exactHeightStyle}
                   value={formData.level || ""}
                   onChange={handleInputChange}
                   disabled={levelsLoading || !formData.stage || gradeOptions.length === 0}

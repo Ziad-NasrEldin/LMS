@@ -137,7 +137,7 @@ function SecuritySection() {
           {/* Current Password Field */}
           <div className="form-control mb-3">
             <label className={`label pb-1 ${isRTL ? 'justify-end' : 'justify-start'}`}>
-              <span className="label-text">{t('security.labels.currentPassword')}</span>
+              <span className={`label-text ${isRTL ? 'text-left' : 'text-left'}`}>{t('security.labels.currentPassword')}</span>
             </label>
             <div className="relative w-full max-w-2xl">
               <input
@@ -194,7 +194,7 @@ function SecuritySection() {
           {/* New Password Field */}
           <div className="form-control mb-3">
             <label className={`label pb-1 ${isRTL ? 'justify-end' : 'justify-start'}`}>
-              <span className="label-text">{t('security.labels.newPassword')}</span>
+              <span className={`label-text ${isRTL ? 'text-left' : 'text-left'}`}>{t('security.labels.newPassword')}</span>
             </label>
             <div className="w-full max-w-2xl">
               <input
@@ -213,7 +213,7 @@ function SecuritySection() {
           {/* Confirm Password Field */}
           <div className="form-control mb-3">
             <label className={`label pb-1 ${isRTL ? 'justify-end' : 'justify-start'}`}>
-              <span className="label-text">{t('security.labels.confirmPassword')}</span>
+              <span className={`label-text ${isRTL ? 'text-left' : 'text-left'}`}>{t('security.labels.confirmPassword')}</span>
             </label>
             <div className="w-full max-w-2xl">
               <input

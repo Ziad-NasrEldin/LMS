@@ -12,7 +12,7 @@ export default function NavigationButtons({
     <button
       onClick={handlePrev}
       disabled={currentStep === 1 || isLoading}
-      className="btn btn-outline h-12 min-h-12 rounded-xl px-7 text-base font-semibold"
+      className="btn btn-outline h-10 px-6 text-sm font-semibold"
       type="button"
     >
       {t('buttons.previous')}
@@ -22,12 +22,12 @@ export default function NavigationButtons({
   const nextOrSubmitButton = (
     <button
       onClick={handleNext}
-      className="btn btn-primary h-12 min-h-12 rounded-xl px-7 text-base font-semibold"
+      className="btn btn-primary h-10 px-6 text-sm font-semibold"
       disabled={isLoading}
       type="button"
     >
       {isLoading ? (
-        <span className="loading loading-spinner"></span>
+        <span className="loading loading-spinner loading-sm"></span>
       ) : (
         currentStep === totalSteps[role] ? t('buttons.submit') : t('buttons.next')
       )}
@@ -35,9 +35,18 @@ export default function NavigationButtons({
   )
 
   return (
-    <div className="mt-6 flex items-center justify-between gap-3 px-0 sm:mt-8 sm:px-[10%]">
-      {isRTL ? nextOrSubmitButton : previousButton}
-      {isRTL ? previousButton : nextOrSubmitButton}
+    <div className="flex items-center justify-between gap-3 w-full">
+      {isRTL ? (
+        <>
+          {nextOrSubmitButton}
+          {previousButton}
+        </>
+      ) : (
+        <>
+          {previousButton}
+          {nextOrSubmitButton}
+        </>
+      )}
     </div>
   );
 }

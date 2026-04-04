@@ -662,7 +662,7 @@ function PersonalInfoSection() {
                 <label
                   htmlFor="profilePicInput"
                   className="absolute bottom-0 right-0 btn btn-circle btn-sm btn-primary cursor-pointer"
-                  title={t("personalInfo.uploadProfilePic") || "Upload Profile Picture"}
+                  title={t("personalInfo.uploadProfilePic")}
                 >
                   <Camera className="w-4 h-4" />
                 </label>
@@ -682,7 +682,7 @@ function PersonalInfoSection() {
             {formData.profilePic && (
               <div className="mt-4 flex flex-col items-center gap-2">
                 <div className="text-sm text-gray-600">
-                  {t("personalInfo.selectedFile") || "Selected:"} {formData.profilePic.name}
+                  {t("personalInfo.selectedFile")} {formData.profilePic.name}
                 </div>
                 <div className="flex gap-2">
                   <button
@@ -691,7 +691,7 @@ function PersonalInfoSection() {
                     disabled={profilePicUploading}
                   >
                     {!profilePicUploading && <Upload className="w-4 h-4" />}
-                    {t("personalInfo.uploadButton") || "Upload"}
+                    {t("personalInfo.uploadButton")}
                   </button>
                   <button
                     className="btn btn-outline btn-sm"
@@ -699,7 +699,7 @@ function PersonalInfoSection() {
                     disabled={profilePicUploading}
                   >
                     <X className="w-4 h-4" />
-                    {t("personalInfo.cancelButton") || "Cancel"}
+                    {t("personalInfo.cancelButton")}
                   </button>
                 </div>
               </div>
@@ -711,14 +711,14 @@ function PersonalInfoSection() {
             )}
             {updateStatus.success && !isEditing && (
               <div className="mt-2 text-success text-sm text-center">
-                {t("personalInfo.profilePicUpdated") || "Profile picture updated successfully!"}
+                {t("personalInfo.profilePicUpdated")}
               </div>
             )}
 
             {/* Upload hint for users without profile picture */}
             {!hasProfilePic && !formData.profilePic && (
               <div className="mt-2 text-sm text-gray-500 text-center">
-                {t("personalInfo.noProfilePicHint") || "Click the camera icon to upload a profile picture"}
+                {t("personalInfo.noProfilePicHint")}
               </div>
             )}
           </div>
@@ -745,11 +745,11 @@ function PersonalInfoSection() {
                     disabled={updateStatus.loading || !!emailError}
                   >
                     {!updateStatus.loading && <Check className="h-4 w-4" />}
-                    {t("save") || "Save"}
+                    {t("save")}
                   </button>
                   <button className="btn btn-sm btn-outline" onClick={cancelEditing} disabled={updateStatus.loading}>
                     <X className="h-4 w-4" />
-                    {t("cancel") || "Cancel"}
+                    {t("cancel")}
                   </button>
                 </>
               )}
@@ -757,12 +757,12 @@ function PersonalInfoSection() {
           )}
 
           {updateStatus.error && isEditing && <div className="mb-3 text-sm text-error">{updateStatus.error}</div>}
-          {updateStatus.success && isEditing && <div className="mb-3 text-sm text-success">{personalInfo.messages?.updateSuccess || "Updated successfully"}</div>}
+          {updateStatus.success && isEditing && <div className="mb-3 text-sm text-success">{personalInfo.messages?.updateSuccess}</div>}
 
           {/* Full Name Field */}
           <div className="form-control mb-4">
             <label className={`label pb-1 ${isRTL ? "justify-end" : "justify-start"}`}>
-              <span className="label-text">
+              <span className={`label-text ${isRTL ? "text-left" : "text-left"}`}>
                 {personalInfo.labels.fullName}
                 <span className="text-error">*</span>
               </span>
@@ -784,7 +784,7 @@ function PersonalInfoSection() {
           {/* Phone Number Field */}
           <div className="form-control mb-4">
             <label className={`label pb-1 ${isRTL ? "justify-end" : "justify-start"}`}>
-              <span className="label-text">
+              <span className={`label-text ${isRTL ? "text-left" : "text-left"}`}>
                 {personalInfo.labels.phoneNumber}
                 <span className="text-error">*</span>
               </span>
@@ -806,7 +806,7 @@ function PersonalInfoSection() {
           {/* Email Field */}
           <div className="form-control mb-4">
             <label className={`label pb-1 ${isRTL ? "justify-end" : "justify-start"}`}>
-              <span className="label-text">
+              <span className={`label-text ${isRTL ? "text-left" : "text-left"}`}>
                 {personalInfo.labels.email}
                 <span className="text-error">*</span>
               </span>
@@ -829,8 +829,8 @@ function PersonalInfoSection() {
           {isLecturerRole && (
             <div className="form-control mb-4">
               <label className={`label pb-1 ${isRTL ? "justify-end" : "justify-start"}`}>
-                <span className="label-text">
-                  {personalInfo.labels.socialMedia || "Social Media Links"}
+                <span className={`label-text ${isRTL ? "text-left" : "text-left"}`}>
+                  {personalInfo.labels.socialMedia}
                 </span>
               </label>
 
@@ -849,8 +849,7 @@ function PersonalInfoSection() {
                           dir={isRTL ? "rtl" : "ltr"}
                         >
                           <option value="">
-                            {personalInfo.placeholders?.socialPlatform ||
-                              (isRTL ? "اختر المنصة" : "Select platform")}
+                            {personalInfo.placeholders?.socialPlatform}
                           </option>
                           {LECTURER_SOCIAL_PLATFORM_OPTIONS.map((platform) => (
                             <option key={platform} value={platform}>
@@ -864,8 +863,7 @@ function PersonalInfoSection() {
                           value={social.account || ""}
                           onChange={(event) => handleSocialMediaChange(index, "account", event.target.value)}
                           placeholder={
-                            personalInfo.placeholders?.socialLink ||
-                            (isRTL ? "رابط الحساب" : "Profile URL or @username")
+                            personalInfo.placeholders?.socialLink
                           }
                           className={`input input-bordered w-full ${isRTL ? "text-right" : "text-left"}`}
                           dir={isRTL ? "rtl" : "ltr"}
@@ -875,7 +873,7 @@ function PersonalInfoSection() {
                           type="button"
                           className="btn btn-outline btn-square"
                           onClick={() => removeSocialMediaEntry(index)}
-                          title={t("remove") || "Remove"}
+                          title={t("remove")}
                         >
                           <X className="h-4 w-4" />
                         </button>
@@ -883,7 +881,7 @@ function PersonalInfoSection() {
                     ))}
 
                     <button type="button" className="btn btn-outline btn-sm" onClick={addSocialMediaEntry}>
-                      {personalInfo.buttons?.addSocialMedia || personalInfo.buttons?.add || "Add link"}
+                      {personalInfo.buttons?.addSocialMedia || personalInfo.buttons?.add}
                     </button>
                   </div>
                 ) : lecturerSavedSocialMedia.length > 0 ? (
@@ -920,7 +918,7 @@ function PersonalInfoSection() {
                 ) : (
                   <input
                     type="text"
-                    value={personalInfo.messages?.noSocialMedia || (isRTL ? "لا توجد روابط مضافة" : "No links added yet")}
+                    value={personalInfo.messages?.noSocialMedia}
                     className={`input input-bordered w-full ${isRTL ? "text-right" : "text-left"}`}
                     dir={isRTL ? "rtl" : "ltr"}
                     readOnly
@@ -933,7 +931,7 @@ function PersonalInfoSection() {
           {userData?.role === "Parent" && (
             <div className="form-control mb-4">
               <label className={`label pb-1 ${isRTL ? "justify-end" : "justify-start"}`}>
-                <span className="label-text">{personalInfo.labels.profession || "Profession"}</span>
+                <span className={`label-text ${isRTL ? "text-left" : "text-left"}`}>{personalInfo.labels.profession}</span>
               </label>
               <div className="w-full">
                 <input
@@ -951,7 +949,7 @@ function PersonalInfoSection() {
           {isStudentRole && (
             <div className="form-control mb-4">
               <label className={`label pb-1 ${isRTL ? "justify-end" : "justify-start"}`}>
-                <span className="label-text">{personalInfo.labels.hobby || "Hobby"}</span>
+                <span className={`label-text ${isRTL ? "text-left" : "text-left"}`}>{personalInfo.labels.hobby}</span>
               </label>
 
               <div className="w-full">
@@ -963,7 +961,7 @@ function PersonalInfoSection() {
                     className={`select select-bordered w-full max-w-2xl ${isRTL ? "text-right" : "text-left"}`}
                     dir={isRTL ? "rtl" : "ltr"}
                   >
-                    <option value="">{personalInfo.placeholders?.hobby || "Select a hobby"}</option>
+                    <option value="">{personalInfo.placeholders?.hobby}</option>
                     {studentHobbyOptions.map((option) => (
                       <option key={option} value={option}>
                         {t(`personalInfo.hobbyOptions.${option}`, { defaultValue: option })}
@@ -986,7 +984,7 @@ function PersonalInfoSection() {
           {isStudentRole && userData?.level && (
             <div className="form-control mb-4">
               <label className={`label pb-1 ${isRTL ? "justify-end" : "justify-start"}`}>
-                <span className="label-text">{personalInfo.labels.level || "Level"}</span>
+                <span className={`label-text ${isRTL ? "text-left" : "text-left"}`}>{personalInfo.labels.level}</span>
               </label>
               <div className="w-full">
                 <input
@@ -1004,11 +1002,11 @@ function PersonalInfoSection() {
           {isStudentRole && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
               <div className="stat rounded-box" style={{ background: TOKENS.neutralCloud }}>
-                <div className="stat-title">{personalInfo.labels.generalPoints || t("General Points")}</div>
+                <div className="stat-title">{personalInfo.labels.generalPoints}</div>
                 <div className="stat-value">{userData.generalPoints || 0}</div>
               </div>
               <div className="stat rounded-box" style={{ background: TOKENS.neutralCloud }}>
-                <div className="stat-title">{personalInfo.labels.totalPoints || t("Total Points")}</div>
+                <div className="stat-title">{personalInfo.labels.totalPoints}</div>
                 <div className="stat-value">{userData.totalPoints || 0}</div>
               </div>
             </div>

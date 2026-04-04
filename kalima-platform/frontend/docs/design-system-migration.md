@@ -73,22 +73,35 @@ This document outlines the systematic process for migrating from Daisy UI to a c
 ## Migration Status
 
 ### ✅ Completed Components
-- **Buttons**: `.btn`, `.btn-primary`, `.btn-secondary`, `.btn-accent`, `.btn-ghost`, `.btn-outline`, `.btn-error`, `.btn-success`, `.btn-neutral`
-- **Forms**: `.form-control`, `.input`, `.select`, `.textarea`, `.label`, `.label-text`, `.file-input`, `.checkbox`, `.radio`, `.toggle`
+- **Buttons**: `.btn`, `.btn-primary`, `.btn-secondary`, `.btn-accent`, `.btn-ghost`, `.btn-outline`, `.btn-error`, `.btn-success`, `.btn-neutral`, `.btn-sm`, `.btn-square`
+- **Forms**: `.form-control`, `.input`, `.select`, `.textarea`, `.label`, `.label-text`, `.file-input`, `.checkbox`, `.radio`, `.toggle`, `.input-group`
 - **Alerts**: `.alert`, `.alert-info`, `.alert-success`, `.alert-warning`, `.alert-error`
 - **Loading**: `.loading`, `.loading-spinner` (xs, sm, md, lg sizes)
 - **Badges**: `.badge`, `.badge-primary`, `.badge-secondary`, `.badge-accent`, `.badge-success`, `.badge-error`, `.badge-neutral`, `.badge-outline`
 - **Cards**: `.card`, `.card-body`, `.card-title`, `.card-actions`
 - **Modals**: `.modal`, `.modal-open`, `.modal-box`, `.modal-action`, `.modal-backdrop`, `.modal-bottom`, `.modal-middle`, `.modal-lg`, `.modal-xl`, `.modal-full`, `.modal-success`, `.modal-error`, `.modal-info`
+- **Tables**: `.table`, `.table-zebra`
+- **Tabs**: `.tabs`, `.tabs-boxed`, `.tab`, `.tab-active`
+- **Join**: `.join`, `.join-item`
+- **Avatar**: `.avatar`, `.avatar-placeholder`
+- **Base Colors**: `.bg-base-100`, `.bg-base-200`, `.border-base-200`, `.text-base-content`, `.text-primary-content`, `.text-secondary-content`, `.bg-secondary`
 
-### Next Phase: Data Display Components
+### In Progress: Layout Components
 
 ### Target Classes to Replace
-- `table`, `table-zebra`
-- `tabs`, `tab`, `tab-active`
-- `join` (button groups)
-- `divider`
-- `skeleton`
+- `drawer`, `drawer-content`, `drawer-side` (UnifiedSidebar)
+- `navbar` (navbar.jsx)
+- `footer`, `footer-title` (footer.jsx)
+- `hero`, `hero-content`
+- `chat`, `chat-bubble`
+The UnifiedSidebar component is being migrated from Daisy UI to Fekra custom classes:
+- ✅ `avatar` → `fekra-avatar`
+- ✅ `ring` → `fekra-avatar-ring`
+- ✅ `text-base-content` → `fekra-text-slate`
+- ✅ `text-primary` → `fekra-text-primary`
+- 🔄 `bg-base-*` → Custom backgrounds
+- 🔄 `border-base-*` → Custom borders
+- 🔄 `text-primary-content` → `fekra-text-white`
 
 ### Design Token Mapping
 | Element | Primary Color | Border | Background |

@@ -332,15 +332,8 @@ const TeacherLogin = () => {
                         value={formData.email}
                         onChange={handleInputChange}
                         placeholder={t("emailPlaceholder", "youremail@example.com")}
-                        className={`input input-bordered input-md w-full bg-base-200/70 text-base ${
-                          isRTL ? "pr-12" : "pl-12"
-                        }`}
+                        className="input input-bordered input-md w-full bg-base-200/70 text-base px-4"
                         required
-                      />
-                      <Mail
-                        className={`pointer-events-none absolute top-1/2 h-4 w-4 -translate-y-1/2 text-base-content/50 ${
-                          isRTL ? "right-4" : "left-4"
-                        }`}
                       />
                     </div>
                   </div>
@@ -358,15 +351,8 @@ const TeacherLogin = () => {
                         value={formData.phoneNumber}
                         onChange={handleInputChange}
                         placeholder={t("phonePlaceholder", "01234567890")}
-                        className={`input input-bordered input-md w-full bg-base-200/70 text-base ${
-                          isRTL ? "pr-12" : "pl-12"
-                        }`}
+                        className="input input-bordered input-md w-full bg-base-200/70 text-base px-4"
                         required
-                      />
-                      <Phone
-                        className={`pointer-events-none absolute top-1/2 h-4 w-4 -translate-y-1/2 text-base-content/50 ${
-                          isRTL ? "right-4" : "left-4"
-                        }`}
                       />
                     </div>
                   </div>
@@ -393,15 +379,8 @@ const TeacherLogin = () => {
                       value={formData.password}
                       onChange={handleInputChange}
                       placeholder={t("passwordPlaceholder", "••••••••")}
-                      className={`password-toggle-input relative z-0 input input-bordered input-md w-full bg-base-200/70 text-base ${
-                        isRTL ? "pr-24" : "pl-12"
-                      } ${isRTL ? "pl-12" : "pr-24"}`}
+                      className="input input-bordered input-md w-full bg-base-200/70 text-base px-4"
                       required
-                    />
-                    <Lock
-                      className={`pointer-events-none absolute top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-base-content/50 ${
-                        isRTL ? "right-4" : "left-4"
-                      }`}
                     />
                     <button
                       type="button"
@@ -440,23 +419,6 @@ const TeacherLogin = () => {
                   </Link>
                 </p>
               </form>
-
-              <div
-                className="rounded-box p-4 text-sm"
-                style={{ background: TOKENS.lightAquaMist, color: TOKENS.slateText }}
-              >
-                <p className="inline-flex items-center gap-2 font-semibold" style={{ color: TOKENS.deepTeal }}>
-                  <Sparkles className="h-4 w-4" />
-                  {tr("tipTitle", "نصيحة اليوم", "Daily Learning Tip")}
-                </p>
-                <p className="mt-1">
-                  {tr(
-                    "tipBody",
-                    "سجّل دخولك يوميًا للحفاظ على سلسلة الإنجاز وفتح الشارات بشكل أسرع.",
-                    "Log in daily to keep your streak and unlock growth badges faster.",
-                  )}
-                </p>
-              </div>
             </div>
           </section>
         </div>

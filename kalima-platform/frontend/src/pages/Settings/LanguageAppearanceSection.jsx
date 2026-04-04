@@ -41,7 +41,7 @@ function LanguageAppearanceSection() {
 
           <div className="form-control">
             <label className={`label pb-1 ${isRTL ? 'justify-end' : 'justify-start'}`}>
-              <span className="label-text">{t("languageAppearance.options.language")}</span>
+              <span className={`label-text ${isRTL ? 'text-left' : 'text-left'}`}>{t("languageAppearance.options.language")}</span>
             </label>
             <div className={`flex ${isRTL ? "justify-end" : "justify-start"}`}>
               <DSSelect

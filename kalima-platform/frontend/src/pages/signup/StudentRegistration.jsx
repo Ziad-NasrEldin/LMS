@@ -688,132 +688,175 @@ export default function StudentRegistration() {
           boxShadow: SHADOWS.level2,
         }}
       >
-        <div className="grid min-h-[auto] lg:min-h-[760px] lg:grid-cols-[1.1fr_1fr]">
-          <section className="relative hidden overflow-hidden p-10 lg:block" style={{ background: GRADIENTS.appPanel }}>
+        <div className="grid min-h-[auto] lg:min-h-[760px] lg:grid-cols-[1fr_1.2fr]">
+          {/* Left Side - Hero/Progress */}
+          <section className="relative overflow-hidden p-6 lg:p-8" style={{ background: GRADIENTS.appPanel }}>
             <div className="absolute -left-12 top-6 h-48 w-48 rounded-full bg-secondary/20 blur-3xl" />
             <div className="absolute bottom-12 right-8 h-44 w-44 rounded-full bg-primary/15 blur-3xl" />
 
-            <div className="relative z-10 mt-10 max-w-xl">
-              <h2 className="text-5xl font-black leading-[1.04] text-base-content xl:text-6xl">
-                {t("signupHeroStart", "Start your")}
-                <br />
-                <span style={{ color: TOKENS.deepTeal }}>{t("signupHeroMiddle", "learning")}</span>{" "}
-                {t("signupHeroEnd", "journey today.")}
-              </h2>
-              <p className="mt-6 text-lg xl:text-xl" style={{ color: TOKENS.slateText }}>
-                {t(
-                  "signupHeroSub",
-                  "Join thousands of students and educators in a playful, structured learning environment designed for growth.",
-                )}
-              </p>
+            <div className="relative z-10 h-full flex flex-col">
+              {currentStep === 1 ? (
+                /* Hero content on first step */
+                <>
+                  <h2 className="text-4xl font-black leading-[1.04] text-base-content xl:text-5xl">
+                    {t("signupHeroStart", "Start your")}
+                    <br />
+                    <span style={{ color: TOKENS.deepTeal }}>{t("signupHeroMiddle", "learning")}</span>{" "}
+                    {t("signupHeroEnd", "journey today.")}
+                  </h2>
+                  <p className="mt-4 text-base xl:text-lg" style={{ color: TOKENS.slateText }}>
+                    {t(
+                      "signupHeroSub",
+                      "Join thousands of students and educators in a playful, structured learning environment designed for growth.",
+                    )}
+                  </p>
 
-              <div className="mt-12 w-full max-w-md rounded-[1.75rem] border border-base-300 bg-base-100 p-6 shadow-xl">
-                  <p className="text-base font-semibold text-base-content">{t("interactiveLessons", "Interactive Lessons")}</p>
-                  <div className="mt-4 h-3 rounded-full bg-base-200">
-                    <div className="h-full w-3/4 rounded-full bg-primary" />
+                  <div className="mt-auto pt-8">
+                    <div className="w-full max-w-sm rounded-[1.5rem] border border-base-300 bg-base-100 p-5 shadow-xl">
+                      <p className="text-sm font-semibold text-base-content">{t("interactiveLessons", "Interactive Lessons")}</p>
+                      <div className="mt-3 h-2.5 rounded-full bg-base-200">
+                        <div className="h-full w-3/4 rounded-full bg-primary" />
+                      </div>
+                      <p className="mt-2 text-xs text-base-content/60">{t("progress", "Progress")}</p>
+                    </div>
+
+                    <div
+                      className={`mt-3 w-fit rounded-2xl px-4 py-3 text-sm font-bold text-info-content shadow-lg inline-flex ${isRTL ? "me-4" : "ms-4"}`}
+                      style={{ background: TOKENS.softCyanTeal }}
+                    >
+                      {t("earnBadges", "Earn badges while you learn!")}
+                    </div>
                   </div>
-                  <p className="mt-3 text-sm text-base-content/60">{t("progress", "Progress")}</p>
-                </div>
+                </>
+              ) : (
+                /* Form summary/progress on other steps */
+                <div className="flex flex-col h-full">
+                  <div className="mb-6">
+                    <h3 className="text-2xl font-bold text-base-content">
+                      {t("signupProgressTitle", "Creating your account")}
+                    </h3>
+                    <p className="text-sm mt-2" style={{ color: TOKENS.slateText }}>
+                      {t("signupProgressSubtitle", "You're almost there! Complete the remaining steps.")}
+                    </p>
+                  </div>
 
-                <div
-                  className={`mt-4 hidden w-fit rounded-3xl px-6 py-4 text-base font-bold text-info-content shadow-lg xl:inline-flex ${isRTL ? "me-4" : "ms-4"}`}
-                  style={{ background: TOKENS.softCyanTeal }}
-                >
-                  {t("earnBadges", "Earn badges while you learn!")}
+                  {/* Step summary cards */}
+                  <div className="space-y-3 flex-1">
+                    {formData.fullName && (
+                      <div className="rounded-xl bg-white/60 p-3 border border-white/40">
+                        <p className="text-xs text-slate-500 uppercase tracking-wider">{t("form.fullName")}</p>
+                        <p className="text-sm font-semibold text-slate-800">{formData.fullName}</p>
+                      </div>
+                    )}
+                    {formData.email && (
+                      <div className="rounded-xl bg-white/60 p-3 border border-white/40">
+                        <p className="text-xs text-slate-500 uppercase tracking-wider">{t("form.email")}</p>
+                        <p className="text-sm font-semibold text-slate-800">{formData.email}</p>
+                      </div>
+                    )}
+                    {formData.parentPhoneNumber && (
+                      <div className="rounded-xl bg-white/60 p-3 border border-white/40">
+                        <p className="text-xs text-slate-500 uppercase tracking-wider">{t("form.parentPhone")}</p>
+                        <p className="text-sm font-semibold text-slate-800">{formData.parentPhoneNumber}</p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Benefits list */}
+                  <div className="mt-auto pt-6">
+                    <div className="rounded-xl bg-white/40 p-4 border border-white/30">
+                      <p className="text-sm font-semibold text-slate-700 mb-3">{t("whyJoin", "Why join Fekra?")}</p>
+                      <ul className="space-y-2 text-sm text-slate-600">
+                        <li className="flex items-center gap-2">
+                          <svg className="w-4 h-4 text-[#0E5563]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                          {t("benefit1", "Expert-led courses")}
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <svg className="w-4 h-4 text-[#0E5563]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                          {t("benefit2", "Interactive learning")}
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <svg className="w-4 h-4 text-[#0E5563]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                          {t("benefit3", "Track your progress")}
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
                 </div>
+              )}
             </div>
           </section>
 
-          <section className="flex items-center justify-center p-3 sm:p-6 lg:p-10">
-            <div className="w-full max-w-xl rounded-[1.25rem] border bg-base-100 p-4 shadow-xl sm:rounded-[1.75rem] sm:p-8" style={{ borderColor: "rgba(17,24,39,0.08)" }}>
-              <h3 className="text-2xl font-extrabold text-base-content sm:text-4xl">
-                {t("createAccount", "Create Account")}
-              </h3>
-              <p className="mt-2 text-base-content/65">
-                {t("createAccountSub", "Choose your role and fill in your details.")}
-              </p>
-
-              <div className="mt-6 space-y-3">
-                <p className="text-xs font-bold uppercase tracking-widest text-base-content/60">
-                  {t("iAmA", "I am a")}
+          {/* Right Side - Form */}
+          <section className="flex flex-col p-4 sm:p-6 lg:p-8" style={{ background: GRADIENTS.appPanel }}>
+            <div className="flex-1 overflow-hidden flex flex-col">
+              {/* Header */}
+              <div className="mb-4">
+                <h3 className="text-xl font-extrabold text-base-content sm:text-2xl">
+                  {currentStep === 1 ? t("createAccount", "Create Account") : t("stepTitle", { step: currentStep })}
+                </h3>
+                <p className="mt-1 text-sm text-base-content/65">
+                  {currentStep === 1 
+                    ? t("createAccountSub", "Choose your role and fill in your details.")
+                    : t("stepSubtitle", { step: currentStep, total: totalSteps[formData.role] })
+                  }
                 </p>
-                <div className="grid grid-cols-3 gap-2 sm:gap-3">
-                  {["student", "parent", "teacher"].map((itemRole) => (
-                    <button
-                      key={itemRole}
-                      type="button"
-                      onClick={() => handleRoleSelect(itemRole)}
-                      className={`btn h-14 rounded-xl border text-xs transition-all sm:h-16 sm:rounded-2xl sm:text-sm ${
-                        formData.role === itemRole
-                          ? "text-primary-content"
-                          : "btn-ghost border-base-300 text-base-content/70"
-                      }`}
-                      style={
-                        formData.role === itemRole
-                          ? { background: TOKENS.deepTeal, borderColor: TOKENS.deepTeal }
-                          : undefined
-                      }
-                    >
-                      {t(`role.${itemRole}`, itemRole)}
-                    </button>
-                  ))}
-                </div>
               </div>
 
-              {apiError && (
-                <div className="alert alert-error mt-5 animate-fade-in" dir={isRTL ? "rtl" : "ltr"}>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-6 w-6 flex-shrink-0"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
+              {/* Role Selector - Only on step 1 */}
+              {currentStep === 1 && (
+                <div className="mb-5">
+                  <p className="text-xs font-bold uppercase tracking-widest text-base-content/60 mb-2">
+                    {t("iAmA", "I am a")}
+                  </p>
+                  <div className="grid grid-cols-3 gap-2">
+                    {["student", "parent", "teacher"].map((itemRole) => (
+                      <button
+                        key={itemRole}
+                        type="button"
+                        onClick={() => handleRoleSelect(itemRole)}
+                        className={`btn h-11 rounded-xl border-2 text-xs transition-all sm:h-12 sm:text-sm ${
+                          formData.role === itemRole
+                            ? "btn-primary border-transparent"
+                            : "bg-white border-[#0E5563]/30 text-[#0E5563] hover:bg-[#0E5563]/5"
+                        }`}
                       >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                        />
-                      </svg>
-                      <div>
-                        <h3 className="font-bold">{t("errors.errorTitle")}</h3>
-                        <p className="text-sm">{apiError}</p>
-                      </div>
-                    </div>
-
-                    {Object.keys(errors).length > 0 && (
-                      <div className="mt-4">
-                        <ul className="list-disc space-y-1 ps-5">
-                          {Object.entries(errors).map(
-                            ([field, message]) =>
-                              typeof message === "string" && (
-                                <li key={field} className="text-sm">
-                                  <span className="font-medium">
-                                    {t(`form.${field}`) === `form.${field}` ? field : t(`form.${field}`)}:
-                                  </span>{" "}
-                                  <span className="text-opacity-80">
-                                    {t(`validation.${message}`) === `validation.${message}`
-                                      ? message
-                                      : t(`validation.${message}`)}
-                                  </span>
-                                </li>
-                              ),
-                          )}
-                        </ul>
-                      </div>
-                    )}
+                        {t(`role.${itemRole}`, itemRole)}
+                      </button>
+                    ))}
                   </div>
                 </div>
               )}
 
-              <div className="mt-5 max-h-[60vh] overflow-y-auto pe-2 sm:max-h-[65vh] lg:mt-6 lg:max-h-[58vh] custom-scrollbar">
+              {apiError && (
+                <div className="alert alert-error mb-4 animate-fade-in" dir={isRTL ? "rtl" : "ltr"}>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <svg className="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                      </svg>
+                      <div>
+                        <h3 className="font-bold text-sm">{t("errors.errorTitle")}</h3>
+                        <p className="text-xs">{apiError}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Form Content - Full height scrollable */}
+              <div className="flex-1 overflow-y-auto custom-scrollbar pr-2">
                 {renderStepContent()}
               </div>
 
-              <div className="mt-6">
+              {/* Navigation */}
+              <div className="mt-4 pt-4 border-t border-base-200">
                 <NavigationButtons
                   currentStep={currentStep}
                   handlePrev={() => setCurrentStep((prev) => prev - 1)}
@@ -825,7 +868,7 @@ export default function StudentRegistration() {
                 />
               </div>
 
-              <div className="mt-4">
+              <div className="mt-3">
                 <StepsIndicator currentStep={currentStep} t={t} role={formData.role} />
               </div>
             </div>

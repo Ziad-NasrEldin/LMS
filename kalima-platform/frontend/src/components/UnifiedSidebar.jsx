@@ -573,7 +573,7 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
           <div className="absolute -right-8 bottom-10 h-28 w-28 rounded-full bg-info/25 blur-2xl" />
         </div>
 
-        <div className="relative flex items-center justify-between border-b border-base-300/70 p-4">
+        <div className="relative flex items-center justify-between border-b border-gray-300/70 p-4">
           <div className={`mx-auto flex items-center gap-3 ${isRTL ? "flex-row-reverse" : ""}`}>
             <span className="font-extrabold tracking-tight text-primary">
               {t("dashboardTitle") || "Dashboard"}
@@ -587,8 +587,8 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
         {userData && (
           <div className="relative mx-3 mt-3 rounded-2xl border border-white/70 bg-white/65 px-3 py-3 shadow-sm">
             <div className="flex items-center gap-3">
-              <div className="avatar">
-                <div className="h-11 w-11 rounded-full ring ring-primary/70 ring-offset-2 ring-offset-base-100">
+              <div className="fekra-avatar">
+                <div className="fekra-avatar-ring h-11 w-11">
                   <img
                     src={resolveProfileImageUrl(userData?.profilePic)}
                     alt={userData?.name || "User Avatar"}
@@ -601,9 +601,9 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
               </div>
               <div className="min-w-0">
                 <p className="truncate text-sm font-semibold leading-5">{userData.name}</p>
-                <p className="truncate text-xs text-base-content/70">{userData.role}</p>
+                <p className="truncate text-xs fekra-text-slate">{userData.role}</p>
                 {impersonationSession?.isActive && (
-                  <p className="mt-1 truncate text-[11px] font-semibold text-primary">
+                  <p className="mt-1 truncate text-[11px] font-semibold fekra-text-primary">
                     {t("viewingAs", {
                       defaultValue: "Viewing as: {{role}}",
                       role: impersonationSession.targetRole,
@@ -668,8 +668,8 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
                   <Link
                     to={item.path}
                     className={`group mb-1 flex items-center justify-between gap-2 rounded-xl px-3 py-2.5 text-sm transition-all duration-200 ${location.pathname === item.path
-                      ? "bg-primary text-primary-content shadow-[0_10px_25px_rgba(14,85,99,0.22)]"
-                      : "text-base-content hover:bg-white/70 hover:text-primary"
+                      ? "bg-primary text-white shadow-[0_10px_25px_rgba(14,85,99,0.22)]"
+                      : "text-gray-800 hover:bg-white/70 hover:text-primary"
                       }`}
                     onClick={(event) => {
                       if (item.onClick) {
@@ -683,8 +683,8 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
                   >
                     <div
                       className={`grid h-8 w-8 place-items-center rounded-lg transition-colors ${location.pathname === item.path
-                        ? "bg-primary-content/15 text-primary-content"
-                        : "bg-primary/10 text-primary group-hover:bg-primary/15"
+                        ? "bg-white/20 text-white"
+                      : "bg-primary/10 text-primary group-hover:bg-primary/15"
                         } ${isRTL ? "ml-1" : "mr-1"}`}
                     >
                       {item.icon}
@@ -693,13 +693,13 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
                       {item.title}
                     </span>
                   </Link>
-                  {item.divider && <div className="my-2 border-t border-base-300/70" />}
+                  {item.divider && <div className="my-2 border-t border-gray-300/70" />}
                 </React.Fragment>
               ))}
             </div>
 
             {impersonationSession?.isActive && (
-              <div className="relative border-t border-base-300/70 p-3">
+              <div className="relative border-t border-gray-300/70 p-3">
                 <button
                   type="button"
                   className="btn w-full rounded-xl border-0 bg-[linear-gradient(140deg,#0E5563_0%,#146A78_100%)] text-primary-content"
@@ -749,7 +749,7 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
       {showImpersonationModal && (
         <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/40 p-4">
           <div
-            className={`w-full max-w-2xl rounded-2xl border border-white/70 bg-base-100 p-4 shadow-2xl ${isRTL ? "text-right" : "text-left"
+            className={`w-full max-w-2xl rounded-2xl border border-white/70 bg-white p-4 shadow-2xl ${isRTL ? "text-right" : "text-left"
               }`}
             dir={isRTL ? "rtl" : "ltr"}
           >
@@ -758,7 +758,7 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
                 <h3 className="text-lg font-extrabold text-primary">
                   {t("chooseUser", { defaultValue: "Choose User" })}
                 </h3>
-                <p className="text-sm text-base-content/70">
+                <p className="text-sm fekra-text-slate">
                   {getRoleLabel(selectedTargetRole)}
                 </p>
               </div>
@@ -781,13 +781,13 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
               </div>
             )}
 
-            <div className="mt-4 max-h-[320px] overflow-y-auto rounded-xl border border-base-300">
+            <div className="mt-4 max-h-[320px] overflow-y-auto rounded-xl border border-gray-300">
               {targetsLoading ? (
                 <div className="flex items-center justify-center p-6">
                   <span className="loading loading-spinner loading-md text-primary"></span>
                 </div>
               ) : filteredTargets.length === 0 ? (
-                <div className="p-6 text-center text-sm font-semibold text-base-content/70">
+                <div className="p-6 text-center text-sm font-semibold fekra-text-slate">
                   {t("noMatchingUsers", { defaultValue: "No matching users found" })}
                 </div>
               ) : (
@@ -795,16 +795,16 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
                   <button
                     key={target._id}
                     type="button"
-                    className="flex w-full items-center justify-between border-b border-base-300/70 px-4 py-3 text-sm hover:bg-base-200/40 last:border-b-0"
+                    className="flex w-full items-center justify-between border-b border-gray-300/70 px-4 py-3 text-sm hover:bg-gray-100/40 last:border-b-0"
                     onClick={() => handleStartImpersonation(target)}
                     disabled={switchingTargetId === target._id}
                   >
                     <div className="min-w-0">
                       <p className="truncate font-bold">{target.name || t("unknownUser", { defaultValue: "Unknown User" })}</p>
-                      <p className="truncate text-xs text-base-content/70">{target.email || target.phoneNumber || "-"}</p>
+                      <p className="truncate text-xs fekra-text-slate">{target.email || target.phoneNumber || "-"}</p>
                     </div>
                     {switchingTargetId === target._id ? (
-                      <span className="loading loading-spinner loading-sm text-primary"></span>
+                      <span className="loading loading-spinner loading-sm fekra-text-primary"></span>
                     ) : (
                       <span className="badge badge-outline">{t("switchView", { defaultValue: "Switch" })}</span>
                     )}

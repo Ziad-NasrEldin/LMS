@@ -86,7 +86,14 @@ export default function Footer() {
             <ul className="space-y-4 text-sm">
               <li className="flex items-start gap-3 opacity-80">
                 <Phone className="mt-1 h-5 w-5 shrink-0" style={{ color: TOKENS.warmMango }} />
-                <span>01027314148</span>
+                <a 
+                  href="tel:+201027314148" 
+                  className="font-medium hover:underline transition-colors"
+                  style={{ color: TOKENS.inkText }}
+                  dir="ltr"
+                >
+                  +20 102 731 4148
+                </a>
               </li>
               <li className="flex items-start gap-3 opacity-80">
                 <Mail className="mt-1 h-5 w-5 shrink-0" style={{ color: TOKENS.warmMango }} />

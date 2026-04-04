@@ -899,6 +899,10 @@ const MyLecturesPage = () => {
                   </td>
 
                   <td>{lecture.name}</td>
+                  {(isStudentLikeRole || isAdminLikeRole) && (
+                    <td>{lecture.lecturer?.name || t("lecturesPage.unknown")}</td>
+                  )}
+                  <td>{lecture.subject?.name || t("lecturesPage.notSpecified")}</td>
                   <td>
                     {t(`gradeLevels.${lecture.level?.name}`, { ns: "common" }) ||
                       lecture.level?.name ||
@@ -911,31 +915,33 @@ const MyLecturesPage = () => {
                     {lecture.price || 0} {t("lecturesPage.points")}
                   </td>
                   {isStudentLikeRole && <td>{lecture.purchasedAt}</td>}
-                  <td>
-                    <div className="flex flex-wrap gap-2">
-                      <Link
-                        to={`/dashboard/${isStudentLikeRole ? "student" : "lecturer"}-dashboard/${isStudentLikeRole ? "lecture-display" : "detailed-lecture-view"
-                          }/${lecture.id}`}
-                      >
-                        <button
-                          className="btn btn-sm border-none"
-                          style={{ background: TOKENS.deepTeal, color: "#F8FCFF" }}
+                  {!isStudentLikeRole && (
+                    <td>
+                      <div className="flex flex-wrap gap-2">
+                        <Link
+                          to={`/dashboard/${isStudentLikeRole ? "student" : "lecturer"}-dashboard/${isStudentLikeRole ? "lecture-display" : "detailed-lecture-view"
+                            }/${lecture.id}`}
                         >
-                          {t("lecturesPage.buttons.details")}
-                        </button>
-                      </Link>
-                      {!isStudentLikeRole && (
-                        <button
-                          type="button"
-                          className="btn btn-sm border-none"
-                          style={{ background: TOKENS.warmMango, color: "#fff" }}
-                          onClick={() => openEditLectureModal(lecture)}
-                        >
-                          {t("lecturesPage.buttons.edit", "Edit")}
-                        </button>
-                      )}
-                    </div>
-                  </td>
+                          <button
+                            className="btn btn-sm border-none"
+                            style={{ background: TOKENS.deepTeal, color: "#F8FCFF" }}
+                          >
+                            {t("lecturesPage.buttons.details")}
+                          </button>
+                        </Link>
+                        {!isStudentLikeRole && (
+                          <button
+                            type="button"
+                            className="btn btn-sm border-none"
+                            style={{ background: TOKENS.warmMango, color: "#fff" }}
+                            onClick={() => openEditLectureModal(lecture)}
+                          >
+                            {t("lecturesPage.buttons.edit", "Edit")}
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>

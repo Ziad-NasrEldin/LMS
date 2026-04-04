@@ -211,7 +211,7 @@ export default function Step2({
               <input
                 type={showPassword ? "text" : "password"}
                 name="password"
-                className={`input h-12 rounded-xl w-full ${i18n.language === "ar" ? "pr-12" : "pl-12"} ${errors.password ? "input-error" : ""}`}
+                className={`input h-12 rounded-xl w-full pl-12 ${errors.password ? "input-error" : ""}`}
                 value={formData.password || ""}
                 onChange={handleInputChange}
                 placeholder={t("form.passwordPlaceholder", "••••••••")}
@@ -219,7 +219,7 @@ export default function Step2({
               />
               <button
                 type="button"
-                className={`absolute top-1/2 ${i18n.language === "ar" ? "right-3" : "left-3"} -translate-y-1/2 z-10 text-slate-400 hover:text-slate-600`}
+                className="absolute top-1/2 left-3 -translate-y-1/2 z-10 text-slate-400 hover:text-slate-600"
                 onClick={() => setShowPassword((prev) => !prev)}
                 tabIndex={-1}
               >
@@ -240,7 +240,7 @@ export default function Step2({
               <input
                 type={showConfirmPassword ? "text" : "password"}
                 name="confirmPassword"
-                className={`input h-12 rounded-xl w-full ${i18n.language === "ar" ? "pr-12" : "pl-12"} ${errors.confirmPassword ? "input-error" : ""}`}
+                className={`input h-12 rounded-xl w-full pl-12 ${errors.confirmPassword ? "input-error" : ""}`}
                 value={formData.confirmPassword || ""}
                 onChange={handleInputChange}
                 placeholder={t("form.confirmPasswordPlaceholder", "••••••••")}
@@ -248,7 +248,7 @@ export default function Step2({
               />
               <button
                 type="button"
-                className={`absolute top-1/2 ${i18n.language === "ar" ? "right-3" : "left-3"} -translate-y-1/2 z-10 text-slate-400 hover:text-slate-600`}
+                className="absolute top-1/2 left-3 -translate-y-1/2 z-10 text-slate-400 hover:text-slate-600"
                 onClick={() => setShowConfirmPassword((prev) => !prev)}
                 tabIndex={-1}
               >
