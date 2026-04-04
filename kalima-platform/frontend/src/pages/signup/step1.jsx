@@ -16,8 +16,16 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
 
   const stageOptions = levelHierarchy?.stageOptions || [];
   const fieldClass = "h-12 min-h-12 w-full rounded-xl text-base";
-  const inputClass = `input input-bordered ${fieldClass}`;
-  const selectClass = `select select-bordered ${fieldClass} ps-4 pe-10`;
+  const inputClass = `input ${fieldClass}`;
+  const selectClass = `select ${fieldClass}`;
+  
+  // Section header component
+  const SectionHeader = ({ title, subtitle }) => (
+    <div className="mb-4 mt-6 first:mt-0">
+      <h4 className="text-sm font-bold text-[#0E5563] uppercase tracking-wider">{title}</h4>
+      {subtitle && <p className="text-xs text-slate-500 mt-1">{subtitle}</p>}
+    </div>
+  );
 
   const gradeOptions = formData.stage
     ? getGradeOptionsForStage(levelHierarchy, formData.stage)
@@ -110,42 +118,40 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
   }
 
   return (
-    <div className="space-y-2">
-      <p className="text-xl sm:text-2xl font-semibold mb-2">{t("form.personalDetails")}</p>
-      <div className="grid grid-cols-1 gap-x-4 gap-y-3 sm:grid-cols-2">
-        <div className="form-control relative">
-          <div className="flex flex-col gap-1">
-            <label className="label py-1">
-              <span className="label-text text-xs">{t("form.fullName")}</span>
+      <div className="space-y-1">
+        {/* Section: Basic Info */}
+        <SectionHeader 
+          title={t("form.personalDetails")} 
+          subtitle={t("form.personalDetailsSubtitle", "Enter your basic information")}
+        />
+        
+        {/* Row 1: Name (2/3) + Gender (1/3) */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+          <div className="form-control sm:col-span-2">
+            <label className="label">
+              <span className="label-text">{t("form.fullName")}</span>
             </label>
             <input
               type="text"
               name="fullName"
-              className={`${inputClass} ${
-                errors.fullName ? "input-error animate-shake" : ""
-              }`}
+              className={`${inputClass} ${errors.fullName ? "input-error" : ""}`}
               value={formData.fullName}
               onChange={handleInputChange}
               required
+              placeholder={t("form.fullNamePlaceholder", "Enter your full name")}
             />
             {errors.fullName && (
-              <span className="text-error text-sm mt-1">
-                {t(`validation.${errors.fullName}`)}
-              </span>
+              <span className="text-error text-sm mt-1">{t(`validation.${errors.fullName}`)}</span>
             )}
           </div>
-        </div>
 
-        <div className="form-control relative">
-          <div className="flex flex-col gap-1">
-            <label className="label py-1">
-              <span className="label-text text-xs">{t("form.gender")}</span>
+          <div className="form-control">
+            <label className="label">
+              <span className="label-text">{t("form.gender")}</span>
             </label>
             <DSSelect
               name="gender"
-              className={`${selectClass} ${
-                errors.gender ? "select-error animate-shake" : ""
-              }`}
+              className={`${selectClass} ${errors.gender ? "select-error" : ""}`}
               value={formData.gender}
               onChange={handleInputChange}
               required
@@ -157,37 +163,34 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
           </div>
         </div>
 
-        <div className="form-control relative">
-          <div className="flex flex-col gap-1">
-            <label className="label py-1">
-              <span className="label-text text-xs">{t("form.phoneNumber")}</span>
+        {/* Row 2: Phone Numbers */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+          <div className="form-control">
+            <label className="label">
+              <span className="label-text">{t("form.phoneNumber")}</span>
             </label>
             <input
               type="text"
               name="phoneNumber"
               value={formData.phoneNumber}
               onChange={handleInputChange}
-              className={`${inputClass} ${
-                errors.phoneNumber ? "input-error animate-shake" : ""
-              }`}
+              className={`${inputClass} ${errors.phoneNumber ? "input-error" : ""}`}
               inputMode="tel"
               dir="ltr"
               autoComplete="tel"
               required
+              placeholder={t("form.phonePlaceholder", "01xxxxxxxxx")}
             />
             {errors.phoneNumber && (
-              <span className="text-error text-sm mt-1">
-                {t(`validation.${errors.phoneNumber}`)}
-              </span>
+              <span className="text-error text-sm mt-1">{t(`validation.${errors.phoneNumber}`)}</span>
             )}
           </div>
-        </div>
 
-        {role === "teacher" && (
-          <div className="form-control relative">
-            <div className="flex flex-col gap-1">
-              <label className="label py-1">
-                <span className="label-text text-xs">{t("form.phoneNumber2")}</span>
+          {role === "teacher" && (
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text">{t("form.phoneNumber2")}</span>
+                <span className="label-text-alt text-xs text-slate-400">{t("form.optional")}</span>
               </label>
               <input
                 type="text"
@@ -198,40 +201,32 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
                 inputMode="tel"
                 dir="ltr"
                 autoComplete="tel"
+                placeholder={t("form.phonePlaceholder", "01xxxxxxxxx")}
               />
-              <label className="label py-1">
-                <span className="label-text text-xs">{t("form.optional")}</span>
-              </label>
-              {errors.phoneNumber2 && (
-                <span className="absolute bottom-0 text-error text-sm mt-1">
-                  {t(`validation.${errors.phoneNumber2}`)}
-                </span>
-              )}
             </div>
-          </div>
-        )}
+          )}
+        </div>
 
-        <div className="form-control relative">
-          <div className="flex flex-col gap-1">
-            <label className="label py-1">
-              <span className="label-text text-xs">
-                {t("form.government", { defaultValue: isRTL ? "المحافظة" : "Government" })}
-              </span>
+        {/* Section: Location */}
+        <SectionHeader 
+          title={t("form.location")} 
+          subtitle={t("form.locationSubtitle", "Select your governorate and educational zone")}
+        />
+        
+        {/* Row 3: Government + Administration Zone */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+          <div className="form-control">
+            <label className="label">
+              <span className="label-text">{t("form.government", { defaultValue: isRTL ? "المحافظة" : "Government" })}</span>
             </label>
             <DSSelect
               name="government"
-              className={`${selectClass} ${
-                errors.government ? "select-error animate-shake" : ""
-              }`}
+              className={`${selectClass} ${errors.government ? "select-error" : ""}`}
               value={formData.government || ""}
               onChange={handleGovernmentChange}
             >
-              <option
-                value=""
-              >
-                {t("form.selectGovernment", {
-                  defaultValue: isRTL ? "اختر المحافظة" : "Select Government",
-                })}
+              <option value="">
+                {t("form.selectGovernment", { defaultValue: isRTL ? "اختر المحافظة" : "Select Government" })}
               </option>
               {(Array.isArray(governments) ? governments : []).map((government) => (
                 <option key={government._id} value={government.name}>
@@ -240,39 +235,25 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
               ))}
             </DSSelect>
             {errors.government && (
-              <span className="text-error text-sm mt-1">
-                {t(`validation.${errors.government}`, {
-                  defaultValue: isRTL ? "المحافظة مطلوبة" : "Government is required",
-                })}
-              </span>
+              <span className="text-error text-sm mt-1">{t(`validation.${errors.government}`, { defaultValue: isRTL ? "المحافظة مطلوبة" : "Government is required" })}</span>
             )}
           </div>
-        </div>
 
-        <div className="form-control relative">
-          <div className="flex flex-col gap-1">
-            <label className="label py-1">
-              <span className="label-text text-xs">
-                {t("form.administrationZone", {
-                  defaultValue: isRTL ? "الإدارة التعليمية" : "Administration Zone",
-                })}
-              </span>
+          <div className="form-control">
+            <label className="label">
+              <span className="label-text">{t("form.administrationZone", { defaultValue: isRTL ? "الإدارة التعليمية" : "Administration Zone" })}</span>
             </label>
             <DSSelect
               disabled={!formData.government || zonesLoading}
               name="administrationZone"
-              className={`${selectClass} ${
-                errors.administrationZone ? "select-error animate-shake" : ""
-              }`}
+              className={`${selectClass} ${errors.administrationZone ? "select-error" : ""}`}
               value={formData.administrationZone || ""}
               onChange={handleInputChange}
             >
               <option value="">
                 {zonesLoading
                   ? t("common.loading", { defaultValue: "Loading..." })
-                  : t("form.selectAdministrationZone", {
-                      defaultValue: isRTL ? "اختر الإدارة التعليمية" : "Select Administration Zone",
-                    })}
+                  : t("form.selectAdministrationZone", { defaultValue: isRTL ? "اختر الإدارة التعليمية" : "Select Administration Zone" })}
               </option>
               {(Array.isArray(administrationZones) ? administrationZones : []).map((zone) => (
                 <option key={zone} value={zone}>
@@ -281,39 +262,32 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
               ))}
             </DSSelect>
             {errors.administrationZone && (
-              <span className="text-error text-sm mt-1">
-                {t(`validation.${errors.administrationZone}`, {
-                  defaultValue: isRTL ? "الإدارة التعليمية مطلوبة" : "Administration Zone is required",
-                })}
-              </span>
+              <span className="text-error text-sm mt-1">{t(`validation.${errors.administrationZone}`, { defaultValue: isRTL ? "الإدارة التعليمية مطلوبة" : "Administration Zone is required" })}</span>
             )}
           </div>
         </div>
 
+        {/* Section: Education Level (Students only) */}
         {role === "student" && (
           <>
-            <div className="form-control relative">
-              <div className="flex flex-col gap-1">
-                <label className="label py-1">
-                  <span className="label-text text-xs">
-                    {t("form.stage", { defaultValue: isRTL ? "المرحلة" : "Stage" })}
-                  </span>
+            <SectionHeader 
+              title={t("form.educationLevel")} 
+              subtitle={t("form.educationSubtitle", "Select your academic stage and grade")}
+            />
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text">{t("form.stage", { defaultValue: isRTL ? "المرحلة" : "Stage" })}</span>
                 </label>
                 <DSSelect
                   name="stage"
-                  className={`${selectClass} ${
-                    errors.stage ? "select-error animate-shake" : ""
-                  }`}
+                  className={`${selectClass} ${errors.stage ? "select-error" : ""}`}
                   value={formData.stage || ""}
                   onChange={(e) => {
                     handleInputChange(e);
                     if (formData.level) {
-                      handleInputChange({
-                        target: {
-                          name: "level",
-                          value: "",
-                        },
-                      });
+                      handleInputChange({ target: { name: "level", value: "" } });
                     }
                   }}
                   disabled={levelsLoading || stageOptions.length === 0}
@@ -331,27 +305,17 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
                   ))}
                 </DSSelect>
                 {errors.stage && (
-                  <span className="text-error text-sm mt-1">
-                    {t(`validation.${errors.stage}`)}
-                  </span>
+                  <span className="text-error text-sm mt-1">{t(`validation.${errors.stage}`)}</span>
                 )}
               </div>
-            </div>
 
-            <div className="form-control relative">
-              <div className="flex flex-col gap-1">
-                <label className="label py-1">
-                  <span className="label-text text-xs">
-                    {t("form.level", {
-                      defaultValue: isRTL ? "المستوى التعليمي" : "Learning Level",
-                    })}
-                  </span>
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text">{t("form.level", { defaultValue: isRTL ? "المستوى التعليمي" : "Learning Level" })}</span>
                 </label>
                 <DSSelect
                   name="level"
-                  className={`${selectClass} ${
-                    errors.level ? "select-error animate-shake" : ""
-                  }`}
+                  className={`${selectClass} ${errors.level ? "select-error" : ""}`}
                   value={formData.level || ""}
                   onChange={handleInputChange}
                   disabled={levelsLoading || !formData.stage || gradeOptions.length === 0}
@@ -361,18 +325,10 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
                     {levelsLoading
                       ? t("form.loadingGrades", { defaultValue: isRTL ? "جاري تحميل الصفوف..." : "Loading grades..." })
                       : !formData.stage
-                        ? t("form.selectStageFirst", {
-                            defaultValue: isRTL ? "اختر المرحلة أولاً" : "Select a stage first",
-                          })
+                        ? t("form.selectStageFirst", { defaultValue: isRTL ? "اختر المرحلة أولاً" : "Select a stage first" })
                         : gradeOptions.length === 0
-                          ? t("form.noGradesAvailable", {
-                              defaultValue: isRTL ? "لا توجد صفوف متاحة" : "No grades available",
-                            })
-                          : t("form.selectGradeLevel", {
-                              defaultValue: t("form.selectGrade", {
-                                defaultValue: isRTL ? "اختر المستوى التعليمي" : "Select Learning Level",
-                              }),
-                            })}
+                          ? t("form.noGradesAvailable", { defaultValue: isRTL ? "لا توجد صفوف متاحة" : "No grades available" })
+                          : t("form.selectGradeLevel", { defaultValue: t("form.selectGrade", { defaultValue: isRTL ? "اختر المستوى التعليمي" : "Select Learning Level" }) })}
                   </option>
                   {gradeOptions.map((level) => (
                     <option key={level.value} value={level.value}>
@@ -381,15 +337,12 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
                   ))}
                 </DSSelect>
                 {errors.level && (
-                  <span className="text-error text-sm mt-1">
-                    {t(`validation.${errors.level}`)}
-                  </span>
+                  <span className="text-error text-sm mt-1">{t(`validation.${errors.level}`)}</span>
                 )}
               </div>
             </div>
           </>
         )}
       </div>
-    </div>
   );
 }

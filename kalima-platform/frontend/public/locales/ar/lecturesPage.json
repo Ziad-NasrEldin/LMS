@@ -61,6 +61,7 @@
   "containerDetails": {
     "buttons": {
       "backToDashboard": "العودة إلى لوحة التحكم",
+      "goBack": "رجوع",
       "viewDetails": "عرض التفاصيل",
       "add": "إضافة",
       "delete": "حذف"
@@ -141,7 +142,7 @@
     "videoURL": "رابط الفيديو",
     "numberOfViews": "عدد المشاهدات",
     "lectureType": "نوع المحاضرة",
-    "requiresExam": "يتطلب اختبار",
+    "requiresExam": "يتطلب اختبار/تقييم",
     "requiresHomework": "يتطلب واجب منزلي",
     "homeworkConfiguration": "إعدادات الواجب المنزلي",
     "enterGoogleFormOrLink": "أدخل رابط نموذج جوجل أو رابط المشاركة",

@@ -58,6 +58,18 @@
     "first secondary": "الصف الأول الثانوي",
     "second secondary": "الصف الثاني الثانوي",
     "third secondary": "الصف الثالث الثانوي",
+    "Third Secondary": "الصف الثالث الثانوي",
+    "Second Secondary": "الصف الثاني الثانوي",
+    "First Secondary": "الصف الأول الثانوي",
+    "Third Preparatory": "الصف الثالث الإعدادي",
+    "Second Preparatory": "الصف الثاني الإعدادي",
+    "First Preparatory": "الصف الأول الإعدادي",
+    "Sixth Primary": "الصف السادس الابتدائي",
+    "Fifth Primary": "الصف الخامس الابتدائي",
+    "Fourth Primary": "الصف الرابع الابتدائي",
+    "Third Primary": "الصف الثالث الابتدائي",
+    "Second Primary": "الصف الثاني الابتدائي",
+    "First Primary": "الصف الأول الابتدائي",
     "primary": "الابتدائي",
     "preparatory": "الإعدادي",
     "secondary": "الثانوي",
@@ -69,8 +81,12 @@
   "role": {
     "student": "طالب",
     "teacher": "معلم",
+    "lecturer": "محاضر",
     "admin": "مسؤول",
-    "assistnat": "مساعد"
+    "subadmin": "مسؤول فرعي",
+    "moderator": "مشرف",
+    "assistant": "مساعد",
+    "parent": "ولي أمر"
   },
   "dir": "rtl",
   "passwordStrength": {
@@ -245,7 +261,8 @@
     "accessId": "معرّف الوصول",
     "studentId": "معرّف الطالب",
     "purchaseId": "معرّف الشراء",
-    "eventId": "معرّف الحدث"
+    "eventId": "معرّف الحدث",
+    "price": "السعر"
   },
   "entities": {
     "users": "المستخدمين",
@@ -287,5 +304,30 @@
     "promoCodes": "أكواد الشحن",
     "dashboardData": "بيانات لوحة التحكم",
     "purchasedCourseContainers": "حاويات الدورات المشتراة"
+  },
+  "containerModal": {
+    "editTitle": "تعديل {{type}}",
+    "createTitle": "إنشاء {{type}} جديد",
+    "enterName": "أدخل اسم {{type}}",
+    "enterDescription": "أدخل وصف {{type}}",
+    "enterGoal": "أدخل هدف {{type}}",
+    "enterPrice": "أدخل السعر",
+    "selectLevel": "اختر الصف",
+    "selectSubject": "اختر المادة",
+    "cancel": "إلغاء",
+    "saveChanges": "حفظ التغييرات",
+    "create": "إنشاء",
+    "saving": "جاري الحفظ...",
+    "creating": "جاري الإنشاء...",
+    "confirmSave": "هل أنت متأكد أنك تريد حفظ هذه التغييرات؟",
+    "editSuccess": "تم حفظ التغييرات بنجاح!",
+    "createSuccess": "تم الإنشاء بنجاح!",
+    "types": {
+      "course": "الكورس",
+      "year": "السنة",
+      "term": "الفصل",
+      "month": "الشهر",
+      "container": "الحاوية"
+    }
   }
 }

@@ -809,7 +809,7 @@ export default function StudentRegistration() {
                 </div>
               )}
 
-              <div className="mt-5 max-h-[50vh] overflow-y-auto pe-1 sm:max-h-[54vh] lg:mt-6 lg:max-h-[46vh]">
+              <div className="mt-5 max-h-[60vh] overflow-y-auto pe-2 sm:max-h-[65vh] lg:mt-6 lg:max-h-[58vh] custom-scrollbar">
                 {renderStepContent()}
               </div>
 

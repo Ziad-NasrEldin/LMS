@@ -362,7 +362,7 @@ const ContainerDetailsPage = () => {
               borderColor: "rgba(17,24,39,0.16)",
             }}
           >
-            {isRTL ? <FiArrowRight /> : <FiArrowLeft />} {t('containerDetails.buttons.backToDashboard')}
+            {isRTL ? <FiArrowRight /> : <FiArrowLeft />} {t('containerDetails.buttons.goBack')}
           </Link>
         </div>
       </div>
@@ -394,7 +394,7 @@ const ContainerDetailsPage = () => {
             }}
           >
             {isRTL ? <FiArrowRight className="text-lg flex-shrink-0" /> : <FiArrowLeft className="text-lg flex-shrink-0" />}
-            <span className="font-medium whitespace-nowrap">{t('containerDetails.buttons.backToDashboard')}</span>
+            <span className="font-medium whitespace-nowrap">{t('containerDetails.buttons.goBack')}</span>
           </button>
           <div className={`flex flex-wrap items-center gap-3 ${isRTL ? "justify-start" : "justify-end"}`}>
             {container.points > 0 && (

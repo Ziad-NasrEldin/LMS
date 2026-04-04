@@ -526,10 +526,1024 @@ select.select option:hover {
   text-align: center;
 }
 
+/* Glassmorphism utility classes */
+.glass {
+  background: rgba(255, 255, 255, 0.25);
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 8px 32px rgba(14, 85, 99, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+.glass-dark {
+  background: rgba(14, 85, 99, 0.25);
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+.glass-text {
+  color: #0E5563;
+}
+
+.glass-text-light {
+  color: #ffffff;
+}
+
+/* ============================================
+   FEKRA BUTTON SYSTEM - Independent of Daisy UI
+   Uses design tokens for consistent styling
+   ============================================ */
+
+/* Base button styles */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.25rem;
+  border-radius: 9999px;
+  border: 1.5px solid transparent;
+  cursor: pointer;
+  transition: all 200ms ease;
+  white-space: nowrap;
+  user-select: none;
+  background: rgba(255, 255, 255, 0.8);
+  color: #111827;
+  box-shadow: 0 2px 8px rgba(14, 85, 99, 0.08);
+}
+
+.btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(14, 85, 99, 0.15);
+}
+
+.btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.btn:disabled,
+.btn.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* Button sizes */
+.btn-xs {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.75rem;
+}
+
+.btn-sm {
+  padding: 0.5rem 1rem;
+  font-size: 0.8125rem;
+}
+
+.btn-lg {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+}
+
+/* Primary button - Deep Teal */
+.btn-primary {
+  background: linear-gradient(135deg, #0E5563 0%, #146A78 100%);
+  color: #ffffff;
+  border-color: transparent;
+  box-shadow: 0 4px 14px rgba(14, 85, 99, 0.3);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #0d4a56 0%, #125f6b 100%);
+  box-shadow: 0 6px 20px rgba(14, 85, 99, 0.4);
+}
+
+/* Secondary button - Soft Cyan */
+.btn-secondary {
+  background: linear-gradient(135deg, #4DB3C2 0%, #3da3b2 100%);
+  color: #ffffff;
+  border-color: transparent;
+  box-shadow: 0 4px 14px rgba(77, 179, 194, 0.3);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #3da3b2 0%, #2d939f 100%);
+  box-shadow: 0 6px 20px rgba(77, 179, 194, 0.4);
+}
+
+/* Accent button - Warm Mango */
+.btn-accent {
+  background: linear-gradient(135deg, #F39A3F 0%, #e88a2f 100%);
+  color: #ffffff;
+  border-color: transparent;
+  box-shadow: 0 4px 14px rgba(243, 154, 63, 0.3);
+}
+
+.btn-accent:hover:not(:disabled) {
+  background: linear-gradient(135deg, #e88a2f 0%, #d87a1f 100%);
+  box-shadow: 0 6px 20px rgba(243, 154, 63, 0.4);
+}
+
+/* Ghost button - Transparent with hover */
+.btn-ghost {
+  background: transparent;
+  color: #0E5563;
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.btn-ghost:hover:not(:disabled) {
+  background: rgba(14, 85, 99, 0.08);
+  box-shadow: none;
+}
+
+/* Outline button */
+.btn-outline {
+  background: transparent;
+  color: #0E5563;
+  border-color: rgba(14, 85, 99, 0.4);
+  box-shadow: none;
+}
+
+.btn-outline:hover:not(:disabled) {
+  background: rgba(14, 85, 99, 0.08);
+  border-color: #0E5563;
+  box-shadow: 0 2px 8px rgba(14, 85, 99, 0.1);
+}
+
+/* Error/Danger button */
+.btn-error {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  color: #ffffff;
+  border-color: transparent;
+  box-shadow: 0 4px 14px rgba(220, 38, 38, 0.3);
+}
+
+.btn-error:hover:not(:disabled) {
+  background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%);
+  box-shadow: 0 6px 20px rgba(220, 38, 38, 0.4);
+}
+
+/* Success button */
+.btn-success {
+  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+  color: #ffffff;
+  border-color: transparent;
+  box-shadow: 0 4px 14px rgba(22, 163, 74, 0.3);
+}
+
+.btn-success:hover:not(:disabled) {
+  background: linear-gradient(135deg, #15803d 0%, #166534 100%);
+  box-shadow: 0 6px 20px rgba(22, 163, 74, 0.4);
+}
+
+/* Neutral button */
+.btn-neutral {
+  background: linear-gradient(135deg, #374151 0%, #1f2937 100%);
+  color: #ffffff;
+  border-color: transparent;
+  box-shadow: 0 4px 14px rgba(55, 65, 81, 0.3);
+}
+
+.btn-neutral:hover:not(:disabled) {
+  background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+  box-shadow: 0 6px 20px rgba(55, 65, 81, 0.4);
+}
+
+/* Circle button (icon buttons) */
+.btn-circle {
+  padding: 0;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  min-height: 2.5rem;
+}
+
+.btn-circle.btn-sm {
+  width: 2rem;
+  height: 2rem;
+  min-height: 2rem;
+}
+
+.btn-circle.btn-lg {
+  width: 3rem;
+  height: 3rem;
+  min-height: 3rem;
+}
+
+/* Square button */
+.btn-square {
+  padding: 0;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.75rem;
+}
+
+/* Loading state */
+.btn.loading,
+.btn.loading:hover {
+  color: transparent !important;
+  pointer-events: none;
+}
+
+.btn.loading::after {
+  content: "";
+  position: absolute;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: btn-spin 1s linear infinite;
+}
+
+@keyframes btn-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Wide button */
+.btn-wide {
+  width: 100%;
+}
+
+/* Block button */
+.btn-block {
+  width: 100%;
+}
+
+@media (max-width: 640px) {
+  .btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.8125rem;
+  }
+  
+  .btn-sm {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.75rem;
+  }
+}
+
 @media (max-width: 640px) {
   .lecture-video-watermark__content {
     --wm-gap: 10px;
     padding: 0.2rem 0.54rem;
     font-size: 10px;
   }
+}
+
+/* ============================================
+   FEKRA FORM SYSTEM - Independent of Daisy UI
+   Uses design tokens for consistent styling
+   ============================================ */
+
+/* Form Control Wrapper */
+.form-control {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  width: 100%;
+}
+
+.form-control + .form-control {
+  margin-top: 1rem;
+}
+
+/* Labels */
+.label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #111827;
+  cursor: pointer;
+}
+
+.label-text {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.label-text-alt {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-left: auto;
+}
+
+/* Base Input Styles */
+.input,
+.select,
+.textarea {
+  display: flex;
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.625rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.25rem;
+  color: #111827;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1.5px solid rgba(17, 24, 39, 0.12);
+  border-radius: 0.75rem;
+  transition: all 200ms ease;
+  outline: none;
+}
+
+.input::placeholder,
+.textarea::placeholder {
+  color: #9ca3af;
+  font-weight: 400;
+}
+
+/* Input Hover State */
+.input:hover,
+.select:hover,
+.textarea:hover {
+  border-color: rgba(14, 85, 99, 0.3);
+  background: #ffffff;
+}
+
+/* Input Focus State - Deep Teal */
+.input:focus,
+.input:focus-visible,
+.select:focus,
+.select:focus-visible,
+.textarea:focus,
+.textarea:focus-visible {
+  border-color: #0E5563;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(14, 85, 99, 0.15);
+}
+
+/* Input Disabled State */
+.input:disabled,
+.select:disabled,
+.textarea:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: rgba(17, 24, 39, 0.04);
+}
+
+/* Input Error State */
+.input-error,
+.select-error,
+.textarea-error,
+.input.input-error,
+.select.select-error,
+.textarea.textarea-error {
+  border-color: rgba(220, 38, 38, 0.5);
+  background: rgba(220, 38, 38, 0.04);
+}
+
+.input-error:focus,
+.select-error:focus,
+.textarea-error:focus {
+  border-color: #dc2626;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15);
+}
+
+/* Input Success State */
+.input-success,
+.select-success,
+.textarea-success,
+.input.input-success,
+.select.select-success,
+.textarea.textarea-success {
+  border-color: rgba(22, 163, 74, 0.5);
+  background: rgba(22, 163, 74, 0.04);
+}
+
+.input-success:focus,
+.select-success:focus,
+.textarea-success:focus {
+  border-color: #16a34a;
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.15);
+}
+
+/* Input Sizes */
+.input-sm,
+.select-sm,
+.textarea-sm {
+  min-height: 2.25rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.8125rem;
+  border-radius: 0.625rem;
+}
+
+.input-lg,
+.select-lg,
+.textarea-lg {
+  min-height: 3.25rem;
+  padding: 0.75rem 1.25rem;
+  font-size: 1rem;
+  border-radius: 1rem;
+}
+
+/* Select Specific Styles */
+.select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%230E5563' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: 1.25rem 1.25rem;
+  background-position: right 0.75rem center;
+  padding-right: 2.5rem;
+  cursor: pointer;
+}
+
+.select::-ms-expand {
+  display: none;
+}
+
+[dir="rtl"] .select {
+  background-position: left 0.75rem center;
+  padding-right: 1rem;
+  padding-left: 2.5rem;
+}
+
+/* Textarea Specific Styles */
+.textarea {
+  min-height: 6rem;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.textarea-sm {
+  min-height: 4rem;
+}
+
+.textarea-lg {
+  min-height: 8rem;
+}
+
+/* File Input */
+.file-input {
+  display: flex;
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.5rem;
+  font-size: 0.875rem;
+  color: #111827;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1.5px solid rgba(17, 24, 39, 0.12);
+  border-radius: 0.75rem;
+  transition: all 200ms ease;
+  cursor: pointer;
+}
+
+.file-input:hover {
+  border-color: rgba(14, 85, 99, 0.3);
+  background: #ffffff;
+}
+
+.file-input:focus {
+  border-color: #0E5563;
+  box-shadow: 0 0 0 3px rgba(14, 85, 99, 0.15);
+  outline: none;
+}
+
+.file-input::file-selector-button {
+  padding: 0.5rem 1rem;
+  margin-right: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #ffffff;
+  background: linear-gradient(135deg, #0E5563 0%, #146A78 100%);
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 200ms ease;
+}
+
+.file-input::file-selector-button:hover {
+  background: linear-gradient(135deg, #0d4a56 0%, #125f6b 100%);
+}
+
+[dir="rtl"] .file-input::file-selector-button {
+  margin-right: 0;
+  margin-left: 0.75rem;
+}
+
+/* Checkbox and Radio */
+.checkbox,
+.radio {
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 1.5px solid rgba(17, 24, 39, 0.2);
+  border-radius: 0.375rem;
+  background: #ffffff;
+  cursor: pointer;
+  transition: all 200ms ease;
+  accent-color: #0E5563;
+}
+
+.radio {
+  border-radius: 50%;
+}
+
+.checkbox:checked,
+.radio:checked {
+  border-color: #0E5563;
+  background: #0E5563;
+}
+
+.checkbox:focus,
+.radio:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(14, 85, 99, 0.2);
+}
+
+/* Toggle/Switch */
+.toggle {
+  appearance: none;
+  width: 3rem;
+  height: 1.5rem;
+  background: rgba(17, 24, 39, 0.2);
+  border-radius: 9999px;
+  position: relative;
+  cursor: pointer;
+  transition: all 200ms ease;
+}
+
+.toggle::after {
+  content: "";
+  position: absolute;
+  width: 1.25rem;
+  height: 1.25rem;
+  background: #ffffff;
+  border-radius: 50%;
+  top: 0.125rem;
+  left: 0.125rem;
+  transition: all 200ms ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.toggle:checked {
+  background: #0E5563;
+}
+
+.toggle:checked::after {
+  left: calc(100% - 1.375rem);
+}
+
+.toggle:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(14, 85, 99, 0.2);
+}
+
+/* ============================================
+   FEKRA ALERT SYSTEM
+   ============================================ */
+
+.alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  border-radius: 1rem;
+  border: 1.5px solid transparent;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.alert svg,
+.alert-icon {
+  flex-shrink: 0;
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+/* Alert Info (Default) */
+.alert-info {
+  background: rgba(14, 85, 99, 0.08);
+  border-color: rgba(14, 85, 99, 0.25);
+  color: #0E5563;
+}
+
+/* Alert Success */
+.alert-success {
+  background: rgba(22, 163, 74, 0.08);
+  border-color: rgba(22, 163, 74, 0.3);
+  color: #15803d;
+}
+
+/* Alert Warning */
+.alert-warning {
+  background: rgba(243, 154, 63, 0.1);
+  border-color: rgba(243, 154, 63, 0.35);
+  color: #c26a20;
+}
+
+/* Alert Error */
+.alert-error {
+  background: rgba(220, 38, 38, 0.08);
+  border-color: rgba(220, 38, 38, 0.3);
+  color: #b91c1c;
+}
+
+/* ============================================
+   FEKRA LOADING SYSTEM
+   ============================================ */
+
+.loading {
+  pointer-events: none;
+  color: transparent !important;
+  position: relative;
+}
+
+.loading::after {
+  content: "";
+  position: absolute;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: loading-spin 1s linear infinite;
+  top: 50%;
+  left: 50%;
+  margin-top: -0.5rem;
+  margin-left: -0.5rem;
+}
+
+.loading-spinner {
+  display: inline-block;
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 2.5px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: loading-spin 1s linear infinite;
+}
+
+.loading-xs {
+  width: 0.75rem;
+  height: 0.75rem;
+  border-width: 1.5px;
+}
+
+.loading-sm {
+  width: 1rem;
+  height: 1rem;
+  border-width: 2px;
+}
+
+.loading-md {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-width: 3px;
+}
+
+.loading-lg {
+  width: 2rem;
+  height: 2rem;
+  border-width: 3.5px;
+}
+
+@keyframes loading-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Loading within buttons - inherit button text color */
+.btn.loading::after,
+.btn .loading::after {
+  border-color: currentColor;
+  border-right-color: transparent;
+}
+
+/* ============================================
+   FEKRA BADGE SYSTEM
+   ============================================ */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1rem;
+  border-radius: 9999px;
+  white-space: nowrap;
+}
+
+.badge-primary {
+  background: rgba(14, 85, 99, 0.12);
+  color: #0E5563;
+}
+
+.badge-secondary {
+  background: rgba(77, 179, 194, 0.15);
+  color: #146A78;
+}
+
+.badge-accent {
+  background: rgba(243, 154, 63, 0.15);
+  color: #c26a20;
+}
+
+.badge-success {
+  background: rgba(22, 163, 74, 0.12);
+  color: #15803d;
+}
+
+.badge-error {
+  background: rgba(220, 38, 38, 0.12);
+  color: #b91c1c;
+}
+
+.badge-neutral {
+  background: rgba(55, 65, 81, 0.12);
+  color: #374151;
+}
+
+.badge-outline {
+  background: transparent;
+  border: 1.5px solid currentColor;
+}
+
+.badge-sm {
+  padding: 0.125rem 0.5rem;
+  font-size: 0.6875rem;
+}
+
+.badge-lg {
+  padding: 0.375rem 1rem;
+  font-size: 0.875rem;
+}
+
+/* ============================================
+   FEKRA CARD SYSTEM
+   ============================================ */
+
+.card {
+  display: flex;
+  flex-direction: column;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1.5px solid rgba(17, 24, 39, 0.08);
+  border-radius: 1.4rem;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: all 200ms ease;
+}
+
+.card:hover {
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.14);
+}
+
+.card-body {
+  padding: 1.5rem;
+  flex: 1 1 auto;
+}
+
+.card-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 0.75rem;
+}
+
+.card-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid rgba(17, 24, 39, 0.08);
+}
+
+/* ============================================
+   CUSTOM SCROLLBAR FOR SIGNUP FORM
+   ============================================ */
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(14, 85, 99, 0.05);
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(14, 85, 99, 0.2);
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(14, 85, 99, 0.35);
+}
+
+/* Firefox scrollbar */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(14, 85, 99, 0.2) rgba(14, 85, 99, 0.05);
+}
+
+@media (max-width: 640px) {
+  .input,
+  .select,
+  .textarea,
+  .file-input {
+    font-size: 0.9375rem; /* Prevents zoom on iOS */
+  }
+  
+  .form-control + .form-control {
+    margin-top: 0.875rem;
+  }
+  
+  .card-body {
+    padding: 1rem;
+  }
+  
+  .alert {
+    padding: 0.875rem 1rem;
+  }
+}
+
+/* ============================================
+   FEKRA MODAL SYSTEM
+   ============================================ */
+
+/* Modal container - hidden by default */
+.modal {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+/* Modal open state */
+.modal-open,
+.modal[open] {
+  pointer-events: auto;
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Modal backdrop */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+/* Modal box */
+.modal-box {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 32rem;
+  max-height: calc(100vh - 5rem);
+  overflow-y: auto;
+  background: #ffffff;
+  border: 1.5px solid rgba(17, 24, 39, 0.08);
+  border-radius: 1.5rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  transform: translateY(100%);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Modal open state - box animation */
+.modal-open .modal-box,
+.modal[open] .modal-box {
+  transform: translateY(0);
+}
+
+/* Modal bottom (mobile-first) */
+.modal-bottom {
+  align-items: flex-end;
+}
+
+.modal-bottom .modal-box {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  max-width: 100%;
+}
+
+/* Modal middle (desktop) */
+@media (min-width: 640px) {
+  .modal {
+    align-items: center;
+    padding: 1rem;
+  }
+
+  .modal-bottom {
+    align-items: flex-end;
+  }
+
+  .sm\:modal-middle {
+    align-items: center !important;
+  }
+
+  .sm\:modal-middle .modal-box {
+    border-radius: 1.5rem;
+    max-width: 32rem;
+  }
+
+  .modal-box {
+    max-width: 28rem;
+    border-radius: 1.5rem;
+  }
+
+  .modal-open .modal-box,
+  .modal[open] .modal-box {
+    transform: scale(1);
+  }
+
+  .modal-box {
+    transform: scale(0.95);
+  }
+}
+
+/* Large modal */
+.modal-lg .modal-box {
+  max-width: 42rem;
+}
+
+/* Extra large modal */
+.modal-xl .modal-box {
+  max-width: 72rem;
+}
+
+/* Full width modal */
+.modal-full .modal-box {
+  max-width: 100%;
+  min-height: 100vh;
+  border-radius: 0;
+}
+
+/* Modal actions (footer) */
+.modal-action {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid rgba(17, 24, 39, 0.08);
+  margin-top: auto;
+}
+
+/* RTL support for modal actions */
+[dir="rtl"] .modal-action {
+  justify-content: flex-start;
+}
+
+/* Modal header styling */
+.modal-box > .flex.items-start.justify-between,
+.modal-box > header,
+.modal-box > [class*="flex items-center"] {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid rgba(17, 24, 39, 0.08);
+}
+
+/* Modal close button */
+.modal-box .btn-circle.btn-ghost {
+  position: absolute;
+  right: 1rem;
+  top: 1rem;
+  z-index: 10;
+}
+
+[dir="rtl"] .modal-box .btn-circle.btn-ghost {
+  right: auto;
+  left: 1rem;
+}
+
+/* Success Modal Styling */
+.modal-success .modal-box {
+  background: linear-gradient(135deg, rgba(22, 163, 74, 0.05) 0%, #ffffff 50%);
+  border-color: rgba(22, 163, 74, 0.2);
+}
+
+/* Error Modal Styling */
+.modal-error .modal-box {
+  background: linear-gradient(135deg, rgba(220, 38, 38, 0.05) 0%, #ffffff 50%);
+  border-color: rgba(220, 38, 38, 0.2);
+}
+
+/* Info Modal Styling */
+.modal-info .modal-box {
+  background: linear-gradient(135deg, rgba(14, 85, 99, 0.05) 0%, #ffffff 50%);
+  border-color: rgba(14, 85, 99, 0.2);
 }

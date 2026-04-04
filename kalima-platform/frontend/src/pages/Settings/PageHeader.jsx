@@ -16,10 +16,10 @@ function PageHeader({ title }) {
     >
       <div className={`flex flex-col gap-3 sm:items-center sm:justify-between ${isRTL ? "sm:flex-row-reverse" : "sm:flex-row"}`}>
         <div className="min-w-0">
-          <h1 className="text-2xl font-bold md:text-3xl" style={{ color: TOKENS.deepTeal }}>
+          <h1 className={`text-2xl font-bold md:text-3xl ${isRTL ? 'text-right' : 'text-left'}`} style={{ color: TOKENS.deepTeal }}>
             {title}
           </h1>
-          <p className="mt-1 text-sm md:text-base" style={{ color: TOKENS.slateText }}>
+          <p className={`mt-1 text-sm md:text-base ${isRTL ? 'text-right' : 'text-left'}`} style={{ color: TOKENS.slateText }}>
             {t("personalInfo.subtitle")}
           </p>
         </div>

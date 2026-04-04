@@ -154,12 +154,6 @@ const Services = () => {
           : "'Plus Jakarta Sans', 'Helvetica Neue', sans-serif",
       }}
     >
-      <div className={`home-logo-watermark${isRTL ? " home-logo-watermark--rtl" : ""}`} aria-hidden="true">
-        <span className="home-logo-watermark__body" />
-        <span className="home-logo-watermark__fill" />
-        <span className="home-logo-watermark__outline" />
-      </div>
-
       <div
         className="pointer-events-none fixed inset-0 -z-20 opacity-50"
         style={{

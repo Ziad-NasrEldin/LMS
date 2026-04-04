@@ -583,7 +583,7 @@ export default function LecturerOverviewPanel() {
           </p>
         </div>
 
-        <Link to="/dashboard/lecturer-dashboard/CoursesForm" className="btn btn-primary rounded-xl w-full md:w-auto">
+        <Link to="/dashboard/lecturer-dashboard/CoursesForm" className="btn btn-primary rounded-xl w-full md:w-auto" style={{ color: "#F8FCFF" }}>
           {t("addNewCourse")}
         </Link>
       </div>
@@ -623,7 +623,7 @@ export default function LecturerOverviewPanel() {
           </div>
 
           <div className="flex flex-wrap gap-2">
-            <button type="submit" className="btn btn-primary rounded-xl">
+            <button type="submit" className="btn btn-primary rounded-xl" style={{ color: "#F8FCFF" }}>
               {t("applyFilters", { defaultValue: isRTL ? "تطبيق" : "Apply" })}
             </button>
             <button type="button" onClick={handleResetFilters} className="btn btn-ghost rounded-xl">

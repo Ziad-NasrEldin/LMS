@@ -58,6 +58,18 @@
     "first secondary": "First Secondary",
     "second secondary": "Second Secondary",
     "third secondary": "Third Secondary",
+    "Third Secondary": "Third Secondary",
+    "Second Secondary": "Second Secondary",
+    "First Secondary": "First Secondary",
+    "Third Preparatory": "Third Preparatory",
+    "Second Preparatory": "Second Preparatory",
+    "First Preparatory": "First Preparatory",
+    "Sixth Primary": "sixth Primary",
+    "Fifth Primary": "Fifth Primary",
+    "Fourth Primary": "4th Primary",
+    "Third Primary": "Third Primary",
+    "Second Primary": "Second Primary",
+    "First Primary": "First Primary",
     "primary": "Primary",
     "preparatory": "Preparatory",
     "secondary": "Secondary",
@@ -66,11 +78,15 @@
     "secondary stage": "Secondary Stage",
     "undefined": "Undefined"
   },
- "role" :{
+ "role": {
     "student": "Student",
     "teacher": "Teacher",
+    "lecturer": "Lecturer",
     "admin": "Admin",
-    "assistnat": "Assistant"
+    "subadmin": "Sub Admin",
+    "moderator": "Moderator",
+    "assistant": "Assistant",
+    "parent": "Parent"
   },
   "dir": "ltr",
    "passwordStrength": {
@@ -245,7 +261,8 @@
     "accessId": "access ID",
     "studentId": "student ID",
     "purchaseId": "purchase ID",
-    "eventId": "event ID"
+    "eventId": "event ID",
+    "price": "price"
   },
   "entities": {
     "users": "users",
@@ -287,5 +304,30 @@
     "promoCodes": "promo codes",
     "dashboardData": "dashboard data",
     "purchasedCourseContainers": "purchased course containers"
+  },
+  "containerModal": {
+    "editTitle": "Edit {{type}}",
+    "createTitle": "Create New {{type}}",
+    "enterName": "Enter {{type}} name",
+    "enterDescription": "Enter {{type}} description",
+    "enterGoal": "Enter {{type}} goal",
+    "enterPrice": "Enter price",
+    "selectLevel": "Select a level",
+    "selectSubject": "Select a subject",
+    "cancel": "Cancel",
+    "saveChanges": "Save Changes",
+    "create": "Create",
+    "saving": "Saving...",
+    "creating": "Creating...",
+    "confirmSave": "Are you sure you want to save these changes?",
+    "editSuccess": "Changes saved successfully!",
+    "createSuccess": "Created successfully!",
+    "types": {
+      "course": "Course",
+      "year": "Year",
+      "term": "Term",
+      "month": "Month",
+      "container": "Container"
+    }
   }
 }

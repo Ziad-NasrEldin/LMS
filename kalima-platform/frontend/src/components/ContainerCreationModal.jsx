@@ -1,7 +1,9 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useTranslation } from "react-i18next"
 import { FiX } from "react-icons/fi"
+import toast from "react-hot-toast"
 import { getAllLevels } from "../routes/levels"
 import { getAllSubjects } from "../routes/courses"
 import { translateErrorMessage } from "../utils/errorTranslator"
@@ -21,6 +23,7 @@ const ContainerCreationModal = ({
   mode = "create",
   initialData = null,
 }) => {
+  const { t } = useTranslation("common")
   const isEditMode = mode === "edit"
 
   // Form state
@@ -123,6 +126,12 @@ const ContainerCreationModal = ({
     onClose()
   }
 
+  const handleBackdropClick = (e) => {
+    if (e.target === e.currentTarget) {
+      handleClose()
+    }
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setCreationLoading(true)
@@ -132,15 +141,15 @@ const ContainerCreationModal = ({
       const childType = getChildType()
       const nextType = isEditMode ? (initialData?.type || containerType || childType) : childType
       if (!isEditMode && !childType) throw new Error(translateErrorMessage("Invalid container type for creation"))
-      if (!newItemName) throw new Error(translateErrorMessage("Name is required"))
-      if (!selectedLevel) throw new Error(translateErrorMessage("Level is required"))
-      if (!selectedSubject) throw new Error(translateErrorMessage("Subject is required"))
+      if (!newItemName) throw new Error(translateErrorMessage(t("errors.fieldRequired", { field: t("fields.name") })))
+      if (!selectedLevel) throw new Error(translateErrorMessage(t("errors.fieldRequired", { field: t("fields.level") })))
+      if (!selectedSubject) throw new Error(translateErrorMessage(t("errors.fieldRequired", { field: t("fields.subject") })))
 
       if (!nextType) throw new Error(translateErrorMessage("Invalid container type for creation"))
       const isCourseType = nextType === "course"
 
-      if (isCourseType && !newDescription) throw new Error(translateErrorMessage("Description is required"))
-      if (isCourseType && !newGoal) throw new Error(translateErrorMessage("Goal is required"))
+      if (isCourseType && !newDescription) throw new Error(translateErrorMessage(t("errors.fieldRequired", { field: t("fields.description") })))
+      if (isCourseType && !newGoal) throw new Error(translateErrorMessage(t("errors.fieldRequired", { field: t("fields.goal") })))
 
       // Prepare container data
       const containerData = buildContainerPayloadObject({
@@ -159,8 +168,10 @@ const ContainerCreationModal = ({
       // Call the onSubmit callback with the container data
       if (isEditMode) {
         await onSubmit(containerId, containerData)
+        toast.success(t("containerModal.editSuccess"))
       } else {
         await onSubmit(containerData)
+        toast.success(t("containerModal.createSuccess"))
       }
 
       // Reset form and close modal on success
@@ -193,14 +204,14 @@ const ContainerCreationModal = ({
   const childType = getChildType()
   const isCourseType = (isEditMode ? initialData?.type || containerType : childType) === "course"
   const modalLabel = isEditMode
-    ? (initialData?.type ? `${initialData.type.charAt(0).toUpperCase() + initialData.type.slice(1)}` : "Container")
-    : (childType ? `${childType.charAt(0).toUpperCase() + childType.slice(1)}` : "Container")
+    ? (initialData?.type ? t(`containerModal.types.${initialData.type}`) : t("containerModal.types.container"))
+    : (childType ? t(`containerModal.types.${childType}`) : t("containerModal.types.container"))
 
   return (
-    <div className={`modal ${isOpen && "modal-open"}`}>
+    <div className={`modal ${isOpen && "modal-open"}`} onClick={handleBackdropClick}>
       <div className="modal-box max-w-md">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-bold">{isEditMode ? `Edit ${modalLabel}` : `Create New ${modalLabel}`}</h3>
+          <h3 className="text-lg font-bold">{isEditMode ? t("containerModal.editTitle", { type: modalLabel }) : t("containerModal.createTitle", { type: modalLabel })}</h3>
           <button onClick={handleClose} className="btn btn-sm btn-circle btn-ghost">
             <FiX className="w-5 h-5" />
           </button>
@@ -209,11 +220,11 @@ const ContainerCreationModal = ({
         <form onSubmit={handleSubmit}>
           <div className="form-control w-full mb-4">
             <label className="label">
-              <span className="label-text">Name</span>
+              <span className="label-text">{t("fields.name")}</span>
             </label>
             <input
               type="text"
-              placeholder={`Enter ${modalLabel} name`}
+              placeholder={t("containerModal.enterName", { type: modalLabel })}
               className="input input-bordered w-full"
               value={newItemName}
               onChange={(e) => setNewItemName(e.target.value)}
@@ -224,7 +235,7 @@ const ContainerCreationModal = ({
           {/* Level dropdown */}
           <div className="form-control w-full mb-4">
             <label className="label">
-              <span className="label-text">Level</span>
+              <span className="label-text">{t("fields.level")}</span>
             </label>
             <DSSelect
               className="select select-bordered w-full"
@@ -232,7 +243,7 @@ const ContainerCreationModal = ({
               onChange={(e) => setSelectedLevel(e.target.value)}
               required
             >
-              <option value="">Select a level</option>
+              <option value="">{t("containerModal.selectLevel")}</option>
               {levels.map((level) => (
                 <option key={level.value || level._id} value={level.value || level._id}>
                   {level.label || level.displayName || level.name}
@@ -245,7 +256,7 @@ const ContainerCreationModal = ({
           {/* Subject dropdown */}
           <div className="form-control w-full mb-4">
             <label className="label">
-              <span className="label-text">Subject</span>
+              <span className="label-text">{t("fields.subject")}</span>
             </label>
             <DSSelect
               className="select select-bordered w-full"
@@ -253,7 +264,7 @@ const ContainerCreationModal = ({
               onChange={(e) => setSelectedSubject(e.target.value)}
               required
             >
-              <option value="">Select a subject</option>
+              <option value="">{t("containerModal.selectSubject")}</option>
               {subjects.map((subject) => (
                 <option key={subject._id} value={subject._id}>
                   {subject.name}
@@ -267,10 +278,10 @@ const ContainerCreationModal = ({
             <>
               <div className="form-control w-full mb-4">
                 <label className="label">
-                  <span className="label-text">Description</span>
+                  <span className="label-text">{t("fields.description")}</span>
                 </label>
                 <textarea
-                  placeholder={`Enter ${modalLabel} description`}
+                  placeholder={t("containerModal.enterDescription", { type: modalLabel })}
                   className="textarea textarea-bordered w-full"
                   value={newDescription}
                   onChange={(e) => setNewDescription(e.target.value)}
@@ -280,10 +291,10 @@ const ContainerCreationModal = ({
 
               <div className="form-control w-full mb-4">
                 <label className="label">
-                  <span className="label-text">Goal</span>
+                  <span className="label-text">{t("fields.goal")}</span>
                 </label>
                 <textarea
-                  placeholder={`Enter ${modalLabel} goal`}
+                  placeholder={t("containerModal.enterGoal", { type: modalLabel })}
                   className="textarea textarea-bordered w-full"
                   value={newGoal}
                   onChange={(e) => setNewGoal(e.target.value)}
@@ -295,11 +306,11 @@ const ContainerCreationModal = ({
 
           <div className="form-control w-full mb-4">
             <label className="label">
-              <span className="label-text">Price</span>
+              <span className="label-text">{t("fields.price")}</span>
             </label>
             <input
               type="number"
-              placeholder="Enter price"
+              placeholder={t("containerModal.enterPrice")}
               className="input input-bordered w-full"
               value={newPrice}
               onChange={(e) => setNewPrice(e.target.value)}
@@ -329,16 +340,16 @@ const ContainerCreationModal = ({
 
           <div className="modal-action">
             <button type="button" className="btn btn-ghost" onClick={handleClose} disabled={creationLoading}>
-              Cancel
+              {t("containerModal.cancel")}
             </button>
             <button type="submit" className="btn btn-primary" disabled={creationLoading}>
               {creationLoading ? (
                 <>
                   <span className="loading loading-spinner"></span>
-                  {isEditMode ? "Saving..." : "Creating..."}
+                  {isEditMode ? t("containerModal.saving") : t("containerModal.creating")}
                 </>
               ) : (
-                isEditMode ? "Save Changes" : "Create"
+                isEditMode ? t("containerModal.saveChanges") : t("containerModal.create")
               )}
             </button>
           </div>

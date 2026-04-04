@@ -803,7 +803,12 @@ const MyLecturesPage = () => {
                     className="h-14 w-14 rounded-xl object-cover flex-shrink-0"
                   />
                 ) : (
-                  <div className="h-14 w-14 rounded-xl bg-base-200 text-xs flex items-center justify-center flex-shrink-0">N/A</div>
+                  <div
+                    className="h-14 w-14 rounded-xl flex items-center justify-center text-sm font-bold flex-shrink-0"
+                    style={{ background: TOKENS.lightAquaMist, color: TOKENS.deepTeal }}
+                  >
+                    {lecture.name?.charAt(0)?.toUpperCase() || "?"}
+                  </div>
                 )}
 
                 <div className="min-w-0 flex-1">
@@ -884,20 +889,16 @@ const MyLecturesPage = () => {
                     ) : (
                       <div className="avatar placeholder">
                         <div
-                          className="w-12 h-12 rounded-xl flex items-center justify-center"
+                          className="w-12 h-12 rounded-xl flex items-center justify-center text-xs"
                           style={{ background: TOKENS.lightAquaMist, color: TOKENS.deepTeal }}
                         >
-                          <span className="text-xs font-bold">IMG</span>
+                          {lecture.name?.charAt(0)?.toUpperCase() || "?"}
                         </div>
                       </div>
                     )}
                   </td>
 
                   <td>{lecture.name}</td>
-                  {(isStudentLikeRole || isAdminLikeRole) && (
-                    <td>{lecture.lecturer?.name || t("lecturesPage.unknown")}</td>
-                  )}
-                  <td>{lecture.subject?.name || t("lecturesPage.notSpecified")}</td>
                   <td>
                     {t(`gradeLevels.${lecture.level?.name}`, { ns: "common" }) ||
                       lecture.level?.name ||

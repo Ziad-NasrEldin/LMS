@@ -60,7 +60,7 @@
   },
   "containerDetails": {
     "buttons": {
-      "backToDashboard": "Back to Dashboard",
+      "goBack": "Back",
       "viewDetails": "View Details",
       "add": "Add",
       "delete": "Delete"
@@ -141,7 +141,7 @@
     "videoURL": "Video URL",
     "numberOfViews": "Number of Views",
     "lectureType": "Lecture Type",
-    "requiresExam": "Requires Exam",
+    "requiresExam": "Requires Exam/Assessment",
     "requiresHomework": "Requires Homework",
     "homeworkConfiguration": "Homework Configuration",
     "enterGoogleFormOrLink": "Enter Google Form URL or share link",

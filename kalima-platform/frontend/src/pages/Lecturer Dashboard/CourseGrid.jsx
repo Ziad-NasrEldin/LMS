@@ -406,7 +406,7 @@ export default function CourseGrid() {
         <h3 className="text-xl font-bold">{t("noCoursesTitle")}</h3>
         <p className="text-lg text-gray-500 max-w-md mx-auto">{t("noCoursesDescription")}</p>
         <Link to="/dashboard/lecturer-dashboard/CoursesForm">
-          <button className="btn btn-primary mt-4">
+          <button className="btn btn-primary mt-4" style={{ color: "#F8FCFF" }}>
             <Edit className="h-4 w-4" style={{ marginRight: isRTL ? 0 : "0.5rem", marginLeft: isRTL ? "0.5rem" : 0 }} />
             {t("addNewCourse")}
           </button>
@@ -421,7 +421,7 @@ export default function CourseGrid() {
       <div className="text-center py-12">
         <p className="text-lg text-gray-500">{t("noCourses")}</p>
         <Link to="/dashboard/lecturer-dashboard/CoursesForm">
-          <button className="btn btn-primary mt-4">{t("addNewCourse")}</button>
+          <button className="btn btn-primary mt-4" style={{ color: "#F8FCFF" }}>{t("addNewCourse")}</button>
         </Link>
       </div>
     )

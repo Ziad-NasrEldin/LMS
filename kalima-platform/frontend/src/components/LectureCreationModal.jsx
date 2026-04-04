@@ -375,6 +375,12 @@ const LectureCreationModal = ({
     onClose()
   }
 
+  const handleBackdropClick = (e) => {
+    if (e.target === e.currentTarget) {
+      handleClose()
+    }
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setCreationLoading(true)
@@ -503,7 +509,7 @@ const LectureCreationModal = ({
   }
 
   return (
-    <div className={`modal ${isOpen ? "modal-open" : ""}`} dir={isRTL ? "rtl" : "ltr"}>
+    <div className={`modal ${isOpen ? "modal-open" : ""}`} dir={isRTL ? "rtl" : "ltr"} onClick={handleBackdropClick}>
       <div className="modal-box w-11/12 max-w-7xl h-[92vh] max-h-[92vh] overflow-hidden rounded-[2rem] border border-base-300 bg-base-100 p-0 shadow-2xl">
         <div className="flex h-full flex-col">
           <div className="flex items-start justify-between gap-4 border-b border-base-300 px-6 py-5 sm:px-8">

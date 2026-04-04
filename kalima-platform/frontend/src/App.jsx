@@ -3,6 +3,7 @@
 import { Suspense, lazy, useEffect, useState } from "react";
 import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
+import { FiX } from "react-icons/fi";
 import NavBar from "./components/navbar";
 import { LoadingSpinner } from "./components/LoadingSpinner";
 import { isMobile } from "./utils/isMobile";
@@ -52,6 +53,7 @@ function App() {
   const [showSidebar, setShowSidebar] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [impersonationSession, setImpersonationSession] = useState(getImpersonationSession());
+  const [isBannerDismissed, setIsBannerDismissed] = useState(false);
   const { t, i18n } = useTranslation("common");
   const isRTL = i18n.dir() === "rtl";
   const authRoutes = [
@@ -98,7 +100,12 @@ function App() {
 
   useEffect(() => {
     const syncImpersonationSession = () => {
-      setImpersonationSession(getImpersonationSession());
+      const session = getImpersonationSession();
+      setImpersonationSession(session);
+      // Reset dismissal when impersonation session changes (new session started)
+      if (session?.isActive) {
+        setIsBannerDismissed(false);
+      }
     };
 
     syncImpersonationSession();
@@ -269,30 +276,37 @@ function App() {
         position="top-right"
         toastOptions={{
           duration: 3000,
+          className: "glass glass-text",
           style: {
-            borderRadius: "14px",
-            padding: "12px 16px",
+            borderRadius: "999px",
+            padding: "12px 20px",
           },
         }}
       />
       <NavBar />
-      {!isAuthRoute && showSidebar && impersonationSession?.isActive && (
+      {!isAuthRoute && showSidebar && impersonationSession?.isActive && !isBannerDismissed && (
         <div
-          className={`mx-auto mt-2 max-w-[1220px] rounded-2xl border px-4 py-3 text-sm font-semibold ${
-            isRTL ? "text-right" : "text-left"
+          className={`glass glass-text fixed top-24 z-[100] rounded-2xl px-4 py-3 text-sm font-semibold shadow-xl ${
+            isRTL ? "right-20 md:right-80 text-right" : "left-20 md:left-80 text-left"
           }`}
-          style={{
-            background: "rgba(14,85,99,0.08)",
-            borderColor: "rgba(14,85,99,0.24)",
-            color: "#0E5563",
-          }}
           dir={isRTL ? "rtl" : "ltr"}
         >
-          {t("impersonationBanner", {
-            defaultValue: "You are viewing as {{role}}: {{name}}",
-            role: impersonationSession.targetRole,
-            name: impersonationSession.targetName,
-          })}
+          <div className="flex items-center gap-3">
+            <span className="flex-1 drop-shadow-sm">
+              {t("impersonationBanner", {
+                defaultValue: "You are viewing as {{role}}: {{name}}",
+                role: impersonationSession.targetRole,
+                name: impersonationSession.targetName,
+              })}
+            </span>
+            <button
+              onClick={() => setIsBannerDismissed(true)}
+              className="flex-shrink-0 rounded-full p-1 hover:bg-[#0E5563]/20 transition-colors"
+              aria-label="Dismiss"
+            >
+              <FiX className="h-4 w-4" />
+            </button>
+          </div>
         </div>
       )}
       {!isAuthRoute && showSidebar && (
