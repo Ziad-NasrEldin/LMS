@@ -88,6 +88,7 @@
     "subject": "Subject",
     "level": "Level",
     "price": "Price",
+    "paid": "Paid",
     "actions": "Actions",
     "details": "Details",
     "notAvailable": "N/A",

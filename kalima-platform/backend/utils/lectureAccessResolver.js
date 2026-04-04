@@ -7,7 +7,7 @@ const StudentLectureAccess = require("../models/studentLectureAccessModel");
 const AppError = require("./appError");
 
 const TARGET_SELECT =
-  "_id name type parent numberOfViews videoLink lecture_type requiresExam requiresHomework thumbnail createdBy subject level teacherAllowed price examConfig homeworkConfig examLink homeworkLink";
+  "_id name type parent numberOfViews videoLink requiresExam requiresHomework thumbnail createdBy subject level teacherAllowed price examConfig homeworkConfig examLink homeworkLink";
 
 const PURCHASE_SELECT = "student container lecture type";
 

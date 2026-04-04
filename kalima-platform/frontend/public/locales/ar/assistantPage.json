@@ -88,6 +88,7 @@
     "subject": "المادة",
     "level": "المرحلة",
     "price": "السعر",
+    "paid": "مدفوعة",
     "actions": "الإجراءات",
     "details": "التفاصيل",
     "notAvailable": "غير متوفر",

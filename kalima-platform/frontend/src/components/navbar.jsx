@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import LanguageSwitcher from "./LanguageSwitcher";
 import {
   isLoggedIn,
-  getUserDashboard,
+  getCachedUserSummary,
   logoutUser,
 } from "../routes/auth-services";
 import { Layout, Menu, X } from "lucide-react";
@@ -24,13 +24,8 @@ const NavBar = () => {
     const isAuth = await isLoggedIn();
     if (isAuth) {
       try {
-        const result = await getUserDashboard();
-        if (result.success) {
-          const userInfo = result?.data?.data?.userInfo || result?.data?.userInfo;
-          setUserRole(userInfo?.role || null);
-        } else {
-          setUserRole(null);
-        }
+        const userInfo = getCachedUserSummary();
+        setUserRole(userInfo?.role || null);
       } catch (err) {
         setUserRole(null);
         console.error(err);

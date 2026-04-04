@@ -62,5 +62,6 @@ containerSchema.virtual('containerImage').get(function() {
 
 containerSchema.index({ parent: 1 });
 containerSchema.index({ createdBy: 1 });
+containerSchema.index({ createdBy: 1, type: 1, createdAt: -1 });
 
 module.exports = mongoose.model("Container", containerSchema);

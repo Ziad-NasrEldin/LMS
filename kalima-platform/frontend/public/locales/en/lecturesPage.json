@@ -42,6 +42,7 @@
     },
     "lectureType": {
       "paid": "Paid",
+      "free": "Free",
       "review": "Review"
     },
     "points": "EGP",
@@ -61,7 +62,8 @@
     "buttons": {
       "backToDashboard": "Back to Dashboard",
       "viewDetails": "View Details",
-      "add": "Add"
+      "add": "Add",
+      "delete": "Delete"
     },
     "labels": {
       "points": "EGP"
@@ -77,6 +79,11 @@
     "error": {
       "title": "Oops! Something went wrong"
     },
+    "messages": {
+      "deleteSuccess": "Container deleted successfully",
+      "deleteError": "Failed to delete container"
+    },
+    "confirmDelete": "Delete \"{{name}}\" and all of its contents recursively?",
     "emptyState": {
       "noContent": "No content available in this container"
     }
@@ -125,6 +132,8 @@
   "fields": {
     "name": "Name",
     "thumbnail": "Thumbnail",
+    "course": "Course",
+    "container": "Container",
     "level": "Level",
     "subject": "Subject",
     "description": "Description",
@@ -142,6 +151,8 @@
   },
   "placeholders": {
     "enterLectureName": "Enter lecture name",
+    "selectCourse": "Select a course",
+    "selectContainer": "Select a container",
     "selectLevel": "Select a level",
     "selectSubject": "Select a subject",
     "enterDescription": "Enter lecture description",
@@ -208,6 +219,8 @@
   },
   "validation": {
     "nameRequired": "Name is required",
+    "courseRequired": "Course is required",
+    "containerRequired": "Container is required",
     "levelRequired": "Level is required",
     "subjectRequired": "Subject is required",
     "videoLinkRequired": "Video link is required for lectures",

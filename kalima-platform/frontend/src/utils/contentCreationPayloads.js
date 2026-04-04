@@ -90,7 +90,6 @@ export const buildLecturePayloadObject = ({
   videoLink,
   description,
   numberOfViews = 0,
-  lectureType = "Revision",
   requiresExam = false,
   examFormUrl,
   examConfig,
@@ -110,7 +109,6 @@ export const buildLecturePayloadObject = ({
     videoLink,
     description,
     numberOfViews: Number(numberOfViews) || 0,
-    lecture_type: lectureType,
     requiresExam: Boolean(requiresExam),
     requiresHomework: Boolean(requiresHomework),
   }

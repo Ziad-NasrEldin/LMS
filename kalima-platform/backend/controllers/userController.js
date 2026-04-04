@@ -596,21 +596,22 @@ const getMyData = catchAsync(async (req, res, next) => {
         responseData.containers = containers;
       }
 
-      // Always fetch standalone lectures created by this lecturer (from Lecture model)
-      const lectures = await Lecture.find({ createdBy: userId })
-        .select("name type price subject level createdAt lecture_type teacherAllowed thumbnail")
-        .populate("subject", "name")
-        .populate("level", "name")
-        .lean();
+      if (!fields || fields.includes("lectures")) {
+        // Fetch lecturer lectures only when explicitly requested.
+        const lectures = await Lecture.find({ createdBy: userId })
+          .select("name type price subject level createdAt teacherAllowed thumbnail")
+          .populate("subject", "name")
+          .populate("level", "name")
+          .lean();
 
-      // Also fetch lectures from Container model
-      const containerLectures = await Container.find({ createdBy: userId, type: "lecture" })
-        .select("name type price subject level createdAt teacherAllowed image")
-        .populate("subject", "name")
-        .populate("level", "name")
-        .lean();
+        const containerLectures = await Container.find({ createdBy: userId, type: "lecture" })
+          .select("name type price subject level createdAt teacherAllowed image")
+          .populate("subject", "name")
+          .populate("level", "name")
+          .lean();
 
-      responseData.lectures = [...lectures, ...containerLectures];
+        responseData.lectures = [...lectures, ...containerLectures];
+      }
 
       // Only fetch point purchases if no specific fields were requested or if pointPurchases field was included
       if (!fields || fields.includes("pointPurchases")) {
@@ -739,7 +740,7 @@ const getMyData = catchAsync(async (req, res, next) => {
           .populate("subject", "name")
           .populate("level", "name")
           .select(
-            "name description videoLink numberOfViews requiresExam requiresHomework examConfig homeworkConfig lecture_type"
+            "name description videoLink numberOfViews requiresExam requiresHomework examConfig homeworkConfig"
           )
           .lean();
 
@@ -1059,7 +1060,7 @@ const enrichPurchasesWithLectureData = async (purchaseHistory = []) => {
     const [lectureDocs, legacyLectureContainers] = await Promise.all([
       Lecture.find({ parent: { $in: allScopedContainerObjectIds } })
         .select(
-          "name price subject level videoLink lecture_type requiresExam examConfig requiresHomework homeworkConfig createdBy thumbnail createdAt parent"
+          "name price subject level videoLink requiresExam examConfig requiresHomework homeworkConfig createdBy thumbnail createdAt parent"
         )
         .populate("subject", "name")
         .populate("level", "name")
@@ -1070,7 +1071,7 @@ const enrichPurchasesWithLectureData = async (purchaseHistory = []) => {
         type: "lecture",
       })
         .select(
-          "name type price subject level videoLink lecture_type requiresExam examConfig requiresHomework homeworkConfig createdBy thumbnail createdAt"
+          "name type price subject level videoLink requiresExam examConfig requiresHomework homeworkConfig createdBy thumbnail createdAt"
         )
         .populate("subject", "name")
         .populate("level", "name")
@@ -1185,13 +1186,13 @@ const getStudentParentAdditionalData = async (
         {
           path: "container",
           select:
-            "name type price subject level videoLink lecture_type requiresExam examConfig requiresHomework homeworkConfig createdBy thumbnail",
+            "name type price subject level videoLink requiresExam examConfig requiresHomework homeworkConfig createdBy thumbnail",
         },
         { path: "lecturer", select: "name expertise role" },
         {
           path: "lecture",
           select:
-            "name price subject level videoLink lecture_type requiresExam examConfig requiresHomework homeworkConfig createdBy thumbnail",
+            "name price subject level videoLink requiresExam examConfig requiresHomework homeworkConfig createdBy thumbnail",
         },
       ])
       .lean();
@@ -1384,7 +1385,7 @@ const getParentChildrenData = catchAsync(async (req, res, next) => {
         .populate({
           path: "lecture",
           select:
-            "name price subject level videoLink lecture_type requiresExam examConfig requiresHomework homeworkConfig createdBy thumbnail",
+            "name price subject level videoLink requiresExam examConfig requiresHomework homeworkConfig createdBy thumbnail",
           populate: [
             { path: "subject", select: "name" },
             { path: "level", select: "name" }

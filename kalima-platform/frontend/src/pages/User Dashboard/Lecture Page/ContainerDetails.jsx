@@ -3,14 +3,15 @@
 import { useState, useEffect } from "react"
 import { Link, useParams, useNavigate } from "react-router-dom"
 import { useTranslation } from 'react-i18next';
-import { getContainerById, createContainer, updateContainer, createLecture, createLectureAttachment } from "../../../routes/lectures"
-import { getUserDashboard } from "../../../routes/auth-services"
-import { FiBook, FiFolder, FiArrowLeft, FiArrowRight, FiPlus, FiEdit2 } from "react-icons/fi"
+import { getContainerById, createContainer, updateContainer, createLecture, createLectureAttachment, deleteContainerById } from "../../../routes/lectures"
+import { getCachedUserSummary } from "../../../routes/auth-services"
+import { FiBook, FiFolder, FiArrowLeft, FiArrowRight, FiPlus, FiEdit2, FiTrash2 } from "react-icons/fi"
 import LectureCreationModal from "../../../components/LectureCreationModal"
 import ContainerCreationModal from "../../../components/ContainerCreationModal"
 import { designTokens } from "../../../constants/designTokens"
 import { translateErrorMessage } from "../../../utils/errorTranslator"
 import { objectToFormData } from "../../../utils/contentCreationPayloads"
+import toast from "react-hot-toast"
 
 const ContainerDetailsPage = () => {
   const { t, i18n } = useTranslation('lecturesPage');
@@ -31,6 +32,7 @@ const ContainerDetailsPage = () => {
   const [modalState, setModalState] = useState({ mode: null, target: null })
   const [creationLoading, setCreationLoading] = useState(false)
   const [creationError, setCreationError] = useState("")
+  const [deletingContainerId, setDeletingContainerId] = useState(null)
 
   const openCreateModal = () => {
     setModalState({ mode: "create", target: null })
@@ -67,29 +69,6 @@ const ContainerDetailsPage = () => {
     return basePath + "/container-details/" + id
   }
 
-  const buildBreadcrumbTrail = async (currentContainer) => {
-    const trail = []
-    let activeContainer = currentContainer
-
-    while (activeContainer) {
-      trail.unshift(activeContainer)
-
-      const parentId = activeContainer.parent?._id || activeContainer.parent?.id || activeContainer.parent
-      if (!parentId) break
-
-      const parentResponse = await getContainerById(parentId)
-      const parentContainer = normalizeContainerData(parentResponse)
-
-      if (!parentContainer || trail.some((item) => (item._id || item.id) === (parentContainer._id || parentContainer.id))) {
-        break
-      }
-
-      activeContainer = parentContainer
-    }
-
-    return trail
-  }
-
   const fetchContainer = async () => {
     try {
       const response = await getContainerById(containerId)
@@ -98,8 +77,8 @@ const ContainerDetailsPage = () => {
         setContainer(containerData)
 
         if (containerData) {
-          const trail = await buildBreadcrumbTrail(containerData)
-          setBreadcrumbTrail(trail)
+          const ancestors = Array.isArray(containerData.ancestors) ? containerData.ancestors : []
+          setBreadcrumbTrail([...ancestors, containerData])
         } else {
           setBreadcrumbTrail([])
         }
@@ -115,15 +94,14 @@ const ContainerDetailsPage = () => {
     const fetchData = async () => {
       try {
         setLoading(true)
-        const dashRes = await getUserDashboard()
-        if (!dashRes.success) {
+        const cachedUser = getCachedUserSummary()
+        if (!cachedUser?.role) {
           setError(translateErrorMessage("Failed to load user info"))
           return
         }
 
-        const { userInfo } = dashRes.data.data
-        setUserRole(userInfo.role)
-        setUserId(userInfo._id)
+        setUserRole(cachedUser.role)
+        setUserId(cachedUser.id)
         await fetchContainer()
       } catch (err) {
         setError(translateErrorMessage(err.message || "Failed to load data. Please try again later."))
@@ -283,6 +261,45 @@ const ContainerDetailsPage = () => {
     }
   }
 
+  const handleDeleteContainer = async (targetContainer, { isCurrent = false } = {}) => {
+    const targetId = targetContainer?._id || targetContainer?.id
+    if (!targetId || deletingContainerId) return
+
+    const targetName = targetContainer?.name || "container"
+    if (!window.confirm(t('containerDetails.confirmDelete', { name: targetName }))) return
+
+    try {
+      setDeletingContainerId(targetId)
+
+      const result = await deleteContainerById(targetId)
+      const isDeleteSuccess = result?.status === "success" || result?.success === true
+
+      if (!isDeleteSuccess) {
+        throw new Error(result?.message || t('containerDetails.messages.deleteError'))
+      }
+
+      toast.success(t('containerDetails.messages.deleteSuccess'))
+
+      if (isCurrent) {
+        const parentId = container?.parent?._id || container?.parent?.id || container?.parent
+        if (parentId) {
+          navigate(getContainerRoute(parentId))
+        } else {
+          navigate("/dashboard/lecturer-dashboard")
+        }
+        return
+      }
+
+      await fetchContainer()
+    } catch (err) {
+      const message = translateErrorMessage(err.message || t('containerDetails.messages.deleteError'))
+      toast.error(message)
+      setCreationError(message)
+    } finally {
+      setDeletingContainerId(null)
+    }
+  }
+
   if (loading) {
     return (
       <div
@@ -366,20 +383,20 @@ const ContainerDetailsPage = () => {
     >
       <div className="max-w-7xl mx-auto">
         {/* Header Section */}
-        <div className={`mb-6 flex flex-col gap-3 sm:mb-8 sm:flex-row sm:items-center sm:justify-between ${isRTL ? "sm:flex-row-reverse" : ""}`}>
+        <div className={`mb-6 flex flex-col gap-4 sm:mb-8 sm:flex-row sm:items-center sm:justify-between ${isRTL ? "sm:flex-row-reverse" : ""}`}>
           <button
             onClick={() => navigate(-1)}
-            className="inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition-colors sm:text-base"
+            className="inline-flex items-center justify-center gap-2 rounded-full border px-4 py-2.5 text-sm font-semibold transition-colors w-full sm:w-auto"
             style={{
               color: TOKENS.slateText,
               borderColor: "rgba(17,24,39,0.12)",
               background: "#FFFFFF",
             }}
           >
-            {isRTL ? <FiArrowRight className="text-lg" /> : <FiArrowLeft className="text-lg" />}
-            <span className="font-medium">{t('containerDetails.buttons.backToDashboard')}</span>
+            {isRTL ? <FiArrowRight className="text-lg flex-shrink-0" /> : <FiArrowLeft className="text-lg flex-shrink-0" />}
+            <span className="font-medium whitespace-nowrap">{t('containerDetails.buttons.backToDashboard')}</span>
           </button>
-          <div className={`flex items-center gap-4 ${isRTL ? "sm:justify-start" : "sm:justify-end"}`}>
+          <div className={`flex flex-wrap items-center gap-3 ${isRTL ? "justify-start" : "justify-end"}`}>
             {container.points > 0 && (
               <div
                 className="flex items-center gap-2 rounded-full border px-4 py-2"
@@ -390,22 +407,38 @@ const ContainerDetailsPage = () => {
                 }}
               >
                 <span className="text-lg">🏅</span>
-                <span className="font-medium">{container.points} {t('containerDetails.labels.points')}</span>
+                <span className="font-medium text-sm sm:text-base">{container.points} {t('containerDetails.labels.points')}</span>
               </div>
             )}
             {userRole === "Lecturer" && container.type !== "lecture" && (
-              <button
-                onClick={() => openEditModal(container)}
-                className="inline-flex items-center gap-2 rounded-full border px-4 py-2 font-semibold transition-all duration-200 hover:-translate-y-[1px]"
-                style={{
-                  background: "#E0F2FE",
-                  color: "#075985",
-                  borderColor: "rgba(7,89,133,0.18)",
-                }}
-              >
-                <FiEdit2 className="text-base" />
-                <span>{isRTL ? "تعديل" : "Edit"}</span>
-              </button>
+              <>
+                <button
+                  onClick={() => openEditModal(container)}
+                  className="inline-flex items-center justify-center gap-2 rounded-full border px-4 py-2.5 font-semibold transition-all duration-200 hover:-translate-y-[1px] text-sm sm:text-base"
+                  style={{
+                    background: "#E0F2FE",
+                    color: "#075985",
+                    borderColor: "rgba(7,89,133,0.18)",
+                  }}
+                >
+                  <FiEdit2 className="text-base flex-shrink-0" />
+                  <span className="whitespace-nowrap">{isRTL ? "تعديل" : "Edit"}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleDeleteContainer(container, { isCurrent: true })}
+                  disabled={deletingContainerId !== null}
+                  className="inline-flex items-center justify-center gap-2 rounded-full border px-4 py-2.5 font-semibold transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-60 text-sm sm:text-base"
+                  style={{
+                    background: "#FFF1F2",
+                    color: "#BE123C",
+                    borderColor: "rgba(190,24,93,0.18)",
+                  }}
+                >
+                  <FiTrash2 className="text-base flex-shrink-0" />
+                  <span className="whitespace-nowrap">{t('containerDetails.buttons.delete')}</span>
+                </button>
+              </>
             )}
           </div>
         </div>
@@ -420,21 +453,21 @@ const ContainerDetailsPage = () => {
           }}
         >
           {breadcrumbTrail.length > 0 && (
-            <div className="mb-6 flex flex-wrap items-center gap-2 overflow-x-auto rounded-2xl border px-3 py-3" style={{ background: "rgba(255,255,255,0.8)", borderColor: "rgba(17,24,39,0.08)" }}>
+            <div className="mb-6 flex flex-wrap items-center gap-2 rounded-2xl border px-3 py-3" style={{ background: "rgba(255,255,255,0.8)", borderColor: "rgba(17,24,39,0.08)" }}>
               {breadcrumbTrail.map((node, index) => {
                 const nodeId = node._id || node.id
                 const isCurrentNode = index === breadcrumbTrail.length - 1
 
                 return (
-                  <div key={nodeId} className="flex items-center gap-2 whitespace-nowrap">
-                    {index > 0 && <span className="text-base-content/30">/</span>}
+                  <div key={nodeId} className="flex items-center gap-2">
+                    {index > 0 && <span className="text-base-content/30 px-1">/</span>}
                     <Link
                       to={getContainerRoute(nodeId)}
-                      className={"inline-flex items-center gap-2 rounded-full border px-3 py-2 text-sm font-semibold transition-all duration-200 hover:-translate-y-[1px] " + (isCurrentNode ? "shadow-sm" : "hover:bg-base-200")}
+                      className={`inline-flex items-center gap-2 rounded-full border px-3 py-2 text-sm font-semibold transition-all duration-200 hover:-translate-y-[1px] max-w-[200px] sm:max-w-[280px] ${isCurrentNode ? "shadow-sm" : "hover:bg-base-200"}`}
                       style={{ background: isCurrentNode ? TOKENS.lightAquaMist : "#FFFFFF", color: TOKENS.inkText, borderColor: isCurrentNode ? "rgba(15,118,110,0.18)" : "rgba(17,24,39,0.12)" }}
                     >
-                      <FiFolder className="text-base" />
-                      <span>{node.name}</span>
+                      <FiFolder className="text-base flex-shrink-0" />
+                      <span className="truncate">{node.name}</span>
                     </Link>
                   </div>
                 )
@@ -457,67 +490,83 @@ const ContainerDetailsPage = () => {
           </div>
 
           {/* Content Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
             {container.children?.map((child) => (
               <div
                 key={child._id}
-                className="group relative rounded-2xl border transition-all duration-300 hover:-translate-y-[2px]"
+                className="group relative rounded-2xl border transition-all duration-300 hover:-translate-y-[2px] flex flex-col"
                 style={{
                   background: "#FFFFFF",
                   borderColor: "rgba(17,24,39,0.08)",
                   boxShadow: SHADOWS.level1,
                 }}
               >
-                <div className="p-5 sm:p-6">
-                  <div className="mb-4 flex items-start gap-4">
+                <div className="p-4 sm:p-5 flex flex-col flex-grow">
+                  <div className="mb-4 flex items-start gap-3">
                     <div
-                      className="flex h-12 w-12 items-center justify-center rounded-xl"
+                      className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-xl flex-shrink-0"
                       style={{ background: TOKENS.lightAquaMist, color: TOKENS.deepTeal }}
                     >
                       {childType === "lecture" ? (
-                        <FiBook className="text-xl" />
+                        <FiBook className="text-lg sm:text-xl" />
                       ) : (
-                        <FiFolder className="text-xl" />
+                        <FiFolder className="text-lg sm:text-xl" />
                       )}
                     </div>
-                    <h3 className="font-semibold" style={{ color: TOKENS.inkText }}>{child.name}</h3>
+                    <h3 className="font-semibold text-base sm:text-lg leading-tight" style={{ color: TOKENS.inkText }}>{child.name}</h3>
                   </div>
 
-                  <div className={`flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between ${isRTL ? "sm:flex-row-reverse" : ""}`}>
-                    <span className="text-sm" style={{ color: TOKENS.slateText }}>{t(`types.${childType?.toLowerCase()}`) || container.type}</span>
-                      <div className="flex flex-col gap-2 sm:flex-row">
-                        {childType !== "lecture" && userRole === "Lecturer" && (
+                  <div className={`mt-auto flex flex-col gap-3 ${isRTL ? "items-start" : "items-end"}`}>
+                    <span className="text-xs sm:text-sm px-2 py-1 rounded-full" style={{ color: TOKENS.slateText, background: "rgba(17,24,39,0.04)" }}>{t(`types.${childType?.toLowerCase()}`) || container.type}</span>
+                    <div className={`flex flex-wrap gap-2 w-full ${isRTL ? "justify-start" : "justify-end"}`}>
+                      {childType !== "lecture" && userRole === "Lecturer" && (
+                        <>
                           <button
                             type="button"
                             onClick={() => openEditModal(child)}
-                            className="inline-flex w-full items-center justify-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition-all duration-200 hover:-translate-y-[1px] sm:w-auto"
+                            className="inline-flex items-center justify-center gap-1.5 rounded-full border px-3 py-1.5 text-xs sm:text-sm font-semibold transition-all duration-200 hover:-translate-y-[1px] flex-1 sm:flex-none min-w-[80px]"
                             style={{
                               background: "#E0F2FE",
                               color: "#075985",
                               borderColor: "rgba(7,89,133,0.18)",
                             }}
                           >
-                            <FiEdit2 className="h-4 w-4" />
-                            {isRTL ? "تعديل" : "Edit"}
+                            <FiEdit2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0" />
+                            <span>{isRTL ? "تعديل" : "Edit"}</span>
                           </button>
-                        )}
-                        <Link
-                          to={
-                            userRole === "Lecturer"
-                              ? `/dashboard/lecturer-dashboard/${childType === "lecture" ? "lecture-display" : "container-details"}/${child._id}`
-                              : `/dashboard/student-dashboard/${childType === "lecture" ? "lecture-display" : "container-details"}/${child._id}`
-                          }
-                          className={`inline-flex w-full items-center justify-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition-all duration-200 hover:-translate-y-[1px] sm:w-auto ${isRTL ? "flex-row-reverse" : ""}`}
-                          style={{
-                            background: TOKENS.deepTeal,
-                            color: "#F8FCFF",
-                            borderColor: TOKENS.deepTeal,
-                          }}
-                        >
-                          {t('containerDetails.buttons.viewDetails')}
-                          {isRTL ? <FiArrowLeft className="h-4 w-4" /> : <FiArrowRight className="h-4 w-4" />}
-                        </Link>
-                      </div>
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteContainer(child)}
+                            disabled={deletingContainerId !== null}
+                            className="inline-flex items-center justify-center gap-1.5 rounded-full border px-3 py-1.5 text-xs sm:text-sm font-semibold transition-all duration-200 hover:-translate-y-[1px] disabled:cursor-not-allowed disabled:opacity-60 flex-1 sm:flex-none min-w-[80px]"
+                            style={{
+                              background: "#FFF1F2",
+                              color: "#BE123C",
+                              borderColor: "rgba(190,24,93,0.18)",
+                            }}
+                          >
+                            <FiTrash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0" />
+                            <span>{t('containerDetails.buttons.delete')}</span>
+                          </button>
+                        </>
+                      )}
+                      <Link
+                        to={
+                          userRole === "Lecturer"
+                            ? `/dashboard/lecturer-dashboard/${childType === "lecture" ? "lecture-display" : "container-details"}/${child._id}`
+                            : `/dashboard/student-dashboard/${childType === "lecture" ? "lecture-display" : "container-details"}/${child._id}`
+                        }
+                        className={`inline-flex items-center justify-center gap-1.5 rounded-full border px-3 py-1.5 text-xs sm:text-sm font-semibold transition-all duration-200 hover:-translate-y-[1px] flex-1 sm:flex-none min-w-[100px] ${isRTL ? "flex-row-reverse" : ""}`}
+                        style={{
+                          background: TOKENS.deepTeal,
+                          color: "#F8FCFF",
+                          borderColor: TOKENS.deepTeal,
+                        }}
+                      >
+                        <span>{t('containerDetails.buttons.viewDetails')}</span>
+                        {isRTL ? <FiArrowLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0" /> : <FiArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0" />}
+                      </Link>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -541,10 +590,10 @@ const ContainerDetailsPage = () => {
 
         {/* Lecturer Actions */}
         {userRole === "Lecturer" && childType && (
-          <div className={`flex gap-4 ${isRTL ? "justify-start" : "justify-end"}`}>
+          <div className={`flex gap-3 ${isRTL ? "justify-start" : "justify-end"} mt-6`}>
             <button
               onClick={openCreateModal}
-              className="inline-flex w-full items-center justify-center gap-2 rounded-full border px-6 py-3 font-semibold transition-all duration-200 hover:-translate-y-[1px] sm:w-auto"
+              className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-full border px-5 py-2.5 font-semibold transition-all duration-200 hover:-translate-y-[1px] text-sm sm:text-base"
               style={{
                 background: TOKENS.deepTeal,
                 color: "#F8FCFF",
@@ -552,8 +601,8 @@ const ContainerDetailsPage = () => {
                 boxShadow: SHADOWS.level2,
               }}
             >
-              <FiPlus className="text-lg" />
-              {t('containerDetails.buttons.add')} {t(`types.${creationLabel.toLowerCase()}`)}
+              <FiPlus className="text-lg flex-shrink-0" />
+              <span className="whitespace-nowrap">{t('containerDetails.buttons.add')} {t(`types.${creationLabel.toLowerCase()}`)}</span>
             </button>
           </div>
         )}

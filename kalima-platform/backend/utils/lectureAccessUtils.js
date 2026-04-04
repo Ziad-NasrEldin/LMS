@@ -112,7 +112,6 @@ const getRestrictedLectureSnapshot = (lecture) => ({
   _id: lecture._id,
   name: lecture.name,
   type: lecture.type,
-  lecture_type: lecture.lecture_type,
   description: lecture.description,
   thumbnail: lecture.thumbnail,
   price: lecture.price,

@@ -62,6 +62,8 @@ const LectureCreationModal = ({
   mode = "create",
   initialData = null,
   lectureId = null,
+  lecturerCourseOptions = [],
+  lecturerContainerOptionsByCourse = {},
 }) => {
   const { t, i18n } = useTranslation(["lecturesPage"])
   const isRTL = i18n.language === "ar"
@@ -72,7 +74,6 @@ const LectureCreationModal = ({
   const [newDescription, setNewDescription] = useState("")
   const [newPrice, setNewPrice] = useState(0)
   const [newVideoLink, setNewVideoLink] = useState("")
-  const [newLectureType, setNewLectureType] = useState("Revision")
   const [attachmentFilesByCategory, setAttachmentFilesByCategory] = useState(createEmptyAttachmentBuckets())
   const [existingAttachmentsByCategory, setExistingAttachmentsByCategory] = useState({
     ...createEmptyAttachmentBuckets(),
@@ -104,6 +105,15 @@ const LectureCreationModal = ({
   const [subjectsLoading, setSubjectsLoading] = useState(false)
   const [selectedLevel, setSelectedLevel] = useState("")
   const [selectedSubject, setSelectedSubject] = useState("")
+  const [selectedCourseId, setSelectedCourseId] = useState("")
+  const [selectedParentContainerId, setSelectedParentContainerId] = useState("")
+
+  const usesSelectableParent = !isEditMode && !containerId
+  const selectedCourseInfo = lecturerCourseOptions.find((course) => String(course.value) === String(selectedCourseId))
+  const availableContainersForCourse = lecturerContainerOptionsByCourse[String(selectedCourseId)] || []
+  const selectedParentContainerInfo = availableContainersForCourse.find(
+    (containerOption) => String(containerOption.value) === String(selectedParentContainerId),
+  )
 
   const normalizeExistingAttachment = (attachment) => {
     const filePath = attachment?.filePath || ""
@@ -146,7 +156,6 @@ const LectureCreationModal = ({
     setNewDescription(initialData.description || "")
     setNewPrice(initialData.price ?? 0)
     setNewVideoLink(initialData.videoLink || "")
-    setNewLectureType(initialData.lecture_type || "Revision")
     setNumberOfViews(initialData.numberOfViews ?? 0)
     setRequiresExam(Boolean(initialData.requiresExam))
     setRequiresHomework(Boolean(initialData.requiresHomework))
@@ -164,6 +173,8 @@ const LectureCreationModal = ({
       initialData.homeworkConfig?.formUrl ||
       "",
     )
+    setSelectedCourseId("")
+    setSelectedParentContainerId("")
     setSelectedLevel(initialData.level?._id || initialData.level || containerLevel || "")
     setSelectedSubject(initialData.subject?._id || initialData.subject || containerSubject || "")
     setThumbnailPreview(
@@ -234,6 +245,8 @@ const LectureCreationModal = ({
         resetAttachmentState()
 
         // Set default values from container if available
+        setSelectedCourseId("")
+        setSelectedParentContainerId("")
         if (containerLevel) {
           setSelectedLevel(containerLevel)
         }
@@ -304,6 +317,8 @@ const LectureCreationModal = ({
     setHomeworkPassingThreshold(50)
     setHomeworkFormUrl("")
 
+    setSelectedCourseId("")
+    setSelectedParentContainerId("")
     setSelectedLevel(containerLevel || "")
     setSelectedSubject(containerSubject || "")
     setCreationError("")
@@ -311,6 +326,49 @@ const LectureCreationModal = ({
       setThumbnailPreview(resolveUploadUrl(initialData.thumbnail, "lecture_thumbnails"))
     }
   }
+
+  useEffect(() => {
+    if (!usesSelectableParent) {
+      return
+    }
+
+    if (!selectedCourseId) {
+      setSelectedParentContainerId("")
+      setSelectedLevel("")
+      setSelectedSubject("")
+      return
+    }
+
+    const nextCourseContainers = lecturerContainerOptionsByCourse[String(selectedCourseId)] || []
+    const hasSelectedContainer = nextCourseContainers.some(
+      (containerOption) => String(containerOption.value) === String(selectedParentContainerId),
+    )
+
+    if (!hasSelectedContainer && selectedParentContainerId) {
+      setSelectedParentContainerId("")
+    }
+
+    const nextLevelId =
+      (hasSelectedContainer ? selectedParentContainerInfo?.levelId : null) ||
+      selectedCourseInfo?.levelId ||
+      ""
+    const nextSubjectId =
+      (hasSelectedContainer ? selectedParentContainerInfo?.subjectId : null) ||
+      selectedCourseInfo?.subjectId ||
+      ""
+
+    setSelectedLevel(nextLevelId)
+    setSelectedSubject(nextSubjectId)
+  }, [
+    lecturerContainerOptionsByCourse,
+    selectedCourseId,
+    selectedCourseInfo?.levelId,
+    selectedCourseInfo?.subjectId,
+    selectedParentContainerId,
+    selectedParentContainerInfo?.levelId,
+    selectedParentContainerInfo?.subjectId,
+    usesSelectableParent,
+  ])
 
   const handleClose = () => {
     resetForm()
@@ -324,6 +382,8 @@ const LectureCreationModal = ({
 
     try {
       if (!newItemName) throw new Error(t("validation.nameRequired"))
+      if (usesSelectableParent && !selectedCourseId) throw new Error(t("validation.courseRequired"))
+      if (usesSelectableParent && !selectedParentContainerId) throw new Error(t("validation.containerRequired"))
       if (!selectedLevel) throw new Error(t("validation.levelRequired"))
       if (!selectedSubject) throw new Error(t("validation.subjectRequired"))
       if (!newVideoLink) throw new Error(t("validation.videoLinkRequired"))
@@ -345,7 +405,6 @@ const LectureCreationModal = ({
         numberOfViews: Number(numberOfViews) || 0,
         videoLink: newVideoLink,
         teacherAllowed: true,
-        lectureType: newLectureType,
         requiresExam,
         examFormUrl,
         passingThreshold: Number(passingThreshold),
@@ -353,7 +412,7 @@ const LectureCreationModal = ({
         homeworkFormUrl,
         homeworkPassingThreshold: Number(homeworkPassingThreshold),
         createdBy: !isEditMode ? userId : undefined,
-        parent: !isEditMode ? containerId : undefined,
+        parent: !isEditMode ? (containerId || selectedParentContainerId) : undefined,
       })
 
       // Call onSubmit ONCE with all files and links for all categories
@@ -393,6 +452,8 @@ const LectureCreationModal = ({
 
   const selectedLevelInfo = levels.find((level) => (level.value || level._id) === selectedLevel)
   const selectedSubjectInfo = subjects.find((subject) => subject._id === selectedSubject)
+  const selectedCourseLabel = selectedCourseInfo?.label || ""
+  const selectedParentContainerLabel = selectedParentContainerInfo?.label || ""
   const selectedLevelLabel = selectedLevelInfo?.label || selectedLevelInfo?.displayName || selectedLevelInfo?.name || ""
   const selectedSubjectLabel = selectedSubjectInfo?.name || ""
   const attachmentCategoryLabels = {
@@ -420,15 +481,6 @@ const LectureCreationModal = ({
     (count, files) => count + (files?.length || 0),
     0,
   ) + existingAttachmentsTotal
-  const lectureTypeLabel =
-    newLectureType === "Revision"
-      ? t("lectureTypes.revision")
-      : newLectureType === "Free"
-        ? t("lectureTypes.free", "Free")
-        : newLectureType === "Teachers Only"
-          ? t("lectureTypes.teachersOnly", "Teachers Only")
-          : t("lectureTypes.normal")
-
   const handleUnifiedAttachmentFilesChange = (files) => {
     setAttachmentFilesByCategory({
       ...createEmptyAttachmentBuckets(),
@@ -555,21 +607,6 @@ const LectureCreationModal = ({
                         />
                       </div>
 
-                      <div className="form-control md:col-span-2">
-                        <label className="label">
-                          <span className="label-text font-semibold">{t("fields.lectureType")}</span>
-                        </label>
-                        <DSSelect
-                          className="select select-bordered w-full rounded-2xl"
-                          value={newLectureType}
-                          onChange={(e) => setNewLectureType(e.target.value)}
-                        >
-                          <option value="Free">{t("lectureTypes.free", "Free")}</option>
-                          <option value="Teachers Only">{t("lectureTypes.teachersOnly", "Teachers Only")}</option>
-                          <option value="Revision">{t("lectureTypes.revision")}</option>
-                          <option value="Paid">{t("lectureTypes.normal")}</option>
-                        </DSSelect>
-                      </div>
                     </div>
                   </section>
 
@@ -580,11 +617,58 @@ const LectureCreationModal = ({
                       </div>
                       <div>
                         <h4 className="text-lg font-bold text-base-content">{t("sections.publishSettings")}</h4>
-                        <p className="text-sm text-base-content/60">{t("fields.level")}, {t("fields.subject")}, {t("fields.requiresExam")}, {t("fields.requiresHomework")}</p>
+                        <p className="text-sm text-base-content/60">
+                          {usesSelectableParent
+                            ? `${t("fields.course")}, ${t("fields.container")}, ${t("fields.level")}, ${t("fields.subject")}`
+                            : `${t("fields.level")}, ${t("fields.subject")}, ${t("fields.requiresExam")}, ${t("fields.requiresHomework")}`}
+                        </p>
                       </div>
                     </div>
 
                     <div className="grid gap-4 md:grid-cols-2">
+                      {usesSelectableParent && (
+                        <>
+                          <div className="form-control">
+                            <label className="label">
+                              <span className="label-text font-semibold">{t("fields.course")}</span>
+                            </label>
+                            <DSSelect
+                              className="select select-bordered w-full rounded-2xl"
+                              value={selectedCourseId}
+                              onChange={(e) => setSelectedCourseId(e.target.value)}
+                              required
+                            >
+                              <option value="">{t("placeholders.selectCourse")}</option>
+                              {lecturerCourseOptions.map((course) => (
+                                <option key={course.value} value={course.value}>
+                                  {course.label}
+                                </option>
+                              ))}
+                            </DSSelect>
+                          </div>
+
+                          <div className="form-control">
+                            <label className="label">
+                              <span className="label-text font-semibold">{t("fields.container")}</span>
+                            </label>
+                            <DSSelect
+                              className="select select-bordered w-full rounded-2xl"
+                              value={selectedParentContainerId}
+                              onChange={(e) => setSelectedParentContainerId(e.target.value)}
+                              required
+                              disabled={!selectedCourseId}
+                            >
+                              <option value="">{t("placeholders.selectContainer")}</option>
+                              {availableContainersForCourse.map((containerOption) => (
+                                <option key={containerOption.value} value={containerOption.value}>
+                                  {containerOption.label}
+                                </option>
+                              ))}
+                            </DSSelect>
+                          </div>
+                        </>
+                      )}
+
                       <div className="form-control">
                         <label className="label">
                           <span className="label-text font-semibold">{t("fields.level")}</span>
@@ -593,6 +677,7 @@ const LectureCreationModal = ({
                           className="select select-bordered w-full rounded-2xl"
                           value={selectedLevel}
                           onChange={(e) => setSelectedLevel(e.target.value)}
+                          disabled={usesSelectableParent}
                           required
                         >
                           <option value="">{t("placeholders.selectLevel")}</option>
@@ -613,6 +698,7 @@ const LectureCreationModal = ({
                           className="select select-bordered w-full rounded-2xl"
                           value={selectedSubject}
                           onChange={(e) => setSelectedSubject(e.target.value)}
+                          disabled={usesSelectableParent}
                           required
                         >
                           <option value="">{t("placeholders.selectSubject")}</option>
@@ -970,11 +1056,22 @@ const LectureCreationModal = ({
                     </div>
 
                     <div className="mt-4 space-y-3">
+                      {usesSelectableParent && (
+                        <SummaryRow
+                          label={t("fields.course")}
+                          value={selectedCourseLabel || t("lecturesPage.notSpecified")}
+                        />
+                      )}
+                      {usesSelectableParent && (
+                        <SummaryRow
+                          label={t("fields.container")}
+                          value={selectedParentContainerLabel || t("lecturesPage.notSpecified")}
+                        />
+                      )}
                       <SummaryRow label={t("fields.level")} value={selectedLevelLabel || t("lecturesPage.notSpecified")} loading={levelsLoading} />
                       <SummaryRow label={t("fields.subject")} value={selectedSubjectLabel || t("lecturesPage.notSpecified")} loading={subjectsLoading} />
                       <SummaryRow label={t("fields.price")} value={`${Number(newPrice) || 0}`} />
                       <SummaryRow label={t("fields.numberOfViews")} value={`${Number(numberOfViews) || 0}`} />
-                      <SummaryRow label={t("fields.lectureType")} value={lectureTypeLabel} />
                       <SummaryRow label={t("fields.requiresExam")} value={requiresExam ? t("options.yes") : t("options.no")} />
                       <SummaryRow label={t("fields.requiresHomework")} value={requiresHomework ? t("options.yes") : t("options.no")} />
                       <SummaryRow label={t("sections.attachments")} value={String(totalAttachments)} />

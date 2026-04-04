@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react"
 import { Link, useLocation } from "react-router-dom"
 import { useTranslation } from 'react-i18next';
-import { getMyPurchasedCourseContainers, getUserDashboard } from "../../../routes/auth-services"
+import { getCachedUserSummary, getMyPurchasedCourseContainers } from "../../../routes/auth-services"
+import { getContainersByLecturerId } from "../../../routes/lectures"
 import { FiArrowLeft, FiArrowRight, FiChevronDown } from "react-icons/fi"
 import { designTokens } from "../../../constants/designTokens"
 import { translateErrorMessage } from "../../../utils/errorTranslator"
@@ -37,22 +38,27 @@ const ContainersPage = () => {
         const isLecturerRoute = location.pathname.includes('/lecturer-dashboard/');
 
         if (isLecturerRoute) {
-          const result = await getUserDashboard({
-            params: {
-              fields: 'userInfo,containers',
-              limit: 200,
-              page: 1,
-            }
-          });
+          const cachedUser = getCachedUserSummary()
+          const lecturerId = cachedUser?.id
 
-          if (!result.success) {
+          if (!lecturerId) {
+            setError(translateErrorMessage("Failed to load data"))
+            return
+          }
+
+          const result = await getContainersByLecturerId(lecturerId, {
+            type: "course",
+            limit: 200,
+            sort: "-createdAt",
+          })
+
+          if (result.status !== "success") {
             setError(translateErrorMessage("Failed to load data"));
             return;
           }
 
-          const { userInfo, containers = [] } = result.data.data;
-          setUserRole(userInfo.role);
-          setAllContainers(containers.filter((container) => container.type === 'course'));
+          setUserRole(cachedUser.role)
+          setAllContainers(result.data?.containers || [])
           return;
         }
 

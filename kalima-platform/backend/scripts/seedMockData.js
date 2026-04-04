@@ -238,7 +238,6 @@ async function upsertLecture({ name, subjectId, levelId, lecturerId, parentId, d
     level: levelId,
     createdBy: lecturerId,
     parent: parentId,
-    lecture_type: "Free",
     teacherAllowed: true,
     price: 0,
     description,

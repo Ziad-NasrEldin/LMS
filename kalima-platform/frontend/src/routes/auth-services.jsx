@@ -157,6 +157,45 @@ export const getUserFromToken = () => {
   }
 }
 
+export const getCachedUserSummary = () => {
+  const tokenUser = getUserFromToken()
+  const localUser = (() => {
+    try {
+      const rawUser = localStorage.getItem("user")
+      return rawUser ? JSON.parse(rawUser) : null
+    } catch (_error) {
+      return null
+    }
+  })()
+  const impersonationSession = getImpersonationSession()
+
+  const mergedUser = {
+    ...(localUser && typeof localUser === "object" ? localUser : {}),
+    ...(tokenUser && typeof tokenUser === "object" ? tokenUser : {}),
+  }
+
+  const role = impersonationSession?.isActive
+    ? impersonationSession.targetRole || mergedUser.role || mergedUser?.UserInfo?.role || null
+    : mergedUser.role || mergedUser?.UserInfo?.role || null
+
+  const id = impersonationSession?.isActive
+    ? impersonationSession.targetUserId || mergedUser.id || mergedUser?._id || mergedUser?.UserInfo?.id || null
+    : mergedUser.id || mergedUser?._id || mergedUser?.UserInfo?.id || null
+
+  const name = impersonationSession?.isActive
+    ? impersonationSession.targetName || mergedUser.name || null
+    : mergedUser.name || null
+
+  return {
+    id,
+    name,
+    email: mergedUser.email || null,
+    role,
+    profilePic: mergedUser.profilePic || null,
+    userSerial: mergedUser.userSerial || null,
+  }
+}
+
 export const hasRole = (role) => {
   const user = getUserFromToken()
   if (!user || !user.role) return false

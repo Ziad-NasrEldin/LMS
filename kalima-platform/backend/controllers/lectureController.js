@@ -270,7 +270,6 @@ exports.createLecture = catchAsync(async (req, res, next) => {
         videoLink,
         description,
         numberOfViews,
-        lecture_type,
         // New exam requirement fields
         requiresExam,
         examConfig,
@@ -293,18 +292,38 @@ exports.createLecture = catchAsync(async (req, res, next) => {
 
       const thumbnailPath = req.file ? req.file.path : null
 
-      // Validate lecture type
-      const allowedTypes = ["Free", "Paid", "Revision", "Teachers Only"]
-      if (lecture_type && !allowedTypes.includes(lecture_type)) {
-        if (thumbnailPath) deleteFile(thumbnailPath)
-        throw new AppError(`Invalid lecture type. Allowed types are: ${allowedTypes.join(", ")}`, 400)
-      }
-
       // Check required documents exist
       const levelDoc = await checkDoc(Level, level, session)
       const subjectDoc = await checkDoc(Subject, subject, session)
       const lecturerId = createdBy || req.user._id
       await checkDoc(Lecturer, lecturerId, session)
+
+      if (!parent) {
+        if (thumbnailPath) deleteFile(thumbnailPath)
+        throw new AppError("Parent container is required for lecture creation", 400)
+      }
+
+      const parentContainer = await checkDoc(Container, parent, session)
+
+      if (parentContainer.type === "lecture") {
+        if (thumbnailPath) deleteFile(thumbnailPath)
+        throw new AppError("Lectures cannot be nested under another lecture", 400)
+      }
+
+      if (parentContainer.createdBy?.toString() !== lecturerId.toString()) {
+        if (thumbnailPath) deleteFile(thumbnailPath)
+        throw new AppError("Selected parent container does not belong to this lecturer", 403)
+      }
+
+      if (parentContainer.level && parentContainer.level.toString() !== levelDoc._id.toString()) {
+        if (thumbnailPath) deleteFile(thumbnailPath)
+        throw new AppError("Lecture level must match the selected parent container", 400)
+      }
+
+      if (parentContainer.subject && parentContainer.subject.toString() !== subjectDoc._id.toString()) {
+        if (thumbnailPath) deleteFile(thumbnailPath)
+        throw new AppError("Lecture subject must match the selected parent container", 400)
+      }
 
       validateThresholdRange(parsedPassingThreshold, "Exam passing threshold")
       validateThresholdRange(parsedHomeworkPassingThreshold, "Homework passing threshold")
@@ -404,7 +423,6 @@ exports.createLecture = catchAsync(async (req, res, next) => {
             videoLink,
             description,
             numberOfViews: parsedNumberOfViews,
-            lecture_type,
             thumbnail: thumbnailPath,
             // Add exam requirement fields
             requiresExam: parsedRequiresExam,
@@ -422,41 +440,9 @@ exports.createLecture = catchAsync(async (req, res, next) => {
       )
 
       // Add lecture to parent's children if parent exists
-      if (parent) {
-        const parentContainer = await checkDoc(Container, parent, session)
+      if (!parentContainer.children.some((childId) => childId.toString() === lecture[0]._id.toString())) {
         parentContainer.children.push(lecture[0]._id)
         await parentContainer.save({ session })
-      }
-
-      // Find or create lecturer's container
-
-      let lecturerContainer = await Container.findOne({
-        createdBy: lecturerId,
-        type: "course", // Use a valid type from the enum
-      }).session(session)
-
-      if (!lecturerContainer) {
-        // Create lecturer's container if it doesn't exist
-        const lecturer = await Lecturer.findById(lecturerId).session(session)
-        lecturerContainer = await Container.create(
-          [
-            {
-              name: `${lecturer.name || "Lecturer"} Content`,
-              type: "course", // Use a valid type from the enum
-              createdBy: lecturerId,
-              children: [],
-              teacherAllowed: true, // Required field
-            },
-          ],
-          { session },
-        )
-        lecturerContainer = lecturerContainer[0]
-      }
-
-      // Add lecture to lecturer's container if not already present
-      if (!lecturerContainer.children.includes(lecture[0]._id)) {
-        lecturerContainer.children.push(lecture[0]._id)
-        await lecturerContainer.save({ session })
       }
 
       await session.commitTransaction()
@@ -587,7 +573,7 @@ exports.getAllLecturesPublic = catchAsync(async (req, res, next) => {
   ])
 
   // Always select only basic, non-sensitive fields for this public route
-  query = query.select("name type subject level createdBy price description lecture_type teacherAllowed thumbnail")
+  query = query.select("name type subject level createdBy price description teacherAllowed thumbnail")
 
   const features = new QueryFeatures(query, req.query).filter().sort().paginate()
 
@@ -713,7 +699,6 @@ exports.updatelectures = catchAsync(async (req, res, next) => {
       teacherAllowed,
       description,
       numberOfViews,
-      lecture_type,
       // New exam requirement fields
       requiresExam,
       examConfig,
@@ -751,7 +736,6 @@ exports.updatelectures = catchAsync(async (req, res, next) => {
         videoLink,
         description,
         numberOfViews,
-        lecture_type,
         teacherAllowed: teacherAllowed !== undefined ? parseBoolean(teacherAllowed) : undefined,
       }
       const parsedPassingThreshold = parseOptionalNumber(passingThreshold)
@@ -766,17 +750,6 @@ exports.updatelectures = catchAsync(async (req, res, next) => {
           deleteFile(currentLecture.thumbnail)
         }
         obj.thumbnail = req.file.path
-      }
-
-      // Basic validation for lecture_type (Mongoose enum validation also applies)
-      if (lecture_type) {
-        const allowedTypes = ["Free", "Paid", "Revision", "Teachers Only"]
-        if (!allowedTypes.includes(lecture_type)) {
-          if (req.file && req.file.path) {
-            deleteFile(req.file.path)
-          }
-          throw new AppError(`Invalid lecture type. Allowed types are: ${allowedTypes.join(", ")}`, 400)
-        }
       }
 
       const normalizedExamConfig = examConfig === "" ? null : examConfig

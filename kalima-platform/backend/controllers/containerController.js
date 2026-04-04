@@ -4,11 +4,16 @@ const mongoose = require("mongoose");
 const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
 const QueryFeatures = require("../utils/queryFeatures");
+const Lecture = require("../models/LectureModel");
+const Attachment = require("../models/attachmentModel");
+const StudentLectureAccess = require("../models/studentLectureAccessModel");
+const StudentExamSubmission = require("../models/studentExamSubmissionModel");
 const Level = require("../models/levelModel");
 const Subject = require("../models/subjectModel");
 const Lecturer = require("../models/lecturerModel");
 const multer = require("multer");
 const cloudinary = require("cloudinary").v2;
+const fs = require("fs");
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const configureCloudinary = require("../config/cloudinaryOptions");
 const {
@@ -50,6 +55,24 @@ const checkDoc = async (Model, id, session) => {
     throw new AppError(`${Model.modelName} not found`, 404);
   }
   return doc;
+};
+
+const withSession = (query, session) => (session ? query.session(session) : query);
+
+const deleteLocalFile = (filePath) => {
+  if (filePath && fs.existsSync(filePath)) {
+    fs.unlinkSync(filePath);
+  }
+};
+
+const destroyCloudinaryAsset = async (publicId) => {
+  if (!publicId) return;
+
+  try {
+    await cloudinary.uploader.destroy(publicId);
+  } catch (error) {
+    console.error(`Failed to delete Cloudinary asset ${publicId}:`, error.message);
+  }
 };
 exports.getAccessibleChildContainers = catchAsync(async (req, res, next) => {
   const { studentId, containerId, purchaseId } = req.params;
@@ -334,7 +357,7 @@ exports.getContainerById = catchAsync(async (req, res, next) => {
         ])
         .lean(),
       LectureModel.find({ _id: { $in: childIds } })
-        .select("name type level subject price description numberOfViews lecture_type thumbnail")
+        .select("name type level subject price description numberOfViews thumbnail")
         .populate([
           { path: "subject", select: "name" },
           { path: "level", select: "name" },
@@ -349,30 +372,30 @@ exports.getContainerById = catchAsync(async (req, res, next) => {
     orderedChildren = childIds.map((id) => childrenById.get(id)).filter(Boolean);
   }
 
-  // Add image inheritance logic - if no image, check parents
+  // Resolve ancestors once so the client does not issue one request per breadcrumb level.
+  const ancestors = [];
   let inheritedImage = null;
   let inheritedFrom = null;
+  let currentParentId = container.parent;
 
-  // Only look for parent images if this container doesn't have its own image
-  if (!container.image || !container.image.url) {
-    // Start with the current container's parent
-    let currentParentId = container.parent;
+  while (currentParentId) {
+    const parentContainer = await Container.findById(currentParentId)
+      .select("name type parent image")
+      .lean();
+    if (!parentContainer) break;
 
-    // Keep searching up the parent chain until we find an image or reach the top
-    while (currentParentId) {
-      const parentContainer = await Container.findById(currentParentId);
-      if (!parentContainer) break;
+    ancestors.unshift({
+      _id: parentContainer._id,
+      name: parentContainer.name,
+      type: parentContainer.type,
+    });
 
-      // If this parent has an image, use it
-      if (parentContainer.image && parentContainer.image.url) {
-        inheritedImage = parentContainer.image;
-        inheritedFrom = parentContainer._id;
-        break;
-      }
-
-      // Move up to the next parent
-      currentParentId = parentContainer.parent;
+    if (!inheritedImage && parentContainer.image && parentContainer.image.url) {
+      inheritedImage = parentContainer.image;
+      inheritedFrom = parentContainer._id;
     }
+
+    currentParentId = parentContainer.parent;
   }
 
   // Role-specific logic for authenticated users
@@ -397,6 +420,7 @@ exports.getContainerById = catchAsync(async (req, res, next) => {
     : { ...container };
 
   responseData.children = orderedChildren;
+  responseData.ancestors = ancestors;
 
   // Add inherited image info to the response if applicable
   if (inheritedImage) {
@@ -492,11 +516,15 @@ exports.getLecturerContainers = catchAsync(async (req, res, next) => {
     filter.parent = null;
   }
 
-  const containers = await Container.find(filter).populate([
-    { path: "createdBy", select: "name" }, // Keep createdBy populated for context
-    { path: "subject", select: "name" },
-    { path: "level", select: "name" },
-  ]);
+  const containers = await Container.find(filter)
+    .select("name type price subject level createdAt")
+    .sort({ createdAt: -1 })
+    .populate([
+      { path: "createdBy", select: "name" },
+      { path: "subject", select: "name" },
+      { path: "level", select: "name" },
+    ])
+    .lean();
 
   res.status(200).json({
     status: "success",
@@ -725,14 +753,24 @@ exports.deleteContainerAndChildren = catchAsync(async (req, res, next) => {
     session = await mongoose.startSession();
     session.startTransaction();
 
-    // Find the container and recursively search for nested children.
+    const rootContainer = await withSession(Container.findById(containerId), session);
+    if (!rootContainer) {
+      throw new AppError("Container not found", 404);
+    }
+
+    const canBypassOwnership = ["Admin", "SubAdmin", "Moderator"].includes(req.user?.role);
+    if (!canBypassOwnership && rootContainer.createdBy?.toString() !== req.user._id.toString()) {
+      throw new AppError("You do not have permission to delete this container", 403);
+    }
+
+    // Traverse only container documents here. Lecture rows are collected separately by parent.
     const containerTree = await Container.aggregate([
       {
         $match: { _id: new mongoose.Types.ObjectId(containerId) },
       },
       {
         $graphLookup: {
-          from: "containers", // Ensure this matches your actual collection name
+          from: "containers",
           startWith: "$children",
           connectFromField: "children",
           connectToField: "_id",
@@ -746,28 +784,69 @@ exports.deleteContainerAndChildren = catchAsync(async (req, res, next) => {
     }
 
     const containerDoc = containerTree[0];
-    const toDeleteIds = [
+    const containersToDelete = [
+      rootContainer.toObject ? rootContainer.toObject() : rootContainer,
+      ...containerDoc.nestedChildren,
+    ];
+    const containerIds = [
       containerDoc._id,
       ...containerDoc.nestedChildren.map((child) => child._id),
     ];
+    const lectureDocs = await withSession(
+      Lecture.find({ parent: { $in: containerIds } }).select("_id thumbnail parent").lean(),
+      session
+    );
+    const lectureIds = lectureDocs.map((lecture) => lecture._id);
+    const contentIdsToPrune = [...containerIds, ...lectureIds];
 
-    // Remove the container id from its parent's children array if applicable.
-    if (containerDoc.parent) {
-      const parent = await Container.findByIdAndUpdate(
-        containerDoc.parent,
-        { $pull: { children: containerDoc._id } },
-        { session }
+    const attachmentDocs = lectureIds.length
+      ? await withSession(
+        Attachment.find({ lectureId: { $in: lectureIds } }).select("_id publicId").lean(),
+        session
+      )
+      : [];
+
+    if (contentIdsToPrune.length > 0) {
+      await withSession(
+        Container.updateMany(
+          { children: { $in: contentIdsToPrune } },
+          { $pull: { children: { $in: contentIdsToPrune } } }
+        ),
+        session
       );
-      if (!parent) {
-        throw new AppError(
-          "Failed to remove the container from parent's children array",
-          404
-        );
-      }
     }
 
-    // Delete the container and all nested children.
-    await Container.deleteMany({ _id: { $in: toDeleteIds } }).session(session);
+    await Promise.all([
+      ...containersToDelete.map((container) => destroyCloudinaryAsset(container.image?.publicId)),
+      ...attachmentDocs.map((attachment) => destroyCloudinaryAsset(attachment.publicId)),
+    ]);
+
+    lectureDocs.forEach((lecture) => deleteLocalFile(lecture.thumbnail));
+
+    await Promise.all([
+      withSession(
+        Purchase.deleteMany({
+          $or: [
+            { container: { $in: containerIds } },
+            ...(lectureIds.length > 0 ? [{ lecture: { $in: lectureIds } }] : []),
+          ],
+        }),
+        session
+      ),
+      lectureIds.length
+        ? withSession(Attachment.deleteMany({ lectureId: { $in: lectureIds } }), session)
+        : Promise.resolve(),
+      lectureIds.length
+        ? withSession(StudentLectureAccess.deleteMany({ lecture: { $in: lectureIds } }), session)
+        : Promise.resolve(),
+      lectureIds.length
+        ? withSession(StudentExamSubmission.deleteMany({ lecture: { $in: lectureIds } }), session)
+        : Promise.resolve(),
+      lectureIds.length
+        ? withSession(Lecture.deleteMany({ _id: { $in: lectureIds } }), session)
+        : Promise.resolve(),
+      withSession(Container.deleteMany({ _id: { $in: containerIds } }), session),
+    ]);
 
     await session.commitTransaction();
     res.status(204).json({ status: "success", data: null });

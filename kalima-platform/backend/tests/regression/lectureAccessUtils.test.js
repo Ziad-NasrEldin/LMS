@@ -95,7 +95,6 @@ test("getRestrictedLectureSnapshot excludes protected content fields", () => {
     _id: "lecture-1",
     name: "Physics Lecture",
     type: "lecture",
-    lecture_type: "Paid",
     description: "desc",
     thumbnail: "thumb.jpg",
     price: 10,

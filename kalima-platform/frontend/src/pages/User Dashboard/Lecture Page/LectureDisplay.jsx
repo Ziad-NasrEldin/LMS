@@ -1769,7 +1769,7 @@ const LectureDisplay = () => {
               <div>
                 <p className="mb-2">
                   <strong>{t("type")}:</strong>{" "}
-                  {lecture?.lecture_type || t("notSpecified")}
+                  {Number(lecture?.price || 0) > 0 ? t("paid") : t("free", "Free")}
                 </p>
                 <p className="mb-2">
                   <strong>{t("createdBy")}:</strong>{" "}

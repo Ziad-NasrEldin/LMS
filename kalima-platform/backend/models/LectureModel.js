@@ -56,14 +56,6 @@ const lectureSchema = new mongoose.Schema(
       default: 0,
       min: [0, "Number of views cannot be negative"],
     },
-    lecture_type: {
-      type: String,
-      required: [true, "A lecture must have a type"],
-      enum: {
-        values: ["Free", "Paid", "Revision", "Teachers Only"],
-        message: "Lecture type must be either Free, Paid, Revision, or Teachers Only",
-      },
-    },
     thumbnail: {
       type: String,
     },

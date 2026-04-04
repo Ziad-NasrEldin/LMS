@@ -34,7 +34,6 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
   const [subjects, setSubjects] = useState([])
   const [numberOfViews, setNumberOfViews] = useState(0)
   const [lecturePrice, setLecturePrice] = useState(0)
-  const [lectureType, setLectureType] = useState("Paid")
   const [requiresExam, setRequiresExam] = useState(false)
   const [examFormUrl, setExamFormUrl] = useState("")
   const [passingThreshold, setPassingThreshold] = useState(60)
@@ -183,7 +182,6 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
           teacherAllowed: formData.privacy === "teacher",
           description: description || `Lecture for ${containerName}`,
           numberOfViews: Number(numberOfViews),
-          lectureType: lectureType,
           requiresExam,
           examFormUrl,
           passingThreshold: Number(passingThreshold),
@@ -311,7 +309,6 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
       setAttachmentFile(null)
       setNumberOfViews(0)
       setLecturePrice(0)
-      setLectureType("Paid")
       setRequiresExam(false)
       setExamFormUrl("")
       setPassingThreshold(60)
@@ -508,19 +505,6 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
             {containerType === CONTAINER_TYPES.LECTURE ? (
               <>
             <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-2">
-              <div>
-                <label className="block text-sm font-medium mb-1">{isRTL ? "نوع المحاضرة" : "Lecture Type"}</label>
-                <DSSelect
-                  value={lectureType}
-                  onChange={(e) => setLectureType(e.target.value)}
-                  className={compactSelect}
-                >
-                  <option value="Free">{isRTL ? "مجاني" : "Free"}</option>
-                  <option value="Paid">{isRTL ? "مدفوع" : "Paid"}</option>
-                  <option value="Revision">{isRTL ? "مراجعة" : "Revision"}</option>
-                  <option value="Teachers Only">{isRTL ? "للمعلمين فقط" : "Teachers Only"}</option>
-                </DSSelect>
-              </div>
               <div>
               <label className="block text-sm font-medium mb-1">{isRTL ? "سعر المحاضرة" : "Lecture Price"}</label>
               <input

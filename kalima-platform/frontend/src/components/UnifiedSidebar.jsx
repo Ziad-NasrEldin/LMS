@@ -21,7 +21,7 @@ import { Edit, Lightbulb } from "lucide-react";
 import { getAllUsers } from "../routes/fetch-users";
 import {
   getImpersonationSession,
-  getUserDashboard,
+  getCachedUserSummary,
   logoutUser,
   startImpersonation,
   stopImpersonation,
@@ -166,12 +166,12 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
   const fetchUserData = useCallback(async () => {
     setLoading(true);
     try {
-      const result = await getUserDashboard();
-      if (result.success) {
-        setUserData(result.data.data.userInfo);
+      const cachedUser = getCachedUserSummary();
+      if (cachedUser?.role || cachedUser?.name || cachedUser?.id) {
+        setUserData(cachedUser);
         setError(null);
       } else {
-        setError(translateErrorMessage(result.error || "Failed to fetch user data"));
+        setError(translateErrorMessage("Failed to fetch user data"));
       }
     } catch (fetchError) {
       setError("Failed to fetch user data");

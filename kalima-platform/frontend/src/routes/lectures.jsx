@@ -128,6 +128,15 @@ export const getLectureAttachments = async (lectureId) => {
   }
 };
 
+export const getMyContainers = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/containers/my-containers`, authConfig())
+    return response.data
+  } catch (error) {
+    return normalizeApiError(error, "Error fetching lecturer containers")
+  }
+}
+
 /**
  * Delete a lecture by ID
  * @param {string} lectureId - The ID of the lecture to delete
@@ -280,19 +289,6 @@ export const updateContainer = async (containerId, formData) => {
     return response.data
   } catch (error) {
     throw new Error(error.response?.data?.message || "Error updating container")
-  }
-}
-
-export const getMyContainers = async () => {
-  try {
-    const response = await axios.get(`${API_URL}/containers/my-containers`, authConfig())
-
-    return {
-      status: "success",
-      data: response.data.data
-    }
-  } catch (error) {
-    return normalizeApiErrorWithEmpty404(error, "Failed to fetch containers")
   }
 }
 

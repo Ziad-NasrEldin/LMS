@@ -228,7 +228,9 @@ const AssistantPage = () => {
               <div className="card-body p-4">
                 <div className="flex justify-between items-start">
                   <h3 className="card-title text-base line-clamp-1">{lecture.name}</h3>
-                  <div className="badge badge-primary">{lecture.lecture_type}</div>
+                  <div className={`badge ${Number(lecture.price || 0) > 0 ? "badge-primary" : "badge-secondary"}`}>
+                    {Number(lecture.price || 0) > 0 ? t("common.paid") : t("common.free")}
+                  </div>
                 </div>
                 <p className="text-sm opacity-70 line-clamp-2">{lecture.description || t("common.noDescription")}</p>
                 <div className="flex flex-wrap justify-between items-center mt-2 text-xs opacity-70 gap-2">

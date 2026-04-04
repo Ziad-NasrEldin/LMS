@@ -78,6 +78,7 @@ const DetailedLectureView = () => {
   const [remainingViews, setRemainingViews] = useState(0)
   const [updateAccessLoading, setUpdateAccessLoading] = useState(false)
   const [updateAccessError, setUpdateAccessError] = useState(null)
+  const lecturePricingLabel = Number(lecture?.price || 0) > 0 ? t("paid") : t("free", "Free")
   const [updateAccessSuccess, setUpdateAccessSuccess] = useState(false)
 
   // Check if user has admin-like privileges
@@ -521,8 +522,8 @@ const DetailedLectureView = () => {
             <FiArrowLeft className="w-5 h-5" />
           </button>
           <h1 className="text-2xl font-bold">{lecture.name}</h1>
-          <span className={`badge ${lecture.lecture_type === "Paid" ? "badge-primary" : "badge-secondary"}`}>
-            {lecture.lecture_type === "Paid" ? t('paid') : t('review')}
+          <span className={`badge ${Number(lecture?.price || 0) > 0 ? "badge-primary" : "badge-secondary"}`}>
+            {lecturePricingLabel}
           </span>
         </div>
 

@@ -42,6 +42,7 @@
     },
     "lectureType": {
       "paid": "مدفوعة",
+      "free": "مجانية",
       "review": "مراجعة"
     },
     "points": "جنيه",
@@ -61,7 +62,8 @@
     "buttons": {
       "backToDashboard": "العودة إلى لوحة التحكم",
       "viewDetails": "عرض التفاصيل",
-      "add": "إضافة"
+      "add": "إضافة",
+      "delete": "حذف"
     },
     "labels": {
       "points": "جنيه"
@@ -77,6 +79,11 @@
     "error": {
       "title": "حدث خطأ ما!"
     },
+    "messages": {
+      "deleteSuccess": "تم حذف الحاوية بنجاح",
+      "deleteError": "فشل حذف الحاوية"
+    },
+    "confirmDelete": "هل تريد حذف \"{{name}}\" وكل محتوياته بشكل متكرر؟",
     "emptyState": {
       "noContent": "لا يوجد محتوى متاح في هذا الحاوية"
     }
@@ -125,6 +132,8 @@
   "fields": {
     "name": "الاسم",
     "thumbnail": "الصورة المصغرة",
+    "course": "الكورس",
+    "container": "الحاوية",
     "level": "المرحلة",
     "subject": "المادة",
     "description": "الوصف",
@@ -142,6 +151,8 @@
   },
   "placeholders": {
     "enterLectureName": "أدخل اسم المحاضرة",
+    "selectCourse": "اختر كورس",
+    "selectContainer": "اختر حاوية",
     "selectLevel": "اختر مرحلة",
     "selectSubject": "اختر مادة",
     "enterDescription": "أدخل وصف المحاضرة",
@@ -208,6 +219,8 @@
   },
   "validation": {
     "nameRequired": "الاسم مطلوب",
+    "courseRequired": "الكورس مطلوب",
+    "containerRequired": "الحاوية مطلوبة",
     "levelRequired": "المرحلة مطلوبة",
     "subjectRequired": "المادة مطلوبة",
     "videoLinkRequired": "رابط الفيديو مطلوب للمحاضرات",

@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next"
 import { getUserDashboard } from "../../../routes/auth-services"
 import { getAllSubjects } from "../../../routes/courses"
 import { getAllLevels } from "../../../routes/levels"
-import { createLecture, updateLecture, createLectureAttachment, getLectureById } from "../../../routes/lectures"
+import { createLecture, updateLecture, createLectureAttachment, getLectureById, getMyContainers } from "../../../routes/lectures"
 import { getAllLectures } from "../../../routes/lectures"
 import LectureCreationModal from "../../../components/LectureCreationModal"
 import { designTokens } from "../../../constants/designTokens"
@@ -14,6 +14,86 @@ import { resolveUploadUrl } from "../../../utils/uploadUrl"
 import { translateErrorMessage } from "../../../utils/errorTranslator"
 import { objectToFormData } from "../../../utils/contentCreationPayloads"
 import DSSelect from "../../../components/DSSelect"
+
+const normalizeEntityId = (value) => value?._id || value?.id || value || null
+
+const buildLecturerLectureTargets = (containers = []) => {
+  const normalizedContainers = containers
+    .filter((container) => container && container.type !== "lecture")
+    .map((container) => ({
+      id: normalizeEntityId(container),
+      name: container.name,
+      type: container.type,
+      parentId: normalizeEntityId(container.parent),
+      levelId: normalizeEntityId(container.level),
+      subjectId: normalizeEntityId(container.subject),
+    }))
+    .filter((container) => Boolean(container.id))
+
+  const containersById = new Map(normalizedContainers.map((container) => [String(container.id), container]))
+  const courses = normalizedContainers.filter((container) => container.type === "course")
+
+  const getAncestorChain = (containerId) => {
+    const chain = []
+    let current = containersById.get(String(containerId))
+
+    while (current) {
+      chain.unshift(current)
+      if (!current.parentId) break
+      current = containersById.get(String(current.parentId))
+    }
+
+    return chain
+  }
+
+  const isDescendantOfCourse = (container, courseId) => {
+    let currentParentId = container.parentId
+
+    while (currentParentId) {
+      if (String(currentParentId) === String(courseId)) {
+        return true
+      }
+
+      const parentContainer = containersById.get(String(currentParentId))
+      currentParentId = parentContainer?.parentId || null
+    }
+
+    return false
+  }
+
+  const courseOptions = courses
+    .map((course) => ({
+      value: course.id,
+      label: course.name,
+      levelId: course.levelId || "",
+      subjectId: course.subjectId || "",
+    }))
+    .sort((left, right) => left.label.localeCompare(right.label))
+
+  const containerOptionsByCourse = courses.reduce((acc, course) => {
+    const descendantOptions = normalizedContainers
+      .filter((container) => container.type !== "course" && isDescendantOfCourse(container, course.id))
+      .map((container) => {
+        const pathParts = getAncestorChain(container.id)
+          .filter((entry) => String(entry.id) !== String(course.id))
+          .map((entry) => entry.name)
+
+        return {
+          value: container.id,
+          label: pathParts.join(" / ") || container.name,
+          type: container.type,
+          levelId: container.levelId || course.levelId || "",
+          subjectId: container.subjectId || course.subjectId || "",
+        }
+      })
+      .sort((left, right) => left.label.localeCompare(right.label))
+
+    acc[String(course.id)] = descendantOptions
+    return acc
+  }, {})
+
+  return { courseOptions, containerOptionsByCourse }
+}
 
 const MyLecturesPage = () => {
   const { t, i18n } = useTranslation("lecturesPage")
@@ -27,6 +107,10 @@ const MyLecturesPage = () => {
     const rightTime = new Date(right.sortDate || right.createdAt || 0).getTime()
     return rightTime - leftTime
   }
+  const getLecturePricingLabel = (lecture) =>
+    Number(lecture?.price || 0) > 0
+      ? t("lecturesPage.lectureType.paid")
+      : t("lecturesPage.lectureType.free", "Free")
   const [lectures, setLectures] = useState([])
   const [allLectures, setAllLectures] = useState([]) // Store all lectures before pagination
   const [subjects, setSubjects] = useState([])
@@ -38,6 +122,10 @@ const MyLecturesPage = () => {
   const [lectureModalState, setLectureModalState] = useState({ mode: null, target: null })
   const [creationLoading, setCreationLoading] = useState(false)
   const [successMessage, setSuccessMessage] = useState("")
+  const [lectureCreationTargets, setLectureCreationTargets] = useState({
+    courseOptions: [],
+    containerOptionsByCourse: {},
+  })
   const [selectedSubjectFilter, setSelectedSubjectFilter] = useState("")
   const [selectedLevelFilter, setSelectedLevelFilter] = useState("")
   const [searchTerm, setSearchTerm] = useState("")
@@ -159,6 +247,7 @@ const MyLecturesPage = () => {
 
         // Role-specific data fetching
         if (["Admin", "Subadmin", "Moderator"].includes(userRole)) {
+          setLectureCreationTargets({ courseOptions: [], containerOptionsByCourse: {} })
           // Use getAllLectures for admin roles
           const allLecturesResult = await getAllLectures({ limit: 200 });
 
@@ -170,7 +259,6 @@ const MyLecturesPage = () => {
               level: lecture.level,
               price: lecture.price,
               videoLink: lecture.videoLink,
-              lecture_type: lecture.lecture_type,
               requiresExam: lecture.requiresExam,
               examConfig: lecture.examConfig,
               lecturer: lecture.createdBy,
@@ -184,9 +272,12 @@ const MyLecturesPage = () => {
           }
         } else if (userRole === "Lecturer") {
           // Use getUserDashboard with specific fields for lecturers
-          const result = await getUserDashboard({
-            params: { fields: "userInfo,lectures,containers", limit: 500 },
-          });
+          const [result, lecturerContainersResult] = await Promise.all([
+            getUserDashboard({
+              params: { fields: "userInfo,lectures,containers", limit: 500 },
+            }),
+            getMyContainers(),
+          ])
 
           if (result.success) {
             const { containers, lectures } = result.data.data;
@@ -200,7 +291,6 @@ const MyLecturesPage = () => {
                 level: lecture.level,
                 price: lecture.price,
                 videoLink: lecture.videoLink,
-                lecture_type: lecture.lecture_type || "Unknown",
                 requiresExam: lecture.requiresExam || false,
                 examConfig: lecture.examConfig || null,
                 lecturer: result.data.data.userInfo,
@@ -215,7 +305,6 @@ const MyLecturesPage = () => {
               subject: lecture.subject,
               level: lecture.level,
               price: lecture.price,
-              lecture_type: lecture.lecture_type,
               requiresExam: lecture.requiresExam || false,
               examConfig: lecture.examConfig || null,
               lecturer: result.data.data.userInfo,
@@ -225,10 +314,14 @@ const MyLecturesPage = () => {
 
             const allLecturesCombined = [...containerLectures, ...standaloneLectures].sort(sortLecturesNewestFirst);
             setAllLectures(allLecturesCombined);
+            setLectureCreationTargets(
+              buildLecturerLectureTargets(lecturerContainersResult?.data?.containers || []),
+            )
           } else {
             throw new Error(translateErrorMessage(result.error || "Failed to fetch lecturer data"));
           }
         } else if (userRole === "Student" || userRole === "Parent") {
+          setLectureCreationTargets({ courseOptions: [], containerOptionsByCourse: {} })
           // Handle student case
           const result = await getUserDashboard({
             params: { fields: "purchaseHistory", limit: 500 },
@@ -251,10 +344,9 @@ const MyLecturesPage = () => {
                 lectureLike?.name ||
                 fallbackName ||
                 purchase.description?.replace("Purchased container ", "").split(" for ")[0] ||
-                "Lecture",
+              "Lecture",
               price: lectureLike?.price ?? purchase.points,
               videoLink: lectureLike?.videoLink,
-              lecture_type: lectureLike?.lecture_type,
               purchasedAt: formatPurchaseDate(purchase.purchasedAt),
               lecturer: purchase.lecturer,
               subject: lectureLike?.subject,
@@ -349,7 +441,7 @@ const MyLecturesPage = () => {
         const name = String(lecture.name || "").toLowerCase()
         const subjectName = String(lecture.subject?.name || "").toLowerCase()
         const lecturerName = String(lecture.lecturer?.name || "").toLowerCase()
-        const lectureType = String(lecture.lecture_type || "").toLowerCase()
+        const lectureType = getLecturePricingLabel(lecture).toLowerCase()
         return (
           name.includes(normalizedSearch) ||
           subjectName.includes(normalizedSearch) ||
@@ -512,7 +604,6 @@ const MyLecturesPage = () => {
             level: lecture.level,
             price: lecture.price,
             videoLink: lecture.videoLink,
-            lecture_type: lecture.lecture_type,
             requiresExam: lecture.requiresExam,
             examConfig: lecture.examConfig,
             lecturer: lecture.createdBy,
@@ -538,7 +629,6 @@ const MyLecturesPage = () => {
               level: lecture.level,
               price: lecture.price,
               videoLink: lecture.videoLink,
-              lecture_type: lecture.lecture_type || "Unknown",
               requiresExam: lecture.requiresExam || false,
               examConfig: lecture.examConfig || null,
               lecturer: { id: userId, name: result.data.data.userInfo?.name },
@@ -552,7 +642,6 @@ const MyLecturesPage = () => {
             subject: lecture.subject,
             level: lecture.level,
             price: lecture.price,
-            lecture_type: lecture.lecture_type,
             requiresExam: lecture.requiresExam || false,
             examConfig: lecture.examConfig || null,
             lecturer: { id: userId, name: result.data.data.userInfo?.name },
@@ -665,7 +754,7 @@ const MyLecturesPage = () => {
               ))}
             </DSSelect>
           </div>
-          {["Lecturer", "Admin"].includes(userRole) && (
+          {userRole === "Lecturer" && (
             <button
               onClick={openCreateLectureModal}
               className="btn border-none"
@@ -696,6 +785,8 @@ const MyLecturesPage = () => {
           containerLevel={null}
           containerSubject={null}
           containerType="month"
+          lecturerCourseOptions={lectureCreationTargets.courseOptions}
+          lecturerContainerOptionsByCourse={lectureCreationTargets.containerOptionsByCourse}
           mode={lectureModalState.mode || "create"}
           initialData={lectureModalState.target}
           lectureId={lectureModalState.target?.id || lectureModalState.target?._id || null}
@@ -813,9 +904,7 @@ const MyLecturesPage = () => {
                       t("lecturesPage.notSpecified")}
                   </td>
                   <td>
-                    {lecture.lecture_type === "Paid"
-                      ? t("lecturesPage.lectureType.paid")
-                      : t("lecturesPage.lectureType.review")}
+                    {getLecturePricingLabel(lecture)}
                   </td>
                   <td>
                     {lecture.price || 0} {t("lecturesPage.points")}
