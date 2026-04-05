@@ -13,6 +13,22 @@ router.get("/course/:containerId", reviewController.getCourseReviews);
 
 router.use(verifyJWT);
 
+// ─── ADMIN ROUTES (exact paths first to avoid wildcard conflicts) ──────────────
+
+// Get all reviews (with filtering and pagination)
+router.get(
+  "/",
+  authController.verifyRoles("Admin", "Sub-Admin", "Moderator", "Lecturer"),
+  reviewController.getAllReviews
+);
+
+// Get review statistics
+router.get(
+  "/stats",
+  authController.verifyRoles("Admin", "Sub-Admin", "Moderator", "Lecturer"),
+  reviewController.getReviewStats
+);
+
 // Student creates a review
 router.post(
   "/",
@@ -39,22 +55,6 @@ router.delete(
   "/my-review/:containerId",
   authController.verifyRoles("Student"),
   reviewController.deleteMyReview
-);
-
-// ─── ADMIN ROUTES ─────────────────────────────────────────────────────────────
-
-// Get all reviews (with filtering and pagination)
-router.get(
-  "/",
-  authController.verifyRoles("Admin", "Sub-Admin", "Moderator", "Lecturer"),
-  reviewController.getAllReviews
-);
-
-// Get review statistics
-router.get(
-  "/stats",
-  authController.verifyRoles("Admin", "Sub-Admin", "Moderator", "Lecturer"),
-  reviewController.getReviewStats
 );
 
 // Approve a review

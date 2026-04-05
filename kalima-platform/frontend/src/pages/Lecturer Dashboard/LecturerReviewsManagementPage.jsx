@@ -4,7 +4,6 @@ import { useTranslation } from "react-i18next"
 import { useEffect, useState, useCallback } from "react"
 import { designTokens } from "../../constants/designTokens"
 import { getAllReviews, approveReview, rejectReview, respondToReview, deleteReview } from "../../routes/reviews"
-import { getContainerById } from "../../routes/lectures"
 import { LoadingSpinner } from "../../components/LoadingSpinner"
 import { ErrorAlert } from "../../components/ErrorAlert"
 import { Star, MessageSquare, CheckCircle, XCircle, Trash2, Send, Search, Filter } from "lucide-react"
@@ -28,17 +27,11 @@ export default function LecturerReviewsManagementPage() {
     setLoading(true)
     try {
       const result = await getAllReviews({ status: filter !== "all" ? filter : undefined })
-      if (result?.success) {
-        // Get course details for each review to filter by lecturer's courses
-        const reviewsWithCourse = await Promise.all(
-          result.data.map(async (review) => {
-            const courseResult = await getContainerById(review.containerId)
-            return {
-              ...review,
-              courseName: courseResult?.data?.name || t("unknownCourse", "Unknown Course"),
-            }
-          })
-        )
+      if (result?.status === "success") {
+        const reviewsWithCourse = (result.data || []).map((review) => ({
+          ...review,
+          courseName: review.container?.name || t("unknownCourse", "Unknown Course"),
+        }))
         setReviews(reviewsWithCourse)
       } else {
         setError(result?.error || t("fetchReviewsError", "Failed to fetch reviews"))
@@ -58,7 +51,7 @@ export default function LecturerReviewsManagementPage() {
     setActionLoading(true)
     try {
       const result = await approveReview(reviewId)
-      if (result?.success) {
+      if (result?.status === "success") {
         toast.success(t("reviewApproved", "Review approved"))
         fetchReviews()
       } else {
@@ -75,7 +68,7 @@ export default function LecturerReviewsManagementPage() {
     setActionLoading(true)
     try {
       const result = await rejectReview(reviewId)
-      if (result?.success) {
+      if (result?.status === "success") {
         toast.success(t("reviewRejected", "Review rejected"))
         fetchReviews()
       } else {
@@ -95,7 +88,8 @@ export default function LecturerReviewsManagementPage() {
     setActionLoading(true)
     try {
       const result = await deleteReview(reviewId)
-      if (result?.success) {
+      // 204 No Content = success (result is empty string)
+      if (result?.status === "success" || result === "") {
         toast.success(t("reviewDeleted", "Review deleted"))
         fetchReviews()
       } else {
@@ -113,7 +107,7 @@ export default function LecturerReviewsManagementPage() {
     setActionLoading(true)
     try {
       const result = await respondToReview(selectedReview._id, responseText)
-      if (result?.success) {
+      if (result?.status === "success") {
         toast.success(t("responseSent", "Response sent"))
         setResponseText("")
         setSelectedReview(null)

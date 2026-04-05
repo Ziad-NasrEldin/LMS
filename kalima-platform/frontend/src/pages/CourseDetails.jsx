@@ -492,7 +492,7 @@ export default function CourseDetails() {
   const SHADOWS = designTokens.shadows
   const RADIUS = designTokens.radius
   const GRADIENTS = designTokens.gradients
-  
+
   const [courseData, setCourseData] = useState(null)
   const [purchaseHistory, setPurchaseHistory] = useState([])
   const [loading, setLoading] = useState(true)
@@ -518,6 +518,44 @@ export default function CourseDetails() {
   const [reviewForm, setReviewForm] = useState({ rating: 5, comment: '' })
   const [reviewError, setReviewError] = useState('')
   const [reviewSuccess, setReviewSuccess] = useState('')
+
+  // Recursive function to count all containers and lectures
+  const countCourseContent = useMemo(() => {
+    const countRecursive = (items) => {
+      let containers = 0
+      let lectures = 0
+
+      if (!items?.length) return { containers, lectures }
+
+      for (const item of items) {
+        if (item?.type === 'lecture') {
+          lectures++
+        } else {
+          containers++
+          // Recursively count children
+          if (item?.children?.length) {
+            const childCounts = countRecursive(item.children)
+            containers += childCounts.containers
+            lectures += childCounts.lectures
+          }
+          // Also check lectures array on containers
+          if (item?.lectures?.length) {
+            lectures += item.lectures.length
+          }
+        }
+      }
+
+      return { containers, lectures }
+    }
+
+    return () => {
+      const topLevel = courseData?.children || []
+      const directLectures = courseData?.lectures || []
+      const result = countRecursive(topLevel)
+      result.lectures += directLectures.length
+      return result
+    }
+  }, [courseData])
 
   const courseName = String(courseData?.name || "").trim()
   const canonicalPath = courseData ? buildCoursePath(courseData) : null
@@ -1291,7 +1329,10 @@ export default function CourseDetails() {
                         {t("syllabus.courseContent")}
                       </h2>
                       <p className="text-sm mt-0.5" style={{ color: TOKENS.slateText }}>
-                        {t('syllabus.modulesCount', { modules: courseData?.children?.length || 0, lectures: courseData?.lectures?.length || 0 })}
+                        {(() => {
+                          const counts = countCourseContent()
+                          return t('syllabus.modulesCount', { modules: counts.containers, lectures: counts.lectures })
+                        })()}
                       </p>
                     </div>
                     {/* Legend */}

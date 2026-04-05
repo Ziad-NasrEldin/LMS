@@ -127,7 +127,7 @@ exports.deleteMyReview = catchAsync(async (req, res, next) => {
     return next(new AppError("Review not found", 404));
   }
 
-  res.status(204).json({
+  res.status(200).json({
     status: "success",
     message: "Review deleted successfully",
     data: null,
@@ -343,7 +343,7 @@ exports.deleteReview = catchAsync(async (req, res, next) => {
     return next(new AppError("Review not found", 404));
   }
 
-  res.status(204).json({
+  res.status(200).json({
     status: "success",
     message: "Review deleted successfully",
     data: null,
