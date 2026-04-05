@@ -317,7 +317,7 @@ const ContainerRow = ({ item, depth, isPurchased, onPurchase, purchaseInProgress
   const purchased = parentPurchased || isPurchased(itemId)
   const childCount = item?.children?.length || 0
   const typeConfig = CONTAINER_TYPE_CONFIG[item?.type] || { bg: `${tokens.lightAquaMist}30`, text: tokens.deepTeal }
-  const typeLabel = item?.type ? item.type.charAt(0).toUpperCase() + item.type.slice(1) : 'Module'
+  const typeLabel = item?.type ? t(`containerTypes.${item.type}`, item.type.charAt(0).toUpperCase() + item.type.slice(1)) : t('containerTypes.module', 'Module')
   const indentPx = depth * 12
 
   const toggle = async () => {

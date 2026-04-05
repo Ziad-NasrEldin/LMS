@@ -1088,12 +1088,11 @@ const LectureDisplay = () => {
       (videoBlocked || (remainingViews !== null && remainingViews <= 0));
 
     // Check if content should be blocked due to exam requirements
-    const isContentBlocked =
-  userRole === "Student" && 
-  ((examRequired && !examVerified) || 
-   (homeworkRequired && !homeworkVerified));
+    const isContentBlocked = userRole === "Student" && 
+      ((assessments.exam.required && !assessments.exam.verified) || 
+       (assessments.homework.required && !assessments.homework.verified));
 
-    if (loading || examVerificationLoading) {
+    if (loading || verificationLoading) {
       return (
         <div className="flex justify-center items-center min-h-screen">
           <div className="loading loading-spinner loading-lg text-primary"></div>
@@ -1148,31 +1147,17 @@ const LectureDisplay = () => {
     // Render requirements gate for students when lecture access is still restricted.
     if (isContentBlocked) {
       const requirementCards = [
-        examRequired
-          ? {
-              key: "exam",
-              title: t("examInfo"),
-              subtitle: t("examRequiredDescription"),
-              passed: examVerified,
-              threshold: examData?.passingThreshold,
-              actionUrl: resolvedExamFormUrl,
-              actionLabel: t("startExam"),
-            }
-          : null,
-        homeworkRequired
-          ? {
-              key: "homework",
-              title: t("homeworkInfo", "Homework Information"),
-              subtitle: t(
-                "homeworkRequiredDescription",
-                "You must complete and submit homework before you can access this lecture.",
-              ),
-              passed: homeworkVerified,
-              threshold: homeworkData?.passingThreshold,
-              actionUrl: resolvedHomeworkFormUrl,
-              actionLabel: t("startHomework", "Start Homework"),
-            }
-          : null,
+        assessments.exam.required && {
+          key: "exam", title: t("examInfo"), subtitle: t("examRequiredDescription"),
+          passed: assessments.exam.verified, threshold: assessments.exam.data?.passingThreshold,
+          actionUrl: resolvedExamFormUrl, actionLabel: t("startExam"),
+        },
+        assessments.homework.required && {
+          key: "homework", title: t("homeworkInfo", "Homework Information"),
+          subtitle: t("homeworkRequiredDescription", "Complete homework to access this lecture."),
+          passed: assessments.homework.verified, threshold: assessments.homework.data?.passingThreshold,
+          actionUrl: resolvedHomeworkFormUrl, actionLabel: t("startHomework", "Start Homework"),
+        },
       ].filter(Boolean);
 
       return (
@@ -1214,9 +1199,9 @@ const LectureDisplay = () => {
                 type="button"
                 className="btn btn-primary btn-sm"
                 onClick={debouncedRecheck}
-                disabled={examVerificationLoading}
+                disabled={verificationLoading}
               >
-                {examVerificationLoading ? t("loading") : t("recheckAccess", "Recheck Access")}
+                {verificationLoading ? t("loading") : t("recheckAccess", "Recheck Access")}
               </button>
             </div>
 
@@ -1367,55 +1352,44 @@ const LectureDisplay = () => {
           </div>
         )}
 
-        {userRole === "Student" && (examRequired || homeworkRequired) && (
+        {userRole === "Student" && (assessments.exam.required || assessments.homework.required) && (
           <div className="mb-4 grid gap-3 md:grid-cols-2">
-            {examRequired && (
+            {assessments.exam.required && (
               <div className="rounded-2xl border border-success/30 bg-success/10 p-4 shadow-sm">
                 <div className="mb-1 flex items-center justify-between gap-2">
                   <div className="flex items-center gap-2 font-bold text-base-content">
                     <FiAward className="h-5 w-5 text-success" />
                     {t("examInfo")}
                   </div>
-                  <span className={`badge ${examVerified ? "badge-success" : "badge-warning"}`}>
-                    {examVerified ? t("statusPassed", "Passed") : t("statusPending", "Pending")}
+                  <span className={`badge ${assessments.exam.verified ? "badge-success" : "badge-warning"}`}>
+                    {assessments.exam.verified ? t("statusPassed", "Passed") : t("statusPending", "Pending")}
                   </span>
                 </div>
-
-                {examSubmission && (
+                {assessments.exam.submission && (
                   <div className="text-sm text-base-content/80">
-                    <span>
-                      {t("score")}: {examSubmission.score}/{examSubmission.maxScore}
-                    </span>
+                    <span>{t("score")}: {assessments.exam.submission.score}/{assessments.exam.submission.maxScore}</span>
                     <span className="mx-2">|</span>
-                    <span>
-                      {t("passDate")}: {formatDate(examSubmission.verifiedAt)}
-                    </span>
+                    <span>{t("passDate")}: {formatDate(assessments.exam.submission.verifiedAt)}</span>
                   </div>
                 )}
               </div>
             )}
-
-            {homeworkRequired && (
+            {assessments.homework.required && (
               <div className="rounded-2xl border border-info/30 bg-info/10 p-4 shadow-sm">
                 <div className="mb-1 flex items-center justify-between gap-2">
                   <div className="flex items-center gap-2 font-bold text-base-content">
                     <FiCheck className="h-5 w-5 text-info" />
                     {t("homeworkInfo", "Homework Information")}
                   </div>
-                  <span className={`badge ${homeworkVerified ? "badge-success" : "badge-warning"}`}>
-                    {homeworkVerified ? t("statusPassed", "Passed") : t("statusPending", "Pending")}
+                  <span className={`badge ${assessments.homework.verified ? "badge-success" : "badge-warning"}`}>
+                    {assessments.homework.verified ? t("statusPassed", "Passed") : t("statusPending", "Pending")}
                   </span>
                 </div>
-
-                {homeworkSubmission && (
+                {assessments.homework.submission && (
                   <div className="text-sm text-base-content/80">
-                    <span>
-                      {t("score")}: {homeworkSubmission.score}/{homeworkSubmission.maxScore}
-                    </span>
+                    <span>{t("score")}: {assessments.homework.submission.score}/{assessments.homework.submission.maxScore}</span>
                     <span className="mx-2">|</span>
-                    <span>
-                      {t("passDate")}: {formatDate(homeworkSubmission.verifiedAt)}
-                    </span>
+                    <span>{t("passDate")}: {formatDate(assessments.homework.submission.verifiedAt)}</span>
                   </div>
                 )}
               </div>

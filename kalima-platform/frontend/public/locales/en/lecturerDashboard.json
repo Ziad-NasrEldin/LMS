@@ -159,7 +159,6 @@
   "responsePlaceholder": "Write your response...",
   "sending": "Sending...",
   "sendResponse": "Send Response",
-  "cancel": "Cancel",
   "containerTypes": {
     "course": "Course",
     "year": "Academic Year",

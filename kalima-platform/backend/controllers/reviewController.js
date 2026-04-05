@@ -207,10 +207,28 @@ exports.getCourseReviews = catchAsync(async (req, res, next) => {
 // Get all reviews (admin only) - with filtering and pagination
 exports.getAllReviews = catchAsync(async (req, res, next) => {
   const { status, containerId, page = 1, limit = 20 } = req.query;
+  const userRole = req.user.role;
+  const userId = req.user._id;
 
   const filter = {};
   if (status) filter.status = status;
   if (containerId) filter.container = containerId;
+
+  // If lecturer, only show reviews for their courses
+  if (userRole === "Lecturer") {
+    const lecturerContainers = await Container.find({ createdBy: userId }).select("_id");
+    const containerIds = lecturerContainers.map((c) => c._id.toString());
+    
+    // If a specific containerId is requested, verify it belongs to lecturer
+    if (containerId) {
+      if (!containerIds.includes(containerId)) {
+        return next(new AppError("You can only view reviews for your own courses", 403));
+      }
+    } else {
+      // Filter by all containers belonging to lecturer
+      filter.container = { $in: containerIds };
+    }
+  }
 
   const skip = (parseInt(page) - 1) * parseInt(limit);
 
@@ -334,7 +352,20 @@ exports.deleteReview = catchAsync(async (req, res, next) => {
 
 // Get review statistics (admin only)
 exports.getReviewStats = catchAsync(async (req, res, next) => {
+  const userRole = req.user.role;
+  const userId = req.user._id;
+
+  let containerFilter = {};
+
+  // If lecturer, only show stats for their courses
+  if (userRole === "Lecturer") {
+    const lecturerContainers = await Container.find({ createdBy: userId }).select("_id");
+    const containerIds = lecturerContainers.map((c) => c._id.toString());
+    containerFilter = { container: { $in: containerIds } };
+  }
+
   const stats = await Review.aggregate([
+    { $match: containerFilter },
     {
       $group: {
         _id: "$status",
@@ -343,8 +374,8 @@ exports.getReviewStats = catchAsync(async (req, res, next) => {
     },
   ]);
 
-  const totalReviews = await Review.countDocuments();
-  const pendingReviews = await Review.countDocuments({ status: "pending" });
+  const totalReviews = await Review.countDocuments(containerFilter);
+  const pendingReviews = await Review.countDocuments({ ...containerFilter, status: "pending" });
 
   res.status(200).json({
     status: "success",
