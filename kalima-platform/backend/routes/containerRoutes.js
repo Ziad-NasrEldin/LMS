@@ -25,6 +25,12 @@ router.get(
   containerController.getContainerById
 );
 
+// Get enrollment count for a container - public endpoint (no authentication required)
+router.get(
+  "/:containerId/enrollment-count",
+  containerController.getContainerEnrollmentCount
+);
+
 // Apply JWT verification middleware to all routes below this line
 router.use(verifyJWT);
 
@@ -116,5 +122,12 @@ router
     ),
     containerController.getLecturerRevenueByMonth
   );
+
+// Recalculate total duration for a container
+router.post(
+  "/:containerId/recalculate-duration",
+  authController.verifyRoles("Admin", "Sub-Admin", "Moderator", "Lecturer"),
+  containerController.recalculateContainerDuration
+);
 
 module.exports = router;

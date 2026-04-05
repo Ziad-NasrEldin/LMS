@@ -174,6 +174,50 @@ exports.getContainerPurchaseCountById = catchAsync(async (req, res, next) => {
   });
 });
 
+// Get public enrollment count for a container - counts unique students who purchased
+exports.getContainerEnrollmentCount = catchAsync(async (req, res, next) => {
+  const { containerId } = req.params;
+
+  if (!mongoose.Types.ObjectId.isValid(containerId)) {
+    return next(new AppError("Invalid container ID", 400));
+  }
+
+  // Check if container exists
+  const container = await Container.findById(containerId).select("name");
+  if (!container) {
+    return next(new AppError("Container not found", 404));
+  }
+
+  // Count unique students who purchased this container
+  const purchaseData = await Purchase.aggregate([
+    {
+      $match: {
+        container: new mongoose.Types.ObjectId(containerId),
+        type: { $in: ["containerPurchase", "lecturePurchase", "promoCodePurchase"] }
+      }
+    },
+    {
+      $group: {
+        _id: "$student",
+      }
+    },
+    {
+      $count: "enrollmentCount"
+    }
+  ]);
+
+  const enrollmentCount = purchaseData.length > 0 ? purchaseData[0].enrollmentCount : 0;
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      containerId,
+      containerName: container.name,
+      enrollmentCount,
+    },
+  });
+});
+
 exports.createContainer = catchAsync(async (req, res, next) => {
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -294,7 +338,7 @@ exports.getContainerById = catchAsync(async (req, res, next) => {
   // Fetch container metadata first. Children are resolved manually because they can be either
   // Container docs or Lecture docs.
   const container = await Container.findById(containerId).populate([
-    { path: "createdBy", select: "name" },
+    { path: "createdBy", select: "name profilePic" },
     { path: "subject", select: "name" },
     { path: "level", select: "name" },
   ]);
@@ -303,7 +347,7 @@ exports.getContainerById = catchAsync(async (req, res, next) => {
     // Try to find in Lecture model
     const Lecture = require("../models/LectureModel");
     const lecture = await Lecture.findById(containerId).populate([
-      { path: "createdBy", select: "name" },
+      { path: "createdBy", select: "name profilePic" },
       { path: "subject", select: "name" },
       { path: "level", select: "name" },
     ]);
@@ -1026,6 +1070,54 @@ exports.getLecturerRevenueByMonth = catchAsync(async (req, res, next) => {
         totalPurchases: overallPurchaseCount,
         monthsWithRevenue: monthlyRevenue.length,
       },
+    },
+  });
+});
+
+// Recalculate total duration for a container
+exports.recalculateContainerDuration = catchAsync(async (req, res, next) => {
+  const { containerId } = req.params;
+  
+  if (!mongoose.Types.ObjectId.isValid(containerId)) {
+    return next(new AppError("Invalid container ID format.", 400));
+  }
+  
+  const container = await Container.findById(containerId);
+  if (!container) {
+    return next(new AppError("Container not found.", 404));
+  }
+  
+  // Check permissions
+  const canBypassOwnership = ["Admin", "SubAdmin", "Moderator"].includes(req.user?.role);
+  if (!canBypassOwnership && container.createdBy?.toString() !== req.user._id.toString()) {
+    return next(new AppError("You do not have permission to modify this container.", 403));
+  }
+  
+  // Check if container has children (courses, years, terms, etc.)
+  if (!container.children || container.children.length === 0) {
+    return res.status(200).json({
+      status: "success",
+      message: "Container has no children to calculate duration from.",
+      data: {
+        totalDuration: 0,
+        formattedDuration: "0m",
+      },
+    });
+  }
+  
+  // Recalculate duration
+  const duration = await container.recalculateDuration();
+  
+  const hours = Math.floor(duration / 60);
+  const minutes = duration % 60;
+  const formatted = hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
+  
+  res.status(200).json({
+    status: "success",
+    data: {
+      totalDuration: duration,
+      formattedDuration: formatted,
+      durationCalculatedAt: container.durationCalculatedAt,
     },
   });
 });

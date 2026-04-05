@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next"
 import { useState } from "react"
 import { designTokens } from "../constants/designTokens"
 import { resolveLevelDisplayName } from "../utils/levelHierarchy"
+import { Star, Clock, BookOpen, GraduationCap, ArrowUpRight } from "lucide-react"
 
 export const CourseCard = ({
   image,
@@ -17,10 +18,13 @@ export const CourseCard = ({
   childrenCount,
   containerType,
   isRTL,
-  containerImage, // New prop for container image from API
+  containerImage,
+  rating = 4.8,
+  duration,
 }) => {
   const { t, i18n } = useTranslation("home")
   const [imageError, setImageError] = useState(false)
+  const [isHovered, setIsHovered] = useState(false)
   const TOKENS = designTokens.colors
   const SHADOWS = designTokens.shadows
 
@@ -31,19 +35,13 @@ export const CourseCard = ({
     return i18n.language === "ar" ? `${formattedNumber} ${t("currency")}` : `${t("currency")} ${formattedNumber}`
   }
 
-  // Determine the display text for the status
   const getStatusText = () => {
     if (status === "مجاني" || status === "free") return t("free")
     return t("paid")
   }
 
-  // Handle image loading error
-  const handleImageError = () => {
-    setImageError(true)
-  }
+  const isFree = status === "مجاني" || status === "free" || price === 0
 
-  // Determine which image to display
-  // Priority: 1. containerImage from API, 2. image prop, 3. fallback image
   const imageToDisplay = !imageError && containerImage 
     ? containerImage 
     : !imageError && image 
@@ -52,62 +50,141 @@ export const CourseCard = ({
 
   return (
     <div
-      className="h-full overflow-hidden rounded-[1.4rem] border bg-white transition-all"
+      className="group relative h-full overflow-hidden rounded-2xl bg-white transition-all duration-500 ease-out"
       dir={isRTL ? "rtl" : "ltr"}
-      style={{ borderColor: "rgba(17,24,39,0.08)", boxShadow: SHADOWS.level1 }}
+      style={{ 
+        borderColor: "rgba(17,24,39,0.06)",
+        boxShadow: isHovered 
+          ? "0 25px 50px -12px rgba(14, 85, 99, 0.25), 0 12px 24px -8px rgba(14, 85, 99, 0.15)" 
+          : "0 4px 20px rgba(0, 0, 0, 0.08)",
+        transform: isHovered ? "translateY(-8px)" : "translateY(0)",
+      }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
-      <figure className="relative">
+      {/* Image Section with Gradient Overlay */}
+      <figure className="relative h-52 overflow-hidden">
         <img 
-          src={imageToDisplay || "/placeholder.svg"} 
+          src={imageToDisplay} 
           alt={title} 
-          className="w-full h-48 object-cover" 
-          onError={handleImageError}
+          className="h-full w-full object-cover transition-transform duration-700 ease-out"
+          style={{ transform: isHovered ? "scale(1.1)" : "scale(1)" }}
+          onError={() => setImageError(true)}
         />
-        {status && (
-          <div className="absolute top-2 right-2">
+        
+        {/* Gradient Overlay */}
+        <div 
+          className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"
+        />
+        
+        {/* Bottom Info Bar on Image */}
+        <div className="absolute bottom-0 left-0 right-0 p-4">
+          <div className="flex items-center justify-end">
+            {/* Price Display */}
             <div
-              className="rounded-full px-3 py-1 text-xs font-bold"
+              className="rounded-full px-3 py-1 text-sm font-bold"
               style={{
-                background: status === "مجاني" || status === "free" ? "#22c55e" : TOKENS.goldenSand,
-                color: status === "مجاني" || status === "free" ? "#F8FCFF" : TOKENS.inkText,
+                background: isFree ? "rgba(34, 197, 94, 0.95)" : "rgba(255, 255, 255, 0.95)",
+                color: isFree ? "#fff" : TOKENS.deepTeal,
+                boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
               }}
             >
-              {getStatusText()}
+              {isFree ? t("free") : formatPrice()}
             </div>
           </div>
-        )}
+        </div>
       </figure>
+
+      {/* Content Section */}
       <div className="p-5">
-        <h2 className="text-lg font-bold" style={{ color: TOKENS.inkText }}>{title || t("titleFallback")}</h2>
-        <div className="flex flex-wrap gap-2 mt-1">
-          {subject && <div className="rounded-full px-3 py-1 text-xs font-semibold" style={{ background: TOKENS.lightAquaMist, color: TOKENS.deepTeal }}>{subject}</div>}
-          {grade && <div className="rounded-full px-3 py-1 text-xs font-semibold" style={{ background: "#E8EEF7", color: TOKENS.slateText }}>{resolveLevelDisplayName(grade, i18n.language)}</div>}
-          {stage && <div className="rounded-full px-3 py-1 text-xs font-semibold" style={{ background: "#F3F4F6", color: TOKENS.slateText }}>{resolveLevelDisplayName(stage, i18n.language)}</div>}
-          {type && <div className="rounded-full px-3 py-1 text-xs font-semibold" style={{ border: "1px solid rgba(17,24,39,0.14)", color: TOKENS.slateText }}>{type}</div>}
-        </div>
+        {/* Title */}
+        <h2 
+          className="mb-3 text-lg font-bold leading-tight transition-colors duration-300 group-hover:text-[#0E5563]"
+          style={{ color: TOKENS.inkText }}
+        >
+          {title || t("titleFallback")}
+        </h2>
 
-        <div className="flex items-center mt-2">
-          <div className="avatar avatar-placeholder">
-            <div className="rounded-full w-8" style={{ background: TOKENS.deepTeal, color: "#F8FCFF" }}>
-              <span>{teacher?.[0] + (teacher?.[1] || "") || "?"}</span>
+        {/* Tags Row */}
+        <div className="mb-4 flex flex-wrap gap-2">
+          {subject && (
+            <div 
+              className="flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold"
+              style={{ background: TOKENS.lightAquaMist, color: TOKENS.deepTeal }}
+            >
+              {subject}
             </div>
-          </div>
-          <div className={isRTL ? "mr-2" : "ml-2"}>
-            <p className="text-sm font-medium">{teacher || t("teacherFallback")}</p>
-            <p className="text-xs" style={{ color: TOKENS.slateText }}>{teacherRole || t("roleFallback")}</p>
-          </div>
+          )}
+          {grade && (
+            <div 
+              className="flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium"
+              style={{ background: TOKENS.neutralCloud, color: TOKENS.slateText }}
+            >
+              <GraduationCap className="h-3 w-3" />
+              {resolveLevelDisplayName(grade, i18n.language)}
+            </div>
+          )}
+          {duration && (
+            <div 
+              className="flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium"
+              style={{ background: TOKENS.neutralCloud, color: TOKENS.slateText }}
+            >
+              <Clock className="h-3 w-3" />
+              {duration}
+            </div>
+          )}
         </div>
 
-        {childrenCount > 0 && (
-          <div className="mt-2 text-sm" style={{ color: TOKENS.slateText }}>{t("lessonsCount", { count: childrenCount })}</div>
-        )}
-
-        {containerType && containerType !== "course" && (
-          <div className="mt-2 text-xs" style={{ color: TOKENS.slateText }}>
-            {t("containerType")}: {containerType}
+        {/* Instructor Section */}
+        <div 
+          className="flex items-center gap-3 rounded-xl p-3 transition-colors duration-300"
+          style={{ 
+            background: isHovered ? TOKENS.lightAquaMist : TOKENS.neutralCloud,
+          }}
+        >
+          {/* Avatar */}
+          <div 
+            className="flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold"
+            style={{ background: TOKENS.deepTeal, color: "#fff" }}
+          >
+            {teacher?.[0]?.toUpperCase() || "?"}
           </div>
-        )}
+          
+          {/* Info */}
+          <div className="flex-1 min-w-0">
+            <p className="truncate text-sm font-semibold" style={{ color: TOKENS.inkText }}>
+              {teacher || t("teacherFallback")}
+            </p>
+            <p className="truncate text-xs" style={{ color: TOKENS.slateText }}>
+              {teacherRole || t("roleFallback")}
+            </p>
+          </div>
+
+          {/* Arrow Indicator on Hover */}
+          <div 
+            className="flex h-8 w-8 items-center justify-center rounded-full transition-all duration-300"
+            style={{ 
+              background: isHovered ? TOKENS.deepTeal : "transparent",
+              opacity: isHovered ? 1 : 0,
+              transform: isHovered ? "translateX(0)" : `translateX(${isRTL ? '-10px' : '10px'})`,
+            }}
+          >
+            <ArrowUpRight 
+              className="h-4 w-4 transition-colors duration-300"
+              style={{ color: isHovered ? "#fff" : TOKENS.deepTeal }}
+            />
+          </div>
+        </div>
       </div>
+
+      {/* Bottom Accent Line */}
+      <div 
+        className="absolute bottom-0 left-0 h-1 transition-all duration-500 ease-out"
+        style={{ 
+          background: `linear-gradient(90deg, ${TOKENS.deepTeal}, ${TOKENS.softCyanTeal})`,
+          width: isHovered ? "100%" : "0%",
+        }}
+      />
     </div>
   )
 }

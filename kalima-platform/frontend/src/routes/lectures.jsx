@@ -401,6 +401,31 @@ export const getLectureById = async (lectureId) => {
   }
 }
 
+// Function to get enrollment count for a course
+export const getEnrollmentCount = async (containerId) => {
+  try {
+    if (!containerId) {
+      throw new Error(translateErrorMessage("Missing container ID"));
+    }
+
+    const response = await axios.get(
+      `${API_URL}/containers/${containerId}/enrollment-count`
+    );
+
+    return {
+      success: true,
+      count: response.data.data?.enrollmentCount || 0,
+      data: response.data,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      count: 0,
+      error: translateErrorMessage(error.response?.data?.message || "Failed to fetch enrollment count"),
+    };
+  }
+};
+
 // Function to delete a container by ID
 export const deleteContainerById = async (containerId) => {
   try {
