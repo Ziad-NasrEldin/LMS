@@ -14,7 +14,7 @@ import { getAllSubjects } from "../../../routes/courses"
 
 import { getAllLevels } from "../../../routes/levels"
 
-import { createLecture, updateLecture, createLectureAttachment, getLectureById, getMyContainers } from "../../../routes/lectures"
+import { createLecture, updateLecture, createLectureAttachment, getLectureById, getMyContainers, deleteLecture } from "../../../routes/lectures"
 
 import { getAllLectures } from "../../../routes/lectures"
 
@@ -363,6 +363,38 @@ const MyLecturesPage = () => {
   const closeLectureModal = () => {
 
     setLectureModalState({ mode: null, target: null })
+
+  }
+
+
+
+  const handleDeleteLecture = async (lecture) => {
+
+    const lectureId = lecture?._id || lecture?.id
+
+    if (!lectureId) return
+
+    if (!window.confirm(t("lecturesPage.buttons.confirmDelete", "Are you sure you want to delete this lecture? This action cannot be undone."))) return
+
+    try {
+
+      const result = await deleteLecture(lectureId)
+
+      if (result?.success) {
+
+        setLectures((prev) => prev.filter((l) => (l._id || l.id) !== lectureId))
+
+      } else {
+
+        setError(translateErrorMessage(result?.message || t("lecturesPage.buttons.deleteError", "Failed to delete lecture")))
+
+      }
+
+    } catch (err) {
+
+      setError(translateErrorMessage(t("lecturesPage.buttons.deleteError", "Failed to delete lecture")))
+
+    }
 
   }
 
@@ -1688,6 +1720,26 @@ const MyLecturesPage = () => {
 
                   )}
 
+                  {!isStudentLikeRole && (
+
+                    <button
+
+                      type="button"
+
+                      className="btn btn-sm border-none"
+
+                      style={{ background: "#EF4444", color: "#fff" }}
+
+                      onClick={() => handleDeleteLecture(lecture)}
+
+                    >
+
+                      {t("lecturesPage.buttons.delete", "Delete")}
+
+                    </button>
+
+                  )}
+
                 </div>
 
               </div>
@@ -1875,6 +1927,26 @@ const MyLecturesPage = () => {
                             >
 
                               {t("lecturesPage.buttons.edit", "Edit")}
+
+                            </button>
+
+                          )}
+
+                          {!isStudentLikeRole && (
+
+                            <button
+
+                              type="button"
+
+                              className="btn btn-sm border-none"
+
+                              style={{ background: "#EF4444", color: "#fff" }}
+
+                              onClick={() => handleDeleteLecture(lecture)}
+
+                            >
+
+                              {t("lecturesPage.buttons.delete", "Delete")}
 
                             </button>
 

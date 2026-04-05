@@ -17,11 +17,15 @@
       "close": "Close",
       "createNewLecture": "Create New Lecture",
       "details": "Details",
-      "edit": "Edit"
+      "edit": "Edit",
+      "delete": "Delete",
+      "confirmDelete": "Are you sure you want to delete this lecture? This action cannot be undone.",
+      "deleteError": "Failed to delete lecture. Please try again."
     },
     "messages": {
       "lectureUpdatedSuccessfully": "Lecture updated successfully",
-      "lectureCreatedSuccessfully": "Lecture created successfully"
+      "lectureCreatedSuccessfully": "Lecture created successfully",
+      "lectureDeletedSuccessfully": "Lecture deleted successfully"
     },
     "filters": {
       "allSubjects": "All Subjects",

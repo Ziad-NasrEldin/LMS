@@ -17,11 +17,15 @@
       "close": "إغلاق",
       "createNewLecture": "إنشاء محاضرة جديدة",
       "details": "التفاصيل",
-      "edit": "تعديل"
+      "edit": "تعديل",
+      "delete": "حذف",
+      "confirmDelete": "هل أنت متأكد من حذف هذه المحاضرة؟ لا يمكن التراجع عن هذا الإجراء.",
+      "deleteError": "فشل في حذف المحاضرة. يرجى المحاولة مرة أخرى."
     },
     "messages": {
       "lectureUpdatedSuccessfully": "تم تحديث المحاضرة بنجاح",
-      "lectureCreatedSuccessfully": "تم إنشاء المحاضرة بنجاح"
+      "lectureCreatedSuccessfully": "تم إنشاء المحاضرة بنجاح",
+      "lectureDeletedSuccessfully": "تم حذف المحاضرة بنجاح"
     },
     "filters": {
       "allSubjects": "كل المواد",

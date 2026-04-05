@@ -937,7 +937,7 @@ export default function CourseDetails() {
       }
       
       if (result.status === 'success') {
-        setReviewSuccess(myReview ? 'Review updated successfully!' : 'Review submitted successfully!')
+        setReviewSuccess(myReview ? t('reviews.updatedSuccess') : t('reviews.submittedSuccess'))
         setMyReview(result.data)
         // Refresh reviews list
         const reviewsResult = await getCourseReviews(courseId)
@@ -947,10 +947,10 @@ export default function CourseDetails() {
         }
         setTimeout(() => setReviewSuccess(''), 3000)
       } else {
-        setReviewError(result.message || 'Failed to submit review')
+        setReviewError(result.message || t('reviews.submitError'))
       }
     } catch (err) {
-      setReviewError('An error occurred. Please try again.')
+      setReviewError(t('reviews.unexpectedError'))
     } finally {
       setReviewLoading(false)
     }
@@ -958,14 +958,14 @@ export default function CourseDetails() {
 
   // Handle review deletion
   const handleDeleteReview = async () => {
-    if (!confirm('Are you sure you want to delete your review?')) return
-    
+    if (!confirm(t('reviews.confirmDelete'))) return
+
     setReviewLoading(true)
     const result = await deleteMyReview(courseId)
     if (result.status === 'success') {
       setMyReview(null)
       setReviewForm({ rating: 5, comment: '' })
-      setReviewSuccess('Review deleted successfully')
+      setReviewSuccess(t('reviews.deletedSuccess'))
       // Refresh reviews list
       const reviewsResult = await getCourseReviews(courseId)
       if (reviewsResult.status === 'success') {

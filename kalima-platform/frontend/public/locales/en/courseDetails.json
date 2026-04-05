@@ -93,6 +93,13 @@
     "noReviewsYet": "No reviews yet. Be the first to review this course!",
     "anonymous": "Anonymous",
     "adminResponse": "Admin Response",
+    "submittedSuccess": "Review submitted successfully!",
+    "updatedSuccess": "Review updated successfully!",
+    "deletedSuccess": "Review deleted successfully.",
+    "submitError": "Failed to submit review. Please try again.",
+    "unexpectedError": "An error occurred. Please try again.",
+    "confirmDelete": "Are you sure you want to delete your review?",
+    "fetchError": "Failed to load reviews. Please try again.",
     "r1": {
       "name": "Ahmed Hassan",
       "role": "Engineering Student",
