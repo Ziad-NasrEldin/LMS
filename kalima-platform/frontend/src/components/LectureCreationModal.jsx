@@ -301,7 +301,6 @@ const LectureCreationModal = ({
     setNewDescription("")
     setNewPrice(0)
     setNewVideoLink("")
-    setNewLectureType("Revision")
     resetAttachmentState()
     setThumbnailFile(null)
     setThumbnailPreview(null)

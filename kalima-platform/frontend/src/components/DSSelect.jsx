@@ -222,53 +222,6 @@ export default function DSSelect({
       }
     }, 10)
     
-    // Simple fixed scroll based on number of options
-    setTimeout(() => {
-      if (wrapperRef.current) {
-        const scrollContainer = wrapperRef.current.closest('.custom-scrollbar') || 
-                              wrapperRef.current.closest('[class*="overflow-y"]') ||
-                              document.documentElement
-        
-        // Calculate scroll distance: 40px per option
-        const scrollDistance = enabledOptions.length * 40
-        
-        if (scrollContainer !== document.documentElement) {
-          // For custom scroll container - try smooth scroll first
-          if (scrollContainer.scrollTo) {
-            scrollContainer.scrollTo({
-              top: scrollContainer.scrollTop + scrollDistance,
-              behavior: 'smooth'
-            })
-          } else {
-            // Fallback - animate manually
-            const startScroll = scrollContainer.scrollTop
-            const targetScroll = startScroll + scrollDistance
-            const duration = 300 // ms
-            const startTime = performance.now()
-            
-            const animateScroll = (currentTime) => {
-              const elapsed = currentTime - startTime
-              const progress = Math.min(elapsed / duration, 1)
-              const easeProgress = 1 - Math.pow(1 - progress, 3) // Ease out cubic
-              
-              scrollContainer.scrollTop = startScroll + (targetScroll - startScroll) * easeProgress
-              
-              if (progress < 1) {
-                requestAnimationFrame(animateScroll)
-              }
-            }
-            
-            requestAnimationFrame(animateScroll)
-          }
-        } else {
-          // For document scrolling
-          window.scrollBy({
-            top: scrollDistance,
-            behavior: 'smooth'
-          })
-        }
-      }
-    }, 50)
   }
 
   const closeMenu = () => {

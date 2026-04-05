@@ -584,8 +584,8 @@ const PromoCodes = () => {
                 <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
                   {!loading && lectureAccess.map((access, index) => (
                     <article key={`${access?.lecture?._id || "lecture"}-${index}`} className="rounded-xl border p-3" style={{ borderColor: "rgba(17,24,39,0.08)" }}>
-                      <p className="font-bold">{access.lecture.name}</p>
-                      <p className="text-sm" style={{ color: TOKENS.slateText }}>{access.lecture.description || t("noDescription")}</p>
+                      <p className="font-bold">{access.lecture?.name || "-"}</p>
+                      <p className="text-sm" style={{ color: TOKENS.slateText }}>{access.lecture?.description || t("noDescription")}</p>
                       <p className="text-xs mt-1" style={{ color: TOKENS.slateText }}>{access.remainingViews} {t("views")}</p>
                     </article>
                   ))}
@@ -599,7 +599,7 @@ const PromoCodes = () => {
               <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
                 {examScores.map((exam, index) => (
                   <article key={`${exam?.lecture?._id || "exam"}-${index}`} className="rounded-xl border p-3" style={{ borderColor: "rgba(17,24,39,0.08)" }}>
-                    <p className="font-bold">{exam.lecture.name}</p>
+                    <p className="font-bold">{exam.lecture?.name || "-"}</p>
                     <p className="text-sm">{t("exams.score")}: {exam.score}/{exam.maxScore}</p>
                     <p className={`text-xs font-semibold ${exam.passed ? "text-green-600" : "text-red-600"}`}>
                       {exam.passed ? t("exams.passed") : t("exams.failed")}

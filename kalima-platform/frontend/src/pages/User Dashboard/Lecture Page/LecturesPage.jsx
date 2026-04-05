@@ -1116,35 +1116,41 @@ const MyLecturesPage = () => {
 
 
 
-      let lectureId = null
+      let resolvedLectureId = isEditMode ? lectureId : null
 
-      if (response.data && response.data.lecture && response.data.lecture._id) {
+      if (!resolvedLectureId) {
+        if (response.data && response.data.lecture && response.data.lecture._id) {
 
-        lectureId = response.data.lecture._id
+          resolvedLectureId = response.data.lecture._id
 
-      } else if (response.data && response.data._id) {
+        } else if (response.data && response.data._id) {
 
-        lectureId = response.data._id
+          resolvedLectureId = response.data._id
 
-      } else if (response.data && response.data.lecture && response.data.lecture.id) {
+        } else if (response.data && response.data.lecture && response.data.lecture.id) {
 
-        lectureId = response.data.lecture.id
+          resolvedLectureId = response.data.lecture.id
 
-      } else if (response.data && response.data.id) {
+        } else if (response.data && response.data.id) {
 
-        lectureId = response.data.id
+          resolvedLectureId = response.data.id
 
+        } else if (response.data && response.data.container && response.data.container._id) {
+
+          resolvedLectureId = response.data.container._id
+
+        }
       }
 
 
 
-      if (lectureId) {
+      if (resolvedLectureId) {
 
         try {
 
           await uploadLectureAttachments(
 
-            lectureId,
+            resolvedLectureId,
 
             attachmentFilesByCategory,
 
