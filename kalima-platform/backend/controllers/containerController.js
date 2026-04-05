@@ -458,6 +458,16 @@ exports.getContainerById = catchAsync(async (req, res, next) => {
     }
   }
 
+  // Auto-recalculate totalDuration if it hasn't been computed yet (first visit for this course).
+  // After the first calculation, Redis caches the result for 24h so subsequent fetches are instant.
+  if ((!container.totalDuration || container.totalDuration === 0) && container.children?.length > 0) {
+    try {
+      await container.recalculateDuration();
+    } catch (err) {
+      // Non-fatal: serve the page with 0 duration rather than failing the request
+    }
+  }
+
   // Convert to plain object so we can add inherited image info
   const responseData = container.toObject
     ? container.toObject()

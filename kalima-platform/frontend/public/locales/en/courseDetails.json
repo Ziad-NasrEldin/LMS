@@ -1,202 +1,289 @@
 {
+  "header": {
+    "title": "My Courses"
+  },
 
-    "header": {
+  "tabs": {
+    "overview": "Overview",
+    "syllabus": "Syllabus",
+    "reviews": "Reviews",
+    "instructors": "Instructors",
+    "faq": "FAQ"
+  },
 
-      "title": "My Courses"
+  "stats": {
+    "level": "Level",
+    "students": "Students",
+    "duration": "Duration",
+    "updated": "Updated"
+  },
 
+  "details": {
+    "title": "Course Details",
+    "teacher": "Teacher",
+    "teacherName": "Instructor",
+    "lectures": "Lectures Count",
+    "lecturesCount": "10",
+    "grade": "Level",
+    "gradeLevel": "All Levels",
+    "views": "Views",
+    "viewsCount": "1240 views",
+    "level": "Level",
+    "totalEnrolled": "Total Enrolled",
+    "language": "Language",
+    "certification": "Certification"
+  },
+
+  "level": {
+    "beginner": "Beginner",
+    "intermediate": "Intermediate",
+    "advanced": "Advanced"
+  },
+
+  "language": {
+    "arabic": "Arabic",
+    "english": "English"
+  },
+
+  "hero": {
+    "taughtBy": "Taught by",
+    "wishlist": "Wishlist",
+    "wishlisted": "Wishlisted",
+    "share": "Share",
+    "courseVisual": "Course Visual",
+    "shareText": "Check out this course: {{title}}"
+  },
+
+  "overview": {
+    "masteringCourse": "Mastering the Course",
+    "didYouKnow": "Did you know?",
+    "courseDescription": "This course is designed to provide comprehensive learning with practical applications and real-world examples."
+  },
+
+  "syllabus": {
+    "purchased": "Purchased",
+    "paid": "Paid",
+    "free": "Free",
+    "unlocked": "Unlocked",
+    "items": "items",
+    "quickView": "Quick View",
+    "noContent": "No content available yet",
+    "modulesCount": "{{modules}} Modules • {{lectures}} Lectures",
+    "courseContent": "Course Content"
+  },
+
+  "reviews": {
+    "courseRating": "Course Rating",
+    "basedOn": "Based on verified students",
+    "breakdown": "Rating Breakdown",
+    "star": "star",
+    "testimonials": "Student Testimonials",
+    "helpful": "Helpful",
+    "report": "Report",
+    "r1": {
+      "name": "Ahmed Hassan",
+      "role": "Engineering Student",
+      "date": "October 2023",
+      "text": "This course completely changed the way I understand the subject. The instructor explains complex concepts in a clear, structured way. I highly recommend it to anyone looking to deepen their knowledge."
     },
-
-    "details": {
-
-      "title": "Course Details",
-
-      "teacher": "Teacher",
-
-      "teacherName": "Mr. Yusuf Othman",
-
-      "lectures": "Lectures Count",
-
-      "lecturesCount": "10",
-
-      "grade": "Level",
-
-      "gradeLevel": "All Levels",
-
-      "views": "Views",
-
-      "viewsCount": "1240 views"
-
+    "r2": {
+      "name": "Nour El-Din",
+      "role": "MSc. Student",
+      "date": "September 2023",
+      "text": "Excellent content and a well-organized curriculum. The practical examples helped me connect theory to real applications. I would have appreciated more exercises, but overall a fantastic resource."
     },
-
-    "courseDescription": {
-
-      "title": "Course Name:",
-
-      "name": "English Language",
-
-      "description": "This course aims to develop learners' skills in English language including reading, writing, listening, and speaking. The course covers basic grammar, vocabulary, and pronunciation, with a focus on using the language in daily situations.",
-
-      "level": "Level: Beginner/Intermediate/Advanced",
-
-      "duration": "Duration: 10 weeks",
-
-      "objectivesTitle": "Course Objectives:",
-
-      "imageAlt": "Teacher with books",
-
-        "descriptionTitle": "Course Description:",
-
-      "objectives": [
-
-        "Develop vocabulary and improve grammar usage",
-
-        "Enhance speaking and listening skills with confidence",
-
-        "Improve reading and writing skills"
-
-      ]
-
-    },
-
-    "plan": {
-
-      "title": "Course Plan",
-
-      "decorationAlt": "Decorative Image",
-
-      "months": [
-
-        {
-
-          "month": "January",
-
-          "items": [
-
-            { "lesson": "Lesson 1: Introduction to React", "time": 30 },
-
-            { "lesson": "Lesson 2: React Components", "time": 45 }
-
-          ]
-
-        },
-
-        {
-
-          "month": "February",
-
-          "items": [
-
-            { "lesson": "Lesson 1: Component State", "time": 30 },
-
-            { "lesson": "Lesson 2: Events in React", "time": 45 }
-
-          ]
-
-        }
-
-      ]
-
-    },
-
-    "buttons": {
-
-      "subscribe": "Subscribe Now"
-
-    },
-
-    "errors": {
-
-      "fetchError": "Failed to fetch course details",
-
-      "unexpected": "An unexpected error occurred"
-
-    },
-
-    "containerTypes": {
-
-      "course": "Course",
-
-      "year": "Year",
-
-      "term": "Term",
-
-      "month": "Month",
-
-      "lecture": "Lecture"
-
-    },
-
-    "pricing": {
-
-      "points": "EGP",
-
-      "free": "Free"
-
-    },
-
-    "purchase": {
-
-      "purchased": "Purchased",
-
-      "availableInCourse": "Available in Course",
-
-      "buy": "Buy",
-
-      "getFree": "Get Free",
-
-      "purchaseStatus": "Purchase Status",
-
-      "notPurchased": "Not Purchased",
-
-      "notDetermined": "Not Determined",
-
-      "purchaseSuccess": "Purchase Successful!",
-
-      "purchaseError": "Purchase failed. Please try again.",
-
-      "purchaseInProgress": "Purchasing...",
-
-      "getCourseFree": "Get Course for Free",
-
-      "buyCourse": "Buy Course"
-
-    },
-
-    "courseInfo": {
-
-      "price": "Price",
-
-      "level": "Level",
-
-      "subject": "Subject",
-
-      "courseObjectives": "Course Objectives",
-
-      "courseContents": "Course Contents"
-
-    },
-
-    "actions": {
-
-      "show": "Show",
-
-      "hide": "Hide"
-
-    },
-
-    "errors": {
-
-      "fetchError": "Failed to fetch course data",
-
-      "unexpected": "An unexpected error occurred",
-
-      "purchaseError": "Purchase failed. Please try again.",
-
-      "purchaseProcessError": "An error occurred during purchase",
-
-      "courseNotFound": "Course not found"
-
+    "r3": {
+      "name": "Sara Khalil",
+      "role": "Undergraduate Student",
+      "date": "August 2023",
+      "text": "This course was the turning point for my exams. The breakdown of key concepts made the material finally make sense in a real context. Highly recommended for anyone struggling with this subject."
     }
+  },
 
-  }
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "subtitle": "Everything you need to know about this course.",
+    "q1": "What are the prerequisites for this course?",
+    "a1": "No prior experience is required. This course is designed to be accessible to all learners. A basic understanding of the subject area will be helpful but is not mandatory.",
+    "q2": "Will I receive a certificate upon completion?",
+    "a2": "Yes! After successfully completing all course content and assessments, you will receive a verified digital certificate that you can share on your LinkedIn profile or include in your CV.",
+    "q3": "How long do I have access to the course?",
+    "a3": "Once you purchase the course, you have lifetime access to all materials. You can revisit lectures and resources anytime at your own pace.",
+    "q4": "Is there a refund policy?",
+    "a4": "We offer a satisfaction guarantee. If you are not happy with the course, please contact our support team within the first week of purchase and we will work with you to find a solution.",
+    "q5": "In what language is the course taught?",
+    "a5": "The course content is delivered in Arabic with supporting materials available in both Arabic and English to ensure all learners can follow along comfortably.",
+    "q6": "How is the course structured?",
+    "a6": "The course is broken into structured modules, each containing video lectures, practical exercises, and quizzes. You can progress at your own pace and revisit any section as needed.",
+    "ctaTitle": "Still have questions?",
+    "ctaDesc": "Our support team is ready to help you with anything you need.",
+    "ctaButton": "Contact Support"
+  },
 
+  "instructors": {
+    "title": "Meet Your Instructor",
+    "subtitle": "Learn directly from an expert who brings both academic knowledge and real-world experience.",
+    "leadBadge": "Lead Instructor",
+    "instructorRole": "Course Instructor",
+    "bio": "An experienced educator dedicated to making complex concepts accessible. This course reflects years of teaching experience and a deep passion for helping students succeed.",
+    "rating": "Rating",
+    "courseInfo": "Course Information",
+    "subject": "Subject",
+    "ctaTitle": "Ready to Start?",
+    "ctaTitlePurchased": "You're Enrolled!",
+    "ctaDesc": "Join hundreds of students learning with this instructor.",
+    "ctaDescPurchased": "Access all your course content from the dashboard."
+  },
+
+  "sidebar": {
+    "courseDetailsTitle": "Course Details",
+    "whoIsThisFor": "Who is this course for",
+    "whatYouWillGet": "What you'll get out of this",
+    "free": "Free"
+  },
+
+  "modal": {
+    "purchaseSuccess": "Purchase Successful!",
+    "purchaseSuccessDesc": "Your purchase was successful and is now available in your dashboard. Would you like to go to your dashboard now?"
+  },
+
+  "misc": {
+    "enrolled": "Enrolled",
+    "students": "Students",
+    "yes": "Yes",
+    "no": "No",
+    "notAvailable": "Not available",
+    "processing": "Processing...",
+    "getFree": "Get Free",
+    "buyNow": "Buy Now",
+    "goToDashboard": "Go to Dashboard",
+    "later": "Later",
+    "linkCopied": "Link copied to clipboard!",
+    "contentComingSoonSuffix": "content coming soon...",
+    "general": "General",
+    "instructor": "Instructor",
+    "outcome1": "Master the course content",
+    "outcome2": "Gain practical skills"
+  },
+
+  "courseDescription": {
+    "title": "Course Name:",
+    "name": "Course",
+    "description": "This course aims to develop learners' skills with a focus on using knowledge in real situations.",
+    "level": "Level: Beginner / Intermediate / Advanced",
+    "duration": "Duration: 10 weeks",
+    "objectivesTitle": "Course Objectives:",
+    "imageAlt": "Teacher with books",
+    "descriptionTitle": "Course Description:",
+    "objectives": [
+      "Develop vocabulary and improve grammar usage",
+      "Enhance speaking and listening skills with confidence",
+      "Improve reading and writing skills"
+    ]
+  },
+
+  "plan": {
+    "title": "Course Plan",
+    "decorationAlt": "Decorative Image",
+    "months": [
+      {
+        "month": "January",
+        "items": [
+          { "lesson": "Lesson 1: Introduction", "time": 30 },
+          { "lesson": "Lesson 2: Core Concepts", "time": 45 }
+        ]
+      },
+      {
+        "month": "February",
+        "items": [
+          { "lesson": "Lesson 1: Applied Practice", "time": 30 },
+          { "lesson": "Lesson 2: Advanced Topics", "time": 45 }
+        ]
+      }
+    ]
+  },
+
+  "buttons": {
+    "subscribe": "Subscribe Now"
+  },
+
+  "errors": {
+    "fetchError": "Failed to fetch course data",
+    "unexpected": "An unexpected error occurred",
+    "purchaseError": "Purchase failed. Please try again.",
+    "purchaseProcessError": "An error occurred during purchase",
+    "courseNotFound": "Course not found"
+  },
+
+  "containerTypes": {
+    "course": "Course",
+    "year": "Year",
+    "term": "Term",
+    "month": "Month",
+    "lecture": "Lecture"
+  },
+
+  "pricing": {
+    "points": "EGP",
+    "free": "Free"
+  },
+
+  "purchase": {
+    "purchased": "Purchased",
+    "availableInCourse": "Available in Course",
+    "buy": "Buy",
+    "getFree": "Get Free",
+    "purchaseStatus": "Purchase Status",
+    "notPurchased": "Not Purchased",
+    "notDetermined": "Not Determined",
+    "purchaseSuccess": "Purchase Successful!",
+    "purchaseError": "Purchase failed. Please try again.",
+    "purchaseInProgress": "Purchasing...",
+    "getCourseFree": "Get Course for Free",
+    "buyCourse": "Buy Course"
+  },
+
+  "courseInfo": {
+    "price": "Price",
+    "level": "Level",
+    "subject": "Subject",
+    "courseObjectives": "Course Objectives",
+    "courseContents": "Course Contents"
+  },
+
+  "actions": {
+    "show": "Show",
+    "hide": "Hide"
+  },
+
+  "courseContent": "Course Content",
+  "taughtBy": "Taught by",
+  "wishlist": "Wishlist",
+  "wishlisted": "Wishlisted",
+  "share": "Share",
+  "courseVisual": "Course Visual",
+  "masteringCourse": "Mastering the Course",
+  "didYouKnow": "Did you know?",
+  "free": "Free",
+  "notAvailable": "Not available",
+  "instructor": "Instructor",
+  "general": "General",
+  "outcome1": "Master the course content",
+  "outcome2": "Gain practical skills",
+  "enrolled": "Enrolled",
+  "students": "Students",
+  "yes": "Yes",
+  "no": "No",
+  "contentComingSoonSuffix": "content coming soon...",
+  "processing": "Processing...",
+  "getFree": "Get Free",
+  "buyNow": "Buy Now",
+  "goToDashboard": "Go to Dashboard",
+  "later": "Later",
+  "linkCopied": "Link copied to clipboard!",
+  "purchaseSuccess": "Purchase Successful!",
+  "purchaseSuccessDesc": "Your purchase was successful and is now available in your dashboard. Would you like to go to your dashboard now?",
+  "courseDetailsTitle": "Course Details",
+  "whoIsThisFor": "Who is this course for",
+  "whatYouWillGet": "What you'll get out of this"
+}

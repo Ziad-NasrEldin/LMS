@@ -213,7 +213,7 @@ containerSchema.methods.recalculateDuration = async function() {
   // Try to get from Redis cache first
   await durationCache.connect();
   const cachedDuration = await durationCache.getDuration(containerId);
-  if (cachedDuration !== null) {
+  if (cachedDuration !== null && cachedDuration > 0) {
     this.totalDuration = cachedDuration;
     this.durationCalculatedAt = new Date();
     await this.save({ validateBeforeSave: false });

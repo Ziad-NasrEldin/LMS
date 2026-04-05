@@ -426,6 +426,20 @@ export const getEnrollmentCount = async (containerId) => {
   }
 };
 
+// Trigger backend recalculation of total duration for a container (uses YouTube API + Redis cache)
+export const recalculateContainerDuration = async (containerId) => {
+  try {
+    const response = await axios.post(
+      `${API_URL}/containers/${containerId}/recalculate-duration`,
+      {},
+      authConfig()
+    )
+    return { success: true, data: response.data.data }
+  } catch (error) {
+    return { success: false, error: error.response?.data?.message || "Failed to recalculate duration" }
+  }
+}
+
 // Function to delete a container by ID
 export const deleteContainerById = async (containerId) => {
   try {

@@ -103,6 +103,64 @@ function formatMins(mins) {
   return `${m}m`
 }
 
+// Recursively walk the course tree to collect all YouTube video IDs from leaf lectures.
+// Each level's children may be full objects (already fetched) or bare IDs that need fetching.
+async function collectVideoIds(children) {
+  const videoIds = []
+  const toFetch = []
+
+  for (const child of children) {
+    const item = typeof child === 'string' || !child.type
+      ? null   // bare ID — needs fetching
+      : child
+    if (!item) { toFetch.push(typeof child === 'string' ? child : (child._id || child.id)); continue }
+
+    if (item.type === 'lecture') {
+      const vid = item.videoLink ? getYouTubeId(item.videoLink) : null
+      if (vid) videoIds.push(vid)
+    } else if (item.children?.length) {
+      toFetch.push(...item.children)
+    }
+  }
+
+  if (toFetch.length) {
+    const fetched = await Promise.all(
+      toFetch.map(id => {
+        const strId = typeof id === 'string' ? id : (id._id || id.id)
+        return fetch(`${import.meta.env.VITE_API_URL}/containers/${strId}`, { credentials: 'include' })
+          .then(r => r.ok ? r.json() : null)
+          .then(r => r?.data || null)
+          .catch(() => null)
+      })
+    )
+    const nested = await collectVideoIds(fetched.filter(Boolean))
+    videoIds.push(...nested)
+  }
+
+  return videoIds
+}
+
+// Batch-fetch durations from YouTube API (50 IDs per request) and return total minutes.
+async function fetchTotalMinutesFromYouTube(videoIds) {
+  if (!videoIds.length || !YOUTUBE_API_KEY) return 0
+  const unique = [...new Set(videoIds)]
+  let total = 0
+  for (let i = 0; i < unique.length; i += 50) {
+    const batch = unique.slice(i, i + 50).join(',')
+    try {
+      const r = await fetch(
+        `https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=${batch}&key=${YOUTUBE_API_KEY}`
+      )
+      const d = await r.json()
+      d.items?.forEach(item => {
+        const m = (item.contentDetails?.duration || '').match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/)
+        if (m) total += parseInt(m[1]||0)*60 + parseInt(m[2]||0) + (parseInt(m[3]||0) > 30 ? 1 : 0)
+      })
+    } catch { /* skip batch on error */ }
+  }
+  return total
+}
+
 const CONTAINER_TYPE_CONFIG = {
   course:  { bg: 'rgba(14,85,99,0.12)',   text: '#0E5563' },
   year:    { bg: 'rgba(20,106,120,0.12)',  text: '#146A78' },
@@ -132,7 +190,7 @@ const LectureRow = ({ item, depth, isPurchased, onPurchase, purchaseInProgress, 
   return (
     <div
       className="flex items-center gap-3 border-b last:border-b-0 transition-colors hover:bg-black/[0.018] group"
-      style={{ borderColor: 'rgba(17,24,39,0.05)', padding: `11px 16px 11px ${indentPx}px` }}
+      style={{ borderColor: 'rgba(17,24,39,0.05)', paddingTop: '11px', paddingBottom: '11px', paddingInlineEnd: '16px', paddingInlineStart: `${indentPx}px` }}
     >
       {/* Icon */}
       <div
@@ -166,7 +224,7 @@ const LectureRow = ({ item, depth, isPurchased, onPurchase, purchaseInProgress, 
             style={{ background: `linear-gradient(135deg, ${tokens.deepTeal}, ${tokens.softCyanTeal})` }}
           >
             <Play size={10} />
-            {isRTL ? 'عرض سريع' : 'Quick View'}
+            {t('syllabus.quickView')}
           </button>
         ) : typeof item?.price === 'number' ? (
           <button
@@ -248,7 +306,7 @@ const ContainerRow = ({ item, depth, isPurchased, onPurchase, purchaseInProgress
   return (
     <div
       className="border-b last:border-b-0"
-      style={{ borderColor: 'rgba(17,24,39,0.06)', marginLeft: `${indentPx}px` }}
+      style={{ borderColor: 'rgba(17,24,39,0.06)', marginInlineStart: `${indentPx}px` }}
     >
       {/* Accordion Header */}
       <div
@@ -259,7 +317,7 @@ const ContainerRow = ({ item, depth, isPurchased, onPurchase, purchaseInProgress
         className="w-full flex items-center gap-3 text-left transition-colors hover:bg-black/[0.02] focus:outline-none cursor-pointer"
         style={{
           padding: `13px 16px`,
-          borderLeft: depth > 0 ? `3px solid ${accentColor}30` : 'none',
+          borderInlineStart: depth > 0 ? `3px solid ${accentColor}30` : 'none',
         }}
       >
         {/* Expand icon */}
@@ -282,51 +340,55 @@ const ContainerRow = ({ item, depth, isPurchased, onPurchase, purchaseInProgress
 
         {/* Title & meta */}
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="font-bold text-sm leading-snug" style={{ color: tokens.inkText }}>{item?.name}</span>
-            <span
-              className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full flex-shrink-0"
-              style={{ background: typeConfig.bg, color: typeConfig.text }}
-            >
-              {typeLabel}
-            </span>
-            {purchased && (
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0" style={{ background: 'rgba(22,163,74,0.12)', color: '#15803d' }}>
-                {isRTL ? 'مفتوح' : 'Unlocked'}
-              </span>
-            )}
-          </div>
-          <div className="flex items-center gap-3 mt-0.5 flex-wrap">
-            {childCount > 0 && (
-              <span className="text-[11px]" style={{ color: tokens.slateText }}>
-                {childCount} {isRTL ? 'عناصر' : 'items'}
-              </span>
-            )}
-            {item?.duration > 0 && (
-              <span className="text-[11px] flex items-center gap-1" style={{ color: tokens.slateText }}>
-                <Clock size={10} /> {formatMins(item.duration)}
-              </span>
+          <div className="flex items-start justify-between gap-2">
+            <div className="min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="font-bold text-sm leading-snug" style={{ color: tokens.inkText }}>{item?.name}</span>
+                <span
+                  className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full flex-shrink-0"
+                  style={{ background: typeConfig.bg, color: typeConfig.text }}
+                >
+                  {typeLabel}
+                </span>
+                {purchased && (
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0" style={{ background: 'rgba(22,163,74,0.12)', color: '#15803d' }}>
+                    {t('syllabus.unlocked')}
+                  </span>
+                )}
+              </div>
+              <div className="flex items-center gap-3 mt-0.5 flex-wrap">
+                {childCount > 0 && (
+                  <span className="text-[11px]" style={{ color: tokens.slateText }}>
+                    {childCount} {t('syllabus.items')}
+                  </span>
+                )}
+                {item?.duration > 0 && (
+                  <span className="text-[11px] flex items-center gap-1" style={{ color: tokens.slateText }}>
+                    <Clock size={10} /> {formatMins(item.duration)}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Buy button */}
+            {!purchased && typeof item?.price === 'number' && (
+              <button
+                onClick={(e) => { e.stopPropagation(); onPurchase(itemId) }}
+                disabled={purchaseInProgress !== null}
+                className="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold text-white transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:transform-none shadow-sm"
+                style={{ background: item.price > 0 ? tokens.warmMango : tokens.softCyanTeal }}
+              >
+                {purchaseInProgress === itemId ? (
+                  <span className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                ) : item.price > 0 ? (
+                  <><DollarSign size={10} /> {item.price} {t('pricing.points', 'pts')}</>
+                ) : (
+                  <><Unlock size={10} /> {t('purchase.getFree', 'Free')}</>
+                )}
+              </button>
             )}
           </div>
         </div>
-
-        {/* Buy button */}
-        {!purchased && typeof item?.price === 'number' && (
-          <button
-            onClick={(e) => { e.stopPropagation(); onPurchase(itemId) }}
-            disabled={purchaseInProgress !== null}
-            className="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold text-white transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:transform-none shadow-sm"
-            style={{ background: item.price > 0 ? tokens.warmMango : tokens.softCyanTeal }}
-          >
-            {purchaseInProgress === itemId ? (
-              <span className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
-            ) : item.price > 0 ? (
-              <><DollarSign size={10} /> {item.price} {t('pricing.points', 'pts')}</>
-            ) : (
-              <><Unlock size={10} /> {t('purchase.getFree', 'Free')}</>
-            )}
-          </button>
-        )}
       </div>
 
       {/* Children */}
@@ -396,7 +458,8 @@ export default function CourseDetails() {
   const [isWishlisted, setIsWishlisted] = useState(false)
   const [enrollmentCount, setEnrollmentCount] = useState(0)
   const [openFaqIndex, setOpenFaqIndex] = useState(null)
-  
+  const [computedDuration, setComputedDuration] = useState(null)
+
   const courseName = String(courseData?.name || "").trim()
   const canonicalPath = courseData ? buildCoursePath(courseData) : null
   const seoDescription =
@@ -512,6 +575,20 @@ export default function CourseDetails() {
 
     fetchEnrollmentCount()
   }, [courseId])
+
+  // If the backend hasn't pre-calculated the duration, compute it client-side:
+  // walk the course tree, collect all YouTube IDs, batch-fetch from YouTube API.
+  useEffect(() => {
+    if (!courseData) return
+    if (courseData.totalDuration > 0) { setComputedDuration(courseData.totalDuration); return }
+    if (!courseData.children?.length) return
+    collectVideoIds(courseData.children).then(ids => {
+      if (!ids.length) return
+      fetchTotalMinutesFromYouTube(ids).then(mins => {
+        if (mins > 0) setComputedDuration(mins)
+      })
+    })
+  }, [courseData?._id])
 
   // Handle canonical path redirect
   useEffect(() => {
@@ -658,9 +735,7 @@ export default function CourseDetails() {
   const handleShare = async () => {
     const shareUrl = window.location.href
     const shareTitle = courseData?.name || "Course"
-    const shareText = isRTL 
-      ? `اطلع على هذا الكورس: ${shareTitle}`
-      : `Check out this course: ${shareTitle}`
+    const shareText = t('hero.shareText', { title: shareTitle })
 
     if (navigator.share) {
       try {
@@ -762,7 +837,7 @@ export default function CourseDetails() {
     rating: 4.8,
     students: enrollmentCount || 0,
     level: levelName || t("level.beginner", "Beginner"),
-    duration: "2.6 Hours",
+    duration: formatMins(computedDuration) || "—",
     updated: getLastUpdatedDate() || t("notAvailable", "Not available"),
     language: isRTL ? t("language.arabic", "Arabic") : t("language.english", "English (UK)"),
     certification: true,
@@ -954,14 +1029,14 @@ export default function CourseDetails() {
               <div className="flex flex-wrap gap-4">
                 <button
                   onClick={() => setIsWishlisted(!isWishlisted)}
-                  className="flex items-center gap-2 rounded-full bg-white/10 px-8 py-3 font-bold backdrop-blur-md transition-all hover:bg-white/20"
+                  className="flex items-center gap-2 rounded-full bg-white/10 px-5 py-2 sm:px-8 sm:py-3 text-sm sm:text-base font-bold backdrop-blur-md transition-all hover:bg-white/20"
                 >
-                  <Heart className={`h-5 w-5 ${isWishlisted ? 'fill-current' : ''}`} />
+                  <Heart className={`h-4 w-4 sm:h-5 sm:w-5 ${isWishlisted ? 'fill-current' : ''}`} />
                   {isWishlisted ? t("wishlisted", "Wishlisted") : t("wishlist", "Wishlist")}
                 </button>
-                <button 
+                <button
                   onClick={handleShare}
-                  className="flex items-center gap-2 rounded-full border border-white/20 px-8 py-3 font-bold backdrop-blur-md transition-all hover:bg-white/10">
+                  className="flex items-center gap-2 rounded-full border border-white/20 px-5 py-2 sm:px-8 sm:py-3 text-sm sm:text-base font-bold backdrop-blur-md transition-all hover:bg-white/10">
                   <Share2 className="h-5 w-5" />
                   {t("share", "Share")}
                 </button>
@@ -1019,12 +1094,12 @@ export default function CourseDetails() {
               className="rounded-xl p-1.5 shadow-inner"
               style={{ background: TOKENS.neutralCloud }}
             >
-              <div className="flex gap-1 overflow-x-auto">
+              <div className="flex flex-wrap gap-1">
                 {tabs.map((tab) => (
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`flex-1 min-w-[120px] rounded-lg px-6 py-3 text-sm font-bold transition-all whitespace-nowrap ${
+                    className={`flex-1 rounded-lg px-4 py-3 text-sm font-bold transition-all whitespace-nowrap ${
                       activeTab === tab.id
                         ? 'bg-white shadow-sm'
                         : 'hover:bg-white/50'
@@ -1070,7 +1145,7 @@ export default function CourseDetails() {
                         {t("didYouKnow", "Did you know?")}
                       </h4>
                       <p className="text-sm font-medium leading-relaxed" style={{ color: TOKENS.slateText }}>
-                        {t("courseDescription", "This course is designed to provide comprehensive learning with practical applications and real-world examples.")}
+                        {t("overview.courseDescription")}
                       </p>
                     </div>
                   </div>
@@ -1083,24 +1158,22 @@ export default function CourseDetails() {
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                     <div>
                       <h2 className="text-2xl font-black" style={{ color: TOKENS.deepTeal }}>
-                        {t("courseContent", "Course Content")}
+                        {t("syllabus.courseContent")}
                       </h2>
                       <p className="text-sm mt-0.5" style={{ color: TOKENS.slateText }}>
-                        {isRTL
-                          ? `${courseData?.children?.length || 0} وحدة • ${courseData?.lectures?.length || 0} محاضرة`
-                          : `${courseData?.children?.length || 0} Modules • ${courseData?.lectures?.length || 0} Lectures`}
+                        {t('syllabus.modulesCount', { modules: courseData?.children?.length || 0, lectures: courseData?.lectures?.length || 0 })}
                       </p>
                     </div>
                     {/* Legend */}
                     <div className="flex items-center gap-3 flex-wrap">
                       <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full" style={{ background: 'rgba(22,163,74,0.1)', color: '#15803d' }}>
-                        <Unlock size={11} /> {isRTL ? 'مشتراة' : 'Purchased'}
+                        <Unlock size={11} /> {t('syllabus.purchased')}
                       </span>
                       <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full" style={{ background: `${TOKENS.warmMango}18`, color: TOKENS.warmMango }}>
-                        <Lock size={11} /> {isRTL ? 'مدفوعة' : 'Paid'}
+                        <Lock size={11} /> {t('syllabus.paid')}
                       </span>
                       <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full" style={{ background: `${TOKENS.softCyanTeal}15`, color: TOKENS.deepTeal }}>
-                        <Sparkles size={11} /> {isRTL ? 'مجانية' : 'Free'}
+                        <Sparkles size={11} /> {t('syllabus.free')}
                       </span>
                     </div>
                   </div>
@@ -1173,7 +1246,7 @@ export default function CourseDetails() {
                           <Book className="w-8 h-8" style={{ color: TOKENS.deepTeal }} />
                         </div>
                         <p className="font-semibold text-sm" style={{ color: TOKENS.slateText }}>
-                          {isRTL ? 'لا يوجد محتوى متاح بعد' : 'No content available yet'}
+                          {t('syllabus.noContent')}
                         </p>
                       </div>
                     )}
@@ -1383,8 +1456,8 @@ export default function CourseDetails() {
 
                           {isOpen && (
                             <div
-                              className="pb-6 pr-6"
-                              style={{ paddingLeft: isRTL ? '1.5rem' : 'calc(1.5rem + 2.75rem + 1rem)' }}
+                              className="pb-6"
+                              style={{ paddingInlineStart: 'calc(1.5rem + 2.75rem + 1rem)', paddingInlineEnd: '1.5rem' }}
                             >
                               <p className="text-sm leading-relaxed font-medium" style={{ color: TOKENS.slateText }}>
                                 {item.answer}
@@ -1738,7 +1811,7 @@ export default function CourseDetails() {
         <div className="fixed bottom-4 sm:bottom-8 left-1/2 z-50 -translate-x-1/2 rounded-full px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-medium text-white shadow-lg"
           style={{ background: TOKENS.deepTeal }}
         >
-          {isRTL ? t('linkCopiedAr', 'تم نسخ الرابط!') : t('linkCopied', 'Link copied to clipboard!')}
+          {t('linkCopied')}
         </div>
       )}
 
@@ -1753,13 +1826,10 @@ export default function CourseDetails() {
             }}
           >
             <h3 className="text-xl font-bold" style={{ color: TOKENS.deepTeal }}>
-              {isRTL ? t("purchaseSuccessAr", "تم الشراء بنجاح!") : t("purchaseSuccess", "Purchase Successful!")}
+              {t("purchaseSuccess")}
             </h3>
             <p className="py-4 text-base font-medium" style={{ color: TOKENS.inkText }}>
-              {isRTL 
-                ? t("purchaseSuccessDescAr", "تمت عملية الشراء بنجاح، ومحتواك الآن متاح في لوحة التحكم الخاصة بك. هل تود الانتقال إلى لوحة التحكم الآن؟")
-                : t("purchaseSuccessDesc", "Your purchase was successful and is now available in your dashboard. Would you like to go to your dashboard now?")
-              }
+              {t("purchaseSuccessDesc")}
             </p>
             <div className="flex gap-3">
               <button 
