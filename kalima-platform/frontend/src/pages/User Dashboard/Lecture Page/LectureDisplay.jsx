@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import toast from "react-hot-toast";
@@ -400,10 +400,11 @@ const LectureDisplay = () => {
       if (accessResult.status === "restricted") {
         // Handle exam requirements
         if (accessResult.data?.exam?.required) {
+          // FIX: verificationResult URLs take precedence over accessResult
           const resolvedExamUrl = pickFirstUrl(
-            accessResult.data?.exam?.url,
-            verificationResult.data?.exam?.url,
             verificationResult.data?.exam?.examUrl,
+            verificationResult.data?.exam?.url,
+            accessResult.data?.exam?.url,
             legacyExamFormUrl,
           )
 
@@ -436,10 +437,11 @@ const LectureDisplay = () => {
 
         // Handle homework requirements
         if (accessResult.data?.homework?.required && accessResult.status === "restricted") {
+          // FIX: verificationResult URLs take precedence over accessResult
           const resolvedHomeworkUrl = pickFirstUrl(
-            accessResult.data?.homework?.url,
-            verificationResult.data?.homework?.url,
             verificationResult.data?.homework?.homeworkUrl,
+            verificationResult.data?.homework?.url,
+            accessResult.data?.homework?.url,
             legacyHomeworkFormUrl,
           )
 
@@ -496,13 +498,65 @@ const LectureDisplay = () => {
     }
   };
 
-    // Add a useEffect to call verifyExamAndCheckAccess on refresh
-    useEffect(() => {
-      // This will run when the component mounts or when lectureId or userRole changes
-      if (userRole === "Student" && lectureId) {
+  // Add a useEffect to call verifyExamAndCheckAccess on refresh
+  useEffect(() => {
+    // Check for cached verification result
+    const cachedVerification = sessionStorage.getItem(`lecture_verification_${lectureId}`);
+    if (cachedVerification) {
+      try {
+        const parsed = JSON.parse(cachedVerification);
+        // Check if cache is less than 5 minutes old
+        if (parsed.timestamp && (Date.now() - parsed.timestamp) < 300000) {
+          // Restore cached state
+          setExamVerified(parsed.examVerified || false);
+          setHomeworkVerified(parsed.homeworkVerified || false);
+          setExamRequired(parsed.examRequired || false);
+          setHomeworkRequired(parsed.homeworkRequired || false);
+          setExamSubmission(parsed.examSubmission || null);
+          setHomeworkSubmission(parsed.homeworkSubmission || null);
+          if (parsed.examData) setExamData(parsed.examData);
+          if (parsed.homeworkData) setHomeworkData(parsed.homeworkData);
+          // Skip API call if we have valid cache
+          return;
+        }
+      } catch (e) {
+        console.warn("Failed to parse verification cache:", e);
+      }
+    }
+    
+    // This will run when the component mounts or when lectureId or userRole changes
+    if (userRole === "Student" && lectureId) {
+      verifyExamAndCheckAccess();
+    }
+  }, [lectureId, userRole]);
+
+  // Cache successful verification results
+  useEffect(() => {
+    if (userRole === "Student" && (examVerified || homeworkVerified)) {
+      const cacheData = {
+        timestamp: Date.now(),
+        examVerified,
+        homeworkVerified,
+        examRequired,
+        homeworkRequired,
+        examSubmission,
+        homeworkSubmission,
+        examData,
+        homeworkData,
+      };
+      sessionStorage.setItem(`lecture_verification_${lectureId}`, JSON.stringify(cacheData));
+    }
+  }, [examVerified, homeworkVerified, examRequired, homeworkRequired, examSubmission, homeworkSubmission, examData, homeworkData, lectureId, userRole]);
+
+  // Debounced recheck function to prevent spamming
+  const debouncedRecheck = useCallback(
+    () => {
+      if (!examVerificationLoading) {
         verifyExamAndCheckAccess();
       }
-    }, [lectureId, userRole]);
+    },
+    [examVerificationLoading, verifyExamAndCheckAccess]
+  );
 
     // Fetch student access data - only for students
     useEffect(() => {
@@ -1280,7 +1334,7 @@ const LectureDisplay = () => {
               <button
                 type="button"
                 className="btn btn-primary btn-sm"
-                onClick={verifyExamAndCheckAccess}
+                onClick={debouncedRecheck}
                 disabled={examVerificationLoading}
               >
                 {examVerificationLoading ? t("loading") : t("recheckAccess", "Recheck Access")}

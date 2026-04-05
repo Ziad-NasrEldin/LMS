@@ -116,9 +116,9 @@ const NavBar = () => {
   };
 
   const navItems = [
-    { key: "teachers", path: "/teachers" },
-    { key: "educationalCourses", path: "/courses" },
     { key: "homepage", path: "/" },
+    { key: "educationalCourses", path: "/courses" },
+    { key: "teachers", path: "/teachers" },
   ];
 
   return (

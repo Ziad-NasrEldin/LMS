@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from "react"
 import { useParams, useNavigate, useLocation } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import { getContainerById, purchaseContainer, getEnrollmentCount } from "../routes/lectures"
+import { getYouTubeId } from "./User Dashboard/Lecture Page/lectureDisplay.utils"
 import { getUserDashboard } from "../routes/auth-services"
 import { LoadingSpinner } from "../components/LoadingSpinner"
 import { ErrorAlert } from "../components/ErrorAlert"
@@ -37,7 +38,9 @@ import {
   Unlock,
   ChevronDown,
   Lock,
-  Play
+  Play,
+  ThumbsUp,
+  Flag
 } from "lucide-react"
 
 const normalizeId = (value) => {
@@ -67,138 +70,300 @@ const DetailItem = ({ label, value, icon, tokens }) => (
   </div>
 )
 
-const SyllabusItem = ({ item, depth = 0, isPurchased, onPurchase, purchaseInProgress, parentPurchased, t }) => {
-  const [isOpen, setIsOpen] = useState(false)
-  const [children, setChildren] = useState([])
+// ─── Syllabus Helpers ─────────────────────────────────────────────────────────
+
+const YOUTUBE_API_KEY = import.meta.env.VITE_YOUTUBE_API_KEY
+
+function parseISODuration(iso) {
+  if (!iso) return null
+  const m = iso.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/)
+  if (!m) return null
+  const h = parseInt(m[1] || 0), min = parseInt(m[2] || 0), s = parseInt(m[3] || 0)
+  if (h > 0) return `${h}h${min > 0 ? ` ${min}m` : ''}`
+  if (min > 0) return `${min}m${s > 0 ? ` ${s}s` : ''}`
+  return `${s}s`
+}
+
+async function fetchYTDuration(videoId) {
+  if (!videoId || !YOUTUBE_API_KEY) return null
+  try {
+    const r = await fetch(
+      `https://www.googleapis.com/youtube/v3/videos?id=${videoId}&key=${YOUTUBE_API_KEY}&part=contentDetails`
+    )
+    const d = await r.json()
+    return parseISODuration(d?.items?.[0]?.contentDetails?.duration)
+  } catch { return null }
+}
+
+function formatMins(mins) {
+  if (!mins) return null
+  const h = Math.floor(mins / 60), m = mins % 60
+  if (h > 0 && m > 0) return `${h}h ${m}m`
+  if (h > 0) return `${h}h`
+  return `${m}m`
+}
+
+const CONTAINER_TYPE_CONFIG = {
+  course:  { bg: 'rgba(14,85,99,0.12)',   text: '#0E5563' },
+  year:    { bg: 'rgba(20,106,120,0.12)',  text: '#146A78' },
+  term:    { bg: 'rgba(77,179,194,0.15)',  text: '#0E5563' },
+  month:   { bg: 'rgba(243,154,63,0.15)', text: '#b5721a' },
+}
+
+// ─── LectureRow ────────────────────────────────────────────────────────────────
+
+const LectureRow = ({ item, depth, isPurchased, onPurchase, purchaseInProgress, onNavigate, t, isRTL }) => {
+  const tokens = designTokens.colors
+  const [ytDuration, setYtDuration] = useState(null)
+
+  const lectureId = item?._id || item?.id
+  const purchased = isPurchased(lectureId)
+  const isPending = purchaseInProgress === lectureId
+
+  useEffect(() => {
+    if (!item?.videoLink) return
+    const vid = getYouTubeId(item.videoLink)
+    if (vid) fetchYTDuration(vid).then(d => { if (d) setYtDuration(d) })
+  }, [item?.videoLink])
+
+  const duration = item?.duration > 0 ? formatMins(item.duration) : ytDuration
+  const indentPx = 16 + depth * 20
+
+  return (
+    <div
+      className="flex items-center gap-3 border-b last:border-b-0 transition-colors hover:bg-black/[0.018] group"
+      style={{ borderColor: 'rgba(17,24,39,0.05)', padding: `11px 16px 11px ${indentPx}px` }}
+    >
+      {/* Icon */}
+      <div
+        className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center"
+        style={{
+          background: purchased ? `${tokens.deepTeal}18` : tokens.neutralCloud,
+          border: `1.5px solid ${purchased ? tokens.deepTeal + '30' : 'rgba(17,24,39,0.08)'}`,
+        }}
+      >
+        {purchased
+          ? <Play size={13} style={{ color: tokens.deepTeal }} />
+          : <Lock size={13} style={{ color: tokens.slateText }} />}
+      </div>
+
+      {/* Info */}
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-semibold leading-snug truncate" style={{ color: tokens.inkText }}>{item?.name}</p>
+        {duration && (
+          <span className="inline-flex items-center gap-1 mt-0.5 text-[11px]" style={{ color: tokens.slateText }}>
+            <Clock size={10} /> {duration}
+          </span>
+        )}
+      </div>
+
+      {/* Actions */}
+      <div className="flex items-center gap-2 flex-shrink-0">
+        {purchased ? (
+          <button
+            onClick={() => onNavigate(`/dashboard/student-dashboard/lecture-display/${lectureId}`)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold text-white transition-all hover:scale-105 active:scale-95 shadow-sm"
+            style={{ background: `linear-gradient(135deg, ${tokens.deepTeal}, ${tokens.softCyanTeal})` }}
+          >
+            <Play size={10} />
+            {isRTL ? 'عرض سريع' : 'Quick View'}
+          </button>
+        ) : typeof item?.price === 'number' ? (
+          <button
+            onClick={() => onPurchase(lectureId)}
+            disabled={isPending || purchaseInProgress !== null}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold text-white transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+            style={{ background: item.price > 0 ? tokens.warmMango : tokens.softCyanTeal }}
+          >
+            {isPending ? (
+              <span className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            ) : item.price > 0 ? (
+              <><ShoppingCart size={10} /> {item.price} {t('pricing.points', 'pts')}</>
+            ) : (
+              <><Unlock size={10} /> {t('purchase.getFree', 'Free')}</>
+            )}
+          </button>
+        ) : null}
+      </div>
+    </div>
+  )
+}
+
+// ─── ContainerRow ─────────────────────────────────────────────────────────────
+
+const ContainerRow = ({ item, depth, isPurchased, onPurchase, purchaseInProgress, parentPurchased, onNavigate, t, isRTL }) => {
+  const tokens = designTokens.colors
+  const hasKids = (item?.children?.length > 0) || ['course', 'year', 'term', 'month'].includes(item?.type)
+  const [isOpen, setIsOpen] = useState(depth === 0)
+  const [children, setChildren] = useState(
+    item?.children?.length > 0 && typeof item.children[0] === 'object' ? item.children : []
+  )
+  const [childrenLoaded, setChildrenLoaded] = useState(
+    item?.children?.length > 0 && typeof item.children[0] === 'object'
+  )
   const [loading, setLoading] = useState(false)
 
   const itemId = item?._id || item?.id
-  const hasKids = item?.children?.length > 0 || ['course', 'year', 'term', 'month'].includes(item?.type)
-  const isLecture = item?.type === 'lecture'
   const purchased = parentPurchased || isPurchased(itemId)
+  const childCount = item?.children?.length || 0
+  const typeConfig = CONTAINER_TYPE_CONFIG[item?.type] || { bg: `${tokens.lightAquaMist}30`, text: tokens.deepTeal }
+  const typeLabel = item?.type ? item.type.charAt(0).toUpperCase() + item.type.slice(1) : 'Module'
+  const indentPx = depth * 20
 
   const toggle = async () => {
     if (!hasKids) return
-    if (isOpen) {
-      setIsOpen(false)
-      return
-    }
-    if (children.length > 0) {
-      setIsOpen(true)
-      return
-    }
-    // Fetch children if needed
-    if (item.children?.length > 0 && typeof item.children[0] === 'object') {
-      setChildren(item.children)
-      setIsOpen(true)
-      return
-    }
-    // Fetch from API
+    if (isOpen) { setIsOpen(false); return }
+    if (childrenLoaded) { setIsOpen(true); return }
     setLoading(true)
     try {
-      const result = await getContainerById(itemId)
-      if (result?.data?.children) {
-        const childIds = result.data.children
-        const childData = await Promise.all(
-          childIds.map(id => getContainerById(typeof id === 'string' ? id : (id._id || id.id)))
+      if (item?.children?.length > 0 && typeof item.children[0] === 'object') {
+        setChildren(item.children)
+        setChildrenLoaded(true)
+      } else if (item?.children?.length > 0) {
+        const results = await Promise.all(
+          item.children.map(id => getContainerById(typeof id === 'string' ? id : (id._id || id.id)))
         )
-        setChildren(childData.filter(r => r?.data).map(r => r.data))
+        setChildren(results.filter(r => r?.data).map(r => r.data))
+        setChildrenLoaded(true)
+      } else {
+        const result = await getContainerById(itemId)
+        if (result?.data?.children?.length > 0) {
+          const cids = result.data.children
+          const results = await Promise.all(
+            cids.map(id => getContainerById(typeof id === 'string' ? id : (id._id || id.id)))
+          )
+          setChildren(results.filter(r => r?.data).map(r => r.data))
+          setChildrenLoaded(true)
+        }
       }
-    } catch (e) {
-      console.error('Failed to load children:', e)
-    }
+    } catch (e) { console.error('Syllabus load error:', e) }
     setLoading(false)
     setIsOpen(true)
   }
 
-  const formatDuration = (mins) => {
-    if (!mins) return ''
-    const h = Math.floor(mins / 60)
-    const m = mins % 60
-    if (h > 0 && m > 0) return `${h}h ${m}m`
-    if (h > 0) return `${h}h`
-    return `${m}m`
-  }
+  // Depth-based left border accent color
+  const borderAccentColors = [tokens.deepTeal, tokens.softCyanTeal, tokens.warmMango, tokens.goldenSand]
+  const accentColor = borderAccentColors[depth % borderAccentColors.length]
 
   return (
-    <div className={`border-b last:border-b-0 ${depth > 0 ? 'ml-4' : ''}`} style={{ borderColor: 'rgba(17,24,39,0.06)' }}>
-      <div className="flex items-center gap-3 p-4 hover:bg-black/[0.02] transition-colors">
-        {/* Expand button */}
+    <div
+      className="border-b last:border-b-0"
+      style={{ borderColor: 'rgba(17,24,39,0.06)', marginLeft: `${indentPx}px` }}
+    >
+      {/* Accordion Header */}
+      <div
+        onClick={toggle}
+        role="button"
+        tabIndex={hasKids ? 0 : -1}
+        onKeyDown={(e) => e.key === 'Enter' && toggle()}
+        className="w-full flex items-center gap-3 text-left transition-colors hover:bg-black/[0.02] focus:outline-none cursor-pointer"
+        style={{
+          padding: `13px 16px`,
+          borderLeft: depth > 0 ? `3px solid ${accentColor}30` : 'none',
+        }}
+      >
+        {/* Expand icon */}
         {hasKids ? (
-          <button onClick={toggle} className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-colors" style={{ background: designTokens.colors.lightAquaMist }}>
+          <div
+            className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center"
+            style={{ background: `${accentColor}18`, border: `1.5px solid ${accentColor}30` }}
+          >
             {loading ? (
-              <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              <span className="w-3.5 h-3.5 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor: `${accentColor}80`, borderTopColor: 'transparent' }} />
             ) : (
-              <ChevronDown size={16} className={`transition-transform ${isOpen ? 'rotate-180' : ''}`} style={{ color: designTokens.colors.deepTeal }} />
+              <ChevronDown size={14} className={`transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} style={{ color: accentColor }} />
             )}
-          </button>
+          </div>
         ) : (
-          <div className="w-8 h-8 flex items-center justify-center">
-            <PlayCircle size={16} style={{ color: designTokens.colors.slateText }} />
+          <div className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center" style={{ background: tokens.neutralCloud }}>
+            <Book size={13} style={{ color: tokens.slateText }} />
           </div>
         )}
 
-        {/* Content */}
+        {/* Title & meta */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="font-medium text-sm" style={{ color: designTokens.colors.inkText }}>{item?.name}</span>
-            {item?.type && (
-              <span className="text-[10px] uppercase px-2 py-0.5 rounded-full font-semibold" style={{ background: `${designTokens.colors.lightAquaMist}40`, color: designTokens.colors.deepTeal }}>
-                {item.type}
+            <span className="font-bold text-sm leading-snug" style={{ color: tokens.inkText }}>{item?.name}</span>
+            <span
+              className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full flex-shrink-0"
+              style={{ background: typeConfig.bg, color: typeConfig.text }}
+            >
+              {typeLabel}
+            </span>
+            {purchased && (
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0" style={{ background: 'rgba(22,163,74,0.12)', color: '#15803d' }}>
+                {isRTL ? 'مفتوح' : 'Unlocked'}
               </span>
             )}
           </div>
-          <div className="flex items-center gap-3 mt-1 text-xs" style={{ color: designTokens.colors.slateText }}>
-            {item?.duration > 0 && (
-              <span className="flex items-center gap-1">
-                <Clock size={12} />
-                {formatDuration(item.duration)}
+          <div className="flex items-center gap-3 mt-0.5 flex-wrap">
+            {childCount > 0 && (
+              <span className="text-[11px]" style={{ color: tokens.slateText }}>
+                {childCount} {isRTL ? 'عناصر' : 'items'}
               </span>
             )}
-            {item?.price > 0 && <span>{item.price} {t('pricing.points')}</span>}
+            {item?.duration > 0 && (
+              <span className="text-[11px] flex items-center gap-1" style={{ color: tokens.slateText }}>
+                <Clock size={10} /> {formatMins(item.duration)}
+              </span>
+            )}
           </div>
         </div>
 
-        {/* Actions */}
-        <div className="flex items-center gap-2">
-          {isLecture && purchased && (
-            <button className="px-3 py-1.5 rounded-full text-xs font-medium text-white" style={{ background: designTokens.colors.deepTeal }}>
-              {t('actions.view') || 'View'}
-            </button>
-          )}
-          {!purchased && item?.price >= 0 && (
-            <button
-              onClick={() => onPurchase(itemId)}
-              disabled={purchaseInProgress}
-              className="px-3 py-1.5 rounded-full text-xs font-medium text-white disabled:opacity-50"
-              style={{ background: designTokens.colors.warmMango }}
-            >
-              {purchaseInProgress === itemId ? '...' : item.price > 0 ? t('purchase.buy') : t('purchase.getFree')}
-            </button>
-          )}
-          {purchased && !isLecture && (
-            <span className="text-xs px-2 py-1 rounded-full bg-green-100 text-green-700">
-              <Unlock size={12} />
-            </span>
-          )}
-        </div>
+        {/* Buy button */}
+        {!purchased && typeof item?.price === 'number' && (
+          <button
+            onClick={(e) => { e.stopPropagation(); onPurchase(itemId) }}
+            disabled={purchaseInProgress !== null}
+            className="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold text-white transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:transform-none shadow-sm"
+            style={{ background: item.price > 0 ? tokens.warmMango : tokens.softCyanTeal }}
+          >
+            {purchaseInProgress === itemId ? (
+              <span className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            ) : item.price > 0 ? (
+              <><DollarSign size={10} /> {item.price} {t('pricing.points', 'pts')}</>
+            ) : (
+              <><Unlock size={10} /> {t('purchase.getFree', 'Free')}</>
+            )}
+          </button>
+        )}
       </div>
 
       {/* Children */}
       {isOpen && children.length > 0 && (
-        <div className="border-t" style={{ borderColor: 'rgba(17,24,39,0.06)' }}>
-          {children.map((child, idx) => (
-            <SyllabusItem
-              key={child._id || child.id || idx}
-              item={child}
-              depth={depth + 1}
-              isPurchased={isPurchased}
-              onPurchase={onPurchase}
-              purchaseInProgress={purchaseInProgress}
-              parentPurchased={purchased}
-              t={t}
-            />
-          ))}
+        <div style={{ background: depth === 0 ? 'rgba(14,85,99,0.016)' : 'transparent' }}>
+          {children.map((child, idx) => {
+            const key = child?._id || child?.id || idx
+            if (child?.type === 'lecture') {
+              return (
+                <LectureRow
+                  key={key}
+                  item={child}
+                  depth={depth + 1}
+                  isPurchased={isPurchased}
+                  onPurchase={onPurchase}
+                  purchaseInProgress={purchaseInProgress}
+                  onNavigate={onNavigate}
+                  t={t}
+                  isRTL={isRTL}
+                />
+              )
+            }
+            return (
+              <ContainerRow
+                key={key}
+                item={child}
+                depth={depth + 1}
+                isPurchased={isPurchased}
+                onPurchase={onPurchase}
+                purchaseInProgress={purchaseInProgress}
+                parentPurchased={purchased}
+                onNavigate={onNavigate}
+                t={t}
+                isRTL={isRTL}
+              />
+            )
+          })}
         </div>
       )}
     </div>
@@ -230,6 +395,7 @@ export default function CourseDetails() {
   const [activeTab, setActiveTab] = useState('overview')
   const [isWishlisted, setIsWishlisted] = useState(false)
   const [enrollmentCount, setEnrollmentCount] = useState(0)
+  const [openFaqIndex, setOpenFaqIndex] = useState(null)
   
   const courseName = String(courseData?.name || "").trim()
   const canonicalPath = courseData ? buildCoursePath(courseData) : null
@@ -530,12 +696,6 @@ export default function CourseDetails() {
 
   // Calculate last updated date from course content
   const getLastUpdatedDate = () => {
-    // Debug: Log the data structure
-    console.log('Course data children:', courseData?.children)
-    console.log('Course data lectures:', courseData?.lectures)
-    console.log('Course updatedAt:', courseData?.updatedAt)
-    console.log('Course createdAt:', courseData?.createdAt)
-    
     // First, check if the course itself has an updatedAt
     const courseUpdatedAt = courseData?.updatedAt || courseData?.updated_at || courseData?.createdAt || courseData?.created_at
     
@@ -597,7 +757,7 @@ export default function CourseDetails() {
     instructor: {
       name: courseData.createdBy?.name || t("instructor", "Instructor"),
       title: t("instructor", "Instructor"),
-      avatar: courseData.createdBy?.profilePic ? resolveProfileImageUrl(courseData.createdBy.profilePic) : "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face"
+      avatar: resolveProfileImageUrl(courseData.createdBy?.profilePic || courseData.createdBy?.profilePicture?.url || courseData.createdBy?.profilePicture || null)
     },
     rating: 4.8,
     students: enrollmentCount || 0,
@@ -672,8 +832,82 @@ export default function CourseDetails() {
     }
   ]
 
+  const ratingBreakdown = [
+    { stars: 5, pct: 82 },
+    { stars: 4, pct: 12 },
+    { stars: 3, pct: 4 },
+    { stars: 2, pct: 1 },
+    { stars: 1, pct: 1 },
+  ]
+
+  const sampleReviews = [
+    {
+      id: 1,
+      name: t('reviews.r1.name', 'Ahmed Hassan'),
+      role: t('reviews.r1.role', 'Engineering Student'),
+      initials: 'AH',
+      rating: 5,
+      date: t('reviews.r1.date', 'October 2023'),
+      helpfulCount: 8,
+      text: t('reviews.r1.text', 'This course completely changed the way I understand the subject. The instructor explains complex concepts in a clear, structured way. I highly recommend it to anyone looking to deepen their knowledge.')
+    },
+    {
+      id: 2,
+      name: t('reviews.r2.name', 'Nour El-Din'),
+      role: t('reviews.r2.role', 'MSc. Student'),
+      initials: 'NE',
+      rating: 4,
+      date: t('reviews.r2.date', 'September 2023'),
+      helpfulCount: 12,
+      text: t('reviews.r2.text', 'Excellent content and a well-organized curriculum. The practical examples helped me connect theory to real applications. I would have appreciated more exercises, but overall a fantastic resource.')
+    },
+    {
+      id: 3,
+      name: t('reviews.r3.name', 'Sara Khalil'),
+      role: t('reviews.r3.role', 'Undergraduate Student'),
+      initials: 'SK',
+      rating: 5,
+      date: t('reviews.r3.date', 'August 2023'),
+      helpfulCount: 4,
+      text: t('reviews.r3.text', 'This course was the turning point for my exams. The breakdown of key concepts made the material finally make sense in a real context. Highly recommended for anyone struggling with this subject.')
+    }
+  ]
+
+  const faqItems = [
+    {
+      icon: GraduationCap,
+      question: t('faq.q1', 'What are the prerequisites for this course?'),
+      answer: t('faq.a1', 'No prior experience is required. This course is designed to be accessible to all learners. A basic understanding of the subject area will be helpful but is not mandatory.')
+    },
+    {
+      icon: Shield,
+      question: t('faq.q2', 'Will I receive a certificate upon completion?'),
+      answer: t('faq.a2', 'Yes! After successfully completing all course content and assessments, you will receive a verified digital certificate that you can share on your LinkedIn profile or include in your CV.')
+    },
+    {
+      icon: Clock,
+      question: t('faq.q3', 'How long do I have access to the course?'),
+      answer: t('faq.a3', 'Once you purchase the course, you have lifetime access to all materials. You can revisit lectures and resources anytime at your own pace.')
+    },
+    {
+      icon: DollarSign,
+      question: t('faq.q4', 'Is there a refund policy?'),
+      answer: t('faq.a4', 'We offer a satisfaction guarantee. If you are not happy with the course, please contact our support team within the first week of purchase and we will work with you to find a solution.')
+    },
+    {
+      icon: Globe,
+      question: t('faq.q5', 'In what language is the course taught?'),
+      answer: t('faq.a5', 'The course content is delivered in Arabic with supporting materials available in both Arabic and English to ensure all learners can follow along comfortably.')
+    },
+    {
+      icon: Brain,
+      question: t('faq.q6', 'How is the course structured?'),
+      answer: t('faq.a6', 'The course is broken into structured modules, each containing video lectures, practical exercises, and quizzes. You can progress at your own pace and revisit any section as needed.')
+    }
+  ]
+
   return (
-    <div 
+    <div
       className="min-h-screen"
       style={{ background: GRADIENTS.pageAtmosphere }}
       dir={isRTL ? "rtl" : "ltr"}
@@ -703,7 +937,7 @@ export default function CourseDetails() {
                   className="h-14 w-14 rounded-full border-2 border-white/20 object-cover"
                   onError={(e) => {
                     e.target.onerror = null
-                    e.target.src = "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face"
+                    e.target.src = resolveProfileImageUrl(null)
                   }}
                 />
                 <div>
@@ -844,55 +1078,523 @@ export default function CourseDetails() {
               )}
 
               {activeTab === 'syllabus' && (
-                <div className="space-y-4">
+                <div className="space-y-5">
                   {/* Header */}
-                  <div className="flex items-center justify-between">
-                    <h2 className="text-2xl font-black" style={{ color: TOKENS.deepTeal }}>
-                      {t("courseContent", "Course Content")}
-                    </h2>
-                    <p className="text-sm mt-1" style={{ color: TOKENS.slateText }}>
-                      {courseData?.children?.length || 0} {t("modules", "Modules")} • {courseData?.lectures?.length || 0} {t("lectures", "Lectures")}
-                    </p>
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div>
+                      <h2 className="text-2xl font-black" style={{ color: TOKENS.deepTeal }}>
+                        {t("courseContent", "Course Content")}
+                      </h2>
+                      <p className="text-sm mt-0.5" style={{ color: TOKENS.slateText }}>
+                        {isRTL
+                          ? `${courseData?.children?.length || 0} وحدة • ${courseData?.lectures?.length || 0} محاضرة`
+                          : `${courseData?.children?.length || 0} Modules • ${courseData?.lectures?.length || 0} Lectures`}
+                      </p>
+                    </div>
+                    {/* Legend */}
+                    <div className="flex items-center gap-3 flex-wrap">
+                      <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full" style={{ background: 'rgba(22,163,74,0.1)', color: '#15803d' }}>
+                        <Unlock size={11} /> {isRTL ? 'مشتراة' : 'Purchased'}
+                      </span>
+                      <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full" style={{ background: `${TOKENS.warmMango}18`, color: TOKENS.warmMango }}>
+                        <Lock size={11} /> {isRTL ? 'مدفوعة' : 'Paid'}
+                      </span>
+                      <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full" style={{ background: `${TOKENS.softCyanTeal}15`, color: TOKENS.deepTeal }}>
+                        <Sparkles size={11} /> {isRTL ? 'مجانية' : 'Free'}
+                      </span>
+                    </div>
                   </div>
 
                   {/* Content List */}
-                  <div className="rounded-xl border overflow-hidden" style={{ background: TOKENS.neutralCloud, borderColor: 'rgba(17,24,39,0.08)' }}>
-                    {/* Children */}
-                    {courseData?.children?.map((child, idx) => (
-                      <SyllabusItem
-                        key={child._id || child.id || idx}
-                        item={child}
+                  <div
+                    className="rounded-2xl overflow-hidden"
+                    style={{
+                      border: '1.5px solid rgba(17,24,39,0.08)',
+                      background: 'white',
+                      boxShadow: SHADOWS.level1,
+                    }}
+                  >
+                    {/* Top-level containers */}
+                    {courseData?.children?.map((child, idx) => {
+                      const key = child._id || child.id || idx
+                      if (child?.type === 'lecture') {
+                        return (
+                          <LectureRow
+                            key={key}
+                            item={child}
+                            depth={0}
+                            isPurchased={isContainerPurchased}
+                            onPurchase={handlePurchase}
+                            purchaseInProgress={purchaseInProgress}
+                            onNavigate={navigate}
+                            t={t}
+                            isRTL={isRTL}
+                          />
+                        )
+                      }
+                      return (
+                        <ContainerRow
+                          key={key}
+                          item={child}
+                          depth={0}
+                          isPurchased={isContainerPurchased}
+                          onPurchase={handlePurchase}
+                          purchaseInProgress={purchaseInProgress}
+                          parentPurchased={isContainerPurchased(courseId)}
+                          onNavigate={navigate}
+                          t={t}
+                          isRTL={isRTL}
+                        />
+                      )
+                    })}
+
+                    {/* Direct lectures (if any) */}
+                    {courseData?.lectures?.map((lec, idx) => (
+                      <LectureRow
+                        key={lec._id || lec.id || idx}
+                        item={lec}
+                        depth={0}
                         isPurchased={isContainerPurchased}
                         onPurchase={handlePurchase}
                         purchaseInProgress={purchaseInProgress}
-                        parentPurchased={isContainerPurchased(courseId)}
+                        onNavigate={navigate}
                         t={t}
+                        isRTL={isRTL}
                       />
                     ))}
-                    {/* Lectures */}
-                    {courseData?.lectures?.map((lecture, idx) => (
-                      <SyllabusItem
-                        key={lecture._id || lecture.id || idx}
-                        item={lecture}
-                        isPurchased={isContainerPurchased}
-                        onPurchase={handlePurchase}
-                        purchaseInProgress={purchaseInProgress}
-                        parentPurchased={isContainerPurchased(courseId)}
-                        t={t}
-                      />
-                    ))}
+
                     {/* Empty State */}
                     {!courseData?.children?.length && !courseData?.lectures?.length && (
-                      <div className="p-8 text-center">
-                        <Book className="h-10 w-10 mx-auto mb-3" style={{ color: TOKENS.slateText }} />
-                        <p style={{ color: TOKENS.slateText }}>{t('syllabus.empty') || 'No content available yet'}</p>
+                      <div className="flex flex-col items-center justify-center py-16 px-8 text-center">
+                        <div
+                          className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4"
+                          style={{ background: `${TOKENS.lightAquaMist}30` }}
+                        >
+                          <Book className="w-8 h-8" style={{ color: TOKENS.deepTeal }} />
+                        </div>
+                        <p className="font-semibold text-sm" style={{ color: TOKENS.slateText }}>
+                          {isRTL ? 'لا يوجد محتوى متاح بعد' : 'No content available yet'}
+                        </p>
                       </div>
                     )}
                   </div>
                 </div>
               )}
 
-              {activeTab !== 'overview' && activeTab !== 'syllabus' && (
+              {activeTab === 'reviews' && (
+                <div className="space-y-8">
+                  {/* Rating Summary */}
+                  <div className="grid grid-cols-1 sm:grid-cols-12 gap-5">
+                    {/* Big Score */}
+                    <div
+                      className="sm:col-span-4 rounded-xl p-8 flex flex-col items-center justify-center text-center"
+                      style={{ background: 'white', boxShadow: SHADOWS.level1 }}
+                    >
+                      <div className="text-7xl font-black mb-2 leading-none" style={{ color: TOKENS.warmMango }}>
+                        {course.rating.toFixed(1)}
+                      </div>
+                      <div className="flex gap-1 mb-3">
+                        {Array.from({ length: 5 }, (_, i) => (
+                          <Star
+                            key={i}
+                            className="h-5 w-5"
+                            style={{
+                              color: TOKENS.warmMango,
+                              fill: i < Math.floor(course.rating) ? TOKENS.warmMango : 'none'
+                            }}
+                          />
+                        ))}
+                      </div>
+                      <p className="text-xs font-black uppercase tracking-widest" style={{ color: TOKENS.slateText }}>
+                        {t('reviews.courseRating', 'Course Rating')}
+                      </p>
+                      <p className="text-xs mt-3 italic" style={{ color: `${TOKENS.slateText}90` }}>
+                        {t('reviews.basedOn', 'Based on verified students')}
+                      </p>
+                    </div>
+
+                    {/* Breakdown Bars */}
+                    <div
+                      className="sm:col-span-8 rounded-xl p-8"
+                      style={{ background: 'white', boxShadow: SHADOWS.level1 }}
+                    >
+                      <h3 className="font-bold text-lg mb-6" style={{ color: TOKENS.deepTeal }}>
+                        {t('reviews.breakdown', 'Rating Breakdown')}
+                      </h3>
+                      <div className="space-y-4">
+                        {ratingBreakdown.map(({ stars, pct }) => (
+                          <div key={stars} className="flex items-center gap-4">
+                            <span className="w-12 text-sm font-bold flex-shrink-0" style={{ color: TOKENS.slateText }}>
+                              {stars} {t('reviews.star', 'star')}
+                            </span>
+                            <div
+                              className="flex-1 h-2 rounded-full overflow-hidden"
+                              style={{ background: TOKENS.neutralCloud }}
+                            >
+                              <div
+                                className="h-full rounded-full"
+                                style={{ width: `${pct}%`, background: TOKENS.warmMango }}
+                              />
+                            </div>
+                            <span className="w-10 text-right text-sm font-semibold flex-shrink-0" style={{ color: TOKENS.slateText }}>
+                              {pct}%
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Testimonials Header */}
+                  <h2 className="text-2xl font-black" style={{ color: TOKENS.deepTeal }}>
+                    {t('reviews.testimonials', 'Student Testimonials')}
+                  </h2>
+
+                  {/* Review Cards */}
+                  <div className="space-y-5">
+                    {sampleReviews.map((review) => (
+                      <div
+                        key={review.id}
+                        className="relative overflow-hidden rounded-xl bg-white p-7"
+                        style={{ boxShadow: SHADOWS.level1 }}
+                      >
+                        {/* Decorative quote watermark */}
+                        <div
+                          className="absolute top-0 right-0 p-5 pointer-events-none select-none"
+                          style={{ opacity: 0.04 }}
+                        >
+                          <Sparkles className="h-20 w-20" style={{ color: TOKENS.deepTeal }} />
+                        </div>
+
+                        <div className="flex flex-col sm:flex-row gap-6">
+                          {/* Reviewer info */}
+                          <div className="sm:w-1/4 flex flex-col items-center sm:items-start text-center sm:text-left flex-shrink-0">
+                            <div
+                              className="w-14 h-14 rounded-full flex items-center justify-center text-white text-lg font-black mb-3"
+                              style={{ background: GRADIENTS.cta }}
+                            >
+                              {review.initials}
+                            </div>
+                            <h4 className="font-bold text-sm" style={{ color: TOKENS.deepTeal }}>
+                              {review.name}
+                            </h4>
+                            <p className="text-xs mb-2" style={{ color: TOKENS.slateText }}>
+                              {review.role}
+                            </p>
+                            <div className="flex gap-0.5">
+                              {Array.from({ length: 5 }, (_, i) => (
+                                <Star
+                                  key={i}
+                                  className="h-3.5 w-3.5"
+                                  style={{
+                                    color: TOKENS.warmMango,
+                                    fill: i < review.rating ? TOKENS.warmMango : 'none'
+                                  }}
+                                />
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* Review body */}
+                          <div className="flex-1">
+                            <p
+                              className="text-xs font-black uppercase tracking-widest mb-3"
+                              style={{ color: `${TOKENS.slateText}80` }}
+                            >
+                              {review.date}
+                            </p>
+                            <p
+                              className="text-sm leading-relaxed font-medium italic"
+                              style={{ color: TOKENS.inkText }}
+                            >
+                              &ldquo;{review.text}&rdquo;
+                            </p>
+                            <div className="mt-5 flex gap-4">
+                              <button
+                                className="flex items-center gap-1.5 text-xs font-bold transition-opacity hover:opacity-70"
+                                style={{ color: TOKENS.slateText }}
+                              >
+                                <ThumbsUp className="h-3.5 w-3.5" />
+                                {t('reviews.helpful', 'Helpful')}
+                                {review.helpfulCount > 0 && ` (${review.helpfulCount})`}
+                              </button>
+                              <button
+                                className="flex items-center gap-1.5 text-xs font-bold transition-opacity hover:opacity-70"
+                                style={{ color: TOKENS.slateText }}
+                              >
+                                <Flag className="h-3.5 w-3.5" />
+                                {t('reviews.report', 'Report')}
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {activeTab === 'faq' && (
+                <div className="space-y-6">
+                  {/* Section Header */}
+                  <div className="space-y-2">
+                    <h2 className="text-3xl font-black" style={{ color: TOKENS.deepTeal }}>
+                      {t('faq.title', 'Frequently Asked Questions')}
+                    </h2>
+                    <p className="text-base font-medium" style={{ color: TOKENS.slateText }}>
+                      {t('faq.subtitle', 'Everything you need to know about this course.')}
+                    </p>
+                  </div>
+
+                  {/* FAQ Accordion */}
+                  <div className="space-y-3">
+                    {faqItems.map((item, index) => {
+                      const isOpen = openFaqIndex === index
+                      return (
+                        <div
+                          key={index}
+                          className="overflow-hidden rounded-xl border transition-all duration-200"
+                          style={{
+                            borderColor: isOpen ? `${TOKENS.lightAquaMist}80` : 'rgba(17,24,39,0.08)',
+                            boxShadow: isOpen ? SHADOWS.level1 : 'none'
+                          }}
+                        >
+                          <button
+                            className="w-full flex items-center justify-between gap-4 p-6 text-left transition-colors duration-200"
+                            style={{ background: isOpen ? `${TOKENS.lightAquaMist}18` : 'white' }}
+                            onClick={() => setOpenFaqIndex(isOpen ? null : index)}
+                          >
+                            <div className="flex items-center gap-4">
+                              <div
+                                className="w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0"
+                                style={{ background: `${TOKENS.lightAquaMist}35`, color: TOKENS.deepTeal }}
+                              >
+                                <item.icon className="h-5 w-5" />
+                              </div>
+                              <span className="font-bold text-base" style={{ color: TOKENS.deepTeal }}>
+                                {item.question}
+                              </span>
+                            </div>
+                            <ChevronDown
+                              className={`h-5 w-5 flex-shrink-0 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
+                              style={{ color: TOKENS.slateText }}
+                            />
+                          </button>
+
+                          {isOpen && (
+                            <div
+                              className="pb-6 pr-6"
+                              style={{ paddingLeft: isRTL ? '1.5rem' : 'calc(1.5rem + 2.75rem + 1rem)' }}
+                            >
+                              <p className="text-sm leading-relaxed font-medium" style={{ color: TOKENS.slateText }}>
+                                {item.answer}
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      )
+                    })}
+                  </div>
+
+                  {/* Still have questions CTA */}
+                  <div
+                    className="flex flex-col sm:flex-row items-center gap-6 rounded-xl p-8"
+                    style={{ background: GRADIENTS.hero }}
+                  >
+                    <div className="flex-1 text-white">
+                      <h3 className="text-xl font-black mb-2">
+                        {t('faq.ctaTitle', 'Still have questions?')}
+                      </h3>
+                      <p className="text-sm font-medium" style={{ opacity: 0.8 }}>
+                        {t('faq.ctaDesc', 'Our support team is ready to help you with anything you need.')}
+                      </p>
+                    </div>
+                    <a
+                      href="mailto:support@fekra.com"
+                      className="whitespace-nowrap rounded-full px-8 py-3 font-bold text-sm text-white transition-all hover:scale-105 active:scale-95"
+                      style={{
+                        background: TOKENS.warmMango,
+                        boxShadow: `0 4px 14px ${TOKENS.warmMango}55`
+                      }}
+                    >
+                      {t('faq.ctaButton', 'Contact Support')}
+                    </a>
+                  </div>
+                </div>
+              )}
+
+              {activeTab === 'instructors' && (
+                <div className="space-y-8">
+                  {/* Section Header */}
+                  <div className="space-y-3">
+                    <h2 className="text-3xl font-black" style={{ color: TOKENS.deepTeal }}>
+                      {t('instructors.title', 'Meet Your Instructor')}
+                    </h2>
+                    <p className="text-base font-medium max-w-xl" style={{ color: TOKENS.slateText }}>
+                      {t('instructors.subtitle', 'Learn directly from an expert who brings both academic knowledge and real-world experience.')}
+                    </p>
+                  </div>
+
+                  {/* Bento Grid */}
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    {/* Primary Instructor Card */}
+                    <div
+                      className="lg:col-span-8 rounded-xl overflow-hidden"
+                      style={{ background: 'white', boxShadow: SHADOWS.level2 }}
+                    >
+                      <div className="flex flex-col md:flex-row">
+                        {/* Photo */}
+                        <div className="md:w-2/5 h-64 md:h-auto relative overflow-hidden flex-shrink-0">
+                          <img
+                            src={course.instructor.avatar}
+                            alt={course.instructor.name}
+                            className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
+                            onError={(e) => { e.target.onerror = null; e.target.src = resolveProfileImageUrl(null) }}
+                          />
+                          <div
+                            className="absolute inset-0"
+                            style={{ background: `linear-gradient(to top, ${TOKENS.deepTeal}55, transparent)` }}
+                          />
+                        </div>
+
+                        {/* Details */}
+                        <div className="flex-1 p-8 flex flex-col justify-center">
+                          <div className="flex items-center gap-3 mb-5">
+                            <span
+                              className="px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest"
+                              style={{ background: `${TOKENS.warmMango}18`, color: TOKENS.warmMango }}
+                            >
+                              {t('instructors.leadBadge', 'Lead Instructor')}
+                            </span>
+                          </div>
+
+                          <h3 className="text-2xl font-black mb-1" style={{ color: TOKENS.deepTeal }}>
+                            {course.instructor.name}
+                          </h3>
+                          <p className="text-base font-bold mb-5" style={{ color: TOKENS.warmMango }}>
+                            {t('instructors.instructorRole', 'Course Instructor')}
+                          </p>
+                          <p className="text-sm leading-relaxed font-medium" style={{ color: TOKENS.slateText }}>
+                            {t('instructors.bio', 'An experienced educator dedicated to making complex concepts accessible. This course reflects years of teaching experience and a deep passion for helping students succeed.')}
+                          </p>
+
+                          {/* Stats */}
+                          <div
+                            className="grid grid-cols-2 gap-6 mt-7 pt-6 border-t"
+                            style={{ borderColor: 'rgba(17,24,39,0.08)' }}
+                          >
+                            <div>
+                              <p className="text-xs uppercase tracking-widest font-black mb-1" style={{ color: TOKENS.slateText }}>
+                                {t('stats.students', 'Students')}
+                              </p>
+                              <p className="font-black" style={{ color: TOKENS.deepTeal }}>
+                                {course.students}+ {t('enrolled', 'Enrolled')}
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-xs uppercase tracking-widest font-black mb-1" style={{ color: TOKENS.slateText }}>
+                                {t('instructors.rating', 'Rating')}
+                              </p>
+                              <p className="font-black flex items-center gap-1.5" style={{ color: TOKENS.deepTeal }}>
+                                <Star
+                                  className="h-4 w-4 flex-shrink-0"
+                                  style={{ color: TOKENS.warmMango, fill: TOKENS.warmMango }}
+                                />
+                                {course.rating.toFixed(1)} / 5.0
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Right Column */}
+                    <div className="lg:col-span-4 flex flex-col gap-5">
+                      {/* Course Info Card */}
+                      <div
+                        className="rounded-xl p-6"
+                        style={{ background: 'white', boxShadow: SHADOWS.level1 }}
+                      >
+                        <h4
+                          className="text-xs font-black uppercase tracking-widest mb-4 pb-3 border-b"
+                          style={{ color: TOKENS.slateText, borderColor: 'rgba(17,24,39,0.08)' }}
+                        >
+                          {t('instructors.courseInfo', 'Course Information')}
+                        </h4>
+                        <div>
+                          {[
+                            { label: t('details.level', 'Level'), value: course.level },
+                            { label: t('stats.students', 'Students'), value: `${course.students} ${t('enrolled', 'Enrolled')}` },
+                            { label: t('details.language', 'Language'), value: course.language },
+                            { label: t('instructors.subject', 'Subject'), value: courseData?.subject?.name || '-' },
+                          ].map(({ label, value }) => (
+                            <div
+                              key={label}
+                              className="flex justify-between items-center text-sm py-3 border-b last:border-b-0"
+                              style={{ borderColor: 'rgba(17,24,39,0.07)' }}
+                            >
+                              <span className="font-semibold" style={{ color: TOKENS.slateText }}>{label}</span>
+                              <span className="font-bold text-right" style={{ color: TOKENS.inkText }}>{value}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* CTA Card */}
+                      <div
+                        className="rounded-xl p-7 text-white relative overflow-hidden"
+                        style={{ background: GRADIENTS.hero }}
+                      >
+                        <div className="relative z-10">
+                          <h4 className="text-lg font-black mb-2">
+                            {isContainerPurchased(courseId)
+                              ? t('instructors.ctaTitlePurchased', "You're Enrolled!")
+                              : t('instructors.ctaTitle', 'Ready to Start?')
+                            }
+                          </h4>
+                          <p className="text-sm mb-5" style={{ opacity: 0.8 }}>
+                            {isContainerPurchased(courseId)
+                              ? t('instructors.ctaDescPurchased', 'Access all your course content from the dashboard.')
+                              : t('instructors.ctaDesc', 'Join hundreds of students learning with this instructor.')
+                            }
+                          </p>
+                          {isContainerPurchased(courseId) ? (
+                            <button
+                              className="w-full py-3 rounded-full font-bold text-sm transition-all hover:scale-105 active:scale-95"
+                              style={{ background: TOKENS.warmMango, color: 'white' }}
+                              onClick={() => navigate('/dashboard/student-dashboard')}
+                            >
+                              {t('goToDashboard', 'Go to Dashboard')}
+                            </button>
+                          ) : (
+                            <button
+                              className="w-full py-3 rounded-full font-bold text-sm transition-all hover:scale-105 active:scale-95"
+                              style={{ background: 'white', color: TOKENS.deepTeal }}
+                              onClick={() => handlePurchase(courseId)}
+                              disabled={purchaseInProgress !== null}
+                            >
+                              {purchaseInProgress === courseId
+                                ? t('processing', 'Processing...')
+                                : course.price === 0
+                                  ? t('getFree', 'Get Free')
+                                  : t('buyNow', 'Buy Now')
+                              }
+                            </button>
+                          )}
+                        </div>
+                        <div
+                          className="absolute -right-4 -bottom-4 pointer-events-none select-none"
+                          style={{ opacity: 0.08 }}
+                        >
+                          <GraduationCap className="h-28 w-28 text-white" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {activeTab !== 'overview' && activeTab !== 'syllabus' && activeTab !== 'reviews' && activeTab !== 'instructors' && activeTab !== 'faq' && (
                 <div className="text-center py-12" style={{ color: TOKENS.slateText }}>
                   <p className="text-lg font-medium">
                     {tabs.find(t => t.id === activeTab)?.label} {t("contentComingSoonSuffix", "content coming soon...")}
