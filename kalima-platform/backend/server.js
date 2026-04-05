@@ -35,6 +35,7 @@ const studentExamSubmissionRouter = require("./routes/studentExamSubmissionRoute
 const seedInitialAdminDirect = require("./utils/seeds/seedInitialAdminDirect");
 const governmentRoutes = require("./routes/governmentRoutes");
 const ecReferralRoutes = require("./routes/ec.referralRoutes");
+const reviewRouter = require("./routes/reviewRoutes");
 
 
 connectDB();
@@ -71,6 +72,7 @@ app.use("/api/v1/exam-configs", ExamConfigRouter);
 app.use("/api/v1/exam-submissions", studentExamSubmissionRouter);
 app.use("/api/v1/governments", governmentRoutes);
 app.use("/api/v1/ec/referrals", ecReferralRoutes);
+app.use("/api/v1/reviews", reviewRouter);
 
 app.use("/api/v1/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));

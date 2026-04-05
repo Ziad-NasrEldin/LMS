@@ -33,6 +33,7 @@ const DashboardPage = lazy(() => import("./pages/Lecturer Dashboard/LecturerDash
 const LecturerAnalyticsPage = lazy(() => import("./pages/Lecturer Dashboard/LecturerAnalyticsPage.jsx"))
 const LecturerPromoCodesPage = lazy(() => import("./pages/Lecturer Dashboard/LecturerPromoCodesPage.jsx"))
 const LecturerLinkedStudentsPage = lazy(() => import("./pages/Lecturer Dashboard/LecturerLinkedStudentsPage.jsx"))
+const LecturerReviewsManagementPage = lazy(() => import("./pages/Lecturer Dashboard/LecturerReviewsManagementPage.jsx"))
 const ContainersPage = lazy(() => import("./pages/User Dashboard/Lecture Page/ContainerPage.jsx"))
 const ContainerDetails = lazy(() => import("./pages/User Dashboard/Lecture Page/ContainerDetails.jsx"))
 const LectureDisplay = lazy(() => import("./pages/User Dashboard/Lecture Page/LectureDisplay.jsx"))
@@ -489,6 +490,10 @@ function App() {
             <Route
               path="/dashboard/lecturer-dashboard/linked-students"
               element={renderLecturerRoute(<LecturerLinkedStudentsPage />)}
+            />
+            <Route
+              path="/dashboard/lecturer-dashboard/reviews"
+              element={renderLecturerRoute(<LecturerReviewsManagementPage />)}
             />
           </Routes>
         </Suspense>

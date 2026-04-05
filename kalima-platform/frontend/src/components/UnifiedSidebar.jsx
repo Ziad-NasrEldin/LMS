@@ -16,6 +16,7 @@ import {
   FaUserGraduate,
   FaUserShield,
   FaUserTie,
+  FaComment,
 } from "react-icons/fa";
 import { Edit, Lightbulb } from "lucide-react";
 import { getAllUsers } from "../routes/fetch-users";
@@ -440,6 +441,12 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
         title: t("MyLectures") || "My Lectures",
         icon: <FaGraduationCap className="h-5 w-5" />,
         path: "/dashboard/lecturer-dashboard/lectures-page",
+      },
+      {
+        id: "reviews-management",
+        title: t("reviewsManagement") || "Reviews",
+        icon: <FaComment className="h-5 w-5" />,
+        path: "/dashboard/lecturer-dashboard/reviews",
       },
     ];
 

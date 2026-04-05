@@ -1,0 +1,39 @@
+{
+  "title": "إدارة التقييمات",
+  "subtitle": "إدارة ومراجعة تقييمات الطلاب",
+  "refresh": "تحديث",
+  "stats": {
+    "totalReviews": "إجمالي التقييمات",
+    "pendingApproval": "بانتظار الموافقة",
+    "approved": "المعتمدة"
+  },
+  "filters": {
+    "all": "الكل",
+    "pending": "معلق",
+    "approved": "معتمد",
+    "rejected": "مرفوض"
+  },
+  "status": {
+    "pending": "معلق",
+    "approved": "معتمد",
+    "rejected": "مرفوض"
+  },
+  "actions": {
+    "approve": "موافقة",
+    "reject": "رفض",
+    "respond": "رد",
+    "delete": "حذف"
+  },
+  "review": {
+    "course": "الدورة",
+    "adminResponse": "رد الإدارة"
+  },
+  "modal": {
+    "respondTitle": "الرد على التقييم",
+    "sendResponse": "إرسال الرد",
+    "cancel": "إلغاء",
+    "placeholder": "اكتب ردك هنا..."
+  },
+  "empty": "لا توجد تقييمات",
+  "confirmDelete": "هل أنت متأكد من حذف هذا التقييم؟"
+}

@@ -4,13 +4,13 @@ import { useState, useEffect, useMemo } from "react"
 import { useParams, useNavigate, useLocation } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import { getContainerById, purchaseContainer, getEnrollmentCount } from "../routes/lectures"
-import { getYouTubeId } from "./User Dashboard/Lecture Page/lectureDisplay.utils"
 import { getUserDashboard } from "../routes/auth-services"
 import { LoadingSpinner } from "../components/LoadingSpinner"
 import { ErrorAlert } from "../components/ErrorAlert"
 import { designTokens } from "../constants/designTokens"
 import { resolveLevelDisplayName } from "../utils/levelHierarchy"
 import { resolveProfileImageUrl } from "../utils/profileImage"
+import { getCourseReviews, getMyReview, createReview, updateMyReview, deleteMyReview } from "../routes/reviews"
 import { buildCoursePath } from "../seo/site.mjs"
 import { useSeo } from "../seo/useSeo"
 import { buildBreadcrumbSchema, buildCourseSchema } from "../seo/structuredData.mjs"
@@ -74,7 +74,7 @@ const DetailItem = ({ label, value, icon, tokens }) => (
 
 const YOUTUBE_API_KEY = import.meta.env.VITE_YOUTUBE_API_KEY
 
-function parseISODuration(iso) {
+function formatISODuration(iso) {
   if (!iso) return null
   const m = iso.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/)
   if (!m) return null
@@ -91,7 +91,7 @@ async function fetchYTDuration(videoId) {
       `https://www.googleapis.com/youtube/v3/videos?id=${videoId}&key=${YOUTUBE_API_KEY}&part=contentDetails`
     )
     const d = await r.json()
-    return parseISODuration(d?.items?.[0]?.contentDetails?.duration)
+    return formatISODuration(d?.items?.[0]?.contentDetails?.duration)
   } catch { return null }
 }
 
@@ -103,63 +103,114 @@ function formatMins(mins) {
   return `${m}m`
 }
 
-// Recursively walk the course tree to collect all YouTube video IDs from leaf lectures.
-// Each level's children may be full objects (already fetched) or bare IDs that need fetching.
-async function collectVideoIds(children) {
-  const videoIds = []
-  const toFetch = []
+// ─── Duration Calculation ─────────────────────────────────────────────────────
 
-  for (const child of children) {
-    const item = typeof child === 'string' || !child.type
-      ? null   // bare ID — needs fetching
-      : child
-    if (!item) { toFetch.push(typeof child === 'string' ? child : (child._id || child.id)); continue }
+// Parse ISO 8601 duration (PT1H30M45S) to minutes
+function parseISODuration(iso) {
+  const m = iso?.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/)
+  if (!m) return 0
+  const h = parseInt(m[1] || 0)
+  const min = parseInt(m[2] || 0)
+  const s = parseInt(m[3] || 0)
+  return h * 60 + min + (s > 30 ? 1 : 0)
+}
 
+// Extract YouTube video ID from various URL formats
+function extractYouTubeId(url) {
+  if (!url) return null
+  const patterns = [
+    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\s?]+)/,
+    /^([a-zA-Z0-9_-]{11})$/
+  ]
+  for (const p of patterns) {
+    const m = url.match(p)
+    if (m) return m[1]
+  }
+  return null
+}
+
+// Recursively fetch all nested containers and collect video IDs from lectures
+async function collectAllVideoIds(containerIds, collected = new Set()) {
+  if (!containerIds?.length) return collected
+  
+  const idsToFetch = containerIds.filter(id => !collected.has(id))
+  if (!idsToFetch.length) return collected
+  
+  const results = await Promise.all(
+    idsToFetch.map(id => 
+      fetch(`${import.meta.env.VITE_API_URL}/containers/${id}`, { credentials: 'include' })
+        .then(r => r.ok ? r.json() : null)
+        .then(r => r?.data || null)
+        .catch(() => null)
+    )
+  )
+  
+  const childIdsToFetch = []
+  
+  for (const item of results.filter(Boolean)) {
     if (item.type === 'lecture') {
-      const vid = item.videoLink ? getYouTubeId(item.videoLink) : null
-      if (vid) videoIds.push(vid)
+      // Check all possible video URL fields
+      const videoUrl = item.videoLink || item.videoURL || item.youtubeUrl || item.url || item.video
+      const vid = extractYouTubeId(videoUrl)
+      if (vid) collected.add(vid)
     } else if (item.children?.length) {
-      toFetch.push(...item.children)
+      childIdsToFetch.push(...item.children.map(c => typeof c === 'string' ? c : (c._id || c.id)))
     }
   }
-
-  if (toFetch.length) {
-    const fetched = await Promise.all(
-      toFetch.map(id => {
-        const strId = typeof id === 'string' ? id : (id._id || id.id)
-        return fetch(`${import.meta.env.VITE_API_URL}/containers/${strId}`, { credentials: 'include' })
-          .then(r => r.ok ? r.json() : null)
-          .then(r => r?.data || null)
-          .catch(() => null)
-      })
-    )
-    const nested = await collectVideoIds(fetched.filter(Boolean))
-    videoIds.push(...nested)
+  
+  if (childIdsToFetch.length) {
+    await collectAllVideoIds(childIdsToFetch, collected)
   }
-
-  return videoIds
+  
+  return collected
 }
 
-// Batch-fetch durations from YouTube API (50 IDs per request) and return total minutes.
-async function fetchTotalMinutesFromYouTube(videoIds) {
-  if (!videoIds.length || !YOUTUBE_API_KEY) return 0
-  const unique = [...new Set(videoIds)]
-  let total = 0
-  for (let i = 0; i < unique.length; i += 50) {
-    const batch = unique.slice(i, i + 50).join(',')
+// Fetch total duration from YouTube API (batch requests, 50 max per call)
+async function fetchTotalDurationFromYouTube(videoIds) {
+  if (!videoIds?.length || !YOUTUBE_API_KEY) return 0
+  
+  const ids = [...videoIds]
+  let totalMinutes = 0
+  
+  for (let i = 0; i < ids.length; i += 50) {
+    const batch = ids.slice(i, i + 50).join(',')
     try {
-      const r = await fetch(
+      const res = await fetch(
         `https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=${batch}&key=${YOUTUBE_API_KEY}`
       )
-      const d = await r.json()
-      d.items?.forEach(item => {
-        const m = (item.contentDetails?.duration || '').match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/)
-        if (m) total += parseInt(m[1]||0)*60 + parseInt(m[2]||0) + (parseInt(m[3]||0) > 30 ? 1 : 0)
+      const data = await res.json()
+      data.items?.forEach(item => {
+        totalMinutes += parseISODuration(item.contentDetails?.duration)
       })
-    } catch { /* skip batch on error */ }
+    } catch (e) {
+      console.error('YouTube API error:', e)
+    }
   }
-  return total
+  
+  return totalMinutes
 }
+
+// Cache duration in localStorage
+const getCachedDuration = (courseId) => {
+  try {
+    const cached = localStorage.getItem(`course_duration_${courseId}`)
+    if (cached) {
+      const { duration, timestamp } = JSON.parse(cached)
+      if (Date.now() - timestamp < 24 * 60 * 60 * 1000) return duration
+    }
+  } catch {}
+  return null
+}
+
+const setCachedDuration = (courseId, duration) => {
+  try {
+    localStorage.setItem(`course_duration_${courseId}`, JSON.stringify({
+      duration,
+      timestamp: Date.now()
+    }))
+  } catch {}
+}
+
 
 const CONTAINER_TYPE_CONFIG = {
   course:  { bg: 'rgba(14,85,99,0.12)',   text: '#0E5563' },
@@ -180,17 +231,17 @@ const LectureRow = ({ item, depth, isPurchased, onPurchase, purchaseInProgress, 
 
   useEffect(() => {
     if (!item?.videoLink) return
-    const vid = getYouTubeId(item.videoLink)
+    const vid = extractYouTubeId(item.videoLink)
     if (vid) fetchYTDuration(vid).then(d => { if (d) setYtDuration(d) })
   }, [item?.videoLink])
 
   const duration = item?.duration > 0 ? formatMins(item.duration) : ytDuration
-  const indentPx = 16 + depth * 20
+  const indentPx = 8 + depth * 12
 
   return (
     <div
-      className="flex items-center gap-3 border-b last:border-b-0 transition-colors hover:bg-black/[0.018] group"
-      style={{ borderColor: 'rgba(17,24,39,0.05)', paddingTop: '11px', paddingBottom: '11px', paddingInlineEnd: '16px', paddingInlineStart: `${indentPx}px` }}
+      className="flex flex-col sm:flex-row sm:items-center gap-3 border-b last:border-b-0 transition-colors hover:bg-black/[0.018] group py-3 px-4"
+      style={{ borderColor: 'rgba(17,24,39,0.05)', paddingInlineStart: `${indentPx}px` }}
     >
       {/* Icon */}
       <div
@@ -207,7 +258,7 @@ const LectureRow = ({ item, depth, isPurchased, onPurchase, purchaseInProgress, 
 
       {/* Info */}
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-semibold leading-snug truncate" style={{ color: tokens.inkText }}>{item?.name}</p>
+        <p className="text-sm font-semibold leading-snug" style={{ color: tokens.inkText }}>{item?.name}</p>
         {duration && (
           <span className="inline-flex items-center gap-1 mt-0.5 text-[11px]" style={{ color: tokens.slateText }}>
             <Clock size={10} /> {duration}
@@ -216,29 +267,30 @@ const LectureRow = ({ item, depth, isPurchased, onPurchase, purchaseInProgress, 
       </div>
 
       {/* Actions */}
-      <div className="flex items-center gap-2 flex-shrink-0">
+      <div className="flex items-center gap-2 flex-shrink-0 sm:self-center">
         {purchased ? (
           <button
             onClick={() => onNavigate(`/dashboard/student-dashboard/lecture-display/${lectureId}`)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold text-white transition-all hover:scale-105 active:scale-95 shadow-sm"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold text-white transition-all hover:scale-105 active:scale-95 shadow-sm whitespace-nowrap"
             style={{ background: `linear-gradient(135deg, ${tokens.deepTeal}, ${tokens.softCyanTeal})` }}
           >
             <Play size={10} />
-            {t('syllabus.quickView')}
+            <span className="hidden sm:inline">{t('syllabus.quickView')}</span>
+            <span className="sm:hidden">{t('syllabus.watch', 'Watch')}</span>
           </button>
         ) : typeof item?.price === 'number' ? (
           <button
             onClick={() => onPurchase(lectureId)}
             disabled={isPending || purchaseInProgress !== null}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold text-white transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold text-white transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none whitespace-nowrap"
             style={{ background: item.price > 0 ? tokens.warmMango : tokens.softCyanTeal }}
           >
             {isPending ? (
               <span className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
             ) : item.price > 0 ? (
-              <><ShoppingCart size={10} /> {item.price} {t('pricing.points', 'pts')}</>
+              <><ShoppingCart size={10} /> {item.price}</>
             ) : (
-              <><Unlock size={10} /> {t('purchase.getFree', 'Free')}</>
+              <><Unlock size={10} /> {t('purchase.getFree', 'Get')}</>
             )}
           </button>
         ) : null}
@@ -266,7 +318,7 @@ const ContainerRow = ({ item, depth, isPurchased, onPurchase, purchaseInProgress
   const childCount = item?.children?.length || 0
   const typeConfig = CONTAINER_TYPE_CONFIG[item?.type] || { bg: `${tokens.lightAquaMist}30`, text: tokens.deepTeal }
   const typeLabel = item?.type ? item.type.charAt(0).toUpperCase() + item.type.slice(1) : 'Module'
-  const indentPx = depth * 20
+  const indentPx = depth * 12
 
   const toggle = async () => {
     if (!hasKids) return
@@ -314,81 +366,78 @@ const ContainerRow = ({ item, depth, isPurchased, onPurchase, purchaseInProgress
         role="button"
         tabIndex={hasKids ? 0 : -1}
         onKeyDown={(e) => e.key === 'Enter' && toggle()}
-        className="w-full flex items-center gap-3 text-left transition-colors hover:bg-black/[0.02] focus:outline-none cursor-pointer"
+        className="w-full flex flex-col sm:flex-row sm:items-center gap-3 text-left transition-colors hover:bg-black/[0.02] focus:outline-none cursor-pointer p-3 sm:px-4"
         style={{
-          padding: `13px 16px`,
           borderInlineStart: depth > 0 ? `3px solid ${accentColor}30` : 'none',
         }}
       >
-        {/* Expand icon */}
-        {hasKids ? (
-          <div
-            className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center"
-            style={{ background: `${accentColor}18`, border: `1.5px solid ${accentColor}30` }}
-          >
-            {loading ? (
-              <span className="w-3.5 h-3.5 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor: `${accentColor}80`, borderTopColor: 'transparent' }} />
-            ) : (
-              <ChevronDown size={14} className={`transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} style={{ color: accentColor }} />
-            )}
-          </div>
-        ) : (
-          <div className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center" style={{ background: tokens.neutralCloud }}>
-            <Book size={13} style={{ color: tokens.slateText }} />
-          </div>
-        )}
-
-        {/* Title & meta */}
-        <div className="flex-1 min-w-0">
-          <div className="flex items-start justify-between gap-2">
-            <div className="min-w-0">
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="font-bold text-sm leading-snug" style={{ color: tokens.inkText }}>{item?.name}</span>
-                <span
-                  className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full flex-shrink-0"
-                  style={{ background: typeConfig.bg, color: typeConfig.text }}
-                >
-                  {typeLabel}
-                </span>
-                {purchased && (
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0" style={{ background: 'rgba(22,163,74,0.12)', color: '#15803d' }}>
-                    {t('syllabus.unlocked')}
-                  </span>
-                )}
-              </div>
-              <div className="flex items-center gap-3 mt-0.5 flex-wrap">
-                {childCount > 0 && (
-                  <span className="text-[11px]" style={{ color: tokens.slateText }}>
-                    {childCount} {t('syllabus.items')}
-                  </span>
-                )}
-                {item?.duration > 0 && (
-                  <span className="text-[11px] flex items-center gap-1" style={{ color: tokens.slateText }}>
-                    <Clock size={10} /> {formatMins(item.duration)}
-                  </span>
-                )}
-              </div>
+        <div className="flex items-center gap-3 flex-1 min-w-0">
+          {/* Expand icon */}
+          {hasKids ? (
+            <div
+              className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center"
+              style={{ background: `${accentColor}18`, border: `1.5px solid ${accentColor}30` }}
+            >
+              {loading ? (
+                <span className="w-3.5 h-3.5 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor: `${accentColor}80`, borderTopColor: 'transparent' }} />
+              ) : (
+                <ChevronDown size={14} className={`transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} style={{ color: accentColor }} />
+              )}
             </div>
+          ) : (
+            <div className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center" style={{ background: tokens.neutralCloud }}>
+              <Book size={13} style={{ color: tokens.slateText }} />
+            </div>
+          )}
 
-            {/* Buy button */}
-            {!purchased && typeof item?.price === 'number' && (
-              <button
-                onClick={(e) => { e.stopPropagation(); onPurchase(itemId) }}
-                disabled={purchaseInProgress !== null}
-                className="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold text-white transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:transform-none shadow-sm"
-                style={{ background: item.price > 0 ? tokens.warmMango : tokens.softCyanTeal }}
+          {/* Title & meta */}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="font-bold text-sm leading-snug" style={{ color: tokens.inkText }}>{item?.name}</span>
+              <span
+                className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full flex-shrink-0"
+                style={{ background: typeConfig.bg, color: typeConfig.text }}
               >
-                {purchaseInProgress === itemId ? (
-                  <span className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                ) : item.price > 0 ? (
-                  <><DollarSign size={10} /> {item.price} {t('pricing.points', 'pts')}</>
-                ) : (
-                  <><Unlock size={10} /> {t('purchase.getFree', 'Free')}</>
-                )}
-              </button>
-            )}
+                {typeLabel}
+              </span>
+              {purchased && (
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0" style={{ background: 'rgba(22,163,74,0.12)', color: '#15803d' }}>
+                  {t('syllabus.unlocked')}
+                </span>
+              )}
+            </div>
+            <div className="flex items-center gap-3 mt-0.5 flex-wrap">
+              {childCount > 0 && (
+                <span className="text-[11px]" style={{ color: tokens.slateText }}>
+                  {childCount} {t('syllabus.items')}
+                </span>
+              )}
+              {item?.duration > 0 && (
+                <span className="text-[11px] flex items-center gap-1" style={{ color: tokens.slateText }}>
+                  <Clock size={10} /> {formatMins(item.duration)}
+                </span>
+              )}
+            </div>
           </div>
         </div>
+
+        {/* Buy button */}
+        {!purchased && typeof item?.price === 'number' && (
+          <button
+            onClick={(e) => { e.stopPropagation(); onPurchase(itemId) }}
+            disabled={purchaseInProgress !== null}
+            className="flex-shrink-0 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold text-white transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:transform-none shadow-sm whitespace-nowrap self-start sm:self-center"
+            style={{ background: item.price > 0 ? tokens.warmMango : tokens.softCyanTeal }}
+          >
+            {purchaseInProgress === itemId ? (
+              <span className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            ) : item.price > 0 ? (
+              <><DollarSign size={10} /> {item.price}</>
+            ) : (
+              <><Unlock size={10} /> {t('purchase.getFree', 'Get')}</>
+            )}
+          </button>
+        )}
       </div>
 
       {/* Children */}
@@ -454,11 +503,21 @@ export default function CourseDetails() {
   const [showSuccessModal, setShowSuccessModal] = useState(false)
   const [showShareToast, setShowShareToast] = useState(false)
   const [remainingPoints, setRemainingPoints] = useState(null)
-  const [activeTab, setActiveTab] = useState('overview')
-  const [isWishlisted, setIsWishlisted] = useState(false)
+  const [activeTab, setActiveTab] = useState('syllabus')
   const [enrollmentCount, setEnrollmentCount] = useState(0)
   const [openFaqIndex, setOpenFaqIndex] = useState(null)
   const [computedDuration, setComputedDuration] = useState(null)
+  const [reviews, setReviews] = useState([])
+  const [reviewStats, setReviewStats] = useState({
+    average: 0,
+    total: 0,
+    distribution: { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 },
+  })
+  const [myReview, setMyReview] = useState(null)
+  const [reviewLoading, setReviewLoading] = useState(false)
+  const [reviewForm, setReviewForm] = useState({ rating: 5, comment: '' })
+  const [reviewError, setReviewError] = useState('')
+  const [reviewSuccess, setReviewSuccess] = useState('')
 
   const courseName = String(courseData?.name || "").trim()
   const canonicalPath = courseData ? buildCoursePath(courseData) : null
@@ -576,19 +635,48 @@ export default function CourseDetails() {
     fetchEnrollmentCount()
   }, [courseId])
 
-  // If the backend hasn't pre-calculated the duration, compute it client-side:
-  // walk the course tree, collect all YouTube IDs, batch-fetch from YouTube API.
+  // Calculate total course duration from YouTube videos
   useEffect(() => {
     if (!courseData) return
-    if (courseData.totalDuration > 0) { setComputedDuration(courseData.totalDuration); return }
-    if (!courseData.children?.length) return
-    collectVideoIds(courseData.children).then(ids => {
-      if (!ids.length) return
-      fetchTotalMinutesFromYouTube(ids).then(mins => {
-        if (mins > 0) setComputedDuration(mins)
-      })
-    })
-  }, [courseData?._id])
+    
+    // Check cache first
+    const cached = getCachedDuration(courseData._id)
+    if (cached) {
+      setComputedDuration(cached)
+      return
+    }
+    
+    // If backend already has totalDuration, use it
+    if (courseData.totalDuration > 0) {
+      setComputedDuration(courseData.totalDuration)
+      setCachedDuration(courseData._id, courseData.totalDuration)
+      return
+    }
+    
+    // Otherwise, fetch from YouTube API
+    const calculateDuration = async () => {
+      try {
+        // Get all child IDs to fetch
+        const childIds = courseData.children?.map(c => typeof c === 'string' ? c : (c._id || c.id)) || []
+        if (!childIds.length) return
+        
+        // Collect all video IDs recursively
+        const videoIds = await collectAllVideoIds(childIds)
+        if (!videoIds.size) return
+        
+        // Fetch durations from YouTube API
+        const totalMinutes = await fetchTotalDurationFromYouTube([...videoIds])
+        if (totalMinutes > 0) {
+          setComputedDuration(totalMinutes)
+          setCachedDuration(courseData._id, totalMinutes)
+        }
+      } catch (err) {
+        console.error('Failed to calculate duration:', err)
+      }
+    }
+    
+    calculateDuration()
+  }, [courseData])
 
   // Handle canonical path redirect
   useEffect(() => {
@@ -765,6 +853,92 @@ export default function CourseDetails() {
     }
   }
 
+  // Fetch reviews
+  useEffect(() => {
+    const fetchReviews = async () => {
+      if (!courseId) return
+      
+      const result = await getCourseReviews(courseId)
+      if (result.status === 'success') {
+        setReviews(result.data.reviews || [])
+        setReviewStats(result.data.stats || { average: 0, total: 0, distribution: { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 } })
+      }
+    }
+    
+    fetchReviews()
+  }, [courseId])
+
+  // Fetch student's own review
+  useEffect(() => {
+    const fetchMyReview = async () => {
+      if (!courseId || !purchaseHistory.length) return
+      
+      const result = await getMyReview(courseId)
+      if (result.status === 'success' && result.data) {
+        setMyReview(result.data)
+        setReviewForm({ rating: result.data.rating, comment: result.data.comment })
+      }
+    }
+    
+    fetchMyReview()
+  }, [courseId, purchaseHistory.length])
+
+  // Handle review submission
+  const handleSubmitReview = async (e) => {
+    e.preventDefault()
+    setReviewError('')
+    setReviewSuccess('')
+    setReviewLoading(true)
+    
+    try {
+      let result
+      if (myReview) {
+        result = await updateMyReview(courseId, reviewForm)
+      } else {
+        result = await createReview({ ...reviewForm, containerId: courseId })
+      }
+      
+      if (result.status === 'success') {
+        setReviewSuccess(myReview ? 'Review updated successfully!' : 'Review submitted successfully!')
+        setMyReview(result.data)
+        // Refresh reviews list
+        const reviewsResult = await getCourseReviews(courseId)
+        if (reviewsResult.status === 'success') {
+          setReviews(reviewsResult.data.reviews || [])
+          setReviewStats(reviewsResult.data.stats || { average: 0, total: 0, distribution: { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 } })
+        }
+        setTimeout(() => setReviewSuccess(''), 3000)
+      } else {
+        setReviewError(result.message || 'Failed to submit review')
+      }
+    } catch (err) {
+      setReviewError('An error occurred. Please try again.')
+    } finally {
+      setReviewLoading(false)
+    }
+  }
+
+  // Handle review deletion
+  const handleDeleteReview = async () => {
+    if (!confirm('Are you sure you want to delete your review?')) return
+    
+    setReviewLoading(true)
+    const result = await deleteMyReview(courseId)
+    if (result.status === 'success') {
+      setMyReview(null)
+      setReviewForm({ rating: 5, comment: '' })
+      setReviewSuccess('Review deleted successfully')
+      // Refresh reviews list
+      const reviewsResult = await getCourseReviews(courseId)
+      if (reviewsResult.status === 'success') {
+        setReviews(reviewsResult.data.reviews || [])
+        setReviewStats(reviewsResult.data.stats || { average: 0, total: 0, distribution: { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 } })
+      }
+      setTimeout(() => setReviewSuccess(''), 3000)
+    }
+    setReviewLoading(false)
+  }
+
   if (loading) return <LoadingSpinner />
   if (error) return <ErrorAlert message={error} />
   if (!courseData) return <ErrorAlert message={t("errors.courseNotFound")} />
@@ -837,7 +1011,7 @@ export default function CourseDetails() {
     rating: 4.8,
     students: enrollmentCount || 0,
     level: levelName || t("level.beginner", "Beginner"),
-    duration: formatMins(computedDuration) || "—",
+    duration: typeof computedDuration === 'string' ? computedDuration : (formatMins(computedDuration) || "—"),
     updated: getLastUpdatedDate() || t("notAvailable", "Not available"),
     language: isRTL ? t("language.arabic", "Arabic") : t("language.english", "English (UK)"),
     certification: true,
@@ -850,7 +1024,6 @@ export default function CourseDetails() {
   }
 
   const tabs = [
-    { id: 'overview', label: t('tabs.overview', 'Overview') },
     { id: 'syllabus', label: t('tabs.syllabus', 'Syllabus') },
     { id: 'reviews', label: t('tabs.reviews', 'Reviews') },
     { id: 'instructors', label: t('tabs.instructors', 'Instructors') },
@@ -1028,13 +1201,6 @@ export default function CourseDetails() {
               {/* Action Buttons */}
               <div className="flex flex-wrap gap-4">
                 <button
-                  onClick={() => setIsWishlisted(!isWishlisted)}
-                  className="flex items-center gap-2 rounded-full bg-white/10 px-5 py-2 sm:px-8 sm:py-3 text-sm sm:text-base font-bold backdrop-blur-md transition-all hover:bg-white/20"
-                >
-                  <Heart className={`h-4 w-4 sm:h-5 sm:w-5 ${isWishlisted ? 'fill-current' : ''}`} />
-                  {isWishlisted ? t("wishlisted", "Wishlisted") : t("wishlist", "Wishlist")}
-                </button>
-                <button
                   onClick={handleShare}
                   className="flex items-center gap-2 rounded-full border border-white/20 px-5 py-2 sm:px-8 sm:py-3 text-sm sm:text-base font-bold backdrop-blur-md transition-all hover:bg-white/10">
                   <Share2 className="h-5 w-5" />
@@ -1116,42 +1282,6 @@ export default function CourseDetails() {
 
             {/* Tab Content */}
             <div className="rounded-xl bg-white p-8 shadow-sm" style={{ borderColor: 'rgba(17,24,39,0.08)' }}>
-              {activeTab === 'overview' && (
-                <div className="space-y-8">
-                  <div className="space-y-4">
-                    <h2 className="text-3xl font-black" style={{ color: TOKENS.deepTeal }}>
-                      {t("masteringCourse", "Mastering the Course")}
-                    </h2>
-                    <p className="text-lg leading-relaxed font-medium" style={{ color: TOKENS.slateText }}>
-                      {course.description}
-                    </p>
-                  </div>
-
-                  {/* Did you know callout */}
-                  <div className="flex gap-6 rounded-lg border p-6" 
-                    style={{ 
-                      background: `${TOKENS.lightAquaMist}20`,
-                      borderColor: `${TOKENS.lightAquaMist}50`
-                    }}
-                  >
-                    <div 
-                      className="rounded-xl p-3 text-white flex-shrink-0"
-                      style={{ background: TOKENS.softCyanTeal }}
-                    >
-                      <Lightbulb className="h-6 w-6" />
-                    </div>
-                    <div className="space-y-1">
-                      <h4 className="text-lg font-bold" style={{ color: TOKENS.deepTeal }}>
-                        {t("didYouKnow", "Did you know?")}
-                      </h4>
-                      <p className="text-sm font-medium leading-relaxed" style={{ color: TOKENS.slateText }}>
-                        {t("overview.courseDescription")}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              )}
-
               {activeTab === 'syllabus' && (
                 <div className="space-y-5">
                   {/* Header */}
@@ -1264,7 +1394,7 @@ export default function CourseDetails() {
                       style={{ background: 'white', boxShadow: SHADOWS.level1 }}
                     >
                       <div className="text-7xl font-black mb-2 leading-none" style={{ color: TOKENS.warmMango }}>
-                        {course.rating.toFixed(1)}
+                        {reviewStats.average.toFixed(1)}
                       </div>
                       <div className="flex gap-1 mb-3">
                         {Array.from({ length: 5 }, (_, i) => (
@@ -1273,7 +1403,7 @@ export default function CourseDetails() {
                             className="h-5 w-5"
                             style={{
                               color: TOKENS.warmMango,
-                              fill: i < Math.floor(course.rating) ? TOKENS.warmMango : 'none'
+                              fill: i < Math.round(reviewStats.average) ? TOKENS.warmMango : 'none'
                             }}
                           />
                         ))}
@@ -1282,7 +1412,7 @@ export default function CourseDetails() {
                         {t('reviews.courseRating', 'Course Rating')}
                       </p>
                       <p className="text-xs mt-3 italic" style={{ color: `${TOKENS.slateText}90` }}>
-                        {t('reviews.basedOn', 'Based on verified students')}
+                        {t('reviews.basedOnCount', 'Based on {{count}} verified students', { count: reviewStats.total })}
                       </p>
                     </div>
 
@@ -1295,114 +1425,219 @@ export default function CourseDetails() {
                         {t('reviews.breakdown', 'Rating Breakdown')}
                       </h3>
                       <div className="space-y-4">
-                        {ratingBreakdown.map(({ stars, pct }) => (
-                          <div key={stars} className="flex items-center gap-4">
-                            <span className="w-12 text-sm font-bold flex-shrink-0" style={{ color: TOKENS.slateText }}>
-                              {stars} {t('reviews.star', 'star')}
-                            </span>
-                            <div
-                              className="flex-1 h-2 rounded-full overflow-hidden"
-                              style={{ background: TOKENS.neutralCloud }}
-                            >
+                        {[5, 4, 3, 2, 1].map((stars) => {
+                          const count = reviewStats.distribution[stars] || 0
+                          const pct = reviewStats.total > 0 ? Math.round((count / reviewStats.total) * 100) : 0
+                          return (
+                            <div key={stars} className="flex items-center gap-4">
+                              <span className="w-12 text-sm font-bold flex-shrink-0" style={{ color: TOKENS.slateText }}>
+                                {stars} {t('reviews.star', 'star')}
+                              </span>
                               <div
-                                className="h-full rounded-full"
-                                style={{ width: `${pct}%`, background: TOKENS.warmMango }}
-                              />
+                                className="flex-1 h-2 rounded-full overflow-hidden"
+                                style={{ background: TOKENS.neutralCloud }}
+                              >
+                                <div
+                                  className="h-full rounded-full"
+                                  style={{ width: `${pct}%`, background: TOKENS.warmMango }}
+                                />
+                              </div>
+                              <span className="w-16 text-right text-sm font-semibold flex-shrink-0" style={{ color: TOKENS.slateText }}>
+                                {count} ({pct}%)
+                              </span>
                             </div>
-                            <span className="w-10 text-right text-sm font-semibold flex-shrink-0" style={{ color: TOKENS.slateText }}>
-                              {pct}%
-                            </span>
-                          </div>
-                        ))}
+                          )
+                        })}
                       </div>
                     </div>
                   </div>
 
+                  {/* Write a Review Section (only for students who purchased) */}
+                  {isContainerPurchased(courseId) && (
+                    <div
+                      className="rounded-xl p-6"
+                      style={{ background: 'white', boxShadow: SHADOWS.level1 }}
+                    >
+                      <h3 className="text-xl font-black mb-4" style={{ color: TOKENS.deepTeal }}>
+                        {myReview ? t('reviews.updateYourReview', 'Update Your Review') : t('reviews.writeAReview', 'Write a Review')}
+                      </h3>
+
+                      {reviewError && (
+                        <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+                          {reviewError}
+                        </div>
+                      )}
+
+                      {reviewSuccess && (
+                        <div className="mb-4 rounded-lg border border-green-200 bg-green-50 p-3 text-sm text-green-700">
+                          {reviewSuccess}
+                        </div>
+                      )}
+
+                      <form onSubmit={handleSubmitReview} className="space-y-4">
+                        {/* Rating Stars */}
+                        <div>
+                          <label className="block text-sm font-bold mb-2" style={{ color: TOKENS.slateText }}>
+                            {t('reviews.yourRating', 'Your Rating')}
+                          </label>
+                          <div className="flex gap-2">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <button
+                                key={star}
+                                type="button"
+                                onClick={() => setReviewForm({ ...reviewForm, rating: star })}
+                                className="transition-transform hover:scale-110"
+                              >
+                                <Star
+                                  className="h-8 w-8"
+                                  style={{
+                                    color: TOKENS.warmMango,
+                                    fill: star <= reviewForm.rating ? TOKENS.warmMango : 'none'
+                                  }}
+                                />
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Review Comment */}
+                        <div>
+                          <label className="block text-sm font-bold mb-2" style={{ color: TOKENS.slateText }}>
+                            {t('reviews.yourReview', 'Your Review')}
+                          </label>
+                          <textarea
+                            value={reviewForm.comment}
+                            onChange={(e) => setReviewForm({ ...reviewForm, comment: e.target.value })}
+                            placeholder={t('reviews.reviewPlaceholder', 'Share your experience with this course...')}
+                            className="w-full rounded-xl border p-4 text-sm resize-none"
+                            style={{ 
+                              borderColor: 'rgba(17,24,39,0.15)',
+                              minHeight: '120px'
+                            }}
+                            maxLength={1000}
+                            required
+                          />
+                          <p className="text-xs mt-1" style={{ color: TOKENS.slateText }}>
+                            {reviewForm.comment.length}/1000
+                          </p>
+                        </div>
+
+                        {/* Submit Buttons */}
+                        <div className="flex gap-3">
+                          <button
+                            type="submit"
+                            disabled={reviewLoading || !reviewForm.comment.trim()}
+                            className="flex-1 py-3 rounded-full font-bold text-white transition-all hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                            style={{ background: TOKENS.deepTeal }}
+                          >
+                            {reviewLoading 
+                              ? t('processing', 'Processing...') 
+                              : myReview 
+                                ? t('reviews.updateReview', 'Update Review')
+                                : t('reviews.submitReview', 'Submit Review')
+                            }
+                          </button>
+                          {myReview && (
+                            <button
+                              type="button"
+                              onClick={handleDeleteReview}
+                              disabled={reviewLoading}
+                              className="px-6 py-3 rounded-full font-bold text-red-600 border border-red-200 transition-all hover:bg-red-50 disabled:opacity-50"
+                            >
+                              {t('delete', 'Delete')}
+                            </button>
+                          )}
+                        </div>
+
+                        {myReview?.status === 'pending' && (
+                          <p className="text-sm text-amber-600 bg-amber-50 p-3 rounded-lg">
+                            {t('reviews.pendingApproval', 'Your review is pending approval from an administrator.')}
+                          </p>
+                        )}
+                      </form>
+                    </div>
+                  )}
+
                   {/* Testimonials Header */}
                   <h2 className="text-2xl font-black" style={{ color: TOKENS.deepTeal }}>
-                    {t('reviews.testimonials', 'Student Testimonials')}
+                    {t('reviews.testimonials', 'Student Testimonials')} ({reviews.length})
                   </h2>
 
                   {/* Review Cards */}
                   <div className="space-y-5">
-                    {sampleReviews.map((review) => (
-                      <div
-                        key={review.id}
-                        className="relative overflow-hidden rounded-xl bg-white p-7"
-                        style={{ boxShadow: SHADOWS.level1 }}
-                      >
-                        {/* Decorative quote watermark */}
-                        <div
-                          className="absolute top-0 right-0 p-5 pointer-events-none select-none"
-                          style={{ opacity: 0.04 }}
-                        >
-                          <Sparkles className="h-20 w-20" style={{ color: TOKENS.deepTeal }} />
-                        </div>
-
-                        <div className="flex flex-col sm:flex-row gap-6">
-                          {/* Reviewer info */}
-                          <div className="sm:w-1/4 flex flex-col items-center sm:items-start text-center sm:text-left flex-shrink-0">
-                            <div
-                              className="w-14 h-14 rounded-full flex items-center justify-center text-white text-lg font-black mb-3"
-                              style={{ background: GRADIENTS.cta }}
-                            >
-                              {review.initials}
-                            </div>
-                            <h4 className="font-bold text-sm" style={{ color: TOKENS.deepTeal }}>
-                              {review.name}
-                            </h4>
-                            <p className="text-xs mb-2" style={{ color: TOKENS.slateText }}>
-                              {review.role}
-                            </p>
-                            <div className="flex gap-0.5">
-                              {Array.from({ length: 5 }, (_, i) => (
-                                <Star
-                                  key={i}
-                                  className="h-3.5 w-3.5"
-                                  style={{
-                                    color: TOKENS.warmMango,
-                                    fill: i < review.rating ? TOKENS.warmMango : 'none'
-                                  }}
-                                />
-                              ))}
-                            </div>
-                          </div>
-
-                          {/* Review body */}
-                          <div className="flex-1">
-                            <p
-                              className="text-xs font-black uppercase tracking-widest mb-3"
-                              style={{ color: `${TOKENS.slateText}80` }}
-                            >
-                              {review.date}
-                            </p>
-                            <p
-                              className="text-sm leading-relaxed font-medium italic"
-                              style={{ color: TOKENS.inkText }}
-                            >
-                              &ldquo;{review.text}&rdquo;
-                            </p>
-                            <div className="mt-5 flex gap-4">
-                              <button
-                                className="flex items-center gap-1.5 text-xs font-bold transition-opacity hover:opacity-70"
-                                style={{ color: TOKENS.slateText }}
-                              >
-                                <ThumbsUp className="h-3.5 w-3.5" />
-                                {t('reviews.helpful', 'Helpful')}
-                                {review.helpfulCount > 0 && ` (${review.helpfulCount})`}
-                              </button>
-                              <button
-                                className="flex items-center gap-1.5 text-xs font-bold transition-opacity hover:opacity-70"
-                                style={{ color: TOKENS.slateText }}
-                              >
-                                <Flag className="h-3.5 w-3.5" />
-                                {t('reviews.report', 'Report')}
-                              </button>
-                            </div>
-                          </div>
-                        </div>
+                    {reviews.length === 0 ? (
+                      <div className="text-center py-12" style={{ color: TOKENS.slateText }}>
+                        <p className="text-lg font-medium">
+                          {t('reviews.noReviewsYet', 'No reviews yet. Be the first to review this course!')}
+                        </p>
                       </div>
-                    ))}
+                    ) : (
+                      reviews.map((review) => (
+                        <div
+                          key={review._id}
+                          className="relative overflow-hidden rounded-xl bg-white p-7"
+                          style={{ boxShadow: SHADOWS.level1 }}
+                        >
+                          {/* Decorative quote watermark */}
+                          <div
+                            className="absolute top-0 right-0 p-5 pointer-events-none select-none"
+                            style={{ opacity: 0.04 }}
+                          >
+                            <Sparkles className="h-20 w-20" style={{ color: TOKENS.deepTeal }} />
+                          </div>
+
+                          <div className="flex flex-col sm:flex-row gap-6">
+                            {/* Reviewer info */}
+                            <div className="sm:w-1/4 flex flex-col items-center sm:items-start text-center sm:text-left flex-shrink-0">
+                              <div
+                                className="w-14 h-14 rounded-full flex items-center justify-center text-white text-lg font-black mb-3"
+                                style={{ background: GRADIENTS.cta }}
+                              >
+                                {review.studentName?.charAt(0).toUpperCase() || '?'}
+                              </div>
+                              <h4 className="font-bold text-sm" style={{ color: TOKENS.deepTeal }}>
+                                {review.studentName || t('reviews.anonymous', 'Anonymous')}
+                              </h4>
+                              <p className="text-xs mb-2" style={{ color: TOKENS.slateText }}>
+                                {new Date(review.createdAt).toLocaleDateString()}
+                              </p>
+                              <div className="flex gap-0.5">
+                                {Array.from({ length: 5 }, (_, i) => (
+                                  <Star
+                                    key={i}
+                                    className="h-3.5 w-3.5"
+                                    style={{
+                                      color: TOKENS.warmMango,
+                                      fill: i < review.rating ? TOKENS.warmMango : 'none'
+                                    }}
+                                  />
+                                ))}
+                              </div>
+                            </div>
+
+                            {/* Review body */}
+                            <div className="flex-1">
+                              <p
+                                className="text-sm leading-relaxed font-medium italic"
+                                style={{ color: TOKENS.inkText }}
+                              >
+                                &ldquo;{review.comment}&rdquo;
+                              </p>
+                              {review.adminResponse && (
+                                <div className="mt-4 p-4 rounded-lg" style={{ background: `${TOKENS.lightAquaMist}20` }}>
+                                  <p className="text-xs font-bold mb-1" style={{ color: TOKENS.deepTeal }}>
+                                    {t('reviews.adminResponse', 'Admin Response')}:
+                                  </p>
+                                  <p className="text-sm" style={{ color: TOKENS.slateText }}>
+                                    {review.adminResponse}
+                                  </p>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      ))
+                    )}
                   </div>
                 </div>
               )}

@@ -119,13 +119,12 @@ const LectureDisplay = () => {
   const [showControls, setShowControls] = useState(false)
   const [hasAttemptedToLeave, setHasAttemptedToLeave] = useState(false)
 
-  // Exam verification states
-  const [examVerified, setExamVerified] = useState(false);
-  const [examVerificationLoading, setExamVerificationLoading] = useState(false);
-  const [examRequired, setExamRequired] = useState(false);
-  const [examData, setExamData] = useState(null);
-  const [examUrl, setExamUrl] = useState("");
-  const [examSubmission, setExamSubmission] = useState(null);
+  // Consolidated assessment state (replaces 12 separate state variables)
+  const [assessments, setAssessments] = useState({
+    exam: { required: false, verified: false, data: null, submission: null, url: "" },
+    homework: { required: false, verified: false, data: null, submission: null, url: "" },
+  });
+  const [verificationLoading, setVerificationLoading] = useState(false);
 
   // Attachment tabs and uploads
   const [activeTab, setActiveTab] = useState("pdfsandimages");
@@ -144,10 +143,6 @@ const LectureDisplay = () => {
   const [homeworks, setHomeworks] = useState([])
   const homeworkFileInputRef = useRef(null)
   const [accessDataLoaded, setAccessDataLoaded] = useState(false)
-  const [homeworkRequired, setHomeworkRequired] = useState(false);
-  const [homeworkVerified, setHomeworkVerified] = useState(false);
-  const [homeworkData, setHomeworkData] = useState(null);
-  const [homeworkSubmission, setHomeworkSubmission] = useState(null);
   const [viewSyncStatus, setViewSyncStatus] = useState(null);
 
   const playerRef = useRef(null)
@@ -175,19 +170,15 @@ const LectureDisplay = () => {
 
   const canEditLecture = ["Lecturer", "Admin", "SubAdmin", "Moderator"].includes(userRole)
   const legacyExamFormUrl = pickFirstUrl(
-    lecture?.examLink,
-    lecture?.examFormLink,
-    lecture?.examUrl,
+    lecture?.examLink, lecture?.examFormLink, lecture?.examUrl,
     findFirstAttachmentLinkUrl(attachments?.exams),
   )
   const legacyHomeworkFormUrl = pickFirstUrl(
-    lecture?.homeworkFormLink,
-    lecture?.homeworkLink,
-    lecture?.homeworkUrl,
+    lecture?.homeworkFormLink, lecture?.homeworkLink, lecture?.homeworkUrl,
     findFirstAttachmentLinkUrl(attachments?.homeworks),
   )
-  const resolvedExamFormUrl = pickFirstUrl(examData?.examUrl, examUrl, legacyExamFormUrl)
-  const resolvedHomeworkFormUrl = pickFirstUrl(homeworkData?.homeworkUrl, legacyHomeworkFormUrl)
+  const resolvedExamFormUrl = pickFirstUrl(assessments.exam.data?.examUrl, assessments.exam.data?.url, assessments.exam.url, legacyExamFormUrl)
+  const resolvedHomeworkFormUrl = pickFirstUrl(assessments.homework.data?.homeworkUrl, assessments.homework.data?.url, assessments.homework.url, legacyHomeworkFormUrl)
 
   const handleEditLecture = () => {
     if (!lecture || !canEditLecture) {
@@ -373,190 +364,78 @@ const LectureDisplay = () => {
     }
   }, [lectureId, userId, userRole, t]);
 
-  // Implement the complete flow for exam verification and lecture access
+  // Compact verification function using consolidated state
   const verifyExamAndCheckAccess = async () => {
     if (userRole !== "Student" || !lectureId) return;
 
     try {
-      setExamVerificationLoading(true);
-
-      // Step 1: Check lecture access requirements first.
+      setVerificationLoading(true);
       const accessResult = await checkLectureAccess(lectureId);
-
-      if (accessResult?.status === "error") {
-        throw new Error(accessResult.message || t("failedToLoadAccessData"));
-      }
+      if (accessResult?.status === "error") throw new Error(accessResult.message || t("failedToLoadAccessData"));
 
       let verificationResult = { data: {} };
-      const requiresVerification =
-        accessResult?.status === "restricted" &&
+      const needsVerify = accessResult?.status === "restricted" && 
         (accessResult.data?.exam?.required || accessResult.data?.homework?.required);
+      if (needsVerify) verificationResult = await verifyExamSubmission(lectureId);
 
-      // Step 2: Only verify submissions when there is an actual requirement.
-      if (requiresVerification) {
-        verificationResult = await verifyExamSubmission(lectureId);
-      }
+      const newAssessments = { exam: { required: false, verified: true, data: null, submission: null, url: "" }, 
+        homework: { required: false, verified: true, data: null, submission: null, url: "" } };
 
       if (accessResult.status === "restricted") {
-        // Handle exam requirements
         if (accessResult.data?.exam?.required) {
-          // FIX: verificationResult URLs take precedence over accessResult
-          const resolvedExamUrl = pickFirstUrl(
-            verificationResult.data?.exam?.examUrl,
-            verificationResult.data?.exam?.url,
-            accessResult.data?.exam?.url,
-            legacyExamFormUrl,
-          )
-
-          setExamRequired(true);
-          setExamUrl(resolvedExamUrl || "");
-          setExamData({
-            passingThreshold: accessResult.data.exam.passingThreshold,
-            examUrl: resolvedExamUrl,
-            examType: "exam",
-          });
-
-          // Check exam submission status
-          if (verificationResult.data?.exam?.passed) {
-            setExamVerified(true);
-            setExamSubmission(verificationResult.data.exam.submission);
-          } else {
-            setExamVerified(false);
-            if (verificationResult.data?.exam?.submission) {
-              setExamSubmission(verificationResult.data.exam.submission);
-            } else {
-              setExamSubmission(null);
-            }
-          }
-        } else {
-          setExamRequired(false);
-          setExamData(null);
-          setExamUrl("");
-          setExamSubmission(null);
+          const e = verificationResult.data?.exam || {};
+          newAssessments.exam = {
+            required: true, verified: !!e.passed, data: { passingThreshold: accessResult.data.exam.passingThreshold },
+            submission: e.submission || null,
+            url: pickFirstUrl(e.examUrl, e.url, accessResult.data.exam.url, legacyExamFormUrl)
+          };
         }
-
-        // Handle homework requirements
-        if (accessResult.data?.homework?.required && accessResult.status === "restricted") {
-          // FIX: verificationResult URLs take precedence over accessResult
-          const resolvedHomeworkUrl = pickFirstUrl(
-            verificationResult.data?.homework?.homeworkUrl,
-            verificationResult.data?.homework?.url,
-            accessResult.data?.homework?.url,
-            legacyHomeworkFormUrl,
-          )
-
-          setHomeworkRequired(true);
-          setHomeworkData({
-            passingThreshold: accessResult.data.homework.passingThreshold,
-            homeworkUrl: resolvedHomeworkUrl,
-            homeworkType: "homework",
-          });
-
-          // Check homework submission status
-          if (verificationResult.data?.homework?.passed) {
-            setHomeworkVerified(true);
-            setHomeworkSubmission(verificationResult.data.homework.submission);
-          } else {
-            setHomeworkVerified(false);
-            if (verificationResult.data?.homework?.submission) {
-              setHomeworkSubmission(verificationResult.data.homework.submission);
-            } else {
-              setHomeworkSubmission(null);
-            }
-          }
-        } else {
-          setHomeworkRequired(false);
-          setHomeworkData(null);
-          setHomeworkSubmission(null);
+        if (accessResult.data?.homework?.required) {
+          const h = verificationResult.data?.homework || {};
+          newAssessments.homework = {
+            required: true, verified: !!h.passed, data: { passingThreshold: accessResult.data.homework.passingThreshold },
+            submission: h.submission || null,
+            url: pickFirstUrl(h.homeworkUrl, h.url, accessResult.data.homework.url, legacyHomeworkFormUrl)
+          };
         }
-
-        // Handle case where neither exam nor homework is required but access is restricted
         if (!accessResult.data?.exam?.required && !accessResult.data?.homework?.required) {
           console.error("Unexpected restricted access:", accessResult);
-          setExamVerified(true);
-          setHomeworkVerified(true);
         }
-      } else {
-        // No restrictions found
-        setExamRequired(false);
-        setHomeworkRequired(false);
-        setExamVerified(true);
-        setHomeworkVerified(true);
-        setExamData(null);
-        setHomeworkData(null);
-        setExamSubmission(null);
-        setHomeworkSubmission(null);
-        setExamUrl("");
       }
+      setAssessments(newAssessments);
     } catch (err) {
-      console.error("Error in verification flow:", err);
-      setExamVerified(false);
-      setHomeworkVerified(false);
-      setError(err.message || t("failedToLoadAccessData"));
+      console.error("Verification error:", err);
+      toast.error(err.message || t("failedToLoadAccessData"));
     } finally {
-      setExamVerificationLoading(false);
+      setVerificationLoading(false);
     }
   };
 
-  // Add a useEffect to call verifyExamAndCheckAccess on refresh
   useEffect(() => {
-    // Check for cached verification result
-    const cachedVerification = sessionStorage.getItem(`lecture_verification_${lectureId}`);
-    if (cachedVerification) {
+    const cached = sessionStorage.getItem(`lecture_verification_${lectureId}`);
+    if (cached) {
       try {
-        const parsed = JSON.parse(cachedVerification);
-        // Check if cache is less than 5 minutes old
+        const parsed = JSON.parse(cached);
         if (parsed.timestamp && (Date.now() - parsed.timestamp) < 300000) {
-          // Restore cached state
-          setExamVerified(parsed.examVerified || false);
-          setHomeworkVerified(parsed.homeworkVerified || false);
-          setExamRequired(parsed.examRequired || false);
-          setHomeworkRequired(parsed.homeworkRequired || false);
-          setExamSubmission(parsed.examSubmission || null);
-          setHomeworkSubmission(parsed.homeworkSubmission || null);
-          if (parsed.examData) setExamData(parsed.examData);
-          if (parsed.homeworkData) setHomeworkData(parsed.homeworkData);
-          // Skip API call if we have valid cache
+          setAssessments(parsed.assessments);
           return;
         }
-      } catch (e) {
-        console.warn("Failed to parse verification cache:", e);
-      }
+      } catch (e) { console.warn("Cache parse error:", e); }
     }
-    
-    // This will run when the component mounts or when lectureId or userRole changes
-    if (userRole === "Student" && lectureId) {
-      verifyExamAndCheckAccess();
-    }
+    if (userRole === "Student" && lectureId) verifyExamAndCheckAccess();
   }, [lectureId, userRole]);
 
-  // Cache successful verification results
   useEffect(() => {
-    if (userRole === "Student" && (examVerified || homeworkVerified)) {
-      const cacheData = {
-        timestamp: Date.now(),
-        examVerified,
-        homeworkVerified,
-        examRequired,
-        homeworkRequired,
-        examSubmission,
-        homeworkSubmission,
-        examData,
-        homeworkData,
-      };
-      sessionStorage.setItem(`lecture_verification_${lectureId}`, JSON.stringify(cacheData));
+    if (userRole === "Student" && (assessments.exam.verified || assessments.homework.verified)) {
+      sessionStorage.setItem(`lecture_verification_${lectureId}`, JSON.stringify({
+        timestamp: Date.now(), assessments
+      }));
     }
-  }, [examVerified, homeworkVerified, examRequired, homeworkRequired, examSubmission, homeworkSubmission, examData, homeworkData, lectureId, userRole]);
+  }, [assessments, lectureId, userRole]);
 
-  // Debounced recheck function to prevent spamming
-  const debouncedRecheck = useCallback(
-    () => {
-      if (!examVerificationLoading) {
-        verifyExamAndCheckAccess();
-      }
-    },
-    [examVerificationLoading, verifyExamAndCheckAccess]
-  );
+  const debouncedRecheck = useCallback(() => {
+    if (!verificationLoading) verifyExamAndCheckAccess();
+  }, [verificationLoading, verifyExamAndCheckAccess]);
 
     // Fetch student access data - only for students
     useEffect(() => {
