@@ -1788,29 +1788,16 @@ const MyLecturesPage = () => {
 
                   <th>{t("lecturesPage.tableHeaders.price")}</th>
 
-                  <th>{t("lecturesPage.tableHeaders.points")}</th>
-
-                  {isStudentLikeRole && <th>{t("lecturesPage.tableHeaders.purchaseDate")}</th>}
-
-                  {!isStudentLikeRole && (
-
-                    <th>{t("lecturesPage.tableHeaders.actions")}</th>
-
-                  )}
-
-                </tr>
-
-              </thead>
-
-              <tbody>
-
-                {lectures?.map((lecture) => (
-
-                  <tr key={lecture.id}>
-
-                    <td>
-
-                      {lecture.thumbnail ? (
+                   <th>{t("lecturesPage.tableHeaders.points")}</th>
+                   {isStudentLikeRole && <th>{t("lecturesPage.tableHeaders.purchaseDate")}</th>}
+                   <th>{t("lecturesPage.tableHeaders.actions")}</th>
+                 </tr>
+               </thead>
+               <tbody>
+                 {lectures?.map((lecture) => (
+                   <tr key={lecture.id}>
+                     <td>
+                       {lecture.thumbnail ? (
 
                         <div className="avatar">
 
@@ -1900,87 +1887,44 @@ const MyLecturesPage = () => {
 
                     </td>
 
-                    {isStudentLikeRole && <td>{lecture.purchasedAt}</td>}
-
-                    {!isStudentLikeRole && (
-
-                      <td>
-
-                        <div className="flex flex-wrap gap-2">
-
-                          <Link
-
-                            to={`/dashboard/${isStudentLikeRole ? "student" : "lecturer"}-dashboard/${isStudentLikeRole ? "lecture-display" : "detailed-lecture-view"
-
-                              }/${lecture.id}`}
-
-                          >
-
-                            <button
-
-                              className="btn btn-sm border-none"
-
-                              style={{ background: TOKENS.deepTeal, color: "#F8FCFF" }}
-
-                            >
-
-                              {t("lecturesPage.buttons.details")}
-
-                            </button>
-
-                          </Link>
-
-                          {!isStudentLikeRole && (
-
-                            <button
-
-                              type="button"
-
-                              className="btn btn-sm border-none"
-
-                              style={{ background: TOKENS.warmMango, color: "#fff" }}
-
-                              onClick={() => openEditLectureModal(lecture)}
-
-                            >
-
-                              {t("lecturesPage.buttons.edit", "Edit")}
-
-                            </button>
-
-                          )}
-
-                          {!isStudentLikeRole && (
-
-                            <button
-
-                              type="button"
-
-                              className="btn btn-sm border-none"
-
-                              style={{ background: "#EF4444", color: "#fff" }}
-
-                              onClick={() => handleDeleteLecture(lecture)}
-
-                            >
-
-                              {t("lecturesPage.buttons.delete", "Delete")}
-
-                            </button>
-
-                          )}
-
-                        </div>
-
-                      </td>
-
-                    )}
-
-                  </tr>
-
-                ))}
-
-              </tbody>
+                     {isStudentLikeRole && <td>{lecture.purchasedAt}</td>}
+                     <td>
+                       <div className="flex flex-wrap gap-2">
+                         <Link
+                           to={`/dashboard/${isStudentLikeRole ? "student" : "lecturer"}-dashboard/${isStudentLikeRole ? "lecture-display" : "detailed-lecture-view"}/${lecture.id}`}
+                         >
+                           <button
+                             className="btn btn-sm border-none"
+                             style={{ background: TOKENS.deepTeal, color: "#F8FCFF" }}
+                           >
+                             {isStudentLikeRole ? t("lecturesPage.buttons.view") : t("lecturesPage.buttons.details")}
+                           </button>
+                         </Link>
+                         {!isStudentLikeRole && (
+                           <button
+                             type="button"
+                             className="btn btn-sm border-none"
+                             style={{ background: TOKENS.warmMango, color: "#fff" }}
+                             onClick={() => openEditLectureModal(lecture)}
+                           >
+                             {t("lecturesPage.buttons.edit", "Edit")}
+                           </button>
+                         )}
+                         {!isStudentLikeRole && (
+                           <button
+                             type="button"
+                             className="btn btn-sm border-none"
+                             style={{ background: "#EF4444", color: "#fff" }}
+                             onClick={() => handleDeleteLecture(lecture)}
+                           >
+                             {t("lecturesPage.buttons.delete", "Delete")}
+                           </button>
+                         )}
+                       </div>
+                     </td>
+                   </tr>
+                 ))}
+               </tbody>
 
             </table>
 

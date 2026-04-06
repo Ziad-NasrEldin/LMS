@@ -17,10 +17,46 @@ const BulkCreateUsers = () => {
   const [loading, setLoading] = useState(false)
 
   const generateCSVTemplate = () => {
+    // Get translated headers with required field indicators
     const headers = {
-      student: ["name", "phoneNumber", "parentPhoneNumber", "parentPhoneRelation", "stage", "level", "government", "administrationZone", "hobby", "gender", "email", "password"],
-      parent: ["name", "phoneNumber", "profession", "government", "administrationZone", "gender", "email", "password"],
-      teacher: ["name", "phoneNumber", "phoneNumber2", "subject", "level", "teachesAtType", "school", "government", "administrationZone", "gender", "email", "password"],
+      student: [
+        t("csvHeaders.student.name"),
+        t("csvHeaders.student.phoneNumber"),
+        t("csvHeaders.student.parentPhoneNumber"),
+        t("csvHeaders.student.parentPhoneRelation"),
+        t("csvHeaders.student.stage"),
+        t("csvHeaders.student.level"),
+        t("csvHeaders.student.government"),
+        t("csvHeaders.student.administrationZone"),
+        t("csvHeaders.student.hobby"),
+        t("csvHeaders.student.gender"),
+        t("csvHeaders.student.email"),
+        t("csvHeaders.student.password"),
+      ],
+      parent: [
+        t("csvHeaders.parent.name"),
+        t("csvHeaders.parent.phoneNumber"),
+        t("csvHeaders.parent.profession"),
+        t("csvHeaders.parent.government"),
+        t("csvHeaders.parent.administrationZone"),
+        t("csvHeaders.parent.gender"),
+        t("csvHeaders.parent.email"),
+        t("csvHeaders.parent.password"),
+      ],
+      teacher: [
+        t("csvHeaders.teacher.name"),
+        t("csvHeaders.teacher.phoneNumber"),
+        t("csvHeaders.teacher.phoneNumber2"),
+        t("csvHeaders.teacher.subject"),
+        t("csvHeaders.teacher.level"),
+        t("csvHeaders.teacher.teachesAtType"),
+        t("csvHeaders.teacher.school"),
+        t("csvHeaders.teacher.government"),
+        t("csvHeaders.teacher.administrationZone"),
+        t("csvHeaders.teacher.gender"),
+        t("csvHeaders.teacher.email"),
+        t("csvHeaders.teacher.password"),
+      ],
     }
 
     const sampleData = {
@@ -42,7 +78,9 @@ const BulkCreateUsers = () => {
     const csvRows = sampleData[accountType].map((row) => row.join(","))
     const csvContent = [csvHeaders, ...csvRows].join("\n")
 
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })
+    // Add UTF-8 BOM for proper Arabic text display in Excel
+    const BOM = "\uFEFF"
+    const blob = new Blob([BOM + csvContent], { type: "text/csv;charset=utf-8;" })
     const link = document.createElement("a")
     const url = URL.createObjectURL(blob)
 
@@ -219,10 +257,53 @@ const BulkCreateUsers = () => {
 
           <div className="mt-6 bg-base-200 p-4 rounded-lg">
             <h3 className="font-medium mb-2">{t("titles.csvGuidelines")}</h3>
+            <p className="text-sm mb-2 text-info">{t("help.requiredFields")}</p>
             <p className="text-sm mb-2">{t("help.csvFormat")}</p>
             <ul className="list-disc list-inside text-sm space-y-1">
-              <li>{t("csvFields.name")}</li>
-              <li>{t("csvFields.phone")}</li>
+              {accountType === "student" && (
+                <>
+                  <li className="font-semibold">{t("csvHeaders.student.name")}</li>
+                  <li className="font-semibold">{t("csvHeaders.student.phoneNumber")}</li>
+                  <li className="font-semibold">{t("csvHeaders.student.parentPhoneNumber")}</li>
+                  <li className="font-semibold">{t("csvHeaders.student.parentPhoneRelation")}</li>
+                  <li className="font-semibold">{t("csvHeaders.student.stage")}</li>
+                  <li className="font-semibold">{t("csvHeaders.student.level")}</li>
+                  <li className="font-semibold">{t("csvHeaders.student.gender")}</li>
+                  <li className="font-semibold">{t("csvHeaders.student.password")}</li>
+                  <li>{t("csvHeaders.student.government")}</li>
+                  <li>{t("csvHeaders.student.administrationZone")}</li>
+                  <li>{t("csvHeaders.student.hobby")}</li>
+                  <li>{t("csvHeaders.student.email")}</li>
+                </>
+              )}
+              {accountType === "parent" && (
+                <>
+                  <li className="font-semibold">{t("csvHeaders.parent.name")}</li>
+                  <li className="font-semibold">{t("csvHeaders.parent.phoneNumber")}</li>
+                  <li className="font-semibold">{t("csvHeaders.parent.gender")}</li>
+                  <li className="font-semibold">{t("csvHeaders.parent.password")}</li>
+                  <li>{t("csvHeaders.parent.profession")}</li>
+                  <li>{t("csvHeaders.parent.government")}</li>
+                  <li>{t("csvHeaders.parent.administrationZone")}</li>
+                  <li>{t("csvHeaders.parent.email")}</li>
+                </>
+              )}
+              {accountType === "teacher" && (
+                <>
+                  <li className="font-semibold">{t("csvHeaders.teacher.name")}</li>
+                  <li className="font-semibold">{t("csvHeaders.teacher.phoneNumber")}</li>
+                  <li className="font-semibold">{t("csvHeaders.teacher.subject")}</li>
+                  <li className="font-semibold">{t("csvHeaders.teacher.level")}</li>
+                  <li className="font-semibold">{t("csvHeaders.teacher.teachesAtType")}</li>
+                  <li className="font-semibold">{t("csvHeaders.teacher.gender")}</li>
+                  <li className="font-semibold">{t("csvHeaders.teacher.password")}</li>
+                  <li>{t("csvHeaders.teacher.phoneNumber2")}</li>
+                  <li>{t("csvHeaders.teacher.school")}</li>
+                  <li>{t("csvHeaders.teacher.government")}</li>
+                  <li>{t("csvHeaders.teacher.administrationZone")}</li>
+                  <li>{t("csvHeaders.teacher.email")}</li>
+                </>
+              )}
             </ul>
           </div>
         </div>

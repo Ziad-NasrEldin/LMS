@@ -177,10 +177,51 @@
   "help": {
     "holdCtrlToSelectMultiple": "اضغط Ctrl (أو Cmd) لتحديد خيارات متعددة",
     "selectAccountType": "الإنشاء بالجملة يدعم فقط: طالب، ولي أمر، مدرس",
-    "csvRequiredFields": "يجب أن يحتوي ملف CSV على الحقول المطلوبة لنوع الحساب المحدد",
+    "csvRequiredFields": "املأ الحقول المطلوبة (معلمة بـ *). يمكن إضافة الحقول الاختيارية لاحقاً",
     "uploadCSV": "تحميل ملف CSV",
     "csvFormat": "يجب أن يحتوي ملف CSV على الحقول التالية:",
-    "downloadTemplate": "قم بتحميل نموذج CSV واملأ البيانات ثم ارفعه"
+    "downloadTemplate": "قم بتحميل نموذج CSV واملأ البيانات ثم ارفعه",
+    "requiredFields": "يجب ملء الحقول المطلوبة. يمكن ترك الحقول الاختيارية فارغة أو ملؤها لاحقاً."
+  },
+  "csvHeaders": {
+    "student": {
+      "name": "name* - الاسم",
+      "phoneNumber": "phoneNumber* - رقم الهاتف",
+      "parentPhoneNumber": "parentPhoneNumber* - رقم هاتف ولي الأمر",
+      "parentPhoneRelation": "parentPhoneRelation* - صلة ولي الأمر",
+      "stage": "stage* - المرحلة",
+      "level": "level* - الصف",
+      "government": "government - المحافظة",
+      "administrationZone": "administrationZone - الإدارة التعليمية",
+      "hobby": "hobby - الهواية",
+      "gender": "gender* - الجنس",
+      "email": "email - البريد الإلكتروني",
+      "password": "password* - كلمة المرور"
+    },
+    "parent": {
+      "name": "name* - الاسم",
+      "phoneNumber": "phoneNumber* - رقم الهاتف",
+      "profession": "profession - المهنة",
+      "government": "government - المحافظة",
+      "administrationZone": "administrationZone - الإدارة التعليمية",
+      "gender": "gender* - الجنس",
+      "email": "email - البريد الإلكتروني",
+      "password": "password* - كلمة المرور"
+    },
+    "teacher": {
+      "name": "name* - الاسم",
+      "phoneNumber": "phoneNumber* - رقم الهاتف",
+      "phoneNumber2": "phoneNumber2 - رقم هاتف إضافي",
+      "subject": "subject* - المادة",
+      "level": "level* - الصف",
+      "teachesAtType": "teachesAtType* - مكان التدريس",
+      "school": "school - المدرسة",
+      "government": "government - المحافظة",
+      "administrationZone": "administrationZone - الإدارة التعليمية",
+      "gender": "gender* - الجنس",
+      "email": "email - البريد الإلكتروني",
+      "password": "password* - كلمة المرور"
+    }
   },
   "csvFields": {
     "name": "الاسم",

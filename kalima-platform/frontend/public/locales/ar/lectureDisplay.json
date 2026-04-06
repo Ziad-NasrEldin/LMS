@@ -176,5 +176,7 @@
   "unexpectedErrorFetchingAccesses": "حدث خطأ غير متوقع أثناء جلب سجلات وصول الطلاب",
   "failedToDeleteLecture": "فشل في حذف المحاضرة",
   "unexpectedErrorDeletingLecture": "حدث خطأ غير متوقع أثناء حذف المحاضرة",
-  "unexpectedErrorUpdatingAccess": "حدث خطأ غير متوقع أثناء تحديث وصول الطالب للمحاضرة"
+  "unexpectedErrorUpdatingAccess": "حدث خطأ غير متوقع أثناء تحديث وصول الطالب للمحاضرة",
+  "copyEmail": "نسخ البريد الإلكتروني",
+  "useAccountEmail": "هام: يرجى استخدام نفس البريد الإلكتروني الخاص بحسابك عند تعبئة النموذج لضمان تسجيل تسليمك بشكل صحيح."
 }

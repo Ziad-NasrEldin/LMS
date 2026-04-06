@@ -3,14 +3,17 @@ const lectureController = require("../controllers/lectureController");
 const attachmentController = require("../controllers/attachmentController");
 const verifyJWT = require("../middleware/verifyJWT");
 const authController = require("../controllers/authController");
-// Apply JWT verification middleware
+
 const router = express.Router();
+
+// Apply JWT verification middleware
+router.use(verifyJWT);
+
+// Unified endpoint for loading the lecture page
+router.get("/load-page/:lectureId", lectureController.loadLecturePage);
 
 // New public route for non-sensitive lecture data
 router.route("/public").get(lectureController.getAllLecturesPublic);
-
-// Apply JWT verification middleware for subsequent routes
-router.use(verifyJWT);
 
 // Check student access to standalone lecture - MUST be before role verification
 router
@@ -18,7 +21,8 @@ router
   .get(lectureController.checkStudentLectureAccess);
 
 // Apply role verification middleware for lecture CRUD operations
-router.use(authController.verifyRoles("admin", "subadmin", "moderator", "lecturer", "assistant", "student"));
+router.use(authController.verifyRoles("admin", "subadmin", "moderator", "lecturer", "assistant", "student", "parent"));
+
 
 router
   .route("/")

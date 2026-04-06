@@ -937,30 +937,17 @@ const getMyPurchasedCourseContainers = catchAsync(async (req, res, next) => {
   let purchaseQuery;
 
   if (normalizedUserRole === "parent") {
-    // For parents: get all purchases from their children
+    // For parents: get all purchases from themselves AND their children
     const parent = await Parent.findById(userId).lean();
-    if (!parent || !parent.children || parent.children.length === 0) {
-      // Parent has no children, return empty response
-      return res.status(200).json({
-        status: "success",
-        data: {
-          userInfo: {
-            id: userId,
-            role: userRole,
-          },
-          containers: [],
-        },
-        pagination: {
-          totalCount: 0,
-          page,
-          limit,
-          totalPages: 1,
-        },
-      });
+    
+    // Combine parent's own ID with children's IDs
+    const allStudentIds = [userId];
+    if (parent && parent.children && parent.children.length > 0) {
+      allStudentIds.push(...parent.children);
     }
 
     purchaseQuery = {
-      student: { $in: parent.children },
+      student: { $in: allStudentIds },
       type: "containerPurchase",
     };
   } else {
@@ -1094,7 +1081,6 @@ const enrichPurchasesWithLectureData = async (purchaseHistory = []) => {
     ]);
 
     const containerToRootIds = new Map();
-
     purchasedContainerTrees.forEach((containerTree) => {
       const rootId = containerTree._id.toString();
       const scopedContainerIds = new Set([
@@ -1107,23 +1093,16 @@ const enrichPurchasesWithLectureData = async (purchaseHistory = []) => {
         roots.push(rootId);
         containerToRootIds.set(containerId, roots);
       });
-
       courseContainerLecturesMap[rootId] = [];
     });
 
-    const allScopedContainerIds = [
-      ...new Set(Array.from(containerToRootIds.keys())),
-    ];
-
-    const allScopedContainerObjectIds = allScopedContainerIds.map(
+    const allScopedContainerObjectIds = Array.from(containerToRootIds.keys()).map(
       (id) => new mongoose.Types.ObjectId(id)
     );
 
     const [lectureDocs, legacyLectureContainers] = await Promise.all([
       Lecture.find({ parent: { $in: allScopedContainerObjectIds } })
-        .select(
-          "name price subject level videoLink requiresExam examConfig requiresHomework homeworkConfig createdBy thumbnail createdAt parent"
-        )
+        .select("name price subject level videoLink requiresExam examConfig requiresHomework homeworkConfig createdBy thumbnail createdAt parent")
         .populate("subject", "name")
         .populate("level", "name")
         .populate("createdBy", "name")
@@ -1132,55 +1111,39 @@ const enrichPurchasesWithLectureData = async (purchaseHistory = []) => {
         _id: { $in: allScopedContainerObjectIds },
         type: "lecture",
       })
-        .select(
-          "name type price subject level videoLink requiresExam examConfig requiresHomework homeworkConfig createdBy thumbnail createdAt"
-        )
+        .select("name type price subject level videoLink requiresExam examConfig requiresHomework homeworkConfig createdBy thumbnail createdAt")
         .populate("subject", "name")
         .populate("level", "name")
         .populate("createdBy", "name")
         .lean(),
     ]);
 
-    const seenLectureIdsByRoot = new Map();
-
     const registerLectureForRoots = (roots, lectureDoc) => {
       roots.forEach((rootId) => {
-        const seenIds = seenLectureIdsByRoot.get(rootId) || new Set();
-        const lectureId = lectureDoc._id.toString();
-
-        if (!seenIds.has(lectureId)) {
-          courseContainerLecturesMap[rootId].push(lectureDoc);
-          seenIds.add(lectureId);
-          seenLectureIdsByRoot.set(rootId, seenIds);
-        }
+        courseContainerLecturesMap[rootId].push(lectureDoc);
       });
     };
 
     lectureDocs.forEach((lectureDoc) => {
       const parentId = lectureDoc.parent?.toString();
-      if (!parentId) return;
-      const roots = containerToRootIds.get(parentId) || [];
-      if (roots.length === 0) return;
-      registerLectureForRoots(roots, lectureDoc);
+      if (parentId) {
+        const roots = containerToRootIds.get(parentId) || [];
+        registerLectureForRoots(roots, lectureDoc);
+      }
     });
 
     legacyLectureContainers.forEach((lectureDoc) => {
       const roots = containerToRootIds.get(lectureDoc._id.toString()) || [];
-      if (roots.length === 0) return;
       registerLectureForRoots(roots, lectureDoc);
     });
   }
 
   return purchaseHistory.map((purchase) => {
     if (purchase.lecture) return purchase;
-
     if (purchase.container && purchase.container.type === "lecture") {
       const lectureData = lecturesMap[purchase.container._id?.toString()];
-      if (lectureData) {
-        return { ...purchase, lecture: lectureData };
-      }
+      if (lectureData) return { ...purchase, lecture: lectureData };
     }
-
     if (
       purchase.container &&
       purchase.container._id &&
@@ -1188,7 +1151,6 @@ const enrichPurchasesWithLectureData = async (purchaseHistory = []) => {
     ) {
       const purchasedContainerLectures =
         courseContainerLecturesMap[purchase.container._id.toString()] || [];
-
       if (purchasedContainerLectures.length > 0) {
         return {
           ...purchase,
@@ -1199,7 +1161,6 @@ const enrichPurchasesWithLectureData = async (purchaseHistory = []) => {
         };
       }
     }
-
     return purchase;
   });
 };

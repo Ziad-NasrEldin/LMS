@@ -16,6 +16,18 @@ const authConfig = ({ withCredentials = true, headers = {}, ...rest } = {}) => (
   headers: authHeaders(headers),
 })
 
+export const loadLecturePage = async (lectureId) => {
+  try {
+    const response = await axios.get(`${API_URL}/lectures/load-page/${lectureId}`, authConfig());
+    return {
+      success: true,
+      data: response.data.data,
+    };
+  } catch (error) {
+    return normalizeApiError(error, "Failed to load lecture page data");
+  }
+};
+
 // Function to get all containers
 export const getAllContainers = async (queryParams = {}) => {
   try {

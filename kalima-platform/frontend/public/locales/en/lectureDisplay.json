@@ -176,5 +176,7 @@
   "unexpectedErrorFetchingAccesses": "An unexpected error occurred while fetching student lecture accesses",
   "failedToDeleteLecture": "Failed to delete lecture",
   "unexpectedErrorDeletingLecture": "An unexpected error occurred while deleting the lecture",
-  "unexpectedErrorUpdatingAccess": "An unexpected error occurred while updating student lecture access"
+  "unexpectedErrorUpdatingAccess": "An unexpected error occurred while updating student lecture access",
+  "copyEmail": "Copy Email",
+  "useAccountEmail": "Important: Please use the same email as your account when filling out the form to ensure your submission is recorded correctly."
 }

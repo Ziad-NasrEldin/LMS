@@ -6,6 +6,7 @@ const QueryFeatures = require("../utils/queryFeatures")
 const Level = require("../models/levelModel")
 const Subject = require("../models/subjectModel")
 const Lecturer = require("../models/lecturerModel")
+const Attachment = require("../models/attachmentModel")
 const Lecture = require("../models/LectureModel")
 const LecturerExamConfig = require("../models/ExamConfigModel")
 const Purchase = require("../models/purchaseModel")
@@ -250,7 +251,126 @@ const deleteFile = (filePath) => {
   }
 }
 
+// Unified endpoint to load all data needed for the lecture page
+exports.loadLecturePage = catchAsync(async (req, res, next) => {
+  const { lectureId } = req.params;
+  const user = req.user;
+
+  if (!mongoose.Types.ObjectId.isValid(lectureId)) {
+    throw new AppError("Invalid lecture ID", 400);
+  }
+
+  // 1. Fetch Lecture Data
+  let lecture = await Lecture.findById(lectureId).populate([
+    { path: "createdBy", select: "name" },
+    { path: "subject", select: "name" },
+    { path: "level", select: "name nameAr kind sortOrder parentLevel isActive" },
+    { path: "examConfig", select: "name formUrl googleSheetId googleSheetTabName defaultPassingThreshold" },
+    { path: "homeworkConfig", select: "name formUrl googleSheetId googleSheetTabName defaultPassingThreshold" },
+  ]);
+
+  if (!lecture) {
+    lecture = await Container.findOne({ _id: lectureId, type: "lecture" }).populate([
+      { path: "createdBy", select: "name" },
+      { path: "subject", select: "name" },
+      { path: "level", select: "name nameAr kind sortOrder parentLevel isActive" },
+    ]);
+  }
+
+  if (!lecture) throw new AppError("Lecture not found", 404);
+
+  // Normalize form URLs
+  if (lecture.examConfig?.formUrl) lecture.examFormUrl = lecture.examConfig.formUrl;
+  else if (lecture.examLink) lecture.examFormUrl = lecture.examLink;
+
+  if (lecture.homeworkConfig?.formUrl) lecture.homeworkFormUrl = lecture.homeworkConfig.formUrl;
+  else if (lecture.homeworkLink) lecture.homeworkFormUrl = lecture.homeworkLink;
+
+  // 2. Fetch Attachments
+  const attachmentsResult = await Attachment.find({ lectureId }).lean();
+  const categorizedAttachments = {
+    exams: [],
+    booklets: [],
+    homeworks: [],
+    pdfsandimages: [],
+  };
+
+  attachmentsResult.forEach(att => {
+    const type = att.type?.toLowerCase();
+    if (type === "exams") categorizedAttachments.exams.push(att);
+    else if (type === "booklets") categorizedAttachments.booklets.push(att);
+    else if (type === "homeworks") categorizedAttachments.homeworks.push(att);
+    else categorizedAttachments.pdfsandimages.push(att);
+  });
+
+  // 3. User-specific data
+  let accessData = null;
+  let requirements = null;
+  let homeworks = [];
+
+  if (user.role === "Student") {
+    // Check access record
+    const access = await StudentLectureAccess.findOne({
+      student: user._id,
+      lecture: lectureId,
+    }).lean();
+
+    accessData = access ? {
+      _id: access._id,
+      remainingViews: access.remainingViews,
+      lastAccessed: access.lastAccessed,
+    } : null;
+
+    // Check requirements
+    requirements = buildLectureRequirements(lecture);
+    if (lecture.requiresExam) {
+      const examPassed = await StudentExamSubmission.findOne({
+        student: user._id,
+        lecture: lectureId,
+        type: "exam",
+        passed: true,
+      }).lean();
+      requirements.exam.passed = !!examPassed;
+    }
+    if (lecture.requiresHomework) {
+      const hwPassed = await StudentExamSubmission.findOne({
+        student: user._id,
+        lecture: lectureId,
+        type: "homework",
+        passed: true,
+      }).lean();
+      requirements.homework.passed = !!hwPassed;
+    }
+  }
+
+  // 4. Privileged homework fetch
+  const privilegedRoles = ["Lecturer", "Admin", "SubAdmin", "Moderator", "Assistant"];
+  if (privilegedRoles.includes(user.role)) {
+    homeworks = await StudentExamSubmission.find({
+      lecture: lectureId,
+      type: "homework",
+    }).populate("student", "name sequencedId").lean();
+  }
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      lecture,
+      attachments: categorizedAttachments,
+      accessData,
+      requirements,
+      homeworks,
+      user: {
+        id: user._id,
+        role: user.role,
+        email: user.email,
+      },
+    },
+  });
+});
+
 exports.createLecture = catchAsync(async (req, res, next) => {
+
   // Handle image upload first
   uploadSingleImageToDisk(req, res, async (uploadErr) => {
     if (uploadErr) {

@@ -106,6 +106,14 @@ const assertLectureAccessReadPermission = async (req, lectureDoc) => {
     return;
   }
 
+  if (role === STUDENT_ROLE) {
+    return; // Students are allowed to initiate the request; filtering happens in the query
+  }
+
+  if (role === PARENT_ROLE) {
+    return; // Parents are allowed to initiate the request; filtering happens in the query
+  }
+
   throw new AppError("Forbidden, you don't have access to this lecture records", 403);
 };
 
@@ -127,17 +135,32 @@ const assertSingleAccessPermission = async (
         403
       );
     }
-
+ 
     if (!allowStudentRead) {
       throw new AppError(
         "Forbidden, students cannot modify lecture access records",
         403
       );
     }
-
+ 
     return;
   }
-
+ 
+  if (role === PARENT_ROLE) {
+    const hasAccess = await hasAccessToStudentRecord(
+      req.user?._id,
+      role,
+      accessDoc.student
+    );
+    if (!hasAccess) {
+      throw new AppError(
+        "Forbidden, you can only access lecture access records for your children",
+        403
+      );
+    }
+    return;
+  }
+ 
   if (isLecturerScopedRole(role)) {
     const lectureDoc = await resolveLectureDocument(accessDoc.lecture);
 
@@ -155,23 +178,8 @@ const assertSingleAccessPermission = async (
 };
 
 const buildLectureContainerChain = async (lectureId) => {
-  const chainIds = [];
-  const seen = new Set();
-
-  const pushId = (id) => {
-    const idStr = toIdString(id);
-
-    if (!idStr || seen.has(idStr) || !mongoose.Types.ObjectId.isValid(idStr)) {
-      return;
-    }
-
-    seen.add(idStr);
-    chainIds.push(new mongoose.Types.ObjectId(idStr));
-  };
-
   const lectureDoc = await Lecture.findById(lectureId).select("parent").lean();
-
-  let cursor = lectureDoc?.parent || null;
+  let startContainerId = lectureDoc?.parent;
 
   if (!lectureDoc) {
     const legacyLectureContainer = await Container.findById(lectureId)
@@ -179,34 +187,49 @@ const buildLectureContainerChain = async (lectureId) => {
       .lean();
 
     if (legacyLectureContainer?.type === "lecture") {
-      pushId(legacyLectureContainer._id);
-      cursor = legacyLectureContainer.parent || null;
+      startContainerId = legacyLectureContainer.parent;
+      // Include the legacy lecture itself in the chain as it's a container
+      const chain = [legacyLectureContainer._id];
+      if (!startContainerId) return chain;
+      
+      const parents = await Container.aggregate([
+        { $match: { _id: new mongoose.Types.ObjectId(startContainerId) } },
+        {
+          $graphLookup: {
+            from: "containers",
+            startWith: "$parent",
+            connectFromField: "parent",
+            connectToField: "_id",
+            as: "ancestors",
+            maxDepth: 25,
+          },
+        },
+        { $project: { allIds: { $concatArrays: [["$_id"], "$ancestors._id"] } } },
+      ]);
+
+      return parents[0]?.allIds || chain;
     }
+    return [];
   }
 
-  let depth = 0;
-  while (cursor && depth < 25) {
-    const cursorId = toIdString(cursor);
+  if (!startContainerId) return [];
 
-    if (!cursorId || seen.has(cursorId)) {
-      break;
-    }
+  const result = await Container.aggregate([
+    { $match: { _id: new mongoose.Types.ObjectId(startContainerId) } },
+    {
+      $graphLookup: {
+        from: "containers",
+        startWith: "$parent",
+        connectFromField: "parent",
+        connectToField: "_id",
+        as: "ancestors",
+        maxDepth: 25,
+      },
+    },
+    { $project: { allIds: { $concatArrays: [["$_id"], "$ancestors._id"] } } },
+  ]);
 
-    pushId(cursorId);
-
-    const containerDoc = await Container.findById(cursorId)
-      .select("parent")
-      .lean();
-
-    if (!containerDoc) {
-      break;
-    }
-
-    cursor = containerDoc.parent || null;
-    depth += 1;
-  }
-
-  return chainIds;
+  return result[0]?.allIds || [];
 };
 
 const hasLectureEntitlement = async (studentIds, lectureId, purchaseId) => {
@@ -699,9 +722,21 @@ exports.getLectureAccessByLectureId = catchAsync(async (req, res, next) => {
 
   await assertLectureAccessReadPermission(req, lectureDoc);
 
-  const accessRecords = await StudentLectureAccess.find({
+  const role = normalizeRole(req.user?.role);
+  let query = {
     lecture: lectureDoc._id,
-  })
+  };
+
+  if (role === STUDENT_ROLE) {
+    query.student = req.user._id;
+  }
+
+  if (role === PARENT_ROLE) {
+    const childrenIds = await getParentChildrenIds(req.user._id);
+    query.student = { $in: childrenIds };
+  }
+
+  const accessRecords = await StudentLectureAccess.find(query)
     .populate({
       path: "student",
       select: "name email role",

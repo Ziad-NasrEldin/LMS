@@ -9,6 +9,7 @@ import {
   getLectureAttachments,
   downloadAttachmentById,
   createLectureAttachment,
+  loadLecturePage,
 } from "../../../routes/lectures"
 import {
   findFirstAttachmentLinkUrl,
@@ -18,8 +19,8 @@ import {
 } from "./lectureDisplay.utils"
 import { verifyExamSubmission, checkLectureAccess } from "../../../routes/examsAndHomeworks"
 import { uploadHomework, getLectureHomeworks } from "../../../routes/homeworks"
-import { getUserDashboard } from "../../../routes/auth-services"
-import { checkStudentLectureAccess, accountStudentLecturePlayStart } from "../../../routes/student-lecture-access"
+import { getUserDashboard, getUserFromToken } from "../../../routes/auth-services"
+import { checkStudentLectureAccess, accountStudentLecturePlayStart, getStudentLectureAccessByLectureId } from "../../../routes/student-lecture-access"
 import {
   FiUpload,
   FiFile,
@@ -38,6 +39,7 @@ import {
   FiMaximize,
   FiMinimize,
   FiEdit,
+  FiCopy,
 } from "react-icons/fi"
 
 // Vidstack imports
@@ -69,8 +71,15 @@ const LectureDisplay = () => {
   const [remainingViews, setRemainingViews] = useState(null);
   const [studentLectureAccessId, setStudentLectureAccessId] = useState(null);   
   const [videoBlocked, setVideoBlocked] = useState(false);
-  const [userRole, setUserRole] = useState(null);
-  const [userId, setUserId] = useState(null);
+  const [userRole, setUserRole] = useState(() => {
+    const user = getUserFromToken();
+    return user?.role || user?.UserInfo?.role || null;
+  });
+  const [userId, setUserId] = useState(() => {
+    const user = getUserFromToken();
+    return user?.id || user?._id || user?.UserInfo?.id || null;
+  });
+  const [userEmail, setUserEmail] = useState("");
   const [studentFullName, setStudentFullName] = useState("");
   const [studentSequenceId, setStudentSequenceId] = useState("");
   const [purchaseId, setPurchaseId] = useState(null);
@@ -184,355 +193,116 @@ const LectureDisplay = () => {
     if (!lecture || !canEditLecture) {
       return
     }
-
+ 
     const lecturesPageRoute =
       userRole === "Lecturer"
         ? "/dashboard/lecturer-dashboard/lectures-page"
         : "/dashboard/admin-dashboard/lectures-page"
-
+ 
     navigate(lecturesPageRoute, {
       state: {
         lectureEditTarget: lecture,
       },
     })
   }
+ 
+  const handleCopyEmail = () => {
+    if (!userEmail) {
+      toast.error(t("noEmailFound") || "No email found to copy");
+      return;
+    }
+    navigator.clipboard.writeText(userEmail);
+    toast.success(t("emailCopied") || "Email copied to clipboard!");
+  }
+ 
+  // Fetch all page data in one go
+  const fetchPageData = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
 
-  // Fetch user data first
-  useEffect(() => {
-    let cancelled = false;
+      const result = await loadLecturePage(lectureId);
 
-    const fetchUserData = async () => {
-      try {
-        const dashboardResult = await getUserDashboard();
+      if (result.success) {
+        const { lecture, attachments, accessData, requirements, homeworks, user } = result.data;
 
-        if (!dashboardResult.success) {
-          console.error("Failed to fetch user data:", dashboardResult.error);
-          setError(t("failedToAuthenticateUser"));
-          return;
-        }
+        // 1. Set Lecture & User Info
+        setLecture(lecture);
+        setUserRole(user.role);
+        setUserId(user.id);
+        setUserEmail(user.email || "");
 
-        if (cancelled) return;
+        // 2. Set Attachments
+        setAttachments(attachments);
+        const allAttachmentsArray = [
+          ...(attachments.pdfsandimages || []),
+          ...(attachments.homeworks || []),
+          ...(attachments.exams || []),
+          ...(attachments.booklets || []),
+        ];
+        setAllAttachments(allAttachmentsArray);
 
-        const dashboardData = dashboardResult.data.data || {};
-        const userInfo = dashboardData.userInfo || {};
-        setUserRole(userInfo.role);
-        setUserId(userInfo.id);
-        setStudentSequenceId(userInfo.sequencedId || "");
-        const computedFullName =
-          [
-            userInfo.firstName,
-            userInfo.middleName,
-            userInfo.lastName,
-          ]
-            .filter(Boolean)
-            .join(" ")
-            .trim() ||
-          userInfo.fullName ||
-          userInfo.name ||
-          userInfo.username ||
-          "";
-        setStudentFullName(computedFullName);
-
-        const lectureAccessRecords = Array.isArray(dashboardData.lectureAccess)
-          ? dashboardData.lectureAccess
-          : [];
-        const currentLectureAccess = lectureAccessRecords.find((access) => {
-          const accessLectureId = access?.lecture?._id || access?.lecture;
-          return accessLectureId?.toString() === lectureId;
-        });
-
-        if (currentLectureAccess) {
-          setStudentLectureAccessId(currentLectureAccess._id);
-          setRemainingViews(currentLectureAccess.remainingViews ?? 0);
+        // 3. Set Access & Views (Student Only)
+        if (user.role === "Student") {
+          if (accessData) {
+            setStudentLectureAccessId(accessData._id);
+            setRemainingViews(accessData.remainingViews);
+            if (accessData.remainingViews <= 0) {
+              setVideoBlocked(true);
+              redirectTimeoutRef.current = setTimeout(() => navigate(-1), 180000);
+            }
+          }
           setAccessDataLoaded(true);
           accessResolvedForLectureRef.current = lectureId;
 
-          if ((currentLectureAccess.remainingViews ?? 0) <= 0) {
-            setVideoBlocked(true);
-            redirectTimeoutRef.current = setTimeout(() => navigate(-1), 180000);
-          }
-
-          return;
-        }
-
-        if (
-          Array.isArray(dashboardData.purchaseHistory) &&
-          dashboardData.purchaseHistory.length > 0
-        ) {
-          const lecturePurchase = dashboardData.purchaseHistory.find((purchase) => {
-            if (purchase.lecture && String(purchase.lecture._id) === String(lectureId)) {
-              return true;
-            }
-
-            if (purchase.container && String(purchase.container._id) === String(lectureId)) {
-              return true;
-            }
-
-            if (purchase.container && purchase.container.lectures) {
-              return purchase.container.lectures.some((lecture) => String(lecture._id) === String(lectureId));
-            }
-
-            return false;
-          });
-
-          if (lecturePurchase) {
-            setPurchaseId(lecturePurchase._id);
-            setCurrentPurchase(lecturePurchase);
+          // Set Requirements
+          if (requirements) {
+            setAssessments({
+              exam: {
+                required: requirements.exam?.required || false,
+                verified: requirements.exam?.passed || false,
+                data: requirements.exam?.data || null,
+                url: requirements.exam?.url || "",
+              },
+              homework: {
+                required: requirements.homework?.required || false,
+                verified: requirements.homework?.passed || false,
+                data: requirements.homework?.data || null,
+                url: requirements.homework?.url || "",
+              },
+            });
           }
         }
-      } catch (err) {
-        if (cancelled) return;
 
-        console.error("Error fetching user data:", err);
-        setError(t("failedToAuthenticateUser"));
+        // 4. Set Homeworks (Privileged)
+        if (homeworks) {
+          setHomeworks(homeworks);
+        }
+      } else {
+        setError(result.error || t("failedToLoadLecture"));
       }
-    };
-
-    fetchUserData();
-
-    return () => {
-      cancelled = true;
-    };
+    } catch (err) {
+      setError(t("failedToLoadLectureTryAgain"));
+      console.error("Error loading page data:", err);
+    } finally {
+      setLoading(false);
+    }
   }, [lectureId, navigate, t]);
 
-  // Fetch lecture data and attachments
   useEffect(() => {
-    const fetchLecture = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const result = await getLectureById(lectureId);
-        if (result.success) {
-          const lectureData = result.data.container;
-          setLecture(lectureData);
-        } else {
-          setError(result.error || t("failedToLoadLecture"));
-        }
-      } catch (err) {
-        setError(t("failedToLoadLectureTryAgain"));
-        console.error("Error:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    const fetchAttachments = async () => {
-      try {
-        const result = await getLectureAttachments(lectureId);
-        if (result.status === "success") {
-
-          // Set the entire data object with all attachment types
-          setAttachments(result.data);
-
-          // Create a flat array of all attachments for simple display
-          const allAttachmentsArray = [
-            ...(result.data.pdfsandimages || []),
-            ...(result.data.homeworks || []),
-            ...(result.data.exams || []),
-            ...(result.data.booklets || []),
-          ];
-
-          setAllAttachments(allAttachmentsArray);
-        } else {
-          console.error("Failed to fetch attachments:", result.message);
-        }
-      } catch (err) {
-        console.error("Error fetching attachments:", err);
-      }
-    };
-
-    // Fetch homeworks if user has permission
-    const fetchHomeworks = async () => {
-      if (!hasUploadPermission()) return;
-
-      try {
-        const result = await getLectureHomeworks(lectureId);
-        if (result.success) {
-          setHomeworks(result.data.attachments || []);
-        } else {
-          console.error("Failed to fetch homeworks:", result.error);
-        }
-      } catch (err) {
-        console.error("Error fetching homeworks:", err);
-      }
-    };
-
     if (lectureId) {
-      fetchLecture();
-      fetchAttachments();
-      fetchHomeworks();
+      fetchPageData();
     }
-  }, [lectureId, userId, userRole, t]);
+  }, [lectureId, fetchPageData]);
 
-  // Compact verification function using consolidated state
-  const verifyExamAndCheckAccess = async () => {
-    if (userRole !== "Student" || !lectureId) return;
+  const debouncedRecheck = useCallback(async () => {
+    setVerificationLoading(true);
+    await fetchPageData();
+    setVerificationLoading(false);
+  }, [fetchPageData]);
 
-    try {
-      setVerificationLoading(true);
-      const accessResult = await checkLectureAccess(lectureId);
-      if (accessResult?.status === "error") throw new Error(accessResult.message || t("failedToLoadAccessData"));
-
-      let verificationResult = { data: {} };
-      const needsVerify = accessResult?.status === "restricted" && 
-        (accessResult.data?.exam?.required || accessResult.data?.homework?.required);
-      if (needsVerify) verificationResult = await verifyExamSubmission(lectureId);
-
-      const newAssessments = { exam: { required: false, verified: true, data: null, submission: null, url: "" }, 
-        homework: { required: false, verified: true, data: null, submission: null, url: "" } };
-
-      if (accessResult.status === "restricted") {
-        if (accessResult.data?.exam?.required) {
-          const e = verificationResult.data?.exam || {};
-          newAssessments.exam = {
-            required: true, verified: !!e.passed, data: { passingThreshold: accessResult.data.exam.passingThreshold },
-            submission: e.submission || null,
-            url: pickFirstUrl(e.examUrl, e.url, accessResult.data.exam.url, legacyExamFormUrl)
-          };
-        }
-        if (accessResult.data?.homework?.required) {
-          const h = verificationResult.data?.homework || {};
-          newAssessments.homework = {
-            required: true, verified: !!h.passed, data: { passingThreshold: accessResult.data.homework.passingThreshold },
-            submission: h.submission || null,
-            url: pickFirstUrl(h.homeworkUrl, h.url, accessResult.data.homework.url, legacyHomeworkFormUrl)
-          };
-        }
-        if (!accessResult.data?.exam?.required && !accessResult.data?.homework?.required) {
-          console.error("Unexpected restricted access:", accessResult);
-        }
-      }
-      setAssessments(newAssessments);
-    } catch (err) {
-      console.error("Verification error:", err);
-      toast.error(err.message || t("failedToLoadAccessData"));
-    } finally {
-      setVerificationLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    const cached = sessionStorage.getItem(`lecture_verification_${lectureId}`);
-    if (cached) {
-      try {
-        const parsed = JSON.parse(cached);
-        if (parsed.timestamp && (Date.now() - parsed.timestamp) < 300000) {
-          setAssessments(parsed.assessments);
-          return;
-        }
-      } catch (e) { console.warn("Cache parse error:", e); }
-    }
-    if (userRole === "Student" && lectureId) verifyExamAndCheckAccess();
-  }, [lectureId, userRole]);
-
-  useEffect(() => {
-    if (userRole === "Student" && (assessments.exam.verified || assessments.homework.verified)) {
-      sessionStorage.setItem(`lecture_verification_${lectureId}`, JSON.stringify({
-        timestamp: Date.now(), assessments
-      }));
-    }
-  }, [assessments, lectureId, userRole]);
-
-  const debouncedRecheck = useCallback(() => {
-    if (!verificationLoading) verifyExamAndCheckAccess();
-  }, [verificationLoading, verifyExamAndCheckAccess]);
-
-    // Fetch student access data - only for students
-    useEffect(() => {
-      const fetchAccessData = async () => {
-        if (
-          userRole === "Lecturer" ||
-          userRole === "Admin" ||
-          userRole === "SubAdmin" ||
-          userRole === "Moderator" ||
-          userRole === "Assistant" ||
-          !userId || // Make sure we have a userId before proceeding
-          !purchaseId // Make sure we have a purchaseId before proceeding
-        ) {
-          return;
-        }
-
-        try {
-          setError(null);
-          
-          
-          let apiLectureId = lectureId; // Default to lecture ID
-          let isStandaloneLecture = false;
-          
-          // Determine if this is a standalone lecture or container-based lecture
-          if (currentPurchase && currentPurchase.type === "containerPurchase" && currentPurchase.container) {
-            // For container purchases (including full courses), check access against the target lecture ID.
-            // The backend validates this lecture against the purchased container using purchaseId.
-            apiLectureId = lectureId;
-            isStandaloneLecture = false;
-          } else if (currentPurchase && currentPurchase.type === "lecturePurchase") {
-            // For lecture purchases, use the lecture ID and mark as standalone
-            apiLectureId = lectureId;
-            isStandaloneLecture = true;
-          }
-          
-          // Use the updated function to check student lecture access
-          const result = await checkStudentLectureAccess(
-            userId,
-            apiLectureId,
-            purchaseId,
-            isStandaloneLecture
-          );
-
-          if (result.success && result.data) {
-            // The access data is directly in result.data.access
-            if (result.data.access) {
-              
-              // Only set the studentLectureAccessId, don't update remainingViews yet
-              setStudentLectureAccessId(result.data.access._id)
-              setAccessDataLoaded(true)
-
-              // Store the remaining views in a ref to use when the video plays
-              if (result.data.access.remainingViews !== undefined) {
-                setRemainingViews(result.data.access.remainingViews);
-              }
-              accessResolvedForLectureRef.current = lectureId;
-
-              if (result.data.access.remainingViews <= 0) {
-                setVideoBlocked(true)
-                redirectTimeoutRef.current = setTimeout(() => navigate(-1), 180000)
-              }
-            } else {
-              console.error("No access data found in API response");
-              setError(t("noAccessToLecture"));
-            }
-          } else {
-            console.error("Failed to check lecture access:", result.error);
-            setError(t("noAccessToLecture"));
-          }
-        } catch (error) {
-          console.error("Error fetching access data:", error)
-          setError(t("failedToLoadAccessData"))
-          setAccessDataLoaded(true)
-        }
-      };
-
-      // Wait for user/purchase resolution instead of setting a premature error.
-      if (!lectureId || userRole !== "Student") {
-        return;
-      }
-
-      if (accessResolvedForLectureRef.current === lectureId) {
-        setAccessDataLoaded(true);
-        return;
-      }
-
-      if (!userId) {
-        return;
-      }
-
-      if (!purchaseId) {
-        setAccessDataLoaded(true);
-        return;
-      }
-
-      fetchAccessData();
-    }, [lectureId, navigate, userRole, userId, purchaseId, currentPurchase, t]);
+  // Remove old fetchUserData, fetchLecture, fetchAttachments, fetchHomeworks, and verifyExamAndCheckAccess useEffects.
+  // Keep only the view sync, upload, and video player logic.
 
     // Reset upload states when changing tabs
     useEffect(() => {
@@ -1159,23 +929,23 @@ const LectureDisplay = () => {
           actionUrl: resolvedHomeworkFormUrl, actionLabel: t("startHomework", "Start Homework"),
         },
       ].filter(Boolean);
-
+ 
       return (
-        <div className="mx-auto w-full max-w-5xl px-3 py-3 sm:px-4" dir={isRTL ? "rtl" : "ltr"}>
+        <div className="mx-auto w-full max-w-5xl px-4 py-3 sm:px-6" dir={isRTL ? "rtl" : "ltr"}>
           <button onClick={() => navigate(-1)} className="btn btn-outline btn-primary btn-sm mb-3">
             {t("back")}
           </button>
-
+ 
           <h1 className="text-2xl font-bold mb-4 text-center md:text-right md:text-4xl leading-tight">
             {lecture?.name || t("loadingLecture")}
           </h1>
-
+ 
           {showViewSyncBanner && (
             <div className="mb-4 rounded-2xl border border-info/30 bg-info/10 px-4 py-3 text-sm text-info-content shadow-sm">
               {viewSyncStatus}
             </div>
           )}
-
+ 
           <div className="rounded-3xl border border-warning/30 bg-gradient-to-br from-base-100 to-base-200/40 p-5 shadow-xl md:p-6">
             <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
               <div className="flex items-center gap-3">
@@ -1194,7 +964,7 @@ const LectureDisplay = () => {
                   </p>
                 </div>
               </div>
-
+ 
               <button
                 type="button"
                 className="btn btn-primary btn-sm"
@@ -1204,12 +974,12 @@ const LectureDisplay = () => {
                 {verificationLoading ? t("loading") : t("recheckAccess", "Recheck Access")}
               </button>
             </div>
-
+ 
             <div className="grid gap-4 md:grid-cols-2">
               {requirementCards.map((item) => (
                 <div
                   key={item.key}
-                  className="rounded-2xl border border-base-300 bg-base-100 p-4 shadow-sm"
+                   className="rounded-2xl border border-base-300 bg-base-100 p-4 sm:p-5 shadow-sm"
                 >
                   <div className="mb-2 flex items-start justify-between gap-3">
                     <h3 className="text-lg font-bold text-base-content">{item.title}</h3>
@@ -1219,38 +989,59 @@ const LectureDisplay = () => {
                         : t("statusPending", "Pending")}
                     </span>
                   </div>
-
+ 
                   <p className="mb-3 text-sm text-base-content/70">{item.subtitle}</p>
-
+ 
                   {item.threshold !== undefined && item.threshold !== null && (
                     <p className="mb-3 text-sm font-medium text-base-content">
                       {t("requiredPassingScore")}: {item.threshold}
                     </p>
                   )}
-
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {!item.passed && item.actionUrl && (
-                      <a
-                        href={item.actionUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="btn btn-primary btn-sm"
-                      >
-                        <FiExternalLink className={isRTL ? "ml-1" : "mr-1"} />
-                        {item.actionLabel}
-                      </a>
-                    )}
-
-                    {item.passed && (
-                      <span className="badge badge-success badge-outline">
-                        {t("completed", "Completed")}
-                      </span>
-                    )}
-                  </div>
+ 
+                   <div className="mt-2 flex flex-wrap gap-2">
+                     {!item.passed && item.actionUrl && (
+                       <div className="w-full mb-4 p-4 bg-warning/10 border-2 border-warning/30 rounded-xl flex flex-col gap-3 shadow-sm">
+                         <div className="flex items-center gap-2 text-warning-content">
+                           <FiAlertTriangle className="h-5 w-5 shrink-0" />
+                           <p className="text-sm md:text-base font-bold">
+                             {t("useAccountEmail")}
+                           </p>
+                         </div>
+                         <div className="flex flex-wrap items-center gap-3 bg-base-100 p-2 rounded-lg border border-warning/20">
+                           <code className="text-sm md:text-base font-mono break-all px-2 flex-1 min-w-0">
+                             {userEmail}
+                           </code>
+                           <button
+                             onClick={handleCopyEmail}
+                             className="btn btn-sm btn-warning shrink-0"
+                           >
+                             <FiCopy className="mr-1" /> {t("copyEmail")}
+                           </button>
+                         </div>
+                       </div>
+                     )}
+                     {!item.passed && item.actionUrl && (
+                       <a
+                         href={item.actionUrl}
+                         target="_blank"
+                         rel="noopener noreferrer"
+                         className="btn btn-primary btn-sm"
+                       >
+                         <FiExternalLink className={isRTL ? "ml-1" : "mr-1"} />
+                         {item.actionLabel}
+                       </a>
+                     )}
+ 
+                     {item.passed && (
+                       <span className="badge badge-success badge-outline">
+                         {t("completed", "Completed")}
+                       </span>
+                     )}
+                   </div>
                 </div>
               ))}
             </div>
-
+ 
             <div className="mt-4 rounded-2xl border border-info/30 bg-info/10 px-4 py-3 text-sm text-base-content/80">
               {t(
                 "accessVerificationHint",
@@ -1495,43 +1286,45 @@ const LectureDisplay = () => {
             <div className="p-3 bg-base-200">
               <div className="flex flex-col space-y-2">
                 {/* Video info */}
-                <div className="flex justify-between items-center mb-2">
-                  <div className="flex items-center gap-2">
-                    <FiClock className="text-primary" />
-                    <span className="text-sm font-medium">
-                      {formatTime(currentTime)} / {formatTime(duration)}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    {/* Playback rate selector */}
-                    <div className="dropdown dropdown-top dropdown-end">
-                      <label tabIndex={0} className="btn btn-sm btn-ghost">
-                        {playbackRate}x
-                      </label>
-                      <ul tabIndex={0} className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
-                        {[0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2].map((rate) => (
-                          <li key={rate}>
-                            <a className={playbackRate === rate ? "active" : ""} onClick={() => changePlaybackRate(rate)}>
-                              {rate}x
-                            </a>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
+                 <div className="flex flex-wrap justify-between items-center gap-2 mb-2">
+                   <div className="flex items-center gap-2">
+                     <FiClock className="text-primary" />
+                     <span className="text-sm font-medium">
+                       {formatTime(currentTime)} / {formatTime(duration)}
+                     </span>
+                   </div>
+                   <div className="flex flex-wrap items-center gap-3">
+                     {/* Playback rate selector */}
+                     <div className="dropdown dropdown-top dropdown-end">
+                       <label tabIndex={0} className="btn btn-sm btn-ghost">
+                         {playbackRate}x
+                       </label>
+                       <ul tabIndex={0} className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
+                         {[0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2].map((rate) => (
+                           <li key={rate}>
+                             <a className={playbackRate === rate ? "active" : ""} onClick={() => changePlaybackRate(rate)}>
+                               {rate}x
+                             </a>
+                           </li>
+                         ))}
+                       </ul>
+                     </div>
+
 
                     {/* Volume control */}
                     <div className="flex items-center gap-2">
                       <button className={`btn btn-sm btn-ghost ${isRTL ? "rotate-180" : ""}`} onClick={toggleMute}>
                         {isMuted ? <FiVolumeX /> : <FiVolume2 />}
                       </button>
-                      <input
-                        type="range"
-                        min="0"
-                        max="100"
-                        value={isMuted ? 0 : volume}
-                        onChange={(e) => changeVolume(Number.parseInt(e.target.value))}
-                        className="range range-xs range-primary w-24"
-                      />
+                         <input
+                           type="range"
+                           min="0"
+                           max="100"
+                           value={isMuted ? 0 : volume}
+                           onChange={(e) => changeVolume(Number.parseInt(e.target.value))}
+                           className="range range-xs range-primary w-20 sm:w-24"
+                         />
+
                     </div>
 
                     {/* Fullscreen toggle */}
@@ -1588,11 +1381,11 @@ const LectureDisplay = () => {
                   <span className="badge badge-primary">
                     {t("totalDuration")} : {formatTime(duration)}
                   </span>
-                  {userRole === "Student" && (
-                    <span className="badge badge-secondary">
-                      {t("remainingViews")}: {remainingViews === null ? t("loading") : remainingViews}
-                    </span>
-                  )}
+                   { (userRole === "Student" || userRole === "Parent") && (
+                     <span className="badge badge-secondary">
+                       {t("remainingViews")}: {remainingViews === null ? t("loading") : remainingViews}
+                     </span>
+                   )}
                 </div>
 
                 <div className="flex flex-wrap gap-2 mt-2 sm:mt-0">
@@ -1678,15 +1471,21 @@ const LectureDisplay = () => {
                   <strong>{t("type")}:</strong>{" "}
                   {Number(lecture?.price || 0) > 0 ? t("paid") : t("free", "Free")}
                 </p>
-                <p className="mb-2">
-                  <strong>{t("createdBy")}:</strong>{" "}
-                  {lecture?.createdBy?.name || t("notSpecified")}
-                </p>
-                {lecture?.requiresExam && (
-                  <p className="mb-2">
-                    <strong>{t("requiresExam")}:</strong> {t("yes")}
-                  </p>
-                )}
+                   <p className="mb-2">
+                     <strong>{t("createdBy")}:</strong>{" "}
+                     {lecture?.createdBy?.name || t("notSpecified")}
+                   </p>
+                   {(userRole === "Student" || userRole === "Parent") && (
+                     <p className="mb-2">
+                       <strong>{t("remainingViews")}:</strong>{" "}
+                       {remainingViews === null ? t("loading") : remainingViews}
+                     </p>
+                   )}
+                   {lecture?.requiresExam && (
+                     <p className="mb-2">
+                       <strong>{t("requiresExam")}:</strong> {t("yes")}
+                     </p>
+                   )}
               </div>
             </div>
           </div>
@@ -1721,7 +1520,7 @@ const LectureDisplay = () => {
                     key={index}
                     className="card bg-base-100 border border-base-300/80 hover:border-primary transition-all duration-300 rounded-xl"
                   >
-                    <div className="card-body p-4">
+                     <div className="card-body p-4 sm:p-5">
                       <div className="flex flex-col sm:flex-row sm:items-center gap-4 justify-between">
                         <div className="flex items-start gap-3">
                           <div className="mt-1">
@@ -1896,6 +1695,25 @@ const LectureDisplay = () => {
 
                     {resolvedHomeworkFormUrl ? (
                       <div className="mb-4">
+                        <div className="p-4 mb-4 bg-warning/10 border-2 border-warning/30 rounded-xl flex flex-col gap-3 shadow-sm">
+                          <div className="flex items-center gap-2 text-warning-content">
+                            <FiAlertTriangle className="h-5 w-5 shrink-0" />
+                            <p className="text-sm md:text-base font-bold">
+                              {t("useAccountEmail")}
+                            </p>
+                          </div>
+                          <div className="flex flex-wrap items-center gap-3 bg-base-100 p-2 rounded-lg border border-warning/20">
+                            <code className="text-sm md:text-base font-mono break-all px-2 flex-1 min-w-0">
+                              {userEmail}
+                            </code>
+                            <button
+                              onClick={handleCopyEmail}
+                              className="btn btn-sm btn-warning shrink-0"
+                            >
+                              <FiCopy className="mr-1" /> {t("copyEmail")}
+                            </button>
+                          </div>
+                        </div>
                         <p className="mb-4">
                           {t("completeGoogleFormDescription")}
                         </p>
@@ -1955,7 +1773,7 @@ const LectureDisplay = () => {
                     key={index}
                     className="card bg-base-100 border border-base-300/80 hover:border-primary transition-all duration-300 rounded-xl"
                   >
-                    <div className="card-body p-4">
+                     <div className="card-body p-4 sm:p-5">
                       <div className="flex flex-col sm:flex-row sm:items-center gap-4 justify-between">
                         <div className="flex items-start gap-3">
                           <div className="mt-1">

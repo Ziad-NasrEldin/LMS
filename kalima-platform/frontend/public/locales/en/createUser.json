@@ -177,10 +177,51 @@
   "help": {
     "holdCtrlToSelectMultiple": "Hold Ctrl (or Cmd) to select multiple options",
     "selectAccountType": "Bulk create supports: student, parent, teacher",
-    "csvRequiredFields": "CSV file should include required fields for the selected account type",
+    "csvRequiredFields": "Fill required fields (marked with *). Optional fields can be added later",
     "uploadCSV": "Upload CSV File",
     "csvFormat": "Your CSV file should include the following columns:",
-    "downloadTemplate": "Download the CSV template, fill in the data, then upload it"
+    "downloadTemplate": "Download the CSV template, fill in the data, then upload it",
+    "requiredFields": "Required fields must be filled. Optional fields can be left empty or filled later."
+  },
+  "csvHeaders": {
+    "student": {
+      "name": "name *",
+      "phoneNumber": "phoneNumber *",
+      "parentPhoneNumber": "parentPhoneNumber *",
+      "parentPhoneRelation": "parentPhoneRelation *",
+      "stage": "stage *",
+      "level": "level *",
+      "government": "government",
+      "administrationZone": "administrationZone",
+      "hobby": "hobby",
+      "gender": "gender *",
+      "email": "email",
+      "password": "password *"
+    },
+    "parent": {
+      "name": "name *",
+      "phoneNumber": "phoneNumber *",
+      "profession": "profession",
+      "government": "government",
+      "administrationZone": "administrationZone",
+      "gender": "gender *",
+      "email": "email",
+      "password": "password *"
+    },
+    "teacher": {
+      "name": "name *",
+      "phoneNumber": "phoneNumber *",
+      "phoneNumber2": "phoneNumber2",
+      "subject": "subject *",
+      "level": "level *",
+      "teachesAtType": "teachesAtType *",
+      "school": "school",
+      "government": "government",
+      "administrationZone": "administrationZone",
+      "gender": "gender *",
+      "email": "email",
+      "password": "password *"
+    }
   },
   
   "csvFields": {

@@ -7,6 +7,13 @@ const morgan = require("morgan");
 const app = express();
 // Trust first proxy hop (nginx) so rate-limit and client IP handling work correctly.
 app.set("trust proxy", 1);
+
+// LOG ALL REQUESTS
+app.use((req, res, next) => {
+  console.log(`Incoming Request: ${req.method} ${req.url}`);
+  next();
+});
+
 const PORT = process.env.PORT || 3200;
 const cors = require("cors");
 const connectDB = require("./config/dbConn.js");

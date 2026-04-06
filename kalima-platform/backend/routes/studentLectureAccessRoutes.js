@@ -13,7 +13,7 @@ router
 router
   .route("/lecture/:lectureId")
   .get(
-    verifyRoles("Lecturer", "Assistant", "Admin", "SubAdmin", "Moderator"),
+    verifyRoles("Student", "Parent", "Lecturer", "Assistant", "Admin", "SubAdmin", "Moderator"),
     studentLectureAccessController.getLectureAccessByLectureId
   );
 

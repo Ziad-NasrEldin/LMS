@@ -31,6 +31,14 @@ router.get(
   containerController.getContainerEnrollmentCount
 );
 
+// Get accessible child containers for a student by container ID
+// MUST be before /:containerId to avoid being caught by parameter route
+router.get(
+  "/student/:studentId/container/:containerId/purchase/:purchaseId",
+  authController.optionalJWT,
+  containerController.getAccessibleChildContainers
+);
+
 // Get container by ID - works with or without authentication
 // Note: This handles /my-containers as a special case for authenticated lecturers
 // This must be AFTER all other /:containerId/* routes
@@ -42,12 +50,6 @@ router.get(
 
 // Apply JWT verification middleware to all routes below this line
 router.use(verifyJWT);
-
-// Get accessible child containers for a student by container ID
-router.get(
-  "/student/:studentId/container/:containerId/purchase/:purchaseId",
-  containerController.getAccessibleChildContainers
-);
 
 //purchaseCounter for all containers
 router.get(
