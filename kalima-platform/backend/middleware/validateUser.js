@@ -93,6 +93,7 @@ const normalizeRolePayload = (payload, role) => {
 
   if (normalizedRole === "parent") {
     normalizeArrayField(payload, "children");
+    normalizeArrayField(payload, "stages");
   }
 
   return payload;

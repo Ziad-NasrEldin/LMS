@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const fetch = require("node-fetch");
+const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 const durationCache = require("../services/durationCache");
 
 // Helper function to extract YouTube video ID
@@ -156,6 +156,7 @@ const containerSchema = new mongoose.Schema(
     children: [{ type: mongoose.Schema.Types.ObjectId, ref: "Container" }],
     price: { type: Number, default: 0 },
     isPublished: { type: Boolean, default: true, index: true },
+    sameGradeOnly: { type: Boolean, default: false },
     description: { type: String },
     goal: [{ type: String }],
     image: {

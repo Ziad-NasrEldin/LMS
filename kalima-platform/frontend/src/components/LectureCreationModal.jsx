@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo, useCallback } from "react"
 import { useTranslation } from "react-i18next"
 import { FiX, FiPaperclip, FiImage, FiLink } from "react-icons/fi"
 import { getAllLevels } from "../routes/levels"
@@ -16,38 +16,171 @@ const ATTACHMENT_BUCKET_KEYS = ["pdfsandimages", "booklets", "homeworks", "exams
 const FORM_LINK_KEYS = ["homeworks", "exams"]
 
 const createEmptyAttachmentBuckets = () =>
-  ATTACHMENT_BUCKET_KEYS.reduce(
-    (acc, key) => {
-      acc[key] = []
-      return acc
-    },
-    {},
-  )
+  ATTACHMENT_BUCKET_KEYS.reduce((acc, key) => ({ ...acc, [key]: [] }), {})
 
 const createEmptyLinkBuckets = () =>
-  FORM_LINK_KEYS.reduce(
-    (acc, key) => {
-      acc[key] = ""
-      return acc
-    },
-    {},
-  )
+  FORM_LINK_KEYS.reduce((acc, key) => ({ ...acc, [key]: "" }), {})
 
 const flattenAttachmentBuckets = (attachmentBuckets) =>
   ATTACHMENT_BUCKET_KEYS.flatMap((category) =>
-    (attachmentBuckets?.[category] || []).map((attachment) => ({
-      ...attachment,
-      category,
-    })),
+    (attachmentBuckets?.[category] || []).map((attachment) => ({ ...attachment, category }))
   )
 
+const normalizeExistingAttachment = (attachment) => {
+  const filePath = attachment?.filePath || ""
+  const fileType = attachment?.fileType || "file"
+  const displayName =
+    attachment?.fileName || attachment?.name || attachment?.title || attachment?.originalName || filePath.split("/").pop() || "Attachment"
+
+  return {
+    id: attachment?._id || attachment?.id || `${displayName}-${attachment?.uploadedOn || attachment?.createdAt || ""}`,
+    fileName: displayName,
+    filePath: resolveUploadUrl(filePath) || filePath,
+    fileType,
+    uploadedOn: attachment?.uploadedOn || attachment?.createdAt || null,
+    isExisting: true,
+  }
+}
+
+const TOKENS = {
+  radius: { card: "rounded-xl", section: "rounded-2xl", modal: "rounded-[2rem]", full: "rounded-full" },
+  spacing: { tight: "gap-3", default: "gap-4", section: "gap-6", loose: "gap-8" },
+  surface: {
+    card: "bg-base-100 border border-base-300 shadow-sm",
+    highlighted: "bg-base-200/40 border border-base-300",
+    summary: "bg-amber-50/30 border border-amber-200/60",
+    gradient: "bg-gradient-to-br from-base-100 to-primary/5",
+  },
+  typography: {
+    meta: "text-xs font-bold uppercase tracking-wider",
+    sectionTitle: "text-lg font-bold text-base-content",
+    cardTitle: "font-semibold text-base-content",
+    label: "text-sm font-medium text-base-content/60",
+    value: "text-sm font-semibold text-base-content",
+    hint: "text-xs text-base-content/60",
+  },
+}
+
+const Card = ({ children, variant = "default", className = "" }) => {
+  const baseClasses = `${TOKENS.radius.card} ${TOKENS.spacing.tight} flex flex-col`
+  const variantClasses = {
+    default: TOKENS.surface.card,
+    highlighted: TOKENS.surface.highlighted,
+    summary: TOKENS.surface.summary,
+    gradient: `${TOKENS.surface.gradient} ${TOKENS.surface.card}`,
+  }
+  return <div className={`${baseClasses} ${variantClasses[variant]} p-4 ${className}`}>{children}</div>
+}
+
+const InputWithIcon = ({ icon: Icon, children, className = "" }) => (
+  <div className={`relative ${className}`}>
+    {children}
+    {Icon && <Icon className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-primary/50 pointer-events-none" />}
+  </div>
+)
+
+const SectionHeader = ({ number, title, subtitle, variant = "primary" }) => {
+  const colorClasses = {
+    primary: "bg-primary/10 text-primary",
+    secondary: "bg-secondary/10 text-secondary",
+    accent: "bg-accent/10 text-accent",
+  }
+  return (
+    <div className={`${TOKENS.spacing.tight} mb-5 flex items-center`}>
+      <div className={`flex h-10 w-10 items-center justify-center ${TOKENS.radius.card} ${colorClasses[variant]} text-sm font-bold`}>
+        {number}
+      </div>
+      <div>
+        <h4 className={TOKENS.typography.sectionTitle}>{title}</h4>
+        <p className={TOKENS.typography.label}>{subtitle}</p>
+      </div>
+    </div>
+  )
+}
+
+const FormField = ({ label, children, fullWidth = false, className = "" }) => (
+  <div className={`form-control ${fullWidth ? "md:col-span-2" : ""} ${className}`}>
+    <label className="label">
+      <span className="label-text font-semibold">{label}</span>
+    </label>
+    {children}
+  </div>
+)
+
+const ToggleCard = ({ title, enabled, onToggle, children, t }) => (
+  <Card variant="highlighted">
+    <div className={`${TOKENS.spacing.tight} mb-3 flex items-center justify-between`}>
+      <h5 className={TOKENS.typography.cardTitle}>{title}</h5>
+      <DSSelect className="select select-bordered select-sm rounded-lg" value={enabled} onChange={(e) => onToggle(e.target.value === "true")}>
+        <option value={false}>{t("options.no")}</option>
+        <option value={true}>{t("options.yes")}</option>
+      </DSSelect>
+    </div>
+    {enabled && <div className={`${TOKENS.spacing.default} flex flex-col`}>{children}</div>}
+  </Card>
+)
+
+const AssessmentConfig = ({ type, config, onToggle, onUrlChange, onThresholdChange, t }) => {
+  const { enabled, formUrl, passingThreshold } = config
+  const isExam = type === "exam"
+  const title = isExam ? t("fields.requiresExam") : t("fields.requiresHomework")
+  const urlLabel = t("attachments.formUrl", "Google Form URL")
+  const urlPlaceholder = t("attachments.formUrlPlaceholder", isExam ? "Paste exam form URL" : "Paste homework form URL")
+  const thresholdLabel = t("examConfig.passingThreshold", "Passing Threshold")
+
+  return (
+    <ToggleCard title={title} enabled={enabled} onToggle={onToggle} t={t}>
+      <FormField label={urlLabel}>
+        <input
+          type="url"
+          className={`input input-bordered w-full ${TOKENS.radius.section}`}
+          placeholder={urlPlaceholder}
+          value={formUrl}
+          onChange={(e) => onUrlChange(e.target.value)}
+        />
+      </FormField>
+      <FormField label={thresholdLabel}>
+        <input
+          type="number"
+          className={`input input-bordered w-full ${TOKENS.radius.section}`}
+          value={passingThreshold}
+          onChange={(e) => onThresholdChange(Number(e.target.value))}
+          min="0"
+          max="100"
+        />
+      </FormField>
+    </ToggleCard>
+  )
+}
+
+const Badge = ({ children, variant = "default" }) => {
+  const classes = {
+    default: "badge-outline badge-primary",
+    neutral: "badge-neutral",
+  }
+  return <span className={`badge ${classes[variant]}`}>{children}</span>
+}
+
 const SummaryRow = ({ label, value, loading = false }) => (
-  <div className="flex items-center justify-between gap-4 rounded-2xl border border-base-300 bg-base-100/80 px-4 py-3">
-    <span className="text-sm font-medium text-base-content/60">{label}</span>
-    <span className="text-sm font-semibold text-right text-base-content">
+  <div className={`${TOKENS.radius.card} ${TOKENS.surface.summary} flex items-center justify-between gap-3 px-4 py-3`}>
+    <span className={`${TOKENS.typography.label} flex-shrink-0`}>{label}</span>
+    <span className={`${TOKENS.typography.value} text-right truncate flex-1`}>
       {loading ? <span className="loading loading-spinner loading-xs"></span> : value}
     </span>
   </div>
+)
+
+const AttachmentListItem = ({ attachment, categoryLabel }) => (
+  <li className={`${TOKENS.spacing.tight} flex flex-col ${TOKENS.radius.card} bg-base-200/40 px-3 py-2`}>
+    <div className="flex items-center justify-between">
+      <span className="font-medium text-base-content">{attachment.fileName}</span>
+      <Badge>{categoryLabel || attachment.category}</Badge>
+    </div>
+    <a href={attachment.filePath} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 break-all text-xs text-primary hover:underline">
+      <FiLink className="h-3 w-3" />
+      Open file
+    </a>
+  </li>
 )
 
 const LectureCreationModal = ({
@@ -68,121 +201,138 @@ const LectureCreationModal = ({
   const { t, i18n } = useTranslation(["lecturesPage"])
   const isRTL = i18n.language === "ar"
   const isEditMode = mode === "edit"
-
-  // Form state
-  const [newItemName, setNewItemName] = useState("")
-  const [newDescription, setNewDescription] = useState("")
-  const [newPrice, setNewPrice] = useState(0)
-  const [newVideoLink, setNewVideoLink] = useState("")
-  const [attachmentFilesByCategory, setAttachmentFilesByCategory] = useState(createEmptyAttachmentBuckets())
-  const [existingAttachmentsByCategory, setExistingAttachmentsByCategory] = useState({
-    ...createEmptyAttachmentBuckets(),
-  })
-  const [thumbnailFile, setThumbnailFile] = useState(null)
-  const [thumbnailPreview, setThumbnailPreview] = useState(null)
-  const [creationLoading, setCreationLoading] = useState(false)
-  const [creationError, setCreationError] = useState("")
-  const [numberOfViews, setNumberOfViews] = useState(0)
-  const [attachmentLinksByCategory, setAttachmentLinksByCategory] = useState(createEmptyLinkBuckets())
-  const [existingAttachmentLinksByCategory, setExistingAttachmentLinksByCategory] = useState(createEmptyLinkBuckets())
-  const [selectedFormLinkType, setSelectedFormLinkType] = useState("homeworks")
-  const [googleFormLink, setGoogleFormLink] = useState("")
-
-  // Exam related state
-  const [requiresExam, setRequiresExam] = useState(false)
-  const [passingThreshold, setPassingThreshold] = useState(50)
-  const [examFormUrl, setExamFormUrl] = useState("")
-
-  // Homework related state
-  const [requiresHomework, setRequiresHomework] = useState(false)
-  const [homeworkPassingThreshold, setHomeworkPassingThreshold] = useState(50)
-  const [homeworkFormUrl, setHomeworkFormUrl] = useState("")
-
-  // Levels and subjects state
-  const [levels, setLevels] = useState([])
-  const [subjects, setSubjects] = useState([])
-  const [levelsLoading, setLevelsLoading] = useState(false)
-  const [subjectsLoading, setSubjectsLoading] = useState(false)
-  const [selectedLevel, setSelectedLevel] = useState("")
-  const [selectedSubject, setSelectedSubject] = useState("")
-  const [selectedCourseId, setSelectedCourseId] = useState("")
-  const [selectedParentContainerId, setSelectedParentContainerId] = useState("")
-
   const usesSelectableParent = !isEditMode && !containerId
-  const selectedCourseInfo = lecturerCourseOptions.find((course) => String(course.value) === String(selectedCourseId))
-  const availableContainersForCourse = lecturerContainerOptionsByCourse[String(selectedCourseId)] || []
-  const selectedParentContainerInfo = availableContainersForCourse.find(
-    (containerOption) => String(containerOption.value) === String(selectedParentContainerId),
-  )
 
-  const normalizeExistingAttachment = (attachment) => {
-    const filePath = attachment?.filePath || ""
-    const fileType = attachment?.fileType || "file"
-    const displayName =
-      attachment?.fileName ||
-      attachment?.name ||
-      attachment?.title ||
-      attachment?.originalName ||
-      filePath.split("/").pop() ||
-      "Attachment"
+  const [formData, setFormData] = useState({
+    name: "",
+    description: "",
+    price: 0,
+    videoLink: "",
+    numberOfViews: 0,
+  })
 
-    return {
-      id: attachment?._id || attachment?.id || `${displayName}-${attachment?.uploadedOn || attachment?.createdAt || ""}`,
-      fileName: displayName,
-      filePath: resolveUploadUrl(filePath) || filePath,
-      fileType,
-      uploadedOn: attachment?.uploadedOn || attachment?.createdAt || null,
-      isExisting: true,
+  const [assessmentConfig, setAssessmentConfig] = useState({
+    exam: { enabled: false, formUrl: "", passingThreshold: 50 },
+    homework: { enabled: false, formUrl: "", passingThreshold: 50 },
+  })
+
+  const [attachments, setAttachments] = useState({
+    files: createEmptyAttachmentBuckets(),
+    existing: createEmptyAttachmentBuckets(),
+    links: createEmptyLinkBuckets(),
+    existingLinks: createEmptyLinkBuckets(),
+    selectedLinkType: "homeworks",
+    activeLinkValue: "",
+  })
+
+  const [thumbnail, setThumbnail] = useState({ file: null, preview: null })
+  const [metadata, setMetadata] = useState({
+    level: containerLevel || "",
+    subject: containerSubject || "",
+    courseId: "",
+    parentContainerId: "",
+  })
+  const [dropdownData, setDropdownData] = useState({ levels: [], subjects: [] })
+  const [loading, setLoading] = useState({ levels: false, subjects: false, submit: false })
+  const [error, setError] = useState("")
+
+  const resetAttachments = useCallback(() => {
+    setAttachments({
+      files: createEmptyAttachmentBuckets(),
+      existing: createEmptyAttachmentBuckets(),
+      links: createEmptyLinkBuckets(),
+      existingLinks: createEmptyLinkBuckets(),
+      selectedLinkType: "homeworks",
+      activeLinkValue: "",
+    })
+  }, [])
+
+  const resetForm = useCallback(() => {
+    setFormData({ name: "", description: "", price: 0, videoLink: "", numberOfViews: 0 })
+    setAssessmentConfig({
+      exam: { enabled: false, formUrl: "", passingThreshold: 50 },
+      homework: { enabled: false, formUrl: "", passingThreshold: 50 },
+    })
+    resetAttachments()
+    setThumbnail({ file: null, preview: null })
+    setMetadata({
+      level: containerLevel || "",
+      subject: containerSubject || "",
+      courseId: "",
+      parentContainerId: "",
+    })
+    setError("")
+    if (isEditMode && initialData?.thumbnail) {
+      setThumbnail((prev) => ({ ...prev, preview: resolveUploadUrl(initialData.thumbnail, "lecture_thumbnails") }))
     }
-  }
+  }, [containerLevel, containerSubject, isEditMode, initialData, resetAttachments])
 
-  const resetAttachmentState = () => {
-    const resetBuckets = createEmptyAttachmentBuckets()
-    const resetLinks = createEmptyLinkBuckets()
-    setAttachmentFilesByCategory(resetBuckets)
-    setExistingAttachmentsByCategory(resetBuckets)
-    setAttachmentLinksByCategory(resetLinks)
-    setExistingAttachmentLinksByCategory(resetLinks)
-    setSelectedFormLinkType("homeworks")
-    setGoogleFormLink("")
-  }
+  const populateFromInitialData = useCallback(() => {
+    if (!initialData) return
 
-  const populateFromInitialData = () => {
-    if (!initialData) {
-      return
+    setFormData({
+      name: initialData.name || "",
+      description: initialData.description || "",
+      price: initialData.price ?? 0,
+      videoLink: initialData.videoLink || "",
+      numberOfViews: initialData.numberOfViews ?? 0,
+    })
+
+    setAssessmentConfig({
+      exam: {
+        enabled: Boolean(initialData.requiresExam),
+        formUrl: initialData.examFormUrl || initialData.examLink || initialData.examConfig?.formUrl || "",
+        passingThreshold: initialData.passingThreshold ?? 50,
+      },
+      homework: {
+        enabled: Boolean(initialData.requiresHomework),
+        formUrl: initialData.homeworkFormUrl || initialData.homeworkLink || initialData.homeworkConfig?.formUrl || "",
+        passingThreshold: initialData.homeworkPassingThreshold ?? 50,
+      },
+    })
+
+    setMetadata({
+      level: initialData.level?._id || initialData.level || containerLevel || "",
+      subject: initialData.subject?._id || initialData.subject || containerSubject || "",
+      courseId: "",
+      parentContainerId: "",
+    })
+
+    setThumbnail((prev) => ({
+      ...prev,
+      preview: initialData.thumbnail ? resolveUploadUrl(initialData.thumbnail, "lecture_thumbnails") : null,
+    }))
+  }, [initialData, containerLevel, containerSubject])
+
+  const fetchLevels = useCallback(async () => {
+    try {
+      setLoading((prev) => ({ ...prev, levels: true }))
+      const response = await getAllLevels()
+      if (response.success) {
+        const hierarchy = response.hierarchy || buildLevelHierarchy(response.data || [], i18n.language)
+        setDropdownData((prev) => ({ ...prev, levels: hierarchy.gradeOptions || [] }))
+      }
+    } catch (error) {
+      console.error("Error fetching levels:", error)
+    } finally {
+      setLoading((prev) => ({ ...prev, levels: false }))
     }
+  }, [i18n.language])
 
-    setNewItemName(initialData.name || "")
-    setNewDescription(initialData.description || "")
-    setNewPrice(initialData.price ?? 0)
-    setNewVideoLink(initialData.videoLink || "")
-    setNumberOfViews(initialData.numberOfViews ?? 0)
-    setRequiresExam(Boolean(initialData.requiresExam))
-    setRequiresHomework(Boolean(initialData.requiresHomework))
-    setPassingThreshold(initialData.passingThreshold ?? 50)
-    setHomeworkPassingThreshold(initialData.homeworkPassingThreshold ?? 50)
-    setExamFormUrl(
-      initialData.examFormUrl ||
-      initialData.examLink ||
-      initialData.examConfig?.formUrl ||
-      "",
-    )
-    setHomeworkFormUrl(
-      initialData.homeworkFormUrl ||
-      initialData.homeworkLink ||
-      initialData.homeworkConfig?.formUrl ||
-      "",
-    )
-    setSelectedCourseId("")
-    setSelectedParentContainerId("")
-    setSelectedLevel(initialData.level?._id || initialData.level || containerLevel || "")
-    setSelectedSubject(initialData.subject?._id || initialData.subject || containerSubject || "")
-    setThumbnailPreview(
-      initialData.thumbnail ? resolveUploadUrl(initialData.thumbnail, "lecture_thumbnails") : null,
-    )
-  }
+  const fetchSubjects = useCallback(async () => {
+    try {
+      setLoading((prev) => ({ ...prev, subjects: true }))
+      const response = await getAllSubjects()
+      if (response.success) {
+        setDropdownData((prev) => ({ ...prev, subjects: response.data }))
+      }
+    } catch (error) {
+      console.error("Error fetching subjects:", error)
+    } finally {
+      setLoading((prev) => ({ ...prev, subjects: false }))
+    }
+  }, [])
 
-  // Fetch levels and subjects when modal opens
   useEffect(() => {
     let cancelled = false
 
@@ -193,937 +343,643 @@ const LectureCreationModal = ({
       if (isEditMode) {
         const loadEditData = async () => {
           populateFromInitialData()
-          resetAttachmentState()
+          resetAttachments()
 
           const lectureAttachmentsId = initialData?._id || initialData?.id || lectureId
           if (!lectureAttachmentsId) return
 
           try {
             const result = await getLectureAttachments(lectureAttachmentsId)
-            if (cancelled || result?.status !== "success" || !result.data) {
-              return
-            }
+            if (cancelled || result?.status !== "success" || !result.data) return
 
-          const attachmentData = result.data
-            const nextExistingAttachments = createEmptyAttachmentBuckets()
+            const attachmentData = result.data
+            const nextExisting = createEmptyAttachmentBuckets()
             const nextExistingLinks = createEmptyLinkBuckets()
             const nextPrefilledLinks = createEmptyLinkBuckets()
 
             ATTACHMENT_BUCKET_KEYS.forEach((category) => {
               const rawItems = Array.isArray(attachmentData?.[category]) ? attachmentData[category] : []
               const fileItems = rawItems.filter((item) => item?.fileType !== "link")
-              const normalizedItems = fileItems.map(normalizeExistingAttachment)
-
-              nextExistingAttachments[category] = normalizedItems
+              nextExisting[category] = fileItems.map(normalizeExistingAttachment)
 
               if (category === "homeworks" || category === "exams") {
-                const savedLink =
-                  rawItems.find((item) => item?.fileType === "link")?.filePath ||
-                  ""
+                const savedLink = rawItems.find((item) => item?.fileType === "link")?.filePath || ""
                 nextExistingLinks[category] = savedLink
                 nextPrefilledLinks[category] = savedLink
               }
             })
 
-            setExistingAttachmentsByCategory(nextExistingAttachments)
-            setExistingAttachmentLinksByCategory(nextExistingLinks)
-            setAttachmentLinksByCategory(nextPrefilledLinks)
-            const initialLinkType = nextExistingLinks.homeworks
-              ? "homeworks"
-              : nextExistingLinks.exams
-                ? "exams"
-                : "homeworks"
-            setSelectedFormLinkType(initialLinkType)
-            setGoogleFormLink(nextExistingLinks[initialLinkType] || "")
+            const initialLinkType = nextExistingLinks.homeworks ? "homeworks" : nextExistingLinks.exams ? "exams" : "homeworks"
+
+            setAttachments({
+              files: createEmptyAttachmentBuckets(),
+              existing: nextExisting,
+              links: nextPrefilledLinks,
+              existingLinks: nextExistingLinks,
+              selectedLinkType: initialLinkType,
+              activeLinkValue: nextExistingLinks[initialLinkType] || "",
+            })
           } catch (error) {
             console.error("Error fetching lecture attachments for edit modal:", error)
           }
         }
-
         void loadEditData()
       } else {
-        resetAttachmentState()
-
-        // Set default values from container if available
-        setSelectedCourseId("")
-        setSelectedParentContainerId("")
-        if (containerLevel) {
-          setSelectedLevel(containerLevel)
-        }
-        if (containerSubject) {
-          setSelectedSubject(containerSubject)
-        }
+        resetForm()
       }
     }
 
     return () => {
       cancelled = true
     }
-  }, [isOpen, containerLevel, containerSubject, isEditMode, initialData, lectureId])
-
-  // Functions to fetch levels and subjects
-  const fetchLevels = async () => {
-    try {
-      setLevelsLoading(true)
-      const response = await getAllLevels()
-      if (response.success) {
-        const hierarchy = response.hierarchy || buildLevelHierarchy(response.data || [], i18n.language)
-        setLevels(hierarchy.gradeOptions || [])
-      } else {
-        console.error("Failed to fetch levels:", response.error)
-      }
-    } catch (error) {
-      console.error("Error fetching levels:", error)
-    } finally {
-      setLevelsLoading(false)
-    }
-  }
-
-  const fetchSubjects = async () => {
-    try {
-      setSubjectsLoading(true)
-      const response = await getAllSubjects()
-      if (response.success) {
-        setSubjects(response.data)
-      } else {
-        console.error("Failed to fetch subjects:", response.error)
-      }
-    } catch (error) {
-      console.error("Error fetching subjects:", error)
-    } finally {
-      setSubjectsLoading(false)
-    }
-  }
-
-  // Reset form function
-  const resetForm = () => {
-    setNewItemName("")
-    setNewDescription("")
-    setNewPrice(0)
-    setNewVideoLink("")
-    resetAttachmentState()
-    setThumbnailFile(null)
-    setThumbnailPreview(null)
-    setNumberOfViews(0)
-
-    // Reset exam fields
-    setRequiresExam(false)
-    setPassingThreshold(50)
-    setExamFormUrl("")
-
-    // Reset homework fields
-    setRequiresHomework(false)
-    setHomeworkPassingThreshold(50)
-    setHomeworkFormUrl("")
-
-    setSelectedCourseId("")
-    setSelectedParentContainerId("")
-    setSelectedLevel(containerLevel || "")
-    setSelectedSubject(containerSubject || "")
-    setCreationError("")
-    if (isEditMode && initialData?.thumbnail) {
-      setThumbnailPreview(resolveUploadUrl(initialData.thumbnail, "lecture_thumbnails"))
-    }
-  }
+  }, [isOpen, isEditMode, initialData, lectureId, containerLevel, containerSubject, fetchLevels, fetchSubjects, populateFromInitialData, resetAttachments, resetForm])
 
   useEffect(() => {
-    if (!usesSelectableParent) {
+    if (!usesSelectableParent) return
+
+    if (!metadata.courseId) {
+      setMetadata((prev) => ({ ...prev, parentContainerId: "", level: "", subject: "" }))
       return
     }
 
-    if (!selectedCourseId) {
-      setSelectedParentContainerId("")
-      setSelectedLevel("")
-      setSelectedSubject("")
-      return
-    }
-
-    const nextCourseContainers = lecturerContainerOptionsByCourse[String(selectedCourseId)] || []
+    const nextCourseContainers = lecturerContainerOptionsByCourse[String(metadata.courseId)] || []
     const hasSelectedContainer = nextCourseContainers.some(
-      (containerOption) => String(containerOption.value) === String(selectedParentContainerId),
+      (container) => String(container.value) === String(metadata.parentContainerId)
     )
 
-    if (!hasSelectedContainer && selectedParentContainerId) {
-      setSelectedParentContainerId("")
+    if (!hasSelectedContainer && metadata.parentContainerId) {
+      setMetadata((prev) => ({ ...prev, parentContainerId: "" }))
     }
 
-    const nextLevelId =
-      (hasSelectedContainer ? selectedParentContainerInfo?.levelId : null) ||
-      selectedCourseInfo?.levelId ||
-      ""
-    const nextSubjectId =
-      (hasSelectedContainer ? selectedParentContainerInfo?.subjectId : null) ||
-      selectedCourseInfo?.subjectId ||
-      ""
+    const selectedCourseInfo = lecturerCourseOptions.find((course) => String(course.value) === String(metadata.courseId))
+    const selectedContainerInfo = nextCourseContainers.find((container) => String(container.value) === String(metadata.parentContainerId))
 
-    setSelectedLevel(nextLevelId)
-    setSelectedSubject(nextSubjectId)
-  }, [
-    lecturerContainerOptionsByCourse,
-    selectedCourseId,
-    selectedCourseInfo?.levelId,
-    selectedCourseInfo?.subjectId,
-    selectedParentContainerId,
-    selectedParentContainerInfo?.levelId,
-    selectedParentContainerInfo?.subjectId,
-    usesSelectableParent,
-  ])
+    const nextLevelId = (hasSelectedContainer ? selectedContainerInfo?.levelId : null) || selectedCourseInfo?.levelId || ""
+    const nextSubjectId = (hasSelectedContainer ? selectedContainerInfo?.subjectId : null) || selectedCourseInfo?.subjectId || ""
 
-  const handleClose = () => {
+    setMetadata((prev) => ({ ...prev, level: nextLevelId, subject: nextSubjectId }))
+  }, [usesSelectableParent, metadata.courseId, metadata.parentContainerId, lecturerCourseOptions, lecturerContainerOptionsByCourse])
+
+  const handleClose = useCallback(() => {
     resetForm()
     onClose()
-  }
+  }, [resetForm, onClose])
 
-  const handleBackdropClick = (e) => {
+  const handleBackdropClick = useCallback((e) => {
     if (e.target === e.currentTarget) {
       handleClose()
     }
-  }
+  }, [handleClose])
 
-  const handleSubmit = async (e) => {
+  const validateForm = useCallback(() => {
+    if (!formData.name) throw new Error(t("validation.nameRequired"))
+    if (usesSelectableParent && !metadata.courseId) throw new Error(t("validation.courseRequired"))
+    if (usesSelectableParent && !metadata.parentContainerId) throw new Error(t("validation.containerRequired"))
+    if (!metadata.level) throw new Error(t("validation.levelRequired"))
+    if (!metadata.subject) throw new Error(t("validation.subjectRequired"))
+    if (!formData.videoLink) throw new Error(t("validation.videoLinkRequired"))
+    if (assessmentConfig.exam.enabled && !assessmentConfig.exam.formUrl) {
+      throw new Error(t("validation.examFormUrlRequired", "Exam form URL is required"))
+    }
+    if (assessmentConfig.homework.enabled && !assessmentConfig.homework.formUrl) {
+      throw new Error(t("validation.homeworkFormUrlRequired", "Homework form URL is required"))
+    }
+  }, [formData, metadata, assessmentConfig, usesSelectableParent, t])
+
+  const handleSubmit = useCallback(async (e) => {
     e.preventDefault()
-    setCreationLoading(true)
-    setCreationError("")
+    setLoading((prev) => ({ ...prev, submit: true }))
+    setError("")
 
     try {
-      if (!newItemName) throw new Error(t("validation.nameRequired"))
-      if (usesSelectableParent && !selectedCourseId) throw new Error(t("validation.courseRequired"))
-      if (usesSelectableParent && !selectedParentContainerId) throw new Error(t("validation.containerRequired"))
-      if (!selectedLevel) throw new Error(t("validation.levelRequired"))
-      if (!selectedSubject) throw new Error(t("validation.subjectRequired"))
-      if (!newVideoLink) throw new Error(t("validation.videoLinkRequired"))
-
-      // Prepare lecture data
-      if (requiresExam && !examFormUrl) {
-        throw new Error(t("validation.examFormUrlRequired", "Exam form URL is required"))
-      }
-      if (requiresHomework && !homeworkFormUrl) {
-        throw new Error(t("validation.homeworkFormUrlRequired", "Homework form URL is required"))
-      }
+      validateForm()
 
       const lectureData = buildLecturePayloadObject({
-        name: newItemName,
-        level: selectedLevel,
-        subject: selectedSubject,
-        price: Number(newPrice) || 0,
-        description: newDescription || `${t("defaults.lectureDescription")} ${newItemName}`,
-        numberOfViews: Number(numberOfViews) || 0,
-        videoLink: newVideoLink,
+        name: formData.name,
+        level: metadata.level,
+        subject: metadata.subject,
+        price: Number(formData.price) || 0,
+        description: formData.description || `${t("defaults.lectureDescription")} ${formData.name}`,
+        numberOfViews: Number(formData.numberOfViews) || 0,
+        videoLink: formData.videoLink,
         teacherAllowed: true,
-        requiresExam,
-        examFormUrl,
-        passingThreshold: Number(passingThreshold),
-        requiresHomework,
-        homeworkFormUrl,
-        homeworkPassingThreshold: Number(homeworkPassingThreshold),
+        requiresExam: assessmentConfig.exam.enabled,
+        examFormUrl: assessmentConfig.exam.formUrl,
+        passingThreshold: Number(assessmentConfig.exam.passingThreshold),
+        requiresHomework: assessmentConfig.homework.enabled,
+        homeworkFormUrl: assessmentConfig.homework.formUrl,
+        homeworkPassingThreshold: Number(assessmentConfig.homework.passingThreshold),
         createdBy: !isEditMode ? userId : undefined,
-        parent: !isEditMode ? (containerId || selectedParentContainerId) : undefined,
+        parent: !isEditMode ? (containerId || metadata.parentContainerId) : undefined,
       })
 
-      // Call onSubmit ONCE with all files and links for all categories
       await onSubmit(
         isEditMode ? lectureId || initialData?._id || initialData?.id : lectureData,
         isEditMode ? lectureData : null,
         null,
-        thumbnailFile,
-        attachmentFilesByCategory,
-        attachmentLinksByCategory,
-        existingAttachmentLinksByCategory,
+        thumbnail.file,
+        attachments.files,
+        attachments.links,
+        attachments.existingLinks
       )
 
       resetForm()
       onClose()
     } catch (err) {
-      setCreationError(translateErrorMessage(err.message))
+      setError(translateErrorMessage(err.message))
       console.error("Creation error:", err)
     } finally {
-      setCreationLoading(false)
+      setLoading((prev) => ({ ...prev, submit: false }))
     }
-  }
+  }, [formData, metadata, assessmentConfig, thumbnail.file, attachments, isEditMode, lectureId, initialData, userId, containerId, onSubmit, onClose, resetForm, validateForm, t])
 
-  const handleThumbnailChange = (e) => {
+  const handleThumbnailChange = useCallback((e) => {
     const file = e.target.files[0]
     if (file) {
-      setThumbnailFile(file)
-
-      // Create preview URL
-      const reader = new FileReader()
-      reader.onload = (e) => {
-        setThumbnailPreview(e.target.result)
-      }
-      reader.readAsDataURL(file)
+      setThumbnail({ file, preview: URL.createObjectURL(file) })
     }
-  }
+  }, [])
 
-  const selectedLevelInfo = levels.find((level) => (level.value || level._id) === selectedLevel)
-  const selectedSubjectInfo = subjects.find((subject) => subject._id === selectedSubject)
-  const selectedCourseLabel = selectedCourseInfo?.label || ""
-  const selectedParentContainerLabel = selectedParentContainerInfo?.label || ""
-  const selectedLevelLabel = selectedLevelInfo?.label || selectedLevelInfo?.displayName || selectedLevelInfo?.name || ""
-  const selectedSubjectLabel = selectedSubjectInfo?.name || ""
-  const attachmentCategoryLabels = {
-    pdfsandimages: t("attachmentTypes.pdfsAndImages"),
-    booklets: t("attachmentTypes.booklets"),
-    homeworks: t("attachmentTypes.homeworks"),
-    exams: t("attachmentTypes.exams"),
-  }
-  const savedAttachments = flattenAttachmentBuckets(existingAttachmentsByCategory)
-  const newAttachmentFiles = attachmentFilesByCategory.pdfsandimages || []
-  const existingAttachmentLinks = FORM_LINK_KEYS
-    .map((key) => ({
-      key,
-      label: key === "homeworks"
-        ? t("attachments.homeworkType", "Homework")
-        : t("attachments.examType", "Exam"),
-      url: existingAttachmentLinksByCategory[key],
-    }))
-    .filter((item) => Boolean(item.url))
-  const existingAttachmentsTotal = Object.values(existingAttachmentsByCategory).reduce(
-    (count, files) => count + (files?.length || 0),
-    0,
-  )
-  const totalAttachments = Object.values(attachmentFilesByCategory).reduce(
-    (count, files) => count + (files?.length || 0),
-    0,
-  ) + existingAttachmentsTotal
-  const handleUnifiedAttachmentFilesChange = (files) => {
-    setAttachmentFilesByCategory({
-      ...createEmptyAttachmentBuckets(),
-      pdfsandimages: files,
-    })
-  }
+  const handleFormLinkTypeChange = useCallback((nextType) => {
+    const nextUrl = attachments.links[nextType] || attachments.existingLinks[nextType] || ""
+    setAttachments((prev) => ({ ...prev, selectedLinkType: nextType, activeLinkValue: nextUrl }))
+  }, [attachments.links, attachments.existingLinks])
 
-  const handleFormLinkTypeChange = (nextType) => {
-    setSelectedFormLinkType(nextType)
-    const nextUrl = attachmentLinksByCategory[nextType] || existingAttachmentLinksByCategory[nextType] || ""
-    setGoogleFormLink(nextUrl)
-  }
-
-  const handleFormLinkChange = (value) => {
-    setGoogleFormLink(value)
-    setAttachmentLinksByCategory((prev) => ({
+  const handleFormLinkChange = useCallback((value) => {
+    setAttachments((prev) => ({
       ...prev,
-      [selectedFormLinkType]: value,
+      activeLinkValue: value,
+      links: { ...prev.links, [prev.selectedLinkType]: value },
     }))
-  }
+  }, [])
+
+  const handleAssessmentToggle = useCallback((type, enabled) => {
+    setAssessmentConfig((prev) => ({ ...prev, [type]: { ...prev[type], enabled } }))
+  }, [])
+
+  const handleAssessmentUrlChange = useCallback((type, value) => {
+    setAssessmentConfig((prev) => ({ ...prev, [type]: { ...prev[type], formUrl: value } }))
+  }, [])
+
+  const handleAssessmentThresholdChange = useCallback((type, value) => {
+    setAssessmentConfig((prev) => ({ ...prev, [type]: { ...prev[type], passingThreshold: value } }))
+  }, [])
+
+  const handleAttachmentFilesChange = useCallback((files) => {
+    setAttachments((prev) => ({
+      ...prev,
+      files: { ...createEmptyAttachmentBuckets(), pdfsandimages: files },
+    }))
+  }, [])
+
+  const selectedLabels = useMemo(() => {
+    const selectedLevelInfo = dropdownData.levels.find((level) => (level.value || level._id) === metadata.level)
+    const selectedSubjectInfo = dropdownData.subjects.find((subject) => subject._id === metadata.subject)
+    const selectedCourseInfo = lecturerCourseOptions.find((course) => String(course.value) === String(metadata.courseId))
+    const availableContainers = lecturerContainerOptionsByCourse[String(metadata.courseId)] || []
+    const selectedContainerInfo = availableContainers.find((container) => String(container.value) === String(metadata.parentContainerId))
+
+    return {
+      level: selectedLevelInfo?.label || selectedLevelInfo?.displayName || selectedLevelInfo?.name || "",
+      subject: selectedSubjectInfo?.name || "",
+      course: selectedCourseInfo?.label || "",
+      container: selectedContainerInfo?.label || "",
+    }
+  }, [dropdownData, metadata, lecturerCourseOptions, lecturerContainerOptionsByCourse])
+
+  const attachmentStats = useMemo(() => {
+    const saved = flattenAttachmentBuckets(attachments.existing)
+    const newFiles = attachments.files.pdfsandimages || []
+    const existingTotal = Object.values(attachments.existing).reduce((count, files) => count + (files?.length || 0), 0)
+    const newTotal = Object.values(attachments.files).reduce((count, files) => count + (files?.length || 0), 0)
+
+    const existingLinks = FORM_LINK_KEYS
+      .map((key) => ({ key, label: key === "homeworks" ? t("attachments.homeworkType", "Homework") : t("attachments.examType", "Exam"), url: attachments.existingLinks[key] }))
+      .filter((item) => Boolean(item.url))
+
+    return { saved, newFiles, total: newTotal + existingTotal, existingLinks }
+  }, [attachments, t])
+
+  const attachmentCategoryLabels = useMemo(
+    () => ({
+      pdfsandimages: t("attachmentTypes.pdfsAndImages"),
+      booklets: t("attachmentTypes.booklets"),
+      homeworks: t("attachmentTypes.homeworks"),
+      exams: t("attachmentTypes.exams"),
+    }),
+    [t]
+  )
+
+  if (!isOpen) return null
+
+  const titleText = isEditMode ? (isRTL ? "تعديل المحاضرة" : "Edit Lecture") : t("titles.createNewLecture")
 
   return (
-    <div className={`modal ${isOpen ? "modal-open" : ""}`} dir={isRTL ? "rtl" : "ltr"} onClick={handleBackdropClick}>
-      <div className="modal-box w-11/12 max-w-7xl h-[92vh] max-h-[92vh] overflow-hidden rounded-[2rem] border border-base-300 bg-base-100 p-0 shadow-2xl">
-        <div className="flex h-full flex-col">
-          <div className="flex items-start justify-between gap-4 border-b border-base-300 px-6 py-5 sm:px-8">
-            <div className="min-w-0">
-              <p className="text-xs font-bold uppercase tracking-[0.28em] text-primary/70">
-                {isEditMode ? (isRTL ? "تعديل المحاضرة" : "Edit Lecture") : t("titles.createNewLecture")}
-              </p>
-              <h3 className="mt-1 text-2xl font-bold leading-tight text-base-content sm:text-3xl">
-                {isEditMode ? (isRTL ? "تعديل المحاضرة" : "Edit Lecture") : t("titles.createNewLecture")}
-              </h3>
-              <p className="mt-2 max-w-3xl text-sm text-base-content/60">{t("descriptions.createNewLectureModal")}</p>
-            </div>
-            <button type="button" onClick={handleClose} className="btn btn-sm btn-circle btn-ghost shrink-0">
-              <FiX className="w-5 h-5" />
-            </button>
+    <div className={`modal ${isOpen ? "modal-open" : ""} modal-xl`} dir={isRTL ? "rtl" : "ltr"} onClick={handleBackdropClick}>
+      <div className={`modal-box w-11/12 max-w-7xl h-[92vh] max-h-[92vh] overflow-hidden ${TOKENS.surface.card} ${TOKENS.radius.modal} p-0 shadow-2xl flex flex-col`}>
+        <div className={`flex items-start justify-between ${TOKENS.spacing.default} border-b border-base-300 px-6 py-5 sm:px-8 flex-shrink-0`}>
+          <div className="min-w-0">
+            <p className={`${TOKENS.typography.meta} text-primary/70`}>{titleText}</p>
+            <h3 className="mt-1 text-2xl font-bold leading-tight text-base-content sm:text-3xl">{titleText}</h3>
+            <p className="mt-2 max-w-3xl text-sm text-base-content/60">{t("descriptions.createNewLectureModal")}</p>
           </div>
+          <button type="button" onClick={handleClose} className="btn btn-sm btn-circle btn-ghost shrink-0">
+            <FiX className="w-5 h-5" />
+          </button>
+        </div>
 
-          <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
-            <div className="min-h-0 flex-1 overflow-y-auto px-6 py-6 sm:px-8">
-              <div className="grid gap-6 lg:grid-cols-[minmax(0,1.35fr)_minmax(320px,380px)]">
-                <div className="space-y-6">
-                  <section className="rounded-[1.75rem] border border-base-300 bg-base-100 p-5 shadow-sm">
-                    <div className="mb-5 flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary/10 text-sm font-bold text-primary">
-                        1
+        <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
+          <div className="flex-1 overflow-y-auto px-6 py-6 sm:px-8 min-h-0">
+            <div className={`grid ${TOKENS.spacing.section} lg:grid-cols-[minmax(0,1.35fr)_minmax(320px,380px)] max-w-full`}>
+              <div className={`${TOKENS.spacing.section} flex flex-col`}>
+                <section className={`${TOKENS.surface.card} ${TOKENS.radius.section} p-5`}>
+                  <SectionHeader
+                    number={1}
+                    title={t("sections.contentBasics")}
+                    subtitle={`${t("fields.name")}, ${t("fields.description")}, ${t("fields.price")}, ${t("fields.videoURL")}`}
+                    variant="primary"
+                  />
+
+                  <div className={`grid ${TOKENS.spacing.default} md:grid-cols-2`}>
+                    <FormField label={t("fields.name")} fullWidth>
+                      <input
+                        type="text"
+                        placeholder={t("placeholders.enterLectureName")}
+                        className={`input input-bordered w-full ${TOKENS.radius.section}`}
+                        value={formData.name}
+                        onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
+                        required
+                      />
+                    </FormField>
+
+                    <FormField label={t("fields.description")} fullWidth>
+                      <textarea
+                        placeholder={t("placeholders.enterDescription")}
+                        className={`textarea textarea-bordered min-h-32 w-full ${TOKENS.radius.section}`}
+                        value={formData.description}
+                        onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
+                      />
+                    </FormField>
+
+                    <FormField label={t("fields.price")}>
+                      <input
+                        type="number"
+                        placeholder={t("placeholders.enterPrice")}
+                        className={`input input-bordered w-full ${TOKENS.radius.section}`}
+                        value={formData.price}
+                        onChange={(e) => setFormData((prev) => ({ ...prev, price: e.target.value }))}
+                        min="0"
+                        required
+                      />
+                    </FormField>
+
+                    <FormField label={t("fields.numberOfViews")}>
+                      <input
+                        type="number"
+                        placeholder={t("placeholders.enterNumberOfViews")}
+                        className={`input input-bordered w-full ${TOKENS.radius.section}`}
+                        value={formData.numberOfViews}
+                        onChange={(e) => setFormData((prev) => ({ ...prev, numberOfViews: e.target.value }))}
+                        min="0"
+                        required
+                      />
+                    </FormField>
+
+                    <FormField label={t("fields.videoURL")} fullWidth>
+                      <input
+                        type="url"
+                        placeholder={t("placeholders.enterVideoLink")}
+                        className={`input input-bordered w-full ${TOKENS.radius.section}`}
+                        value={formData.videoLink}
+                        onChange={(e) => setFormData((prev) => ({ ...prev, videoLink: e.target.value }))}
+                        required
+                      />
+                    </FormField>
+                  </div>
+                </section>
+
+                <section className={`${TOKENS.surface.card} ${TOKENS.radius.section} p-5`}>
+                  <SectionHeader
+                    number={2}
+                    title={t("sections.publishSettings")}
+                    subtitle={usesSelectableParent
+                      ? `${t("fields.course")}, ${t("fields.container")}, ${t("fields.level")}, ${t("fields.subject")}`
+                      : `${t("fields.level")}, ${t("fields.subject")}, ${t("fields.requiresExam")}, ${t("fields.requiresHomework")}`}
+                    variant="secondary"
+                  />
+
+                  <div className={`grid ${TOKENS.spacing.default} md:grid-cols-2`}>
+                    {usesSelectableParent && (
+                      <>
+                        <FormField label={t("fields.course")}>
+                          <DSSelect
+                            className={`select select-bordered w-full ${TOKENS.radius.section}`}
+                            value={metadata.courseId}
+                            onChange={(e) => setMetadata((prev) => ({ ...prev, courseId: e.target.value }))}
+                            required
+                          >
+                            <option value="">{t("placeholders.selectCourse")}</option>
+                            {lecturerCourseOptions.map((course) => (
+                              <option key={course.value} value={course.value}>{course.label}</option>
+                            ))}
+                          </DSSelect>
+                        </FormField>
+
+                        <FormField label={t("fields.container")}>
+                          <DSSelect
+                            className={`select select-bordered w-full ${TOKENS.radius.section}`}
+                            value={metadata.parentContainerId}
+                            onChange={(e) => setMetadata((prev) => ({ ...prev, parentContainerId: e.target.value }))}
+                            required
+                            disabled={!metadata.courseId}
+                          >
+                            <option value="">{t("placeholders.selectContainer")}</option>
+                            {(lecturerContainerOptionsByCourse[String(metadata.courseId)] || []).map((container) => (
+                              <option key={container.value} value={container.value}>{container.label}</option>
+                            ))}
+                          </DSSelect>
+                        </FormField>
+                      </>
+                    )}
+
+                    <FormField label={t("fields.level")}>
+                      <DSSelect
+                        className={`select select-bordered w-full ${TOKENS.radius.section}`}
+                        value={metadata.level}
+                        onChange={(e) => setMetadata((prev) => ({ ...prev, level: e.target.value }))}
+                        disabled={usesSelectableParent}
+                        required
+                      >
+                        <option value="">{t("placeholders.selectLevel")}</option>
+                        {dropdownData.levels.map((level) => (
+                          <option key={level.value || level._id} value={level.value || level._id}>
+                            {level.label || level.displayName || level.name}
+                          </option>
+                        ))}
+                      </DSSelect>
+                      {loading.levels && <span className="loading loading-spinner loading-sm mt-2"></span>}
+                    </FormField>
+
+                    <FormField label={t("fields.subject")}>
+                      <DSSelect
+                        className={`select select-bordered w-full ${TOKENS.radius.section}`}
+                        value={metadata.subject}
+                        onChange={(e) => setMetadata((prev) => ({ ...prev, subject: e.target.value }))}
+                        disabled={usesSelectableParent}
+                        required
+                      >
+                        <option value="">{t("placeholders.selectSubject")}</option>
+                        {dropdownData.subjects.map((subject) => (
+                          <option key={subject._id} value={subject._id}>{subject.name}</option>
+                        ))}
+                      </DSSelect>
+                      {loading.subjects && <span className="loading loading-spinner loading-sm mt-2"></span>}
+                    </FormField>
+                  </div>
+
+                  <div className={`mt-4 grid ${TOKENS.spacing.default} xl:grid-cols-2`}>
+                    <AssessmentConfig
+                      type="exam"
+                      config={assessmentConfig.exam}
+                      onToggle={(enabled) => handleAssessmentToggle("exam", enabled)}
+                      onUrlChange={(value) => handleAssessmentUrlChange("exam", value)}
+                      onThresholdChange={(value) => handleAssessmentThresholdChange("exam", value)}
+                      t={t}
+                    />
+                    <AssessmentConfig
+                      type="homework"
+                      config={assessmentConfig.homework}
+                      onToggle={(enabled) => handleAssessmentToggle("homework", enabled)}
+                      onUrlChange={(value) => handleAssessmentUrlChange("homework", value)}
+                      onThresholdChange={(value) => handleAssessmentThresholdChange("homework", value)}
+                      t={t}
+                    />
+                  </div>
+                </section>
+
+                <section className={`${TOKENS.surface.card} ${TOKENS.radius.section} p-5`}>
+                  <SectionHeader
+                    number={3}
+                    title={t("sections.attachments")}
+                    subtitle={t("fields.attachmentOptional")}
+                    variant="accent"
+                  />
+
+                  <div className={`grid ${TOKENS.spacing.default} xl:grid-cols-2`}>
+                    <Card variant="highlighted">
+                      <div className={`flex items-start justify-between ${TOKENS.spacing.tight}`}>
+                        <div>
+                          <h5 className={TOKENS.typography.cardTitle}>{t("attachments.uploadTitle", "Lecture files")}</h5>
+                          <p className={TOKENS.typography.hint}>
+                            {t("attachments.uploadHelper", "Upload PDFs, PowerPoints, documents, images, or any other lecture files here.")}
+                          </p>
+                        </div>
+                        <Badge>{attachmentStats.newFiles.length} {t("attachments.fileCount", "files")}</Badge>
                       </div>
-                      <div>
-                        <h4 className="text-lg font-bold text-base-content">{t("sections.contentBasics")}</h4>
-                        <p className="text-sm text-base-content/60">{t("fields.name")}, {t("fields.description")}, {t("fields.price")}, {t("fields.videoURL")}</p>
-                      </div>
-                    </div>
 
-                    <div className="grid gap-4 md:grid-cols-2">
-                      <div className="form-control md:col-span-2">
-                        <label className="label">
-                          <span className="label-text font-semibold">{t("fields.name")}</span>
-                        </label>
-                        <input
-                          type="text"
-                          placeholder={t("placeholders.enterLectureName")}
-                          className="input input-bordered w-full rounded-2xl"
-                          value={newItemName}
-                          onChange={(e) => setNewItemName(e.target.value)}
-                          required
-                        />
-                      </div>
-
-                      <div className="form-control md:col-span-2">
-                        <label className="label">
-                          <span className="label-text font-semibold">{t("fields.description")}</span>
-                        </label>
-                        <textarea
-                          placeholder={t("placeholders.enterDescription")}
-                          className="textarea textarea-bordered min-h-32 w-full rounded-2xl"
-                          value={newDescription}
-                          onChange={(e) => setNewDescription(e.target.value)}
-                        />
-                      </div>
-
-                      <div className="form-control">
-                        <label className="label">
-                          <span className="label-text font-semibold">{t("fields.price")}</span>
-                        </label>
-                        <input
-                          type="number"
-                          placeholder={t("placeholders.enterPrice")}
-                          className="input input-bordered w-full rounded-2xl"
-                          value={newPrice}
-                          onChange={(e) => setNewPrice(e.target.value)}
-                          min="0"
-                          required
-                        />
-                      </div>
-
-                      <div className="form-control">
-                        <label className="label">
-                          <span className="label-text font-semibold">{t("fields.numberOfViews")}</span>
-                        </label>
-                        <input
-                          type="number"
-                          placeholder={t("placeholders.enterNumberOfViews")}
-                          className="input input-bordered w-full rounded-2xl"
-                          value={numberOfViews}
-                          onChange={(e) => setNumberOfViews(e.target.value)}
-                          min="0"
-                          required
-                        />
-                      </div>
-
-                      <div className="form-control md:col-span-2">
-                        <label className="label">
-                          <span className="label-text font-semibold">{t("fields.videoURL")}</span>
-                        </label>
-                        <input
-                          type="url"
-                          placeholder={t("placeholders.enterVideoLink")}
-                          className="input input-bordered w-full rounded-2xl"
-                          value={newVideoLink}
-                          onChange={(e) => setNewVideoLink(e.target.value)}
-                          required
-                        />
-                      </div>
-
-                    </div>
-                  </section>
-
-                  <section className="rounded-[1.75rem] border border-base-300 bg-base-100 p-5 shadow-sm">
-                    <div className="mb-5 flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-secondary/10 text-sm font-bold text-secondary">
-                        2
-                      </div>
-                      <div>
-                        <h4 className="text-lg font-bold text-base-content">{t("sections.publishSettings")}</h4>
-                        <p className="text-sm text-base-content/60">
-                          {usesSelectableParent
-                            ? `${t("fields.course")}, ${t("fields.container")}, ${t("fields.level")}, ${t("fields.subject")}`
-                            : `${t("fields.level")}, ${t("fields.subject")}, ${t("fields.requiresExam")}, ${t("fields.requiresHomework")}`}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="grid gap-4 md:grid-cols-2">
-                      {usesSelectableParent && (
-                        <>
-                          <div className="form-control">
-                            <label className="label">
-                              <span className="label-text font-semibold">{t("fields.course")}</span>
-                            </label>
-                            <DSSelect
-                              className="select select-bordered w-full rounded-2xl"
-                              value={selectedCourseId}
-                              onChange={(e) => setSelectedCourseId(e.target.value)}
-                              required
-                            >
-                              <option value="">{t("placeholders.selectCourse")}</option>
-                              {lecturerCourseOptions.map((course) => (
-                                <option key={course.value} value={course.value}>
-                                  {course.label}
-                                </option>
-                              ))}
-                            </DSSelect>
-                          </div>
-
-                          <div className="form-control">
-                            <label className="label">
-                              <span className="label-text font-semibold">{t("fields.container")}</span>
-                            </label>
-                            <DSSelect
-                              className="select select-bordered w-full rounded-2xl"
-                              value={selectedParentContainerId}
-                              onChange={(e) => setSelectedParentContainerId(e.target.value)}
-                              required
-                              disabled={!selectedCourseId}
-                            >
-                              <option value="">{t("placeholders.selectContainer")}</option>
-                              {availableContainersForCourse.map((containerOption) => (
-                                <option key={containerOption.value} value={containerOption.value}>
-                                  {containerOption.label}
-                                </option>
-                              ))}
-                            </DSSelect>
-                          </div>
-                        </>
+                      {attachmentStats.saved.length > 0 && (
+                        <Card className="mt-4">
+                          <p className={`${TOKENS.typography.meta} mb-3 text-base-content/50`}>
+                            {t("attachments.savedFiles", "Saved files")}
+                          </p>
+                          <ul className={`${TOKENS.spacing.tight} flex flex-col`}>
+                            {attachmentStats.saved.map((attachment) => (
+                              <AttachmentListItem key={attachment.id} attachment={attachment} categoryLabel={attachmentCategoryLabels[attachment.category]} />
+                            ))}
+                          </ul>
+                        </Card>
                       )}
 
-                      <div className="form-control">
-                        <label className="label">
-                          <span className="label-text font-semibold">{t("fields.level")}</span>
-                        </label>
-                        <DSSelect
-                          className="select select-bordered w-full rounded-2xl"
-                          value={selectedLevel}
-                          onChange={(e) => setSelectedLevel(e.target.value)}
-                          disabled={usesSelectableParent}
-                          required
-                        >
-                          <option value="">{t("placeholders.selectLevel")}</option>
-                          {levels.map((level) => (
-                            <option key={level.value || level._id} value={level.value || level._id}>
-                              {level.label || level.displayName || level.name}
-                            </option>
-                          ))}
-                        </DSSelect>
-                        {levelsLoading && <span className="loading loading-spinner loading-sm mt-2"></span>}
-                      </div>
-
-                      <div className="form-control">
-                        <label className="label">
-                          <span className="label-text font-semibold">{t("fields.subject")}</span>
-                        </label>
-                        <DSSelect
-                          className="select select-bordered w-full rounded-2xl"
-                          value={selectedSubject}
-                          onChange={(e) => setSelectedSubject(e.target.value)}
-                          disabled={usesSelectableParent}
-                          required
-                        >
-                          <option value="">{t("placeholders.selectSubject")}</option>
-                          {subjects.map((subject) => (
-                            <option key={subject._id} value={subject._id}>
-                              {subject.name}
-                            </option>
-                          ))}
-                        </DSSelect>
-                        {subjectsLoading && <span className="loading loading-spinner loading-sm mt-2"></span>}
-                      </div>
-                    </div>
-
-                    <div className="mt-4 grid gap-4 xl:grid-cols-2">
-                      <div className="rounded-[1.5rem] border border-base-300 bg-base-200/40 p-4">
-                        <div className="mb-3 flex items-center justify-between gap-3">
-                          <h5 className="font-semibold text-base-content">{t("fields.requiresExam")}</h5>
-                          <DSSelect
-                            className="select select-bordered select-sm rounded-xl"
-                            value={requiresExam}
-                            onChange={(e) => setRequiresExam(e.target.value === "true")}
-                          >
-                            <option value={false}>{t("options.no")}</option>
-                            <option value={true}>{t("options.yes")}</option>
-                          </DSSelect>
-                        </div>
-                        {requiresExam && (
-                          <div className="space-y-3">
-                            <div className="form-control">
-                              <label className="label px-0">
-                                <span className="label-text font-semibold">
-                                  {t("attachments.formUrl", "Google Form URL")}
-                                </span>
-                              </label>
-                              <input
-                                type="url"
-                                className="input input-bordered w-full rounded-2xl"
-                                placeholder={t("attachments.formUrlPlaceholder", "Paste exam form URL")}
-                                value={examFormUrl}
-                                onChange={(e) => setExamFormUrl(e.target.value)}
-                              />
-                            </div>
-                            <div className="form-control">
-                              <label className="label px-0">
-                                <span className="label-text font-semibold">
-                                  {t("examConfig.passingThreshold", "Passing Threshold")}
-                                </span>
-                              </label>
-                              <input
-                                type="number"
-                                className="input input-bordered w-full rounded-2xl"
-                                value={passingThreshold}
-                                onChange={(e) => setPassingThreshold(Number(e.target.value))}
-                                min="0"
-                                max="100"
-                              />
-                            </div>
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="rounded-[1.5rem] border border-base-300 bg-base-200/40 p-4">
-                        <div className="mb-3 flex items-center justify-between gap-3">
-                          <h5 className="font-semibold text-base-content">{t("fields.requiresHomework")}</h5>
-                          <DSSelect
-                            className="select select-bordered select-sm rounded-xl"
-                            value={requiresHomework}
-                            onChange={(e) => setRequiresHomework(e.target.value === "true")}
-                          >
-                            <option value={false}>{t("options.no")}</option>
-                            <option value={true}>{t("options.yes")}</option>
-                          </DSSelect>
-                        </div>
-                        {requiresHomework && (
-                          <div className="space-y-3">
-                            <div className="form-control">
-                              <label className="label px-0">
-                                <span className="label-text font-semibold">
-                                  {t("attachments.formUrl", "Google Form URL")}
-                                </span>
-                              </label>
-                              <input
-                                type="url"
-                                className="input input-bordered w-full rounded-2xl"
-                                placeholder={t("attachments.formUrlPlaceholder", "Paste homework form URL")}
-                                value={homeworkFormUrl}
-                                onChange={(e) => setHomeworkFormUrl(e.target.value)}
-                              />
-                            </div>
-                            <div className="form-control">
-                              <label className="label px-0">
-                                <span className="label-text font-semibold">
-                                  {t("examConfig.passingThreshold", "Passing Threshold")}
-                                </span>
-                              </label>
-                              <input
-                                type="number"
-                                className="input input-bordered w-full rounded-2xl"
-                                value={homeworkPassingThreshold}
-                                onChange={(e) => setHomeworkPassingThreshold(Number(e.target.value))}
-                                min="0"
-                                max="100"
-                              />
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </section>
-
-                  <section className="rounded-[1.75rem] border border-base-300 bg-base-100 p-5 shadow-sm">
-                    <div className="mb-5 flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-accent/10 text-sm font-bold text-accent">
-                        3
-                      </div>
-                      <div>
-                        <h4 className="text-lg font-bold text-base-content">{t("sections.attachments")}</h4>
-                        <p className="text-sm text-base-content/60">{t("fields.attachmentOptional")}</p>
-                      </div>
-                    </div>
-
-                    <div className="grid gap-4 xl:grid-cols-2">
-                      <div className="rounded-[1.5rem] border border-base-300 bg-base-200/40 p-4">
-                        <div className="flex items-start justify-between gap-3">
-                          <div>
-                            <h5 className="font-semibold text-base-content">
-                              {t("attachments.uploadTitle", "Lecture files")}
-                            </h5>
-                            <p className="mt-1 text-sm text-base-content/60">
-                              {t(
-                                "attachments.uploadHelper",
-                                "Upload PDFs, PowerPoints, documents, images, or any other lecture files here.",
-                              )}
-                            </p>
-                          </div>
-                          <span className="badge badge-outline badge-primary">
-                            {newAttachmentFiles.length} {t("attachments.fileCount", "files")}
-                          </span>
-                        </div>
-
-                        {savedAttachments.length > 0 && (
-                          <div className="mt-4 rounded-2xl border border-base-300 bg-base-100 p-4">
-                            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-base-content/50">
-                              {t("attachments.savedFiles", "Saved files")}
-                            </p>
-                            <ul className="space-y-2 text-sm text-base-content/75">
-                              {savedAttachments.map((attachment) => (
-                                <li key={attachment.id} className="flex flex-col gap-2 rounded-xl bg-base-200/40 px-3 py-2">
-                                  <div className="flex items-center justify-between gap-3">
-                                    <span className="font-medium text-base-content">{attachment.fileName}</span>
-                                    <span className="badge badge-outline badge-sm">
-                                      {attachmentCategoryLabels[attachment.category] || attachment.category}
-                                    </span>
-                                  </div>
-                                  <a
-                                    href={attachment.filePath}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    className="inline-flex items-center gap-2 break-all text-xs text-primary underline-offset-2 hover:underline"
-                                  >
-                                    <FiLink className="h-3 w-3" />
-                                    {t("attachments.openFile", "Open file")}
-                                  </a>
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        )}
-
-                        <div className="relative mt-4">
+                      <div className="mt-4">
+                        <InputWithIcon icon={FiPaperclip}>
                           <input
                             type="file"
                             multiple
-                            onChange={(e) => {
-                              const files = Array.from(e.target.files || [])
-                              handleUnifiedAttachmentFilesChange(files)
-                            }}
-                            className="file-input file-input-bordered w-full rounded-2xl"
+                            onChange={(e) => handleAttachmentFilesChange(Array.from(e.target.files || []))}
+                            className={`file-input file-input-bordered file-input-primary w-full ${TOKENS.radius.section} pr-12`}
                             accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.zip,.rar,image/*,application/*"
                           />
-                          <FiPaperclip className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-primary" />
-                        </div>
+                        </InputWithIcon>
+                      </div>
 
-                        {newAttachmentFiles.length > 0 && (
-                          <ul className="mt-3 space-y-1 rounded-2xl bg-base-200/50 p-4 text-sm text-base-content/70">
-                            {newAttachmentFiles.map((file, idx) => (
-                              <li key={`${file.name}-${idx}`} className="break-all">
-                                {t("fields.selectedFile")}: {file.name}
+                      {attachmentStats.newFiles.length > 0 && (
+                        <ul className={`mt-3 ${TOKENS.spacing.tight} ${TOKENS.radius.section} bg-base-200/50 p-4 text-sm text-base-content/70`}>
+                          {attachmentStats.newFiles.map((file, idx) => (
+                            <li key={`${file.name}-${idx}`} className="break-all">{t("fields.selectedFile")}: {file.name}</li>
+                          ))}
+                        </ul>
+                      )}
+
+                      <p className={`mt-3 ${TOKENS.typography.hint}`}>
+                        {t("attachments.uploadHint", "This box is for lecture resources only. The files are unified on the lecture page.")}
+                      </p>
+                    </Card>
+
+                    <Card variant="highlighted">
+                      <div className={`flex items-start justify-between ${TOKENS.spacing.tight}`}>
+                        <div>
+                          <h5 className={TOKENS.typography.cardTitle}>{t("attachments.googleFormTitle", "Google Form link")}</h5>
+                          <p className={TOKENS.typography.hint}>
+                            {t("attachments.googleFormHelper", "Use one Google Form link for the after-lecture exam or homework.")}
+                          </p>
+                        </div>
+                        <Badge>
+                          {attachments.selectedLinkType === "homeworks"
+                            ? t("attachments.homeworkType", "Homework")
+                            : t("attachments.examType", "Exam")}
+                        </Badge>
+                      </div>
+
+                      <div className={`mt-4 grid ${TOKENS.spacing.tight} sm:grid-cols-[180px_minmax(0,1fr)] items-center`}>
+                        <FormField label={t("attachments.formType", "Form type")} className="px-0 pt-0">
+                          <DSSelect
+                            className={`select select-bordered w-full ${TOKENS.radius.section}`}
+                            value={attachments.selectedLinkType}
+                            onChange={(e) => handleFormLinkTypeChange(e.target.value)}
+                          >
+                            <option value="homeworks">{t("attachments.homeworkType", "Homework")}</option>
+                            <option value="exams">{t("attachments.examType", "Exam")}</option>
+                          </DSSelect>
+                        </FormField>
+
+                        <FormField label={t("attachments.formUrl", "Google Form URL")} className="px-0 pt-0">
+                          <InputWithIcon icon={FiLink}>
+                            <input
+                              type="url"
+                              className={`input input-bordered w-full ${TOKENS.radius.section} pr-12`}
+                              placeholder={t("attachments.formUrlPlaceholder", "Paste the Google Form link here")}
+                              value={attachments.activeLinkValue}
+                              onChange={(e) => handleFormLinkChange(e.target.value)}
+                            />
+                          </InputWithIcon>
+                          <span className={`mt-2 ${TOKENS.typography.hint}`}>
+                            {t("attachments.formUrlHint", "Switch the form type if the link is for homework instead of exam, or vice versa.")}
+                          </span>
+                        </FormField>
+                      </div>
+
+                      {attachmentStats.existingLinks.length > 0 && (
+                        <Card className="mt-4">
+                          <p className={`${TOKENS.typography.meta} mb-3 text-base-content/50`}>
+                            {t("attachments.savedLinks", "Saved links")}
+                          </p>
+                          <ul className={`${TOKENS.spacing.tight} flex flex-col`}>
+                            {attachmentStats.existingLinks.map((link) => (
+                              <li key={link.key} className={`flex flex-col ${TOKENS.spacing.tight} ${TOKENS.radius.card} bg-base-200/40 px-3 py-2`}>
+                                <div className="flex items-center justify-between">
+                                  <span className="font-medium text-base-content">{link.label}</span>
+                                  <Badge variant="neutral">{link.label}</Badge>
+                                </div>
+                                <a href={link.url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 break-all text-xs text-primary hover:underline">
+                                  <FiLink className="h-3 w-3" />
+                                  {link.url}
+                                </a>
                               </li>
                             ))}
                           </ul>
-                        )}
-
-                        <p className="mt-3 text-xs text-base-content/60">
-                          {t(
-                            "attachments.uploadHint",
-                            "This box is for lecture resources only. The files are unified on the lecture page.",
-                          )}
-                        </p>
-                      </div>
-
-                      <div className="rounded-[1.5rem] border border-base-300 bg-base-200/40 p-4">
-                        <div className="flex items-start justify-between gap-3">
-                          <div>
-                            <h5 className="font-semibold text-base-content">
-                              {t("attachments.googleFormTitle", "Google Form link")}
-                            </h5>
-                            <p className="mt-1 text-sm text-base-content/60">
-                              {t(
-                                "attachments.googleFormHelper",
-                                "Use one Google Form link for the after-lecture exam or homework.",
-                              )}
-                            </p>
-                          </div>
-                          <span className="badge badge-outline badge-primary">
-                            {selectedFormLinkType === "homeworks"
-                              ? t("attachments.homeworkType", "Homework")
-                              : t("attachments.examType", "Exam")}
-                          </span>
-                        </div>
-
-                        <div className="mt-4 grid gap-3 sm:grid-cols-[160px_minmax(0,1fr)]">
-                          <div className="form-control">
-                            <label className="label px-0 pt-0">
-                              <span className="label-text font-semibold">
-                                {t("attachments.formType", "Form type")}
-                              </span>
-                            </label>
-                            <DSSelect
-                              className="select select-bordered w-full rounded-2xl"
-                              value={selectedFormLinkType}
-                              onChange={(e) => handleFormLinkTypeChange(e.target.value)}
-                            >
-                              <option value="homeworks">{t("attachments.homeworkType", "Homework")}</option>
-                              <option value="exams">{t("attachments.examType", "Exam")}</option>
-                            </DSSelect>
-                          </div>
-
-                          <div className="form-control">
-                            <label className="label px-0 pt-0">
-                              <span className="label-text font-semibold">
-                                {t("attachments.formUrl", "Google Form URL")}
-                              </span>
-                            </label>
-                            <div className="relative">
-                              <input
-                                type="url"
-                                className="input input-bordered w-full rounded-2xl"
-                                placeholder={t(
-                                  "attachments.formUrlPlaceholder",
-                                  "Paste the Google Form link here",
-                                )}
-                                value={googleFormLink}
-                                onChange={(e) => handleFormLinkChange(e.target.value)}
-                              />
-                              <FiLink className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-primary" />
-                            </div>
-                            <span className="mt-2 text-xs text-base-content/60">
-                              {t(
-                                "attachments.formUrlHint",
-                                "Switch the form type if the link is for homework instead of exam, or vice versa.",
-                              )}
-                            </span>
-                          </div>
-                        </div>
-
-                        {existingAttachmentLinks.length > 0 && (
-                          <div className="mt-4 rounded-2xl border border-base-300 bg-base-100 p-4">
-                            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-base-content/50">
-                              {t("attachments.savedLinks", "Saved links")}
-                            </p>
-                            <ul className="space-y-2 text-sm text-base-content/75">
-                              {existingAttachmentLinks.map((link) => (
-                                <li
-                                  key={link.key}
-                                  className="flex flex-col gap-2 rounded-xl bg-base-200/40 px-3 py-2"
-                                >
-                                  <div className="flex items-center justify-between gap-3">
-                                    <span className="font-medium text-base-content">{link.label}</span>
-                                    <span className="badge badge-outline badge-sm">{link.label}</span>
-                                  </div>
-                                  <a
-                                    href={link.url}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    className="inline-flex items-center gap-2 break-all text-xs text-primary underline-offset-2 hover:underline"
-                                  >
-                                    <FiLink className="h-3 w-3" />
-                                    {link.url}
-                                  </a>
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </section>
-                </div>
-
-                <aside className="space-y-6 lg:sticky lg:top-0 self-start">
-                  <section className="rounded-[1.75rem] border border-base-300 bg-gradient-to-br from-base-100 to-primary/5 p-5 shadow-sm">
-                    <div className="flex items-start justify-between gap-4">
-                      <div>
-                        <p className="text-xs font-bold uppercase tracking-[0.24em] text-primary/70">{t("sections.assetPreview")}</p>
-                        <h4 className="mt-1 text-xl font-bold text-base-content">{t("fields.thumbnail", "Thumbnail")}</h4>
-                      </div>
-                      <span className="badge badge-outline badge-primary">
-                        {containerType ? t(`types.${containerType}`, containerType) : t("lecturesPage.notSpecified")}
-                      </span>
-                    </div>
-
-                    <div className="mt-4 overflow-hidden rounded-[1.5rem] border border-dashed border-primary/20 bg-base-100">
-                      {thumbnailPreview ? (
-                        <img
-                          src={thumbnailPreview || "/placeholder.svg"}
-                          alt="Thumbnail preview"
-                          className="h-52 w-full object-cover"
-                        />
-                      ) : (
-                        <div className="flex h-52 flex-col items-center justify-center gap-3 px-6 text-center text-base-content/50">
-                          <div className="rounded-full bg-primary/10 p-4 text-primary">
-                            <FiImage className="h-7 w-7" />
-                          </div>
-                          <div>
-                            <p className="font-semibold">{t("fields.thumbnail", "Thumbnail")}</p>
-                            <p className="text-sm">{t("placeholders.enterLectureName")}</p>
-                          </div>
-                        </div>
+                        </Card>
                       )}
-                    </div>
-
-                    <div className="mt-4">
-                      <label className="label px-0 pt-0">
-                        <span className="label-text font-semibold">{t("fields.thumbnail", "Thumbnail")}</span>
-                      </label>
-                      <input
-                        type="file"
-                        onChange={handleThumbnailChange}
-                        className="file-input file-input-bordered w-full rounded-2xl"
-                        accept="image/*"
-                      />
-                      {thumbnailFile && (
-                        <p className="mt-2 text-sm text-base-content/70">
-                          {t("fields.selectedFile", "Selected file")}: {thumbnailFile.name}
-                        </p>
-                      )}
-                    </div>
-                  </section>
-
-                  <section className="rounded-[1.75rem] border border-base-300 bg-base-100 p-5 shadow-sm">
-                    <div className="flex items-center justify-between gap-3">
-                      <h4 className="text-lg font-bold text-base-content">{t("sections.publishSummary")}</h4>
-                      <span className="badge badge-neutral">{totalAttachments} files</span>
-                    </div>
-
-                    <div className="mt-4 space-y-3">
-                      {usesSelectableParent && (
-                        <SummaryRow
-                          label={t("fields.course")}
-                          value={selectedCourseLabel || t("lecturesPage.notSpecified")}
-                        />
-                      )}
-                      {usesSelectableParent && (
-                        <SummaryRow
-                          label={t("fields.container")}
-                          value={selectedParentContainerLabel || t("lecturesPage.notSpecified")}
-                        />
-                      )}
-                      <SummaryRow label={t("fields.level")} value={selectedLevelLabel || t("lecturesPage.notSpecified")} loading={levelsLoading} />
-                      <SummaryRow label={t("fields.subject")} value={selectedSubjectLabel || t("lecturesPage.notSpecified")} loading={subjectsLoading} />
-                      <SummaryRow label={t("fields.price")} value={`${Number(newPrice) || 0}`} />
-                      <SummaryRow label={t("fields.numberOfViews")} value={`${Number(numberOfViews) || 0}`} />
-                      <SummaryRow label={t("fields.requiresExam")} value={requiresExam ? t("options.yes") : t("options.no")} />
-                      <SummaryRow label={t("fields.requiresHomework")} value={requiresHomework ? t("options.yes") : t("options.no")} />
-                      <SummaryRow label={t("sections.attachments")} value={String(totalAttachments)} />
-                    </div>
-                  </section>
-
-                  {creationError && (
-                    <div className="alert alert-error rounded-[1.5rem] border-none shadow-sm">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="stroke-current shrink-0 h-6 w-6"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-                        />
-                      </svg>
-                      <span>{creationError}</span>
-                    </div>
-                  )}
-                </aside>
+                    </Card>
+                  </div>
+                </section>
               </div>
-            </div>
 
-            <div className="border-t border-base-300 bg-base-100/95 px-6 py-4 backdrop-blur sm:px-8">
-              <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-                <button type="button" className="btn btn-ghost rounded-full" onClick={handleClose} disabled={creationLoading}>
-                  {t("buttons.cancel")}
-                </button>
-                <button type="submit" className="btn btn-primary rounded-full" disabled={creationLoading}>
-                  {creationLoading ? (
-                    <>
-                      <span className="loading loading-spinner"></span>
-                      {isEditMode ? (isRTL ? "جارٍ الحفظ" : "Saving...") : t("buttons.creating")}
-                    </>
-                  ) : (
-                    isEditMode ? (isRTL ? "حفظ التغييرات" : "Save Changes") : t("buttons.create")
-                  )}
-                </button>
-              </div>
+              <aside className={`${TOKENS.spacing.section} lg:sticky lg:top-0 self-start`}>
+                <Card variant="gradient" className="mb-6">
+                  <div className={`flex items-start justify-between ${TOKENS.spacing.default}`}>
+                    <div>
+                      <p className={`${TOKENS.typography.meta} text-primary/70`}>{t("sections.assetPreview")}</p>
+                      <h4 className="mt-1 text-xl font-bold text-base-content">{t("fields.thumbnail", "Thumbnail")}</h4>
+                    </div>
+                    <Badge>{containerType ? t(`types.${containerType}`, containerType) : t("notSpecified", "غير محدد")}</Badge>
+                  </div>
+
+                  <div className={`mt-4 overflow-hidden ${TOKENS.radius.section} border border-dashed border-primary/20 bg-base-100`}>
+                    {thumbnail.preview ? (
+                      <img src={thumbnail.preview || "/placeholder.svg"} alt="Thumbnail preview" className="h-52 w-full object-cover" />
+                    ) : (
+                      <div className={`flex h-52 flex-col items-center justify-center ${TOKENS.spacing.tight} px-6 text-center text-base-content/50`}>
+                        <div className={`${TOKENS.radius.full} bg-primary/10 p-4 text-primary`}>
+                          <FiImage className="h-7 w-7" />
+                        </div>
+                        <div>
+                          <p className="font-semibold">{t("fields.thumbnail", "Thumbnail")}</p>
+                          <p className="text-sm">{t("placeholders.enterLectureName")}</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="mt-4">
+                    <FormField label={t("fields.thumbnail", "Thumbnail")} className="px-0 pt-0">
+                      <div className="mt-4">
+                        <InputWithIcon icon={FiImage}>
+                          <input
+                            type="file"
+                            onChange={handleThumbnailChange}
+                            className={`file-input file-input-bordered w-full ${TOKENS.radius.section} pr-12`}
+                            accept="image/*"
+                          />
+                        </InputWithIcon>
+                      </div>
+                    </FormField>
+                    {thumbnail.file && (
+                      <p className="mt-2 text-sm text-base-content/70">
+                        {t("fields.selectedFile", "Selected file")}: {thumbnail.file.name}
+                      </p>
+                    )}
+                  </div>
+                </Card>
+
+                <Card className="mb-6">
+                  <div className={`flex items-center justify-between ${TOKENS.spacing.tight}`}>
+                    <h4 className={TOKENS.typography.sectionTitle}>{t("sections.publishSummary")}</h4>
+                    <Badge variant="neutral">{attachmentStats.total} files</Badge>
+                  </div>
+
+                  <div className={`mt-4 ${TOKENS.spacing.tight} flex flex-col`}>
+                    {usesSelectableParent && <SummaryRow label={t("fields.course")} value={selectedLabels.course || t("notSpecified", "غير محدد")} />}
+                    {usesSelectableParent && <SummaryRow label={t("fields.container")} value={selectedLabels.container || t("notSpecified", "غير محدد")} />}
+                    <SummaryRow label={t("fields.level")} value={selectedLabels.level || t("notSpecified", "غير محدد")} loading={loading.levels} />
+                    <SummaryRow label={t("fields.subject")} value={selectedLabels.subject || t("notSpecified", "غير محدد")} loading={loading.subjects} />
+                    <SummaryRow label={t("fields.price")} value={`${Number(formData.price) || 0}`} />
+                    <SummaryRow label={t("fields.numberOfViews")} value={`${Number(formData.numberOfViews) || 0}`} />
+                    <SummaryRow label={t("fields.requiresExam")} value={assessmentConfig.exam.enabled ? t("options.yes") : t("options.no")} />
+                    <SummaryRow label={t("fields.requiresHomework")} value={assessmentConfig.homework.enabled ? t("options.yes") : t("options.no")} />
+                    <SummaryRow label={t("sections.attachments")} value={String(attachmentStats.total)} />
+                  </div>
+                </Card>
+
+                {error && (
+                  <div className={`alert alert-error ${TOKENS.radius.section} border-none shadow-sm`}>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>{error}</span>
+                  </div>
+                )}
+              </aside>
             </div>
-          </form>
-        </div>
+          </div>
+
+          <div className="border-t border-base-300 bg-base-100/95 px-6 py-4 backdrop-blur sm:px-8 flex-shrink-0">
+            <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+              <button type="button" className="btn btn-ghost rounded-full" onClick={handleClose} disabled={loading.submit}>
+                {t("buttons.cancel")}
+              </button>
+              <button type="submit" className="btn btn-primary rounded-full" disabled={loading.submit}>
+                {loading.submit ? (
+                  <>
+                    <span className="loading loading-spinner"></span>
+                    {isEditMode ? (isRTL ? "جارٍ الحفظ" : "Saving...") : t("buttons.creating")}
+                  </>
+                ) : (
+                  isEditMode ? (isRTL ? "حفظ التغييرات" : "Save Changes") : t("buttons.create")
+                )}
+              </button>
+            </div>
+          </div>
+        </form>
       </div>
     </div>
   )

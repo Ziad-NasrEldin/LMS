@@ -43,6 +43,11 @@ const lectureSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    duration: {
+      type: Number,
+      default: 0,
+      min: [0, "Duration cannot be negative"],
+    },
     examLink: {
       type: String,
       trim: true,

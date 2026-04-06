@@ -1,12 +1,14 @@
 "use client"
 
-import { useState, useEffect, useMemo } from "react"
+import { useState, useEffect, useMemo, useCallback, useRef } from "react"
 import { useParams, useNavigate, useLocation } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import { getContainerById, purchaseContainer, getEnrollmentCount } from "../routes/lectures"
-import { getUserDashboard } from "../routes/auth-services"
+import { getUserDashboard, isLoggedIn } from "../routes/auth-services"
 import { LoadingSpinner } from "../components/LoadingSpinner"
 import { ErrorAlert } from "../components/ErrorAlert"
+import LoginPromptModal from "../components/LoginPromptModal"
+import Syllabus from "../components/Syllabus"
 import { designTokens } from "../constants/designTokens"
 import { resolveLevelDisplayName } from "../utils/levelHierarchy"
 import { resolveProfileImageUrl } from "../utils/profileImage"
@@ -21,7 +23,6 @@ import {
   RefreshCw, 
   BarChart3, 
   Brain, 
-  Sparkles, 
   CheckCircle2,
   Lightbulb,
   ShoppingCart,
@@ -37,7 +38,6 @@ import {
   DollarSign,
   Unlock,
   ChevronDown,
-  Lock,
   Play,
   ThumbsUp,
   Flag
@@ -299,187 +299,17 @@ const LectureRow = ({ item, depth, isPurchased, onPurchase, purchaseInProgress, 
   )
 }
 
+// ─── LectureRow ─────────────────────────────────────────────────────────────
+// DEPRECATED: Replaced by Syllabus component with SyllabusItem
+// Kept temporarily for reference - will be removed in future cleanup
+// eslint-disable-next-line no-unused-vars
+const LectureRow_DEPRECATED = ({ item }) => null
+
 // ─── ContainerRow ─────────────────────────────────────────────────────────────
-
-const ContainerRow = ({ item, depth, isPurchased, onPurchase, purchaseInProgress, parentPurchased, onNavigate, t, isRTL }) => {
-  const tokens = designTokens.colors
-  const hasKids = (item?.children?.length > 0) || ['course', 'year', 'term', 'month'].includes(item?.type)
-  const [isOpen, setIsOpen] = useState(depth === 0)
-  const [children, setChildren] = useState(
-    item?.children?.length > 0 && typeof item.children[0] === 'object' ? item.children : []
-  )
-  const [childrenLoaded, setChildrenLoaded] = useState(
-    item?.children?.length > 0 && typeof item.children[0] === 'object'
-  )
-  const [loading, setLoading] = useState(false)
-
-  const itemId = item?._id || item?.id
-  const purchased = parentPurchased || isPurchased(itemId)
-  const childCount = item?.children?.length || 0
-  const typeConfig = CONTAINER_TYPE_CONFIG[item?.type] || { bg: `${tokens.lightAquaMist}30`, text: tokens.deepTeal }
-  const typeLabel = item?.type ? t(`containerTypes.${item.type}`, item.type.charAt(0).toUpperCase() + item.type.slice(1)) : t('containerTypes.module', 'Module')
-  const indentPx = depth * 12
-
-  const toggle = async () => {
-    if (!hasKids) return
-    if (isOpen) { setIsOpen(false); return }
-    if (childrenLoaded) { setIsOpen(true); return }
-    setLoading(true)
-    try {
-      if (item?.children?.length > 0 && typeof item.children[0] === 'object') {
-        setChildren(item.children)
-        setChildrenLoaded(true)
-      } else if (item?.children?.length > 0) {
-        const results = await Promise.all(
-          item.children.map(id => getContainerById(typeof id === 'string' ? id : (id._id || id.id)))
-        )
-        setChildren(results.filter(r => r?.data).map(r => r.data))
-        setChildrenLoaded(true)
-      } else {
-        const result = await getContainerById(itemId)
-        if (result?.data?.children?.length > 0) {
-          const cids = result.data.children
-          const results = await Promise.all(
-            cids.map(id => getContainerById(typeof id === 'string' ? id : (id._id || id.id)))
-          )
-          setChildren(results.filter(r => r?.data).map(r => r.data))
-          setChildrenLoaded(true)
-        }
-      }
-    } catch (e) { console.error('Syllabus load error:', e) }
-    setLoading(false)
-    setIsOpen(true)
-  }
-
-  // Depth-based left border accent color
-  const borderAccentColors = [tokens.deepTeal, tokens.softCyanTeal, tokens.warmMango, tokens.goldenSand]
-  const accentColor = borderAccentColors[depth % borderAccentColors.length]
-
-  return (
-    <div
-      className="border-b last:border-b-0"
-      style={{ borderColor: 'rgba(17,24,39,0.06)', marginInlineStart: `${indentPx}px` }}
-    >
-      {/* Accordion Header */}
-      <div
-        onClick={toggle}
-        role="button"
-        tabIndex={hasKids ? 0 : -1}
-        onKeyDown={(e) => e.key === 'Enter' && toggle()}
-        className="w-full flex flex-col sm:flex-row sm:items-center gap-3 text-left transition-colors hover:bg-black/[0.02] focus:outline-none cursor-pointer p-3 sm:px-4"
-        style={{
-          borderInlineStart: depth > 0 ? `3px solid ${accentColor}30` : 'none',
-        }}
-      >
-        <div className="flex items-center gap-3 flex-1 min-w-0">
-          {/* Expand icon */}
-          {hasKids ? (
-            <div
-              className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center"
-              style={{ background: `${accentColor}18`, border: `1.5px solid ${accentColor}30` }}
-            >
-              {loading ? (
-                <span className="w-3.5 h-3.5 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor: `${accentColor}80`, borderTopColor: 'transparent' }} />
-              ) : (
-                <ChevronDown size={14} className={`transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} style={{ color: accentColor }} />
-              )}
-            </div>
-          ) : (
-            <div className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center" style={{ background: tokens.neutralCloud }}>
-              <Book size={13} style={{ color: tokens.slateText }} />
-            </div>
-          )}
-
-          {/* Title & meta */}
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="font-bold text-sm leading-snug" style={{ color: tokens.inkText }}>{item?.name}</span>
-              <span
-                className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full flex-shrink-0"
-                style={{ background: typeConfig.bg, color: typeConfig.text }}
-              >
-                {typeLabel}
-              </span>
-              {purchased && (
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0" style={{ background: 'rgba(22,163,74,0.12)', color: '#15803d' }}>
-                  {t('syllabus.unlocked')}
-                </span>
-              )}
-            </div>
-            <div className="flex items-center gap-3 mt-0.5 flex-wrap">
-              {childCount > 0 && (
-                <span className="text-[11px]" style={{ color: tokens.slateText }}>
-                  {childCount} {t('syllabus.items')}
-                </span>
-              )}
-              {item?.duration > 0 && (
-                <span className="text-[11px] flex items-center gap-1" style={{ color: tokens.slateText }}>
-                  <Clock size={10} /> {formatMins(item.duration)}
-                </span>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Buy button */}
-        {!purchased && typeof item?.price === 'number' && (
-          <button
-            onClick={(e) => { e.stopPropagation(); onPurchase(itemId) }}
-            disabled={purchaseInProgress !== null}
-            className="flex-shrink-0 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold text-white transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:transform-none shadow-sm whitespace-nowrap self-start sm:self-center"
-            style={{ background: item.price > 0 ? tokens.warmMango : tokens.softCyanTeal }}
-          >
-            {purchaseInProgress === itemId ? (
-              <span className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
-            ) : item.price > 0 ? (
-              <><DollarSign size={10} /> {item.price}</>
-            ) : (
-              <><Unlock size={10} /> {t('purchase.getFree', 'Get')}</>
-            )}
-          </button>
-        )}
-      </div>
-
-      {/* Children */}
-      {isOpen && children.length > 0 && (
-        <div style={{ background: depth === 0 ? 'rgba(14,85,99,0.016)' : 'transparent' }}>
-          {children.map((child, idx) => {
-            const key = child?._id || child?.id || idx
-            if (child?.type === 'lecture') {
-              return (
-                <LectureRow
-                  key={key}
-                  item={child}
-                  depth={depth + 1}
-                  isPurchased={isPurchased}
-                  onPurchase={onPurchase}
-                  purchaseInProgress={purchaseInProgress}
-                  onNavigate={onNavigate}
-                  t={t}
-                  isRTL={isRTL}
-                />
-              )
-            }
-            return (
-              <ContainerRow
-                key={key}
-                item={child}
-                depth={depth + 1}
-                isPurchased={isPurchased}
-                onPurchase={onPurchase}
-                purchaseInProgress={purchaseInProgress}
-                parentPurchased={purchased}
-                onNavigate={onNavigate}
-                t={t}
-                isRTL={isRTL}
-              />
-            )
-          })}
-        </div>
-      )}
-    </div>
-  )
-}
+// DEPRECATED: Replaced by Syllabus component with SyllabusItem
+// Kept temporarily for reference - will be removed in future cleanup
+// eslint-disable-next-line no-unused-vars
+const ContainerRow_DEPRECATED = ({ item }) => null
 
 export default function CourseDetails() {
   const { courseId } = useParams()
@@ -518,6 +348,7 @@ export default function CourseDetails() {
   const [reviewForm, setReviewForm] = useState({ rating: 5, comment: '' })
   const [reviewError, setReviewError] = useState('')
   const [reviewSuccess, setReviewSuccess] = useState('')
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false)
 
   // Recursive function to count all containers and lectures
   const countCourseContent = useMemo(() => {
@@ -736,6 +567,19 @@ export default function CourseDetails() {
         .filter(Boolean),
     )
 
+    // Helper to check if any child of a container is purchased
+    const hasPurchasedChild = (container) => {
+      if (!container || !container.children) return false
+      
+      for (const child of container.children) {
+        const childId = normalizeId(child._id || child.id)
+        if (purchasedIds.has(childId)) return true
+        // Recursively check grandchildren
+        if (child.children && hasPurchasedChild(child)) return true
+      }
+      return false
+    }
+
     return (containerId) => {
       const normalizedContainerId = normalizeId(containerId)
       if (!normalizedContainerId) return false
@@ -745,6 +589,11 @@ export default function CourseDetails() {
       }
 
       if (courseData && courseData._id) {
+        // If checking the root course, also check if any child is purchased
+        if (normalizedContainerId === normalizeId(courseData._id)) {
+          if (hasPurchasedChild(courseData)) return true
+        }
+
         if (purchasedIds.has(normalizeId(courseData._id)) && normalizedContainerId !== normalizeId(courseData._id)) {
           return true
         }
@@ -775,6 +624,13 @@ export default function CourseDetails() {
 
   // Handle container purchase
   const handlePurchase = async (containerId) => {
+    // Check if user is logged in
+    const loggedIn = await isLoggedIn()
+    if (!loggedIn) {
+      setShowLoginPrompt(true)
+      return
+    }
+
     const normalizedContainerId = normalizeId(containerId)
     setPurchaseInProgress(containerId)
     setPurchaseError("")
@@ -977,7 +833,15 @@ export default function CourseDetails() {
     setReviewLoading(false)
   }
 
-  if (loading) return <LoadingSpinner />
+  const handleLoginRedirect = () => {
+    setShowLoginPrompt(false)
+    navigate('/login', { state: { from: location.pathname } })
+  }
+
+  const handleRegisterRedirect = () => {
+    setShowLoginPrompt(false)
+    navigate('/register', { state: { from: location.pathname } })
+  }
   if (error) return <ErrorAlert message={error} />
   if (!courseData) return <ErrorAlert message={t("errors.courseNotFound")} />
 
@@ -1321,108 +1185,15 @@ export default function CourseDetails() {
             {/* Tab Content */}
             <div className="rounded-xl bg-white p-8 shadow-sm" style={{ borderColor: 'rgba(17,24,39,0.08)' }}>
               {activeTab === 'syllabus' && (
-                <div className="space-y-5">
-                  {/* Header */}
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                    <div>
-                      <h2 className="text-2xl font-black" style={{ color: TOKENS.deepTeal }}>
-                        {t("syllabus.courseContent")}
-                      </h2>
-                      <p className="text-sm mt-0.5" style={{ color: TOKENS.slateText }}>
-                        {(() => {
-                          const counts = countCourseContent()
-                          return t('syllabus.modulesCount', { modules: counts.containers, lectures: counts.lectures })
-                        })()}
-                      </p>
-                    </div>
-                    {/* Legend */}
-                    <div className="flex items-center gap-3 flex-wrap">
-                      <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full" style={{ background: 'rgba(22,163,74,0.1)', color: '#15803d' }}>
-                        <Unlock size={11} /> {t('syllabus.purchased')}
-                      </span>
-                      <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full" style={{ background: `${TOKENS.warmMango}18`, color: TOKENS.warmMango }}>
-                        <Lock size={11} /> {t('syllabus.paid')}
-                      </span>
-                      <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full" style={{ background: `${TOKENS.softCyanTeal}15`, color: TOKENS.deepTeal }}>
-                        <Sparkles size={11} /> {t('syllabus.free')}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Content List */}
-                  <div
-                    className="rounded-2xl overflow-hidden"
-                    style={{
-                      border: '1.5px solid rgba(17,24,39,0.08)',
-                      background: 'white',
-                      boxShadow: SHADOWS.level1,
-                    }}
-                  >
-                    {/* Top-level containers */}
-                    {courseData?.children?.map((child, idx) => {
-                      const key = child._id || child.id || idx
-                      if (child?.type === 'lecture') {
-                        return (
-                          <LectureRow
-                            key={key}
-                            item={child}
-                            depth={0}
-                            isPurchased={isContainerPurchased}
-                            onPurchase={handlePurchase}
-                            purchaseInProgress={purchaseInProgress}
-                            onNavigate={navigate}
-                            t={t}
-                            isRTL={isRTL}
-                          />
-                        )
-                      }
-                      return (
-                        <ContainerRow
-                          key={key}
-                          item={child}
-                          depth={0}
-                          isPurchased={isContainerPurchased}
-                          onPurchase={handlePurchase}
-                          purchaseInProgress={purchaseInProgress}
-                          parentPurchased={isContainerPurchased(courseId)}
-                          onNavigate={navigate}
-                          t={t}
-                          isRTL={isRTL}
-                        />
-                      )
-                    })}
-
-                    {/* Direct lectures (if any) */}
-                    {courseData?.lectures?.map((lec, idx) => (
-                      <LectureRow
-                        key={lec._id || lec.id || idx}
-                        item={lec}
-                        depth={0}
-                        isPurchased={isContainerPurchased}
-                        onPurchase={handlePurchase}
-                        purchaseInProgress={purchaseInProgress}
-                        onNavigate={navigate}
-                        t={t}
-                        isRTL={isRTL}
-                      />
-                    ))}
-
-                    {/* Empty State */}
-                    {!courseData?.children?.length && !courseData?.lectures?.length && (
-                      <div className="flex flex-col items-center justify-center py-16 px-8 text-center">
-                        <div
-                          className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4"
-                          style={{ background: `${TOKENS.lightAquaMist}30` }}
-                        >
-                          <Book className="w-8 h-8" style={{ color: TOKENS.deepTeal }} />
-                        </div>
-                        <p className="font-semibold text-sm" style={{ color: TOKENS.slateText }}>
-                          {t('syllabus.noContent')}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                </div>
+                <Syllabus
+                  courseId={courseId}
+                  isPurchased={isContainerPurchased}
+                  onPurchase={handlePurchase}
+                  purchaseInProgress={purchaseInProgress}
+                  onNavigate={navigate}
+                  tokens={TOKENS}
+                  purchaseHistory={purchaseHistory}
+                />
               )}
 
               {activeTab === 'reviews' && (
@@ -1759,7 +1530,9 @@ export default function CourseDetails() {
                       </p>
                     </div>
                     <a
-                      href="mailto:support@fekra.com"
+                      href="https://wa.me/201027314148"
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="whitespace-nowrap rounded-full px-8 py-3 font-bold text-sm text-white transition-all hover:scale-105 active:scale-95"
                       style={{
                         background: TOKENS.warmMango,
@@ -2129,6 +1902,15 @@ export default function CourseDetails() {
           </div>
         </div>
       )}
+
+      {/* Login Prompt Modal for Guest Users */}
+      <LoginPromptModal
+        isOpen={showLoginPrompt}
+        onClose={() => setShowLoginPrompt(false)}
+        onLogin={handleLoginRedirect}
+        onRegister={handleRegisterRedirect}
+        isRTL={isRTL}
+      />
     </div>
   )
 }

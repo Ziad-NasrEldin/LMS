@@ -15,7 +15,6 @@ import {
   FileCheck,
   Eye,
   Paperclip,
-  ChevronDown,
 } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import { useTranslation } from "react-i18next"
@@ -31,8 +30,6 @@ const AssistantPage = () => {
   const [searchTerm, setSearchTerm] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState(10)
-  const [expandedContainers, setExpandedContainers] = useState({})
-  const [expandedLectures, setExpandedLectures] = useState({})
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -55,13 +52,6 @@ const AssistantPage = () => {
 
     fetchData()
   }, [t])
-
-  const toggleContainerExpand = (id) => {
-    setExpandedContainers((prev) => ({
-      ...prev,
-      [id]: !prev[id],
-    }))
-  }
 
   const handleTabChange = (tab) => {
     setActiveTab(tab)
@@ -181,12 +171,10 @@ const AssistantPage = () => {
                     {container.price > 0 ? t("common.pricePoints", { price: container.price }) : t("common.free")}
                   </td>
                   <td>
-                    <button className="btn btn-sm btn-ghost" onClick={() => toggleContainerExpand(container._id)}>
-                      {expandedContainers[container._id] ? (
-                        <ChevronDown className="w-4 h-4" />
-                      ) : (
-                        <ChevronRight className="w-4 h-4" />
-                      )}
+                    <button 
+                      className="btn btn-sm btn-primary" 
+                      onClick={() => navigate(`/dashboard/assistant-page/container-details/${container._id}`)}
+                    >
                       {t("common.details")}
                     </button>
                   </td>
@@ -316,7 +304,7 @@ const AssistantPage = () => {
                   <td className="font-medium">{attachment.fileName}</td>
                   <td>{attachment.lectureId?.name || t("common.notAvailable")}</td>
                   <td>
-                    <span className="badge badge-outline capitalize">{attachment.type}</span>
+                    <span className="badge badge-outline capitalize">{t(`common.${attachment.type}`)}</span>
                   </td>
                   <td>{new Date(attachment.uploadedOn).toLocaleDateString(i18n.language)}</td>
                   <td>

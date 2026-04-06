@@ -56,7 +56,8 @@ const LecturerForm = ({ userData, handleChange, subjects, t }) => {
           </label>
           <div className="flex gap-2">
             <DSSelect
-              className="select select-bordered flex-1"
+              className="select w-full rounded-xl"
+              style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
               onChange={handleSubjectSelect}
               value=""
             >
@@ -151,7 +152,7 @@ const LecturerForm = ({ userData, handleChange, subjects, t }) => {
           <textarea
             name="bio"
             className="textarea w-full rounded-xl"
-              style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
+            style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
             value={userData.bio || ""}
             onChange={handleChange}
             rows="3"
@@ -170,7 +171,7 @@ const LecturerForm = ({ userData, handleChange, subjects, t }) => {
             type="text"
             name="expertise"
             className="input w-full rounded-xl"
-              style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
+            style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
             value={userData.expertise || ""}
             onChange={handleChange}
             placeholder={t("placeholders.expertise")}

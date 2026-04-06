@@ -41,7 +41,7 @@ const normalizePolicyRole = (role) => {
 };
 
 const ALLOWED_IMPERSONATION_TARGETS = {
-  admin: ["lecturer", "student", "parent", "teacher"],
+  admin: ["lecturer", "student", "parent", "teacher", "assistant"],
   lecturer: ["student", "parent"],
   assistant: ["student"],
 };
@@ -61,7 +61,7 @@ const getDashboardPathByRole = (role) => {
 };
 
 const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
-  const { t, i18n } = useTranslation("common");
+  const { t, i18n } = useTranslation(["common", "lecturerDashboard"]);
   const isRTL = i18n.dir() === "rtl";
   const location = useLocation();
   const navigate = useNavigate();
@@ -108,6 +108,7 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
         student: t("studentView", { defaultValue: "Student View" }),
         parent: t("parentView", { defaultValue: "Parent View" }),
         teacher: t("teacherView", { defaultValue: "Teacher View" }),
+        assistant: t("assistantView", { defaultValue: "Assistant View" }),
       };
       return labels[normalized] || role;
     },
@@ -444,7 +445,7 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
       },
       {
         id: "reviews-management",
-        title: t("reviewsManagement") || "Reviews",
+        title: t("lecturerDashboard:reviewsManagement") || "Reviews",
         icon: <FaComment className="h-5 w-5" />,
         path: "/dashboard/lecturer-dashboard/reviews",
       },

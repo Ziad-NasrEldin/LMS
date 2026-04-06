@@ -53,6 +53,7 @@ export default function StudentRegistration() {
     gender: "",
     faction: "Alpha",
     stage: "",
+    stages: [],
     level: [],
     hobbies: [],
     otherHobbyText: "",
@@ -190,6 +191,9 @@ export default function StudentRegistration() {
         errors.profession = "professionRequired"
       }
 
+      if (role === "parent" && (!formData.stages || formData.stages.length === 0)) {
+        errors.stages = "required"
+      }
 
 
       if (role === "teacher") {
@@ -467,6 +471,12 @@ export default function StudentRegistration() {
 
         case "parent":
           data.append("profession", formData.profession.trim());
+          // Handle stages as array for parents
+          if (formData.stages && Array.isArray(formData.stages)) {
+            formData.stages.forEach((stageValue, index) => {
+              data.append(`stages[${index}]`, stageValue);
+            });
+          }
           formData.children
             .filter((c) => c.trim() !== "")
             .forEach((child, index) => {
@@ -523,7 +533,7 @@ export default function StudentRegistration() {
       });
 
       navigate("/login", {
-        state: { message: "Registration successful" },
+        state: { message: t("registrationSuccess", "Registration successful") },
       });
 
     } catch (error) {

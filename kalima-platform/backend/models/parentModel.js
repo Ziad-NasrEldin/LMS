@@ -39,6 +39,7 @@ const parentSchema = new mongoose.Schema({
   phoneNumber: { type: String, required: true },
   profession: { type: String, required: true, trim: true },
   level: { type: mongoose.Schema.Types.ObjectId, ref: "Level" },
+  stages: [{ type: mongoose.Schema.Types.ObjectId, ref: "Level" }], // Array of stage references
   // Array of lecturer-specific balance records
   lecturerPoints: [lecturerPointsSchema],
   government: { type: String, required: true },
@@ -144,6 +145,24 @@ parentSchema.pre("validate", async function (next) {
           this.invalidate("level", "Selected level does not exist.");
         } else if (levelDoc.isActive === false) {
           this.invalidate("level", "Selected level is inactive.");
+        }
+      }
+    }
+
+    // Validate stages array
+    if (this.stages && Array.isArray(this.stages) && this.stages.length > 0) {
+      for (const stageId of this.stages) {
+        if (!mongoose.Types.ObjectId.isValid(stageId)) {
+          this.invalidate("stages", `Invalid stage ID: ${stageId}`);
+        } else {
+          const stageDoc = await Level.findById(stageId).select("kind isActive");
+          if (!stageDoc) {
+            this.invalidate("stages", `Stage does not exist: ${stageId}`);
+          } else if (stageDoc.isActive === false) {
+            this.invalidate("stages", `Stage is inactive: ${stageId}`);
+          } else if (stageDoc.kind !== "stage") {
+            this.invalidate("stages", `Selected level is not a stage: ${stageId}`);
+          }
         }
       }
     }

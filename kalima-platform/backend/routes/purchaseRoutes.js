@@ -17,7 +17,7 @@ router.post("/points",
 // updated version
 router.post(
   "/points",
-  authController.verifyRoles("Student"),
+  authController.verifyRoles("Student", "Parent"),
   purchaseController.purchaseLecturerPoints
 );
 

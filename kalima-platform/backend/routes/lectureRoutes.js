@@ -12,6 +12,14 @@ router.route("/public").get(lectureController.getAllLecturesPublic);
 // Apply JWT verification middleware for subsequent routes
 router.use(verifyJWT);
 
+// Check student access to standalone lecture - MUST be before role verification
+router
+  .route("/student/:studentId/lecture/:lectureId/purchase/:purchaseId")
+  .get(lectureController.checkStudentLectureAccess);
+
+// Apply role verification middleware for lecture CRUD operations
+router.use(authController.verifyRoles("admin", "subadmin", "moderator", "lecturer", "assistant", "student"));
+
 router
   .route("/")
   .get(lectureController.getAllLectures)
@@ -22,11 +30,6 @@ router
   .get(lectureController.getLectureById)
   .patch(lectureController.updatelectures)
   .delete(lectureController.deletelecture);
-
-// Check student access to standalone lecture
-router
-  .route("/student/:studentId/lecture/:lectureId/purchase/:purchaseId")
-  .get(lectureController.checkStudentLectureAccess);
 
 router
   .route("/attachments/:lectureId")

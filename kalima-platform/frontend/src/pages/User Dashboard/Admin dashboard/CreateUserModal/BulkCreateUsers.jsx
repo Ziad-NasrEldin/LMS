@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
+import { Download } from "lucide-react"
 import { bulkCreateUsers } from "../../../../routes/fetch-users"
 import DSSelect from "../../../../components/DSSelect"
 
@@ -14,6 +15,43 @@ const BulkCreateUsers = () => {
   const [error, setError] = useState("")
   const [success, setSuccess] = useState("")
   const [loading, setLoading] = useState(false)
+
+  const generateCSVTemplate = () => {
+    const headers = {
+      student: ["name", "phoneNumber", "parentPhoneNumber", "parentPhoneRelation", "stage", "level", "government", "administrationZone", "hobby", "gender", "email", "password"],
+      parent: ["name", "phoneNumber", "profession", "government", "administrationZone", "gender", "email", "password"],
+      teacher: ["name", "phoneNumber", "phoneNumber2", "subject", "level", "teachesAtType", "school", "government", "administrationZone", "gender", "email", "password"],
+    }
+
+    const sampleData = {
+      student: [
+        ["أحمد محمد", "01012345678", "01112345678", "father", "Primary", "Grade 1", "Cairo", "Nasr City", "football", "male", "ahmed@example.com", "password123"],
+        ["فاطمة علي", "01212345678", "01312345678", "mother", "Primary", "Grade 2", "Giza", "Dokki", "reading", "female", "fatima@example.com", "password123"],
+      ],
+      parent: [
+        ["محمد أحمد", "01012345678", "Engineer", "Cairo", "Nasr City", "male", "mohamed@example.com", "password123"],
+        ["سارة علي", "01212345678", "Doctor", "Giza", "Dokki", "female", "sara@example.com", "password123"],
+      ],
+      teacher: [
+        ["أحمد محمود", "01012345678", "01112345678", "Math", "Primary,Secondary", "Both", "El-Nasr School", "Cairo", "Nasr City", "male", "teacher@example.com", "password123"],
+        ["فاطمة أحمد", "01212345678", "", "Science", "Secondary", "Center", "", "Giza", "Dokki", "female", "teacher2@example.com", "password123"],
+      ],
+    }
+
+    const csvHeaders = headers[accountType].join(",")
+    const csvRows = sampleData[accountType].map((row) => row.join(","))
+    const csvContent = [csvHeaders, ...csvRows].join("\n")
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })
+    const link = document.createElement("a")
+    const url = URL.createObjectURL(blob)
+
+    link.setAttribute("href", url)
+    link.setAttribute("download", `template_${accountType}_users.csv`)
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
 
   const handleAccountTypeChange = (e) => {
     setAccountType(e.target.value)
@@ -131,6 +169,20 @@ const BulkCreateUsers = () => {
               </DSSelect>
               <label className="label py-0">
                 <span className="label-text-alt text-info">{t("help.selectAccountType")}</span>
+              </label>
+            </div>
+
+            <div className="form-control">
+              <button
+                type="button"
+                onClick={generateCSVTemplate}
+                className="btn btn-outline w-full gap-2"
+              >
+                <Download size={18} />
+                {t("buttons.downloadTemplate")}
+              </button>
+              <label className="label py-0">
+                <span className="label-text-alt text-info">{t("help.downloadTemplate")}</span>
               </label>
             </div>
 

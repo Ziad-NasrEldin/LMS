@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 
 import { useTranslation } from "react-i18next";
 
-import { loginUser, getUserDashboard } from "../../routes/auth-services";
+import { loginUser, getUserDashboard, checkActiveSession } from "../../routes/auth-services";
 
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
@@ -10,9 +10,9 @@ import { Eye, EyeOff, Lock, Mail, Phone, Sparkles, UserCircle } from "lucide-rea
 
 import { getAccessToken } from "../../utils/useLocalStroage";
 
+import SessionConfirmModal from "../../components/SessionConfirmModal";
+
 import { designTokens } from "../../constants/designTokens";
-
-
 
 const TOKENS = designTokens.colors;
 
@@ -60,7 +60,27 @@ const TeacherLogin = () => {
 
   const [error, setError] = useState("");
 
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+
+  const [pendingCredentials, setPendingCredentials] = useState(null);
+
+  const [sessionRevokedMessage, setSessionRevokedMessage] = useState("");
+
   const accessToken = getAccessToken();
+
+
+
+  useEffect(() => {
+    // Check if session was revoked (from another tab/device) - using sessionStorage
+    if (sessionStorage.getItem("sessionRevoked") === "true") {
+      setSessionRevokedMessage(
+        isRTL
+          ? "تم إنهاء جلستك لأنك قمت بتسجيل الدخول على جهاز آخر. يرجى تسجيل الدخول مرة أخرى."
+          : "Your session was ended because you logged in on another device. Please log in again."
+      );
+      sessionStorage.removeItem("sessionRevoked");
+    }
+  }, [isRTL]);
 
 
 
@@ -136,108 +156,102 @@ const TeacherLogin = () => {
 
   };
 
-
-
-  const handleSubmit = async (e) => {
-
-    e.preventDefault();
-
-    setLoading(true);
-
-    setError("");
-
-
-
+  const performLogin = async (credentials) => {
     try {
-
-      const credentials = {
-
-        password: formData.password,
-
-      };
-
-
-
-      if (activeTab === "email_tab") {
-
-        credentials.email = formData.email;
-
-      } else {
-
-        credentials.phoneNumber = formData.phoneNumber;
-
-      }
-
-
-
       const loginResult = await loginUser(credentials);
 
-
-
       if (!loginResult.success) {
-
         setError(t("errors.invalidCredentials"));
-
         return;
-
       }
-
-
 
       const dashboardResult = await getUserDashboard();
 
-
-
       if (!dashboardResult.success) {
-
         setError(t("errors.fetchUserDataError"));
-
         return;
-
       }
-
-
 
       window.dispatchEvent(new Event("user-auth-changed"));
 
       const userRole = dashboardResult.data.data.userInfo.role;
 
-
-
       if (userRole === "Admin" || userRole === "SubAdmin") {
-
         navigate("/dashboard/admin-dashboard");
-
       } else if (userRole === "Lecturer") {
-
         navigate("/dashboard/lecturer-dashboard");
-
       } else if (userRole === "Student" || userRole === "Teacher" || userRole === "Parent") {
-
         navigate("/dashboard/student-dashboard/promo-codes");
-
       } else if (userRole === "Assistant") {
-
         navigate("/dashboard/assistant-page");
+      }
+    } catch (err) {
+      const errorMessage =
+        err.response?.data?.error || err.message || t("errors.generalError");
+      setError(errorMessage);
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  const handleConfirmLogin = () => {
+    setShowConfirmModal(false);
+    if (pendingCredentials) {
+      performLogin(pendingCredentials);
+    }
+  };
+
+  const handleCancelLogin = () => {
+    setShowConfirmModal(false);
+    setPendingCredentials(null);
+    setLoading(false);
+  };
+
+
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+
+    try {
+      const credentials = {
+        password: formData.password,
+      };
+
+      if (activeTab === "email_tab") {
+        credentials.email = formData.email;
+      } else {
+        credentials.phoneNumber = formData.phoneNumber;
       }
 
+      // Check if user has an active session
+      const sessionCheckResult = await checkActiveSession(credentials);
+
+      if (!sessionCheckResult.success) {
+        setError(sessionCheckResult.message || t("errors.invalidCredentials"));
+        setLoading(false);
+        return;
+      }
+
+      // If user has active session and confirmation is required, show modal
+      if (sessionCheckResult.requiresConfirmation && sessionCheckResult.hasActiveSession) {
+        setPendingCredentials(credentials);
+        setShowConfirmModal(true);
+        setLoading(false);
+        return;
+      }
+
+      // Otherwise proceed directly with login
+      await performLogin(credentials);
     } catch (err) {
-
       const errorMessage =
-
         err.response?.data?.error || err.message || t("errors.generalError");
-
       setError(errorMessage);
-
       console.error(err);
-
-    } finally {
-
       setLoading(false);
-
     }
-
   };
 
 
@@ -806,6 +820,12 @@ const TeacherLogin = () => {
 
                 )}
 
+                {sessionRevokedMessage && (
+                  <div className="alert alert-warning" style={{ backgroundColor: "#FEF3C7", borderColor: "#F59E0B", color: "#92400E" }}>
+                    <span>{sessionRevokedMessage}</span>
+                  </div>
+                )}
+
 
 
                 <button
@@ -843,6 +863,12 @@ const TeacherLogin = () => {
                 </p>
 
               </form>
+
+              <SessionConfirmModal
+                isOpen={showConfirmModal}
+                onConfirm={handleConfirmLogin}
+                onCancel={handleCancelLogin}
+              />
 
             </div>
 

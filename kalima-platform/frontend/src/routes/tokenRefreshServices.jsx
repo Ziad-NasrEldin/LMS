@@ -4,6 +4,9 @@ const API_URL = import.meta.env.VITE_API_URL
 const REFRESH_THRESHOLD_SECONDS = 60 // 1 minute before expiry
 const CHECK_INTERVAL_MS = 60000 // Check every 60 seconds
 
+// Session revoked message from backend
+const SESSION_REVOKED_MESSAGE = "Session has been replaced by a newer login. Please login again.";
+
 // Create a dedicated axios instance for refresh token requests
 const refreshAxiosInstance = axios.create({
   baseURL: API_URL,
@@ -27,11 +30,36 @@ const processQueue = (error, token = null) => {
   failedQueue = []
 }
 
+// Flag to prevent multiple session revoked redirects
+let isHandlingSessionRevoked = false;
+
+// Simple session revoked handler - just clear and redirect
+const handleSessionRevokedInRefresh = () => {
+  if (isHandlingSessionRevoked) return;
+  isHandlingSessionRevoked = true;
+  
+  clearAuthData();
+  processQueue(new Error("Session revoked"));
+  
+  // Redirect to login
+  if (!window.location.pathname.includes('/login')) {
+    sessionStorage.setItem("sessionRevoked", "true");
+    window.location.href = "/login";
+  }
+};
+
 // Interceptor for refresh token requests only
 refreshAxiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config
+    const errorMessage = error.response?.data?.message || error.response?.data?.error;
+
+    // Check for session revocation
+    if (error.response?.status === 401 && errorMessage === SESSION_REVOKED_MESSAGE) {
+      handleSessionRevokedInRefresh();
+      return Promise.reject(new Error("Session revoked"));
+    }
 
     if (
       error.response?.status === 401 &&

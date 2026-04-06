@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Eye, EyeOff } from 'lucide-react';
 import { useTranslation } from "react-i18next";
-import { getGradeOptionsForStage } from "../../utils/levelHierarchy";
 import DSSelect from "../../components/DSSelect"
 
 export default function StepParent({ formData, handleChildrenChange, t, errors, handleInputChange, levelHierarchy, levelsLoading }) {
@@ -13,14 +12,28 @@ export default function StepParent({ formData, handleChildrenChange, t, errors, 
     const { i18n } = useTranslation();
     const isRTL = i18n.language === "ar";
     const stageOptions = levelHierarchy?.stageOptions || [];
-    const gradeOptions = formData.stage ? getGradeOptionsForStage(levelHierarchy, formData.stage) : [];
     const fieldClass = "h-12 min-h-12 w-full rounded-xl text-base";
     const inputClass = `input input-bordered ${fieldClass}`;
     const selectClass = `select select-bordered ${fieldClass} ps-4 pe-10`;
     // Ensure we have enough empty slots for all children
     const safeChildren = [...formData.children, ...Array(childrenCount - formData.children.length).fill('')];
 
-   
+    // Handle stage checkbox toggle
+    const handleStageToggle = (stageValue) => {
+        const currentStages = formData.stages || [];
+        const isSelected = currentStages.includes(stageValue);
+        const newStages = isSelected
+            ? currentStages.filter(s => s !== stageValue)
+            : [...currentStages, stageValue];
+        
+        handleInputChange({
+            target: {
+                name: 'stages',
+                value: newStages
+            }
+        });
+    };
+
     const renderErrorMessage = (errorKey) => {
         if (!errors[errorKey]) return null;
         return (
@@ -132,99 +145,37 @@ export default function StepParent({ formData, handleChildrenChange, t, errors, 
                 <div className="flex flex-col gap-1">
                     <label className="label py-1">
                         <span className="label-text text-xs">
-                            {t('form.stage', { defaultValue: isRTL ? 'المرحلة' : 'Stage' })}
+                            {t('form.stages', { defaultValue: isRTL ? 'المراحل' : 'Stages' })}
                         </span>
                     </label>
-                    <DSSelect
-                        name="stage"
-                        className={`${selectClass} ${errors.stage ? 'select-error animate-shake' : ''}`}
-                        value={formData.stage || ''}
-                        onChange={(e) => {
-                            handleInputChange(e);
-                            if (formData.level) {
-                                handleInputChange({
-                                    target: {
-                                        name: 'level',
-                                        value: '',
-                                    },
-                                });
-                            }
-                        }}
-                        disabled={levelsLoading || stageOptions.length === 0}
-                        required
-                    >
-                        <option value="">
-                            {levelsLoading
-                                ? t('form.loadingStages', {
-                                      defaultValue: isRTL ? 'جاري تحميل المراحل...' : 'Loading stages...',
-                                  })
-                                : stageOptions.length === 0
-                                  ? t('form.noStagesAvailable', {
-                                        defaultValue: isRTL ? 'لا توجد مراحل متاحة' : 'No stages available',
-                                    })
-                                  : t('form.selectStage', {
-                                        defaultValue: isRTL ? 'اختر المرحلة' : 'Select Stage',
-                                    })}
-                        </option>
-                        {stageOptions.map((stage) => (
-                            <option key={stage.value} value={stage.value}>
-                                {stage.label}
-                            </option>
-                        ))}
-                    </DSSelect>
-                    {errors.stage && (
+                    <div className={`space-y-2 p-3 rounded-xl border ${errors.stages ? 'border-error bg-error/5' : 'border-base-300 bg-base-100'}`}>
+                        {levelsLoading ? (
+                            <span className="text-sm text-base-content/60">
+                                {t('form.loadingStages', { defaultValue: isRTL ? 'جاري تحميل المراحل...' : 'Loading stages...' })}
+                            </span>
+                        ) : stageOptions.length === 0 ? (
+                            <span className="text-sm text-base-content/60">
+                                {t('form.noStagesAvailable', { defaultValue: isRTL ? 'لا توجد مراحل متاحة' : 'No stages available' })}
+                            </span>
+                        ) : (
+                            stageOptions.map((stage) => (
+                                <label key={stage.value} className="flex items-center gap-3 cursor-pointer hover:bg-base-200/50 p-2 rounded-lg transition-colors">
+                                    <input
+                                        type="checkbox"
+                                        className="checkbox checkbox-primary"
+                                        checked={(formData.stages || []).includes(stage.value)}
+                                        onChange={() => handleStageToggle(stage.value)}
+                                    />
+                                    <span className="text-sm">{stage.label}</span>
+                                </label>
+                            ))
+                        )}
+                    </div>
+                    {errors.stages && (
                         <span className="text-error text-sm mt-1">
-                            {t(`validation.${errors.stage}`)}
+                            {t(`validation.${errors.stages}`)}
                         </span>
                     )}
-                </div>
-            </div>
-
-            <div className="form-control">
-                <div className="flex flex-col gap-1">
-                    <label className="label py-1">
-                        <span className="label-text text-xs">{t('form.level')}</span>
-                    </label>
-                    <DSSelect
-                        name="level"
-                        className={`${selectClass} ${errors.level ? 'select-error animate-shake' : ''}`}
-                        value={formData.level || ''}
-                        onChange={handleInputChange}
-                        disabled={levelsLoading || !formData.stage || gradeOptions.length === 0}
-                        required
-                    >
-                         <option value="">
-                           {levelsLoading
-                             ? t('form.loadingGrades', {
-                                 defaultValue: isRTL ? "جاري تحميل الصفوف..." : "Loading grades...",
-                               })
-                             : !formData.stage
-                               ? t('form.selectStageFirst', {
-                                   defaultValue: isRTL ? "اختر المرحلة أولاً" : "Select a stage first",
-                                 })
-                               : gradeOptions.length === 0
-                                 ? t('form.noGradesAvailable', {
-                                     defaultValue: isRTL ? "لا توجد صفوف متاحة" : "No grades available",
-                                   })
-                                 : t('form.selectGradeLevel', {
-                                     defaultValue: t('form.selectGrade', {
-                                       defaultValue: isRTL ? "اختر الصف الدراسي" : "Select Grade Level",
-                                     }),
-                                   })}
-                         </option>
-              {gradeOptions.map((level) => (
-                <option key={level.value || level._id} value={level.value || level._id}>
-                  {level.label || level.displayName || level.name}
-                </option>
-              ))}
-                           
-                        
-                    </DSSelect>
-                    {errors.level && (
-              <span className="text-error text-sm mt-1">
-                 {t(`validation.${errors.level}`)}
-              </span>
-            )}
                 </div>
             </div>
 

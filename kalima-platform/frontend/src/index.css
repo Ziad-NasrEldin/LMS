@@ -1021,6 +1021,8 @@ select.select option:hover {
   border-radius: 0.75rem;
   transition: all 200ms ease;
   cursor: pointer;
+  align-items: center;
+  justify-content: flex-start;
 }
 
 .file-input:hover {
@@ -1045,6 +1047,10 @@ select.select option:hover {
   border-radius: 0.5rem;
   cursor: pointer;
   transition: all 200ms ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: fit-content;
 }
 
 .file-input::file-selector-button:hover {
@@ -1635,13 +1641,15 @@ select.select option:hover {
   width: 100%;
   max-width: 32rem;
   max-height: calc(100vh - 5rem);
-  overflow-y: auto;
+  overflow: hidden;
   background: #ffffff;
   border: 1.5px solid rgba(17, 24, 39, 0.08);
   border-radius: 1.5rem;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   transform: translateY(100%);
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
 }
 
 /* Modal open state - box animation */
@@ -1704,6 +1712,34 @@ select.select option:hover {
 /* Extra large modal */
 .modal-xl .modal-box {
   max-width: 72rem;
+  max-height: calc(100vh - 2rem);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Large modal content scrolling */
+.modal-xl .modal-box .min-h-0 {
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+}
+
+.modal-xl .modal-box .min-h-0::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modal-xl .modal-box .min-h-0::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.modal-xl .modal-box .min-h-0::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+.modal-xl .modal-box .min-h-0::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.3);
 }
 
 /* Full width modal */

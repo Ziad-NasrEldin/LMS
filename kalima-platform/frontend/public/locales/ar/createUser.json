@@ -118,7 +118,8 @@
     "removeParentPhone": "إزالة",
     "chooseFile": "اختر ملف",
     "createUsers": "إنشاء مستخدمين",
-    "uploading": "جاري التحميل..."
+    "uploading": "جاري التحميل...",
+    "downloadTemplate": "تحميل نموذج CSV"
   },
   "messages": {
     "loading": "جاري التحميل...",
@@ -178,7 +179,8 @@
     "selectAccountType": "الإنشاء بالجملة يدعم فقط: طالب، ولي أمر، مدرس",
     "csvRequiredFields": "يجب أن يحتوي ملف CSV على الحقول المطلوبة لنوع الحساب المحدد",
     "uploadCSV": "تحميل ملف CSV",
-    "csvFormat": "يجب أن يحتوي ملف CSV على الحقول التالية:"
+    "csvFormat": "يجب أن يحتوي ملف CSV على الحقول التالية:",
+    "downloadTemplate": "قم بتحميل نموذج CSV واملأ البيانات ثم ارفعه"
   },
   "csvFields": {
     "name": "الاسم",

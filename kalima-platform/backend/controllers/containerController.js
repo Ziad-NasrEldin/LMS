@@ -233,6 +233,7 @@ exports.createContainer = catchAsync(async (req, res, next) => {
       createdBy,
       description,
       goal,
+      sameGradeOnly,
     } = req.body;
 
     // Check required documents exist
@@ -267,6 +268,7 @@ exports.createContainer = catchAsync(async (req, res, next) => {
       createdBy: createdBy || req.user._id,
       description: type === "course" ? description : undefined,
       goal: type === "course" ? goal : undefined,
+      sameGradeOnly: type === "course" ? Boolean(sameGradeOnly) : undefined,
     };
 
     // Add image data if an image was uploaded
@@ -316,11 +318,11 @@ exports.getContainerById = catchAsync(async (req, res, next) => {
 
   // Special case handling for "my-containers" path
   if (containerId === "my-containers") {
-    // Only authenticated users with role Lecturer can access this resource
-    if (!req.user || req.user.role !== "Lecturer") {
+    // Only authenticated users with role Lecturer or Assistant can access this resource
+    if (!req.user || (req.user.role !== "Lecturer" && req.user.role !== "Assistant")) {
       return next(
         new AppError(
-          "Please log in as a lecturer to access your containers.",
+          "Please log in as a lecturer or assistant to access your containers.",
           401
         )
       );
@@ -491,6 +493,187 @@ exports.getContainerById = catchAsync(async (req, res, next) => {
   });
 });
 
+// Get full container hierarchy with all nested children populated
+exports.getContainerHierarchy = catchAsync(async (req, res, next) => {
+  const { containerId } = req.params;
+
+  // Check if containerId is provided
+  if (!containerId) {
+    return next(new AppError("Container ID is required.", 400));
+  }
+
+  // Verify containerId is a valid MongoDB ObjectId
+  if (!mongoose.Types.ObjectId.isValid(containerId)) {
+    return next(new AppError("Invalid container ID format.", 400));
+  }
+
+  // Recursive function to build hierarchy
+  const buildHierarchy = async (parentId, depth = 0) => {
+    const container = await Container.findById(parentId)
+      .populate([
+        { path: "createdBy", select: "name profilePic" },
+        { path: "subject", select: "name" },
+        { path: "level", select: "name" },
+      ])
+      .lean();
+
+    if (!container) {
+      // Try to find in Lecture model
+      const lecture = await Lecture.findById(parentId)
+        .populate([
+          { path: "createdBy", select: "name profilePic" },
+          { path: "subject", select: "name" },
+          { path: "level", select: "name" },
+        ])
+        .lean();
+
+      if (lecture) {
+        return [{
+          ...lecture,
+          _id: lecture._id.toString(),
+          depth,
+          children: [],
+          isLecture: true,
+        }];
+      }
+      return [];
+    }
+
+    const result = {
+      ...container,
+      _id: container._id.toString(),
+      depth,
+      children: [],
+    };
+
+    // Resolve children
+    const childIds = (container.children || []).map((childId) =>
+      typeof childId === "object" ? childId.toString() : childId
+    );
+
+    if (childIds.length > 0) {
+      // Fetch all child containers and lectures
+      const [containerChildren, lectureChildren] = await Promise.all([
+        Container.find({ _id: { $in: childIds } })
+          .select("name type level subject image price description goal children")
+          .populate([
+            { path: "subject", select: "name" },
+            { path: "level", select: "name" },
+          ])
+          .lean(),
+        Lecture.find({ _id: { $in: childIds } })
+          .select("name type level subject price description numberOfViews thumbnail videoLink duration")
+          .populate([
+            { path: "subject", select: "name" },
+            { path: "level", select: "name" },
+          ])
+          .lean(),
+      ]);
+
+      const childrenById = new Map();
+      containerChildren.forEach((child) => {
+        childrenById.set(child._id.toString(), { ...child, isLecture: false });
+      });
+      lectureChildren.forEach((child) => {
+        childrenById.set(child._id.toString(), { ...child, isLecture: true });
+      });
+
+      // Recursively build hierarchy for each child
+      const orderedChildren = childIds.map((id) => childrenById.get(id)).filter(Boolean);
+      
+      for (const child of orderedChildren) {
+        const childHierarchy = await buildHierarchy(child._id, depth + 1);
+        // The first item is the child itself, rest are its descendants
+        if (childHierarchy.length > 0) {
+          result.children.push(childHierarchy[0]);
+        }
+      }
+    }
+
+    return [result];
+  };
+
+  // Build the full hierarchy
+  const hierarchy = await buildHierarchy(containerId);
+
+  if (hierarchy.length === 0) {
+    return next(new AppError("Container not found.", 404));
+  }
+
+  // Flatten hierarchy for easy rendering (optional - can also return nested)
+  const flattenHierarchy = (node, result = []) => {
+    const { children, ...nodeWithoutChildren } = node;
+    result.push(nodeWithoutChildren);
+    if (children && children.length > 0) {
+      children.forEach((child) => flattenHierarchy(child, result));
+    }
+    return result;
+  };
+
+  // Get ancestors for breadcrumb
+  const ancestors = [];
+  let inheritedImage = null;
+  let inheritedFrom = null;
+  let currentParentId = hierarchy[0].parent;
+
+  while (currentParentId) {
+    const parentContainer = await Container.findById(currentParentId)
+      .select("name type parent image")
+      .lean();
+    if (!parentContainer) break;
+
+    ancestors.unshift({
+      _id: parentContainer._id,
+      name: parentContainer.name,
+      type: parentContainer.type,
+    });
+
+    if (!inheritedImage && parentContainer.image && parentContainer.image.url) {
+      inheritedImage = parentContainer.image;
+      inheritedFrom = parentContainer._id;
+    }
+
+    currentParentId = parentContainer.parent;
+  }
+
+  const rootContainer = hierarchy[0];
+
+  // Role-specific logic for authenticated users
+  if (req.user && req.user.role?.toLowerCase() === "teacher") {
+    if (!rootContainer.teacherAllowed) {
+      return res.status(200).json({
+        status: "restricted",
+        data: {
+          id: rootContainer._id,
+          name: rootContainer.name,
+          owner: rootContainer.createdBy?.name || rootContainer.createdBy,
+          subject: rootContainer.subject?.name || rootContainer.subject,
+          type: rootContainer.type,
+        },
+      });
+    }
+  }
+
+  // Build response
+  const responseData = {
+    container: rootContainer,
+    ancestors,
+    flatHierarchy: flattenHierarchy(rootContainer),
+  };
+
+  if (inheritedImage) {
+    responseData.inheritedImage = {
+      image: inheritedImage,
+      inheritedFrom,
+    };
+  }
+
+  return res.status(200).json({
+    status: "success",
+    data: responseData,
+  });
+});
+
 exports.getAllContainers = catchAsync(async (req, res, next) => {
   // Create base query
   let query = Container.find();
@@ -616,7 +799,7 @@ exports.getMyContainers = catchAsync(async (req, res, next) => {
 });
 
 exports.updateContainer = catchAsync(async (req, res, next) => {
-  const { name, type, price, level, subject, description, goal, teacherAllowed, removeImage } =
+  const { name, type, price, level, subject, description, goal, teacherAllowed, removeImage, sameGradeOnly } =
     req.body;
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -633,7 +816,7 @@ exports.updateContainer = catchAsync(async (req, res, next) => {
       throw new AppError("No container found with that ID", 404);
     }
 
-    const canBypassOwnership = ["Admin", "SubAdmin", "Moderator"].includes(req.user?.role);
+    const canBypassOwnership = ["admin", "subadmin", "moderator", "assistant"].includes(req.user?.role?.toLowerCase());
     if (!canBypassOwnership && container.createdBy?.toString() !== req.user._id.toString()) {
       if (req.file && req.file.filename) {
         await cloudinary.uploader.destroy(req.file.filename);
@@ -646,6 +829,10 @@ exports.updateContainer = catchAsync(async (req, res, next) => {
 
     if (teacherAllowed !== undefined) {
       obj.teacherAllowed = teacherAllowed === true || teacherAllowed === "true";
+    }
+
+    if (sameGradeOnly !== undefined) {
+      obj.sameGradeOnly = sameGradeOnly === true || sameGradeOnly === "true";
     }
 
     if (type === "course") {
@@ -812,7 +999,7 @@ exports.deleteContainerAndChildren = catchAsync(async (req, res, next) => {
       throw new AppError("Container not found", 404);
     }
 
-    const canBypassOwnership = ["Admin", "SubAdmin", "Moderator"].includes(req.user?.role);
+    const canBypassOwnership = ["admin", "subadmin", "moderator", "assistant"].includes(req.user?.role?.toLowerCase());
     if (!canBypassOwnership && rootContainer.createdBy?.toString() !== req.user._id.toString()) {
       throw new AppError("You do not have permission to delete this container", 403);
     }
@@ -1098,7 +1285,7 @@ exports.recalculateContainerDuration = catchAsync(async (req, res, next) => {
   }
   
   // Check permissions
-  const canBypassOwnership = ["Admin", "SubAdmin", "Moderator"].includes(req.user?.role);
+  const canBypassOwnership = ["admin", "subadmin", "moderator", "assistant"].includes(req.user?.role?.toLowerCase());
   if (!canBypassOwnership && container.createdBy?.toString() !== req.user._id.toString()) {
     return next(new AppError("You do not have permission to modify this container.", 403));
   }

@@ -118,7 +118,8 @@
     "close": "Close",
     "addAnotherParentPhone": "Add another parent phone",
     "removeParentPhone": "Remove",
-    "chooseFile": "Choose File"
+    "chooseFile": "Choose File",
+    "downloadTemplate": "Download CSV Template"
   },
   "messages": {
     "loading": "Loading...",
@@ -178,7 +179,8 @@
     "selectAccountType": "Bulk create supports: student, parent, teacher",
     "csvRequiredFields": "CSV file should include required fields for the selected account type",
     "uploadCSV": "Upload CSV File",
-    "csvFormat": "Your CSV file should include the following columns:"
+    "csvFormat": "Your CSV file should include the following columns:",
+    "downloadTemplate": "Download the CSV template, fill in the data, then upload it"
   },
   
   "csvFields": {

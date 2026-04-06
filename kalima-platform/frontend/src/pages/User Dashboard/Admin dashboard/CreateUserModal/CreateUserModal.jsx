@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useTranslation } from "react-i18next"
-import { Eye, EyeOff } from "lucide-react"
+import { Eye, EyeOff, X } from "lucide-react"
 import { getAllLecturers } from "../../../../routes/fetch-users"
 import { getAllLevels } from "../../../../routes/levels"
 import { getAllSubjects } from "../../../../routes/courses"
@@ -450,18 +450,30 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
 
   return (
     <div className="modal modal-open" dir={isRTL ? "rtl" : "ltr"} style={{ backgroundColor: 'rgba(17,24,39,0.4)' }}>
-      <div 
-        className="modal-box max-w-2xl rounded-[2rem] p-6 sm:p-8" 
-        style={{ 
-          backgroundColor: TOKENS.neutralCloud, 
-          boxShadow: SHADOWS.level2 
+      <div
+        className="modal-box max-w-2xl max-h-[90vh] flex flex-col rounded-[2rem] p-0"
+        style={{
+          backgroundColor: TOKENS.neutralCloud,
+          boxShadow: SHADOWS.level2
         }}
       >
-        <h3 className="font-extrabold text-2xl mb-6" style={{ color: TOKENS.inkText }}>
-          {isBulkMode ? t("titles.bulkCreate") : t("titles.createNewUser")}
-        </h3>
+        {/* Header with close button */}
+        <div className="flex items-center justify-between p-6 pb-0 sm:px-8">
+          <h3 className="font-extrabold text-2xl" style={{ color: TOKENS.inkText }}>
+            {isBulkMode ? t("titles.bulkCreate") : t("titles.createNewUser")}
+          </h3>
+          <button
+            type="button"
+            onClick={onClose}
+            className="btn btn-ghost btn-circle btn-sm"
+            style={{ color: TOKENS.slateText }}
+            aria-label={t("buttons.close")}
+          >
+            <X size={20} />
+          </button>
+        </div>
 
-        <div className="flex bg-white rounded-xl p-1 mb-6 border" style={{ borderColor: 'rgba(17,24,39,0.05)' }}>
+        <div className="flex bg-white rounded-xl p-1 mb-6 border px-6 sm:px-8" style={{ borderColor: 'rgba(17,24,39,0.05)' }}>
           <button 
             className={`flex-1 py-3 px-4 rounded-lg font-bold transition-all ${!isBulkMode ? "shadow-sm" : "hover:bg-gray-50"}`} 
             style={{ 
@@ -484,6 +496,9 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
           </button>
         </div>
 
+        {/* Scrollable content */}
+        <div className="flex-1 overflow-y-auto px-6 pb-6 sm:px-8 sm:pb-8">
+
         {formError && (
           <div className="alert border-none rounded-xl mb-6 font-medium" style={{ backgroundColor: "rgba(224,36,36,0.1)", color: "#E02424" }}>
             <span>{formError}</span>
@@ -498,7 +513,7 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-5">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="form-control">
                 <div className="flex flex-col gap-2">
                   <label className="label py-0">
@@ -565,13 +580,14 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
 
             <div className="form-control">
               <div className="flex flex-col gap-2">
-                <label className="label">
-                  <span className="label-text">{t("fields.email")}</span>
+                <label className="label py-0">
+                  <span className="label-text font-bold" style={{ color: TOKENS.inkText }}>{t("fields.email")}</span>
                 </label>
                 <input
                   type="email"
                   name="email"
-                  className="input input-bordered"
+                  className="input w-full rounded-xl"
+                  style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: TOKENS.inkText }}
                   value={userData.email}
                   onChange={handleChange}
                   required
@@ -582,21 +598,22 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="form-control">
                 <div className="flex flex-col gap-2">
-                  <label className="label">
-                    <span className="label-text">{t("fields.password")}</span>
+                  <label className="label py-0">
+                    <span className="label-text font-bold" style={{ color: TOKENS.inkText }}>{t("fields.password")}</span>
                   </label>
                   <div className="relative">
                     <input
                       type={showPassword ? "text" : "password"}
                       name="password"
-                      className={`input input-bordered w-full ${isRTL ? "pr-12" : "pl-12"}`}
+                      className="input w-full rounded-xl"
+                      style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: TOKENS.inkText }}
                       value={userData.password}
                       onChange={handleChange}
                       required
                     />
                     <button
                       type="button"
-                      className={`absolute top-1/2 ${isRTL ? "right-3" : "left-3"} -translate-y-1/2 z-10`}
+                      className={`absolute top-1/2 ${isRTL ? "left-3" : "right-3"} -translate-y-1/2 z-10`}
                       onClick={() => setShowPassword((prev) => !prev)}
                       aria-label={showPassword ? "Hide password" : "Show password"}
                     >
@@ -608,21 +625,22 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
 
               <div className="form-control">
                 <div className="flex flex-col gap-2">
-                  <label className="label">
-                    <span className="label-text">{t("fields.confirmPassword")}</span>
+                  <label className="label py-0">
+                    <span className="label-text font-bold" style={{ color: TOKENS.inkText }}>{t("fields.confirmPassword")}</span>
                   </label>
                   <div className="relative">
                     <input
                       type={showConfirmPassword ? "text" : "password"}
                       name="confirmPassword"
-                      className={`input input-bordered w-full ${isRTL ? "pr-12" : "pl-12"}`}
+                      className="input w-full rounded-xl"
+                      style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: TOKENS.inkText }}
                       value={userData.confirmPassword}
                       onChange={handleChange}
                       required
                     />
                     <button
                       type="button"
-                      className={`absolute top-1/2 ${isRTL ? "right-3" : "left-3"} -translate-y-1/2 z-10`}
+                      className={`absolute top-1/2 ${isRTL ? "left-3" : "right-3"} -translate-y-1/2 z-10`}
                       onClick={() => setShowConfirmPassword((prev) => !prev)}
                       aria-label={showConfirmPassword ? "Hide password" : "Show password"}
                     >
@@ -712,6 +730,7 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
             </div>
           </form>
         )}
+        </div>
       </div>
     </div>
   )

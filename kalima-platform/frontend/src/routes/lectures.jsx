@@ -102,6 +102,32 @@ export const getContainerById = async (containerId) => {
   }
 };
 
+// Get full container hierarchy with all nested children populated
+export const getContainerHierarchy = async (containerId) => {
+  try {
+    if (!containerId) {
+      throw new Error(translateErrorMessage("Missing container ID"));
+    }
+
+    const token = getToken();
+    const config = token 
+      ? authConfig() 
+      : { withCredentials: true };
+
+    const response = await axios.get(`${API_URL}/containers/${containerId}/hierarchy`, config);
+
+    // Handle non-2xx status codes
+    if (response.status < 200 || response.status >= 300) {
+      throw new Error(translateErrorMessage(response.data.message || "Request failed"));
+    }
+
+    return response.data;
+
+  } catch (error) {
+    return normalizeApiError(error, "Error fetching container hierarchy")
+  }
+};
+
 export const getLectureAttachments = async (lectureId) => {
   try {
     const token = getToken();
@@ -491,6 +517,33 @@ export const createLectureAttachment = async (lectureId, attachmentData, isFormD
     return response.data;
   } catch (error) {
     console.error("Error uploading lecture attachment:", error);
+    throw new Error(translateErrorMessage(error.message || "Request failed"));
+  }
+};
+
+export const updateLectureAttachment = async (lectureId, attachmentData, isFormData = false) => {
+  try {
+    let formData;
+    if (isFormData) {
+      formData = attachmentData;
+    } else {
+      formData = new FormData();
+      formData.append("type", attachmentData.type);
+      formData.append("attachment", attachmentData.attachment);
+    }
+
+    const response = await axios.patch(
+      `${API_URL}/lectures/attachments/${lectureId}`,
+      formData,
+      authConfig({
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error updating lecture attachment:", error);
     throw new Error(translateErrorMessage(error.message || "Request failed"));
   }
 };

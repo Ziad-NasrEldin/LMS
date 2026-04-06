@@ -368,6 +368,47 @@ const registerNewUser = catchAsync(async (req, res, next) => {
           return next(mapLevelHierarchyAppError(error, "parent"));
         }
       }
+      
+      // Handle stages array for parents
+      if (userData.stages) {
+        const requestedStages = Array.isArray(userData.stages) 
+          ? userData.stages 
+          : [userData.stages];
+        
+        const validStageIds = [];
+        const invalidStages = [];
+        
+        for (const stageValue of requestedStages) {
+          const value = String(stageValue || "").trim();
+          if (!value) continue;
+          
+          if (mongoose.Types.ObjectId.isValid(value)) {
+            // Verify it's actually a stage
+            const Level = require("../models/levelModel");
+            const stageDoc = await Level.findById(value).select("kind isActive").lean();
+            if (stageDoc && stageDoc.kind === "stage" && stageDoc.isActive !== false) {
+              validStageIds.push(value);
+            } else {
+              invalidStages.push(value);
+            }
+          } else {
+            invalidStages.push(value);
+          }
+        }
+        
+        if (invalidStages.length > 0) {
+          return next(
+            createSignupError("SIGNUP_PARENT_STAGES_INVALID", {
+              details: { invalidStages },
+            })
+          );
+        }
+        
+        if (validStageIds.length > 0) {
+          newUser.stages = validStageIds;
+        }
+      }
+      
       user = await Parent.create(newUser);
       break;
     }

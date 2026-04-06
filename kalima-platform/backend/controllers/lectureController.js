@@ -23,6 +23,7 @@ const {
   upsertStudentLectureAccess,
 } = require("../utils/lectureAccessResolver")
 const { normalizeExternalUrl } = require("../utils/urlValidation")
+const { fetchYouTubeDuration } = require("../utils/youtubeDuration")
 const {
   MASTER_ASSESSMENT_SHEET_ID,
   MASTER_ASSESSMENT_IDENTIFIER_COLUMN,
@@ -310,7 +311,9 @@ exports.createLecture = catchAsync(async (req, res, next) => {
         throw new AppError("Lectures cannot be nested under another lecture", 400)
       }
 
-      if (parentContainer.createdBy?.toString() !== lecturerId.toString()) {
+      // Check if user has permission to create lecture under this container
+      const canBypassOwnership = ["Admin", "SubAdmin", "Moderator", "Assistant"].includes(req.user?.role)
+      if (!canBypassOwnership && parentContainer.createdBy?.toString() !== lecturerId.toString()) {
         if (thumbnailPath) deleteFile(thumbnailPath)
         throw new AppError("Selected parent container does not belong to this lecturer", 403)
       }
@@ -408,6 +411,12 @@ exports.createLecture = catchAsync(async (req, res, next) => {
         }
       }
 
+      // Fetch YouTube video duration if videoLink is provided
+      let videoDuration = 0;
+      if (videoLink) {
+        videoDuration = await fetchYouTubeDuration(videoLink);
+      }
+
       // Create the lecture
       const lecture = await Lecture.create(
         [
@@ -421,6 +430,7 @@ exports.createLecture = catchAsync(async (req, res, next) => {
             parent,
             createdBy: lecturerId,
             videoLink,
+            duration: videoDuration,
             description,
             numberOfViews: parsedNumberOfViews,
             thumbnail: thumbnailPath,
@@ -721,7 +731,7 @@ exports.updatelectures = catchAsync(async (req, res, next) => {
         throw new AppError("No lecture found with that ID", 404)
       }
 
-      const canBypassOwnership = ["Admin", "SubAdmin", "Moderator"].includes(req.user?.role)
+      const canBypassOwnership = ["Admin", "SubAdmin", "Moderator", "Assistant"].includes(req.user?.role)
       if (!canBypassOwnership && currentLecture.createdBy?.toString() !== req.user._id.toString()) {
         if (req.file && req.file.path) {
           deleteFile(req.file.path)
@@ -738,6 +748,13 @@ exports.updatelectures = catchAsync(async (req, res, next) => {
         numberOfViews,
         teacherAllowed: teacherAllowed !== undefined ? parseBoolean(teacherAllowed) : undefined,
       }
+
+      // Fetch new YouTube duration if videoLink is being updated
+      if (videoLink && videoLink !== currentLecture.videoLink) {
+        const newDuration = await fetchYouTubeDuration(videoLink);
+        obj.duration = newDuration;
+      }
+
       const parsedPassingThreshold = parseOptionalNumber(passingThreshold)
       const parsedHomeworkPassingThreshold = parseOptionalNumber(homeworkPassingThreshold)
 
@@ -963,6 +980,12 @@ exports.deletelecture = catchAsync(async (req, res, next) => {
       throw new AppError("Lecture not found", 404)
     }
 
+    // Check if user has permission to delete this lecture
+    const canBypassOwnership = ["Admin", "SubAdmin", "Moderator", "Assistant"].includes(req.user?.role)
+    if (!canBypassOwnership && lecture.createdBy?.toString() !== req.user._id.toString()) {
+      throw new AppError("You do not have permission to delete this lecture", 403)
+    }
+
     if (lecture.thumbnail) {
       deleteFile(lecture.thumbnail)
     }
@@ -1002,6 +1025,12 @@ exports.deleteLectureThumbnail = catchAsync(async (req, res, next) => {
     const lecture = await Lecture.findById(lectureId).session(session)
     if (!lecture) {
       throw new AppError("Lecture not found", 404)
+    }
+
+    // Check if user has permission to delete this lecture thumbnail
+    const canBypassOwnership = ["Admin", "SubAdmin", "Moderator", "Assistant"].includes(req.user?.role)
+    if (!canBypassOwnership && lecture.createdBy?.toString() !== req.user._id.toString()) {
+      throw new AppError("You do not have permission to modify this lecture", 403)
     }
 
     if (lecture.thumbnail) {

@@ -290,6 +290,30 @@ export const loginUser = async (credentials) => {
   }
 };
 
+export const checkActiveSession = async (credentials) => {
+  try {
+    const response = await api.post(`/auth/check-session`, credentials, {
+      headers: { "Content-Type": "application/json" },
+    });
+
+    return {
+      success: true,
+      hasActiveSession: response.data.hasActiveSession,
+      requiresConfirmation: response.data.requiresConfirmation,
+      role: response.data.role,
+      data: response.data,
+      status: response.status,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      status: "error",
+      message: translateErrorMessage(error.response?.data?.error || error.message || "Failed to check active session"),
+      error: translateErrorMessage(error.response?.data?.error || error.message || "Failed to check active session"),
+      details: error.response?.data,
+    };
+  }
+};
 
 export const requestPasswordReset = async (email) => {
   try {

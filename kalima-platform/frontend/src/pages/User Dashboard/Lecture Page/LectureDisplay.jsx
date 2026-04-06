@@ -1812,7 +1812,7 @@ const LectureDisplay = () => {
                         ref={homeworkFileInputRef}
                         onChange={handleHomeworkFileSelect}
                         multiple
-                        className="file-input file-input-bordered file-input-primary w-full"
+                        className="file-input file-input-bordered file-input-primary w-full min-w-0"
                       />
                     </div>
 
@@ -2044,7 +2044,7 @@ const LectureDisplay = () => {
                     ref={fileInputRef}
                     onChange={handleFileSelect}
                     multiple
-                    className="file-input file-input-bordered file-input-primary w-full"
+                    className="file-input file-input-bordered file-input-primary w-full min-w-0"
                   />
                 </div>
 

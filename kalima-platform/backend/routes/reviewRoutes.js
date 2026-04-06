@@ -29,31 +29,31 @@ router.get(
   reviewController.getReviewStats
 );
 
-// Student creates a review
+// Student/Parent creates a review
 router.post(
   "/",
-  authController.verifyRoles("Student"),
+  authController.verifyRoles("Student", "Parent"),
   reviewController.createReview
 );
 
-// Student gets their own review for a course
+// Student/Parent gets their own review for a course
 router.get(
   "/my-review/:containerId",
-  authController.verifyRoles("Student"),
+  authController.verifyRoles("Student", "Parent"),
   reviewController.getMyReview
 );
 
-// Student updates their review
+// Student/Parent updates their review
 router.patch(
   "/my-review/:containerId",
-  authController.verifyRoles("Student"),
+  authController.verifyRoles("Student", "Parent"),
   reviewController.updateMyReview
 );
 
-// Student deletes their review
+// Student/Parent deletes their review
 router.delete(
   "/my-review/:containerId",
-  authController.verifyRoles("Student"),
+  authController.verifyRoles("Student", "Parent"),
   reviewController.deleteMyReview
 );
 

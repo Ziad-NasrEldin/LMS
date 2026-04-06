@@ -12,7 +12,7 @@ const AssistantForm = ({ userData, handleChange, lecturers, t, isRTL }) => {
         <DSSelect
           name="assignedLecturer"
           className="select w-full rounded-xl"
-              style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
+          style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
           value={userData.assignedLecturer || ""}
           onChange={handleChange}
           required

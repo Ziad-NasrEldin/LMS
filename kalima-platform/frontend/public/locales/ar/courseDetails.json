@@ -70,7 +70,11 @@
     "watch": "مشاهدة",
     "noContent": "لا يوجد محتوى متاح بعد",
     "modulesCount": "{{modules}} وحدة • {{lectures}} محاضرة",
-    "courseContent": "محتوى الدورة"
+    "courseContent": "محتوى الدورة",
+    "loading": "جاري تحميل المنهج...",
+    "collapseAll": "طي الكل",
+    "expandAll": "توسيع الكل",
+    "title": "محتوى الدورة"
   },
 
   "reviews": {
@@ -234,7 +238,9 @@
     "unexpected": "حدث خطأ غير متوقع",
     "purchaseError": "فشل في عملية الشراء. يرجى المحاولة مرة أخرى.",
     "purchaseProcessError": "حدث خطأ أثناء الشراء",
-    "courseNotFound": "لم يتم العثور على الدورة"
+    "courseNotFound": "لم يتم العثور على الدورة",
+    "accessRestricted": "الوصول إلى هذا المحتوى مقيد",
+    "error": "خطأ"
   },
 
   "containerTypes": {
@@ -307,5 +313,13 @@
   "purchaseSuccessDesc": "تمت عملية الشراء بنجاح، ومحتواك الآن متاح في لوحة التحكم الخاصة بك. هل تود الانتقال إلى لوحة التحكم الآن؟",
   "courseDetailsTitle": "تفاصيل الدورة",
   "whoIsThisFor": "لمن هذه الدورة",
-  "whatYouWillGet": "ماذا ستكتسب من هذه الدورة"
+  "whatYouWillGet": "ماذا ستكتسب من هذه الدورة",
+
+  "loginPrompt": {
+    "title": "تسجيل الدخول مطلوب",
+    "message": "يرجى إنشاء حساب أو تسجيل الدخول لشراء هذه الدورة",
+    "loginButton": "تسجيل الدخول",
+    "registerButton": "إنشاء حساب",
+    "cancel": "إلغاء"
+  }
 }

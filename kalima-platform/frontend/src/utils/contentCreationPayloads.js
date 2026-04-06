@@ -47,6 +47,7 @@ export const buildContainerPayloadObject = ({
   parent,
   description,
   goal,
+  sameGradeOnly = false,
 }) => {
   const payload = {
     name,
@@ -55,6 +56,7 @@ export const buildContainerPayloadObject = ({
     level,
     subject,
     teacherAllowed: Boolean(teacherAllowed),
+    sameGradeOnly: Boolean(sameGradeOnly),
   }
 
   if (createdBy) {

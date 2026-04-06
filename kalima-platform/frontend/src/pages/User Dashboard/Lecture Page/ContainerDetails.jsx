@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { Link, useParams, useNavigate } from "react-router-dom"
 import { useTranslation } from 'react-i18next';
-import { getContainerById, createContainer, updateContainer, createLecture, createLectureAttachment, deleteContainerById } from "../../../routes/lectures"
+import { getContainerById, createContainer, updateContainer, createLecture, createLectureAttachment, deleteContainerById, updateLecture, updateLectureAttachment } from "../../../routes/lectures"
 import { getCachedUserSummary } from "../../../routes/auth-services"
 import { FiBook, FiFolder, FiArrowLeft, FiArrowRight, FiPlus, FiEdit2, FiTrash2 } from "react-icons/fi"
 import LectureCreationModal from "../../../components/LectureCreationModal"
@@ -65,7 +65,14 @@ const ContainerDetailsPage = () => {
   }
 
   const getContainerRoute = (id) => {
-    const basePath = userRole === "Lecturer" ? "/dashboard/lecturer-dashboard" : "/dashboard/student-dashboard"
+    let basePath
+    if (userRole === "Lecturer") {
+      basePath = "/dashboard/lecturer-dashboard"
+    } else if (userRole === "Assistant") {
+      basePath = "/dashboard/assistant-page"
+    } else {
+      basePath = "/dashboard/student-dashboard"
+    }
     return basePath + "/container-details/" + id
   }
 
@@ -240,6 +247,86 @@ const ContainerDetailsPage = () => {
     }
   }
 
+  const handleUpdateLecture = async (
+    lectureId,
+    lectureData,
+    _unused,
+    _unused2,
+    thumbnailFile,
+    attachmentFilesByCategory,
+    attachmentLinksByCategory,
+    existingAttachmentLinksByCategory,
+  ) => {
+    setCreationLoading(true)
+    setCreationError("")
+
+    try {
+      let response
+      if (thumbnailFile) {
+        const formData = objectToFormData(lectureData, [{ key: "thumbnail", file: thumbnailFile }])
+        response = await updateLecture(lectureId, formData)
+      } else {
+        response = await updateLecture(lectureId, lectureData)
+      }
+
+      if (response.status !== "success" && response.success !== true) {
+        throw new Error(translateErrorMessage(response.message || "Failed to update lecture"))
+      }
+
+      // Handle attachments after successful lecture update
+      if (lectureId) {
+        try {
+          const formData = new FormData()
+          const categories = ["pdfsandimages", "booklets", "homeworks", "exams"]
+
+          categories.forEach((category) => {
+            if (
+              attachmentFilesByCategory &&
+              attachmentFilesByCategory[category] &&
+              attachmentFilesByCategory[category].length > 0
+            ) {
+              attachmentFilesByCategory[category].forEach((file) => {
+                formData.append(category, file)
+              })
+            }
+          })
+
+          if (attachmentLinksByCategory) {
+            if (attachmentLinksByCategory.homeworks && attachmentLinksByCategory.homeworks.trim() !== "") {
+              formData.append("homeworks", attachmentLinksByCategory.homeworks)
+            }
+            if (attachmentLinksByCategory.exams && attachmentLinksByCategory.exams.trim() !== "") {
+              formData.append("exams", attachmentLinksByCategory.exams)
+            }
+          }
+
+          if (
+            formData.has("pdfsandimages") ||
+            formData.has("booklets") ||
+            formData.has("homeworks") ||
+            formData.has("exams")
+          ) {
+            await updateLectureAttachment(lectureId, formData, true)
+          }
+        } catch (attachmentError) {
+          console.error("Error uploading attachments:", attachmentError)
+          setCreationError(
+            `${translateErrorMessage("Lecture updated but failed to upload attachments")}: ${translateErrorMessage(attachmentError.message)}`
+          )
+        }
+      }
+
+      await fetchContainer()
+      return true
+    } catch (err) {
+      setCreationError(translateErrorMessage(err.message))
+      console.error("Update error:", err)
+      return false
+    } finally {
+      setCreationLoading(false)
+    }
+  }
+
   const handleUpdateContainer = async (containerIdToUpdate, containerData) => {
     setCreationLoading(true)
     setCreationError("")
@@ -285,7 +372,14 @@ const ContainerDetailsPage = () => {
         if (parentId) {
           navigate(getContainerRoute(parentId))
         } else {
-          navigate("/dashboard/lecturer-dashboard")
+          // Navigate to the appropriate dashboard based on user role
+          if (userRole === "Lecturer") {
+            navigate("/dashboard/lecturer-dashboard")
+          } else if (userRole === "Assistant") {
+            navigate("/dashboard/assistant-page")
+          } else {
+            navigate("/dashboard/student-dashboard")
+          }
         }
         return
       }
@@ -351,6 +445,8 @@ const ContainerDetailsPage = () => {
             to={
               userRole === "Lecturer"
                 ? "/dashboard/lecturer-dashboard"
+                : userRole === "Assistant"
+                ? "/dashboard/assistant-page"
                 : userRole === "Parent"
                   ? "/dashboard/parent-dashboard/overview"
                   : "/dashboard/student-dashboard/overview"
@@ -410,7 +506,7 @@ const ContainerDetailsPage = () => {
                 <span className="font-medium text-sm sm:text-base">{container.points} {t('containerDetails.labels.points')}</span>
               </div>
             )}
-            {userRole === "Lecturer" && container.type !== "lecture" && (
+            {(userRole === "Lecturer" || userRole === "Assistant") && container.type !== "lecture" && (
               <>
                 <button
                   onClick={() => openEditModal(container)}
@@ -519,7 +615,7 @@ const ContainerDetailsPage = () => {
                   <div className={`mt-auto flex flex-col gap-3 ${isRTL ? "items-start" : "items-end"}`}>
                     <span className="text-xs sm:text-sm px-2 py-1 rounded-full" style={{ color: TOKENS.slateText, background: "rgba(17,24,39,0.04)" }}>{t(`types.${childType?.toLowerCase()}`) || container.type}</span>
                     <div className={`flex flex-wrap gap-2 w-full ${isRTL ? "justify-start" : "justify-end"}`}>
-                      {childType !== "lecture" && userRole === "Lecturer" && (
+                      {childType !== "lecture" && (userRole === "Lecturer" || userRole === "Assistant") && (
                         <>
                           <button
                             type="button"
@@ -554,6 +650,8 @@ const ContainerDetailsPage = () => {
                         to={
                           userRole === "Lecturer"
                             ? `/dashboard/lecturer-dashboard/${childType === "lecture" ? "lecture-display" : "container-details"}/${child._id}`
+                            : userRole === "Assistant"
+                            ? `/dashboard/assistant-page/${childType === "lecture" ? "lecture-display" : "container-details"}/${child._id}`
                             : `/dashboard/student-dashboard/${childType === "lecture" ? "lecture-display" : "container-details"}/${child._id}`
                         }
                         className={`inline-flex items-center justify-center gap-1.5 rounded-full border px-3 py-1.5 text-xs sm:text-sm font-semibold transition-all duration-200 hover:-translate-y-[1px] flex-1 sm:flex-none min-w-[100px] ${isRTL ? "flex-row-reverse" : ""}`}
@@ -588,8 +686,8 @@ const ContainerDetailsPage = () => {
           )}
         </div>
 
-        {/* Lecturer Actions */}
-        {userRole === "Lecturer" && childType && (
+        {/* Lecturer and Assistant Actions */}
+        {(userRole === "Lecturer" || userRole === "Assistant") && childType && (
           <div className={`flex gap-3 ${isRTL ? "justify-start" : "justify-end"} mt-6`}>
             <button
               onClick={openCreateModal}
@@ -637,6 +735,24 @@ const ContainerDetailsPage = () => {
               containerSubject={container?.subject?._id}
               containerType={container?.type}
               mode="create"
+            />
+          )
+        }
+
+        if (modalState.mode === "edit" && modalState.target?.type === "lecture") {
+          return (
+            <LectureCreationModal
+              isOpen={modalState.mode === "edit"}
+              onClose={closeModal}
+              onSubmit={handleUpdateLecture}
+              containerId={containerId}
+              userId={userId}
+              containerLevel={modalState.target?.level?._id || modalState.target?.level}
+              containerSubject={modalState.target?.subject?._id || modalState.target?.subject}
+              containerType={modalState.target?.type}
+              mode="edit"
+              initialData={modalState.target}
+              lectureId={modalState.target?._id || modalState.target?.id}
             />
           )
         }

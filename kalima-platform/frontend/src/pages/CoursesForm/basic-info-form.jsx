@@ -101,6 +101,7 @@ function BasicInfoForm({
         goal: formData.goal.trim(),
         price: isPaidCourse ? Number(formData.priceFull) || 0 : 0,
         teacherAllowed: formData.privacy === "teacher",
+        sameGradeOnly: formData.sameGradeOnly === true || formData.sameGradeOnly === "true",
       })
 
       const formDataPayload = objectToFormData(containerPayload, courseImage ? [{ key: "image", file: courseImage }] : [])
@@ -375,6 +376,28 @@ function BasicInfoForm({
                       </p>
                     </div>
                   )}
+
+                  <div className="mt-4">
+                    <label className="label cursor-pointer justify-start gap-3 p-0 items-start">
+                      <input
+                        type="checkbox"
+                        name="sameGradeOnly"
+                        checked={formData.sameGradeOnly === true || formData.sameGradeOnly === "true"}
+                        onChange={(e) => handleChange({ target: { name: "sameGradeOnly", value: e.target.checked } })}
+                        className="toggle toggle-primary mt-0.5"
+                      />
+                      <div className="flex flex-col flex-1 min-w-0">
+                        <span className="label-text font-medium text-sm">
+                          {isRTL ? "تقييد الشراء لنفس المرحلة فقط" : "Restrict to same grade only"}
+                        </span>
+                        <span className="label-text-alt text-xs text-base-content/60 whitespace-normal">
+                          {isRTL
+                            ? "عند التفعيل، فقط الطلاب في نفس المرحلة يمكنهم شراء هذا الكورس"
+                            : "When enabled, only students in the same grade level can purchase this course"}
+                        </span>
+                      </div>
+                    </label>
+                  </div>
                   <div>
                     <h2 className="block text-primary text-base font-semibold mb-2">
                       {isRTL ? "خصوصية الكورس" : "Course Privacy"}

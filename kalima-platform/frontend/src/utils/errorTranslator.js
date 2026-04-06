@@ -23,6 +23,7 @@ const exactMessages = new Map([
   ["Logout failed on server, but local session was cleared", () => t("errors.logoutLocalSessionCleared")],
   ["Nested impersonation is not allowed. Exit current view first.", () => t("errors.nestedImpersonationNotAllowed")],
   ["No active impersonation session", () => t("errors.noActiveImpersonationSession")],
+  ["No active impersonation session found", () => t("errors.noActiveImpersonationSession")],
   ["Failed to start impersonation", () => t("errors.startImpersonationFailed")],
   ["Failed to stop impersonation", () => t("errors.stopImpersonationFailed")],
   ["Token refresh failed", () => t("errors.tokenRefreshFailed")],
@@ -48,12 +49,16 @@ const exactMessages = new Map([
   ["Invalid role selected", () => t("errors.invalidRole")],
   ["User ID is missing", () => t("errors.missingUserId")],
   ["User not found", () => t("errors.userNotFound")],
+  ["Target user not found", () => t("errors.userNotFound")],
   ["Invalid input data", () => t("errors.invalidInput")],
   ["Something went wrong!", () => t("errors.unexpected")],
   ["Something went wrong", () => t("errors.unexpected")],
   ["Unknown error occurred", () => t("errors.unknown")],
   ["An unexpected error occurred", () => t("errors.unexpected")],
   ["Network Error", () => t("errors.network")],
+  ["Refresh token not found, please login again", () => t("errors.refreshTokenNotFound")],
+  ["Refresh token is expired, please login again", () => t("errors.refreshTokenExpired")],
+  ["Access token required", () => t("errors.accessTokenRequired")],
 ]);
 
 const fieldLabels = {
@@ -254,6 +259,10 @@ const translatePattern = (message) => {
     {
       regex: /(?:Invalid role selected|Invalid role|Invalid or missing role)/i,
       run: () => t("errors.invalidRole"),
+    },
+    {
+      regex: /Couldn't find a user with this (email|phone number) and password/i,
+      run: () => t("errors.invalidCredentials"),
     },
     {
       regex: /(?:Failed to|Error (?:fetching|loading|creating|updating|deleting|saving|recording|purchasing|uploading|calculating|checking|generating|submitting)) (.+)/i,

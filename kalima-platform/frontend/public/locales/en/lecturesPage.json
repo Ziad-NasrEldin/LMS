@@ -247,5 +247,6 @@
   "options": {
     "yes": "Yes",
     "no": "No"
-  }
+  },
+  "notSpecified": "Not specified"
 }

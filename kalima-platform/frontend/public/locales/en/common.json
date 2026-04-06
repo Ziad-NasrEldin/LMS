@@ -131,6 +131,7 @@
   "studentView": "Student View",
   "parentView": "Parent View",
   "teacherView": "Teacher View",
+  "assistantView": "Assistant View",
   "exitView": "Exit View",
   "chooseUser": "Choose User",
   "searchUsers": "Search by name, email, or phone",
@@ -162,6 +163,11 @@
     }
   },
   "errors": {
+    "invalidCredentials": "Invalid email or password",
+    "userNotFound": "User not found",
+    "refreshTokenNotFound": "Refresh token not found, please login again",
+    "refreshTokenExpired": "Refresh token is expired, please login again",
+    "accessTokenRequired": "Access token required",
     "unexpected": "An unexpected error occurred",
     "unknown": "Unknown error occurred",
     "network": "Network error. Please check your connection.",

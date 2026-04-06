@@ -4,6 +4,7 @@ const StudentExamSubmission = require("../models/studentExamSubmissionModel");
 const Lecture = require("../models/LectureModel");
 const Container = require("../models/containerModel");
 const Purchase = require("../models/purchaseModel");
+const Parent = require("../models/parentModel");
 const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
 const QueryFeatures = require("../utils/queryFeatures");
@@ -12,6 +13,7 @@ const { buildLectureRequirements } = require("../utils/lectureAccessUtils");
 const PRIVILEGED_ROLES = new Set(["Admin", "SubAdmin", "Moderator"]);
 const LECTURER_SCOPED_ROLES = new Set(["Lecturer", "Assistant"]);
 const STUDENT_ROLE = "Student";
+const PARENT_ROLE = "Parent";
 
 const STRICT_ENTITLEMENT_RECHECK =
   String(process.env.LECTURE_VIEW_STRICT_RECHECK || "false").toLowerCase() ===
@@ -33,8 +35,35 @@ const isSameId = (left, right) => {
 };
 
 const isPrivilegedRole = (role) => PRIVILEGED_ROLES.has(normalizeRole(role));
-const isLecturerScopedRole = (role) =>
-  LECTURER_SCOPED_ROLES.has(normalizeRole(role));
+const isStudentOrParentRole = (role) => {
+  const normalized = normalizeRole(role);
+  return normalized === STUDENT_ROLE || normalized === PARENT_ROLE;
+};
+
+// Helper to get parent's children IDs
+const getParentChildrenIds = async (parentId) => {
+  const parent = await Parent.findById(parentId).lean();
+  if (!parent || !parent.children || parent.children.length === 0) {
+    return [];
+  }
+  return parent.children.map(childId => toIdString(childId));
+};
+
+// Helper to check if user has access to a student's lecture (for parents)
+const hasAccessToStudentRecord = async (reqUserId, reqUserRole, accessStudentId) => {
+  const role = normalizeRole(reqUserRole);
+  
+  if (role === STUDENT_ROLE) {
+    return isSameId(reqUserId, accessStudentId);
+  }
+  
+  if (role === PARENT_ROLE) {
+    const childrenIds = await getParentChildrenIds(reqUserId);
+    return childrenIds.some(childId => isSameId(childId, accessStudentId));
+  }
+  
+  return false;
+};
 
 const resolveLectureDocument = async (lectureId) => {
   const lectureDoc = await Lecture.findById(lectureId)
@@ -180,7 +209,10 @@ const buildLectureContainerChain = async (lectureId) => {
   return chainIds;
 };
 
-const hasLectureEntitlement = async (studentId, lectureId, purchaseId) => {
+const hasLectureEntitlement = async (studentIds, lectureId, purchaseId) => {
+  // Normalize studentIds to array
+  const ids = Array.isArray(studentIds) ? studentIds : [studentIds];
+  
   const entitlementOrFilters = [
     {
       type: "lecturePurchase",
@@ -205,7 +237,7 @@ const hasLectureEntitlement = async (studentId, lectureId, purchaseId) => {
   }
 
   const entitlementFilter = {
-    student: studentId,
+    student: { $in: ids },
     $or: entitlementOrFilters,
   };
 
@@ -381,8 +413,8 @@ exports.deleteStudentLectureAccess = catchAsync(async (req, res, next) => {
 const accountLecturePlayStart = async (req, res, next) => {
   const role = normalizeRole(req.user?.role);
 
-  if (role !== STUDENT_ROLE) {
-    return next(new AppError("Only students can consume lecture views", 403));
+  if (!isStudentOrParentRole(role)) {
+    return next(new AppError("Only students and parents can consume lecture views", 403));
   }
 
   const accessId = req.params.id;
@@ -415,10 +447,17 @@ const accountLecturePlayStart = async (req, res, next) => {
     return next(new AppError("No document found with that ID", 404));
   }
 
-  if (!isSameId(accessSnapshot.student, req.user?._id)) {
+  // Check if user has access to this student's lecture record
+  const hasAccess = await hasAccessToStudentRecord(
+    req.user._id,
+    req.user?.role,
+    accessSnapshot.student
+  );
+  
+  if (!hasAccess) {
     return next(
       new AppError(
-        "Forbidden, you can only consume views for your own access record",
+        "Forbidden, you can only consume views for your own or your children's access records",
         403
       )
     );
@@ -441,11 +480,22 @@ const accountLecturePlayStart = async (req, res, next) => {
   }
 
   if (STRICT_ENTITLEMENT_RECHECK) {
-    const entitled = await hasLectureEntitlement(
-      req.user._id,
-      accessSnapshot.lecture,
-      purchaseId
-    );
+    // For parents, check entitlement for all their children
+    let entitled;
+    if (role === PARENT_ROLE) {
+      const childrenIds = await getParentChildrenIds(req.user._id);
+      entitled = await hasLectureEntitlement(
+        childrenIds,
+        accessSnapshot.lecture,
+        purchaseId
+      );
+    } else {
+      entitled = await hasLectureEntitlement(
+        req.user._id,
+        accessSnapshot.lecture,
+        purchaseId
+      );
+    }
 
     if (!entitled) {
       return next(new AppError("Lecture entitlement validation failed", 403));
@@ -457,7 +507,6 @@ const accountLecturePlayStart = async (req, res, next) => {
   const updatedAccess = await StudentLectureAccess.findOneAndUpdate(
     {
       _id: accessId,
-      student: req.user._id,
       remainingViews: { $gt: 0 },
       $or: [
         { lastViewEventId: { $exists: false } },
@@ -526,7 +575,29 @@ exports.consumeLectureView = catchAsync(accountLecturePlayStart);
 
 exports.checkLectureAccess = catchAsync(async (req, res, next) => {
   const { lectureId } = req.params;
-  const studentId = req.user._id;
+  const userId = req.user._id;
+  const role = normalizeRole(req.user?.role);
+  
+  let studentIdsToCheck;
+  
+  if (role === PARENT_ROLE) {
+    // For parents, check access for all their children
+    studentIdsToCheck = await getParentChildrenIds(userId);
+    if (studentIdsToCheck.length === 0) {
+      return res.status(200).json({
+        status: "success",
+        message: "No children found",
+        data: {
+          hasAccess: false,
+          requiresExam: false,
+          requiresHomework: false,
+        },
+      });
+    }
+  } else {
+    // For students, check their own access
+    studentIdsToCheck = [userId];
+  }
 
   const lecture = await Lecture.findById(lectureId)
     .populate("examConfig")
@@ -536,19 +607,55 @@ exports.checkLectureAccess = catchAsync(async (req, res, next) => {
     return next(new AppError("Lecture not found", 404));
   }
 
+  // Check entitlement for the lecture
+  const hasEntitlement = await hasLectureEntitlement(
+    studentIdsToCheck,
+    lectureId,
+    null
+  );
+
+  if (!hasEntitlement) {
+    return res.status(200).json({
+      status: "restricted",
+      message: "You don't have access to this lecture",
+      data: {
+        hasAccess: false,
+        requiresExam: lecture.requiresExam,
+        requiresHomework: lecture.requiresHomework,
+      },
+    });
+  }
+
   if (lecture.requiresExam || lecture.requiresHomework) {
     const results = buildLectureRequirements(lecture);
 
-    if (lecture.requiresExam) {
-      results.exam.passed = await hasPassedAssessment(studentId, lectureId, "exam");
-    }
+    // For parents, check if any child has passed the assessments
+    if (role === PARENT_ROLE) {
+      const childrenIds = await getParentChildrenIds(userId);
+      
+      if (lecture.requiresExam) {
+        results.exam.passed = await Promise.any(
+          childrenIds.map(childId => hasPassedAssessment(childId, lectureId, "exam"))
+        ).catch(() => false);
+      }
 
-    if (lecture.requiresHomework) {
-      results.homework.passed = await hasPassedAssessment(
-        studentId,
-        lectureId,
-        "homework"
-      );
+      if (lecture.requiresHomework) {
+        results.homework.passed = await Promise.any(
+          childrenIds.map(childId => hasPassedAssessment(childId, lectureId, "homework"))
+        ).catch(() => false);
+      }
+    } else {
+      if (lecture.requiresExam) {
+        results.exam.passed = await hasPassedAssessment(userId, lectureId, "exam");
+      }
+
+      if (lecture.requiresHomework) {
+        results.homework.passed = await hasPassedAssessment(
+          userId,
+          lectureId,
+          "homework"
+        );
+      }
     }
 
     if (

@@ -96,7 +96,7 @@ const buildTargetAncestorIds = async (
 
 const loadPurchaseForStudent = async (
   purchaseId,
-  studentId,
+  studentIds,
   { PurchaseModel = Purchase } = {},
 ) => {
   const purchase = await PurchaseModel.findById(purchaseId)
@@ -107,7 +107,14 @@ const loadPurchaseForStudent = async (
     throw new AppError("Purchase not found", 403);
   }
 
-  if (toIdString(purchase.student) !== toIdString(studentId)) {
+  // Normalize studentIds to array
+  const ids = Array.isArray(studentIds) ? studentIds : [studentIds];
+  const purchaseStudentId = toIdString(purchase.student);
+  
+  // Check if purchase belongs to any of the provided student IDs
+  const hasMatch = ids.some(id => purchaseStudentId === toIdString(id));
+  
+  if (!hasMatch) {
     throw new AppError("Purchase does not belong to this student", 403);
   }
 

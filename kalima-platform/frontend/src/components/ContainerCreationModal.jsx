@@ -31,6 +31,7 @@ const ContainerCreationModal = ({
   const [newDescription, setNewDescription] = useState("")
   const [newGoal, setNewGoal] = useState("")
   const [newPrice, setNewPrice] = useState(0)
+  const [sameGradeOnly, setSameGradeOnly] = useState(false)
   const [creationLoading, setCreationLoading] = useState(false)
   const [creationError, setCreationError] = useState("")
 
@@ -51,6 +52,7 @@ const ContainerCreationModal = ({
     setNewDescription(initialData.description || "")
     setNewGoal(Array.isArray(initialData.goal) ? initialData.goal.join("\n") : initialData.goal || "")
     setNewPrice(initialData.price ?? 0)
+    setSameGradeOnly(initialData.sameGradeOnly ?? false)
     setSelectedLevel(initialData.level?._id || initialData.level || containerLevel || "")
     setSelectedSubject(initialData.subject?._id || initialData.subject || containerSubject || "")
   }
@@ -116,6 +118,7 @@ const ContainerCreationModal = ({
     setNewDescription("")
     setNewGoal("")
     setNewPrice(0)
+    setSameGradeOnly(false)
     setSelectedLevel(containerLevel || "")
     setSelectedSubject(containerSubject || "")
     setCreationError("")
@@ -161,6 +164,7 @@ const ContainerCreationModal = ({
         description: isCourseType ? newDescription : undefined,
         goal: isCourseType ? newGoal : undefined,
         teacherAllowed: initialData?.teacherAllowed ?? true,
+        sameGradeOnly: isCourseType ? sameGradeOnly : false,
         createdBy: isEditMode ? undefined : userId,
         parent: isEditMode ? undefined : containerId,
       })
@@ -318,6 +322,23 @@ const ContainerCreationModal = ({
               required
             />
           </div>
+
+          {isCourseType && (
+            <div className="form-control w-full mb-4">
+              <label className="label cursor-pointer justify-start gap-3 items-start p-0">
+                <input
+                  type="checkbox"
+                  className="toggle toggle-primary mt-0.5"
+                  checked={sameGradeOnly}
+                  onChange={(e) => setSameGradeOnly(e.target.checked)}
+                />
+                <div className="flex flex-col flex-1 min-w-0">
+                  <span className="label-text font-medium">{t("containerModal.sameGradeOnly")}</span>
+                  <span className="label-text-alt text-base-content/60 whitespace-normal">{t("containerModal.sameGradeOnlyHelp")}</span>
+                </div>
+              </label>
+            </div>
+          )}
 
           {creationError && (
             <div className="alert alert-error mb-4">

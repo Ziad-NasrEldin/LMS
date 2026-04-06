@@ -420,6 +420,10 @@ function App() {
               path="/dashboard/assistant-page/lecture-display/:lectureId"
               element={renderAssistantRoute(<LectureDisplay />)}
             />
+            <Route
+              path="/dashboard/assistant-page/container-details/:containerId"
+              element={renderAssistantRoute(<ContainerDetails />)}
+            />
             
             {/* Admin Routes */}
             <Route

@@ -656,10 +656,10 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
                 <input
                   type="file"
                   onChange={(e) => setAttachmentFile(e.target.files[0])}
-                  className="file-input file-input-bordered file-input-sm w-full bg-base-200/80"
+                  className="file-input file-input-bordered file-input-sm w-full bg-base-200/80 pr-10"
                   accept=".pdf,.jpg,.jpeg,.png"
                 />
-                <Paperclip className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-primary" />
+                <Paperclip className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-primary pointer-events-none" />
               </div>
               {attachmentFile && (
                 <p className="mt-2 text-sm text-base-content/70">
@@ -689,10 +689,10 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
                   <input
                     type="file"
                     onChange={(e) => setImageFile(e.target.files[0])}
-                    className="file-input file-input-bordered file-input-sm w-full bg-base-200/80"
+                    className="file-input file-input-bordered file-input-sm w-full bg-base-200/80 pr-10"
                     accept="image/*"
                   />
-                  <Paperclip className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-primary" />
+                  <Paperclip className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-primary pointer-events-none" />
                 </div>
                 {imageFile && (
                   <p className="mt-2 text-sm text-base-content/70">

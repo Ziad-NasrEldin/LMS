@@ -18,17 +18,26 @@ router.get(
   containerController.getAllContainers
 );
 
-// Get container by ID - works with or without authentication
-// Note: This handles /my-containers as a special case for authenticated lecturers
+// Get full container hierarchy - MUST be before /:containerId to avoid being caught by parameter route
 router.get(
-  "/:containerId", authController.optionalJWT,  // Apply optional JWT middleware
-  containerController.getContainerById
+  "/:containerId/hierarchy",
+  authController.optionalJWT,
+  containerController.getContainerHierarchy
 );
 
 // Get enrollment count for a container - public endpoint (no authentication required)
 router.get(
   "/:containerId/enrollment-count",
   containerController.getContainerEnrollmentCount
+);
+
+// Get container by ID - works with or without authentication
+// Note: This handles /my-containers as a special case for authenticated lecturers
+// This must be AFTER all other /:containerId/* routes
+router.get(
+  "/:containerId",
+  authController.optionalJWT,  // Apply optional JWT middleware
+  containerController.getContainerById
 );
 
 // Apply JWT verification middleware to all routes below this line
@@ -89,7 +98,8 @@ router
       "Admin",
       "SubAdmin",
       "Moderator",
-      "Lecturer"
+      "Lecturer",
+      "Assistant"
     ),
     containerController.deleteContainerAndChildren
   );
@@ -126,7 +136,7 @@ router
 // Recalculate total duration for a container
 router.post(
   "/:containerId/recalculate-duration",
-  authController.verifyRoles("Admin", "Sub-Admin", "Moderator", "Lecturer"),
+  authController.verifyRoles("Admin", "Sub-Admin", "Moderator", "Lecturer", "Assistant"),
   containerController.recalculateContainerDuration
 );
 

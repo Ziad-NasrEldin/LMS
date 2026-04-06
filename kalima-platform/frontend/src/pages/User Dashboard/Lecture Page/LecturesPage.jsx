@@ -1663,24 +1663,28 @@ const MyLecturesPage = () => {
 
 
                 <div className="min-w-0 flex-1">
-
-                  <h3 className="font-semibold leading-5 break-words">{lecture.name}</h3>
-
+                  <Link
+                    to={`/dashboard/${isStudentLikeRole ? "student" : "lecturer"}-dashboard/${isStudentLikeRole ? "lecture-display" : "detailed-lecture-view"}/${lecture?.id}`}
+                    className="hover:underline"
+                    style={{ color: TOKENS.deepTeal }}
+                  >
+                    <h3 className="font-semibold leading-5 break-words">{lecture?.name || "-"}</h3>
+                  </Link>
                   <div className="mt-2 text-xs opacity-80 space-y-1">
 
                     {(isStudentLikeRole || isAdminLikeRole) && (
 
-                      <p className="break-words"><span className="font-medium">{t("lecturesPage.tableHeaders.lecturer")}: </span>{lecture.lecturer?.name || t("lecturesPage.unknown")}</p>
+                      <p className="break-words"><span className="font-medium">{t("lecturesPage.tableHeaders.lecturer")}: </span>{lecture?.lecturer?.name || t("lecturesPage.unknown")}</p>
 
                     )}
 
-                    <p className="break-words"><span className="font-medium">{t("lecturesPage.tableHeaders.subject")}: </span>{lecture.subject?.name || t("lecturesPage.notSpecified")}</p>
+                    <p className="break-words"><span className="font-medium">{t("lecturesPage.tableHeaders.subject")}: </span>{lecture?.subject?.name || t("lecturesPage.notSpecified")}</p>
 
-                    <p><span className="font-medium">{t("lecturesPage.tableHeaders.level")}: </span>{t(`gradeLevels.${lecture.level?.name}`, { ns: "common" }) || lecture.level?.name || t("lecturesPage.notSpecified")}</p>
+                    <p><span className="font-medium">{t("lecturesPage.tableHeaders.level")}: </span>{t(`gradeLevels.${lecture?.level?.name}`, { ns: "common" }) || lecture?.level?.name || t("lecturesPage.notSpecified")}</p>
 
-                    <p><span className="font-medium">{t("lecturesPage.tableHeaders.price")}: </span>{lecture.price || 0} {t("lecturesPage.points")}</p>
+                    <p><span className="font-medium">{t("lecturesPage.tableHeaders.price")}: </span>{lecture?.price || 0} {t("lecturesPage.points")}</p>
 
-                    {isStudentLikeRole && <p><span className="font-medium">{t("lecturesPage.tableHeaders.purchaseDate")}: </span>{lecture.purchasedAt}</p>}
+                    {isStudentLikeRole && <p><span className="font-medium">{t("lecturesPage.tableHeaders.purchaseDate")}: </span>{lecture?.purchasedAt}</p>}
 
                   </div>
 
@@ -1856,7 +1860,15 @@ const MyLecturesPage = () => {
 
 
 
-                    <td>{lecture.name}</td>
+                    <td>
+                      <Link
+                        to={`/dashboard/${isStudentLikeRole ? "student" : "lecturer"}-dashboard/${isStudentLikeRole ? "lecture-display" : "detailed-lecture-view"}/${lecture?.id}`}
+                        className="hover:underline font-semibold"
+                        style={{ color: TOKENS.deepTeal }}
+                      >
+                        {lecture?.name || "-"}
+                      </Link>
+                    </td>
 
                     {(isStudentLikeRole || isAdminLikeRole) && (
 

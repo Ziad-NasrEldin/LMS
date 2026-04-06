@@ -28,6 +28,13 @@ const parentValidation = userValidation.concat(
 
       }),
     profession: Joi.string().trim().required(),
+    stages: Joi.array().items(
+      Joi.string()
+        .regex(/^[0-9a-fA-F]{24}$/)
+        .messages({
+          "string.pattern.base": "Each stage must be a valid MongoDB ObjectId.",
+        })
+    ).optional(),
     government: Joi.string()
       .trim()
       .empty("")

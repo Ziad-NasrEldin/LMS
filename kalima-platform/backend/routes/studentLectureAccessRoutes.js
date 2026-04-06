@@ -8,7 +8,7 @@ router.use(verifyJWT);
 
 router
   .route("/check/:lectureId")
-  .get(verifyRoles("Student"), studentLectureAccessController.checkLectureAccess);
+  .get(verifyRoles("Student", "Parent"), studentLectureAccessController.checkLectureAccess);
 
 router
   .route("/lecture/:lectureId")
@@ -30,16 +30,16 @@ router
 
 router
   .route("/:id/play-start")
-  .post(verifyRoles("Student"), studentLectureAccessController.accountLecturePlayStart);
+  .post(verifyRoles("Student", "Parent"), studentLectureAccessController.accountLecturePlayStart);
 
 router
   .route("/:id/consume-view")
-  .post(verifyRoles("Student"), studentLectureAccessController.consumeLectureView);
+  .post(verifyRoles("Student", "Parent"), studentLectureAccessController.consumeLectureView);
 
 router
   .route("/:id")
   .get(
-    verifyRoles("Student", "Lecturer", "Assistant", "Admin", "SubAdmin", "Moderator"),
+    verifyRoles("Student", "Parent", "Lecturer", "Assistant", "Admin", "SubAdmin", "Moderator"),
     studentLectureAccessController.getStudentLectureAccess
   )
   .patch(

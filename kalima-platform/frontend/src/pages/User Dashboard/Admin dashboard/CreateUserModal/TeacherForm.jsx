@@ -289,7 +289,8 @@ const TeacherForm = ({
               <input
                 type="text"
                 id="centerInput"
-                className="input input-bordered flex-1"
+                className="input w-full rounded-xl flex-1"
+                style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
                 placeholder={t("placeholders.centerName") || "Enter center name"}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
@@ -345,7 +346,8 @@ const TeacherForm = ({
           </label>
           <DSSelect
             name="government"
-            className="select select-bordered w-2/3 lg:w-1/2"
+            className="select w-full rounded-xl"
+            style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
             value={userData.government || ""}
             onChange={handleGovernmentSelect}
             required
@@ -370,7 +372,8 @@ const TeacherForm = ({
           <DSSelect
             disabled={!userData.government || loadingZones}
             name="administrationZone"
-            className="select select-bordered w-2/3 lg:w-1/2"
+            className="select w-full rounded-xl"
+            style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
             value={userData.administrationZone || ""}
             onChange={handleChange}
             required

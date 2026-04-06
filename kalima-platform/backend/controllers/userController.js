@@ -541,6 +541,9 @@ const getMyData = catchAsync(async (req, res, next) => {
         profilePic: parent.profilePic || responseData.userInfo.profilePic || null,
       };
 
+      // Get children IDs for querying their data
+      const childrenIds = parent.children?.map(child => child._id.toString()) || [];
+
       // Get parent purchases, redeemed codes, and lecture access (with query params)
       if (
         !fields ||
@@ -554,7 +557,9 @@ const getMyData = catchAsync(async (req, res, next) => {
           userId,
           responseData,
           parent.lecturerPoints || [],
-          req.query
+          req.query,
+          true, // isParent
+          childrenIds
         );
       }
       break;
@@ -772,15 +777,25 @@ const getMyData = catchAsync(async (req, res, next) => {
 
       if (!fields || fields.includes("examSubmissions")) {
         // Get exam submissions for lectures created by the assigned lecturer
+        // but only from students who have purchased from this lecturer
         const lecturerLectures = !responseData.lectures ?
           await Lecture.find({ createdBy: assistant.assignedLecturer._id }).select("_id").lean() :
           responseData.lectures;
 
         const lectureIds = lecturerLectures.map(lecture => lecture._id);
 
+        // Get students who have purchased from this lecturer
+        const purchasingStudents = await Purchase.find({
+          lecturer: assistant.assignedLecturer._id,
+          type: { $in: ["pointPurchase", "containerPurchase", "lecturePurchase", "promoCodePurchase"] }
+        }).select("student").lean();
+
+        const purchasingStudentIds = purchasingStudents.map(purchase => purchase.student);
+
         const examSubmissions = await StudentExamSubmission.find({
           lecture: { $in: lectureIds },
-          type: "exam"
+          type: "exam",
+          student: { $in: purchasingStudentIds }
         })
           .populate("student", "name sequencedId")
           .populate("lecture", "name")
@@ -790,6 +805,7 @@ const getMyData = catchAsync(async (req, res, next) => {
         responseData.examSubmissions = examSubmissions;
       } if (!fields || fields.includes("homeworkSubmissions")) {
         // Get homework submissions for lectures created by the assigned lecturer
+        // but only from students who have purchased from this lecturer
         const lecturerLectures = !responseData.lectures && !responseData.examSubmissions ?
           await Lecture.find({ createdBy: assistant.assignedLecturer._id }).select("_id").lean() :
           (responseData.lectures || responseData.examSubmissions);
@@ -801,9 +817,18 @@ const getMyData = catchAsync(async (req, res, next) => {
           return lecture;
         }).filter(id => id); // Filter out any undefined values
 
+        // Get students who have purchased from this lecturer (reuse from exam submissions if available)
+        const purchasingStudents = await Purchase.find({
+          lecturer: assistant.assignedLecturer._id,
+          type: { $in: ["pointPurchase", "containerPurchase", "lecturePurchase", "promoCodePurchase"] }
+        }).select("student").lean();
+
+        const purchasingStudentIds = purchasingStudents.map(purchase => purchase.student);
+
         const homeworkSubmissions = await StudentExamSubmission.find({
           lecture: { $in: lectureIds },
-          type: "homework"
+          type: "homework",
+          student: { $in: purchasingStudentIds }
         })
           .populate("student", "name sequencedId")
           .populate("lecture", "name")
@@ -901,18 +926,53 @@ const getMyPurchasedCourseContainers = catchAsync(async (req, res, next) => {
   const userRole = req.user.role;
   const normalizedUserRole = String(userRole || "").trim().toLowerCase();
 
-  if (normalizedUserRole !== "student") {
-    return next(new AppError("Only students can access purchased course containers", 403));
+  // Allow both students and parents to access purchased course containers
+  if (normalizedUserRole !== "student" && normalizedUserRole !== "parent") {
+    return next(new AppError("Only students and parents can access purchased course containers", 403));
   }
 
   const page = Math.max(parseInt(req.query.page, 10) || 1, 1);
   const limit = Math.max(parseInt(req.query.limit, 10) || 20, 1);
 
-  const purchases = await Purchase.find({
-    student: userId,
-    type: "containerPurchase",
-  })
-    .select("container lecturer points purchasedAt")
+  let purchaseQuery;
+
+  if (normalizedUserRole === "parent") {
+    // For parents: get all purchases from their children
+    const parent = await Parent.findById(userId).lean();
+    if (!parent || !parent.children || parent.children.length === 0) {
+      // Parent has no children, return empty response
+      return res.status(200).json({
+        status: "success",
+        data: {
+          userInfo: {
+            id: userId,
+            role: userRole,
+          },
+          containers: [],
+        },
+        pagination: {
+          totalCount: 0,
+          page,
+          limit,
+          totalPages: 1,
+        },
+      });
+    }
+
+    purchaseQuery = {
+      student: { $in: parent.children },
+      type: "containerPurchase",
+    };
+  } else {
+    // For students: get their own purchases
+    purchaseQuery = {
+      student: userId,
+      type: "containerPurchase",
+    };
+  }
+
+  const purchases = await Purchase.find(purchaseQuery)
+    .select("container lecturer points purchasedAt student")
     .populate({
       path: "container",
       select: "name type price subject level createdBy containerImage",
@@ -939,6 +999,8 @@ const getMyPurchasedCourseContainers = catchAsync(async (req, res, next) => {
       purchasedAt: purchase.purchasedAt,
       purchaseId: purchase._id,
       price: purchase.points || purchase.container.price || 0,
+      // For parents, include which child made the purchase
+      purchasedBy: normalizedUserRole === "parent" ? purchase.student : undefined,
     });
   }
 
@@ -1147,15 +1209,22 @@ const getStudentParentAdditionalData = async (
   userId,
   responseData,
   pointsBalances,
-  queryParams = {}
+  queryParams = {},
+  isParent = false,
+  parentChildrenIds = []
 ) => {
   const fields = queryParams.fields ? queryParams.fields.split(",") : null;
+  
+  // Determine which student IDs to query (for parents, query all their children)
+  const studentIdsToQuery = isParent && parentChildrenIds.length > 0 
+    ? parentChildrenIds 
+    : [userId];
 
   // Only include purchase history if requested or no specific fields were requested
   if (!fields || fields.includes("purchaseHistory")) {
-    // Get all types of purchases for the user
+    // Get all types of purchases for the user(s)
     let purchaseQuery = Purchase.find({
-      student: userId,
+      student: { $in: studentIdsToQuery },
     });
 
     // Add date filtering if provided
@@ -1202,7 +1271,9 @@ const getStudentParentAdditionalData = async (
     );
 
     // Get total count of purchases for pagination info
-    const totalPurchases = await Purchase.countDocuments({ student: userId });
+    const totalPurchases = await Purchase.countDocuments({ 
+      student: { $in: studentIdsToQuery } 
+    });
     responseData.paginationInfo = {
       purchaseHistory: {
         totalCount: totalPurchases,
@@ -1219,7 +1290,7 @@ const getStudentParentAdditionalData = async (
   // Only include redeemed codes if requested or no specific fields were requested
   if (!fields || fields.includes("redeemedCodes")) {
     let codesQuery = Code.find({
-      redeemedBy: userId,
+      redeemedBy: { $in: studentIdsToQuery },
       isRedeemed: true,
     });
 
@@ -1235,7 +1306,7 @@ const getStudentParentAdditionalData = async (
 
     // Get total count of redeemed codes for pagination info
     const totalCodes = await Code.countDocuments({
-      redeemedBy: userId,
+      redeemedBy: { $in: studentIdsToQuery },
       isRedeemed: true,
     });
 
@@ -1251,7 +1322,7 @@ const getStudentParentAdditionalData = async (
   // Only include lecture access if requested or no specific fields were requested
   if (!fields || fields.includes("lectureAccess")) {
     let lectureAccessQuery = StudentLectureAccess.find({
-      student: userId,
+      student: { $in: studentIdsToQuery },
     });
 
     // Apply query features for lecture access
@@ -1273,7 +1344,7 @@ const getStudentParentAdditionalData = async (
 
     // Get total count of lecture access entries for pagination info
     const totalLectureAccess = await StudentLectureAccess.countDocuments({
-      student: userId,
+      student: { $in: studentIdsToQuery },
     });
 
     if (!responseData.paginationInfo) responseData.paginationInfo = {};
@@ -1307,7 +1378,7 @@ const getStudentParentAdditionalData = async (
     // Otherwise we need to query just to determine feature flags
     else {
       const featureFlagPurchases = await Purchase.find({
-        student: userId,
+        student: { $in: studentIdsToQuery },
         $or: [
           { lecture: { $exists: true, $ne: null } },
           { type: "containerPurchase", container: { $exists: true, $ne: null } },

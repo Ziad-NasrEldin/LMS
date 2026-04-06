@@ -55,6 +55,13 @@
   "verifyOtp": "تحقق من الكود",
   "verifying": "جاري التحقق...",
   "backToLoginPrompt": "تذكرت كلمة المرور؟",
+  "registrationSuccess": "تم التسجيل بنجاح!",
+  "sessionConfirm": {
+    "title": "تنبيه",
+    "message": "لديك جلسة نشطة بالفعل. هل تريد إنهاء الجلسة السابقة والمتابعة؟",
+    "cancel": "إلغاء",
+    "continue": "استمرار"
+  },
   "errors": {
     "loginFailed": "فشل تسجيل الدخول. يرجى التحقق من البيانات",
     "invalidCredentials": "بريد إلكتروني/هاتف أو كلمة مرور خاطئة",

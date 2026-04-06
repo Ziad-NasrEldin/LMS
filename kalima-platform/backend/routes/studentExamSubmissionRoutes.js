@@ -8,16 +8,16 @@ const { configureGoogleSheets } = require("../config/googleApiConfig");
 // Protect all remaining routes
 router.use(verifyJWT);
 
-// Routes for students
+// Routes for students and parents
 router.get(
   "/my-submissions", 
-  authController.verifyRoles("Student", "Admin", "SubAdmin", "Moderator"),
+  authController.verifyRoles("Student", "Parent", "Admin", "SubAdmin", "Moderator"),
   examSubmissionController.getMyExamSubmissions
 );
 
 router.post(
   "/verify/:lectureId", 
-  authController.verifyRoles("Student", "Admin", "SubAdmin", "Moderator"),
+  authController.verifyRoles("Student", "Parent", "Admin", "SubAdmin", "Moderator"),
   examSubmissionController.verifyExamSubmission
 );
 

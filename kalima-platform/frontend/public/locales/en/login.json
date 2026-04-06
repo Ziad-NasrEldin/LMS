@@ -56,7 +56,14 @@
     "verifyOtp": "Verify OTP",
     "verifying": "Verifying...",
     "backToLoginPrompt": "Remembered your password?",
-      "errors": {
+  "registrationSuccess": "Registration successful!",
+  "sessionConfirm": {
+    "title": "Warning",
+    "message": "You already have an active session. Do you want to end the previous session and continue?",
+    "cancel": "Cancel",
+    "continue": "Continue"
+  },
+  "errors": {
         "loginFailed": "Login failed. Please check your credentials",
         "invalidCredentials": "Invalid email/phone or password",
         "accountLocked": "Account locked. Contact support",

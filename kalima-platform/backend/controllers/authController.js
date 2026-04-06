@@ -11,6 +11,7 @@ const RefreshToken = require("../models/refreshTokenModel.js");
 const {
   SESSION_REVOKED_MESSAGE,
   shouldEnforceSingleSession,
+  isEndUserRole,
 } = require("../utils/auth/sessionPolicy.js");
 
 const normalizeRole = (role) =>
@@ -28,6 +29,9 @@ const normalizePolicyTargetRole = (role) => {
   if (["parent", "guardian"].includes(normalized)) return "parent";
   if (["teacher", "instructor", "educator", "معلم", "المعلم"].includes(normalized)) {
     return "teacher";
+  }
+  if (["assistant", "مساعد"].includes(normalized)) {
+    return "assistant";
   }
 
   return normalized;
@@ -56,12 +60,13 @@ const normalizeActorRoleForPolicy = (role) => {
 
 const canImpersonate = (actorRole, targetRole) => {
   const matrix = {
-    admin: new Set(["lecturer", "student", "parent", "teacher"]),
+    admin: new Set(["lecturer", "student", "parent", "teacher", "assistant"]),
     lecturer: new Set(["student", "parent"]),
     assistant: new Set(["student"]),
   };
   const actor = normalizeActorRoleForPolicy(actorRole);
   const target = normalizePolicyTargetRole(targetRole);
+  
   return matrix[actor]?.has(target) || false;
 };
 
@@ -195,6 +200,66 @@ const login = catchAsync(async (req, res, next) => {
   }
 
   await sendToken(foundUser, res);
+});
+
+const checkActiveSession = catchAsync(async (req, res, next) => {
+  const { email, phoneNumber, password } = req.body;
+
+  if (!((email && password) || (phoneNumber && password))) {
+    return next(
+      new AppError(
+        "Please provide either email and password or phone number and password.",
+        400
+      )
+    );
+  }
+
+  const newMail = email ? email.toLowerCase() : null;
+  const newPhoneNumber = phoneNumber ? phoneNumber.toLowerCase() : null;
+
+  const foundUser = email
+    ? await User.findOne({ email: newMail })
+    : await User.findOne({ phoneNumber: newPhoneNumber });
+
+  if (!foundUser) {
+    return next(
+      new AppError(
+        `Couldn't find a user with this ${newMail ? "email" : "phone number"
+        } and password.`,
+        400
+      )
+    );
+  }
+
+  const match = await bcrypt.compare(password, foundUser.password);
+
+  if (!match) {
+    return next(
+      new AppError(
+        `Couldn't find a user with this ${newMail ? "email" : "phone number"
+        } and password.`,
+        400
+      )
+    );
+  }
+
+  const userRole = foundUser.role;
+  const enforceSingleSession = isEndUserRole(userRole);
+
+  if (!enforceSingleSession) {
+    return res.status(200).json({
+      hasActiveSession: false,
+      requiresConfirmation: false,
+    });
+  }
+
+  const activeSession = await RefreshToken.findOne({ user: foundUser._id });
+
+  return res.status(200).json({
+    hasActiveSession: !!activeSession,
+    requiresConfirmation: !!activeSession,
+    role: userRole,
+  });
 });
 
 const refresh = catchAsync(async (req, res, next) => {
@@ -494,6 +559,7 @@ const optionalJWT = async (req, res, next) => {
 
 module.exports = {
   login,
+  checkActiveSession,
   refresh,
   logout,
   startImpersonation,
