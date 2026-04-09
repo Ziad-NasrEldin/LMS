@@ -35,6 +35,8 @@ const isSameId = (left, right) => {
 };
 
 const isPrivilegedRole = (role) => PRIVILEGED_ROLES.has(normalizeRole(role));
+const isLecturerScopedRole = (role) =>
+  LECTURER_SCOPED_ROLES.has(normalizeRole(role));
 const isStudentOrParentRole = (role) => {
   const normalized = normalizeRole(role);
   return normalized === STUDENT_ROLE || normalized === PARENT_ROLE;

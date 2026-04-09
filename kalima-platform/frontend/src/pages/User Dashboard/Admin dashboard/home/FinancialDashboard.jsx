@@ -66,9 +66,10 @@ const FinancialDashboard = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-60">
-        <span className="loading loading-spinner loading-lg text-primary"></span>
-      </div>
+        <div className="flex justify-center items-center h-60">
+          <div className="w-10 h-10 border-4 border-slate-200 border-t-primary rounded-full animate-spin"></div>
+        </div>
+
     );
   }
 
@@ -112,7 +113,7 @@ const FinancialDashboard = () => {
         </div>
 
         {error && (
-          <div className="alert alert-error rounded-2xl shadow-sm">
+          <div className="flex items-center gap-3 p-4 mb-6 bg-red-50 border border-red-200 text-red-800 rounded-2xl shadow-sm">
             <AlertCircle className="w-5 h-5" />
             <span>{error}</span>
           </div>
@@ -158,25 +159,28 @@ const FinancialDashboard = () => {
               })}
             </p>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="table w-full">
-                <thead>
-                  <tr>
-                    <th>{isRTL ? "#" : "#"}</th>
-                    <th>{isRTL ? "العنصر" : "Item"}</th>
-                    <th>{isRTL ? "الإيراد" : "Revenue"}</th>
-                    <th>{isRTL ? "المشتريات" : "Purchases"}</th>
+             <div className="overflow-x-auto">
+               <table className="w-full text-left border-collapse">
+                 <thead>
+                   <tr className="border-b border-slate-200 bg-slate-50">
+
+                     <th className="p-3 font-semibold text-slate-700">{isRTL ? "#" : "#"}</th>
+                     <th className="p-3 font-semibold text-slate-700">{isRTL ? "العنصر" : "Item"}</th>
+                     <th className="p-3 font-semibold text-slate-700">{isRTL ? "الإيراد" : "Revenue"}</th>
+                     <th className="p-3 font-semibold text-slate-700">{isRTL ? "المشتريات" : "Purchases"}</th>
+
                   </tr>
                 </thead>
                 <tbody>
-                  {topBreakdown.map((item, index) => (
-                    <tr key={`${item.lessonId || item._id || index}-${index}`}>
-                      <td>{index + 1}</td>
-                      <td>{item.lessonName || item.name || item.containerName || (isRTL ? "غير محدد" : "Unknown")}</td>
-                      <td>{item.totalRevenue || item.revenue || 0}</td>
-                      <td>{item.purchaseCount || item.totalPurchases || 0}</td>
-                    </tr>
-                  ))}
+                   {topBreakdown.map((item, index) => (
+                     <tr key={`${item.lessonId || item._id || index}-${index}`} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
+                       <td className="p-3">{index + 1}</td>
+                       <td className="p-3">{item.lessonName || item.name || item.containerName || (isRTL ? "غير محدد" : "Unknown")}</td>
+                       <td className="p-3">{item.totalRevenue || item.revenue || 0}</td>
+                       <td className="p-3">{item.purchaseCount || item.totalPurchases || 0}</td>
+                     </tr>
+                   ))}
+
                 </tbody>
               </table>
             </div>

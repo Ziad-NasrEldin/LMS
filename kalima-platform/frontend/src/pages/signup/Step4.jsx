@@ -5,7 +5,7 @@ import { resolveLevelDisplayName } from "../../utils/levelHierarchy"
 
 const ReviewItem = ({ label, value }) => (
   <div>
-    <p className="text-sm text-base-content/70">{label}</p>
+      <p className="text-sm text-slate-600">{label}</p>
     <p className="font-medium">{value || "-"}</p>
   </div>
 )
@@ -74,7 +74,7 @@ export default function Step4({ formData, t, hobbiesList = [], levelHierarchy })
 
   return (
     <div className="space-y-6">
-      <div className="rounded-lg bg-base-200 p-6">
+      <div className="rounded-lg bg-slate-100 p-6">
         <h3 className="mb-4 text-lg font-semibold">{t("review.title")}</h3>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <ReviewItem label={t("form.role")} value={t(`role.${formData.role}`)} />

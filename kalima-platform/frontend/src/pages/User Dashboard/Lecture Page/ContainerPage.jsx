@@ -9,6 +9,7 @@ import { FiArrowLeft, FiArrowRight, FiChevronDown } from "react-icons/fi"
 import { designTokens } from "../../../constants/designTokens"
 import { translateErrorMessage } from "../../../utils/errorTranslator"
 import DSSelect from "../../../components/DSSelect"
+import Button from "../../../components/ui/Button"
 
 const ContainersPage = () => {
   const { t, i18n } = useTranslation('lecturesPage');
@@ -142,7 +143,7 @@ const ContainersPage = () => {
             color: TOKENS.slateText,
           }}
         >
-          <div className="loading loading-spinner loading-lg" style={{ color: TOKENS.deepTeal }}></div>
+           <div className="animate-spin border-4 border-primary border-t-transparent rounded-full w-12 h-12" style={{ color: TOKENS.deepTeal }}></div>
         </div>
       </div>
     );
@@ -235,20 +236,20 @@ const ContainersPage = () => {
             {containers.map(container => (
               <div
                 key={container._id}
-                className="card border transition-all duration-200 hover:-translate-y-1"
+                className="rounded-2xl border p-6 transition-all duration-200 hover:-translate-y-1"
                 style={{
                   background: "#FFFFFF",
                   borderColor: "rgba(17,24,39,0.08)",
                   boxShadow: SHADOWS.level1,
                 }}
               >
-                <div className="card-body h-full">
-                  <h2 className="card-title line-clamp-2" style={{ color: TOKENS.inkText }}>{container.name}</h2>
-
+                <div className="h-full">
+                  <h2 className="text-xl font-bold line-clamp-2" style={{ color: TOKENS.inkText }}>{container.name}</h2>
+  
                   <div className="my-2 flex flex-wrap gap-2">
                     {container.subject?.name && (
                       <div
-                        className="badge border"
+                        className="px-2 py-1 text-xs font-medium border rounded-full"
                         style={{ background: TOKENS.lightAquaMist, color: TOKENS.deepTeal, borderColor: "rgba(15,118,110,0.22)" }}
                       >
                         {container.subject.name}
@@ -256,26 +257,26 @@ const ContainersPage = () => {
                     )}
                     {container.level?.name && (
                       <div
-                        className="badge border"
+                        className="px-2 py-1 text-xs font-medium border rounded-full"
                         style={{ background: "#ECFEFF", color: TOKENS.slateText, borderColor: "rgba(17,24,39,0.16)" }}
                       >
                         {container.level.name}
                       </div>
                     )}
                     <div
-                      className="badge border"
+                      className="px-2 py-1 text-xs font-medium border rounded-full"
                       style={{ background: "#F0FDFA", color: TOKENS.deepTeal, borderColor: "rgba(15,118,110,0.18)" }}
                     >
                       {t('containersPage.labels.course')}
                     </div>
                   </div>
-
+  
                   {userRole === 'Lecturer' && (
                     <p className="text-sm" style={{ color: TOKENS.slateText }}>
                       {t('containersPage.labels.price', { price: container.price })}
                     </p>
                   )}
-
+  
                   {userRole === 'Student' && container.lecturer && (
                     <p className="text-sm" style={{ color: TOKENS.slateText }}>
                       {t('containersPage.labels.lecturer')}: {typeof container.lecturer === 'string'
@@ -283,14 +284,14 @@ const ContainersPage = () => {
                         : container.lecturer.name || t('containersPage.unknown')}
                     </p>
                   )}
-
+  
                   {userRole === 'Student' && container.purchasedAt && (
                     <p className="text-sm" style={{ color: TOKENS.slateText }}>
                       {t('containersPage.labels.purchaseDate')}: {new Date(container.purchasedAt).toLocaleDateString(i18n.language)}
                     </p>
                   )}
-
-                  <div className={`card-actions mt-4 ${isRTL ? "justify-start" : "justify-end"}`}>
+  
+                  <div className={`flex gap-2 mt-4 ${isRTL ? "justify-start" : "justify-end"}`}>
                     {userRole === 'Lecturer' ? (
                       <Link
                         to={`/dashboard/lecturer-dashboard/container-details/${container._id}`}
@@ -346,58 +347,61 @@ const ContainersPage = () => {
           {totalPages > 1 && (
             <div className="mt-8 flex justify-center">
               <div className="flex w-full max-w-xl flex-wrap items-center justify-center gap-2">
-                <button
-                  className="btn btn-sm rounded-xl"
-                  style={{
-                    background: "#FFFFFF",
-                    borderColor: "rgba(17,24,39,0.16)",
-                    color: TOKENS.inkText,
-                  }}
-                  onClick={() => handlePageChange(currentPage - 1)}
-                  disabled={currentPage === 1}
-                >
-                  {t('containersPage.pagination.previous')}
-                </button>
-
-                {getVisiblePages().map((pageNum) => (
-                  <button
-                    key={pageNum}
-                    className="btn btn-sm min-w-10 rounded-xl"
-                    style={
-                      currentPage === pageNum
-                        ? {
-                          background: TOKENS.deepTeal,
-                          borderColor: TOKENS.deepTeal,
-                          color: "#F8FCFF",
-                        }
-                        : {
-                          background: "#FFFFFF",
-                          borderColor: "rgba(17,24,39,0.16)",
-                          color: TOKENS.inkText,
-                        }
-                    }
-                    onClick={() => handlePageChange(pageNum)}
-                  >
-                    {pageNum}
-                  </button>
-                ))}
-
-                <span className="mx-1 text-xs sm:text-sm" style={{ color: TOKENS.slateText }}>
-                  {currentPage} / {totalPages}
-                </span>
-
-                <button
-                  className="btn btn-sm rounded-xl"
-                  style={{
-                    background: "#FFFFFF",
-                    borderColor: "rgba(17,24,39,0.16)",
-                    color: TOKENS.inkText,
-                  }}
-                  onClick={() => handlePageChange(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                >
-                  {t('containersPage.pagination.next')}
-                </button>
+                 <Button
+                   size="sm" 
+                   className="rounded-xl"
+                   style={{
+                     background: "#FFFFFF",
+                     borderColor: "rgba(17,24,39,0.16)",
+                     color: TOKENS.inkText,
+                   }}
+                   onClick={() => handlePageChange(currentPage - 1)}
+                   disabled={currentPage === 1}
+                 >
+                   {t('containersPage.pagination.previous')}
+                 </Button>
+  
+                 {getVisiblePages().map((pageNum) => (
+                   <Button
+                     key={pageNum}
+                     size="sm" 
+                     className="min-w-10 rounded-xl"
+                     style={
+                       currentPage === pageNum
+                         ? {
+                           background: TOKENS.deepTeal,
+                           borderColor: TOKENS.deepTeal,
+                           color: "#F8FCFF",
+                         }
+                         : {
+                           background: "#FFFFFF",
+                           borderColor: "rgba(17,24,39,0.16)",
+                           color: TOKENS.inkText,
+                         }
+                     }
+                     onClick={() => handlePageChange(pageNum)}
+                   >
+                     {pageNum}
+                   </Button>
+                 ))}
+  
+                 <span className="mx-1 text-xs sm:text-sm" style={{ color: TOKENS.slateText }}>
+                   {currentPage} / {totalPages}
+                 </span>
+  
+                 <Button
+                   size="sm" 
+                   className="rounded-xl"
+                   style={{
+                     background: "#FFFFFF",
+                     borderColor: "rgba(17,24,39,0.16)",
+                     color: TOKENS.inkText,
+                   }}
+                   onClick={() => handlePageChange(currentPage + 1)}
+                   disabled={currentPage === totalPages}
+                 >
+                   {t('containersPage.pagination.next')}
+                 </Button>
               </div>
             </div>
           )}

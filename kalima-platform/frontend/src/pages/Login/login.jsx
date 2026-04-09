@@ -1,18 +1,13 @@
 import React, { useEffect, useState } from "react";
-
 import { useTranslation } from "react-i18next";
-
 import { loginUser, getUserDashboard, checkActiveSession } from "../../routes/auth-services";
-
 import { Link, useLocation, useNavigate } from "react-router-dom";
-
 import { Eye, EyeOff, Lock, Mail, Phone, Sparkles, UserCircle } from "lucide-react";
-
 import { getAccessToken } from "../../utils/useLocalStroage";
-
 import SessionConfirmModal from "../../components/SessionConfirmModal";
-
 import { designTokens } from "../../constants/designTokens";
+import Button from "../../components/ui/Button";
+import Input from "../../components/ui/Input";
 
 const TOKENS = designTokens.colors;
 
@@ -462,7 +457,7 @@ const TeacherLogin = () => {
 
       <div
 
-        className="mx-auto w-full max-w-6xl overflow-hidden rounded-[1.5rem] border bg-base-100"
+        className="mx-auto w-full max-w-6xl overflow-hidden rounded-[1.5rem] border bg-white"
 
         style={{
 
@@ -518,7 +513,7 @@ const TeacherLogin = () => {
 
 
 
-            <div className="relative z-10 my-6 overflow-hidden rounded-[1.75rem] border-8 border-base-100 shadow-xl bg-white/70">
+            <div className="relative z-10 my-6 overflow-hidden rounded-[1.75rem] border-8 border-white shadow-xl bg-white/70">
 
               <HeroIllustration />
 
@@ -582,275 +577,145 @@ const TeacherLogin = () => {
 
               {location.state?.message && (
 
-                <div className="alert alert-success">
-
+                <div className="mb-4 rounded-2xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700 shadow-sm flex items-center gap-3">
                   <span>{location.state.message}</span>
-
                 </div>
 
               )}
 
 
 
-              <div className="grid grid-cols-2 rounded-box p-1" style={{ background: TOKENS.neutralCloud }}>
-
-                <button
-
-                  type="button"
-
-                  className="btn btn-sm"
-
-                  style={
-
-                    activeTab === "email_tab"
-
-                      ? { background: TOKENS.deepTeal, borderColor: TOKENS.deepTeal, color: "#F8FCFF" }
-
-                      : { background: "transparent", borderColor: "transparent", color: TOKENS.slateText }
-
-                  }
-
-                  onClick={() => setActiveTab("email_tab")}
-
-                >
-
-                  <Mail className="h-4 w-4" />
-
-                  {t("emailTab", "Email")}
-
-                </button>
-
-                <button
-
-                  type="button"
-
-                  className="btn btn-sm"
-
-                  style={
-
-                    activeTab === "phone_tab"
-
-                      ? { background: TOKENS.deepTeal, borderColor: TOKENS.deepTeal, color: "#F8FCFF" }
-
-                      : { background: "transparent", borderColor: "transparent", color: TOKENS.slateText }
-
-                  }
-
-                  onClick={() => setActiveTab("phone_tab")}
-
-                >
-
-                  <Phone className="h-4 w-4" />
-
-                  {t("phoneTab", "Phone")}
-
-                </button>
-
-              </div>
+               <div className="grid grid-cols-2 rounded-xl p-1" style={{ background: TOKENS.neutralCloud }}>
+                 <Button
+                   type="button"
+                   size="sm"
+                   style={
+                     activeTab === "email_tab"
+                       ? { background: TOKENS.deepTeal, borderColor: TOKENS.deepTeal, color: "#F8FCFF" }
+                       : { background: "transparent", borderColor: "transparent", color: TOKENS.slateText }
+                   }
+                   onClick={() => setActiveTab("email_tab")}
+                 >
+                   <Mail className="h-4 w-4" />
+                   {t("emailTab", "Email")}
+                 </Button>
+                 <Button
+                   type="button"
+                   size="sm"
+                   style={
+                     activeTab === "phone_tab"
+                       ? { background: TOKENS.deepTeal, borderColor: TOKENS.deepTeal, color: "#F8FCFF" }
+                       : { background: "transparent", borderColor: "transparent", color: TOKENS.slateText }
+                   }
+                   onClick={() => setActiveTab("phone_tab")}
+                 >
+                   <Phone className="h-4 w-4" />
+                   {t("phoneTab", "Phone")}
+                 </Button>
+               </div>
 
 
 
               <form onSubmit={handleSubmit} className="space-y-2" dir={isRTL ? "rtl" : "ltr"}>
 
-                {activeTab === "email_tab" ? (
+                 {activeTab === "email_tab" ? (
+                   <div className="mb-4">
+                     <label className="block mb-1">
+                       <span className="text-sm font-semibold">
+                         {t("emailLabel", "Username or Email")}
+                       </span>
+                     </label>
+                     <div className="relative">
+                       <Input
+                         type="email"
+                         name="email"
+                         value={formData.email}
+                         onChange={handleInputChange}
+                         placeholder={t("emailPlaceholder", "youremail@example.com")}
+                         className="w-full bg-slate-100 text-base"
+                         required
+                       />
+                     </div>
+                   </div>
+                 ) : (
+                   <div className="mb-4">
+                     <label className="block mb-1">
+                       <span className="text-sm font-semibold">
+                         {t("phoneLabel", "Phone Number")}
+                       </span>
+                     </label>
+                     <div className="relative">
+                       <Input
+                         type="tel"
+                         name="phoneNumber"
+                         value={formData.phoneNumber}
+                         onChange={handleInputChange}
+                         placeholder={t("phonePlaceholder", "01234567890")}
+                         className="w-full bg-slate-100 text-base"
+                         required
+                       />
+                     </div>
+                   </div>
+                 )}
 
-                  <div className="form-control">
 
-                    <label className="label py-1">
 
-                      <span className="label-text font-semibold">
-
-                        {t("emailLabel", "Username or Email")}
-
-                      </span>
-
-                    </label>
-
-                    <div className="relative">
-
-                      <input
-
-                        type="email"
-
-                        name="email"
-
-                        value={formData.email}
-
-                        onChange={handleInputChange}
-
-                        placeholder={t("emailPlaceholder", "youremail@example.com")}
-
-                        className="input input-bordered input-md w-full bg-base-200/70 text-base"
-
-                        required
-
-                      />
-
+                 <div className="mb-4">
+                   <div className="flex items-center justify-between">
+                     <label className="block mb-1">
+                       <span className="text-sm font-semibold">
+                         {t("passwordLabel", "Password")}
+                       </span>
+                     </label>
+                     <Link
+                       to="/forgot-password"
+                       className="text-sm font-semibold text-primary hover:underline"
+                     >
+                       {t("forgotPassword", "Forgot Password?")}
+                     </Link>
+                   </div>
+                     <div className="relative">
+                       <Input
+                         type={showPassword ? "text" : "password"}
+                         name="password"
+                         value={formData.password}
+                         onChange={handleInputChange}
+                         placeholder={t("passwordPlaceholder", "••••••••")}
+                         className={`relative z-0 w-full bg-slate-100 text-base ${
+                           isRTL ? "pl-12" : "pr-12"
+                         }`}
+                         required
+                       />
+                     </div>
                     </div>
-
-                  </div>
-
-                ) : (
-
-                  <div className="form-control">
-
-                    <label className="label py-1">
-
-                      <span className="label-text font-semibold">
-
-                        {t("phoneLabel", "Phone Number")}
-
-                      </span>
-
-                    </label>
-
-                    <div className="relative">
-
-                      <input
-
-                        type="tel"
-
-                        name="phoneNumber"
-
-                        value={formData.phoneNumber}
-
-                        onChange={handleInputChange}
-
-                        placeholder={t("phonePlaceholder", "01234567890")}
-
-                        className="input input-bordered input-md w-full bg-base-200/70 text-base"
-
-                        required
-
-                      />
-
+ 
+                    {error && (
+                   <div className="mb-4 rounded-2xl border border-error/30 bg-error/10 px-4 py-3 text-sm text-[#991B1B] shadow-sm flex items-center gap-3">
+                     <span>{error}</span>
+                   </div>
+                 )}
+                  {sessionRevokedMessage && (
+                    <div className="mb-4 rounded-2xl border border-warning/30 bg-warning/10 px-4 py-3 text-sm text-[#92400E] shadow-sm flex items-center gap-3" style={{ backgroundColor: "#FEF3C7", borderColor: "#F59E0B", color: "#92400E" }}>
+                      <span>{sessionRevokedMessage}</span>
                     </div>
-
-                  </div>
-
-                )}
-
-
-
-                <div className="form-control">
-
-                  <div className="flex items-center justify-between">
-
-                    <label className="label py-1">
-
-                      <span className="label-text font-semibold">
-
-                        {t("passwordLabel", "Password")}
-
-                      </span>
-
-                    </label>
-
-                    <Link
-
-                      to="/forgot-password"
-
-                      className="text-sm font-semibold text-primary hover:underline"
-
-                    >
-
-                      {t("forgotPassword", "Forgot Password?")}
-
-                    </Link>
-
-                  </div>
-
-                  <div className="relative">
-
-                    <input
-
-                      type={showPassword ? "text" : "password"}
-
-                      name="password"
-
-                      value={formData.password}
-
-                      onChange={handleInputChange}
-
-                      placeholder={t("passwordPlaceholder", "••••••••")}
-
-                      className={`password-toggle-input relative z-0 input input-bordered input-md w-full bg-base-200/70 text-base ${
-
-                        isRTL ? "pl-12" : "pr-12"
-
-                      }`}
-
-                      required
-
-                    />
-
-                    <button
-
-                      type="button"
-
-                      className={`password-toggle-button absolute top-1/2 z-20 -translate-y-1/2 rounded-full p-1 text-base-content/60 hover:text-base-content ${
-
-                        isRTL ? "left-4" : "right-4"
-
-                      }`}
-
-                      onClick={() => setShowPassword((prev) => !prev)}
-
-                      aria-label={showPassword ? t("hidePassword", "Hide password") : t("showPassword", "Show password")}
-
-                    >
-
-                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-
-                    </button>
-
-                  </div>
-
-                </div>
-
-
-
-                {error && (
-
-                  <div className="alert alert-error">
-
-                    <span>{error}</span>
-
-                  </div>
-
-                )}
-
-                {sessionRevokedMessage && (
-                  <div className="alert alert-warning" style={{ backgroundColor: "#FEF3C7", borderColor: "#F59E0B", color: "#92400E" }}>
-                    <span>{sessionRevokedMessage}</span>
-                  </div>
-                )}
-
-
-
-                <button
-
+                  )}
+ 
+ 
+ 
+                 <Button
                   type="submit"
-
-                  className={`btn btn-lg w-full rounded-full text-base font-extrabold border-0 ${
-
-                    loading ? "loading" : ""
-
-                  }`}
-
+                  variant="primary"
+                  size="lg"
+                  className="w-full rounded-full text-base font-extrabold border-0"
                   style={{ background: TOKENS.deepTeal, color: "#F8FCFF" }}
-
-                  disabled={loading}
-
+                  isLoading={loading}
                 >
-
-                  {loading ? t("loggingIn", "Logging in...") : t("login", "Log In")}
-
-                </button>
+                  {t("login", "Log In")}
+                </Button>
 
 
 
-                <p className="pt-1 text-center text-sm text-base-content/70">
+                 <p className="pt-1 text-center text-sm text-slate-900/70">
 
                   {t("needAccount", "Don't have an account?")} {" "}
 

@@ -23,6 +23,7 @@ import { getUserDashboard, getUserFromToken } from "../../../routes/auth-service
 import { checkStudentLectureAccess, accountStudentLecturePlayStart, getStudentLectureAccessByLectureId } from "../../../routes/student-lecture-access"
 import {
   FiUpload,
+  FiDownload,
   FiFile,
   FiX,
   FiCheck,
@@ -41,6 +42,15 @@ import {
   FiEdit,
   FiCopy,
 } from "react-icons/fi"
+import CommunityTab from "../../../components/lecture-community/CommunityTab";
+import Button from "../../../components/ui/Button";
+import { designTokens } from "../../../constants/designTokens";
+
+import Input from "../../../components/ui/Input";
+import Badge from "../../../components/ui/Badge";
+import Card from "../../../components/ui/Card";
+import Modal from "../../../components/ui/Modal";
+import Tabs from "../../../components/ui/Tabs";
 
 // Vidstack imports
 import { MediaPlayer, MediaProvider, Poster } from "@vidstack/react";
@@ -51,9 +61,50 @@ import {
 import "@vidstack/react/player/styles/default/theme.css";
 import "@vidstack/react/player/styles/default/layouts/video.css";
 
+const LEGACY_ATTACHMENT_GROUPS = ["pdfsandimages", "homeworks", "exams", "booklets"];
+const DEFAULT_LECTURE_ATTACHMENT_TYPE = "pdfsandimages";
+
+const flattenLectureAttachments = (attachmentGroups = {}) =>
+  LEGACY_ATTACHMENT_GROUPS.flatMap((groupKey) =>
+    (attachmentGroups?.[groupKey] || []).map((attachment) => ({
+      ...attachment,
+      sourceType: attachment?.sourceType || groupKey,
+    }))
+  );
+
 const LectureDisplay = () => {
   const { t, i18n } = useTranslation("lectureDisplay");
   const isRTL = i18n.language === "ar";
+  const TOKENS = designTokens.colors;
+  const SHADOWS = designTokens.shadows;
+  const RADIUS = designTokens.radius;
+  const GRADIENTS = designTokens.gradients;
+  const pageBackground = `${GRADIENTS.pageAtmosphere}, linear-gradient(180deg, ${TOKENS.creamSurface} 0%, rgba(241,243,246,0.94) 100%)`;
+  const shellStyle = {
+    background: "rgba(255,255,255,0.62)",
+    border: `1px solid ${TOKENS.borderSubtle}`,
+    borderRadius: RADIUS.section,
+    boxShadow: SHADOWS.level1,
+    backdropFilter: "blur(14px)",
+  };
+  const panelStyle = {
+    background: TOKENS.neutralCloud,
+    border: `1px solid ${TOKENS.borderSubtle}`,
+    borderRadius: RADIUS.card,
+    boxShadow: SHADOWS.level1,
+  };
+  const softCardStyle = {
+    background: "rgba(255,255,255,0.86)",
+    border: `1px solid ${TOKENS.borderSubtle}`,
+    borderRadius: RADIUS.card,
+    boxShadow: SHADOWS.level1,
+  };
+  const chipStyle = {
+    background: "rgba(188,231,236,0.38)",
+    color: TOKENS.deepTeal,
+    border: `1px solid rgba(14,85,99,0.12)`,
+    borderRadius: RADIUS.chip,
+  };
 
   const { lectureId } = useParams();
   const navigate = useNavigate();
@@ -135,9 +186,10 @@ const LectureDisplay = () => {
   });
   const [verificationLoading, setVerificationLoading] = useState(false);
 
-  // Attachment tabs and uploads
-  const [activeTab, setActiveTab] = useState("pdfsandimages");
+  // Attachment uploads
+  const [activeMainTab, setActiveMainTab] = useState("video");
   const [uploadingFiles, setUploadingFiles] = useState([]);
+
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState(null);
   const [uploadSuccess, setUploadSuccess] = useState(false);
@@ -234,13 +286,7 @@ const LectureDisplay = () => {
 
         // 2. Set Attachments
         setAttachments(attachments);
-        const allAttachmentsArray = [
-          ...(attachments.pdfsandimages || []),
-          ...(attachments.homeworks || []),
-          ...(attachments.exams || []),
-          ...(attachments.booklets || []),
-        ];
-        setAllAttachments(allAttachmentsArray);
+        setAllAttachments(flattenLectureAttachments(attachments));
 
         // 3. Set Access & Views (Student Only)
         if (user.role === "Student") {
@@ -304,12 +350,11 @@ const LectureDisplay = () => {
   // Remove old fetchUserData, fetchLecture, fetchAttachments, fetchHomeworks, and verifyExamAndCheckAccess useEffects.
   // Keep only the view sync, upload, and video player logic.
 
-    // Reset upload states when changing tabs
     useEffect(() => {
       setUploadingFiles([]);
       setUploadError(null);
       setUploadSuccess(false);
-    }, [activeTab]);
+    }, []);
 
     // Clear success message after 3 seconds
     useEffect(() => {
@@ -674,7 +719,7 @@ const LectureDisplay = () => {
         // Upload each file sequentially
         for (const file of uploadingFiles) {
           const attachmentData = {
-            type: activeTab,
+            type: DEFAULT_LECTURE_ATTACHMENT_TYPE,
             attachment: file,
           };
 
@@ -685,15 +730,7 @@ const LectureDisplay = () => {
         const result = await getLectureAttachments(lectureId);
         if (result.status === "success") {
           setAttachments(result.data);
-
-          // Update the flat array of all attachments
-          const allAttachmentsArray = [
-            ...(result.data.pdfsandimages || []),
-            ...(result.data.homeworks || []),
-            ...(result.data.exams || []),
-            ...(result.data.booklets || []),
-          ];
-          setAllAttachments(allAttachmentsArray);
+          setAllAttachments(flattenLectureAttachments(result.data));
         }
 
         setUploadingFiles([]);
@@ -761,15 +798,7 @@ const LectureDisplay = () => {
         const result = await getLectureAttachments(lectureId);
         if (result.status === "success") {
           setAttachments(result.data);
-
-          // Update the flat array of all attachments
-          const allAttachmentsArray = [
-            ...(result.data.pdfsandimages || []),
-            ...(result.data.homeworks || []),
-            ...(result.data.exams || []),
-            ...(result.data.booklets || []),
-          ];
-          setAllAttachments(allAttachmentsArray);
+          setAllAttachments(flattenLectureAttachments(result.data));
         }
 
         toast.success(t("homeworkUploadSuccess"));
@@ -864,51 +893,73 @@ const LectureDisplay = () => {
 
     if (loading || verificationLoading) {
       return (
-        <div className="flex justify-center items-center min-h-screen">
-          <div className="loading loading-spinner loading-lg text-primary"></div>
-        </div>
+          <div
+            className="flex min-h-screen items-center justify-center px-4 py-10"
+            dir={isRTL ? "rtl" : "ltr"}
+            style={{ background: pageBackground }}
+          >
+            <div className="w-full max-w-xl p-8 text-center" style={shellStyle}>
+              <div
+                className="mx-auto mb-5 h-12 w-12 animate-spin rounded-full border-4 border-t-transparent"
+                style={{ borderColor: TOKENS.deepTeal, borderTopColor: "transparent" }}
+              />
+              <h2 className="text-2xl font-black" style={{ color: TOKENS.deepTeal }}>
+                {t("loadingLecture", "Loading lecture")}
+              </h2>
+              <p className="mt-2 text-sm" style={{ color: TOKENS.slateText }}>
+                {t("pleaseWait", "Please wait while the lecture details are prepared.")}
+              </p>
+            </div>
+          </div>
       );
     }
 
     if (error) {
       return (
-        <div className="flex justify-center items-center min-h-screen p-4">
-          <div className="w-full max-w-xl rounded-2xl border border-error/30 bg-base-100 p-5 shadow-lg">
-            <div className="alert alert-error">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="stroke-current shrink-0 h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
+        <div className="flex min-h-screen items-center justify-center p-4" style={{ background: pageBackground }}>
+          <div className="w-full max-w-xl p-6" style={shellStyle}>
+            <div
+              className="flex items-center gap-3 rounded-2xl p-4"
+              style={{ background: TOKENS.successLight.replace("22,163,74", "220,38,38"), border: `1px solid rgba(220,38,38,0.2)`, color: TOKENS.error }}
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            <span>{error}</span>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="stroke-current shrink-0 h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              <span>{error}</span>
             </div>
-            <div className="mt-4 flex flex-wrap gap-2">
-              <button
-                type="button"
-                className="btn btn-sm btn-primary"
+            <div className="mt-5 flex flex-wrap gap-3">
+              <Button
+                variant="primary"
+                size="sm"
                 onClick={() => window.location.reload()}
+                style={{ background: GRADIENTS.cta, color: "#F8FCFF", borderRadius: RADIUS.chip }}
               >
                 {t("retry", "Retry")}
-              </button>
-              <button
-                type="button"
-                className="btn btn-sm btn-outline"
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() => navigate(-1)}
+                className="rounded-full"
+                style={{ borderRadius: RADIUS.chip, borderColor: TOKENS.deepTeal, color: TOKENS.deepTeal }}
               >
                 {t("back", "Back")}
-              </button>
+              </Button>
             </div>
           </div>
         </div>
       );
+
     }
 
     const showViewSyncBanner =
@@ -931,118 +982,151 @@ const LectureDisplay = () => {
       ].filter(Boolean);
  
       return (
-        <div className="mx-auto w-full max-w-5xl px-4 py-3 sm:px-6" dir={isRTL ? "rtl" : "ltr"}>
-          <button onClick={() => navigate(-1)} className="btn btn-outline btn-primary btn-sm mb-3">
-            {t("back")}
-          </button>
- 
-          <h1 className="text-2xl font-bold mb-4 text-center md:text-right md:text-4xl leading-tight">
-            {lecture?.name || t("loadingLecture")}
-          </h1>
- 
-          {showViewSyncBanner && (
-            <div className="mb-4 rounded-2xl border border-info/30 bg-info/10 px-4 py-3 text-sm text-info-content shadow-sm">
-              {viewSyncStatus}
-            </div>
-          )}
- 
-          <div className="rounded-3xl border border-warning/30 bg-gradient-to-br from-base-100 to-base-200/40 p-5 shadow-xl md:p-6">
-            <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-              <div className="flex items-center gap-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-warning/15 text-warning">
-                  <FiAlertTriangle className="h-5 w-5" />
+        <div className="min-h-screen px-3 py-4 sm:px-4 sm:py-6" dir={isRTL ? "rtl" : "ltr"} style={{ background: pageBackground }}>
+          <div className="mx-auto w-full max-w-6xl space-y-5">
+            <section className="p-5 md:p-7" style={shellStyle}>
+              <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+                <div className="space-y-4">
+                  <div className="flex flex-wrap gap-2">
+                    <span className="px-3 py-1 text-xs font-bold" style={chipStyle}>
+                      {t("lectureDisplay", "Lecture Display")}
+                    </span>
+                    <span className="px-3 py-1 text-xs font-bold" style={{ ...chipStyle, background: "rgba(243,154,63,0.18)", color: TOKENS.inkText }}>
+                      {t("accessLockedTitle", "Lecture Access Is Locked")}
+                    </span>
+                  </div>
+                  <div>
+                    <h1 className="text-3xl font-black leading-tight md:text-5xl" style={{ color: TOKENS.deepTeal }}>
+                      {lecture?.name || t("loadingLecture")}
+                    </h1>
+                    <p className="mt-3 max-w-2xl text-sm md:text-base" style={{ color: TOKENS.slateText }}>
+                      {t(
+                        "accessLockedDescription",
+                        "Complete all required exam/homework items to unlock this lecture.",
+                      )}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h2 className="text-xl font-extrabold text-base-content md:text-2xl">
-                    {t("accessLockedTitle", "Lecture Access Is Locked")}
-                  </h2>
-                  <p className="text-sm text-base-content/70">
-                    {t(
-                      "accessLockedDescription",
-                      "Complete all required exam/homework items to unlock this lecture.",
-                    )}
-                  </p>
+                <div className="flex flex-wrap gap-3">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => navigate(-1)}
+                    className="rounded-full"
+                    style={{ borderRadius: RADIUS.chip, borderColor: TOKENS.deepTeal, color: TOKENS.deepTeal }}
+                  >
+                    {t("back")}
+                  </Button>
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    onClick={debouncedRecheck}
+                    isDisabled={verificationLoading}
+                    className="rounded-full"
+                    style={{ background: GRADIENTS.cta, color: "#F8FCFF", borderRadius: RADIUS.chip }}
+                  >
+                    {verificationLoading ? t("loading") : t("recheckAccess", "Recheck Access")}
+                  </Button>
                 </div>
               </div>
- 
-              <button
-                type="button"
-                className="btn btn-primary btn-sm"
-                onClick={debouncedRecheck}
-                disabled={verificationLoading}
-              >
-                {verificationLoading ? t("loading") : t("recheckAccess", "Recheck Access")}
-              </button>
-            </div>
+            </section>
+            {showViewSyncBanner && (
+              <div className="rounded-2xl px-4 py-3 text-sm shadow-sm" style={{ ...softCardStyle, color: TOKENS.deepTeal }}>
+                {viewSyncStatus}
+              </div>
+            )}
+            <div className="p-5 md:p-6" style={shellStyle}>
+             <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+               <div className="flex items-center gap-3">
+                 <div
+                   className="flex h-11 w-11 items-center justify-center rounded-2xl"
+                   style={{ background: "rgba(243,154,63,0.18)", color: TOKENS.warmMango }}
+                 >
+                   <FiAlertTriangle className="h-5 w-5" />
+                 </div>
+                  <div>
+                    <h2 className="text-xl font-extrabold md:text-2xl" style={{ color: TOKENS.deepTeal }}>
+                      {t("accessLockedTitle", "Lecture Access Is Locked")}
+                    </h2>
+                    <p className="text-sm" style={{ color: TOKENS.slateText }}>
+                      {t(
+                        "accessLockedDescription",
+                        "Complete all required exam/homework items to unlock this lecture.",
+                     )}
+                   </p>
+                 </div>
+               </div>
+             </div>
  
             <div className="grid gap-4 md:grid-cols-2">
               {requirementCards.map((item) => (
                 <div
                   key={item.key}
-                   className="rounded-2xl border border-base-300 bg-base-100 p-4 sm:p-5 shadow-sm"
+                   className="rounded-2xl border border-base-300 bg-white p-4 sm:p-5 shadow-sm"
                 >
-                  <div className="mb-2 flex items-start justify-between gap-3">
-                    <h3 className="text-lg font-bold text-base-content">{item.title}</h3>
-                    <span className={`badge ${item.passed ? "badge-success" : "badge-warning"}`}>
-                      {item.passed
-                        ? t("statusPassed", "Passed")
-                        : t("statusPending", "Pending")}
-                    </span>
-                  </div>
- 
-                  <p className="mb-3 text-sm text-base-content/70">{item.subtitle}</p>
- 
-                  {item.threshold !== undefined && item.threshold !== null && (
-                    <p className="mb-3 text-sm font-medium text-base-content">
-                      {t("requiredPassingScore")}: {item.threshold}
-                    </p>
-                  )}
- 
-                   <div className="mt-2 flex flex-wrap gap-2">
-                     {!item.passed && item.actionUrl && (
-                       <div className="w-full mb-4 p-4 bg-warning/10 border-2 border-warning/30 rounded-xl flex flex-col gap-3 shadow-sm">
-                         <div className="flex items-center gap-2 text-warning-content">
-                           <FiAlertTriangle className="h-5 w-5 shrink-0" />
-                           <p className="text-sm md:text-base font-bold">
-                             {t("useAccountEmail")}
-                           </p>
-                         </div>
-                         <div className="flex flex-wrap items-center gap-3 bg-base-100 p-2 rounded-lg border border-warning/20">
-                           <code className="text-sm md:text-base font-mono break-all px-2 flex-1 min-w-0">
-                             {userEmail}
-                           </code>
-                           <button
-                             onClick={handleCopyEmail}
-                             className="btn btn-sm btn-warning shrink-0"
-                           >
-                             <FiCopy className="mr-1" /> {t("copyEmail")}
-                           </button>
-                         </div>
-                       </div>
-                     )}
-                     {!item.passed && item.actionUrl && (
-                       <a
-                         href={item.actionUrl}
-                         target="_blank"
-                         rel="noopener noreferrer"
-                         className="btn btn-primary btn-sm"
-                       >
-                         <FiExternalLink className={isRTL ? "ml-1" : "mr-1"} />
-                         {item.actionLabel}
-                       </a>
-                     )}
- 
-                     {item.passed && (
-                       <span className="badge badge-success badge-outline">
-                         {t("completed", "Completed")}
-                       </span>
-                     )}
-                   </div>
+                     <div className="mb-2 flex items-start justify-between gap-3">
+                       <h3 className="text-lg font-bold text-neutral">{item.title}</h3>
+                       <Badge variant={item.passed ? "success" : "warning"}>
+                         {item.passed
+                           ? t("statusPassed", "Passed")
+                           : t("statusPending", "Pending")}
+                       </Badge>
+                     </div>
+  
+                   <p className="mb-3 text-sm text-neutral/70">{item.subtitle}</p>
+  
+                   {item.threshold !== undefined && item.threshold !== null && (
+                     <p className="mb-3 text-sm font-medium text-neutral">
+                       {t("requiredPassingScore")}: {item.threshold}
+                     </p>
+                   )}
+  
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {!item.passed && item.actionUrl && (
+                        <div className="w-full mb-4 p-4 bg-warning/10 border-2 border-warning/30 rounded-xl flex flex-col gap-3 shadow-sm">
+                          <div className="flex items-center gap-2 text-[#92400E]">
+                            <FiAlertTriangle className="h-5 w-5 shrink-0" />
+                            <p className="text-sm md:text-base font-bold">
+                              {t("useAccountEmail")}
+                            </p>
+                          </div>
+                          <div className="flex flex-wrap items-center gap-3 bg-white p-2 rounded-lg border border-warning/20">
+                            <code className="text-sm md:text-base font-mono break-all px-2 flex-1 min-w-0">
+                              {userEmail}
+                            </code>
+                            <Button 
+                              variant="warning" 
+                              size="sm" 
+                              onClick={handleCopyEmail}
+                            >
+                              <FiCopy className="mr-1" /> {t("copyEmail")}
+                               </Button>
+                             </div>
+                           </div>
+                         )}
+                       {!item.passed && item.actionUrl && (
+                         <Button
+                           variant="primary"
+                           size="sm"
+                           onClick={() => window.open(item.actionUrl, "_blank")}
+                         >
+                           <FiExternalLink className={isRTL ? "ml-1" : "mr-1"} />
+                           {item.actionLabel}
+                         </Button>
+                       )}
+  
+                      {item.passed && (
+                        <Badge variant="success" outline>
+                          {t("completed", "Completed")}
+                        </Badge>
+                      )}
+                    </div>
+
                 </div>
               ))}
             </div>
  
-            <div className="mt-4 rounded-2xl border border-info/30 bg-info/10 px-4 py-3 text-sm text-base-content/80">
+            <div className="mt-4 rounded-2xl border border-info/30 bg-info/10 px-4 py-3 text-sm text-neutral/80">
               {t(
                 "accessVerificationHint",
                 "After submitting, wait a moment for sync, then click Recheck Access.",
@@ -1050,6 +1134,7 @@ const LectureDisplay = () => {
             </div>
           </div>
         </div>
+      </div>
       );
     }
 
@@ -1099,65 +1184,149 @@ const LectureDisplay = () => {
       }
     };
 
+    const metaCards = [
+      { label: t("subject", "Subject"), value: lecture?.subject?.name || t("notSpecified") },
+      { label: t("level", "Level"), value: lecture?.level?.name || t("notSpecified") },
+      { label: t("lecturer", "Lecturer"), value: lecture?.createdBy?.name || lecture?.lecturer?.name || t("unknown") },
+      { label: t("attachments", "Attachments"), value: `${allAttachments.length}` },
+    ];
+    const progressStatusLabel =
+      progress < 25
+        ? t("justStarted")
+        : progress < 50
+          ? t("almostHalfway")
+          : progress < 75
+            ? t("goodProgress")
+            : progress < 95
+              ? t("almostDone")
+              : t("completed");
+    const summaryBadges = [
+      lecture?.subject?.name,
+      lecture?.level?.name,
+      userRole && userRole !== "Student" ? t("viewingAs", { role: userRole }) : null,
+      resolvedExamFormUrl || resolvedHomeworkFormUrl ? t("googleForms", "Google Forms") : null,
+    ].filter(Boolean);
+
     return (
-      <div className="mx-auto w-full max-w-5xl px-3 py-3 sm:px-4" dir={isRTL ? "rtl" : "ltr"}>
-        <button
-          onClick={() => navigate(-1)}
-          className="btn btn-outline btn-primary btn-sm mb-3"
-        >
-          {t("back")}
-        </button>
-        <h1 className="text-2xl font-bold mb-4 text-center md:text-right md:text-4xl leading-tight">
-          {lecture?.name || t("loadingLecture")}
-        </h1>
+      <div className="min-h-screen px-3 py-4 sm:px-4 sm:py-6" dir={isRTL ? "rtl" : "ltr"} style={{ background: pageBackground }}>
+        <div className="mx-auto w-full max-w-6xl space-y-5">
+          <section className="relative overflow-hidden p-5 md:p-7" style={shellStyle}>
+            <div
+              className="absolute inset-x-0 top-0 h-28 opacity-80"
+              style={{ background: "linear-gradient(180deg, rgba(188,231,236,0.55) 0%, rgba(188,231,236,0) 100%)" }}
+            />
+            <div className="relative flex flex-col gap-6">
+              <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                <div className="space-y-4">
+                  <div className="flex flex-wrap gap-2">
+                    <span className="px-3 py-1 text-xs font-bold" style={chipStyle}>
+                      {t("lectureDisplay", "Lecture Display")}
+                    </span>
+                    {summaryBadges.map((item) => (
+                      <span
+                        key={item}
+                        className="px-3 py-1 text-xs font-bold"
+                        style={{ ...chipStyle, background: "rgba(255,255,255,0.75)", color: TOKENS.slateText }}
+                      >
+                        {item}
+                      </span>
+                    ))}
+                  </div>
+                  <div>
+                    <h1 className="text-3xl font-black leading-tight md:text-5xl" style={{ color: TOKENS.deepTeal }}>
+                      {lecture?.name || t("loadingLecture")}
+                    </h1>
+                    <p className="mt-3 max-w-3xl text-sm md:text-base" style={{ color: TOKENS.slateText }}>
+                      {lecture?.description || t("lectureDisplayDescription", "A refreshed lecture workspace built on the shared design system.")}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex flex-wrap gap-3">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => navigate(-1)}
+                    className="rounded-full"
+                    style={{ borderRadius: RADIUS.chip, borderColor: TOKENS.deepTeal, color: TOKENS.deepTeal }}
+                  >
+                    {t("back")}
+                  </Button>
+                  {canEditLecture && (
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      onClick={handleEditLecture}
+                      className="rounded-full"
+                      style={{ background: GRADIENTS.cta, color: "#F8FCFF", borderRadius: RADIUS.chip, boxShadow: SHADOWS.level1 }}
+                    >
+                      <FiEdit className={isRTL ? "ml-2" : "mr-2"} />
+                      {t("edit")}
+                    </Button>
+                  )}
+                </div>
+              </div>
 
-        {canEditLecture && (
-          <button
-            type="button"
-            onClick={handleEditLecture}
-            className="btn btn-outline btn-primary btn-sm mb-4"
-          >
-            <FiEdit className={isRTL ? "ml-2" : "mr-2"} />
-            {t("edit")}
-          </button>
-        )}
+              <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+                {metaCards.map((item) => (
+                  <div key={item.label} className="p-4" style={softCardStyle}>
+                    <p className="text-xs font-bold uppercase tracking-[0.16em]" style={{ color: TOKENS.slateText }}>
+                      {item.label}
+                    </p>
+                    <p className="mt-2 text-lg font-black break-words" style={{ color: TOKENS.deepTeal }}>
+                      {item.value}
+                    </p>
+                  </div>
+                ))}
+              </div>
 
-        {userRole && userRole !== "Student" && (
-          <div className="alert alert-info mb-4 shadow-md">
-            <div>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                className="stroke-current shrink-0 w-6 h-6"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                ></path>
-              </svg>
+              <div className="flex justify-center">
+                <div className="rounded-full p-1" style={{ background: "rgba(17,24,39,0.06)", border: `1px solid ${TOKENS.borderSubtle}` }}>
+                  <Tabs
+                    tabs={[
+                      { id: 'video', label: t("viewLecture", "View Lecture") },
+                      { id: 'community', label: t("community", "Community") }
+                    ]}
+                    activeIndex={activeMainTab === 'video' ? 0 : 1}
+                    onChange={(index) => setActiveMainTab(index === 0 ? 'video' : 'community')}
+                  />
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {userRole && userRole !== "Student" && (
+            <div className="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm shadow-sm" style={{ ...softCardStyle, color: TOKENS.deepTeal }}>
+              <FiEye className="h-5 w-5" />
               <span>{t("viewingAs", { role: userRole })}</span>
             </div>
-          </div>
-        )}
+          )}
 
+          {activeMainTab === 'community' ? (
+            <section className="p-4 md:p-5" style={shellStyle}>
+              <CommunityTab 
+                  lectureId={lectureId} 
+                  userId={userId} 
+                  userRole={userRole} 
+              />
+            </section>
+          ) : (
+            <>
+  
         {userRole === "Student" && (assessments.exam.required || assessments.homework.required) && (
           <div className="mb-4 grid gap-3 md:grid-cols-2">
             {assessments.exam.required && (
-              <div className="rounded-2xl border border-success/30 bg-success/10 p-4 shadow-sm">
+              <div className="p-4" style={{ ...softCardStyle, background: "rgba(22,163,74,0.08)", border: `1px solid ${TOKENS.successBorder}` }}>
                 <div className="mb-1 flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-2 font-bold text-base-content">
+                  <div className="flex items-center gap-2 font-bold text-neutral">
                     <FiAward className="h-5 w-5 text-success" />
                     {t("examInfo")}
                   </div>
-                  <span className={`badge ${assessments.exam.verified ? "badge-success" : "badge-warning"}`}>
+                  <Badge variant={assessments.exam.verified ? "success" : "warning"}>
                     {assessments.exam.verified ? t("statusPassed", "Passed") : t("statusPending", "Pending")}
-                  </span>
+                  </Badge>
                 </div>
                 {assessments.exam.submission && (
-                  <div className="text-sm text-base-content/80">
+                  <div className="text-sm text-neutral/80">
                     <span>{t("score")}: {assessments.exam.submission.score}/{assessments.exam.submission.maxScore}</span>
                     <span className="mx-2">|</span>
                     <span>{t("passDate")}: {formatDate(assessments.exam.submission.verifiedAt)}</span>
@@ -1166,18 +1335,18 @@ const LectureDisplay = () => {
               </div>
             )}
             {assessments.homework.required && (
-              <div className="rounded-2xl border border-info/30 bg-info/10 p-4 shadow-sm">
+              <div className="p-4" style={{ ...softCardStyle, background: "rgba(77,179,194,0.12)", border: `1px solid rgba(77,179,194,0.24)` }}>
                 <div className="mb-1 flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-2 font-bold text-base-content">
+                  <div className="flex items-center gap-2 font-bold text-neutral">
                     <FiCheck className="h-5 w-5 text-info" />
                     {t("homeworkInfo", "Homework Information")}
                   </div>
-                  <span className={`badge ${assessments.homework.verified ? "badge-success" : "badge-warning"}`}>
+                  <Badge variant={assessments.homework.verified ? "success" : "warning"}>
                     {assessments.homework.verified ? t("statusPassed", "Passed") : t("statusPending", "Pending")}
-                  </span>
+                  </Badge>
                 </div>
                 {assessments.homework.submission && (
-                  <div className="text-sm text-base-content/80">
+                  <div className="text-sm text-neutral/80">
                     <span>{t("score")}: {assessments.homework.submission.score}/{assessments.homework.submission.maxScore}</span>
                     <span className="mx-2">|</span>
                     <span>{t("passDate")}: {formatDate(assessments.homework.submission.verifiedAt)}</span>
@@ -1187,9 +1356,9 @@ const LectureDisplay = () => {
             )}
           </div>
         )}
-
+  
         {showFiftyPercentWarning && !isVideoEffectivelyBlocked && (
-          <div className="alert alert-warning my-3 shadow-md">
+          <div className="mb-3 flex items-center gap-3 px-4 py-3 text-sm shadow-md" style={{ ...softCardStyle, background: "rgba(243,154,63,0.14)", border: "1px solid rgba(243,154,63,0.28)", color: "#92400E" }}>
             <div>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -1208,9 +1377,9 @@ const LectureDisplay = () => {
             </div>
           </div>
         )}
-
+   
         {hasAttemptedToLeave && !showFiftyPercentWarning && (
-          <div className="alert alert-warning my-3 shadow-md">
+          <div className="mb-3 flex items-center gap-3 px-4 py-3 text-sm shadow-md" style={{ ...softCardStyle, background: "rgba(243,154,63,0.14)", border: "1px solid rgba(243,154,63,0.28)", color: "#92400E" }}>
             <div>
               <FiAlertTriangle className="stroke-current shrink-0 h-6 w-6" />
               <span>
@@ -1219,9 +1388,9 @@ const LectureDisplay = () => {
             </div>
           </div>
         )}
-
+   
         {isVideoEffectivelyBlocked ? (
-          <div className="alert alert-error mb-4 shadow-md">
+          <div className="mb-4 flex items-center gap-3 px-4 py-3 text-sm shadow-md" style={{ ...softCardStyle, background: "rgba(220,38,38,0.08)", border: "1px solid rgba(220,38,38,0.22)", color: "#991B1B" }}>
             <div>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -1240,7 +1409,12 @@ const LectureDisplay = () => {
             </div>
           </div>
         ) : youtubeVideoId ? (
-          <div className="relative mb-4 shadow-lg rounded-2xl overflow-hidden bg-base-300 border border-base-300/60" ref={videoContainerRef}>
+
+          <div
+            className="relative mb-4 overflow-hidden"
+            ref={videoContainerRef}
+            style={{ ...shellStyle, background: "rgba(255,255,255,0.78)" }}
+          >
             <div className="relative">
               <MediaPlayer
                 ref={playerRef}
@@ -1283,73 +1457,96 @@ const LectureDisplay = () => {
             </div>
 
             {/* Enhanced custom progress bar */}
-            <div className="p-3 bg-base-200">
+            <div className="p-4" style={{ background: "rgba(241,243,246,0.75)", borderTop: `1px solid ${TOKENS.borderSubtle}` }}>
               <div className="flex flex-col space-y-2">
                 {/* Video info */}
                  <div className="flex flex-wrap justify-between items-center gap-2 mb-2">
                    <div className="flex items-center gap-2">
-                     <FiClock className="text-primary" />
-                     <span className="text-sm font-medium">
+                      <FiClock style={{ color: TOKENS.deepTeal }} />
+                      <span className="text-sm font-medium" style={{ color: TOKENS.inkText }}>
                        {formatTime(currentTime)} / {formatTime(duration)}
                      </span>
                    </div>
-                   <div className="flex flex-wrap items-center gap-3">
-                     {/* Playback rate selector */}
-                     <div className="dropdown dropdown-top dropdown-end">
-                       <label tabIndex={0} className="btn btn-sm btn-ghost">
-                         {playbackRate}x
-                       </label>
-                       <ul tabIndex={0} className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
-                         {[0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2].map((rate) => (
-                           <li key={rate}>
-                             <a className={playbackRate === rate ? "active" : ""} onClick={() => changePlaybackRate(rate)}>
-                               {rate}x
-                             </a>
-                           </li>
-                         ))}
-                       </ul>
+                    <div className="flex flex-wrap items-center gap-3">
+                      {/* Playback rate selector */}
+                      <div className="relative group">
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="rounded-full"
+                          style={{ borderRadius: RADIUS.chip, color: TOKENS.deepTeal }}
+                        >
+                          {playbackRate}x
+                        </Button>
+                        <div className="absolute bottom-full right-0 z-[1] mb-2 hidden w-32 rounded-xl bg-white p-2 shadow-lg group-hover:block" style={{ border: `1px solid ${TOKENS.borderSubtle}` }}>
+                          <div className="flex flex-col gap-1">
+                            {[0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2].map((rate) => (
+                              <button 
+                                key={rate} 
+                                className="text-left px-3 py-2 text-sm rounded-lg transition-colors"
+                                style={playbackRate === rate ? { background: TOKENS.deepTeal, color: "#F8FCFF" } : { color: TOKENS.inkText }}
+                                onClick={() => changePlaybackRate(rate)}
+                              >
+                                {rate}x
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+
+
+
+                     {/* Volume control */}
+                     <div className="flex items-center gap-2">
+                       <Button 
+                         variant="ghost" 
+                         size="sm" 
+                         className={`rounded-full ${isRTL ? "rotate-180" : ""}`} 
+                         onClick={toggleMute}
+                       >
+                         {isMuted ? <FiVolumeX /> : <FiVolume2 />}
+                       </Button>
+                           <input
+                             type="range"
+                             min="0"
+                             max="100"
+                             value={isMuted ? 0 : volume}
+                             onChange={(e) => changeVolume(Number.parseInt(e.target.value))}
+                            className="w-20 cursor-pointer sm:w-24"
+                            style={{ accentColor: TOKENS.deepTeal }}
+                           />
                      </div>
 
 
-                    {/* Volume control */}
-                    <div className="flex items-center gap-2">
-                      <button className={`btn btn-sm btn-ghost ${isRTL ? "rotate-180" : ""}`} onClick={toggleMute}>
-                        {isMuted ? <FiVolumeX /> : <FiVolume2 />}
-                      </button>
-                         <input
-                           type="range"
-                           min="0"
-                           max="100"
-                           value={isMuted ? 0 : volume}
-                           onChange={(e) => changeVolume(Number.parseInt(e.target.value))}
-                           className="range range-xs range-primary w-20 sm:w-24"
-                         />
+                     {/* Fullscreen toggle */}
+                     <Button 
+                       variant="ghost" 
+                       size="sm" 
+                       onClick={toggleFullscreen}
+                     >
+                       {isFullscreen ? <FiMinimize /> : <FiMaximize />}
+                     </Button>
 
-                    </div>
-
-                    {/* Fullscreen toggle */}
-                    <button className="btn btn-sm btn-ghost" onClick={toggleFullscreen}>
-                      {isFullscreen ? <FiMinimize /> : <FiMaximize />}
-                    </button>
                   </div>
                 </div>
 
                 {/* Progress bar container */}
                 <div
-                  className="relative w-full h-4 bg-gray-300 rounded-full cursor-pointer overflow-hidden group"
+                    className="relative w-full h-4 cursor-pointer overflow-hidden rounded-full group"
+                    style={{ background: "rgba(17,24,39,0.14)" }}
                   ref={progressBarRef}
                   onClick={handleProgressBarClick}
                 >
                   {/* Buffered progress */}
                   <div
-                    className="absolute top-0 left-0 h-full bg-gray-500 opacity-50 transition-all duration-300"
-                    style={{ width: `${buffered}%` }}
-                  ></div>
+                    className="absolute top-0 left-0 h-full opacity-50 transition-all duration-300"
+                    style={{ width: `${buffered}%`, background: "rgba(14,85,99,0.32)" }}
+                    ></div>
 
                   {/* Actual progress */}
                   <div
-                    className="absolute top-0 left-0 h-full bg-primary transition-all duration-300 ease-in-out"
-                    style={{ width: `${progress}%` }}
+                    className="absolute top-0 left-0 h-full transition-all duration-300 ease-in-out"
+                    style={{ width: `${progress}%`, background: GRADIENTS.cta }}
                   ></div>
 
                   {/* Hover effect */}
@@ -1357,147 +1554,55 @@ const LectureDisplay = () => {
 
                   {/* Thumb indicator */}
                   <div
-                    className="absolute top-0 h-full aspect-square rounded-full bg-primary-focus border-2 border-white transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity"
-                    style={{ left: `${progress}%` }}
+                    className="absolute top-0 h-full aspect-square transform -translate-x-1/2 rounded-full border-2 border-white opacity-0 transition-opacity group-hover:opacity-100"
+                    style={{ left: `${progress}%`, background: TOKENS.deepTeal }}
                   ></div>
                 </div>
 
                 {/* Play/Pause button centered over video */}
                 <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button
-                    className="btn btn-circle btn-lg bg-primary bg-opacity-70 hover:bg-opacity-90 border-0"
-                    onClick={togglePlay}
-                  >
-                    {isPlaying ? <FiPause className="text-2xl" /> : <FiPlay className="text-2xl" />}
-                  </button>
+                    <button
+                      className="w-16 h-16 rounded-full bg-primary/70 hover:bg-primary/90 text-white flex items-center justify-center transition-all duration-200 shadow-lg"
+                      onClick={togglePlay}
+                    >
+                      {isPlaying ? <FiPause className="text-2xl" /> : <FiPlay className="text-2xl" />}
+                    </button>
                 </div>
               </div>
             </div>
 
             {/* Video stats and info */}
-            <div className="p-3 bg-base-200 rounded-b-lg">
+            <div className="rounded-b-lg p-4" style={{ background: "rgba(241,243,246,0.92)", borderTop: `1px solid ${TOKENS.borderSubtle}` }}>
               <div className="flex flex-wrap justify-between items-center">
-                <div className="flex items-center gap-2">
-                  <span className="badge badge-primary">
-                    {t("totalDuration")} : {formatTime(duration)}
-                  </span>
+                 <div className="flex items-center gap-2">
+                   <Badge variant="primary">
+                     {t("totalDuration")} : {formatTime(duration)}
+                   </Badge>
                    { (userRole === "Student" || userRole === "Parent") && (
-                     <span className="badge badge-secondary">
-                       {t("remainingViews")}: {remainingViews === null ? t("loading") : remainingViews}
-                     </span>
+                      <Badge variant="secondary">
+                        {t("remainingViews")}: {remainingViews === null ? t("loading") : remainingViews}
+                      </Badge>
+                    )}
+                 </div>
+
+
+                 <div className="flex flex-wrap gap-2 mt-2 sm:mt-0">
+                    <Badge outline>{progressStatusLabel}</Badge>
+
+
+                   {progress > 0 && progress < 100 && (
+                     <Badge variant="info">
+                       {Math.round(progress)}% {t("completed")}
+                     </Badge>
                    )}
-                </div>
 
-                <div className="flex flex-wrap gap-2 mt-2 sm:mt-0">
-                  <span className="badge badge-outline">
-                    {progress < 25
-                      ? t("justStarted")
-                      : progress < 50
-                        ? t("almostHalfway")
-                        : progress < 75
-                          ? t("goodProgress")
-                          : progress < 95
-                            ? t("almostDone")
-                            : t("completed")}
-                  </span>
-
-                  {progress > 0 && progress < 100 && (
-                    <span className="badge badge-info">
-                      {Math.round(progress)}% {t("completed")}
-                    </span>
-                  )}
                 </div>
               </div>
             </div>
           </div>
-        ) : lecture?.videoLink ? (
-          <div className="alert alert-warning mb-4 shadow-md">
-            <div>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                className="stroke-current shrink-0 w-6 h-6"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                ></path>
-              </svg>
-              <span>{t("invalidVideoLink")}</span>
-            </div>
-          </div>
-        ) : (
-          <div className="alert alert-warning mb-4 shadow-md">
-            <div>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                className="stroke-current shrink-0 w-6 h-6"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                ></path>
-              </svg>
-              <span>{t("noVideoLink")}</span>
-            </div>
-          </div>
-        )}
-
-        <div className="card bg-base-100 shadow-lg mb-4 border border-base-300/60 rounded-2xl">
-          <div className="card-body p-4 md:p-5">
-            <h2 className="card-title">{t("lectureDetails")}</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm md:text-base">
+          ) : lecture?.videoLink ? (
+            <div className="mb-4 flex items-center gap-3 px-4 py-3 text-sm shadow-md" style={{ ...softCardStyle, background: "rgba(243,154,63,0.14)", border: "1px solid rgba(243,154,63,0.28)", color: "#92400E" }}>
               <div>
-                <p className="mb-2">
-                  <strong>{t("description")}:</strong>{" "}
-                  {lecture?.description || t("noDescriptionAvailable")}
-                </p>
-                <p className="mb-2">
-                  <strong>{t("price")}:</strong>{" "}
-                  {lecture?.price !== undefined
-                    ? t("pricePoints", { price: lecture?.price })
-                    : t("notSpecified")}
-                </p>
-              </div>
-              <div>
-                <p className="mb-2">
-                  <strong>{t("type")}:</strong>{" "}
-                  {Number(lecture?.price || 0) > 0 ? t("paid") : t("free", "Free")}
-                </p>
-                   <p className="mb-2">
-                     <strong>{t("createdBy")}:</strong>{" "}
-                     {lecture?.createdBy?.name || t("notSpecified")}
-                   </p>
-                   {(userRole === "Student" || userRole === "Parent") && (
-                     <p className="mb-2">
-                       <strong>{t("remainingViews")}:</strong>{" "}
-                       {remainingViews === null ? t("loading") : remainingViews}
-                     </p>
-                   )}
-                   {lecture?.requiresExam && (
-                     <p className="mb-2">
-                       <strong>{t("requiresExam")}:</strong> {t("yes")}
-                     </p>
-                   )}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* IMPROVED RESPONSIVE ATTACHMENTS DISPLAY */}
-        <div className="card bg-base-100 shadow-lg mb-4 border border-base-300/60 rounded-2xl">
-          <div className="card-body p-4 md:p-5">
-            <h2 className="card-title mb-4">{t("attachments")}</h2>
-
-            {allAttachments.length === 0 ? (
-              <div className="alert alert-info">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -1511,94 +1616,163 @@ const LectureDisplay = () => {
                     d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                   ></path>
                 </svg>
-                <span>{t("noAttachments")}</span>
+                <span>{t("invalidVideoLink")}</span>
               </div>
-            ) : (
+            </div>
+          ) : (
+            <div className="mb-4 flex items-center gap-3 px-4 py-3 text-sm shadow-md" style={{ ...softCardStyle, background: "rgba(243,154,63,0.14)", border: "1px solid rgba(243,154,63,0.28)", color: "#92400E" }}>
+              <div>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  className="stroke-current shrink-0 w-6 h-6"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  ></path>
+                </svg>
+                <span>{t("noVideoLink")}</span>
+              </div>
+            </div>
+          )}
+
+          {(resolvedExamFormUrl || resolvedHomeworkFormUrl) && (
+            <Card
+              className="mb-4"
+              title={t("googleForms", "Google Forms")}
+              style={shellStyle}
+            >
+              <div className="grid gap-3 md:grid-cols-2">
+                {resolvedExamFormUrl && (
+                  <div className="p-4" style={softCardStyle}>
+                    <h3 className="mb-1 text-base font-semibold" style={{ color: TOKENS.deepTeal }}>{t("examInfo")}</h3>
+                    <p className="mb-3 text-sm" style={{ color: TOKENS.slateText }}>
+                      {t("openExamGoogleForm", "Open the exam Google Form for this lecture.")}
+                    </p>
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      className="w-full sm:w-auto"
+                      style={{ background: GRADIENTS.cta, color: "#F8FCFF", borderRadius: RADIUS.chip }}
+                      onClick={handleTakeExam}
+                    >
+                      <FiExternalLink className={isRTL ? "ml-1" : "mr-1"} />
+                      {t("openExamForm", "Open Exam Form")}
+                    </Button>
+                  </div>
+                )}
+                {resolvedHomeworkFormUrl && (
+                  <div className="p-4" style={softCardStyle}>
+                    <h3 className="mb-1 text-base font-semibold" style={{ color: TOKENS.deepTeal }}>{t("homeworkInfo", "Homework Information")}</h3>
+                    <p className="mb-3 text-sm" style={{ color: TOKENS.slateText }}>
+                      {t("openHomeworkGoogleForm", "Open the homework Google Form for this lecture.")}
+                    </p>
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      className="w-full sm:w-auto"
+                      style={{ background: GRADIENTS.cta, color: "#F8FCFF", borderRadius: RADIUS.chip }}
+                      onClick={() => window.open(resolvedHomeworkFormUrl, "_blank")}
+                    >
+                      <FiExternalLink className={isRTL ? "ml-1" : "mr-1"} />
+                      {t("openHomeworkForm", "Open Homework Form")}
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </Card>
+          )}
+
+          <Card
+            className="mb-4"
+            title={t("attachments", "Attachments")}
+            style={shellStyle}
+          >
+            {allAttachments.length > 0 ? (
               <div className="grid grid-cols-1 gap-3">
                 {allAttachments.map((attachment, index) => (
-                  <div
-                    key={index}
-                    className="card bg-base-100 border border-base-300/80 hover:border-primary transition-all duration-300 rounded-xl"
+                  <Card
+                    key={attachment._id || `${attachment.fileName || "attachment"}-${index}`}
+                    className="transition-all duration-300"
+                    style={softCardStyle}
                   >
-                     <div className="card-body p-4 sm:p-5">
-                      <div className="flex flex-col sm:flex-row sm:items-center gap-4 justify-between">
-                        <div className="flex items-start gap-3">
-                          <div className="mt-1">
-                            {getFileIcon(attachment.fileType)}
-                          </div>
-                          <div className="flex-1">
-                            <h3 className="font-bold text-lg mb-1 break-words">
-                              {attachment.fileName || t("fileWithoutName")}
-                            </h3>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 text-sm gap-x-4">
-                              <p className="mb-1">
-                                {t("size")}:{" "}
-                                {attachment.fileSize
-                                  ? t("kilobytes", {
-                                    size: Math.round(
-                                      attachment.fileSize / 1024
-                                    ),
-                                  })
-                                  : t("notSpecified")}
-                              </p>
-                              <p className="mb-1">
-                                {t("uploadDate")}:{" "}
-                                {attachment.uploadedOn
-                                  ? new Date(
-                                    attachment.uploadedOn
-                                  ).toLocaleDateString(
-                                    i18n.language === "ar" ? "ar-EG" : "en-US"
-                                  )
-                                  : t("notSpecified")}
-                              </p>
-                            </div>
-                          </div>
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-4 justify-between">
+                      <div className="flex items-start gap-3">
+                        <div className="mt-1">
+                          {getFileIcon(attachment.fileType)}
                         </div>
-                        <div className="flex flex-wrap gap-2 mt-3 sm:mt-0 justify-end">
-                          {attachment.filePath && (
-                            <a
-                              href={attachment.filePath}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="btn btn-sm btn-primary"
-                            >
-                              <FiEye className="mr-1" /> {t("view")}
-                            </a>
-                          )}
+                        <div className="flex-1">
+                          <h3 className="mb-1 text-lg font-bold break-words" style={{ color: TOKENS.deepTeal }}>
+                            {attachment.fileName || t("fileWithoutName")}
+                          </h3>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 text-sm gap-x-4 gap-y-1" style={{ color: TOKENS.slateText }}>
+                            <p>
+                              {t("type", "Type")}: {attachment.fileType || t("notSpecified")}
+                            </p>
+                            <p>
+                              {t("uploadedOn", "Uploaded on")}: {formatDate(attachment.createdAt || attachment.uploadedOn)}
+                            </p>
+                          </div>
                         </div>
                       </div>
+                      <div className="flex flex-wrap gap-2 mt-3 sm:mt-0 justify-end">
+                        {attachment.filePath && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="rounded-full"
+                            style={{ borderRadius: RADIUS.chip, borderColor: TOKENS.deepTeal, color: TOKENS.deepTeal }}
+                            onClick={() => window.open(attachment.filePath, "_blank")}
+                          >
+                            <FiEye className={isRTL ? "ml-1" : "mr-1"} />
+                            {t("view")}
+                          </Button>
+                        )}
+                        <Button
+                          variant="primary"
+                          size="sm"
+                          className="rounded-full"
+                          style={{ background: GRADIENTS.cta, color: "#F8FCFF", borderRadius: RADIUS.chip }}
+                          onClick={() => handleDownload(attachment)}
+                          isDisabled={isDownloading}
+                        >
+                          <FiDownload className={isRTL ? "ml-1" : "mr-1"} />
+                          {t("download", "Download")}
+                        </Button>
+                      </div>
                     </div>
-                  </div>
+                  </Card>
                 ))}
               </div>
-            )}
-          </div>
-        </div>
-
-        {/* Homework upload section for students */}
-        {userRole === "Student" && (
-          <div className="card bg-base-100 shadow-lg mb-4 border border-base-300/60 rounded-2xl">
-            <div className="card-body p-4 md:p-5">
-              <h2 className="card-title mb-4">{t("submitHomework")}</h2>
-
-              <div className="tabs tabs-boxed mb-4">
-                <a
-                  className={`tab ${homeworkSubmitType === "file" ? "tab-active" : ""
-                    }`}
-                  onClick={() => setHomeworkSubmitType("file")}
-                >
-                  {t("uploadFile")}
-                </a>
-                <a
-                  className={`tab ${homeworkSubmitType === "form" ? "tab-active" : ""
-                    }`}
-                  onClick={() => setHomeworkSubmitType("form")}
-                >
-                  {t("googleForm")}
-                </a>
+            ) : (
+              <div className="rounded-xl border border-dashed px-4 py-6 text-sm" style={{ borderColor: TOKENS.borderSubtle, color: TOKENS.slateText, background: "rgba(241,243,246,0.55)" }}>
+                {t("noAttachmentsAvailable", "No uploaded attachments are available for this lecture yet.")}
               </div>
+            )}
+          </Card>
 
-              <div className="p-3 border border-dashed border-primary rounded-lg">
+          {userRole === "Student" && (
+            <Card 
+              className="mb-4"
+              title={t("submitHomework")}
+              style={shellStyle}
+            >
+              <Tabs 
+                tabs={[
+                    { id: 'file', label: t("uploadFile") },
+                    { id: 'form', label: t("googleForm") }
+                ]}
+                activeIndex={homeworkSubmitType === 'file' ? 0 : 1}
+                onChange={(index) => setHomeworkSubmitType(index === 0 ? 'file' : 'form')}
+                className="mb-4"
+              />
+
+
+              <div className="rounded-xl border border-dashed p-4" style={{ borderColor: "rgba(14,85,99,0.28)", background: "rgba(241,243,246,0.45)" }}>
                 {homeworkSubmitType === "file" ? (
                   <>
                     <h3 className="text-base md:text-lg font-semibold mb-2">
@@ -1606,12 +1780,13 @@ const LectureDisplay = () => {
                     </h3>
 
                     <div className="mb-4">
-                      <input
-                        type="file"
-                        ref={homeworkFileInputRef}
-                        onChange={handleHomeworkFileSelect}
-                        multiple
-                        className="file-input file-input-bordered file-input-primary w-full min-w-0"
+                         <input
+                           type="file"
+                           ref={homeworkFileInputRef}
+                           onChange={handleHomeworkFileSelect}
+                           multiple
+                            className="block w-full text-sm text-neutral file:mr-4 file:rounded-full file:border-0 file:px-4 file:py-2 file:text-sm file:font-semibold"
+                            style={{ color: TOKENS.slateText }}
                       />
                     </div>
 
@@ -1624,17 +1799,20 @@ const LectureDisplay = () => {
                           {homeworkFiles.map((file, index) => (
                             <li
                               key={index}
-                              className="flex justify-between items-center p-2 bg-base-200 rounded"
+                              className="flex items-center justify-between rounded-xl p-2"
+                              style={{ background: "rgba(255,255,255,0.7)" }}
                             >
                               <span className="text-sm truncate max-w-[80%]">
                                 {file.name}
                               </span>
-                              <button
-                                onClick={() => handleRemoveHomeworkFile(index)}
-                                className="btn btn-circle btn-xs btn-ghost"
-                              >
-                                <FiX />
-                              </button>
+                               <Button
+                                 onClick={() => handleRemoveHomeworkFile(index)}
+                                 variant="ghost"
+                                 size="xs"
+                                 className="rounded-full"
+                               >
+                                 <FiX />
+                               </Button>
                             </li>
                           ))}
                         </ul>
@@ -1642,50 +1820,51 @@ const LectureDisplay = () => {
                     )}
 
                     {homeworkError && (
-                      <div className="alert alert-error mb-4">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="stroke-current shrink-0 h-6 w-6"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-                          />
-                        </svg>
-                        <span>{homeworkError}</span>
-                      </div>
+                        <div className="mb-4 flex items-center gap-3 rounded-2xl px-4 py-3 text-sm shadow-sm" style={{ background: "rgba(220,38,38,0.08)", border: "1px solid rgba(220,38,38,0.22)", color: "#991B1B" }}>
+                         <svg
+                           xmlns="http://www.w3.org/2000/svg"
+                           className="stroke-current shrink-0 h-6 w-6"
+                           fill="none"
+                           viewBox="0 0 24 24"
+                         >
+                           <path
+                             strokeLinecap="round"
+                             strokeLinejoin="round"
+                             strokeWidth="2"
+                             d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+                           />
+                         </svg>
+                         <span>{homeworkError}</span>
+                       </div>
                     )}
 
                     {homeworkSuccess && (
-                      <div className="alert alert-success mb-4">
-                        <FiCheck className="stroke-current shrink-0 h-6 w-6" />
-                        <span>{t("homeworkUploadSuccess")}</span>
-                      </div>
+                       <div className="mb-4 flex items-center gap-3 rounded-2xl px-4 py-3 text-sm shadow-sm" style={{ background: TOKENS.successLight, border: `1px solid ${TOKENS.successBorder}`, color: "#065F46" }}>
+                         <FiCheck className="stroke-current shrink-0 h-6 w-6" />
+                         <span>{t("homeworkUploadSuccess")}</span>
+                       </div>
                     )}
 
-                    <button
-                      onClick={handleSubmitHomework}
-                      disabled={
-                        homeworkFiles.length === 0 || isSubmittingHomework
-                      }
-                      className="btn btn-primary w-full"
-                    >
-                      {isSubmittingHomework ? (
-                        <>
-                          <span className="loading loading-spinner"></span>
-                          {t("submittingHomework")}
-                        </>
-                      ) : (
-                        <>
-                          <FiUpload className="mr-2" />
-                          {t("submitHomework")}
-                        </>
-                      )}
-                    </button>
+                     <Button
+                       onClick={handleSubmitHomework}
+                       isDisabled={
+                         homeworkFiles.length === 0 || isSubmittingHomework
+                       }
+                       isLoading={isSubmittingHomework}
+                        variant="primary"
+                        className="w-full"
+                        style={{ background: GRADIENTS.cta, color: "#F8FCFF", borderRadius: RADIUS.card }}
+                      >
+                       {isSubmittingHomework ? (
+                         t("submittingHomework")
+                       ) : (
+                         <>
+                           <FiUpload className="mr-2" />
+                           {t("submitHomework")}
+                         </>
+                       )}
+                     </Button>
+
                   </>
                 ) : (
                   <>
@@ -1695,55 +1874,61 @@ const LectureDisplay = () => {
 
                     {resolvedHomeworkFormUrl ? (
                       <div className="mb-4">
-                        <div className="p-4 mb-4 bg-warning/10 border-2 border-warning/30 rounded-xl flex flex-col gap-3 shadow-sm">
-                          <div className="flex items-center gap-2 text-warning-content">
+                        <div className="mb-4 flex flex-col gap-3 rounded-xl p-4 shadow-sm" style={{ background: "rgba(243,154,63,0.14)", border: "1px solid rgba(243,154,63,0.28)" }}>
+                          <div className="flex items-center gap-2 text-[#92400E]">
                             <FiAlertTriangle className="h-5 w-5 shrink-0" />
                             <p className="text-sm md:text-base font-bold">
                               {t("useAccountEmail")}
                             </p>
                           </div>
-                          <div className="flex flex-wrap items-center gap-3 bg-base-100 p-2 rounded-lg border border-warning/20">
+                           <div className="flex flex-wrap items-center gap-3 rounded-lg border bg-white p-2" style={{ borderColor: "rgba(243,154,63,0.18)" }}>
                             <code className="text-sm md:text-base font-mono break-all px-2 flex-1 min-w-0">
                               {userEmail}
                             </code>
-                            <button
-                              onClick={handleCopyEmail}
-                              className="btn btn-sm btn-warning shrink-0"
-                            >
-                              <FiCopy className="mr-1" /> {t("copyEmail")}
-                            </button>
+                             <Button
+                               onClick={handleCopyEmail}
+                               variant="warning"
+                               size="sm"
+                               className="shrink-0 rounded-full"
+                               style={{ background: TOKENS.warmMango, color: "#FFF9F3", borderRadius: RADIUS.chip }}
+                             >
+                               <FiCopy className="mr-1" /> {t("copyEmail")}
+                             </Button>
                           </div>
                         </div>
                         <p className="mb-4">
                           {t("completeGoogleFormDescription")}
                         </p>
-                        <button
-                          onClick={() => {
-                            window.open(resolvedHomeworkFormUrl, "_blank");
-                          }}
-                          className="btn btn-primary w-full"
-                        >
-                          <FiLink className="mr-2" />
-                          {t("openGoogleForm")}
-                        </button>
+                         <Button
+                           onClick={() => {
+                             window.open(resolvedHomeworkFormUrl, "_blank");
+                           }}
+                           variant="primary"
+                           className="w-full"
+                           style={{ background: GRADIENTS.cta, color: "#F8FCFF", borderRadius: RADIUS.card }}
+                          >
+                           <FiLink className="mr-2" />
+                           {t("openGoogleForm")}
+                         </Button>
+
                       </div>
                     ) : (
-                      <div className="alert alert-warning">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="stroke-current shrink-0 h-6 w-6"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                          />
-                        </svg>
-                        <span>{t("noGoogleFormLink")}</span>
-                      </div>
+                       <div className="mb-4 flex items-center gap-3 rounded-2xl px-4 py-3 text-sm shadow-sm" style={{ background: "rgba(243,154,63,0.14)", border: "1px solid rgba(243,154,63,0.28)", color: "#92400E" }}>
+                         <svg
+                           xmlns="http://www.w3.org/2000/svg"
+                           className="stroke-current shrink-0 h-6 w-6"
+                           fill="none"
+                           viewBox="0 0 24 24"
+                         >
+                           <path
+                             strokeLinecap="round"
+                             strokeLinejoin="round"
+                             strokeWidth="2"
+                             d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                           />
+                         </svg>
+                         <span>{t("noGoogleFormLink")}</span>
+                       </div>
                     )}
                   </>
                 )}
@@ -1755,35 +1940,34 @@ const LectureDisplay = () => {
                     <li>{t("fileSizeLimit")}</li>
                   </ul>
                 </div>
-              </div>
-            </div>
-          </div>
-        )}
+               </div>
+             </Card>
+           )}
 
         {/* Homeworks list for authorized users */}
-        {hasUploadPermission() && homeworks.length > 0 && (
-          <div className="card bg-base-100 shadow-lg mb-4 border border-base-300/60 rounded-2xl">
-            <div className="card-body p-4 md:p-5">
-              <h2 className="card-title mb-4">
-                {t("studentSubmittedHomeworks")}
-              </h2>
-              <div className="grid grid-cols-1 gap-3">
-                {homeworks.map((homework, index) => (
-                  <div
-                    key={index}
-                    className="card bg-base-100 border border-base-300/80 hover:border-primary transition-all duration-300 rounded-xl"
-                  >
-                     <div className="card-body p-4 sm:p-5">
+         {hasUploadPermission() && homeworks.length > 0 && (
+           <Card 
+             className="mb-4"
+             title={t("studentSubmittedHomeworks")}
+             style={shellStyle}
+           >
+               <div className="grid grid-cols-1 gap-3">
+                 {homeworks.map((homework, index) => (
+                   <Card 
+                     key={index}
+                     className="transition-all duration-300"
+                     style={softCardStyle}
+                   >
                       <div className="flex flex-col sm:flex-row sm:items-center gap-4 justify-between">
                         <div className="flex items-start gap-3">
                           <div className="mt-1">
                             {getFileIcon(homework.fileType)}
                           </div>
                           <div className="flex-1">
-                            <h3 className="font-bold text-lg mb-1 break-words">
+                            <h3 className="mb-1 text-lg font-bold break-words" style={{ color: TOKENS.deepTeal }}>
                               {homework.fileName || t("fileWithoutName")}
                             </h3>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 text-sm gap-x-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 text-sm gap-x-4" style={{ color: TOKENS.slateText }}>
                               <p className="mb-1">
                                 {t("size")}:{" "}
                                 {homework.fileSize
@@ -1804,164 +1988,171 @@ const LectureDisplay = () => {
                               </p>
                               <p className="mb-1">
                                 {t("student")}:{" "}
-                                {homework.studentId.name || t("notSpecified")}
+                                {homework.studentId?.name || t("notSpecified")}
                               </p>
                             </div>
                           </div>
                         </div>
                         <div className="flex flex-wrap gap-2 mt-3 sm:mt-0 justify-end">
                           {homework.filePath && (
-                            <a
-                              href={homework.filePath}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="btn btn-sm btn-primary"
-                            >
-                              <FiEye className="mr-1" /> {t("view")}
-                            </a>
+                             <Button
+                               variant="primary"
+                               size="sm"
+                               className="rounded-full"
+                               style={{ background: GRADIENTS.cta, color: "#F8FCFF", borderRadius: RADIUS.chip }}
+                               onClick={() => window.open(homework.filePath, "_blank")}
+                             >
+                               <FiEye className="mr-1" /> {t("view")}
+                             </Button>
                           )}
                         </div>
                       </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
+                   </Card>
+                 ))}
+               </div>
+           </Card>
+         )}
+
 
         {/* File uploader for authorized users */}
-        {hasUploadPermission() && (
-          <div className="card bg-base-100 shadow-lg mb-4 border border-base-300/60 rounded-2xl">
-            <div className="card-body p-4 md:p-5">
-              <h2 className="card-title mb-4">{t("uploadNewAttachments")}</h2>
+         {hasUploadPermission() && (
+           <Card 
+             className="mb-4"
+             title={t("uploadAttachments", "Upload Attachments")}
+             style={shellStyle}
+           >
+               <div className="rounded-xl border border-dashed p-4" style={{ borderColor: "rgba(14,85,99,0.28)", background: "rgba(241,243,246,0.45)" }}>
+                 <h3 className="text-lg font-semibold mb-2">
+                   {t("addNewAttachments", "Add New Attachments")}
+                 </h3>
+                 <p className="mb-4 text-sm text-neutral/70">
+                   {t(
+                     "attachmentsUploadHint",
+                     "Upload any files that belong to this lecture. They will appear in the unified Attachments section."
+                   )}
+                 </p>
+  
+                 <div className="mb-4">
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      onChange={handleFileSelect}
+                      multiple
+                      className="block w-full text-sm text-neutral file:mr-4 file:rounded-full file:border-0 file:px-4 file:py-2 file:text-sm file:font-semibold"
+                      style={{ color: TOKENS.slateText }}
+                    />
+                 </div>
+  
+                 {uploadingFiles.length > 0 && (
+                   <div className="mb-4">
+                     <h4 className="text-sm font-medium mb-2">
+                       {t("selectedFiles")}:
+                     </h4>
+                     <ul className="space-y-2">
+                       {uploadingFiles.map((file, index) => (
+                         <li
+                           key={index}
+                           className="flex items-center justify-between rounded-xl p-2"
+                           style={{ background: "rgba(255,255,255,0.7)" }}
+                         >
+                           <span className="text-sm truncate max-w-[80%]">
+                             {file.name}
+                           </span>
+                           <Button 
+                             variant="ghost" 
+                             size="xs" 
+                              className="rounded-full"
+                             onClick={() => handleRemoveFile(index)}
+                           >
+                             <FiX />
+                           </Button>
+                         </li>
+                       ))}
+                     </ul>
+                   </div>
+                 )}
+  
+                 {uploadError && (
+                    <div className="mb-4 flex items-center gap-3 rounded-2xl px-4 py-3 text-sm shadow-sm" style={{ background: "rgba(220,38,38,0.08)", border: "1px solid rgba(220,38,38,0.22)", color: "#991B1B" }}>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="stroke-current shrink-0 h-6 w-6"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                      </svg>
+                      <span>{uploadError}</span>
+                    </div>
+                 )}
+  
+                 {uploadSuccess && (
+                    <div className="mb-4 flex items-center gap-3 rounded-2xl px-4 py-3 text-sm shadow-sm" style={{ background: TOKENS.successLight, border: `1px solid ${TOKENS.successBorder}`, color: "#065F46" }}>
+                      <FiCheck className="stroke-current shrink-0 h-6 w-6" />
+                      <span>{t("filesUploadedSuccessfully")}</span>
+                    </div>
+                 )}
+  
+                 <Button
+                   onClick={handleUploadFiles}
+                   isDisabled={uploadingFiles.length === 0 || isUploading}
+                   isLoading={isUploading}
+                   variant="primary"
+                   className="w-full"
+                   style={{ background: GRADIENTS.cta, color: "#F8FCFF", borderRadius: RADIUS.card }}
+                 >
+                   {isUploading ? (
+                     t("uploading")
+                   ) : (
+                     <>
+                       <FiUpload className="mr-2" />
+                       {t("uploadFiles")}
+                     </>
+                   )}
+                 </Button>
+               </div>
+           </Card>
+         )}
 
-              <div className="tabs tabs-boxed mb-4 flex flex-wrap">
-                {["pdfsandimages", "homeworks", "exams", "booklets"].map(
-                  (type) => (
-                    <a
-                      key={type}
-                      className={`tab flex-grow sm:flex-grow-0 ${activeTab === type ? "tab-active" : ""
-                        }`}
-                      onClick={() => setActiveTab(type)}
-                    >
-                      {t(type)}
-                    </a>
-                  )
-                )}
-              </div>
-
-              <div className="p-3 border border-dashed border-primary rounded-lg">
-                <h3 className="text-lg font-semibold mb-2">
-                  {t("addNewAttachments")} ({t(activeTab)})
-                </h3>
-
-                <div className="mb-4">
-                  <input
-                    type="file"
-                    ref={fileInputRef}
-                    onChange={handleFileSelect}
-                    multiple
-                    className="file-input file-input-bordered file-input-primary w-full min-w-0"
-                  />
-                </div>
-
-                {uploadingFiles.length > 0 && (
-                  <div className="mb-4">
-                    <h4 className="text-sm font-medium mb-2">
-                      {t("selectedFiles")}:
-                    </h4>
-                    <ul className="space-y-2">
-                      {uploadingFiles.map((file, index) => (
-                        <li
-                          key={index}
-                          className="flex justify-between items-center p-2 bg-base-200 rounded"
-                        >
-                          <span className="text-sm truncate max-w-[80%]">
-                            {file.name}
-                          </span>
-                          <button
-                            onClick={() => handleRemoveFile(index)}
-                            className="btn btn-circle btn-xs btn-ghost"
-                          >
-                            <FiX />
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                {uploadError && (
-                  <div className="alert alert-error mb-4">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="stroke-current shrink-0 h-6 w-6"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
-                    <span>{uploadError}</span>
-                  </div>
-                )}
-
-                {uploadSuccess && (
-                  <div className="alert alert-success mb-4">
-                    <FiCheck className="stroke-current shrink-0 h-6 w-6" />
-                    <span>{t("filesUploadedSuccessfully")}</span>
-                  </div>
-                )}
-
-                <button
-                  onClick={handleUploadFiles}
-                  disabled={uploadingFiles.length === 0 || isUploading}
-                  className="btn btn-primary w-full"
-                >
-                  {isUploading ? (
-                    <>
-                      <span className="loading loading-spinner"></span>
-                      {t("uploading")}
-                    </>
-                  ) : (
-                    <>
-                      <FiUpload className="mr-2" />
-                      {t("uploadFiles")}
-                    </>
-                  )}
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-        {/* Exit confirmation dialog */}
-        {showExitConfirmation && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-base-100 p-6 rounded-lg shadow-xl max-w-md w-full">
-              <h3 className="font-bold text-lg mb-4">{t("exitWarningTitle") || "Leaving so soon?"}</h3>
-              <p className="mb-6">
-                {t("exitWarningMessage") ||
-                  "You haven't completed 50% of this lecture yet. Are you sure you want to leave?"}
-              </p>
-              <div className="flex justify-end gap-2">
-                <button onClick={handleCancelNavigation} className="btn btn-outline">
-                  {t("stayOnPage") || "Stay on page"}
-                </button>
-                <button onClick={handleConfirmNavigation} className="btn btn-primary">
-                  {t("leavePage") || "Leave anyway"}
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+         {/* Exit confirmation dialog */}
+         <Modal 
+           isOpen={showExitConfirmation} 
+           onClose={handleCancelNavigation} 
+           title={t("exitWarningTitle") || "Leaving so soon?"}
+           footer={
+             <div className="flex justify-end gap-2">
+               <Button 
+                 variant="outline" 
+                 onClick={handleCancelNavigation}
+               >
+                 {t("stayOnPage") || "Stay on page"}
+               </Button>
+               <Button 
+                 variant="primary" 
+                 onClick={handleConfirmNavigation}
+               >
+                 {t("leavePage") || "Leave anyway"}
+               </Button>
+             </div>
+           }
+          >
+            <p>
+              {t("exitWarningMessage") ||
+                "You haven't completed 50% of this lecture yet. Are you sure you want to leave?"}
+            </p>
+          </Modal>
+        </>
+      )}
       </div>
+    </div>
     );
   };
+
 
   export default LectureDisplay;
 

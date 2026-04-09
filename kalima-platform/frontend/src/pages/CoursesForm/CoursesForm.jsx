@@ -40,6 +40,7 @@ function CourseCreationForm() {
     priceMonthly: "",
     priceSession: "",
     privacy: "student",
+    sameGradeOnly: false,
   })
 
   // Data fetching states
@@ -127,9 +128,10 @@ function CourseCreationForm() {
             description: containerData.description || "",
             goal: Array.isArray(containerData.goal) ? containerData.goal.join("\n") : containerData.goal || "",
             courseType: Number(containerData.price || 0) > 0 ? "paid" : "free",
-            priceFull: containerData.price ?? "",
-            privacy: containerData.teacherAllowed ? "teacher" : "student",
-          }))
+             priceFull: containerData.price ?? "",
+             privacy: containerData.teacherAllowed ? "teacher" : "student",
+             sameGradeOnly: containerData.sameGradeOnly ?? false,
+           }))
 
           setCourseStructure({
             parent: {
@@ -226,16 +228,16 @@ function CourseCreationForm() {
   }, [formData.courseName, formData.courseType, formData.gradeLevel, formData.priceFull, formData.privacy, formData.subject, isRTL, levels, subjects])
 
   if (isLoading) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <span className="loading loading-spinner loading-lg"></span>
-      </div>
-    )
+      return (
+        <div className="flex justify-center items-center h-screen">
+          <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      )
   }
 
   if (error) {
     return (
-      <div className="alert alert-error max-w-md mx-auto mt-8">
+        <div className="mb-4 rounded-2xl border border-error/30 bg-error/10 px-4 py-3 text-sm text-[#991B1B] shadow-sm flex items-center gap-3 max-w-md mx-auto mt-8">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           className="stroke-current shrink-0 h-6 w-6"
@@ -256,7 +258,7 @@ function CourseCreationForm() {
 
   return (
     <div
-      className="min-h-screen py-6 text-base-content sm:py-8 px-4 sm:px-6 lg:px-8"
+      className="min-h-screen py-6 text-slate-900 sm:py-8 px-4 sm:px-6 lg:px-8"
       dir={isRTL ? "rtl" : "ltr"}
       style={{ background: `${GRADIENTS.pageAtmosphere}, ${TOKENS.creamSurface}` }}
     >

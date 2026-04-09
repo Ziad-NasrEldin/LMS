@@ -2,7 +2,7 @@
 
 import DSSelect from "../../../../components/DSSelect"
 
-const AssistantForm = ({ userData, handleChange, lecturers, t, isRTL }) => {
+const AssistantForm = ({ userData, handleChange, lecturers, t, isRTL, fieldErrors = {} }) => {
   return (
     <div className="form-control">
       <div className="flex flex-col gap-2">
@@ -12,7 +12,7 @@ const AssistantForm = ({ userData, handleChange, lecturers, t, isRTL }) => {
         <DSSelect
           name="assignedLecturer"
           className="select w-full rounded-xl"
-          style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
+          style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: fieldErrors.assignedLecturer ? "#DC2626" : "rgba(17,24,39,0.1)", color: "#1F2937" }}
           value={userData.assignedLecturer || ""}
           onChange={handleChange}
           required
@@ -24,6 +24,7 @@ const AssistantForm = ({ userData, handleChange, lecturers, t, isRTL }) => {
             </option>
           ))}
         </DSSelect>
+        {fieldErrors.assignedLecturer && <p className="text-sm text-error">{fieldErrors.assignedLecturer}</p>}
       </div>
     </div>
   )

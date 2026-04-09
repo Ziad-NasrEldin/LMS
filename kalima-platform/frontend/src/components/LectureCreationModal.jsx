@@ -11,6 +11,10 @@ import { translateErrorMessage } from "../utils/errorTranslator"
 import { buildLecturePayloadObject } from "../utils/contentCreationPayloads"
 import { buildLevelHierarchy } from "../utils/levelHierarchy"
 import DSSelect from "./DSSelect"
+import Button from "./ui/Button"
+import Input from "./ui/Input"
+import Textarea from "./ui/Textarea"
+import Badge from "./ui/Badge"
 
 const ATTACHMENT_BUCKET_KEYS = ["pdfsandimages", "booklets", "homeworks", "exams"]
 const FORM_LINK_KEYS = ["homeworks", "exams"]
@@ -46,18 +50,18 @@ const TOKENS = {
   radius: { card: "rounded-xl", section: "rounded-2xl", modal: "rounded-[2rem]", full: "rounded-full" },
   spacing: { tight: "gap-3", default: "gap-4", section: "gap-6", loose: "gap-8" },
   surface: {
-    card: "bg-base-100 border border-base-300 shadow-sm",
-    highlighted: "bg-base-200/40 border border-base-300",
+    card: "bg-white border border-slate-200 shadow-sm",
+    highlighted: "bg-slate-50 border border-slate-200",
     summary: "bg-amber-50/30 border border-amber-200/60",
-    gradient: "bg-gradient-to-br from-base-100 to-primary/5",
+    gradient: "bg-gradient-to-br from-white to-primary/5",
   },
   typography: {
     meta: "text-xs font-bold uppercase tracking-wider",
-    sectionTitle: "text-lg font-bold text-base-content",
-    cardTitle: "font-semibold text-base-content",
-    label: "text-sm font-medium text-base-content/60",
-    value: "text-sm font-semibold text-base-content",
-    hint: "text-xs text-base-content/60",
+    sectionTitle: "text-lg font-bold text-slate-900",
+    cardTitle: "font-semibold text-slate-900",
+    label: "text-sm font-medium text-slate-700",
+    value: "text-sm font-semibold text-slate-900",
+    hint: "text-xs text-slate-600",
   },
 }
 
@@ -99,10 +103,8 @@ const SectionHeader = ({ number, title, subtitle, variant = "primary" }) => {
 }
 
 const FormField = ({ label, children, fullWidth = false, className = "" }) => (
-  <div className={`form-control ${fullWidth ? "md:col-span-2" : ""} ${className}`}>
-    <label className="label">
-      <span className="label-text font-semibold">{label}</span>
-    </label>
+  <div className={`flex flex-col gap-2 ${fullWidth ? "md:col-span-2" : ""} ${className}`}>
+    <label className="text-sm font-semibold text-slate-700">{label}</label>
     {children}
   </div>
 )
@@ -111,7 +113,7 @@ const ToggleCard = ({ title, enabled, onToggle, children, t }) => (
   <Card variant="highlighted">
     <div className={`${TOKENS.spacing.tight} mb-3 flex items-center justify-between`}>
       <h5 className={TOKENS.typography.cardTitle}>{title}</h5>
-      <DSSelect className="select select-bordered select-sm rounded-lg" value={enabled} onChange={(e) => onToggle(e.target.value === "true")}>
+      <DSSelect className="border border-slate-200 text-sm rounded-lg px-2 py-1" value={enabled} onChange={(e) => onToggle(e.target.value === "true")}>
         <option value={false}>{t("options.no")}</option>
         <option value={true}>{t("options.yes")}</option>
       </DSSelect>
@@ -127,22 +129,21 @@ const AssessmentConfig = ({ type, config, onToggle, onUrlChange, onThresholdChan
   const urlLabel = t("attachments.formUrl", "Google Form URL")
   const urlPlaceholder = t("attachments.formUrlPlaceholder", isExam ? "Paste exam form URL" : "Paste homework form URL")
   const thresholdLabel = t("examConfig.passingThreshold", "Passing Threshold")
-
   return (
     <ToggleCard title={title} enabled={enabled} onToggle={onToggle} t={t}>
       <FormField label={urlLabel}>
-        <input
+        <Input
           type="url"
-          className={`input input-bordered w-full ${TOKENS.radius.section}`}
+          className={`w-full ${TOKENS.radius.section}`}
           placeholder={urlPlaceholder}
           value={formUrl}
           onChange={(e) => onUrlChange(e.target.value)}
         />
       </FormField>
       <FormField label={thresholdLabel}>
-        <input
+        <Input
           type="number"
-          className={`input input-bordered w-full ${TOKENS.radius.section}`}
+          className={`w-full ${TOKENS.radius.section}`}
           value={passingThreshold}
           onChange={(e) => onThresholdChange(Number(e.target.value))}
           min="0"
@@ -153,27 +154,20 @@ const AssessmentConfig = ({ type, config, onToggle, onUrlChange, onThresholdChan
   )
 }
 
-const Badge = ({ children, variant = "default" }) => {
-  const classes = {
-    default: "badge-outline badge-primary",
-    neutral: "badge-neutral",
-  }
-  return <span className={`badge ${classes[variant]}`}>{children}</span>
-}
 
 const SummaryRow = ({ label, value, loading = false }) => (
   <div className={`${TOKENS.radius.card} ${TOKENS.surface.summary} flex items-center justify-between gap-3 px-4 py-3`}>
     <span className={`${TOKENS.typography.label} flex-shrink-0`}>{label}</span>
     <span className={`${TOKENS.typography.value} text-right truncate flex-1`}>
-      {loading ? <span className="loading loading-spinner loading-xs"></span> : value}
+      {loading ? <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div> : value}
     </span>
   </div>
 )
 
 const AttachmentListItem = ({ attachment, categoryLabel }) => (
-  <li className={`${TOKENS.spacing.tight} flex flex-col ${TOKENS.radius.card} bg-base-200/40 px-3 py-2`}>
+  <li className={`${TOKENS.spacing.tight} flex flex-col ${TOKENS.radius.card} bg-slate-100 px-3 py-2`}>
     <div className="flex items-center justify-between">
-      <span className="font-medium text-base-content">{attachment.fileName}</span>
+      <span className="font-medium text-slate-900">{attachment.fileName}</span>
       <Badge>{categoryLabel || attachment.category}</Badge>
     </div>
     <a href={attachment.filePath} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 break-all text-xs text-primary hover:underline">
@@ -574,19 +568,20 @@ const LectureCreationModal = ({
 
   const titleText = isEditMode ? (isRTL ? "تعديل المحاضرة" : "Edit Lecture") : t("titles.createNewLecture")
 
-  return (
-    <div className={`modal ${isOpen ? "modal-open" : ""} modal-xl`} dir={isRTL ? "rtl" : "ltr"} onClick={handleBackdropClick}>
-      <div className={`modal-box w-11/12 max-w-7xl h-[92vh] max-h-[92vh] overflow-hidden ${TOKENS.surface.card} ${TOKENS.radius.modal} p-0 shadow-2xl flex flex-col`}>
-        <div className={`flex items-start justify-between ${TOKENS.spacing.default} border-b border-base-300 px-6 py-5 sm:px-8 flex-shrink-0`}>
-          <div className="min-w-0">
-            <p className={`${TOKENS.typography.meta} text-primary/70`}>{titleText}</p>
-            <h3 className="mt-1 text-2xl font-bold leading-tight text-base-content sm:text-3xl">{titleText}</h3>
-            <p className="mt-2 max-w-3xl text-sm text-base-content/60">{t("descriptions.createNewLectureModal")}</p>
-          </div>
-          <button type="button" onClick={handleClose} className="btn btn-sm btn-circle btn-ghost shrink-0">
-            <FiX className="w-5 h-5" />
-          </button>
-        </div>
+    return (
+      <div className={`fixed inset-0 z-50 flex items-center justify-center p-4 ${isOpen ? "block" : "hidden"}`} onClick={handleBackdropClick}>
+        <div className={`relative w-11/12 max-w-7xl h-[92vh] max-h-[92vh] overflow-hidden ${TOKENS.surface.card} ${TOKENS.radius.modal} p-0 shadow-2xl flex flex-col`}>
+    <div className={`flex items-start justify-between ${TOKENS.spacing.default} border-b border-slate-200 px-6 py-5 sm:px-8 flex-shrink-0`}>
+      <div className="min-w-0">
+        <p className={`${TOKENS.typography.meta} text-primary/70`}>{titleText}</p>
+        <h3 className="mt-1 text-2xl font-bold leading-tight text-slate-900 sm:text-3xl">{titleText}</h3>
+        <p className="mt-2 max-w-3xl text-sm text-slate-600">{t("descriptions.createNewLectureModal")}</p>
+      </div>
+      <Button variant="ghost" size="sm" className="rounded-full p-2 shrink-0" onClick={handleClose}>
+        <FiX className="w-5 h-5" />
+      </Button>
+    </div>
+
 
         <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
           <div className="flex-1 overflow-y-auto px-6 py-6 sm:px-8 min-h-0">
@@ -601,55 +596,91 @@ const LectureCreationModal = ({
                   />
 
                   <div className={`grid ${TOKENS.spacing.default} md:grid-cols-2`}>
-                    <FormField label={t("fields.name")} fullWidth>
-                      <input
-                        type="text"
-                        placeholder={t("placeholders.enterLectureName")}
-                        className={`input input-bordered w-full ${TOKENS.radius.section}`}
-                        value={formData.name}
-                        onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
-                        required
-                      />
-                    </FormField>
-
-                    <FormField label={t("fields.description")} fullWidth>
-                      <textarea
-                        placeholder={t("placeholders.enterDescription")}
-                        className={`textarea textarea-bordered min-h-32 w-full ${TOKENS.radius.section}`}
-                        value={formData.description}
-                        onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
-                      />
-                    </FormField>
-
-                    <FormField label={t("fields.price")}>
-                      <input
-                        type="number"
-                        placeholder={t("placeholders.enterPrice")}
-                        className={`input input-bordered w-full ${TOKENS.radius.section}`}
-                        value={formData.price}
-                        onChange={(e) => setFormData((prev) => ({ ...prev, price: e.target.value }))}
-                        min="0"
-                        required
-                      />
-                    </FormField>
-
-                    <FormField label={t("fields.numberOfViews")}>
-                      <input
-                        type="number"
-                        placeholder={t("placeholders.enterNumberOfViews")}
-                        className={`input input-bordered w-full ${TOKENS.radius.section}`}
-                        value={formData.numberOfViews}
-                        onChange={(e) => setFormData((prev) => ({ ...prev, numberOfViews: e.target.value }))}
-                        min="0"
-                        required
-                      />
-                    </FormField>
-
+                   <FormField label={t("fields.name")} fullWidth>
+                     <Input
+                       type="text"
+                       placeholder={t("placeholders.enterLectureName")}
+                       className={`w-full ${TOKENS.radius.section}`}
+                       value={formData.name}
+                       onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
+                       required
+                     />
+                   </FormField>
+                   <FormField label={t("fields.description")} fullWidth>
+                     <Textarea
+                       placeholder={t("placeholders.enterDescription")}
+                       className={`min-h-32 w-full ${TOKENS.radius.section}`}
+                       value={formData.description}
+                       onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
+                     />
+                   </FormField>
+                   <FormField label={t("fields.price")}>
+                     <Input
+                       type="number"
+                       placeholder={t("placeholders.enterPrice")}
+                       className={`w-full ${TOKENS.radius.section}`}
+                       value={formData.price}
+                       onChange={(e) => setFormData((prev) => ({ ...prev, price: e.target.value }))}
+                       min="0"
+                       required
+                     />
+                   </FormField>
+                   <FormField label={t("fields.numberOfViews")}>
+                     <Input
+                       type="number"
+                       placeholder={t("placeholders.enterNumberOfViews")}
+                       className={`w-full ${TOKENS.radius.section}`}
+                       value={formData.numberOfViews}
+                       onChange={(e) => setFormData((prev) => ({ ...prev, numberOfViews: e.target.value }))}
+                       min="0"
+                       required
+                     />
+                   </FormField>
+                   <FormField label={t("fields.videoURL")} fullWidth>
+                     <Input
+                       type="url"
+                       placeholder={t("placeholders.enterVideoLink")}
+                       className={`w-full ${TOKENS.radius.section}`}
+                       value={formData.videoLink}
+                       onChange={(e) => setFormData((prev) => ({ ...prev, videoLink: e.target.value }))}
+                       required
+                     />
+                   </FormField>
+                   <FormField label={t("fields.description")} fullWidth>
+                     <Textarea
+                       placeholder={t("placeholders.enterDescription")}
+                       className={`min-h-32 w-full ${TOKENS.radius.section}`}
+                       value={formData.description}
+                       onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
+                     />
+                   </FormField>
+                   <FormField label={t("fields.price")}>
+                     <Input
+                       type="number"
+                       placeholder={t("placeholders.enterPrice")}
+                       className={`w-full ${TOKENS.radius.section}`}
+                       value={formData.price}
+                       onChange={(e) => setFormData((prev) => ({ ...prev, price: e.target.value }))}
+                       min="0"
+                       required
+                     />
+                   </FormField>
+                   <FormField label={t("fields.numberOfViews")}>
+                     <Input
+                       type="number"
+                       placeholder={t("placeholders.enterNumberOfViews")}
+                       className={`w-full ${TOKENS.radius.section}`}
+                       value={formData.numberOfViews}
+                       onChange={(e) => setFormData((prev) => ({ ...prev, numberOfViews: e.target.value }))}
+                       min="0"
+                       required
+                     />
+                   </FormField>
                     <FormField label={t("fields.videoURL")} fullWidth>
-                      <input
+                      <Input
                         type="url"
                         placeholder={t("placeholders.enterVideoLink")}
-                        className={`input input-bordered w-full ${TOKENS.radius.section}`}
+                        className={`w-full ${TOKENS.radius.section}`}
                         value={formData.videoLink}
                         onChange={(e) => setFormData((prev) => ({ ...prev, videoLink: e.target.value }))}
                         required
@@ -657,6 +688,8 @@ const LectureCreationModal = ({
                     </FormField>
                   </div>
                 </section>
+
+
 
                 <section className={`${TOKENS.surface.card} ${TOKENS.radius.section} p-5`}>
                   <SectionHeader
@@ -672,57 +705,90 @@ const LectureCreationModal = ({
                     {usesSelectableParent && (
                       <>
                         <FormField label={t("fields.course")}>
-                          <DSSelect
-                            className={`select select-bordered w-full ${TOKENS.radius.section}`}
-                            value={metadata.courseId}
-                            onChange={(e) => setMetadata((prev) => ({ ...prev, courseId: e.target.value }))}
-                            required
-                          >
-                            <option value="">{t("placeholders.selectCourse")}</option>
-                            {lecturerCourseOptions.map((course) => (
-                              <option key={course.value} value={course.value}>{course.label}</option>
-                            ))}
-                          </DSSelect>
-                        </FormField>
-
-                        <FormField label={t("fields.container")}>
-                          <DSSelect
-                            className={`select select-bordered w-full ${TOKENS.radius.section}`}
-                            value={metadata.parentContainerId}
-                            onChange={(e) => setMetadata((prev) => ({ ...prev, parentContainerId: e.target.value }))}
-                            required
-                            disabled={!metadata.courseId}
-                          >
-                            <option value="">{t("placeholders.selectContainer")}</option>
-                            {(lecturerContainerOptionsByCourse[String(metadata.courseId)] || []).map((container) => (
-                              <option key={container.value} value={container.value}>{container.label}</option>
-                            ))}
-                          </DSSelect>
-                        </FormField>
-                      </>
-                    )}
-
-                    <FormField label={t("fields.level")}>
                       <DSSelect
-                        className={`select select-bordered w-full ${TOKENS.radius.section}`}
-                        value={metadata.level}
-                        onChange={(e) => setMetadata((prev) => ({ ...prev, level: e.target.value }))}
-                        disabled={usesSelectableParent}
+                        className={`border border-slate-200 w-full ${TOKENS.radius.section}`}
+                        value={metadata.courseId}
+                        onChange={(e) => setMetadata((prev) => ({ ...prev, courseId: e.target.value }))}
                         required
                       >
-                        <option value="">{t("placeholders.selectLevel")}</option>
-                        {dropdownData.levels.map((level) => (
-                          <option key={level.value || level._id} value={level.value || level._id}>
-                            {level.label || level.displayName || level.name}
-                          </option>
+                        <option value="">{t("placeholders.selectCourse")}</option>
+                        {lecturerCourseOptions.map((course) => (
+                          <option key={course.value} value={course.value}>{course.label}</option>
                         ))}
                       </DSSelect>
-                      {loading.levels && <span className="loading loading-spinner loading-sm mt-2"></span>}
+                    </FormField>
+                    <FormField label={t("fields.container")}>
+                      <DSSelect
+                          className={`border border-slate-200 w-full ${TOKENS.radius.section}`}
+
+                        value={metadata.parentContainerId}
+                        onChange={(e) => setMetadata((prev) => ({ ...prev, parentContainerId: e.target.value }))}
+                        required
+                        disabled={!metadata.courseId}
+                      >
+                        <option value="">{t("placeholders.selectContainer")}</option>
+                        {(lecturerContainerOptionsByCourse[String(metadata.courseId)] || []).map((container) => (
+                          <option key={container.value} value={container.value}>{container.label}</option>
+                        ))}
+                      </DSSelect>
+                    </FormField>
+                    <FormField label={t("fields.container")}>
+                      <DSSelect
+                          className={`border border-slate-200 w-full ${TOKENS.radius.section}`}
+
+                        value={metadata.parentContainerId}
+                        onChange={(e) => setMetadata((prev) => ({ ...prev, parentContainerId: e.target.value }))}
+                        required
+                        disabled={!metadata.courseId}
+                      >
+                        <option value="">{t("placeholders.selectContainer")}</option>
+                        {(lecturerContainerOptionsByCourse[String(metadata.courseId)] || []).map((container) => (
+                          <option key={container.value} value={container.value}>{container.label}</option>
+                        ))}
+                      </DSSelect>
                     </FormField>
 
-                    <FormField label={t("fields.subject")}>
+                        <FormField label={t("fields.container")}>
                       <DSSelect
-                        className={`select select-bordered w-full ${TOKENS.radius.section}`}
+                        className={`border border-slate-200 w-full ${TOKENS.radius.section}`}
+                        value={metadata.parentContainerId}
+                        onChange={(e) => setMetadata((prev) => ({ ...prev, parentContainerId: e.target.value }))}
+                        required
+                        disabled={!metadata.courseId}
+                      >
+                        <option value="">{t("placeholders.selectContainer")}</option>
+                        {(lecturerContainerOptionsByCourse[String(metadata.courseId)] || []).map((container) => (
+                          <option key={container.value} value={container.value}>{container.label}</option>
+                        ))}
+                      </DSSelect>
+                    </FormField>
+                    </>
+                  )}
+
+
+
+                     <FormField label={t("fields.level")}>
+                       <DSSelect
+                           className={`border border-slate-200 w-full ${TOKENS.radius.section}`}
+
+                         value={metadata.level}
+                         onChange={(e) => setMetadata((prev) => ({ ...prev, level: e.target.value }))}
+                         disabled={usesSelectableParent}
+                         required
+                       >
+                         <option value="">{t("placeholders.selectLevel")}</option>
+                         {dropdownData.levels.map((level) => (
+                           <option key={level.value || level._id} value={level.value || level._id}>
+                             {level.label || level.displayName || level.name}
+                           </option>
+                         ))}
+                       </DSSelect>
+                        {loading.levels && <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin mt-2"></div>}
+
+                     </FormField>
+                     <FormField label={t("fields.subject")}>
+                      <DSSelect
+                        className={`border border-slate-200 w-full ${TOKENS.radius.section}`}
                         value={metadata.subject}
                         onChange={(e) => setMetadata((prev) => ({ ...prev, subject: e.target.value }))}
                         disabled={usesSelectableParent}
@@ -733,8 +799,10 @@ const LectureCreationModal = ({
                           <option key={subject._id} value={subject._id}>{subject.name}</option>
                         ))}
                       </DSSelect>
-                      {loading.subjects && <span className="loading loading-spinner loading-sm mt-2"></span>}
+                      {loading.subjects && <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin mt-2"></div>}
                     </FormField>
+
+
                   </div>
 
                   <div className={`mt-4 grid ${TOKENS.spacing.default} xl:grid-cols-2`}>
@@ -779,7 +847,7 @@ const LectureCreationModal = ({
 
                       {attachmentStats.saved.length > 0 && (
                         <Card className="mt-4">
-                          <p className={`${TOKENS.typography.meta} mb-3 text-base-content/50`}>
+                          <p className={`${TOKENS.typography.meta} mb-3 text-slate-900/50`}>
                             {t("attachments.savedFiles", "Saved files")}
                           </p>
                           <ul className={`${TOKENS.spacing.tight} flex flex-col`}>
@@ -792,18 +860,18 @@ const LectureCreationModal = ({
 
                       <div className="mt-4">
                         <InputWithIcon icon={FiPaperclip}>
-                          <input
-                            type="file"
-                            multiple
-                            onChange={(e) => handleAttachmentFilesChange(Array.from(e.target.files || []))}
-                            className={`file-input file-input-bordered file-input-primary w-full ${TOKENS.radius.section} pr-12`}
-                            accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.zip,.rar,image/*,application/*"
-                          />
+                       <Input
+                         type="file"
+                         multiple
+                         onChange={(e) => handleAttachmentFilesChange(Array.from(e.target.files || []))}
+                         className={`file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 w-full ${TOKENS.radius.section} pr-12`}
+                         accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.zip,.rar,image/*,application/*"
+                       />
                         </InputWithIcon>
                       </div>
 
                       {attachmentStats.newFiles.length > 0 && (
-                        <ul className={`mt-3 ${TOKENS.spacing.tight} ${TOKENS.radius.section} bg-base-200/50 p-4 text-sm text-base-content/70`}>
+                        <ul className={`mt-3 ${TOKENS.spacing.tight} ${TOKENS.radius.section} bg-slate-100 p-4 text-sm text-slate-900/70`}>
                           {attachmentStats.newFiles.map((file, idx) => (
                             <li key={`${file.name}-${idx}`} className="break-all">{t("fields.selectedFile")}: {file.name}</li>
                           ))}
@@ -832,25 +900,27 @@ const LectureCreationModal = ({
 
                       <div className={`mt-4 grid ${TOKENS.spacing.tight} sm:grid-cols-[180px_minmax(0,1fr)] items-center`}>
                         <FormField label={t("attachments.formType", "Form type")} className="px-0 pt-0">
-                          <DSSelect
-                            className={`select select-bordered w-full ${TOKENS.radius.section}`}
-                            value={attachments.selectedLinkType}
-                            onChange={(e) => handleFormLinkTypeChange(e.target.value)}
-                          >
-                            <option value="homeworks">{t("attachments.homeworkType", "Homework")}</option>
-                            <option value="exams">{t("attachments.examType", "Exam")}</option>
-                          </DSSelect>
+                        <DSSelect
+                          className={`border border-slate-200 w-full ${TOKENS.radius.section}`}
+                          value={attachments.selectedLinkType}
+                          onChange={(e) => handleFormLinkTypeChange(e.target.value)}
+                        >
+
+                         <option value="homeworks">{t("attachments.homeworkType", "Homework")}</option>
+                         <option value="exams">{t("attachments.examType", "Exam")}</option>
+                       </DSSelect>
                         </FormField>
 
                         <FormField label={t("attachments.formUrl", "Google Form URL")} className="px-0 pt-0">
                           <InputWithIcon icon={FiLink}>
-                            <input
-                              type="url"
-                              className={`input input-bordered w-full ${TOKENS.radius.section} pr-12`}
-                              placeholder={t("attachments.formUrlPlaceholder", "Paste the Google Form link here")}
-                              value={attachments.activeLinkValue}
-                              onChange={(e) => handleFormLinkChange(e.target.value)}
-                            />
+                                <Input
+                                  type="url"
+                                  className={`border border-slate-200 w-full ${TOKENS.radius.section} pr-12`}
+                                  placeholder={t("attachments.formUrlPlaceholder", "Paste the Google Form link here")}
+                                  value={attachments.activeLinkValue}
+                                  onChange={(e) => handleFormLinkChange(e.target.value)}
+                                />
+
                           </InputWithIcon>
                           <span className={`mt-2 ${TOKENS.typography.hint}`}>
                             {t("attachments.formUrlHint", "Switch the form type if the link is for homework instead of exam, or vice versa.")}
@@ -860,14 +930,14 @@ const LectureCreationModal = ({
 
                       {attachmentStats.existingLinks.length > 0 && (
                         <Card className="mt-4">
-                          <p className={`${TOKENS.typography.meta} mb-3 text-base-content/50`}>
+                          <p className={`${TOKENS.typography.meta} mb-3 text-slate-900/50`}>
                             {t("attachments.savedLinks", "Saved links")}
                           </p>
                           <ul className={`${TOKENS.spacing.tight} flex flex-col`}>
                             {attachmentStats.existingLinks.map((link) => (
-                              <li key={link.key} className={`flex flex-col ${TOKENS.spacing.tight} ${TOKENS.radius.card} bg-base-200/40 px-3 py-2`}>
+                              <li key={link.key} className={`flex flex-col ${TOKENS.spacing.tight} ${TOKENS.radius.card} bg-slate-100 px-3 py-2`}>
                                 <div className="flex items-center justify-between">
-                                  <span className="font-medium text-base-content">{link.label}</span>
+                                  <span className="font-medium text-slate-900">{link.label}</span>
                                   <Badge variant="neutral">{link.label}</Badge>
                                 </div>
                                 <a href={link.url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 break-all text-xs text-primary hover:underline">
@@ -889,16 +959,16 @@ const LectureCreationModal = ({
                   <div className={`flex items-start justify-between ${TOKENS.spacing.default}`}>
                     <div>
                       <p className={`${TOKENS.typography.meta} text-primary/70`}>{t("sections.assetPreview")}</p>
-                      <h4 className="mt-1 text-xl font-bold text-base-content">{t("fields.thumbnail", "Thumbnail")}</h4>
+                      <h4 className="mt-1 text-xl font-bold text-slate-900">{t("fields.thumbnail", "Thumbnail")}</h4>
                     </div>
                     <Badge>{containerType ? t(`types.${containerType}`, containerType) : t("notSpecified", "غير محدد")}</Badge>
                   </div>
 
-                  <div className={`mt-4 overflow-hidden ${TOKENS.radius.section} border border-dashed border-primary/20 bg-base-100`}>
+                  <div className={`mt-4 overflow-hidden ${TOKENS.radius.section} border border-dashed border-primary/20 bg-white`}>
                     {thumbnail.preview ? (
                       <img src={thumbnail.preview || "/placeholder.svg"} alt="Thumbnail preview" className="h-52 w-full object-cover" />
                     ) : (
-                      <div className={`flex h-52 flex-col items-center justify-center ${TOKENS.spacing.tight} px-6 text-center text-base-content/50`}>
+                      <div className={`flex h-52 flex-col items-center justify-center ${TOKENS.spacing.tight} px-6 text-center text-slate-900/50`}>
                         <div className={`${TOKENS.radius.full} bg-primary/10 p-4 text-primary`}>
                           <FiImage className="h-7 w-7" />
                         </div>
@@ -914,17 +984,17 @@ const LectureCreationModal = ({
                     <FormField label={t("fields.thumbnail", "Thumbnail")} className="px-0 pt-0">
                       <div className="mt-4">
                         <InputWithIcon icon={FiImage}>
-                          <input
-                            type="file"
-                            onChange={handleThumbnailChange}
-                            className={`file-input file-input-bordered w-full ${TOKENS.radius.section} pr-12`}
-                            accept="image/*"
-                          />
+                           <Input
+                             type="file"
+                             onChange={handleThumbnailChange}
+                             className={`file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 w-full ${TOKENS.radius.section} pr-12`}
+                             accept="image/*"
+                           />
                         </InputWithIcon>
                       </div>
                     </FormField>
                     {thumbnail.file && (
-                      <p className="mt-2 text-sm text-base-content/70">
+                      <p className="mt-2 text-sm text-slate-900/70">
                         {t("fields.selectedFile", "Selected file")}: {thumbnail.file.name}
                       </p>
                     )}
@@ -950,35 +1020,35 @@ const LectureCreationModal = ({
                   </div>
                 </Card>
 
-                {error && (
-                  <div className={`alert alert-error ${TOKENS.radius.section} border-none shadow-sm`}>
-                    <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <span>{error}</span>
-                  </div>
-                )}
+                 {error && (
+          <div className={`mb-4 rounded-2xl border border-error/30 bg-error/10 p-4 text-sm text-[#991B1B] shadow-sm flex items-center gap-3 ${TOKENS.radius.section}`}>
+                     <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                     </svg>
+                     <span>{error}</span>
+                   </div>
+                 )}
               </aside>
             </div>
           </div>
 
-          <div className="border-t border-base-300 bg-base-100/95 px-6 py-4 backdrop-blur sm:px-8 flex-shrink-0">
-            <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-              <button type="button" className="btn btn-ghost rounded-full" onClick={handleClose} disabled={loading.submit}>
-                {t("buttons.cancel")}
-              </button>
-              <button type="submit" className="btn btn-primary rounded-full" disabled={loading.submit}>
-                {loading.submit ? (
-                  <>
-                    <span className="loading loading-spinner"></span>
-                    {isEditMode ? (isRTL ? "جارٍ الحفظ" : "Saving...") : t("buttons.creating")}
-                  </>
-                ) : (
-                  isEditMode ? (isRTL ? "حفظ التغييرات" : "Save Changes") : t("buttons.create")
-                )}
-              </button>
-            </div>
-          </div>
+           <div className="border-t border-slate-200 bg-white/95 px-6 py-4 backdrop-blur sm:px-8 flex-shrink-0">
+             <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+               <Button variant="ghost" className="rounded-full" onClick={handleClose} disabled={loading.submit}>
+                 {t("buttons.cancel")}
+               </Button>
+               <Button variant="primary" className="rounded-full" disabled={loading.submit}>
+                 {loading.submit ? (
+                   <>
+                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                     {isEditMode ? (isRTL ? "جارٍ الحفظ" : "Saving...") : t("buttons.creating")}
+                   </>
+                 ) : (
+                   isEditMode ? (isRTL ? "حفظ التغييرات" : "Save Changes") : t("buttons.create")
+                 )}
+               </Button>
+             </div>
+           </div>
         </form>
       </div>
     </div>

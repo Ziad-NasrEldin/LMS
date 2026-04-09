@@ -28,7 +28,7 @@ const PromoCodesManagementPage = () => {
           <h1 className="text-2xl font-bold md:text-3xl" style={{ color: TOKENS.deepTeal }}>
             {t("promoCodesManagement", { defaultValue: isRTL ? "إدارة أكواد الشحن" : "Promo Codes Management" })}
           </h1>
-          <p className="mt-2 text-sm opacity-80 md:text-base">
+        <p className="mt-2 text-sm text-slate-700 md:text-base">
             {isRTL
               ? "إنشاء أكواد جديدة، ومراجعة الأكواد الحالية، وإدارة الحذف من صفحة مستقلة."
               : "Create new promo codes, review existing codes, and manage deletions from a dedicated page."}

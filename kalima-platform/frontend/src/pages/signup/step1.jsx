@@ -4,6 +4,7 @@ import { getAllGovernments, getGovernmentZones } from "../../routes/governments"
 import { translateErrorMessage } from "../../utils/errorTranslator";
 import { getGradeOptionsForStage } from "../../utils/levelHierarchy";
 import DSSelect from "../../components/DSSelect"
+import Input from "../../components/ui/Input"
 
 export default function Step1({ formData, handleInputChange, t, errors, role, levelHierarchy, levelsLoading }) {
   const [loading, setLoading] = useState(true);
@@ -24,7 +25,7 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
   const SectionHeader = ({ title, subtitle }) => (
     <div className="mb-4 mt-6 first:mt-0">
       <h4 className="text-sm font-bold text-[#0E5563] uppercase tracking-wider">{title}</h4>
-      {subtitle && <p className="text-xs text-slate-500 mt-1">{subtitle}</p>}
+      {subtitle && <p className="mt-1 text-xs text-slate-600">{subtitle}</p>}
     </div>
   );
 
@@ -98,7 +99,7 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
       <div className="space-y-2">
         <p className="text-xl sm:text-2xl font-semibold mb-2">{t("form.personalDetails")}</p>
         <div className="flex items-center justify-center py-8">
-          <div className="loading loading-spinner loading-lg"></div>
+           <div className="animate-spin border-2 border-primary border-t-transparent rounded-full w-10 h-10 mx-auto"></div>
           <span className="ml-2">{t("loading", { ns: "common", defaultValue: "Loading..." })}</span>
         </div>
       </div>
@@ -109,7 +110,7 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
     return (
       <div className="space-y-2">
         <p className="text-xl sm:text-2xl font-semibold mb-2">{t("form.personalDetails")}</p>
-        <div className="alert alert-error">
+         <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 shadow-sm flex items-center gap-3">
           <span>
             {t("errors.loadingFailed", { defaultValue: "Failed to load data:" })} {error}
           </span>
@@ -131,15 +132,15 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
           <label className="label">
             <span className="label-text">{t("form.fullName")}</span>
           </label>
-          <input
-            type="text"
-            name="fullName"
-            className={`${inputClass} ${errors.fullName ? "input-error" : ""}`}
-            value={formData.fullName}
-            onChange={handleInputChange}
-            required
-            placeholder={t("form.fullNamePlaceholder", "Enter your full name")}
-          />
+           <Input
+             type="text"
+             name="fullName"
+             className={`${errors.fullName ? "border-error" : ""}`}
+             value={formData.fullName}
+             onChange={handleInputChange}
+             required
+             placeholder={t("form.fullNamePlaceholder", "Enter your full name")}
+           />
           {errors.fullName && (
             <span className="text-error text-sm mt-1">{t(`validation.${errors.fullName}`)}</span>
           )}
@@ -165,19 +166,19 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem', width: '48%' }}>
             <label style={{ fontSize: '0.875rem', fontWeight: 600, minHeight: '1.5rem' }}>{t("form.phoneNumber")}</label>
-            <input
-              type="text"
-              name="phoneNumber"
-              value={formData.phoneNumber}
-              onChange={handleInputChange}
-              className={`${inputClass} ${errors.phoneNumber ? "input-error" : ""}`}
-              style={exactHeight}
-              inputMode="tel"
-              dir="ltr"
-              autoComplete="tel"
-              required
-              placeholder={t("form.phonePlaceholder", "01xxxxxxxxx")}
-            />
+               <Input
+                 type="text"
+                 name="phoneNumber"
+                 value={formData.phoneNumber}
+                 onChange={handleInputChange}
+                 className={`${errors.phoneNumber ? "border-error" : ""}`}
+                 style={exactHeight}
+                 inputMode="tel"
+                 dir="ltr"
+                 autoComplete="tel"
+                 required
+                 placeholder={t("form.phonePlaceholder", "01xxxxxxxxx")}
+               />
             {errors.phoneNumber && (
               <span className="text-error text-sm mt-1">{t(`validation.${errors.phoneNumber}`)}</span>
             )}
@@ -191,17 +192,17 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
               <span className="label-text">{t("form.phoneNumber2")}</span>
               <span className="label-text-alt text-xs text-slate-400">{t("form.optional")}</span>
             </label>
-            <input
-              type="text"
-              name="phoneNumber2"
-              value={formData.phoneNumber2}
-              onChange={handleInputChange}
-              className={inputClass}
-              inputMode="tel"
-              dir="ltr"
-              autoComplete="tel"
-              placeholder={t("form.phonePlaceholder", "01xxxxxxxxx")}
-            />
+             <Input
+               type="text"
+               name="phoneNumber2"
+               value={formData.phoneNumber2}
+               onChange={handleInputChange}
+               className=""
+               inputMode="tel"
+               dir="ltr"
+               autoComplete="tel"
+               placeholder={t("form.phonePlaceholder", "01xxxxxxxxx")}
+             />
           </div>
         )}
 

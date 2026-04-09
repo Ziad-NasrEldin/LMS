@@ -23,7 +23,7 @@ const InfoCard = ({ label, value, isRTL }) => (
     }}
     dir={isRTL ? "rtl" : "ltr"}
   >
-    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-600">
       {label}
     </p>
     <p className="mt-2 text-sm font-medium text-slate-900">{value}</p>
@@ -133,7 +133,7 @@ const PrivacyPolicy = () => {
               >
                 {t("meta.badge")}
               </span>
-              <span className="text-sm text-slate-500">
+              <span className="text-sm text-slate-600">
                 {t("meta.lastUpdatedLabel")}: {t("meta.lastUpdated")}
               </span>
             </div>

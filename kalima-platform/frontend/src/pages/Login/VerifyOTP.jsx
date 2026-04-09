@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { requestPasswordReset, verifyOtp } from '../../routes/auth-services';
 import WaveBackground from './WaveBackground';
+import Button from '../../components/ui/Button';
+import Input from '../../components/ui/Input';
 
 const VerifyOtp = () => {
   const { t, i18n } = useTranslation("login");
@@ -83,12 +85,12 @@ const VerifyOtp = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-base-100"
+    <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-white"
      dir={isRTL ? 'rtl' : 'ltr'} >
       <WaveBackground />
       
       <div className="w-full max-w-md p-6 z-10">
-        <div className="bg-base-100 shadow-xl rounded-lg p-6">
+        <div className="bg-white shadow-xl rounded-lg p-6">
           <h1 className="text-3xl font-bold text-center mb-2">
             {t('verifyOtpTitle')}
           </h1>
@@ -101,15 +103,16 @@ const VerifyOtp = () => {
               <label className="label">
                 <span className="label-text">{t('otpLabel')}</span>
               </label>
-              <input
-                type="text"
-                name="otp"
-                value={otp}
-                onChange={(e) => setOtp(e.target.value)}
-                placeholder={t('otpPlaceholder')}
-                className="input input-bordered w-full"
-                required
-              />
+               <Input
+                 type="text"
+                 name="otp"
+                 value={otp}
+                 onChange={(e) => setOtp(e.target.value)}
+                 placeholder={t('otpPlaceholder')}
+                 className="w-full"
+                 required
+               />
+
               <label className="label">
                 <button
                   type="button"
@@ -124,25 +127,30 @@ const VerifyOtp = () => {
               </label>
             </div>
 
-            {error && (
-              <div className="alert alert-error mb-4">
-                <span>{error}</span>
-              </div>
-            )}
+             {error && (
+               <div className="flex items-center gap-3 p-4 mb-4 bg-red-50 border border-red-200 text-red-800 rounded-lg">
+                 <span>{error}</span>
+               </div>
+             )}
 
-            {success && (
-              <div className="alert alert-success mb-4">
-                <span>{success}</span>
-              </div>
-            )}
 
-            <button
-              type="submit"
-              className={`btn btn-primary w-full ${loading ? 'loading' : ''}`}
-              disabled={loading}
-            >
-              {loading ? t('verifying') : t('verifyOtp')}
-            </button>
+             {success && (
+               <div className="flex items-center gap-3 p-4 mb-4 bg-green-50 border border-green-200 text-green-800 rounded-lg">
+                 <span>{success}</span>
+               </div>
+             )}
+
+
+             <Button
+               type="submit"
+               variant="primary"
+               className="w-full"
+               isLoading={loading}
+               disabled={loading}
+             >
+               {loading ? t('verifying') : t('verifyOtp')}
+             </Button>
+
 
             <div className="text-center mt-4">
               <p>

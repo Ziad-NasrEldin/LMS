@@ -40,8 +40,14 @@ import {
   ChevronDown,
   Play,
   ThumbsUp,
-  Flag
+  Flag,
+  Sparkles
 } from "lucide-react"
+import Button from "../components/ui/Button";
+import Badge from "../components/ui/Badge";
+import Card from "../components/ui/Card";
+import Modal from "../components/ui/Modal";
+import Tabs from "../components/ui/Tabs";
 
 const normalizeId = (value) => {
   if (!value) return null
@@ -220,86 +226,6 @@ const CONTAINER_TYPE_CONFIG = {
 }
 
 // ─── LectureRow ────────────────────────────────────────────────────────────────
-
-const LectureRow = ({ item, depth, isPurchased, onPurchase, purchaseInProgress, onNavigate, t, isRTL }) => {
-  const tokens = designTokens.colors
-  const [ytDuration, setYtDuration] = useState(null)
-
-  const lectureId = item?._id || item?.id
-  const purchased = isPurchased(lectureId)
-  const isPending = purchaseInProgress === lectureId
-
-  useEffect(() => {
-    if (!item?.videoLink) return
-    const vid = extractYouTubeId(item.videoLink)
-    if (vid) fetchYTDuration(vid).then(d => { if (d) setYtDuration(d) })
-  }, [item?.videoLink])
-
-  const duration = item?.duration > 0 ? formatMins(item.duration) : ytDuration
-  const indentPx = 8 + depth * 12
-
-  return (
-    <div
-      className="flex flex-col sm:flex-row sm:items-center gap-3 border-b last:border-b-0 transition-colors hover:bg-black/[0.018] group py-3 px-4"
-      style={{ borderColor: 'rgba(17,24,39,0.05)', paddingInlineStart: `${indentPx}px` }}
-    >
-      {/* Icon */}
-      <div
-        className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center"
-        style={{
-          background: purchased ? `${tokens.deepTeal}18` : tokens.neutralCloud,
-          border: `1.5px solid ${purchased ? tokens.deepTeal + '30' : 'rgba(17,24,39,0.08)'}`,
-        }}
-      >
-        {purchased
-          ? <Play size={13} style={{ color: tokens.deepTeal }} />
-          : <Lock size={13} style={{ color: tokens.slateText }} />}
-      </div>
-
-      {/* Info */}
-      <div className="flex-1 min-w-0">
-        <p className="text-sm font-semibold leading-snug" style={{ color: tokens.inkText }}>{item?.name}</p>
-        {duration && (
-          <span className="inline-flex items-center gap-1 mt-0.5 text-[11px]" style={{ color: tokens.slateText }}>
-            <Clock size={10} /> {duration}
-          </span>
-        )}
-      </div>
-
-      {/* Actions */}
-      <div className="flex items-center gap-2 flex-shrink-0 sm:self-center">
-        {purchased ? (
-          <button
-            onClick={() => onNavigate(`/dashboard/student-dashboard/lecture-display/${lectureId}`)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold text-white transition-all hover:scale-105 active:scale-95 shadow-sm whitespace-nowrap"
-            style={{ background: `linear-gradient(135deg, ${tokens.deepTeal}, ${tokens.softCyanTeal})` }}
-          >
-            <Play size={10} />
-            <span className="hidden sm:inline">{t('syllabus.quickView')}</span>
-            <span className="sm:hidden">{t('syllabus.watch', 'Watch')}</span>
-          </button>
-        ) : typeof item?.price === 'number' ? (
-          <button
-            onClick={() => onPurchase(lectureId)}
-            disabled={isPending || purchaseInProgress !== null}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold text-white transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none whitespace-nowrap"
-            style={{ background: item.price > 0 ? tokens.warmMango : tokens.softCyanTeal }}
-          >
-            {isPending ? (
-              <span className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
-            ) : item.price > 0 ? (
-              <><ShoppingCart size={10} /> {item.price}</>
-            ) : (
-              <><Unlock size={10} /> {t('purchase.getFree', 'Get')}</>
-            )}
-          </button>
-        ) : null}
-      </div>
-    </div>
-  )
-}
-
-// ─── LectureRow ─────────────────────────────────────────────────────────────
 // DEPRECATED: Replaced by Syllabus component with SyllabusItem
 // Kept temporarily for reference - will be removed in future cleanup
 // eslint-disable-next-line no-unused-vars
@@ -454,13 +380,15 @@ export default function CourseDetails() {
       try {
         setLoading(true)
 
-        const [courseResult, dashboardResult] = await Promise.all([
+        const [courseResult, dashboardResult, enrollmentResult, reviewsResult] = await Promise.all([
           getContainerById(courseId),
           getUserDashboard({
             params: {
               fields: "userInfo,purchaseHistory",
             },
           }),
+          getEnrollmentCount(courseId),
+          getCourseReviews(courseId),
         ])
 
         if (courseResult?.status === "success" && courseResult.data) {
@@ -475,6 +403,15 @@ export default function CourseDetails() {
             setRemainingPoints(dashboardResult.data.data.userInfo.generalPoints)
           }
         }
+
+        if (enrollmentResult?.success) {
+          setEnrollmentCount(enrollmentResult.count)
+        }
+
+        if (reviewsResult?.status === 'success') {
+          setReviews(reviewsResult.data.reviews || [])
+          setReviewStats(reviewsResult.data.stats || { average: 0, total: 0, distribution: { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 } })
+        }
       } catch (err) {
         console.error("Error fetching data:", err)
         setError(t("errors.unexpected"))
@@ -484,24 +421,6 @@ export default function CourseDetails() {
     }
 
     fetchData()
-  }, [courseId])
-
-  // Fetch enrollment count
-  useEffect(() => {
-    const fetchEnrollmentCount = async () => {
-      if (!courseId) return
-      
-      try {
-        const result = await getEnrollmentCount(courseId)
-        if (result.success) {
-          setEnrollmentCount(result.count)
-        }
-      } catch (err) {
-        console.error("Error fetching enrollment count:", err)
-      }
-    }
-
-    fetchEnrollmentCount()
   }, [courseId])
 
   // Calculate total course duration from YouTube videos
@@ -746,36 +665,6 @@ export default function CourseDetails() {
       console.error('Failed to copy:', err)
     }
   }
-
-  // Fetch reviews
-  useEffect(() => {
-    const fetchReviews = async () => {
-      if (!courseId) return
-      
-      const result = await getCourseReviews(courseId)
-      if (result.status === 'success') {
-        setReviews(result.data.reviews || [])
-        setReviewStats(result.data.stats || { average: 0, total: 0, distribution: { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 } })
-      }
-    }
-    
-    fetchReviews()
-  }, [courseId])
-
-  // Fetch student's own review
-  useEffect(() => {
-    const fetchMyReview = async () => {
-      if (!courseId || !purchaseHistory.length) return
-      
-      const result = await getMyReview(courseId)
-      if (result.status === 'success' && result.data) {
-        setMyReview(result.data)
-        setReviewForm({ rating: result.data.rating, comment: result.data.comment })
-      }
-    }
-    
-    fetchMyReview()
-  }, [courseId, purchaseHistory.length])
 
   // Handle review submission
   const handleSubmitReview = async (e) => {
@@ -1084,6 +973,7 @@ export default function CourseDetails() {
                 <img 
                   src={course.instructor.avatar}
                   alt={course.instructor.name}
+                  loading="lazy"
                   className="h-14 w-14 rounded-full border-2 border-white/20 object-cover"
                   onError={(e) => {
                     e.target.onerror = null
@@ -1101,14 +991,17 @@ export default function CourseDetails() {
               </div>
 
               {/* Action Buttons */}
-              <div className="flex flex-wrap gap-4">
-                <button
-                  onClick={handleShare}
-                  className="flex items-center gap-2 rounded-full border border-white/20 px-5 py-2 sm:px-8 sm:py-3 text-sm sm:text-base font-bold backdrop-blur-md transition-all hover:bg-white/10">
-                  <Share2 className="h-5 w-5" />
-                  {t("share", "Share")}
-                </button>
-              </div>
+               <div className="flex flex-wrap gap-4">
+                 <Button
+                   variant="ghost"
+                   className="flex items-center gap-2 rounded-full border border-white/20 px-5 py-2 sm:px-8 sm:py-3 text-sm sm:text-base font-bold backdrop-blur-md transition-all hover:bg-white/10 text-white"
+                   onClick={handleShare}
+                 >
+                   <Share2 className="h-5 w-5" />
+                   {t("share", "Share")}
+                 </Button>
+               </div>
+
             </div>
 
             {/* Right Column - Course Image */}
@@ -1117,6 +1010,7 @@ export default function CourseDetails() {
                 <img 
                   src={course.image}
                   alt={t("courseVisual", "Course Visual")}
+                  fetchpriority="high"
                   className="h-auto max-h-[500px] w-full max-w-md rounded-lg object-cover shadow-2xl lg:max-w-none"
                 />
               </div>
@@ -1125,62 +1019,42 @@ export default function CourseDetails() {
         </section>
 
         {/* Quick Stats Grid */}
-        <div className="relative z-30 -mt-16 grid grid-cols-1 gap-4 px-4 sm:grid-cols-2 lg:grid-cols-4 lg:px-0">
-          {quickStats.map((stat, index) => (
-            <div 
-              key={index}
-              className="flex items-center gap-4 rounded-xl border bg-white p-6 shadow-lg"
-              style={{ 
-                borderColor: 'rgba(17,24,39,0.08)',
-                boxShadow: SHADOWS.level1
-              }}
-            >
-              <div 
-                className="rounded-xl p-3"
-                style={{ background: `${TOKENS.lightAquaMist}20`, color: TOKENS.deepTeal }}
-              >
-                <stat.icon className="h-6 w-6" />
-              </div>
-              <div>
-                <p className="text-xs font-bold uppercase tracking-wider" style={{ color: TOKENS.slateText }}>
-                  {stat.label}
-                </p>
-                <p className="text-lg font-bold" style={{ color: TOKENS.inkText }}>
-                  {stat.value}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
+         <div className="relative z-30 -mt-16 grid grid-cols-1 gap-4 px-4 sm:grid-cols-2 lg:grid-cols-4 lg:px-0">
+           {quickStats.map((stat, index) => (
+             <Card 
+               key={index}
+               className="flex items-center gap-4 p-6"
+             >
+               <div 
+                 className="rounded-xl p-3"
+                 style={{ background: `${TOKENS.lightAquaMist}20`, color: TOKENS.deepTeal }}
+               >
+                 <stat.icon className="h-6 w-6" />
+               </div>
+               <div>
+                 <p className="text-xs font-bold uppercase tracking-wider" style={{ color: TOKENS.slateText }}>
+                   {stat.label}
+                 </p>
+                 <p className="text-lg font-bold" style={{ color: TOKENS.inkText }}>
+                   {stat.value}
+                 </p>
+               </div>
+             </Card>
+           ))}
+         </div>
+
 
         {/* Main Content Grid */}
         <div className="mt-12 grid grid-cols-1 gap-8 lg:grid-cols-3">
           {/* Main Content Area */}
           <div className="lg:col-span-2 space-y-8">
             {/* Content Tabs */}
-            <div 
-              className="rounded-xl p-1.5 shadow-inner"
-              style={{ background: TOKENS.neutralCloud }}
-            >
-              <div className="flex flex-wrap gap-1">
-                {tabs.map((tab) => (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`flex-1 rounded-lg px-4 py-3 text-sm font-bold transition-all whitespace-nowrap ${
-                      activeTab === tab.id
-                        ? 'bg-white shadow-sm'
-                        : 'hover:bg-white/50'
-                    }`}
-                    style={{
-                      color: activeTab === tab.id ? TOKENS.deepTeal : TOKENS.slateText
-                    }}
-                  >
-                    {tab.label}
-                  </button>
-                ))}
-              </div>
-            </div>
+             <Tabs 
+               tabs={tabs} 
+               activeIndex={tabs.findIndex(t => t.id === activeTab)} 
+               onChange={(index) => setActiveTab(tabs[index].id)} 
+             />
+
 
             {/* Tab Content */}
             <div className="rounded-xl bg-white p-8 shadow-sm" style={{ borderColor: 'rgba(17,24,39,0.08)' }}>
@@ -1335,31 +1209,34 @@ export default function CourseDetails() {
                         </div>
 
                         {/* Submit Buttons */}
-                        <div className="flex gap-3">
-                          <button
-                            type="submit"
-                            disabled={reviewLoading || !reviewForm.comment.trim()}
-                            className="flex-1 py-3 rounded-full font-bold text-white transition-all hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
-                            style={{ background: TOKENS.deepTeal }}
-                          >
-                            {reviewLoading 
-                              ? t('processing', 'Processing...') 
-                              : myReview 
-                                ? t('reviews.updateReview', 'Update Review')
-                                : t('reviews.submitReview', 'Submit Review')
-                            }
-                          </button>
-                          {myReview && (
-                            <button
-                              type="button"
-                              onClick={handleDeleteReview}
-                              disabled={reviewLoading}
-                              className="px-6 py-3 rounded-full font-bold text-red-600 border border-red-200 transition-all hover:bg-red-50 disabled:opacity-50"
-                            >
-                              {t('delete', 'Delete')}
-                            </button>
-                          )}
-                        </div>
+                           <div className="flex gap-3">
+                             <Button
+                               type="submit"
+                               isDisabled={reviewLoading || !reviewForm.comment.trim()}
+                               variant="primary"
+                               className="flex-1 py-3 rounded-full font-bold text-white transition-all hover:scale-105"
+                               style={{ background: TOKENS.deepTeal }}
+                             >
+                               {reviewLoading 
+                                 ? t('processing', 'Processing...') 
+                                 : myReview 
+                                   ? t('reviews.updateReview', 'Update Review')
+                                   : t('reviews.submitReview', 'Submit Review')
+                               }
+                             </Button>
+                             {myReview && (
+                               <Button
+                                 type="button"
+                                 isDisabled={reviewLoading}
+                                 variant="outline"
+                                 className="px-6 py-3 rounded-full font-bold text-red-600 border-red-200 transition-all hover:bg-red-50"
+                                 onClick={handleDeleteReview}
+                               >
+                                 {t('delete', 'Delete')}
+                               </Button>
+                             )}
+                           </div>
+
 
                         {myReview?.status === 'pending' && (
                           <p className="text-sm text-amber-600 bg-amber-50 p-3 rounded-lg">
@@ -1747,50 +1624,42 @@ export default function CourseDetails() {
 
                 {/* Action Buttons */}
                 <div className="flex flex-col gap-3">
-                  {isContainerPurchased(courseId) ? (
-                    <button 
-                      className="w-full rounded-full py-4 font-black text-lg shadow-lg transition-all"
-                      style={{ 
-                        background: TOKENS.slateText,
-                        color: 'white',
-                        cursor: 'not-allowed'
-                      }}
-                      disabled
-                    >
-                      ✓ {t("purchase.purchased")}
-                    </button>
-                  ) : (
-                    <>
-                      {purchaseError && (
-                        <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
-                          {purchaseError}
-                        </div>
-                      )}
-                      {purchaseSuccess && (
-                        <div className="rounded-lg border border-green-200 bg-green-50 p-3 text-sm text-green-700">
-                          {t("purchase.purchaseSuccess")}
-                        </div>
-                      )}
-                      <button 
-                        className="w-full rounded-full py-4 font-black text-lg text-white shadow-lg transition-all hover:scale-[1.02]"
-                        style={{ 
-                          background: TOKENS.deepTeal,
-                          boxShadow: `0 8px 16px ${TOKENS.deepTeal}40`
-                        }}
-                        onClick={() => handlePurchase(courseId)}
-                        disabled={purchaseInProgress !== null}
-                      >
-                        {purchaseInProgress === courseId ? (
-                          <span className="inline-flex items-center gap-2">
-                            <span className="inline-block h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
-                            {t("processing", "Processing...")}
-                          </span>
-                        ) : (
-                          course.price === 0 ? t("getFree", "Get Free") : t("buyNow", "Buy Now")
-                        )}
-                      </button>
-                    </>
-                  )}
+                           {isContainerPurchased(courseId) ? (
+                             <Button 
+                               variant="neutral" 
+                               className="w-full py-4 font-black text-lg shadow-lg transition-all"
+                               isDisabled
+                             >
+                               ✓ {t("purchase.purchased")}
+                             </Button>
+                           ) : (
+                             <>
+                               {purchaseError && (
+                                 <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+                                   {purchaseError}
+                                 </div>
+                               )}
+                               {purchaseSuccess && (
+                                 <div className="rounded-lg border border-green-200 bg-green-50 p-3 text-sm text-green-700">
+                                   {t("purchase.purchaseSuccess")}
+                                 </div>
+                               )}
+<Button 
+                                  variant={course.price === 0 ? "success" : "primary"} 
+                                  className="w-full py-4 font-black text-lg shadow-lg transition-all hover:scale-[1.02]"
+                                  onClick={() => handlePurchase(courseId)}
+                                  isLoading={purchaseInProgress === courseId}
+                                >
+                                  {purchaseInProgress === courseId 
+                                    ? t('processing', 'Processing...') 
+                                    : course.price === 0 
+                                      ? t("getFree", "Get Free") 
+                                      : t("buyNow", "Buy Now")
+                                  }
+                                </Button>
+                             </>
+                           )}
+
                 </div>
 
                 {/* Course Details */}
@@ -1864,44 +1733,38 @@ export default function CourseDetails() {
         </div>
       )}
 
-      {/* Success Modal */}
-      {showSuccessModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-          <div className="mx-4 max-w-md rounded-[2rem] border p-6" 
-            style={{ 
-              border: '1px solid rgba(17,24,39,0.08)', 
-              boxShadow: SHADOWS.level2, 
-              backgroundColor: TOKENS.creamSurface 
-            }}
-          >
-            <h3 className="text-xl font-bold" style={{ color: TOKENS.deepTeal }}>
-              {t("purchaseSuccess")}
-            </h3>
-            <p className="py-4 text-base font-medium" style={{ color: TOKENS.inkText }}>
-              {t("purchaseSuccessDesc")}
-            </p>
-            <div className="flex gap-3">
-              <button 
-                className="flex-1 rounded-full px-6 py-3 font-medium transition-all hover:bg-black/5" 
-                style={{ color: TOKENS.inkText }}
-                onClick={() => setShowSuccessModal(false)}
-              >
-                {t("later", "Later")}
-              </button>
-              <button 
-                className="flex-1 rounded-full px-6 py-3 font-medium text-white transition-all hover:opacity-90 hover:scale-105" 
-                style={{ backgroundColor: TOKENS.deepTeal }}
-                onClick={() => {
-                  setShowSuccessModal(false);
-                  navigate("/dashboard/student-dashboard");
-                }}
-              >
-                {t("goToDashboard", "Yes, go to Dashboard")}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+       {/* Success Modal */}
+       <Modal 
+         isOpen={showSuccessModal} 
+         onClose={() => setShowSuccessModal(false)} 
+         title={t("purchaseSuccess")}
+         footer={
+           <div className="flex gap-3">
+             <Button 
+               variant="ghost" 
+               className="flex-1 rounded-full px-6 py-3 font-medium transition-all hover:bg-black/5" 
+               onClick={() => setShowSuccessModal(false)}
+             >
+               {t("later", "Later")}
+             </Button>
+             <Button 
+               variant="primary" 
+               className="flex-1 rounded-full px-6 py-3 font-medium text-white transition-all hover:opacity-90 hover:scale-105" 
+               onClick={() => {
+                 setShowSuccessModal(false);
+                 navigate("/dashboard/student-dashboard");
+               }}
+             >
+               {t("goToDashboard", "Yes, go to Dashboard")}
+             </Button>
+           </div>
+         }
+       >
+         <p className="py-4 text-base font-medium" style={{ color: TOKENS.inkText }}>
+           {t("purchaseSuccessDesc")}
+         </p>
+       </Modal>
+
 
       {/* Login Prompt Modal for Guest Users */}
       <LoginPromptModal

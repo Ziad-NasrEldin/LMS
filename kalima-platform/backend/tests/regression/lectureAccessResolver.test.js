@@ -11,12 +11,14 @@ const {
   purchaseUnlocksTarget,
   resolveAccessibleLectureTarget,
   serializeStudentLectureAccess,
+  studentHasLectureEntitlement,
   upsertStudentLectureAccess,
 } = require("../../utils/lectureAccessResolver")
 
 const originalLectureFindById = Lecture.findById
 const originalContainerFindById = Container.findById
 const originalPurchaseFindById = Purchase.findById
+const originalPurchaseFind = Purchase.find
 const originalAccessFindOneAndUpdate = StudentLectureAccess.findOneAndUpdate
 const originalAccessFindOne = StudentLectureAccess.findOne
 
@@ -36,6 +38,7 @@ const restoreModelMethods = () => {
   Lecture.findById = originalLectureFindById
   Container.findById = originalContainerFindById
   Purchase.findById = originalPurchaseFindById
+  Purchase.find = originalPurchaseFind
   StudentLectureAccess.findOneAndUpdate = originalAccessFindOneAndUpdate
   StudentLectureAccess.findOne = originalAccessFindOne
 }
@@ -141,6 +144,27 @@ test("loadPurchaseForStudent rejects purchases owned by another student", async 
         return true
       },
     )
+  } finally {
+    restoreModelMethods()
+  }
+})
+
+test("studentHasLectureEntitlement accepts an existing lecture access record when no purchase row is found", async () => {
+  try {
+    Purchase.find = () => makeLeanQuery([])
+    StudentLectureAccess.findOne = () =>
+      makeLeanQuery({
+        _id: "access-1",
+        student: "student-1",
+        lecture: "111111111111111111111111",
+      })
+
+    const hasEntitlement = await studentHasLectureEntitlement("student-1", {
+      _id: "111111111111111111111111",
+      parent: null,
+    })
+
+    assert.equal(hasEntitlement, true)
   } finally {
     restoreModelMethods()
   }

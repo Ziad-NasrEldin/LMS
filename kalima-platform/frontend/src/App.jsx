@@ -499,6 +499,7 @@ function App() {
               path="/dashboard/lecturer-dashboard/reviews"
               element={renderLecturerRoute(<LecturerReviewsManagementPage />)}
             />
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Suspense>
       </div>

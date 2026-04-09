@@ -11,11 +11,12 @@ import { useSeo } from "../../seo/useSeo"
 import { buildBreadcrumbSchema, buildPersonSchema } from "../../seo/structuredData.mjs"
 import { resolveProfileImageUrl } from "../../utils/profileImage"
 import { resolveUploadUrl } from "../../utils/uploadUrl"
+import Button from "../../components/ui/Button"
 
 const TeacherInfoHeader = () => {
   const { t } = useTranslation("teacherDetails");
   return (
-    <div className="w-full bg-primary text-primary-content pt-20 pb-32 md:pt-28 md:pb-40 relative overflow-hidden rounded-b-[2.5rem]">
+    <div className="w-full bg-[#0E5563] text-white pt-20 pb-32 md:pt-28 md:pb-40 relative overflow-hidden rounded-b-[2.5rem]">
       {/* Organic layered waves/blobs (Design System Theme) */}
       <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] bg-secondary rounded-full opacity-40 blur-[80px] mix-blend-multiply pointer-events-none"></div>
       <div className="absolute bottom-[-20%] right-[-10%] w-[400px] h-[400px] bg-info rounded-full opacity-30 blur-[60px] mix-blend-multiply pointer-events-none"></div>
@@ -33,10 +34,10 @@ const TeacherInfoHeader = () => {
 const CourseCard = ({ course }) => {
   const { t, i18n } = useTranslation("teacherDetails");
   const isRTL = i18n.language === 'ar';
-
+  
   return (
-    <div className={`card bg-base-100 shadow-[0_6px_16px_rgba(0,0,0,0.10)] hover:shadow-[0_12px_28px_rgba(0,0,0,0.14)] hover:-translate-y-1 duration-300 transition-all rounded-3xl w-full max-w-[22rem] mx-auto overflow-hidden ${isRTL ? 'text-right' : 'text-left'}`}>
-      <figure className="relative h-48 bg-base-200 w-full p-2">
+    <div className={`rounded-3xl bg-white shadow-[0_6px_16px_rgba(0,0,0,0.10)] hover:shadow-[0_12px_28px_rgba(0,0,0,0.14)] hover:-translate-y-1 duration-300 transition-all w-full max-w-[22rem] mx-auto overflow-hidden ${isRTL ? 'text-right' : 'text-left'}`}>
+      <figure className="relative h-48 bg-slate-200 w-full p-2">
         <img
           src={course.thumbnail || `/course-4.png`}
           alt={course.title}
@@ -44,35 +45,35 @@ const CourseCard = ({ course }) => {
           onError={(e) => { e.currentTarget.src = `/course-4.png` }}
         />
         {/* Floating badge for rating */}
-        <div className="absolute top-5 right-5 bg-base-100/95 backdrop-blur-sm px-3 py-1.5 rounded-full text-sm font-semibold flex items-center gap-1 shadow-sm">
-          <Star className="w-4 h-4 text-accent fill-accent" />
-          <span>{course.rating || "5.0"}</span>
+        <div className="absolute top-5 right-5 bg-slate-900/90 backdrop-blur-sm px-3 py-1.5 rounded-full text-sm font-semibold flex items-center gap-1 shadow-sm">
+          <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+          <span className="text-white">{course.rating || "5.0"}</span>
         </div>
       </figure>
-
-      <div className="card-body p-6 flex flex-col gap-4">
+  
+      <div className="p-6 flex flex-col gap-4">
         <div>
-          <h3 className="card-title text-xl font-bold text-base-content mb-2 line-clamp-2 leading-snug">{course.title}</h3>
+          <h3 className="text-xl font-bold text-slate-900 mb-2 line-clamp-2 leading-snug">{course.title}</h3>
           
           <div className="flex flex-col gap-2 mt-3">
-            <div className="flex items-center gap-2 text-sm text-neutral font-medium">
+            <div className="flex items-center gap-2 text-sm text-slate-700 font-medium">
               <BookOpen className="w-4 h-4 text-info flex-shrink-0" />
               <span className="truncate">{course.subject} - {course.class}</span>
             </div>
-            <div className="flex items-center gap-2 text-sm text-neutral font-medium">
+            <div className="flex items-center gap-2 text-sm text-slate-700 font-medium">
               <GraduationCap className="w-4 h-4 text-info flex-shrink-0" />
               <span className="truncate">{course.grade}</span>
             </div>
           </div>
         </div>
-
-        <div className="flex flex-col sm:flex-row items-center justify-between mt-auto pt-4 border-t border-base-200/60 gap-3">
+  
+        <div className="flex flex-col sm:flex-row items-center justify-between mt-auto pt-4 border-t border-slate-200/60 gap-3">
           <span className="text-xs font-bold text-primary bg-primary/10 px-4 py-1.5 rounded-full text-center truncate max-w-full">
             {course.type || t('courseType')}
           </span>
           <Link
             to={buildCoursePath({ _id: course.id, name: course.title })}
-            className="btn btn-primary bg-accent border-none text-base-content hover:bg-accent/90 hover:scale-105 btn-sm h-10 rounded-full px-6 w-full sm:w-auto transition-transform"
+            className="bg-primary text-white border-none hover:bg-primary/90 hover:scale-105 inline-flex items-center justify-center h-10 rounded-full px-6 w-full sm:w-auto transition-transform text-sm font-semibold"
           >
             {t('viewDetails', 'عرض التفاصيل')}
           </Link>
@@ -183,13 +184,13 @@ const SocialMediaIcons = ({ linksByPlatform }) => (
   <div className="flex flex-row gap-3 mt-6 justify-center md:justify-start">
     {socialIcons.map(({ key, label, svg }) => {
       const href = linksByPlatform?.[key];
-      const baseClassName = "btn border-none btn-circle bg-base-200 shadow-sm h-10 w-10 min-h-0 flex items-center justify-center";
-
+      const baseClassName = "rounded-full bg-slate-100 shadow-sm h-10 w-10 min-h-0 flex items-center justify-center";
+  
       if (!href) {
         return (
           <span
             key={label}
-            className={`${baseClassName} cursor-not-allowed text-base-content/30`}
+            className={`${baseClassName} cursor-not-allowed text-slate-400`}
             aria-label={label}
             title={label}
           >
@@ -197,7 +198,7 @@ const SocialMediaIcons = ({ linksByPlatform }) => (
           </span>
         );
       }
-
+  
       return (
         <a
           key={label}
@@ -206,7 +207,7 @@ const SocialMediaIcons = ({ linksByPlatform }) => (
           rel="noopener noreferrer"
           aria-label={label}
           title={label}
-          className={`${baseClassName} text-base-content/60 hover:bg-info/20 hover:scale-110 hover:text-info transition-all duration-200`}
+          className={`${baseClassName} text-slate-600 hover:bg-info/20 hover:scale-110 hover:text-info transition-all duration-200`}
         >
           {svg}
         </a>
@@ -214,14 +215,14 @@ const SocialMediaIcons = ({ linksByPlatform }) => (
     })}
   </div>
 )
-
+  
 const TeacherProfileImage = ({ profileImage }) => (
   <div className="relative mx-auto md:mx-0 w-32 h-32 md:w-48 md:h-48 lg:w-56 lg:h-56 shrink-0 group">
     {/* Soft glowing backplates */}
     <div className="absolute inset-0 bg-accent rounded-full opacity-20 group-hover:scale-110 transition-transform duration-500 blur-md"></div>
     <div className="absolute inset-0 bg-info rounded-full opacity-20 scale-105 -translate-x-2 -translate-y-2 group-hover:translate-x-0 group-hover:translate-y-0 transition-all duration-500 blur-md"></div>
     
-    <div className="w-full h-full rounded-full overflow-hidden border-[6px] border-base-100 shadow-[0_12px_28px_rgba(0,0,0,0.12)] relative z-10 bg-base-200">
+    <div className="w-full h-full rounded-full overflow-hidden border-[6px] border-white shadow-[0_12px_28px_rgba(0,0,0,0.12)] relative z-10 bg-slate-100">
       <img 
         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
         src={profileImage || resolveProfileImageUrl(null)} 
@@ -356,7 +357,7 @@ export default function TeacherDetails() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen bg-base-200/50">
+      <div className="flex justify-center items-center h-screen bg-slate-100/50">
         <Loader className="h-10 w-10 animate-spin text-primary" />
         <span className={`text-lg font-semibold text-primary ${isRTL ? 'mr-3' : 'ml-3'}`}>
           {t('error.loading', 'جاري التحميل...')}
@@ -364,35 +365,35 @@ export default function TeacherDetails() {
       </div>
     );
   }
-
+  
   if (error) {
     return (
-      <div className="flex justify-center items-center h-screen bg-base-200/50 p-4">
-        <div className="alert alert-error max-w-md shadow-lg rounded-2xl">
+      <div className="flex justify-center items-center h-screen bg-slate-100/50 p-4">
+        <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 shadow-sm flex items-center gap-3 max-w-md shadow-lg">
           <p className="font-semibold text-center w-full">{error}</p>
         </div>
       </div>
     );
   }
-
+  
   if (!teacher) {
     return (
-      <div className="flex justify-center items-center h-screen bg-base-200/50 p-4">
-        <div className="alert alert-warning max-w-md shadow-lg rounded-2xl">
+      <div className="flex justify-center items-center h-screen bg-slate-100/50 p-4">
+        <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700 shadow-sm flex items-center gap-3 max-w-md shadow-lg">
           <p className="font-semibold text-center w-full">{t('error.notFound')}</p>
         </div>
       </div>
     );
   }
-
+  
   return (
-    <section className="min-h-screen bg-base-200/30 pb-20" dir={isRTL ? 'rtl' : 'ltr'}>
+    <section className="min-h-screen bg-white pb-20" dir={isRTL ? 'rtl' : 'ltr'}>
       <TeacherInfoHeader />
       
       <div className="container mx-auto px-4 md:px-6 lg:px-8">
         
         {/* Profile Details Card - overlapping the header */}
-        <div className="relative z-20 -mt-16 md:-mt-24 bg-base-100 rounded-3xl shadow-[0_12px_28px_rgba(0,0,0,0.08)] p-6 md:p-10 mb-16 max-w-5xl mx-auto">
+        <div className="relative z-20 -mt-16 md:-mt-24 bg-white rounded-3xl shadow-[0_12px_28px_rgba(0,0,0,0.08)] p-6 md:p-10 mb-16 max-w-5xl mx-auto">
           <div className="flex flex-col md:flex-row items-center md:items-start gap-8 md:gap-12">
             
             {/* Image & Socials */}
@@ -400,31 +401,31 @@ export default function TeacherDetails() {
                <TeacherProfileImage profileImage={resolvedTeacherImage} />
                <SocialMediaIcons linksByPlatform={socialLinksByPlatform} />
             </div>
-
+  
             {/* Text details */}
             <div className={`flex flex-col flex-1 w-full ${isRTL ? 'text-right' : 'text-left'} pt-2`}>
               <div className="inline-flex items-center gap-2 mb-2 justify-center md:justify-start">
-                <Award className="h-5 w-5 text-accent" />
-                <h2 className="text-lg font-bold text-accent">{teacher.role || t('lecturer', 'محاضر')}</h2>
+                <Award className="h-5 w-5 text-amber-600" />
+                <h2 className="text-lg font-bold text-slate-800">{teacher.role || t('lecturer', 'محاضر')}</h2>
               </div>
               
-              <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-base-content mb-4 text-center md:text-start">
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-slate-900 mb-4 text-center md:text-start">
                 {teacher.name}
               </h1>
-
-              <div className="flex items-center gap-2 bg-info/10 text-info w-max px-4 py-2 rounded-full font-bold text-sm md:text-base mb-6 mx-auto md:mx-0">
+  
+              <div className="flex items-center gap-2 bg-primary/10 text-primary w-max px-4 py-2 rounded-full font-bold text-sm md:text-base mb-6 mx-auto md:mx-0">
                 <Users className="w-5 h-5" />
                 <span>{t('subject')} {teacher.expertise || t('defaultSubject')}</span>
               </div>
-
-              <div className="mt-4 bg-base-200/50 rounded-2xl p-6 md:p-8">
+  
+              <div className="mt-4 bg-slate-100/50 rounded-2xl p-6 md:p-8">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="h-6 w-1.5 bg-primary rounded-full"></div>
-                  <h3 className="text-xl md:text-2xl font-bold text-primary">
+                  <h3 className="text-xl md:text-2xl font-bold text-slate-800">
                     {t('bioHeader', 'نبذة تعريفية')}
                   </h3>
                 </div>
-                <p className="font-medium text-neutral leading-relaxed md:text-lg">
+                <p className="font-medium text-slate-700 leading-relaxed md:text-lg">
                   {teacher.bio || t('bioTemplate', {
                     name: teacher.name,
                     expertise: teacher.expertise || t('defaultSubject')
@@ -434,16 +435,16 @@ export default function TeacherDetails() {
             </div>
           </div>
         </div>
-
+  
         {/* Courses Section */}
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col items-center mb-12 relative">
-            <h2 className="text-3xl md:text-4xl font-extrabold text-primary mb-3 relative z-10">
+            <h2 className="text-3xl md:text-4xl font-extrabold text-slate-800 mb-3 relative z-10">
               {t('coursesHeader', 'الدورات المتاحة')}
             </h2>
             <div className="h-1.5 w-16 bg-accent rounded-full mb-2"></div>
           </div>
-
+  
           {/* Card grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 xl:gap-10">
             {activeContainers.length > 0 ? (
@@ -470,11 +471,11 @@ export default function TeacherDetails() {
                 />
               ))
             ) : (
-              <div className="col-span-1 sm:col-span-2 lg:col-span-3 text-center py-16 bg-base-100 rounded-3xl shadow-sm border border-base-200">
-                <div className="w-20 h-20 bg-base-200 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <BookOpen className="w-10 h-10 text-neutral/40" />
+              <div className="col-span-1 sm:col-span-2 lg:col-span-3 text-center py-16 bg-white rounded-3xl shadow-sm border border-slate-200">
+                <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <BookOpen className="w-10 h-10 text-slate-400" />
                 </div>
-                <p className="text-lg text-neutral font-medium">{t('noCoursesAvailable', 'لا توجد دورات متاحة حالياً')}</p>
+                <p className="text-lg text-slate-700 font-medium">{t('noCoursesAvailable', 'لا توجد دورات متاحة حالياً')}</p>
               </div>
             )}
           </div>

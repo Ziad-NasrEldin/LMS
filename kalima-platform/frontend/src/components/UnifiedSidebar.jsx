@@ -1,6 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import Button from "./ui/Button";
+import Input from "./ui/Input";
 import {
   FaChartLine,
   FaChevronLeft,
@@ -71,6 +73,7 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
   const [error, setError] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
   const [viewActionError, setViewActionError] = useState("");
+  const [isViewModesExpanded, setIsViewModesExpanded] = useState(true);
 
   const [impersonationSession, setImpersonationSession] = useState(getImpersonationSession());
   const [showImpersonationModal, setShowImpersonationModal] = useState(false);
@@ -561,7 +564,7 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
 
       <div
         id="user-sidebar"
-        className={`fixed z-40 flex w-[17.5rem] flex-col overflow-hidden rounded-[1.75rem] border border-white/50 text-base-content shadow-[0_24px_55px_rgba(14,33,38,0.20)] backdrop-blur-xl transition-all duration-300 ease-out ${isOpen
+        className={`fixed z-40 flex w-[17.5rem] flex-col overflow-hidden rounded-[1.75rem] border border-white/50 text-slate-900 shadow-[0_24px_55px_rgba(14,33,38,0.20)] backdrop-blur-xl transition-all duration-300 ease-out ${isOpen
           ? "scale-100 translate-x-0 opacity-100"
           : isRTL
             ? "translate-x-[120%] scale-[0.98] opacity-0"
@@ -586,7 +589,7 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
             <span className="font-extrabold tracking-tight text-primary">
               {t("dashboardTitle") || "Dashboard"}
             </span>
-            <div className="rounded-full bg-primary p-2 text-primary-content shadow-md shadow-primary/25">
+            <div className="rounded-full bg-[#0E5563] p-2 text-white shadow-md shadow-[rgba(14,85,99,0.25)]">
               <FaUser className="h-2 w-2" />
             </div>
           </div>
@@ -594,50 +597,50 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
 
         {userData && (
           <div className="relative mx-3 mt-3 rounded-2xl border border-white/70 bg-white/65 px-3 py-3 shadow-sm">
-            <div className="flex items-center gap-3">
-              <div className="fekra-avatar">
-                <div className="fekra-avatar-ring h-11 w-11">
-                  <img
-                    src={resolveProfileImageUrl(userData?.profilePic)}
-                    alt={userData?.name || "User Avatar"}
-                    className="object-cover"
-                    onError={(event) => {
-                      event.currentTarget.src = "/person.png";
-                    }}
-                  />
-                </div>
-              </div>
-              <div className="min-w-0">
-                <p className="truncate text-sm font-semibold leading-5">{userData.name}</p>
-                <p className="truncate text-xs fekra-text-slate">{userData.role}</p>
-                {impersonationSession?.isActive && (
-                  <p className="mt-1 truncate text-[11px] font-semibold fekra-text-primary">
-                    {t("viewingAs", {
-                      defaultValue: "Viewing as: {{role}}",
-                      role: impersonationSession.targetRole,
-                    })}
-                  </p>
-                )}
-              </div>
-            </div>
+             <div className="flex items-center gap-3">
+               <div className="h-11 w-11 rounded-full overflow-hidden border-2 border-white shadow-sm">
+                 <img
+                   src={resolveProfileImageUrl(userData?.profilePic)}
+                   alt={userData?.name || "User Avatar"}
+                   className="object-cover w-full h-full"
+                   onError={(event) => {
+                     event.currentTarget.src = "/person.png";
+                   }}
+                 />
+               </div>
+               <div className="min-w-0">
+                 <p className="truncate text-sm font-semibold leading-5">{userData.name}</p>
+                <p className="truncate text-xs text-slate-600">{userData.role}</p>
+                 {impersonationSession?.isActive && (
+                   <p className="mt-1 truncate text-[11px] font-semibold text-primary">
+                     {t("viewingAs", {
+                       defaultValue: "Viewing as: {{role}}",
+                       role: impersonationSession.targetRole,
+                     })}
+                   </p>
+                 )}
+               </div>
+             </div>
           </div>
         )}
 
         {loading && (
-          <div className="flex h-32 items-center justify-center">
-            <div className="loading loading-spinner loading-md text-primary" />
-          </div>
+         <div className="flex h-32 items-center justify-center">
+           <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+         </div>
         )}
 
         {error && !loading && (
           <div className="p-4 text-sm text-error">
             <p>{error}</p>
-            <button
-              className="btn btn-sm btn-outline btn-error mt-2"
-              onClick={() => window.location.reload()}
-            >
-              {t("retry", { defaultValue: "Retry" })}
-            </button>
+                <Button 
+                  variant="error" 
+                  size="sm" 
+                  className="mt-2"
+                  onClick={() => window.location.reload()}
+                >
+                {t("retry", { defaultValue: "Retry" })}
+                  </Button>
           </div>
         )}
 
@@ -652,33 +655,72 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
 
               {allowedTargetRoles.length > 0 && !impersonationSession?.isActive && (
                 <div className="mb-3 rounded-xl border border-primary/20 bg-white/70 p-3">
-                  <p className="mb-2 text-xs font-bold tracking-wide text-primary">
-                    {t("viewModes", { defaultValue: "View Modes" })}
-                  </p>
-                  <div className="space-y-2">
-                    {allowedTargetRoles.map((role) => (
-                      <button
-                        key={role}
-                        type="button"
-                        className="btn btn-sm w-full justify-start rounded-xl border-primary/25 bg-white text-primary hover:bg-primary hover:text-primary-content"
-                        onClick={() => openRolePicker(role)}
+                  <button
+                    type="button"
+                    className="flex w-full items-center justify-between gap-3 rounded-lg text-left text-primary transition-colors hover:text-[#0E5563]"
+                    onClick={() => setIsViewModesExpanded((current) => !current)}
+                    aria-expanded={isViewModesExpanded}
+                    aria-label={t("toggleViewModes", { defaultValue: "Toggle view modes" })}
+                  >
+                    <span className="text-xs font-bold tracking-wide">
+                      {t("viewModes", { defaultValue: "View Modes" })}
+                    </span>
+                    <span className="flex items-center gap-2 text-[11px] font-semibold">
+                      {isViewModesExpanded
+                        ? t("collapse", { defaultValue: "Collapse" })
+                        : t("expand", { defaultValue: "Expand" })}
+                      <span
+                        className={`transition-transform duration-200 ${
+                          isViewModesExpanded ? "rotate-90" : "rotate-0"
+                        }`}
                       >
-                        <FaEye className="h-4 w-4" />
-                        {getRoleLabel(role)}
-                      </button>
-                    ))}
-                  </div>
+                        {isRTL ? (
+                          <FaChevronLeft className="h-3 w-3" />
+                        ) : (
+                          <FaChevronRight className="h-3 w-3" />
+                        )}
+                      </span>
+                    </span>
+                  </button>
+                  {isViewModesExpanded && (
+                    <div className="mt-2 space-y-2">
+                      {allowedTargetRoles.map((role) => (
+                        <Button
+                          key={role}
+                          type="button"
+                          variant="outline"
+                          className="w-full justify-start rounded-xl border-primary/25 bg-white text-[#0E5563] hover:bg-[#0E5563] hover:text-white"
+                          onClick={() => openRolePicker(role)}
+                        >
+                          <FaEye className="mr-2 h-4 w-4" />
+                          {getRoleLabel(role)}
+                        </Button>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
 
-              {menuItems.map((item) => (
+              {menuItems.map((item) => {
+                const isActive = location.pathname === item.path;
+
+                return (
                 <React.Fragment key={item.id}>
                   <Link
                     to={item.path}
-                    className={`group mb-1 flex items-center justify-between gap-2 rounded-xl px-3 py-2.5 text-sm transition-all duration-200 ${location.pathname === item.path
-                      ? "bg-primary text-white shadow-[0_10px_25px_rgba(14,85,99,0.22)]"
-                      : "text-gray-800 hover:bg-white/70 hover:text-primary"
-                      }`}
+                    className={`group mb-1 flex items-center justify-between gap-2 rounded-xl px-3 py-2.5 text-sm transition-all duration-200 ${
+                      isActive
+                        ? "shadow-[0_10px_25px_rgba(14,85,99,0.22)]"
+                        : "text-gray-800 hover:bg-white/70 hover:text-[#0E5563]"
+                    }`}
+                    style={
+                      isActive
+                        ? {
+                            background: "linear-gradient(140deg, #0E5563 0%, #146A78 100%)",
+                            color: "#FFFFFF",
+                          }
+                        : undefined
+                    }
                     onClick={(event) => {
                       if (item.onClick) {
                         event.preventDefault();
@@ -690,10 +732,11 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
                     }}
                   >
                     <div
-                      className={`grid h-8 w-8 place-items-center rounded-lg transition-colors ${location.pathname === item.path
-                        ? "bg-white/20 text-white"
-                      : "bg-primary/10 text-primary group-hover:bg-primary/15"
-                        } ${isRTL ? "ml-1" : "mr-1"}`}
+                      className={`grid h-8 w-8 place-items-center rounded-lg transition-colors ${
+                        isActive
+                          ? "bg-white/20 text-white"
+                          : "bg-[#0E5563]/10 text-[#0E5563] group-hover:bg-[#0E5563]/15"
+                      } ${isRTL ? "ml-1" : "mr-1"}`}
                     >
                       {item.icon}
                     </div>
@@ -703,28 +746,29 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
                   </Link>
                   {item.divider && <div className="my-2 border-t border-gray-300/70" />}
                 </React.Fragment>
-              ))}
+                );
+              })}
             </div>
 
             {impersonationSession?.isActive && (
               <div className="relative border-t border-gray-300/70 p-3">
-                <button
-                  type="button"
-                  className="btn w-full rounded-xl border-0 text-white"
-                  style={{ 
-                    background: "linear-gradient(140deg, #0E5563 0%, #146A78 100%)",
-                    color: "#FFFFFF"
-                  }}
-                  onClick={handleExitView}
-                  disabled={isExitingView}
-                >
-                  {isExitingView ? (
-                    <span className="loading loading-spinner loading-sm"></span>
-                  ) : (
-                    <FaTimes className="h-4 w-4" />
-                  )}
-                  {t("exitView", { defaultValue: "Exit View" })}
-                </button>
+                 <Button
+                   type="button"
+                   className="w-full rounded-xl border-0 text-white"
+                   style={{ 
+                     background: "linear-gradient(140deg, #0E5563 0%, #146A78 100%)",
+                     color: "#FFFFFF"
+                   }}
+                   onClick={handleExitView}
+                   disabled={isExitingView}
+                 >
+                   {isExitingView ? (
+                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                   ) : (
+                     <FaTimes className="h-4 w-4 mr-2" />
+                   )}
+                   {t("exitView", { defaultValue: "Exit View" })}
+                  </Button>
               </div>
             )}
           </>
@@ -734,7 +778,7 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
       <button
         id="sidebar-toggle"
         onClick={toggleSidebar}
-        className={`fixed z-50 -translate-y-1/2 rounded-2xl border border-white/60 bg-[linear-gradient(140deg,#0E5563_0%,#146A78_100%)] p-2 text-primary-content shadow-[0_12px_28px_rgba(14,85,99,0.35)] transition-all duration-300 hover:scale-105 ${isRTL ? "right-1" : "left-1"
+        className={`fixed z-50 -translate-y-1/2 rounded-2xl border border-white/60 bg-[linear-gradient(140deg,#0E5563_0%,#146A78_100%)] p-2 text-white shadow-[0_12px_28px_rgba(14,85,99,0.35)] transition-all duration-300 hover:scale-105 ${isRTL ? "right-1" : "left-1"
           } ${isOpen && isRTL
             ? "-translate-x-[18.5rem]"
             : isOpen && !isRTL
@@ -755,8 +799,8 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
           <FaChevronLeft />
         ) : (
           <FaChevronRight />
-        )}
-      </button>
+         )}
+                </button>
 
       {showImpersonationModal && (
         <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/40 p-4">
@@ -774,18 +818,18 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
                   {getRoleLabel(selectedTargetRole)}
                 </p>
               </div>
-              <button type="button" className="btn btn-sm btn-ghost" onClick={closeModal}>
-                <FaTimes className="h-4 w-4" />
-              </button>
+               <Button variant="ghost" size="sm" onClick={closeModal}>
+                  <FaTimes className="h-4 w-4" />
+                </Button>
             </div>
 
-            <input
-              type="text"
-              value={targetSearch}
-              onChange={(event) => setTargetSearch(event.target.value)}
-              placeholder={t("searchUsers", { defaultValue: "Search by name, email, or phone" })}
-              className="input input-bordered w-full"
-            />
+             <Input
+               type="text"
+               value={targetSearch}
+               onChange={(event) => setTargetSearch(event.target.value)}
+               placeholder={t("searchUsers", { defaultValue: "Search by name, email, or phone" })}
+               className="w-full"
+             />
 
             {targetsError && (
               <div className="mt-3 rounded-xl border border-error/30 bg-error/10 px-3 py-2 text-sm font-semibold text-error">
@@ -794,35 +838,35 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
             )}
 
             <div className="mt-4 max-h-[320px] overflow-y-auto rounded-xl border border-gray-300">
-              {targetsLoading ? (
-                <div className="flex items-center justify-center p-6">
-                  <span className="loading loading-spinner loading-md text-primary"></span>
-                </div>
-              ) : filteredTargets.length === 0 ? (
-                <div className="p-6 text-center text-sm font-semibold fekra-text-slate">
-                  {t("noMatchingUsers", { defaultValue: "No matching users found" })}
-                </div>
-              ) : (
-                filteredTargets.map((target) => (
-                  <button
-                    key={target._id}
-                    type="button"
-                    className="flex w-full items-center justify-between border-b border-gray-300/70 px-4 py-3 text-sm hover:bg-gray-100/40 last:border-b-0"
-                    onClick={() => handleStartImpersonation(target)}
-                    disabled={switchingTargetId === target._id}
-                  >
-                    <div className="min-w-0">
-                      <p className="truncate font-bold">{target.name || t("unknownUser", { defaultValue: "Unknown User" })}</p>
-                      <p className="truncate text-xs fekra-text-slate">{target.email || target.phoneNumber || "-"}</p>
-                    </div>
-                    {switchingTargetId === target._id ? (
-                      <span className="loading loading-spinner loading-sm fekra-text-primary"></span>
-                    ) : (
-                      <span className="badge badge-outline">{t("switchView", { defaultValue: "Switch" })}</span>
-                    )}
-                  </button>
-                ))
-              )}
+             {targetsLoading ? (
+               <div className="flex items-center justify-center p-6">
+                 <div className="w-6 h-6 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+               </div>
+             ) : filteredTargets.length === 0 ? (
+              <div className="p-6 text-center text-sm font-semibold text-slate-600">
+                 {t("noMatchingUsers", { defaultValue: "No matching users found" })}
+               </div>
+             ) : (
+               filteredTargets.map((target) => (
+                 <button
+                   key={target._id}
+                   type="button"
+                   className="flex w-full items-center justify-between border-b border-gray-300/70 px-4 py-3 text-sm hover:bg-gray-100/40 last:border-b-0"
+                   onClick={() => handleStartImpersonation(target)}
+                   disabled={switchingTargetId === target._id}
+                 >
+                   <div className="min-w-0">
+                     <p className="truncate font-bold">{target.name || t("unknownUser", { defaultValue: "Unknown User" })}</p>
+                    <p className="truncate text-xs text-slate-600">{target.email || target.phoneNumber || "-"}</p>
+                   </div>
+                   {switchingTargetId === target._id ? (
+                     <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                   ) : (
+                     <span className="px-2 py-1 text-xs font-medium border border-slate-300 rounded-full">{t("switchView", { defaultValue: "Switch" })}</span>
+                   )}
+                </button>
+               ))
+             )}
             </div>
           </div>
         </div>

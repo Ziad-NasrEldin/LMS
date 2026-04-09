@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import toast from "react-hot-toast";
 import {
@@ -29,6 +29,8 @@ import {
 import { getMyContainers, getLecturerAnalytics } from "../../routes/lectures";
 import { AssistantService } from "../../routes/assistants-services";
 import DashboardStatCard from "../../components/DashboardStatCard";
+import Button from "../../components/ui/Button";
+import Input from "../../components/ui/Input";
 import { translateErrorMessage } from "../../utils/errorTranslator";
 import {
   buildExportFileDate,
@@ -66,6 +68,8 @@ export default function LecturerOverviewPanel() {
   const [forceDemoData, setForceDemoData] = useState(false);
   const [promoCodesPage, setPromoCodesPage] = useState(1);
   const [linkedStudentsPage, setLinkedStudentsPage] = useState(1);
+  const [isExportMenuOpen, setIsExportMenuOpen] = useState(false);
+  const exportMenuRef = useRef(null);
 
   useEffect(() => {
     const fetchOverview = async () => {
@@ -115,6 +119,19 @@ export default function LecturerOverviewPanel() {
 
     fetchOverview();
   }, [appliedFilters.dateFrom, appliedFilters.dateTo, isRTL]);
+
+  useEffect(() => {
+    const handlePointerDown = (event) => {
+      if (!exportMenuRef.current?.contains(event.target)) {
+        setIsExportMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handlePointerDown);
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+    };
+  }, []);
 
   const metrics = useMemo(() => {
     const summary = analytics?.summary || {};
@@ -432,6 +449,7 @@ export default function LecturerOverviewPanel() {
 
   const handleExport = (format = "xlsx") => {
     try {
+      setIsExportMenuOpen(false);
       const summaryRows = buildSummaryRows();
       const purchasesRows = buildPurchasesRows();
       const promoRows = buildPromoRows();
@@ -559,22 +577,22 @@ export default function LecturerOverviewPanel() {
 
   if (loading) {
     return (
-      <section className="rounded-[1.5rem] bg-base-100 border border-base-300 p-6 mb-10">
+      <section className="rounded-[1.5rem] bg-white border border-slate-200 p-6 mb-10">
         <div className="flex items-center justify-center h-36">
-          <span className="loading loading-spinner loading-lg text-primary"></span>
+          <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
         </div>
       </section>
     );
   }
-
+  
   return (
-    <section className="rounded-[1.5rem] bg-base-100 border border-base-300 p-5 md:p-6 mb-10">
+    <section className="rounded-[1.5rem] bg-white border border-slate-200 p-5 md:p-6 mb-10">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
         <div>
           <h2 className="text-2xl md:text-3xl font-bold text-primary">
             {t("dashboardOverview", { defaultValue: isRTL ? "ملخص لوحة التحكم" : "Dashboard Overview" })}
           </h2>
-          <p className="text-sm opacity-70 mt-1">
+          <p className="mt-1 text-sm text-slate-700">
             {t("dashboardOverviewHint", {
               defaultValue: isRTL
                 ? "ملخص سريع للمقررات والمحاضرات والمساعدين والإيرادات"
@@ -582,17 +600,19 @@ export default function LecturerOverviewPanel() {
             })}
           </p>
         </div>
-
-        <Link to="/dashboard/lecturer-dashboard/CoursesForm" className="btn btn-primary rounded-xl w-full md:w-auto" style={{ color: "#F8FCFF" }}>
-          {t("addNewCourse")}
-        </Link>
+  
+         <Link to="/dashboard/lecturer-dashboard/CoursesForm" className="inline-block w-full md:w-auto">
+           <Button variant="primary" className="rounded-xl w-full md:w-auto" style={{ color: "#F8FCFF" }}>
+             {t("addNewCourse")}
+           </Button>
+         </Link>
       </div>
 
-      <form onSubmit={handleApplyFilters} className="mb-6 rounded-2xl border border-base-300 bg-base-200/50 p-4">
+       <form onSubmit={handleApplyFilters} className="mb-6 rounded-2xl border border-slate-200 bg-slate-100/50 p-4">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <h3 className="text-lg font-bold">{t("analyticsFilters", { defaultValue: isRTL ? "مرشحات التحليلات" : "Analytics Filters" })}</h3>
-            <p className="text-sm opacity-70">
+            <p className="text-sm text-slate-700">
               {t("analyticsFiltersHint", {
                 defaultValue: isRTL
                   ? "اختَر تاريخ البداية والنهاية لتحديث الأرقام."
@@ -603,62 +623,76 @@ export default function LecturerOverviewPanel() {
 
           <div className="grid w-full gap-3 sm:grid-cols-2 lg:max-w-3xl">
             <label className="form-control">
-              <span className="label-text text-xs font-semibold opacity-70">{t("dateFrom", { defaultValue: isRTL ? "من تاريخ" : "From date" })}</span>
-              <input
-                type="date"
-                value={dateFrom}
-                onChange={(e) => setDateFrom(e.target.value)}
-                className="input input-bordered input-sm w-full"
-              />
+              <span className="label-text text-xs font-semibold text-slate-700">{t("dateFrom", { defaultValue: isRTL ? "من تاريخ" : "From date" })}</span>
+               <Input
+                 type="date"
+                 value={dateFrom}
+                 onChange={(e) => setDateFrom(e.target.value)}
+                 size="sm"
+                 className="w-full"
+               />
             </label>
             <label className="form-control">
-              <span className="label-text text-xs font-semibold opacity-70">{t("dateTo", { defaultValue: isRTL ? "إلى تاريخ" : "To date" })}</span>
-              <input
-                type="date"
-                value={dateTo}
-                onChange={(e) => setDateTo(e.target.value)}
-                className="input input-bordered input-sm w-full"
-              />
+              <span className="label-text text-xs font-semibold text-slate-700">{t("dateTo", { defaultValue: isRTL ? "إلى تاريخ" : "To date" })}</span>
+               <Input
+                 type="date"
+                 value={dateTo}
+                 onChange={(e) => setDateTo(e.target.value)}
+                 size="sm"
+                 className="w-full"
+               />
             </label>
           </div>
 
           <div className="flex flex-wrap gap-2">
-            <button type="submit" className="btn btn-primary rounded-xl" style={{ color: "#F8FCFF" }}>
+             <Button type="submit" variant="primary" rounded-xl style={{ color: "#F8FCFF" }}>
               {t("applyFilters", { defaultValue: isRTL ? "تطبيق" : "Apply" })}
-            </button>
-            <button type="button" onClick={handleResetFilters} className="btn btn-ghost rounded-xl">
-              {t("resetFilters", { defaultValue: isRTL ? "إعادة ضبط" : "Reset" })}
-            </button>
-            <div className="dropdown dropdown-end">
-              <button type="button" tabIndex={0} className="btn btn-outline rounded-xl">
+             </Button>
+             <Button type="button" onClick={handleResetFilters} variant="ghost" className="rounded-xl">
+               {t("resetFilters", { defaultValue: isRTL ? "إعادة ضبط" : "Reset" })}
+             </Button>
+            <div ref={exportMenuRef} className="relative">
+              <Button
+                type="button"
+                variant="outline"
+                rounded-xl
+                onClick={() => setIsExportMenuOpen((current) => !current)}
+                aria-expanded={isExportMenuOpen}
+                aria-haspopup="menu"
+              >
                 <Download className="w-4 h-4" />
                 {t("exportData", { defaultValue: isRTL ? "تصدير البيانات" : "Export Data" })}
-              </button>
-              <ul tabIndex={0} className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
-                <li>
-                  <button type="button" onClick={() => handleExport("xlsx")}>
-                    {t("exportXlsx", { defaultValue: isRTL ? "تصدير XLSX" : "Export XLSX" })}
-                  </button>
-                </li>
-                <li>
-                  <button type="button" onClick={() => handleExport("csv")}>
-                    {t("exportCsv", { defaultValue: isRTL ? "تصدير CSV" : "Export CSV" })}
-                  </button>
-                </li>
-              </ul>
+              </Button>
+              {isExportMenuOpen && (
+                <ul
+                  className={`absolute ${isRTL ? "left-0" : "right-0"} top-full z-[20] mt-2 menu w-52 rounded-xl bg-white p-2 shadow dropdown-content`}
+                  role="menu"
+                >
+                  <li>
+                    <Button type="button" variant="ghost" size="sm" onClick={() => handleExport("xlsx")}>
+                      {t("exportXlsx", { defaultValue: isRTL ? "تصدير XLSX" : "Export XLSX" })}
+                    </Button>
+                  </li>
+                  <li>
+                    <Button type="button" variant="ghost" size="sm" onClick={() => handleExport("csv")}>
+                      {t("exportCsv", { defaultValue: isRTL ? "تصدير CSV" : "Export CSV" })}
+                    </Button>
+                  </li>
+                </ul>
+              )}
             </div>
           </div>
         </div>
       </form>
 
       {error && (
-        <div className="alert alert-warning mb-6 rounded-xl">
+         <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700 shadow-sm flex items-center gap-3 mb-6 rounded-xl">
           <AlertCircle className="w-5 h-5" />
           <span>{error}</span>
         </div>
       )}
 
-      <div className="mb-6 rounded-2xl border border-base-300 bg-base-200/50 p-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+       <div className="mb-6 rounded-2xl border border-slate-200 bg-slate-100/50 p-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <label className="flex items-center gap-3 cursor-pointer">
           <input
             type="checkbox"
@@ -672,7 +706,7 @@ export default function LecturerOverviewPanel() {
             })}
           </span>
         </label>
-        <p className="text-xs opacity-70">
+        <p className="text-xs text-slate-600">
           {forceDemoData
             ? t("demoDataEnabled", {
                 defaultValue: isRTL ? "الوضع التجريبي مفعل الآن." : "Demo mode is currently enabled.",
@@ -691,7 +725,7 @@ export default function LecturerOverviewPanel() {
           subtitle={t("myCoursesDesc", {
             defaultValue: isRTL ? "عدد الكورسات المنشورة حالياً." : "Number of published courses.",
           })}
-          className="bg-base-200 border-base-300"
+          className="bg-slate-100 border-slate-200"
         />
         <DashboardStatCard
           icon={<FileText className="w-5 h-5" />}
@@ -700,7 +734,7 @@ export default function LecturerOverviewPanel() {
           subtitle={t("lecturesDesc", {
             defaultValue: isRTL ? "إجمالي المحاضرات داخل كل الكورسات." : "Total lectures across all courses.",
           })}
-          className="bg-base-200 border-base-300"
+          className="bg-slate-100 border-slate-200"
         />
         <DashboardStatCard
           icon={<DollarSign className="w-5 h-5" />}
@@ -709,7 +743,7 @@ export default function LecturerOverviewPanel() {
           subtitle={t("totalRevenueDesc", {
             defaultValue: isRTL ? "إيرادك الفعلي من المبيعات." : "Your actual earnings from sales.",
           })}
-          className="bg-base-200 border-base-300"
+          className="bg-slate-100 border-slate-200"
         />
         <DashboardStatCard
           icon={<ListOrdered className="w-5 h-5" />}
@@ -718,7 +752,7 @@ export default function LecturerOverviewPanel() {
           subtitle={t("totalPurchasesDesc", {
             defaultValue: isRTL ? "عدد عمليات الشراء المنفذة." : "Number of completed purchase orders.",
           })}
-          className="bg-base-200 border-base-300"
+          className="bg-slate-100 border-slate-200"
         />
         <DashboardStatCard
           icon={<Users className="w-5 h-5" />}
@@ -727,7 +761,7 @@ export default function LecturerOverviewPanel() {
           subtitle={t("studentsBoughtDesc", {
             defaultValue: isRTL ? "عدد الطلاب المختلفين الذين اشتروا." : "Unique students who purchased your content.",
           })}
-          className="bg-base-200 border-base-300"
+          className="bg-slate-100 border-slate-200"
         />
         <DashboardStatCard
           icon={<UserCog className="w-5 h-5" />}
@@ -736,12 +770,12 @@ export default function LecturerOverviewPanel() {
           subtitle={t("assistantsDesc", {
             defaultValue: isRTL ? "عدد المساعدين المضافين لحسابك." : "Assistants currently linked to your account.",
           })}
-          className="bg-base-200 border-base-300"
+          className="bg-slate-100 border-slate-200"
         />
       </div>
 
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-2 mb-8">
-        <div className="rounded-2xl border border-base-300 bg-base-200/50 p-4">
+        <div className="rounded-2xl border border-slate-200 bg-slate-100/50 p-4">
           <div className="mb-4 flex items-center gap-2">
             <BarChart3 className="w-4 h-4 text-primary" />
             <h3 className="font-semibold">
@@ -750,7 +784,7 @@ export default function LecturerOverviewPanel() {
               })}
             </h3>
           </div>
-          <p className="text-sm opacity-70 mb-3">
+          <p className="mb-3 text-sm text-slate-700">
             {t("revenueByContentDesc", {
               defaultValue: isRTL ? "يوضح أي محتوى يحقق أعلى إيراد." : "Shows which content brings the highest revenue.",
             })}
@@ -767,7 +801,7 @@ export default function LecturerOverviewPanel() {
               <Bar data={revenueChartData} options={revenueChartOptions} />
             </div>
           ) : (
-            <p className="text-sm opacity-70">
+            <p className="text-sm text-slate-600">
               {t("noChartData", {
                 defaultValue: isRTL ? "لا توجد بيانات كافية لعرض الرسم." : "Not enough data to render the chart yet.",
               })}
@@ -775,7 +809,7 @@ export default function LecturerOverviewPanel() {
           )}
         </div>
 
-        <div className="rounded-2xl border border-base-300 bg-base-200/50 p-4">
+                 <div className="rounded-2xl border border-slate-200 bg-slate-100/50 p-4">
           <div className="mb-4 flex items-center gap-2">
             <PieChart className="w-4 h-4 text-primary" />
             <h3 className="font-semibold">
@@ -784,7 +818,7 @@ export default function LecturerOverviewPanel() {
               })}
             </h3>
           </div>
-          <p className="text-sm opacity-70 mb-3">
+          <p className="mb-3 text-sm text-slate-700">
             {t("purchasesDistributionDesc", {
               defaultValue: isRTL ? "نسبة المشتريات بين الكورسات والمحاضرات." : "Purchase share across your content.",
             })}
@@ -801,7 +835,7 @@ export default function LecturerOverviewPanel() {
               <Doughnut data={purchasesChartData} options={purchasesChartOptions} />
             </div>
           ) : (
-            <p className="text-sm opacity-70">
+            <p className="text-sm text-slate-600">
               {t("noChartData", {
                 defaultValue: isRTL ? "لا توجد بيانات كافية لعرض الرسم." : "Not enough data to render the chart yet.",
               })}
@@ -810,20 +844,20 @@ export default function LecturerOverviewPanel() {
         </div>
       </div>
 
-      <div className="rounded-2xl border border-base-300 overflow-hidden mb-8">
-        <div className="px-4 py-3 bg-base-200 flex items-center gap-2">
+       <div className="rounded-2xl border border-slate-200 overflow-hidden mb-8">
+         <div className="px-4 py-3 bg-slate-100 flex items-center gap-2">
           <ListOrdered className="w-4 h-4 text-primary" />
           <h3 className="font-semibold">
             {t("purchaseBreakdown", { defaultValue: isRTL ? "تفصيل المشتريات حسب المحتوى" : "Purchase Breakdown by Content" })}
           </h3>
         </div>
-        <div className="px-4 py-2 text-sm opacity-70 border-t border-base-300 bg-base-100">
+                 <div className="border-t border-slate-200 bg-white px-4 py-2 text-sm text-slate-700">
           {t("purchaseBreakdownDesc", {
             defaultValue: isRTL ? "تفاصيل كل محتوى: عدد المبيعات والإيراد والطلاب." : "Details per content: sales, revenue, and students.",
           })}
         </div>
         {usesPlaceholderCharts ? (
-          <div className="px-4 py-2 text-xs font-semibold text-warning border-t border-base-300 bg-base-100">
+                     <div className="px-4 py-2 text-xs font-semibold text-amber-600 border-t border-slate-200 bg-white">
             {t("sampleDataNotice", {
               defaultValue: isRTL ? "بيانات تجريبية للعرض فقط حتى تتوفر بيانات حقيقية." : "Sample data for preview only until real analytics are available.",
             })}
@@ -858,7 +892,7 @@ export default function LecturerOverviewPanel() {
             </table>
           </div>
         ) : (
-          <div className="p-4 text-sm opacity-70">
+          <div className="p-4 text-sm text-slate-600">
             {t("noPurchases", { defaultValue: isRTL ? "لا توجد مشتريات بعد." : "No purchases yet." })}
           </div>
         )}
@@ -866,18 +900,18 @@ export default function LecturerOverviewPanel() {
 
       <div className="grid gap-6 xl:grid-cols-2">
         <div className="rounded-2xl border border-base-300 overflow-hidden">
-          <div className="px-4 py-3 bg-base-200 flex items-center gap-2">
+          <div className="px-4 py-3 bg-slate-100 flex items-center gap-2">
             <Clock3 className="w-4 h-4 text-primary" />
             <h3 className="font-semibold">{t("recentActivity", { defaultValue: isRTL ? "آخر النشاطات" : "Recent Activity" })}</h3>
           </div>
-          <div className="px-4 py-2 text-sm opacity-70 border-t border-base-300 bg-base-100">
+          <div className="border-t border-slate-200 bg-white px-4 py-2 text-sm text-slate-700">
             {t("recentActivityDesc", {
               defaultValue: isRTL ? "آخر الكورسات أو المحاضرات التي تم تعديلها." : "Latest courses or lectures that were updated.",
             })}
           </div>
 
           {recentItems.length === 0 ? (
-            <div className="p-4 text-sm opacity-70">
+            <div className="p-4 text-sm text-slate-600">
               {t("noCourses", { defaultValue: isRTL ? "لا توجد عناصر بعد" : "No items yet" })}
             </div>
           ) : (
@@ -886,9 +920,9 @@ export default function LecturerOverviewPanel() {
                 <li key={item._id} className="p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-2">
                   <div>
                     <p className="font-semibold">{item.name}</p>
-                    <p className="text-sm opacity-70">{item.subject?.name || t("noSubject")}</p>
+                    <p className="text-sm text-slate-600">{item.subject?.name || t("noSubject")}</p>
                   </div>
-                  <div className="text-sm opacity-70">
+                  <div className="text-sm text-slate-600">
                     {(safeDate(item.updatedAt) || safeDate(item.createdAt) || new Date()).toLocaleDateString(i18n.language)}
                   </div>
                 </li>
@@ -898,23 +932,23 @@ export default function LecturerOverviewPanel() {
         </div>
 
         <div className="rounded-2xl border border-base-300 overflow-hidden">
-          <div className="px-4 py-3 bg-base-200 flex items-center justify-between gap-3">
+          <div className="px-4 py-3 bg-slate-100 flex items-center justify-between gap-3">
             <div className="flex items-center gap-2">
               <Ticket className="w-4 h-4 text-primary" />
               <h3 className="font-semibold">{t("promoCodes", { defaultValue: isRTL ? "أكواد الشحن" : "Promo Codes" })}</h3>
             </div>
-            <Link to="/dashboard/lecturer-dashboard/promo-codes" className="btn btn-xs btn-outline rounded-lg">
-              {t("viewFullList", { defaultValue: isRTL ? "عرض القائمة الكاملة" : "View full list" })}
-            </Link>
+                <Link to="/dashboard/lecturer-dashboard/promo-codes" className="text-xs font-medium border border-slate-300 rounded-lg px-2 py-1 hover:bg-slate-100 transition-colors">
+                 {t("viewFullList", { defaultValue: isRTL ? "عرض القائمة الكاملة" : "View full list" })}
+               </Link>
           </div>
-          <div className="px-4 py-2 text-sm opacity-70 border-t border-base-300 bg-base-100">
+          <div className="border-t border-slate-200 bg-white px-4 py-2 text-sm text-slate-700">
             {t("promoCodesDesc", {
               defaultValue: isRTL ? "كل الأكواد التي أنشأتها وحالتها الحالية." : "All created promo codes and their current status.",
             })}
           </div>
 
           {usesPlaceholderPromoCodes ? (
-            <div className="px-4 py-2 text-xs font-semibold text-warning border-t border-base-300 bg-base-100">
+            <div className="px-4 py-2 text-xs font-semibold text-warning border-t border-slate-200 bg-white">
               {t("sampleDataNotice", {
                 defaultValue: isRTL ? "بيانات تجريبية للعرض فقط حتى تتوفر بيانات حقيقية." : "Sample data for preview only until real analytics are available.",
               })}
@@ -926,7 +960,7 @@ export default function LecturerOverviewPanel() {
                 <li key={code.id} className="p-4 flex items-center justify-between gap-4">
                   <div>
                     <p className="font-semibold tracking-widest">{code.code}</p>
-                    <p className="text-sm opacity-70">
+                    <p className="text-sm text-slate-600">
                       {formatNumber(code.pointsAmount, i18n.language)} {t("currency", { defaultValue: isRTL ? "جنيه" : "EGP" })}
                     </p>
                   </div>
@@ -936,7 +970,7 @@ export default function LecturerOverviewPanel() {
                         ? t("redeemed", { defaultValue: isRTL ? "مستخدم" : "Redeemed" })
                         : t("available", { defaultValue: isRTL ? "متاح" : "Available" })}
                     </p>
-                    <p className="text-xs opacity-70">
+                    <p className="text-xs text-slate-600">
                       {code.redeemedAt
                         ? new Date(code.redeemedAt).toLocaleDateString(i18n.language)
                         : new Date(code.createdAt || Date.now()).toLocaleDateString(i18n.language)}
@@ -946,58 +980,48 @@ export default function LecturerOverviewPanel() {
               ))}
             </ul>
           ) : (
-            <div className="p-4 text-sm opacity-70">
+            <div className="p-4 text-sm text-slate-600">
               {t("noPromoCodes", { defaultValue: isRTL ? "لا توجد أكواد شحن بعد." : "No promo codes yet." })}
             </div>
           )}
           {effectivePromoCodes.length > PROMO_CODES_PAGE_SIZE ? (
             <div className="border-t border-base-300 px-4 py-3 flex items-center justify-between gap-3">
-              <button
-                type="button"
-                className="btn btn-xs btn-outline rounded-lg"
-                onClick={() => setPromoCodesPage((prev) => Math.max(1, prev - 1))}
-                disabled={promoCodesPage === 1}
-              >
-                {t("previous", { defaultValue: isRTL ? "السابق" : "Previous" })}
-              </button>
-              <span className="text-xs opacity-70">
+                 <Button variant="outline" size="xs" className="rounded-lg">
+                   {t("previous", { defaultValue: isRTL ? "السابق" : "Previous" })}
+                 </Button>
+              <span className="text-xs text-slate-600">
                 {t("pageOf", {
                   current: promoCodesPage,
                   total: promoCodesTotalPages,
                   defaultValue: isRTL ? "صفحة {{current}} من {{total}}" : "Page {{current}} of {{total}}",
                 })}
               </span>
-              <button
-                type="button"
-                className="btn btn-xs btn-outline rounded-lg"
-                onClick={() => setPromoCodesPage((prev) => Math.min(promoCodesTotalPages, prev + 1))}
-                disabled={promoCodesPage === promoCodesTotalPages}
-              >
-                {t("next", { defaultValue: isRTL ? "التالي" : "Next" })}
-              </button>
+                 <Button variant="outline" size="xs" className="rounded-lg">
+                   {t("next", { defaultValue: isRTL ? "التالي" : "Next" })}
+                 </Button>
             </div>
           ) : null}
         </div>
       </div>
 
-        <div className="rounded-2xl border border-base-300 overflow-hidden mt-8">
-        <div className="px-4 py-3 bg-base-200 flex items-center justify-between gap-3">
+        <div className="rounded-2xl border border-slate-200 overflow-hidden mt-8">
+         <div className="px-4 py-3 bg-slate-100 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <Users className="w-4 h-4 text-primary" />
             <h3 className="font-semibold">{t("linkedStudents", { defaultValue: isRTL ? "الطلاب المرتبطون" : "Linked Students" })}</h3>
           </div>
-          <Link to="/dashboard/lecturer-dashboard/linked-students" className="btn btn-xs btn-outline rounded-lg">
-            {t("viewFullList", { defaultValue: isRTL ? "عرض القائمة الكاملة" : "View full list" })}
-          </Link>
+                <Link to="/dashboard/lecturer-dashboard/linked-students" className="text-xs font-medium border border-slate-300 rounded-lg px-2 py-1 hover:bg-slate-100 transition-colors">
+                 {t("viewFullList", { defaultValue: isRTL ? "عرض القائمة الكاملة" : "View full list" })}
+               </Link>
         </div>
-        <div className="px-4 py-2 text-sm opacity-70 border-t border-base-300 bg-base-100">
+                 <div className="border-t border-slate-200 bg-white px-4 py-2 text-sm text-slate-700">
           {t("linkedStudentsDesc", {
             defaultValue: isRTL ? "الطلاب المرتبطون بمحاضراتك وعدد المشاهدات المتبقية." : "Students linked to your lectures and their remaining views.",
           })}
         </div>
 
         {usesPlaceholderAccessRecords ? (
-          <div className="px-4 py-2 text-xs font-semibold text-warning border-t border-base-300 bg-base-100">
+                     <div className="px-4 py-2 text-xs font-semibold text-amber-600 border-t border-slate-200 bg-white">
             {t("sampleDataNotice", {
               defaultValue: isRTL ? "بيانات تجريبية للعرض فقط حتى تتوفر بيانات حقيقية." : "Sample data for preview only until real analytics are available.",
             })}
@@ -1009,44 +1033,34 @@ export default function LecturerOverviewPanel() {
               <li key={`${record.studentId || "student"}-${record.lectureId || "lecture"}-${index}`} className="p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-2">
                 <div>
                   <p className="font-semibold">{record.studentName || t("unknown", { defaultValue: isRTL ? "غير معروف" : "Unknown" })}</p>
-                  <p className="text-sm opacity-70">{record.lectureName || t("noSubject")}</p>
+                  <p className="text-sm text-slate-600">{record.lectureName || t("noSubject")}</p>
                 </div>
-                <div className="text-sm opacity-70">
+                <div className="text-sm text-slate-600">
                   {t("remainingViews", { defaultValue: isRTL ? "المشاهدات المتبقية" : "Remaining Views" })}: {record.remainingViews ?? 0}
                 </div>
               </li>
             ))}
           </ul>
         ) : (
-          <div className="p-4 text-sm opacity-70">
+          <div className="p-4 text-sm text-slate-600">
             {t("noLinkedStudents", { defaultValue: isRTL ? "لا توجد بيانات ربط بعد." : "No linked students yet." })}
           </div>
         )}
         {effectiveAccessRecords.length > LINKED_STUDENTS_PAGE_SIZE ? (
           <div className="border-t border-base-300 px-4 py-3 flex items-center justify-between gap-3">
-            <button
-              type="button"
-              className="btn btn-xs btn-outline rounded-lg"
-              onClick={() => setLinkedStudentsPage((prev) => Math.max(1, prev - 1))}
-              disabled={linkedStudentsPage === 1}
-            >
+            <Button variant="outline" size="xs" className="rounded-lg">
               {t("previous", { defaultValue: isRTL ? "السابق" : "Previous" })}
-            </button>
-            <span className="text-xs opacity-70">
+            </Button>
+            <span className="text-xs text-slate-600">
               {t("pageOf", {
                 current: linkedStudentsPage,
                 total: linkedStudentsTotalPages,
                 defaultValue: isRTL ? "صفحة {{current}} من {{total}}" : "Page {{current}} of {{total}}",
               })}
             </span>
-            <button
-              type="button"
-              className="btn btn-xs btn-outline rounded-lg"
-              onClick={() => setLinkedStudentsPage((prev) => Math.min(linkedStudentsTotalPages, prev + 1))}
-              disabled={linkedStudentsPage === linkedStudentsTotalPages}
-            >
+            <Button variant="outline" size="xs" className="rounded-lg">
               {t("next", { defaultValue: isRTL ? "التالي" : "Next" })}
-            </button>
+            </Button>
           </div>
         ) : null}
       </div>

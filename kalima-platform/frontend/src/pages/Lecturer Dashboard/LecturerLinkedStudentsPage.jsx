@@ -4,6 +4,8 @@ import { AlertCircle, ArrowLeft, Users } from "lucide-react";
 import { Link } from "react-router-dom";
 import { getLecturerAnalytics } from "../../routes/lectures";
 import { designTokens } from "../../constants/designTokens";
+import Button from "../../components/ui/Button";
+import Input from "../../components/ui/Input";
 
 const placeholderAccessRecordsByLanguage = (isRTL) => [
   {
@@ -89,127 +91,136 @@ export default function LecturerLinkedStudentsPage() {
     >
       <div className="transition-all duration-300 ease-in-out pt-14">
         <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 md:px-8 lg:px-10 space-y-6">
-          <section className="rounded-[1.5rem] border border-base-300 bg-base-100 p-5 md:p-6">
+          <section className="rounded-[1.5rem] border border-slate-200 bg-white p-5 md:p-6">
             <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
               <div>
                 <h1 className="text-2xl md:text-3xl font-black text-primary">
                   {t("linkedStudentsFullPageTitle", { defaultValue: isRTL ? "كل الطلاب المرتبطين" : "All Linked Students" })}
                 </h1>
-                <p className="text-sm opacity-70 mt-1">
+          <p className="mt-1 text-sm text-slate-700">
                   {t("linkedStudentsFullPageHint", {
                     defaultValue: isRTL ? "قائمة كاملة بالطلاب المرتبطين والمحاضرات وعدد المشاهدات المتبقية." : "Full list of linked students, lectures, and remaining views.",
                   })}
                 </p>
               </div>
-              <Link to="/dashboard/lecturer-dashboard" className="btn btn-outline rounded-xl">
+              <Button as={Link} to="/dashboard/lecturer-dashboard" variant="outline" className="rounded-xl">
                 <ArrowLeft className="w-4 h-4" />
                 {t("backToDashboard", { defaultValue: isRTL ? "العودة للوحة التحكم" : "Back to dashboard" })}
-              </Link>
+              </Button>
             </div>
 
             <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <input
-                type="text"
-                value={query}
-                onChange={(event) => setQuery(event.target.value)}
-                placeholder={t("searchLinkedStudents", { defaultValue: isRTL ? "ابحث باسم الطالب أو المحاضرة..." : "Search student or lecture..." })}
-                className="input input-bordered w-full sm:max-w-sm"
-              />
-              <label className="flex items-center gap-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  className="toggle toggle-warning toggle-sm"
-                  checked={forceDemoData}
-                  onChange={(event) => setForceDemoData(event.target.checked)}
-                />
-                <span className="text-sm font-semibold">
-                  {t("showDemoData", { defaultValue: isRTL ? "عرض بيانات تجريبية" : "Show demo data" })}
-                </span>
-              </label>
+               <Input
+                 type="text"
+                 value={query}
+                 onChange={(event) => setQuery(event.target.value)}
+                 placeholder={t("searchLinkedStudents", { defaultValue: isRTL ? "ابحث باسم الطالب أو المحاضرة..." : "Search student or lecture..." })}
+                 className="w-full sm:max-w-sm"
+               />
+               <label className="flex items-center gap-3 cursor-pointer">
+                 <input
+                   type="checkbox"
+                   className="w-4 h-4 accent-warning"
+                   checked={forceDemoData}
+                   onChange={(event) => setForceDemoData(event.target.checked)}
+                 />
+                 <span className="text-sm font-semibold">
+                   {t("showDemoData", { defaultValue: isRTL ? "عرض بيانات تجريبية" : "Show demo data" })}
+                 </span>
+               </label>
+
             </div>
           </section>
 
-          {error ? (
-            <div className="alert alert-warning rounded-xl">
-              <AlertCircle className="w-5 h-5" />
-              <span>{error}</span>
-            </div>
-          ) : null}
+           {error ? (
+             <div className="flex items-center gap-3 p-4 mb-6 bg-yellow-50 border border-yellow-200 text-yellow-800 rounded-xl">
+               <AlertCircle className="w-5 h-5" />
+               <span>{error}</span>
+             </div>
+           ) : null}
 
-          <section className="rounded-[1.5rem] border border-base-300 bg-base-100 overflow-hidden">
-            {usesPlaceholder ? (
-              <div className="px-4 py-2 text-xs font-semibold text-warning border-b border-base-300 bg-base-100">
-                {t("sampleDataNotice", {
-                  defaultValue: isRTL ? "بيانات تجريبية للعرض فقط حتى تتوفر بيانات حقيقية." : "Sample data for preview only until real analytics are available.",
-                })}
-              </div>
-            ) : null}
 
-            {loading ? (
-              <div className="p-6 flex justify-center">
-                <span className="loading loading-spinner loading-lg text-primary"></span>
-              </div>
-            ) : paginatedAccessRecords.length ? (
-              <div className="overflow-x-auto">
-                <table className="table">
-                  <thead>
-                    <tr>
-                      <th>{t("studentName", { defaultValue: isRTL ? "الطالب" : "Student" })}</th>
-                      <th>{t("lecture", { defaultValue: isRTL ? "المحاضرة" : "Lecture" })}</th>
-                      <th>{t("remainingViews", { defaultValue: isRTL ? "المشاهدات المتبقية" : "Remaining Views" })}</th>
-                      <th>{t("lastAccessed", { defaultValue: isRTL ? "آخر مشاهدة" : "Last accessed" })}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {paginatedAccessRecords.map((record, index) => (
-                      <tr key={`${record.studentId || "student"}-${record.lectureId || "lecture"}-${index}`}>
-                        <td className="font-semibold">
-                          <div className="flex items-center gap-2">
-                            <Users className="w-4 h-4 text-primary" />
-                            {record.studentName || t("unknown", { defaultValue: isRTL ? "غير معروف" : "Unknown" })}
-                          </div>
-                        </td>
-                        <td>{record.lectureName || t("noSubject", { defaultValue: isRTL ? "بدون مادة" : "No subject" })}</td>
-                        <td>{record.remainingViews ?? 0}</td>
-                        <td>{record.lastAccessed ? new Date(record.lastAccessed).toLocaleDateString(i18n.language) : "-"}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+           <section className="rounded-[1.5rem] border border-slate-200 bg-white overflow-hidden">
+             {usesPlaceholder ? (
+               <div className="px-4 py-2 text-xs font-semibold text-warning border-b border-slate-200 bg-white">
+                 {t("sampleDataNotice", {
+                   defaultValue: isRTL ? "بيانات تجريبية للعرض فقط حتى تتوفر بيانات حقيقية." : "Sample data for preview only until real analytics are available.",
+                 })}
+               </div>
+             ) : null}
+                         
+             {loading ? (
+               <div className="p-6 flex justify-center">
+                 <div className="w-10 h-10 border-4 border-slate-200 border-t-primary rounded-full animate-spin"></div>
+               </div>
+             ) : paginatedAccessRecords.length ? (
+
+               <div className="overflow-x-auto">
+                 <table className="w-full text-left border-collapse">
+                   <thead>
+                     <tr className="border-b border-slate-200 bg-slate-50">
+                       <th className="p-3 font-semibold text-slate-700">{t("studentName", { defaultValue: isRTL ? "الطالب" : "Student" })}</th>
+                       <th className="p-3 font-semibold text-slate-700">{t("lecture", { defaultValue: isRTL ? "المحاضرة" : "Lecture" })}</th>
+                       <th className="p-3 font-semibold text-slate-700">{t("remainingViews", { defaultValue: isRTL ? "المشاهدات المتبقية" : "Remaining Views" })}</th>
+                       <th className="p-3 font-semibold text-slate-700">{t("lastAccessed", { defaultValue: isRTL ? "آخر مشاهدة" : "Last accessed" })}</th>
+                     </tr>
+                   </thead>
+                   <tbody>
+                     {paginatedAccessRecords.map((record, index) => (
+                       <tr key={`${record.studentId || "student"}-${record.lectureId || "lecture"}-${index}`} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
+                         <td className="p-3 font-semibold">
+                           <div className="flex items-center gap-2">
+                             <Users className="w-4 h-4 text-primary" />
+                             {record.studentName || t("unknown", { defaultValue: isRTL ? "غير معروف" : "Unknown" })}
+                           </div>
+                         </td>
+                         <td className="p-3">{record.lectureName || t("noSubject", { defaultValue: isRTL ? "بدون مادة" : "No subject" })}</td>
+                         <td className="p-3">{record.remainingViews ?? 0}</td>
+                         <td className="p-3">{record.lastAccessed ? new Date(record.lastAccessed).toLocaleDateString(i18n.language) : "-"}</td>
+                       </tr>
+                     ))}
+                   </tbody>
+                 </table>
+               </div>
+
             ) : (
-              <div className="p-6 text-sm opacity-70">
+              <div className="p-6 text-sm text-slate-600">
                 {t("noLinkedStudents", { defaultValue: isRTL ? "لا توجد بيانات ربط بعد." : "No linked students yet." })}
               </div>
             )}
 
-            {filteredAccessRecords.length > PAGE_SIZE ? (
-              <div className="border-t border-base-300 px-4 py-3 flex items-center justify-between gap-3">
-                <button
-                  type="button"
-                  className="btn btn-sm btn-outline rounded-lg"
-                  onClick={() => setPage((prev) => Math.max(1, prev - 1))}
-                  disabled={page === 1}
-                >
-                  {t("previous", { defaultValue: isRTL ? "السابق" : "Previous" })}
-                </button>
-                <span className="text-xs opacity-70">
-                  {t("pageOf", {
-                    current: page,
-                    total: totalPages,
-                    defaultValue: isRTL ? "صفحة {{current}} من {{total}}" : "Page {{current}} of {{total}}",
-                  })}
-                </span>
-                <button
-                  type="button"
-                  className="btn btn-sm btn-outline rounded-lg"
-                  onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
-                  disabled={page === totalPages}
-                >
-                  {t("next", { defaultValue: isRTL ? "التالي" : "Next" })}
-                </button>
-              </div>
-            ) : null}
+             {filteredAccessRecords.length > PAGE_SIZE ? (
+               <div className="border-t border-slate-200 px-4 py-3 flex items-center justify-between gap-3">
+                 <Button
+                   type="button"
+                   variant="outline"
+                   size="sm"
+                   className="rounded-lg"
+                   onClick={() => setPage((prev) => Math.max(1, prev - 1))}
+                   disabled={page === 1}
+                 >
+                   {t("previous", { defaultValue: isRTL ? "السابق" : "Previous" })}
+                 </Button>
+                <span className="text-xs text-slate-600">
+                   {t("pageOf", {
+                     current: page,
+                     total: totalPages,
+                     defaultValue: isRTL ? "صفحة {{current}} من {{total}}" : "Page {{current}} of {{total}}",
+                   })}
+                 </span>
+                 <Button
+                   type="button"
+                   variant="outline"
+                   size="sm"
+                   className="rounded-lg"
+                   onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
+                   disabled={page === totalPages}
+                 >
+                   {t("next", { defaultValue: isRTL ? "التالي" : "Next" })}
+                 </Button>
+               </div>
+             ) : null}
+
           </section>
         </div>
       </div>

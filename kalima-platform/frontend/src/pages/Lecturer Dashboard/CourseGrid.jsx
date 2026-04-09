@@ -6,6 +6,7 @@ import { User, BookOpen, Star, Edit, Eye, Clock, Users, FileText, ImageOff } fro
 import { Link } from "react-router-dom"
 import { getMyContainers, deleteContainerById } from "../../routes/lectures"
 import Pagination from "../../components/Pagination"
+import Button from "../../components/ui/Button"
 import { designTokens } from "../../constants/designTokens"
 import { translateErrorMessage } from "../../utils/errorTranslator"
 import { resolveUploadUrl } from "../../utils/uploadUrl"
@@ -400,16 +401,20 @@ export default function CourseGrid() {
   if (error) {
     return (
       <div className="text-center py-12 space-y-4">
-        <div className="mx-auto w-24 h-24 bg-base-200 rounded-full flex items-center justify-center">
+        <div className="mx-auto w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center">
           <BookOpen className="h-12 w-12 text-primary" />
         </div>
         <h3 className="text-xl font-bold">{t("noCoursesTitle")}</h3>
-        <p className="text-lg text-gray-500 max-w-md mx-auto">{t("noCoursesDescription")}</p>
+                <p className="mx-auto max-w-md text-lg text-slate-600">{t("noCoursesDescription")}</p>
         <Link to="/dashboard/lecturer-dashboard/CoursesForm">
-          <button className="btn btn-primary mt-4" style={{ color: "#F8FCFF" }}>
-            <Edit className="h-4 w-4" style={{ marginRight: isRTL ? 0 : "0.5rem", marginLeft: isRTL ? "0.5rem" : 0 }} />
-            {t("addNewCourse")}
-          </button>
+             <Button 
+               variant="primary" 
+               className="mt-4" 
+               style={{ color: "#F8FCFF" }}
+             >
+               <Edit className="h-4 w-4" style={{ marginRight: isRTL ? 0 : "0.5rem", marginLeft: isRTL ? "0.5rem" : 0 }} />
+               {t("addNewCourse")}
+             </Button>
         </Link>
       </div>
     )
@@ -419,9 +424,15 @@ export default function CourseGrid() {
   if (filteredContainers?.length === 0) {
     return (
       <div className="text-center py-12">
-        <p className="text-lg text-gray-500">{t("noCourses")}</p>
+              <p className="text-lg text-slate-600">{t("noCourses")}</p>
         <Link to="/dashboard/lecturer-dashboard/CoursesForm">
-          <button className="btn btn-primary mt-4" style={{ color: "#F8FCFF" }}>{t("addNewCourse")}</button>
+           <Button 
+             variant="primary" 
+             className="mt-4" 
+             style={{ color: "#F8FCFF" }}
+           >
+             {t("addNewCourse")}
+           </Button>
         </Link>
       </div>
     )
@@ -439,12 +450,13 @@ export default function CourseGrid() {
           </p>
         </div>
         <Link to="/dashboard/lecturer-dashboard/CoursesForm">
-          <button
-            className="btn border-none hover:scale-105 transition-transform rounded-full px-6 h-11 min-h-11"
-            style={{ background: designTokens.gradients.cta, color: "#F8FCFF", boxShadow: SHADOWS.level1 }}
-          >
-            <span>{t("addNewCourse")}</span>
-          </button>
+           <Button 
+             variant="primary" 
+             className="rounded-full px-6 h-11 min-h-11"
+             style={{ background: designTokens.gradients.cta, color: "#F8FCFF", boxShadow: SHADOWS.level1 }}
+           >
+             <span>{t("addNewCourse")}</span>
+           </Button>
         </Link>
       </div>
 

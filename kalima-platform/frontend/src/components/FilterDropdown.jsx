@@ -1,5 +1,6 @@
 import { ChevronDown } from "lucide-react";
 import { useTranslation } from 'react-i18next';
+import Button from './ui/Button'
 
 export function FilterDropdown({ label, options, selectedValue, onSelect }) {
   const { t } = useTranslation("common");
@@ -14,16 +15,16 @@ export function FilterDropdown({ label, options, selectedValue, onSelect }) {
       <label className="label">
         <span className="label-text">{label}</span>
       </label>
-      <div className="dropdown dropdown-end w-full">
-        <div tabIndex={0} role="button" className="btn w-full justify-between">
-          <span>{selectedValue || t("select")}</span>
-          <ChevronDown className="h-4 w-4" />
-        </div>
-        <ul
-          tabIndex={0}
-          className="dropdown-content z-[100] menu p-2 mt-1 shadow bg-base-100 rounded-box w-full"
-          aria-labelledby="dropdown-button"
-        >
+       <div className="dropdown dropdown-end w-full">
+         <Button className="w-full justify-between">
+           <span>{selectedValue || t("select")}</span>
+           <ChevronDown className="h-4 w-4" />
+         </Button>
+         <ul
+           tabIndex={0}
+           className="dropdown-content z-[100] menu p-2 mt-1 shadow bg-white rounded-lg w-full"
+           aria-labelledby="dropdown-button"
+         >
           {options.map((option) => (
             <li key={option.value}>
               <button

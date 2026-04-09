@@ -1,11 +1,11 @@
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, memo } from "react"
 import { useTranslation } from "react-i18next"
 import { Book, ChevronDown, ChevronRight } from "lucide-react"
 import { getContainerHierarchy } from "../routes/lectures"
 import { motion, AnimatePresence } from "framer-motion"
 import SyllabusItem from "./SyllabusItem"
 
-export default function Syllabus({
+const Syllabus = memo(function Syllabus({
   courseId,
   isPurchased,
   onPurchase,
@@ -186,4 +186,6 @@ export default function Syllabus({
       </div>
     </div>
   )
-}
+})
+
+export default Syllabus

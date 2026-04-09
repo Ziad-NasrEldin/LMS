@@ -25,7 +25,7 @@ export default function StepsIndicator({ currentStep, t, role }) {
     <div className="w-full">
       {/* Progress Bar */}
       <div className="mb-4">
-        <div className="flex justify-between text-xs text-slate-500 mb-2">
+    <div className="mb-2 flex justify-between text-xs text-slate-600">
           <span>{t("stepProgress", { current: currentStep, total: totalSteps })}</span>
           <span>{Math.round(progressPercentage)}%</span>
         </div>

@@ -10,6 +10,9 @@ import { translateErrorMessage } from "../utils/errorTranslator"
 import { buildContainerPayloadObject } from "../utils/contentCreationPayloads"
 import { buildLevelHierarchy } from "../utils/levelHierarchy"
 import DSSelect from "./DSSelect"
+import Button from "./ui/Button"
+import Input from "./ui/Input"
+import Textarea from "./ui/Textarea"
 
 const ContainerCreationModal = ({
   isOpen,
@@ -26,7 +29,6 @@ const ContainerCreationModal = ({
   const { t } = useTranslation("common")
   const isEditMode = mode === "edit"
 
-  // Form state
   const [newItemName, setNewItemName] = useState("")
   const [newDescription, setNewDescription] = useState("")
   const [newGoal, setNewGoal] = useState("")
@@ -35,7 +37,6 @@ const ContainerCreationModal = ({
   const [creationLoading, setCreationLoading] = useState(false)
   const [creationError, setCreationError] = useState("")
 
-  // Levels and subjects state
   const [levels, setLevels] = useState([])
   const [subjects, setSubjects] = useState([])
   const [levelsLoading, setLevelsLoading] = useState(false)
@@ -44,9 +45,7 @@ const ContainerCreationModal = ({
   const [selectedSubject, setSelectedSubject] = useState("")
 
   const populateFromInitialData = () => {
-    if (!initialData) {
-      return
-    }
+    if (!initialData) return
 
     setNewItemName(initialData.name || "")
     setNewDescription(initialData.description || "")
@@ -57,7 +56,6 @@ const ContainerCreationModal = ({
     setSelectedSubject(initialData.subject?._id || initialData.subject || containerSubject || "")
   }
 
-  // Fetch levels and subjects when modal opens
   useEffect(() => {
     if (isOpen) {
       fetchLevels()
@@ -66,7 +64,6 @@ const ContainerCreationModal = ({
       if (isEditMode) {
         populateFromInitialData()
       } else {
-        // Set default values from container if available
         if (containerLevel) {
           setSelectedLevel(containerLevel)
         }
@@ -77,7 +74,6 @@ const ContainerCreationModal = ({
     }
   }, [isOpen, containerLevel, containerSubject, isEditMode, initialData])
 
-  // Functions to fetch levels and subjects
   const fetchLevels = async () => {
     try {
       setLevelsLoading(true)
@@ -112,7 +108,6 @@ const ContainerCreationModal = ({
     }
   }
 
-  // Reset form function
   const resetForm = () => {
     setNewItemName("")
     setNewDescription("")
@@ -154,7 +149,6 @@ const ContainerCreationModal = ({
       if (isCourseType && !newDescription) throw new Error(translateErrorMessage(t("errors.fieldRequired", { field: t("fields.description") })))
       if (isCourseType && !newGoal) throw new Error(translateErrorMessage(t("errors.fieldRequired", { field: t("fields.goal") })))
 
-      // Prepare container data
       const containerData = buildContainerPayloadObject({
         name: newItemName,
         type: nextType,
@@ -169,7 +163,6 @@ const ContainerCreationModal = ({
         parent: isEditMode ? undefined : containerId,
       })
 
-      // Call the onSubmit callback with the container data
       if (isEditMode) {
         await onSubmit(containerId, containerData)
         toast.success(t("containerModal.editSuccess"))
@@ -178,7 +171,6 @@ const ContainerCreationModal = ({
         toast.success(t("containerModal.createSuccess"))
       }
 
-      // Reset form and close modal on success
       resetForm()
       onClose()
     } catch (err) {
@@ -189,19 +181,14 @@ const ContainerCreationModal = ({
     }
   }
 
-  // Helper function to determine the child type based on container type
   const getChildType = () => {
     if (!containerType) return null
 
     switch (containerType.toLowerCase()) {
-      case "course":
-        return "year"
-      case "year":
-        return "term"
-      case "term":
-        return "month"
-      default:
-        return null
+      case "course": return "year"
+      case "year": return "term"
+      case "term": return "month"
+      default: return null
     }
   }
 
@@ -212,37 +199,31 @@ const ContainerCreationModal = ({
     : (childType ? t(`containerModal.types.${childType}`) : t("containerModal.types.container"))
 
   return (
-    <div className={`modal ${isOpen && "modal-open"}`} onClick={handleBackdropClick}>
-      <div className="modal-box max-w-md">
-        <div className="flex justify-between items-center mb-4">
+    <div className={`fixed inset-0 z-50 flex items-center justify-center p-4 ${isOpen ? "block" : "hidden"}`} onClick={handleBackdropClick}>
+      <div className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden">
+        <div className="flex justify-between items-center mb-4 p-6">
           <h3 className="text-lg font-bold">{isEditMode ? t("containerModal.editTitle", { type: modalLabel }) : t("containerModal.createTitle", { type: modalLabel })}</h3>
-          <button onClick={handleClose} className="btn btn-sm btn-circle btn-ghost">
+          <Button variant="ghost" size="sm" className="rounded-full p-2" onClick={handleClose}>
             <FiX className="w-5 h-5" />
-          </button>
+          </Button>
         </div>
 
         <form onSubmit={handleSubmit}>
-          <div className="form-control w-full mb-4">
-            <label className="label">
-              <span className="label-text">{t("fields.name")}</span>
-            </label>
-            <input
+          <div className="mb-4 px-6">
+            <label className="block mb-1 text-sm">{t("fields.name")}</label>
+            <Input
               type="text"
               placeholder={t("containerModal.enterName", { type: modalLabel })}
-              className="input input-bordered w-full"
+              className="border border-slate-200 w-full"
               value={newItemName}
               onChange={(e) => setNewItemName(e.target.value)}
               required
             />
           </div>
-
-          {/* Level dropdown */}
-          <div className="form-control w-full mb-4">
-            <label className="label">
-              <span className="label-text">{t("fields.level")}</span>
-            </label>
+          <div className="mb-4 px-6">
+            <label className="block mb-1 text-sm">{t("fields.level")}</label>
             <DSSelect
-              className="select select-bordered w-full"
+              className="border border-slate-200 w-full"
               value={selectedLevel}
               onChange={(e) => setSelectedLevel(e.target.value)}
               required
@@ -254,16 +235,12 @@ const ContainerCreationModal = ({
                 </option>
               ))}
             </DSSelect>
-            {levelsLoading && <span className="loading loading-spinner mt-2"></span>}
+            {levelsLoading && <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin mt-2"></div>}
           </div>
-
-          {/* Subject dropdown */}
-          <div className="form-control w-full mb-4">
-            <label className="label">
-              <span className="label-text">{t("fields.subject")}</span>
-            </label>
+          <div className="mb-4 px-6">
+            <label className="block mb-1 text-sm">{t("fields.subject")}</label>
             <DSSelect
-              className="select select-bordered w-full"
+              className="border border-slate-200 w-full"
               value={selectedSubject}
               onChange={(e) => setSelectedSubject(e.target.value)}
               required
@@ -275,47 +252,14 @@ const ContainerCreationModal = ({
                 </option>
               ))}
             </DSSelect>
-            {subjectsLoading && <span className="loading loading-spinner mt-2"></span>}
+            {subjectsLoading && <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin mt-2"></div>}
           </div>
-
-          {isCourseType && (
-            <>
-              <div className="form-control w-full mb-4">
-                <label className="label">
-                  <span className="label-text">{t("fields.description")}</span>
-                </label>
-                <textarea
-                  placeholder={t("containerModal.enterDescription", { type: modalLabel })}
-                  className="textarea textarea-bordered w-full"
-                  value={newDescription}
-                  onChange={(e) => setNewDescription(e.target.value)}
-                  required
-                />
-              </div>
-
-              <div className="form-control w-full mb-4">
-                <label className="label">
-                  <span className="label-text">{t("fields.goal")}</span>
-                </label>
-                <textarea
-                  placeholder={t("containerModal.enterGoal", { type: modalLabel })}
-                  className="textarea textarea-bordered w-full"
-                  value={newGoal}
-                  onChange={(e) => setNewGoal(e.target.value)}
-                  required
-                />
-              </div>
-            </>
-          )}
-
-          <div className="form-control w-full mb-4">
-            <label className="label">
-              <span className="label-text">{t("fields.price")}</span>
-            </label>
-            <input
+          <div className="mb-4 px-6">
+            <label className="block mb-1 text-sm">{t("fields.price")}</label>
+            <Input
               type="number"
               placeholder={t("containerModal.enterPrice")}
-              className="input input-bordered w-full"
+              className="w-full"
               value={newPrice}
               onChange={(e) => setNewPrice(e.target.value)}
               min="0"
@@ -324,55 +268,53 @@ const ContainerCreationModal = ({
           </div>
 
           {isCourseType && (
-            <div className="form-control w-full mb-4">
-              <label className="label cursor-pointer justify-start gap-3 items-start p-0">
-                <input
-                  type="checkbox"
-                  className="toggle toggle-primary mt-0.5"
-                  checked={sameGradeOnly}
-                  onChange={(e) => setSameGradeOnly(e.target.checked)}
+            <>
+              <div className="mb-4 px-6">
+                <label className="block mb-1 text-sm">{t("fields.description")}</label>
+                <Textarea
+                  placeholder={t("containerModal.enterDescription", { type: modalLabel })}
+                  className="w-full"
+                  value={newDescription}
+                  onChange={(e) => setNewDescription(e.target.value)}
+                  required
                 />
-                <div className="flex flex-col flex-1 min-w-0">
-                  <span className="label-text font-medium">{t("containerModal.sameGradeOnly")}</span>
-                  <span className="label-text-alt text-base-content/60 whitespace-normal">{t("containerModal.sameGradeOnlyHelp")}</span>
-                </div>
-              </label>
-            </div>
+              </div>
+              <div className="mb-4 px-6">
+                <label className="block mb-1 text-sm">{t("fields.goal")}</label>
+                <Textarea
+                  placeholder={t("containerModal.enterGoal", { type: modalLabel })}
+                  className="w-full"
+                  value={newGoal}
+                  onChange={(e) => setNewGoal(e.target.value)}
+                  required
+                />
+              </div>
+            </>
           )}
 
           {creationError && (
-            <div className="alert alert-error mb-4">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="stroke-current shrink-0 h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
+            <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 shadow-sm flex items-center gap-3 mb-4 mx-6">
+              <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <span>{creationError}</span>
             </div>
           )}
 
-          <div className="modal-action">
-            <button type="button" className="btn btn-ghost" onClick={handleClose} disabled={creationLoading}>
+          <div className="flex justify-end gap-3 p-6">
+            <Button type="button" variant="ghost" onClick={handleClose} disabled={creationLoading}>
               {t("containerModal.cancel")}
-            </button>
-            <button type="submit" className="btn btn-primary" disabled={creationLoading}>
+            </Button>
+            <Button type="submit" variant="primary" disabled={creationLoading}>
               {creationLoading ? (
                 <>
-                  <span className="loading loading-spinner"></span>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
                   {isEditMode ? t("containerModal.saving") : t("containerModal.creating")}
                 </>
               ) : (
                 isEditMode ? t("containerModal.saveChanges") : t("containerModal.create")
               )}
-            </button>
+            </Button>
           </div>
         </form>
       </div>

@@ -2,6 +2,8 @@ import { useState } from "react"
 import { Eye, EyeOff, Trash2 } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import DSSelect from "../../components/DSSelect"
+import Button from "../../components/ui/Button"
+import Input from "../../components/ui/Input"
 
 const PARENT_RELATION_OPTIONS = ["mother", "father", "other"]
 
@@ -29,24 +31,26 @@ function ParentContactField({
     label: t(`parentRelations.${option}`),
   }))
 
-  return (
-    <div className="rounded-2xl border border-base-300/60 bg-base-100/50 p-5">
+    return (
+      <div className="rounded-2xl border border-slate-200 bg-white p-5">
       <div className="flex items-start justify-between gap-3 mb-4">
         <div>
-          <p className="text-base font-bold text-base-content">{title}</p>
-          {subtitle && <p className="text-sm text-slate-500 mt-1">{subtitle}</p>}
+          <p className="text-base font-bold text-slate-900">{title}</p>
+      {subtitle && <p className="mt-1 text-sm text-slate-600">{subtitle}</p>}
         </div>
 
         {showRemove && (
-          <button
-            type="button"
-            onClick={onRemove}
-            className="btn btn-ghost btn-sm rounded-xl gap-2 text-error"
-          >
-            <Trash2 size={16} />
-            {t("buttons.remove")}
-          </button>
-        )}
+             <Button
+               type="button"
+                variant="ghost"
+                size="sm"
+                className="rounded-xl gap-2 text-error"
+                onClick={onRemove}
+              >
+              <Trash2 size={16} />
+              {t("buttons.remove")}
+              </Button>
+            )}
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -54,17 +58,17 @@ function ParentContactField({
           <label className="label">
             <span className="label-text">{phoneLabel}</span>
           </label>
-          <input
-            type="text"
-            name={phoneName}
-            className={`input h-12 rounded-xl ${phoneError ? "input-error" : ""}`}
-            value={phoneValue || ""}
-            onChange={handleInputChange}
-            placeholder={phonePlaceholder}
-            inputMode="tel"
-            dir="ltr"
-            autoComplete="tel"
-          />
+               <Input
+                 type="text"
+                 name={phoneName}
+                 className={`${phoneError ? "border-error" : ""}`}
+                 value={phoneValue || ""}
+                 onChange={handleInputChange}
+                 placeholder={phonePlaceholder}
+                 inputMode="tel"
+                 dir="ltr"
+                 autoComplete="tel"
+               />
           {phoneError && (
             <span className="text-error text-sm mt-1">{t(`validation.${phoneError}`)}</span>
           )}
@@ -123,7 +127,7 @@ export default function Step2({
       <div>
         <div className="mb-4">
           <h4 className="text-sm font-bold text-[#0E5563] uppercase tracking-wider">{t("form.parentDetails")}</h4>
-          <p className="text-xs text-slate-500 mt-1">{t("form.parentDetailsSubtitle", "Provide parent/guardian contact information")}</p>
+            <p className="mt-1 text-xs text-slate-600">{t("form.parentDetailsSubtitle", "Provide parent/guardian contact information")}</p>
         </div>
 
         <div className="space-y-4">
@@ -143,16 +147,16 @@ export default function Step2({
             handleInputChange={handleInputChange}
             t={t}
           />
-
           {!hasAdditionalParentContact ? (
-            <button
-              type="button"
-              onClick={handleAddAdditionalParentPhone}
-              className="btn btn-outline h-11 rounded-xl px-5 text-sm font-semibold w-full sm:w-auto"
-            >
+             <Button
+               type="button"
+               variant="outline"
+               className="h-11 rounded-xl px-5 text-sm font-semibold w-full sm:w-auto"
+               onClick={handleAddAdditionalParentPhone}
+             >
               {t("buttons.addAnotherParentPhone")}
-            </button>
-          ) : (
+             </Button>
+           ) : (
             <ParentContactField
               title={t("form.additionalParentPhone")}
               subtitle={t("form.secondaryParentSubtitle", "Secondary contact (optional)")}
@@ -179,7 +183,7 @@ export default function Step2({
       <div>
         <div className="mb-4">
           <h4 className="text-sm font-bold text-[#0E5563] uppercase tracking-wider">{t("form.accountCredentials")}</h4>
-          <p className="text-xs text-slate-500 mt-1">{t("form.accountSubtitle", "Create your login credentials")}</p>
+            <p className="mt-1 text-xs text-slate-600">{t("form.accountSubtitle", "Create your login credentials")}</p>
         </div>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -188,15 +192,15 @@ export default function Step2({
             <label className="label">
               <span className="label-text">{t("form.email")}</span>
             </label>
-            <input
-              type="email"
-              name="email"
-              className={`input h-12 rounded-xl ${errors.email ? "input-error" : ""}`}
-              value={formData.email || ""}
-              onChange={handleInputChange}
-              placeholder={t("form.emailPlaceholder", "your@email.com")}
-              required
-            />
+               <Input
+                 type="email"
+                 name="email"
+                 className={`h-12 rounded-xl ${errors.email ? "border-error" : ""}`}
+                 value={formData.email || ""}
+                 onChange={handleInputChange}
+                 placeholder={t("form.emailPlaceholder", "your@email.com")}
+                 required
+               />
             {errors.email && (
               <span className="text-error text-sm mt-1">{t(`validation.${errors.email}`)}</span>
             )}
@@ -208,15 +212,15 @@ export default function Step2({
               <span className="label-text">{t("form.password")}</span>
             </label>
             <div className="relative">
-              <input
-                type={showPassword ? "text" : "password"}
-                name="password"
-                className={`input h-12 rounded-xl w-full pl-12 ${errors.password ? "input-error" : ""}`}
-                value={formData.password || ""}
-                onChange={handleInputChange}
-                placeholder={t("form.passwordPlaceholder", "••••••••")}
-                required
-              />
+                   <Input
+                     type={showPassword ? "text" : "password"}
+                     name="password"
+                     className={`h-12 rounded-xl w-full pl-12 ${errors.password ? "border-error" : ""}`}
+                     value={formData.password || ""}
+                     onChange={handleInputChange}
+                     placeholder={t("form.passwordPlaceholder", "••••••••")}
+                     required
+                   />
               <button
                 type="button"
                 className="absolute top-1/2 left-3 -translate-y-1/2 z-10 text-slate-400 hover:text-slate-600"
@@ -237,15 +241,15 @@ export default function Step2({
               <span className="label-text">{t("form.confirmPassword")}</span>
             </label>
             <div className="relative">
-              <input
-                type={showConfirmPassword ? "text" : "password"}
-                name="confirmPassword"
-                className={`input h-12 rounded-xl w-full pl-12 ${errors.confirmPassword ? "input-error" : ""}`}
-                value={formData.confirmPassword || ""}
-                onChange={handleInputChange}
-                placeholder={t("form.confirmPasswordPlaceholder", "••••••••")}
-                required
-              />
+                   <Input
+                     type={showConfirmPassword ? "text" : "password"}
+                     name="confirmPassword"
+                     className={`h-12 rounded-xl w-full pl-12 ${errors.confirmPassword ? "border-error" : ""}`}
+                     value={formData.confirmPassword || ""}
+                     onChange={handleInputChange}
+                     placeholder={t("form.confirmPasswordPlaceholder", "••••••••")}
+                     required
+                   />
               <button
                 type="button"
                 className="absolute top-1/2 left-3 -translate-y-1/2 z-10 text-slate-400 hover:text-slate-600"

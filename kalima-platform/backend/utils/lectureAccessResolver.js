@@ -137,6 +137,38 @@ const purchaseUnlocksTarget = (purchase, targetDoc, targetAncestorIds) => {
   return false;
 };
 
+const studentHasLectureEntitlement = async (
+  studentId,
+  targetDoc,
+  {
+    PurchaseModel = Purchase,
+    StudentLectureAccessModel = StudentLectureAccess,
+    ContainerModel = Container,
+  } = {},
+) => {
+  if (!studentId || !targetDoc?._id) {
+    return false;
+  }
+
+  const targetAncestorIds = await buildTargetAncestorIds(targetDoc, { ContainerModel });
+  const purchases = await PurchaseModel.find({ student: studentId })
+    .select(PURCHASE_SELECT)
+    .lean();
+
+  if (purchases.some((purchase) => purchaseUnlocksTarget(purchase, targetDoc, targetAncestorIds))) {
+    return true;
+  }
+
+  const lectureAccess = await StudentLectureAccessModel.findOne({
+    student: studentId,
+    lecture: targetDoc._id,
+  })
+    .select("_id")
+    .lean();
+
+  return Boolean(lectureAccess);
+};
+
 const upsertStudentLectureAccess = async (
   studentId,
   lectureDoc,
@@ -209,5 +241,6 @@ module.exports = {
   resolveAccessibleLectureTarget,
   sanitizeLectureForAccess,
   serializeStudentLectureAccess,
+  studentHasLectureEntitlement,
   upsertStudentLectureAccess,
 };

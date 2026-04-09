@@ -13,6 +13,7 @@ const ParentForm = ({
   loadingZones,
   t,
   isRTL,
+  fieldErrors = {},
 }) => {
   const gradeOptionsFromHierarchy = Array.isArray(levelHierarchy?.gradeOptions) ? levelHierarchy.gradeOptions : []
   const gradeOptionsFromGrades = Array.isArray(levelHierarchy?.grades)
@@ -69,6 +70,7 @@ const ParentForm = ({
             placeholder={t("placeholders.phoneNumber") || "Enter phone number"}
             required
           />
+          {fieldErrors.phoneNumber && <p className="text-sm text-error">{fieldErrors.phoneNumber}</p>}
         </div>
       </div>
 
@@ -89,6 +91,7 @@ const ParentForm = ({
             placeholder={t("placeholders.profession") || "Enter profession"}
             required
           />
+          {fieldErrors.profession && <p className="text-sm text-error">{fieldErrors.profession}</p>}
         </div>
       </div>
 
@@ -102,7 +105,7 @@ const ParentForm = ({
           <DSSelect
             name="level"
             className="select w-full rounded-xl"
-            style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
+            style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: fieldErrors.level ? "#DC2626" : "rgba(17,24,39,0.1)", color: "#1F2937" }}
             value={userData.level || ""}
             onChange={handleChange}
           >
@@ -117,6 +120,7 @@ const ParentForm = ({
               </option>
             ))}
           </DSSelect>
+          {fieldErrors.level && <p className="text-sm text-error">{fieldErrors.level}</p>}
         </div>
       </div>
 
@@ -128,7 +132,7 @@ const ParentForm = ({
           <DSSelect
             name="government"
             className="select w-full rounded-xl"
-            style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
+            style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: fieldErrors.government ? "#DC2626" : "rgba(17,24,39,0.1)", color: "#1F2937" }}
             value={userData.government || ""}
             onChange={handleGovernmentSelect}
             required
@@ -140,6 +144,7 @@ const ParentForm = ({
               </option>
             ))}
           </DSSelect>
+          {fieldErrors.government && <p className="text-sm text-error">{fieldErrors.government}</p>}
         </div>
       </div>
 
@@ -154,7 +159,7 @@ const ParentForm = ({
             disabled={!userData.government || loadingZones}
             name="administrationZone"
             className="select w-full rounded-xl"
-            style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
+            style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: fieldErrors.administrationZone ? "#DC2626" : "rgba(17,24,39,0.1)", color: "#1F2937" }}
             value={userData.administrationZone || ""}
             onChange={handleChange}
             required
@@ -170,10 +175,11 @@ const ParentForm = ({
               </option>
             ))}
           </DSSelect>
+          {fieldErrors.administrationZone && <p className="text-sm text-error">{fieldErrors.administrationZone}</p>}
           {loadingZones && (
             <div className="flex items-center gap-2 mt-1">
               <span className="loading loading-spinner loading-xs"></span>
-              <span className="text-xs text-gray-500">
+                          <span className="text-xs text-slate-600">
                 {t("fields.loadingZones") || (isRTL ? "جاري تحميل الإدارة التعليمية..." : "Loading administration zones...")}
               </span>
             </div>

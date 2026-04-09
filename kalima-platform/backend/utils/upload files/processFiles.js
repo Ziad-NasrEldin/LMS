@@ -1,6 +1,13 @@
 const AppError = require("../appError");
 const bcrypt = require("bcrypt");
 const User = require("../../models/userModel");
+const Level = require("../../models/levelModel");
+
+const resolveLevelId = async (levelName) => {
+  if (!levelName) return null;
+  const level = await Level.findOne({ name: { $regex: new RegExp(`^${levelName}$`, "i") } });
+  return level ? level._id : null;
+};
 
 const processAndInsertUsers = async (results, accountType, res, next) => {
   if (results.length === 0) {
@@ -8,26 +15,15 @@ const processAndInsertUsers = async (results, accountType, res, next) => {
   }
 
   try {
-    const resultsWithHashedPasswords = await Promise.all(
-      results.map(async (user) => {
-        if (user.password) {
-          const hashedPassword = await bcrypt.hash(user.password, 10);
-          return { ...user, password: hashedPassword };
-        }
-        return user;
-      })
-    );
-
     const existingUsers = await User.find({
-      email: { $in: resultsWithHashedPasswords.map((user) => user.email) },
+      email: { $in: results.map((user) => user.email) },
     });
 
     const existingEmails = new Set(existingUsers.map((user) => user.email));
-
-    const newUsers = [];
+    const newUsersData = [];
     const duplicates = [];
 
-    resultsWithHashedPasswords.forEach((user) => {
+    results.forEach((user) => {
       if (existingEmails.has(user.email)) {
         duplicates.push({
           name: user.name,
@@ -35,18 +31,53 @@ const processAndInsertUsers = async (results, accountType, res, next) => {
           phoneNumber: user.phoneNumber,
         });
       } else {
-        newUsers.push(user);
+        newUsersData.push(user);
       }
     });
 
-    let createdUsers = [];
-    if (newUsers.length > 0) {
-      createdUsers = await User.insertMany(newUsers);
+    const createdUsers = [];
+    const failedUsers = [];
+
+    for (const userData of newUsersData) {
+      try {
+        const { res: _, next: __, ...cleanData } = userData;
+        
+        // Role-based enrichment
+        if (accountType === "student") {
+          cleanData.hobby = cleanData.hobby || "other"; // Required by model
+          cleanData.level = await resolveLevelId(cleanData.level || cleanData.stage);
+        } else if (accountType === "parent") {
+          cleanData.level = await resolveLevelId(cleanData.level);
+        } else if (accountType === "teacher") {
+          // Teachers have an array of levels
+          const levelName = cleanData.level || cleanData.stage;
+          const levelId = await resolveLevelId(levelName);
+          cleanData.level = levelId ? [levelId] : [];
+        }
+
+        // Hash password
+        if (cleanData.password) {
+          cleanData.password = await bcrypt.hash(cleanData.password, 12);
+        } else {
+          // Fallback to phoneNumber as password if not provided
+          cleanData.password = await bcrypt.hash(cleanData.phoneNumber || "Default123!", 12);
+        }
+
+        const user = new User(cleanData);
+        const savedUser = await user.save();
+        createdUsers.push(savedUser);
+      } catch (err) {
+        failedUsers.push({
+          name: userData.name,
+          email: userData.email,
+          error: err.message,
+        });
+      }
     }
 
     const responseObj = {
       status: "success",
-      message: `${createdUsers.length} ${accountType}(s) added successfully. ${duplicates.length} already exist.`,
+      message: `${createdUsers.length} ${accountType}(s) added successfully. ${duplicates.length} already exist. ${failedUsers.length} failed.`,
       createdUsers: {
         count: createdUsers.length,
         users: createdUsers.map((user) => ({
@@ -59,10 +90,14 @@ const processAndInsertUsers = async (results, accountType, res, next) => {
         count: duplicates.length,
         users: duplicates,
       },
+      failedUsers: {
+        count: failedUsers.length,
+        users: failedUsers,
+      },
     };
     res.status(201).json(responseObj);
   } catch (err) {
-    return next(new AppError("Creation failed", 500));
+    return next(new AppError("Creation failed: " + err.message, 500));
   }
 };
 

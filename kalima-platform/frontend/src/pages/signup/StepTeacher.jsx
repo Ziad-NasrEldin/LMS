@@ -5,6 +5,8 @@ import { Eye, EyeOff } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import { getAllSubjects } from "../../routes/courses"
 import DSSelect from "../../components/DSSelect"
+import Button from "../../components/ui/Button"
+import Input from "../../components/ui/Input"
 
 
 export default function StepTeacher({ formData, handleInputChange, t, errors, levelHierarchy, levelsLoading }) {
@@ -15,10 +17,10 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, le
   const isRTL = i18n.language === "ar"
   const stageOptions = levelHierarchy?.stageOptions || []
   const fieldClass = "h-12 min-h-12 w-full rounded-xl text-base"
-  const inputClass = `input input-bordered ${fieldClass}`
-  const selectClass = `select select-bordered ${fieldClass} ps-4 pe-10`
-  const actionButtonClass = "btn btn-outline h-12 min-h-12 w-12 rounded-xl p-0 text-lg leading-none"
-
+  const inputClass = `border border-slate-200 ${fieldClass}`
+  const selectClass = `border border-slate-200 ${fieldClass} ps-4 pe-10`
+  const actionButtonClass = "border border-slate-200 h-12 min-h-12 w-12 rounded-xl p-0 text-lg leading-none flex items-center justify-center"
+  
   useEffect(() => {
     const fetchSubjects = async () => {
       const response = await getAllSubjects()
@@ -43,67 +45,67 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, le
         {t("form.accountDetails", { defaultValue: isRTL ? "تفاصيل الحساب" : "Account Details" })}
       </p>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
-      <div className="form-control sm:col-span-2">
+      <div className="flex flex-col gap-1 sm:col-span-2">
         <div className="flex flex-col gap-1">
-          <label className="label py-1">
-            <span className="label-text text-xs">{t("form.email")}</span>
+          <label className="flex flex-col gap-1 py-1">
+            <span className="text-xs">{t("form.email")}</span>
           </label>
-          <input
+          <Input
             type="email"
             name="email"
-            className={`${inputClass} ${errors.email ? "input-error animate-shake" : ""}`}
+            className={`${inputClass} ${errors.email ? "border-red-500 animate-shake" : ""}`}
             value={formData.email}
             onChange={handleInputChange}
             required
           />
-          {errors.email && <span className="text-error text-sm mt-1">{t(`validation.${errors.email}`)}</span>}
+          {errors.email && <span className="text-red-500 text-sm mt-1">{t(`validation.${errors.email}`)}</span>}
         </div>
       </div>
       <div className="grid gap-4 sm:grid-cols-2 sm:col-span-2 sm:gap-6">
-        <div className="form-control">
+        <div className="flex flex-col gap-1">
           <div className="flex flex-col gap-1">
-            <label className="label py-1">
-              <span className="label-text text-xs">{t("form.password")}</span>
+            <label className="flex flex-col gap-1 py-1">
+              <span className="text-xs">{t("form.password")}</span>
             </label>
             <div className="relative">
-              <input
+              <Input
                 type={showPassword ? "text" : "password"}
                 name="password"
-                className={`${inputClass} ${i18n.language === "ar" ? "pr-12" : "pl-12"} ${errors.password ? "input-error animate-shake" : ""}`}
+                className={`${inputClass} ${i18n.language === "ar" ? "pr-12" : "pl-12"} ${errors.password ? "border-red-500 animate-shake" : ""}`}
                 value={formData.password || ""}
                 onChange={handleInputChange}
                 required
               />
               <button
                 type="button"
-                className={`absolute top-1/2 ${i18n.language === "ar" ? "right-3" : "left-3"} -translate-y-1/2 z-10 text-gray-500`}
+                  className={`absolute top-1/2 ${i18n.language === "ar" ? "right-3" : "left-3"} z-10 -translate-y-1/2 text-slate-600`}
                 onClick={() => setShowPassword((prev) => !prev)}
                 tabIndex={-1}
               >
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
-            {errors.password && <span className="text-error text-sm mt-1">{t("validation.passwordRequirements")}</span>}
+            {errors.password && <span className="text-red-500 text-sm mt-1">{t("validation.passwordRequirements")}</span>}
           </div>
         </div>
-
-        <div className="form-control relative">
+  
+        <div className="flex flex-col gap-1 relative">
           <div className="flex flex-col gap-1">
-            <label className="label py-1">
-              <span className="label-text text-xs">{t("form.confirmPassword")}</span>
+            <label className="flex flex-col gap-1 py-1">
+              <span className="text-xs">{t("form.confirmPassword")}</span>
             </label>
             <div className="relative">
-              <input
+              <Input
                 type={showConfirmPassword ? "text" : "password"}
                 name="confirmPassword"
-                className={`${inputClass} ${i18n.language === "ar" ? "pr-12" : "pl-12"} ${errors.confirmPassword ? "input-error animate-shake" : ""}`}
+                className={`${inputClass} ${i18n.language === "ar" ? "pr-12" : "pl-12"} ${errors.confirmPassword ? "border-red-500 animate-shake" : ""}`}
                 value={formData.confirmPassword || ""}
                 onChange={handleInputChange}
                 required
               />
               <button
                 type="button"
-                className={`absolute top-1/2 ${i18n.language === "ar" ? "right-3" : "left-3"} -translate-y-1/2 z-10 text-gray-500`}
+                  className={`absolute top-1/2 ${i18n.language === "ar" ? "right-3" : "left-3"} z-10 -translate-y-1/2 text-slate-600`}
                 onClick={() => setShowConfirmPassword((prev) => !prev)}
                 tabIndex={-1}
               >
@@ -111,27 +113,27 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, le
               </button>
             </div>
             {errors.confirmPassword && (
-              <span className="text-error text-sm mt-1">{t(`validation.${errors.confirmPassword}`)}</span>
+              <span className="text-red-500 text-sm mt-1">{t(`validation.${errors.confirmPassword}`)}</span>
             )}
           </div>
         </div>
       </div>
       {/* Level Selection */}
-      <div className="form-control sm:col-span-2">
+      <div className="flex flex-col gap-1 sm:col-span-2">
         <div className="flex flex-col gap-1">
-          <label className="label py-1">
-            <span className="label-text text-xs">
+          <label className="flex flex-col gap-1 py-1">
+            <span className="text-xs">
               {t("form.stage", {
                 defaultValue: t("form.level", { defaultValue: isRTL ? "المرحلة" : "Stage" }),
               })}
             </span>
           </label>
           {levelsLoading ? (
-            <div className="rounded-lg border border-base-300 bg-base-100 px-4 py-3 text-sm text-base-content/70">
+            <div className="rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900/70">
               {t("form.loadingStages", { defaultValue: isRTL ? "جاري تحميل المراحل..." : "Loading stages..." })}
             </div>
           ) : stageOptions.length === 0 ? (
-            <div className="rounded-lg border border-base-300 bg-base-100 px-4 py-3 text-sm text-base-content/70">
+            <div className="rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900/70">
               {t("form.noStagesAvailable", {
                 defaultValue: isRTL ? "لا توجد مراحل متاحة" : "No stages available",
               })}
@@ -142,7 +144,7 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, le
                 <label key={levelOption.value} className="flex cursor-pointer items-center gap-2 whitespace-nowrap">
                   <input
                     type="checkbox"
-                    className="checkbox"
+                    className="rounded border-slate-300"
                     name="level"
                     value={levelOption.value}
                     checked={Array.isArray(formData.level) ? formData.level.includes(levelOption.value) : false}
@@ -165,21 +167,21 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, le
               ))}
             </div>
           )}
-          {errors.level && <span className="text-error text-sm mt-1">{t(`validation.${errors.level}`)}</span>}
+          {errors.level && <span className="text-red-500 text-sm mt-1">{t(`validation.${errors.level}`)}</span>}
         </div>
       </div>
 
       {/* Teaches At Type */}
-      <div className="form-control">
+      <div className="flex flex-col gap-1">
         <div className="flex flex-col gap-1">
-          <label className="label py-1">
-            <span className="label-text text-xs">
+          <label className="flex flex-col gap-1 py-1">
+            <span className="text-xs">
               {t("form.teachesAtType", { defaultValue: isRTL ? "أين تدرس؟" : "Teaches At" })}
             </span>
           </label>
           <DSSelect
             name="teachesAtType"
-            className={`${selectClass} ${errors.teachesAtType ? "select-error animate-shake" : ""}`}
+            className={`${selectClass} ${errors.teachesAtType ? "border-red-500 animate-shake" : ""}`}
             value={formData.teachesAtType || ""}
             onChange={handleInputChange}
             required
@@ -194,7 +196,7 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, le
             <option value="Both">{t("both", { defaultValue: isRTL ? "كلاهما" : "Both" })}</option>
           </DSSelect>
           {errors.teachesAtType && (
-            <span className="text-error text-sm mt-1">
+            <span className="text-red-500 text-sm mt-1">
               {t(`validation.${errors.teachesAtType}`, {
                 defaultValue: isRTL ? "هذا الحقل مطلوب" : "This field is required",
               })}
@@ -202,22 +204,22 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, le
           )}
         </div>
       </div>
-
+  
       {/* Centers - Show if teachesAtType is Center or Both */}
       {(formData.teachesAtType === "Center" || formData.teachesAtType === "Both") && (
-        <div className="form-control">
+        <div className="flex flex-col gap-1">
           <div className="flex flex-col gap-1">
-            <label className="label py-1">
-              <span className="label-text text-xs">
+            <label className="flex flex-col gap-1 py-1">
+              <span className="text-xs">
                 {t("form.centers", { defaultValue: isRTL ? "المراكز" : "Centers" })}
               </span>
             </label>
             <div className="flex flex-col gap-1">
               {(formData.centers || [""]).map((center, index) => (
                 <div key={index} className="flex w-full gap-2">
-                  <input
+                  <Input
                     type="text"
-                    className={`${inputClass} flex-1 ${errors.centers?.[index] ? "input-error animate-shake" : ""}`}
+                    className={`${inputClass} flex-1 ${errors.centers?.[index] ? "border-red-500 animate-shake" : ""}`}
                     value={center}
                     onChange={(e) => {
                       const newCenters = [...(formData.centers || [""])]
@@ -242,7 +244,7 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, le
                   ) : (
                     <button
                       type="button"
-                      className={`${actionButtonClass} btn-error`}
+                      className={`${actionButtonClass} text-red-500`}
                       onClick={() => {
                         const newCenters = (formData.centers || [""]).filter((_, i) => i !== index)
                         handleInputChange({ target: { name: "centers", value: newCenters } })
@@ -255,7 +257,7 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, le
               ))}
             </div>
             {errors.centers && (
-              <span className="text-error text-sm mt-1">
+              <span className="text-red-500 text-sm mt-1">
                 {t(`validation.${errors.centers}`, {
                   defaultValue: isRTL ? "الرجاء إضافة مركز واحد على الأقل" : "Please add at least one center",
                 })}
@@ -264,27 +266,27 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, le
           </div>
         </div>
       )}
-
+  
       {/* School - Show if teachesAtType is School or Both */}
       {(formData.teachesAtType === "School" || formData.teachesAtType === "Both") && (
-        <div className="form-control">
+        <div className="flex flex-col gap-1">
           <div className="flex flex-col gap-1">
-            <label className="label py-1">
-              <span className="label-text text-xs">
+            <label className="flex flex-col gap-1 py-1">
+              <span className="text-xs">
                 {t("form.school", { defaultValue: isRTL ? "المدرسة" : "School" })}
               </span>
             </label>
-            <input
+            <Input
               type="text"
               name="school"
-              className={`${inputClass} ${errors.school ? "input-error animate-shake" : ""}`}
+              className={`${inputClass} ${errors.school ? "border-red-500 animate-shake" : ""}`}
               value={formData.school || ""}
               onChange={handleInputChange}
               placeholder={t("form.schoolName", { defaultValue: isRTL ? "اسم المدرسة" : "School name" })}
               required
             />
             {errors.school && (
-              <span className="text-error text-sm mt-1">
+              <span className="text-red-500 text-sm mt-1">
                 {t(`validation.${errors.school}`, {
                   defaultValue: isRTL ? "اسم المدرسة مطلوب" : "School name is required",
                 })}
@@ -295,10 +297,10 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, le
       )}
 
       {/* Social Media */}
-        <div className="form-control sm:col-span-2">
+        <div className="flex flex-col gap-1 sm:col-span-2">
           <div className="flex flex-col gap-1">
-            <label className="label py-1">
-            <span className="label-text text-xs">
+            <label className="flex flex-col gap-1 py-1">
+            <span className="text-xs">
               {t("form.socialMedia", { defaultValue: isRTL ? "وسائل التواصل الاجتماعي" : "Social Media" })}
             </span>
           </label>
@@ -309,7 +311,7 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, le
                 className="grid grid-cols-1 gap-2 sm:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)_3rem] sm:items-center"
               >
                 <DSSelect
-                  className={`${selectClass} ${errors.socialMedia?.[index]?.platform ? "select-error animate-shake" : ""}`}
+                  className={`${selectClass} ${errors.socialMedia?.[index]?.platform ? "border-red-500 animate-shake" : ""}`}
                   value={social.platform || ""}
                   onChange={(e) => {
                     const newSocialMedia = [...(formData.socialMedia || [{ platform: "", account: "" }])]
@@ -317,29 +319,29 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, le
                     handleInputChange({ target: { name: "socialMedia", value: newSocialMedia } })
                   }}
                 >
-                 <option value="">
-                   {t("form.selectPlatform", {
-                     defaultValue: isRTL ? "اختر المنصة" : "Select platform",
-                   })}
-                 </option>
-                  {[
-                    { value: "Facebook", label: t("form.facebook", { defaultValue: "Facebook" }) },
-                    { value: "Instagram", label: t("form.instagram", { defaultValue: "Instagram" }) },
-                    { value: "Twitter", label: t("form.twitter", { defaultValue: "Twitter" }) },
-                    { value: "LinkedIn", label: t("form.linkedin", { defaultValue: "LinkedIn" }) },
-                    { value: "TikTok", label: t("form.tikTok", { defaultValue: "TikTok" }) },
-                    { value: "YouTube", label: t("form.youtube", { defaultValue: "YouTube" }) },
-                    { value: "WhatsApp", label: t("form.whatsApp", { defaultValue: "WhatsApp" }) },
-                    { value: "Telegram", label: t("form.telegram", { defaultValue: "Telegram" }) }
-                  ].map((platform) => (
-                    <option key={platform.value} value={platform.value}>
-                      {platform.label}
-                    </option>
-                  ))}
+                  <option value="">
+                    {t("form.selectPlatform", {
+                      defaultValue: isRTL ? "اختر المنصة" : "Select platform",
+                    })}
+                  </option>
+                   {[
+                     { value: "Facebook", label: t("form.facebook", { defaultValue: "Facebook" }) },
+                     { value: "Instagram", label: t("form.instagram", { defaultValue: "Instagram" }) },
+                     { value: "Twitter", label: t("form.twitter", { defaultValue: "Twitter" }) },
+                     { value: "LinkedIn", label: t("form.linkedin", { defaultValue: "LinkedIn" }) },
+                     { value: "TikTok", label: t("form.tikTok", { defaultValue: "TikTok" }) },
+                     { value: "YouTube", label: t("form.youtube", { defaultValue: "YouTube" }) },
+                     { value: "WhatsApp", label: t("form.whatsApp", { defaultValue: "WhatsApp" }) },
+                     { value: "Telegram", label: t("form.telegram", { defaultValue: "Telegram" }) }
+                   ].map((platform) => (
+                     <option key={platform.value} value={platform.value}>
+                       {platform.label}
+                     </option>
+                   ))}
                 </DSSelect>
-                <input
+                <Input
                   type="text"
-                  className={`${inputClass} placeholder:text-base-content/65 ${errors.socialMedia?.[index]?.account ? "input-error animate-shake" : ""}`}
+                  className={`${inputClass} placeholder:text-slate-900/65 ${errors.socialMedia?.[index]?.account ? "border-red-500 animate-shake" : ""}`}
                   value={social.account || ""}
                   onChange={(e) => {
                     const newSocialMedia = [...(formData.socialMedia || [{ platform: "", account: "" }])]
@@ -367,7 +369,7 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, le
                 ) : (
                   <button
                     type="button"
-                    className={`${actionButtonClass} btn-error`}
+                    className={`${actionButtonClass} text-red-500`}
                     onClick={() => {
                       const newSocialMedia = (formData.socialMedia || [{ platform: "", account: "" }]).filter(
                         (_, i) => i !== index,
@@ -384,16 +386,16 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, le
         </div>
       </div>
       {/* Subject Input */}
-        <div className="form-control sm:col-span-2">
+        <div className="flex flex-col gap-1 sm:col-span-2">
           <div className="flex flex-col gap-1">
-            <label className="label py-1">
-            <span className="label-text text-xs">
+            <label className="flex flex-col gap-1 py-1">
+            <span className="text-xs">
               {t("form.subject", { defaultValue: isRTL ? "المادة" : "Subject" })}
             </span>
           </label>
           <DSSelect
             name="subject"
-            className={`${selectClass} ${errors.subject ? "select-error animate-shake" : ""}`}
+            className={`${selectClass} ${errors.subject ? "border-red-500 animate-shake" : ""}`}
             value={formData.subject}
             onChange={handleSelectChange}
             required
@@ -407,7 +409,7 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, le
               </option>
             ))}
           </DSSelect>
-          {errors.subject && <span className="text-error text-sm mt-1">{t(`validation.${errors.subject}`)}</span>}
+          {errors.subject && <span className="text-red-500 text-sm mt-1">{t(`validation.${errors.subject}`)}</span>}
         </div>
       </div>
 

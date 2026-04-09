@@ -5,6 +5,8 @@ import SectionHeader from "./SectionHeader"
 import { updateUserPassword } from "../../routes/update-user"
 import { designTokens } from "../../constants/designTokens"
 import { translateErrorMessage } from "../../utils/errorTranslator"
+import Button from "../../components/ui/Button"
+import Input from "../../components/ui/Input"
 
 function SecuritySection() {
   const { t, i18n } = useTranslation("settings")
@@ -116,23 +118,23 @@ function SecuritySection() {
             {t('security.changePassword')}
           </h3>
 
-          {updateStatus.success && (
-            <div className="alert alert-success mb-4">
-              <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <span>{t('security.success')}</span>
-            </div>
-          )}
+           {updateStatus.success && (
+             <div className="rounded-2xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700 shadow-sm flex items-center gap-3 mb-4">
+               <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+               </svg>
+               <span>{t('security.success')}</span>
+             </div>
+           )}
 
-          {updateStatus.error && (
-            <div className="alert alert-error mb-4">
-              <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <span>{updateStatus.error}</span>
-            </div>
-          )}
+           {updateStatus.error && (
+             <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 shadow-sm flex items-center gap-3 mb-4">
+               <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+               </svg>
+               <span>{updateStatus.error}</span>
+             </div>
+           )}
 
           {/* Current Password Field */}
           <div className="form-control mb-3">
@@ -140,15 +142,15 @@ function SecuritySection() {
               <span className={`label-text ${isRTL ? 'text-left' : 'text-left'}`}>{t('security.labels.currentPassword')}</span>
             </label>
             <div className="relative w-full max-w-2xl">
-              <input
-                type={showPassword ? "text" : "password"}
-                name="currentPassword"
-                value={formData.currentPassword}
-                onChange={handleInputChange}
-                className={`input input-bordered w-full ${isRTL ? 'text-right' : 'text-left'}`}
-                placeholder={t('security.placeholders.currentPassword')}
-                dir={isRTL ? 'rtl' : 'ltr'}
-              />
+               <Input
+                 type={showPassword ? "text" : "password"}
+                 name="currentPassword"
+                 value={formData.currentPassword}
+                 onChange={handleInputChange}
+                 className={`w-full ${isRTL ? 'text-right' : 'text-left'}`}
+                 placeholder={t('security.placeholders.currentPassword')}
+                 dir={isRTL ? 'rtl' : 'ltr'}
+               />
               <button
                 type="button"
                 className={`absolute ${isRTL ? 'left-3' : 'right-3'} top-1/2 transform -translate-y-1/2`}
@@ -197,15 +199,15 @@ function SecuritySection() {
               <span className={`label-text ${isRTL ? 'text-left' : 'text-left'}`}>{t('security.labels.newPassword')}</span>
             </label>
             <div className="w-full max-w-2xl">
-              <input
-                type={showPassword ? "text" : "password"}
-                name="newPassword"
-                value={formData.newPassword}
-                onChange={handleInputChange}
-                className={`input input-bordered w-full ${isRTL ? 'text-right' : 'text-left'}`}
-                placeholder={t('security.placeholders.newPassword')}
-                dir={isRTL ? 'rtl' : 'ltr'}
-              />
+               <Input
+                 type={showPassword ? "text" : "password"}
+                 name="newPassword"
+                 value={formData.newPassword}
+                 onChange={handleInputChange}
+                 className={`w-full ${isRTL ? 'text-right' : 'text-left'}`}
+                 placeholder={t('security.placeholders.newPassword')}
+                 dir={isRTL ? 'rtl' : 'ltr'}
+               />
             </div>
             <PasswordStrengthIndicator strength={passwordStrength} />
           </div>
@@ -216,30 +218,32 @@ function SecuritySection() {
               <span className={`label-text ${isRTL ? 'text-left' : 'text-left'}`}>{t('security.labels.confirmPassword')}</span>
             </label>
             <div className="w-full max-w-2xl">
-              <input
-                type={showPassword ? "text" : "password"}
-                name="confirmPassword"
-                value={formData.confirmPassword}
-                onChange={handleInputChange}
-                className={`input input-bordered w-full ${isRTL ? 'text-right' : 'text-left'}`}
-                placeholder={t('security.placeholders.confirmPassword')}
-                dir={isRTL ? 'rtl' : 'ltr'}
-              />
+               <Input
+                 type={showPassword ? "text" : "password"}
+                 name="confirmPassword"
+                 value={formData.confirmPassword}
+                 onChange={handleInputChange}
+                 className={`w-full ${isRTL ? 'text-right' : 'text-left'}`}
+                 placeholder={t('security.placeholders.confirmPassword')}
+                 dir={isRTL ? 'rtl' : 'ltr'}
+               />
             </div>
-            <div className={`text-xs mt-1 text-gray-500 ${isRTL ? 'text-right' : 'text-left'}`}>
+            <div className={`mt-1 text-xs text-slate-600 ${isRTL ? 'text-right' : 'text-left'}`}>
               {t('security.passwordRequirement')}
             </div>
           </div>
 
-          <div className={`mt-5 flex ${isRTL ? "justify-end" : "justify-start"}`}>
-            <button
-              className={`btn btn-primary ${loading ? "loading" : ""}`}
-              onClick={updatePassword}
-              disabled={loading || !formData.currentPassword || !formData.newPassword || !formData.confirmPassword}
-            >
-              {t('security.updateButton')}
-            </button>
-          </div>
+           <div className={`mt-5 flex ${isRTL ? "justify-end" : "justify-start"}`}>
+              <Button
+                isLoading={loading}
+                onClick={updatePassword}
+                isDisabled={loading || !formData.currentPassword || !formData.newPassword || !formData.confirmPassword}
+                variant="primary"
+              >
+                {t('security.updateButton')}
+              </Button>
+           </div>
+
         </div>
       </div>
     </section>
@@ -264,7 +268,7 @@ function PasswordStrengthIndicator({ strength }) {
         />
       </div>
 
-      <div className="text-xs mt-1 text-gray-500">
+      <div className="mt-1 text-xs text-slate-600">
         {t("passwordStrength.label")}&nbsp;
         <span className={`font-medium ${colors[strength].replace("bg", "text")}`}>
           {labels[strength]}

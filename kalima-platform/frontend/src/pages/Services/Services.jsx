@@ -368,27 +368,6 @@ const Services = () => {
 
 
 
-            <span
-
-              className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[11px] uppercase tracking-[0.08em]"
-
-              style={{
-
-                borderColor: "rgba(255,255,255,0.3)",
-
-                background: "rgba(255,255,255,0.14)",
-
-                color: "#ECFDFF",
-
-              }}
-
-            >
-
-              <Sparkle size={14} weight="fill" />
-
-              {text.badge}
-
-            </span>
 
 
 

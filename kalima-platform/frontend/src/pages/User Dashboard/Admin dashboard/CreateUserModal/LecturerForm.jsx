@@ -2,8 +2,12 @@
 
 import { useEffect, useMemo, useRef, useState } from "react"
 import DSSelect from "../../../../components/DSSelect"
+import Button from "../../../../components/ui/Button"
+import Badge from "../../../../components/ui/Badge"
+import Input from "../../../../components/ui/Input"
+import Textarea from "../../../../components/ui/Textarea"
 
-const LecturerForm = ({ userData, handleChange, subjects, t }) => {
+const LecturerForm = ({ userData, handleChange, subjects, t, fieldErrors = {} }) => {
   const [selectedSubjects, setSelectedSubjects] = useState(userData.subject || [])
   const fileInputRef = useRef(null)
 
@@ -49,15 +53,15 @@ const LecturerForm = ({ userData, handleChange, subjects, t }) => {
   return (
     <>
       {/* Subjects Selection */}
-      <div className="form-control">
+      <div className="mb-4">
         <div className="flex flex-col gap-2">
-          <label className="label py-0">
-            <span className="label-text font-bold" style={{ color: "#1F2937" }}>{t("fields.subjects")}</span>
+          <label className="block mb-1">
+            <span className="text-sm font-bold" style={{ color: "#1F2937" }}>{t("fields.subjects")}</span>
           </label>
           <div className="flex gap-2">
             <DSSelect
-              className="select w-full rounded-xl"
-              style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
+              className="border border-slate-200 w-full rounded-xl"
+              style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: fieldErrors.subject ? "#DC2626" : "rgba(17,24,39,0.1)", color: "#1F2937" }}
               onChange={handleSubjectSelect}
               value=""
             >
@@ -74,30 +78,32 @@ const LecturerForm = ({ userData, handleChange, subjects, t }) => {
             </DSSelect>
           </div>
         </div>
-
+        {fieldErrors.subject && <p className="text-sm text-error mt-2">{fieldErrors.subject}</p>}
         {selectedSubjects.length > 0 && (
           <div className="flex flex-wrap gap-2 mt-2">
             {selectedSubjects.map((subjectId) => (
-              <div key={subjectId} className="badge badge-secondary gap-1">
+              <Badge key={subjectId} variant="secondary" className="gap-1">
                 {getSubjectNameById(subjectId)}
-                <button
+                <Button
                   type="button"
-                  className="btn btn-ghost btn-xs"
+                  variant="ghost"
+                  size="xs"
+                  className="p-0 h-auto min-w-0"
                   onClick={() => removeSubject(subjectId)}
                 >
                   ×
-                </button>
-              </div>
+                </Button>
+              </Badge>
             ))}
           </div>
         )}
       </div>
 
       {/* Profile Picture Upload */}
-      <div className="form-control">
+      <div className="mb-4">
         <div className="flex flex-col gap-2">
-          <label className="label py-0">
-            <span className="label-text font-bold" style={{ color: "#1F2937" }}>{t("fields.profilePic")}</span>
+          <label className="block mb-1">
+            <span className="text-sm font-bold" style={{ color: "#1F2937" }}>{t("fields.profilePic")}</span>
           </label>
           <input
             ref={fileInputRef}
@@ -112,26 +118,27 @@ const LecturerForm = ({ userData, handleChange, subjects, t }) => {
             }}
           />
           <div className="flex flex-wrap items-center gap-3">
-            <button
+            <Button
               type="button"
-              className="btn btn-outline"
+              variant="outline"
               onClick={() => fileInputRef.current?.click()}
             >
               {t("buttons.chooseFile")}
-            </button>
+            </Button>
             <span className="text-sm text-gray-600">
               {userData.profilePic?.name || t("placeholders.noFileSelected")}
             </span>
           </div>
-          <input
+          <Input
             type="text"
             readOnly
-            className="input w-full rounded-xl"
+            className="w-full rounded-xl"
+            variant={fieldErrors.profilePic ? "error" : "default"}
             style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
             value={userData.profilePic?.name || t("placeholders.noFileSelected")}
+            error={fieldErrors.profilePic}
           />
         </div>
-
         {userData.profilePic && (
           <div className="mt-2">
             <img
@@ -144,37 +151,38 @@ const LecturerForm = ({ userData, handleChange, subjects, t }) => {
       </div>
 
       {/* Bio */}
-      <div className="form-control">
+      <div className="mb-4">
         <div className="flex flex-col gap-2">
-          <label className="label py-0">
-            <span className="label-text font-bold" style={{ color: "#1F2937" }}>{t("fields.bio")}</span>
+          <label className="block mb-1">
+            <span className="text-sm font-bold" style={{ color: "#1F2937" }}>{t("fields.bio")}</span>
           </label>
-          <textarea
+          <Textarea
             name="bio"
-            className="textarea w-full rounded-xl"
+            className="w-full rounded-xl"
             style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
             value={userData.bio || ""}
             onChange={handleChange}
             rows="3"
             placeholder={t("placeholders.bio")}
-          ></textarea>
+          />
+          {fieldErrors.bio && <p className="text-sm text-error">{fieldErrors.bio}</p>}
         </div>
       </div>
-
-      {/* Expertise */}
-      <div className="form-control">
+      <div className="mb-4">
         <div className="flex flex-col gap-2">
-          <label className="label py-0">
-            <span className="label-text font-bold" style={{ color: "#1F2937" }}>{t("fields.expertise")}</span>
+          <label className="block mb-1">
+            <span className="text-sm font-bold" style={{ color: "#1F2937" }}>{t("fields.expertise")}</span>
           </label>
-          <input
+          <Input
             type="text"
             name="expertise"
-            className="input w-full rounded-xl"
+            className="w-full rounded-xl"
+            variant={fieldErrors.expertise ? "error" : "default"}
             style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
             value={userData.expertise || ""}
             onChange={handleChange}
             placeholder={t("placeholders.expertise")}
+            error={fieldErrors.expertise}
           />
         </div>
       </div>

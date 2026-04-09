@@ -413,13 +413,15 @@ const uploadFileForBulkCreation = catchAsync(async (req, res, next) => {
   const fileType = req.file.mimetype;
 
   if (fileType === "text/csv" || fileType === "application/csv") {
-    await handleCSV(req.file.buffer, accountType, res, next);
+    const fileBuffer = fs.readFileSync(req.file.path);
+    await handleCSV(fileBuffer, accountType, res, next);
   } else if (
     fileType ===
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
     fileType === "application/vnd.ms-excel"
   ) {
-    await handleExcel(req.file.buffer, accountType, res, next);
+    const fileBuffer = fs.readFileSync(req.file.path);
+    await handleExcel(fileBuffer, accountType, res, next);
   } else {
     return next(
       new AppError(

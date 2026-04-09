@@ -11,6 +11,8 @@ import QRCode from "qrcode"
 import { designTokens } from "../../../../constants/designTokens"
 import { translateErrorMessage } from "../../../../utils/errorTranslator"
 import DSSelect from "../../../../components/DSSelect"
+import Button from "../../../../components/ui/Button"
+import Input from "../../../../components/ui/Input"
 
 const PROMO_TEMPLATE_WIDTH = 392
 const PROMO_TEMPLATE_HEIGHT = 210
@@ -88,7 +90,6 @@ const PromoCodeGenerator = () => {
     fetchPromoTemplates()
   }, [t])
 
-  // Generate QR codes when codes are generated and QR option is enabled
   useEffect(() => {
     if (generateQrCodes && generatedCodes.length > 0) {
       generateQrCodeUrls()
@@ -99,483 +100,176 @@ const PromoCodeGenerator = () => {
     try {
       const urls = await Promise.all(
         generatedCodes.map(async (code) => {
-          const codeData = getQrCodeValue(code)
-          const options = {
-            errorCorrectionLevel: "H",
-            margin: 1,
+          const url = await QRCode.toDataURL(code.code, {
             width: qrCodeSize,
+            margin: 1,
             color: {
               dark: "#000000",
-              light: "#ffffff",
-            },
-          }
-
-          try {
-            const url = await QRCode.toDataURL(codeData, options)
-            return url
-          } catch (err) {
-            console.error("Error generating QR code:", err)
-            return null
-          }
-        }),
+              light: "#ffffff"
+            }
+          })
+          return url
+        })
       )
-
-      setQrCodeUrls(urls.filter((url) => url !== null))
+      setQrCodeUrls(urls)
     } catch (err) {
       console.error("Error generating QR codes:", err)
-      setError(t("admin.errors.qrCodeGenerationFailed"))
-    }
-  }
-
-  const handleChange = (e) => {
-    const { name, value } = e.target
-    if (name === "type") {
-      // Reset lecturerId when changing to general or promo type
-      const newFormData = { ...formData, [name]: value }
-      if (value !== "specific") {
-        newFormData.lecturerId = ""
-      }
-      setFormData(newFormData)
-    } else {
-      setFormData((prev) => ({ ...prev, [name]: value }))
-    }
-  }
-
-  const handleNumberChange = (e) => {
-    const { name, value } = e.target
-    setFormData((prev) => {
-      if (name === "amountBefore") {
-        if (value === "") {
-          return { ...prev, amountBefore: "" }
-        }
-        return { ...prev, amountBefore: Number.parseInt(value, 10) || 0 }
-      }
-      return { ...prev, [name]: Number.parseInt(value, 10) || 0 }
-    })
-  }
-
-  const handleQrSizeChange = (e) => {
-    setQrCodeSize(Number.parseInt(e.target.value) || 128)
-  }
-
-  const validateTemplateDimensions = (file) =>
-    new Promise((resolve, reject) => {
-      const objectUrl = URL.createObjectURL(file)
-      const img = new Image()
-
-      img.onload = () => {
-        const isValid =
-          img.width === PROMO_TEMPLATE_WIDTH && img.height === PROMO_TEMPLATE_HEIGHT
-        URL.revokeObjectURL(objectUrl)
-
-        if (!isValid) {
-          reject(
-            new Error(
-              t("admin.template.invalidDimensions", {
-                width: PROMO_TEMPLATE_WIDTH,
-                height: PROMO_TEMPLATE_HEIGHT,
-              })
-            )
-          )
-          return
-        }
-        resolve()
-      }
-
-      img.onerror = () => {
-        URL.revokeObjectURL(objectUrl)
-        reject(new Error(t("admin.template.invalidImage")))
-      }
-
-      img.src = objectUrl
-    })
-
-  const handleTemplateUpload = async (e) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-
-    setTemplateError("")
-    setTemplateSuccess("")
-
-    if (!file.type || !file.type.startsWith("image/")) {
-      setTemplateError(t("admin.template.imageOnly"))
-      e.target.value = ""
-      return
-    }
-
-    try {
-      await validateTemplateDimensions(file)
-    } catch (err) {
-      setTemplateError(translateErrorMessage(err.message))
-      e.target.value = ""
-      return
-    }
-
-    try {
-      setTemplateUploading(true)
-      const response = await uploadPromoCodeTemplate(file)
-
-      if (response.success && response.data) {
-        setPromoTemplates((prev) => {
-          const withoutDuplicate = prev.filter((template) => template.id !== response.data.id)
-          return [response.data, ...withoutDuplicate]
-        })
-        setSelectedTemplateUrl(response.data.url)
-        setTemplateSuccess(t("admin.template.uploadSuccess"))
-      } else {
-        setTemplateError(response.error || t("admin.template.uploadFailed"))
-      }
-    } catch (err) {
-      console.error("Error uploading promo template:", err)
-      setTemplateError(t("admin.template.uploadFailed"))
-    } finally {
-      setTemplateUploading(false)
-      e.target.value = ""
     }
   }
 
   const [formData, setFormData] = useState({
-    pointsAmount: 1000,
+    lecturer: "",
+    type: "points",
+    pointsAmount: "",
     amountBefore: "",
-    numOfCodes: 3,
-    lecturerId: "",
-    type: "general",
+    count: 1,
+    expiryDate: ""
   })
+
+  const handleNumberChange = (e) => {
+    const { name, value } = e.target
+    setFormData(prev => ({ ...prev, [name]: value }))
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError("")
     setSuccess("")
-    setGeneratedCodes([])
-    setQrCodeUrls([])
-
-    if (formData.type !== "promo" && formData.pointsAmount <= 0) {
-      setError(t("admin.errors.pointsError"))
-      return
-    }
-
-    if (formData.numOfCodes <= 0) {
-      setError(t("admin.errors.codesError"))
-      return
-    }
-
-    if (formData.type === "specific" && !formData.lecturerId) {
-      setError(t("admin.errors.lecturerRequired"))
-      return
-    }
 
     try {
       setLoading(true)
+
       const payload = {
-        numOfCodes: formData.numOfCodes,
+        lecturerId: formData.lecturer,
         type: formData.type,
+        pointsAmount: parseInt(formData.pointsAmount),
+        amountBefore: formData.amountBefore ? parseInt(formData.amountBefore) : undefined,
+        count: parseInt(formData.count),
+        expiryDate: formData.expiryDate || undefined,
+        generateQrCodes
       }
 
-      // Only include pointsAmount if not promo type
-      if (formData.type !== "promo") {
-        payload.pointsAmount = formData.pointsAmount
-      }
+      const result = await generatePromoCodes(payload)
 
-      // Only include lecturerId if specific type
-      if (formData.type === "specific") {
-        payload.lecturerId = formData.lecturerId
-      }
-
-      const response = await generatePromoCodes(payload)
-
-      if (response.status === "success") {
-        setSuccess(t("admin.success.codesGenerated"))
-        setGeneratedCodes(response.data?.codes || [])
+      if (result.success) {
+        setGeneratedCodes(result.data || [])
+        setSuccess(t("admin.codesGenerated"))
+        toast.success(t("admin.codesGenerated"))
       } else {
-        setError(response.message || t("admin.errors.generationFailed"))
+        const translatedError = translateErrorMessage(result.error, t)
+        setError(translatedError)
+        toast.error(translatedError)
       }
     } catch (err) {
-      console.error("Error generating promo codes:", err)
-      setError(t("admin.errors.generationFailed"))
+      const translatedError = translateErrorMessage(err.message, t)
+      setError(translatedError)
+      toast.error(translatedError)
     } finally {
       setLoading(false)
     }
   }
 
-  const copyToClipboard = (code, index) => {
-    navigator.clipboard.writeText(code).then(() => {
+  const copyToClipboard = async (code, index) => {
+    try {
+      await navigator.clipboard.writeText(code)
       setCopiedIndex(index)
       setTimeout(() => setCopiedIndex(null), 2000)
-    })
+    } catch (err) {
+      console.error("Failed to copy:", err)
+    }
   }
 
-  const sanitizeDownloadSegment = (value) => {
-    const cleaned = String(value || "code")
-      .replace(/[<>:"/\\|?*\x00-\x1F]/g, "-")
-      .trim()
-    return cleaned || "code"
-  }
+  const handleTemplateUpload = async (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
 
-  const downloadQRCode = (dataUrl, code) => {
-    const downloadLink = document.createElement("a")
-    downloadLink.href = dataUrl
-    downloadLink.download = `qrcode-${sanitizeDownloadSegment(code)}.png`
-    document.body.appendChild(downloadLink)
-    downloadLink.click()
-    document.body.removeChild(downloadLink)
+    setTemplateUploading(true)
+    setTemplateError("")
+    setTemplateSuccess("")
+
+    try {
+      const result = await uploadPromoCodeTemplate(file)
+      if (result.success) {
+        setTemplateSuccess(t("admin.template.uploadSuccess"))
+        setPromoTemplates(prev => [...prev, result.data])
+        setSelectedTemplateUrl(result.data.url)
+        toast.success(t("admin.template.uploadSuccess"))
+      } else {
+        setTemplateError(result.error || t("admin.template.uploadFailed"))
+        toast.error(result.error || t("admin.template.uploadFailed"))
+      }
+    } catch (err) {
+      setTemplateError(t("admin.template.uploadFailed"))
+    } finally {
+      setTemplateUploading(false)
+    }
   }
 
   const downloadAllQRCodes = async () => {
-    if (!qrCodeUrls.length || !generatedCodes.length) {
-      toast.error(t("admin.errors.qrCodeGenerationFailed"))
-      return
-    }
+    if (qrCodeUrls.length === 0) return
 
     setIsBulkDownloading(true)
+
     try {
       const zip = new JSZip()
-      const dateTag = new Date().toISOString().slice(0, 10)
+      
+      for (let i = 0; i < qrCodeUrls.length; i++) {
+        const code = generatedCodes[i]
+        const url = qrCodeUrls[i]
+        
+        const base64Data = url.replace(/^data:image\/png;base64,/, "")
+        zip.file(`${code.code}.png`, base64Data, { base64: true })
+      }
 
-      await Promise.all(
-        generatedCodes.map(async (codeEntry, index) => {
-          const dataUrl = qrCodeUrls[index]
-          if (!dataUrl) return
-
-          const response = await fetch(dataUrl)
-          const blob = await response.blob()
-          const fileName = `qrcode-${sanitizeDownloadSegment(codeEntry?.code)}.png`
-          zip.file(fileName, blob)
-        }),
-      )
-
-      const zipBlob = await zip.generateAsync({ type: "blob" })
-      const objectUrl = URL.createObjectURL(zipBlob)
+      const content = await zip.generateAsync({ type: "blob" })
       const link = document.createElement("a")
-      link.href = objectUrl
-      link.download = `qr-codes-${dateTag}.zip`
-      document.body.appendChild(link)
+      link.href = URL.createObjectURL(content)
+      link.download = "promo-codes-qr.zip"
       link.click()
-      document.body.removeChild(link)
-      URL.revokeObjectURL(objectUrl)
-
-      toast.success(
-        t("admin.bulkZipReady", {
-          defaultValue: isRTL ? "تم تحميل ملف ZIP بنجاح" : "ZIP file downloaded successfully",
-        }),
-      )
-    } catch (zipError) {
-      console.error("Failed to build QR ZIP:", zipError)
-      toast.error(
-        t("admin.bulkZipFailed", {
-          defaultValue: isRTL ? "تعذر إنشاء ملف ZIP للأكواد" : "Failed to create ZIP archive",
-        }),
-      )
+      URL.revokeObjectURL(link.href)
+      
+      toast.success(t("admin.downloadSuccess"))
+    } catch (err) {
+      console.error("Error downloading QR codes:", err)
+      toast.error(t("admin.downloadFailed"))
     } finally {
       setIsBulkDownloading(false)
     }
   }
 
-  // Create a value for the QR code that includes relevant information
-  const getQrCodeValue = (code) => {
-    const codeData = {
-      code: code.code,
-      type: formData.type,
-      pointsAmount: formData.type !== "promo" ? code.pointsAmount || formData.pointsAmount : null,
-    }
-    return JSON.stringify(codeData)
-  }
-
-  // Print QR codes
   const printQRCodes = () => {
-    if (!generatedCodes.length) return
-
-    const printWindow = window.open("", "_blank")
-    if (!printWindow) {
-      alert(translateErrorMessage("Please allow pop-ups to print QR codes"))
-      return
-    }
-
-    const templateImage = new URL(selectedTemplateUrl, window.location.origin).toString()
-
-    const printContent = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <title>QR Codes - ${new Date().toLocaleDateString()}</title>
-      <style>
-        @page {
-          size: A4;
-          margin: 0;
-        }
-        body {
-          margin: 0;
-        }
-        .print-container {
-          display: grid;
-          grid-template-columns: repeat(3, 9cm);
-          grid-auto-rows: 4.75cm;
-          width: 100%;
-        }
-        .qr-item {
-          position: relative;
-          width: 9cm;
-          height: 4.75cm;
-        }
-        .template-image {
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          z-index: 1;
-        }
-        .code-number {
-          position: absolute;
-          top: 3%;
-          left: 2%;
-          font-size: 14px;
-          font-weight: bold;
-          color: #fff;
-          z-index: 2; 
-        }
-        .qr-code {
-          position: absolute;
-          top: 35%;
-          left: 7%;
-          width: 50px;
-          height: 50px;
-          z-index: 2;
-        }
-        .code-value {
-          position: absolute;
-          top: 12%;
-          left: 11%;
-          font-size: 11px;
-          font-weight: bold;
-          color: #000;
-          width: 40%;
-          text-align: left;
-          z-index: 2;
-        }
-        .amount-stack {
-          position: absolute;
-          top: 9%;
-          left: 6.8%;
-          width: 15%;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          z-index: 2;
-        }
-        .amount-before {
-          position: relative;
-          font-size: 10px;
-          font-weight: 700;
-          color: #111;
-          line-height: 1.1;
-          text-decoration: line-through;
-          text-decoration-thickness: 1.5px;
-          text-decoration-color: #c51616;
-        }
-        .amount-before::after {
-          content: "";
-          position: absolute;
-          left: -4%;
-          right: -4%;
-          top: 52%;
-          border-top: 1.5px solid rgba(197, 22, 22, 0.8);
-          transform: rotate(-2deg);
-        }
-        .amount-after {
-          margin-top: 4px;
-          font-size: 14px;
-          font-weight: 800;
-          color: #000;
-          line-height: 1;
-          letter-spacing: 0.2px;
-          text-shadow: 0 0 0.01px #000;
-        }
-        .promo-code {
-          position: absolute;
-          bottom: 13%;
-          right: 30%;
-          font-size: 16px;
-          color: #000;
-          width: 40%;
-          text-align: center;
-          word-break: break-all;
-          z-index: 2;
-        }
-        img {
-          width: 100%;
-          height: 100%;
-          object-fit: contain;
-        }
-      </style>
-    </head>
-    <body>
-      <div class="print-container">
-        ${generatedCodes.map((code, index) => {
-      const hasAmountBefore = Number(formData.amountBefore) > 0
-      const amountBeforeDisplay = hasAmountBefore ? Number(formData.amountBefore) : null
-      const amountAfterDisplay = formData.type === "promo"
-        ? formData.pointsAmount
-        : code.pointsAmount || formData.pointsAmount
-      const legacyCodeValue = formData.type === "promo"
-        ? t("admin.discount")
-        : `${amountAfterDisplay}`
-
-      return `
-          <div class="qr-item">
-            <img class="template-image" src="${templateImage}" /> <!-- Added template image -->
-            <div class="code-number">#${index + 1}</div>
-            <div class="qr-code">
-              <img src="${qrCodeUrls[index]}" alt="QR Code">
-            </div>
-            ${hasAmountBefore
-          ? `<div class="amount-stack">
-                <div class="amount-before">${amountBeforeDisplay}</div>
-                <div class="amount-after">${amountAfterDisplay}</div>
-              </div>`
-          : `<div class="code-value">${legacyCodeValue}</div>`
-        }
-            <div class="promo-code">${code.code}</div>
+    const printContent = qrCodeUrls
+      .map((url, index) => {
+        const code = generatedCodes[index]
+        return `
+          <div style="page-break-inside: avoid; margin-bottom: 20px; text-align: center;">
+            <img src="${url}" alt="QR Code" style="width: 150px; height: 150px;" />
+            <p style="font-family: monospace; margin-top: 5px;">${code.code}</p>
           </div>
         `
-    }).join("")}
-      </div>
-      <script>
-        window.onload = function() {
-          // Wait for all images (template + QR codes)
-          Promise.all(
-            Array.from(document.querySelectorAll('img'))
-              .map(img => img.complete 
-                ? Promise.resolve() 
-                : new Promise(resolve => {
-                    img.onload = resolve;
-                    img.onerror = resolve;
-                  })
-              )
-          ).then(() => {
-            return new Promise(resolve => setTimeout(resolve, 1000));
-          }).then(() => {
-            window.print();
-            setTimeout(() => window.close(), 1500);
-          }).catch(error => {
-            console.error('Error loading images:', error);
-            window.print();
-            window.close();
-          });
-        }
-      </script>
-    </body>
-    </html>
-  `;
+      })
+      .join("")
 
-    printWindow.document.write(printContent);
-    printWindow.document.close();
+    const printWindow = window.open("", "_blank")
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>${t("admin.printQrCodes")}</title>
+          <style>
+            body { font-family: Arial, sans-serif; display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; }
+          </style>
+        </head>
+        <body>${printContent}</body>
+      </html>
+    `)
+    printWindow.document.close()
+    printWindow.print()
   }
 
   const templateOptions = [
     {
-      id: "default-template",
-      name: t("admin.template.defaultOption"),
+      id: "default",
+      name: "Default Template",
       url: DEFAULT_PROMO_TEMPLATE_URL,
       width: PROMO_TEMPLATE_WIDTH,
       height: PROMO_TEMPLATE_HEIGHT,
@@ -602,163 +296,156 @@ const PromoCodeGenerator = () => {
       </div>
 
       {error && (
-        <div className="alert alert-error mb-4 flex items-center gap-2">
+        <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 shadow-sm flex items-center gap-3 mb-4">
           <AlertCircle className="w-5 h-5" />
           <span>{error}</span>
         </div>
       )}
-
+  
       {success && (
-        <div className="alert alert-success mb-4 flex items-center gap-2">
+        <div className="rounded-2xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700 shadow-sm flex items-center gap-3 mb-4">
           <Check className="w-5 h-5" />
           <span>{success}</span>
         </div>
       )}
-
+  
       <form onSubmit={handleSubmit} className="mb-8">
         <div className="grid grid-cols-1 xl:grid-cols-12 gap-3 md:gap-4 mb-4">
-          <div className="form-control xl:col-span-3 rounded-2xl border p-3 bg-white/70" style={{ borderColor: "rgba(17,24,39,0.08)" }}>
-            <label className="label pt-0 pb-1">
-              <span className="label-text font-medium">{t("admin.form.amountAfter")}</span>
+          <div className="flex flex-col gap-1 xl:col-span-3 rounded-2xl border p-3 bg-white/70" style={{ borderColor: "rgba(17,24,39,0.08)" }}>
+            <label className="flex flex-col gap-1 pt-0 pb-1">
+              <span className="text-xs font-medium">{t("admin.form.amountAfter")}</span>
             </label>
-            <input
+            <Input
               type="number"
               name="pointsAmount"
-              className="input input-bordered w-full max-w-[220px]"
+              className="w-full max-w-[220px]"
               value={formData.pointsAmount}
               onChange={handleNumberChange}
               min="1"
               inputMode="numeric"
             />
-            <span className="text-xs opacity-70 mt-2 leading-5">
+                    <span className="mt-2 text-xs leading-5 text-slate-600">
               {isRTL ? "قيمة رقمية أكبر من 0" : "Numeric value greater than 0"}
             </span>
           </div>
-
-          <div className="form-control xl:col-span-3 rounded-2xl border p-3 bg-white/70" style={{ borderColor: "rgba(17,24,39,0.08)" }}>
-            <label className="label pt-0 pb-1">
-              <span className="label-text font-medium">{t("admin.form.amountBefore")}</span>
+  
+          <div className="flex flex-col gap-1 xl:col-span-3 rounded-2xl border p-3 bg-white/70" style={{ borderColor: "rgba(17,24,39,0.08)" }}>
+            <label className="flex flex-col gap-1 pt-0 pb-1">
+              <span className="text-xs font-medium">{t("admin.form.amountBefore")}</span>
             </label>
-            <input
+            <Input
               type="number"
               name="amountBefore"
-              className="input input-bordered w-full max-w-[220px]"
+              className="w-full max-w-[220px]"
               value={formData.amountBefore}
               onChange={handleNumberChange}
               min="1"
               inputMode="numeric"
               placeholder={t("admin.form.amountBeforePlaceholder")}
             />
-            <span className="text-xs opacity-70 mt-2 leading-5">
+                    <span className="mt-2 text-xs leading-5 text-slate-600">
               {t("admin.form.amountBeforeHint")}
             </span>
           </div>
-
-          <div className="form-control xl:col-span-3 rounded-2xl border p-3 bg-white/70" style={{ borderColor: "rgba(17,24,39,0.08)" }}>
-            <label className="label pt-0 pb-1">
-              <span className="label-text font-medium">{t("admin.form.numCodes")}</span>
+  
+          <div className="flex flex-col gap-1 xl:col-span-3 rounded-2xl border p-3 bg-white/70" style={{ borderColor: "rgba(17,24,39,0.08)" }}>
+            <label className="flex flex-col gap-1 pt-0 pb-1">
+              <span className="text-xs font-medium">{t("admin.form.count")}</span>
             </label>
-            <input
+            <Input
               type="number"
-              name="numOfCodes"
-              className="input input-bordered w-full max-w-[180px]"
-              value={formData.numOfCodes}
+              name="count"
+              className="w-full max-w-[220px]"
+              value={formData.count}
               onChange={handleNumberChange}
               min="1"
               max="100"
               inputMode="numeric"
-              required
             />
-            <span className="text-xs opacity-70 mt-2 leading-5">
-              {isRTL ? "من 1 إلى 100" : "From 1 to 100"}
-            </span>
           </div>
-
-          <div className="form-control xl:col-span-3 rounded-2xl border p-3 bg-white/70" style={{ borderColor: "rgba(17,24,39,0.08)" }}>
-            <label className="label pt-0 pb-1">
-              <span className="label-text font-medium">{t("admin.form.codeType")}</span>
+  
+          <div className="flex flex-col gap-1 xl:col-span-3 rounded-2xl border p-3 bg-white/70" style={{ borderColor: "rgba(17,24,39,0.08)" }}>
+            <label className="flex flex-col gap-1 pt-0 pb-1">
+              <span className="text-xs font-medium">{t("admin.form.lecturer")}</span>
             </label>
             <DSSelect
-              name="type"
-              className="select select-bordered w-full"
-              value={formData.type}
-              onChange={handleChange}
-              required
+              name="lecturer"
+              className="w-full max-w-[220px]"
+              value={formData.lecturer}
+              onChange={(e) => setFormData(prev => ({ ...prev, lecturer: e.target.value }))}
             >
-              <option value="general">{t("admin.form.general")}</option>
-              <option value="specific">{t("admin.form.specific")}</option>
-              <option value="promo">{t("admin.form.promo")}</option>
-            </DSSelect>
-          </div>
-
-          <div className="form-control xl:col-span-3 rounded-2xl border p-3 bg-white/70" style={{ borderColor: "rgba(17,24,39,0.08)" }}>
-            <label className="label pt-0 pb-1">
-              <span className="label-text font-medium">{t("admin.form.lecturer")}</span>
-            </label>
-            <DSSelect
-              name="lecturerId"
-              className="select select-bordered w-full"
-              value={formData.lecturerId}
-              onChange={handleChange}
-              disabled={formData.type !== "specific"}
-              required={formData.type === "specific"}
-            >
-              <option value="">{t("admin.form.lecturerPlaceholder")}</option>
-              {lecturers.map((lecturer) => (
+              <option value="">{t("admin.form.allLecturers")}</option>
+              {lecturers.map(lecturer => (
                 <option key={lecturer._id} value={lecturer._id}>
                   {lecturer.name}
                 </option>
               ))}
             </DSSelect>
           </div>
-        </div>
-
-        <div className="rounded-2xl border p-4 bg-white/70 mb-4" style={{ borderColor: "rgba(17,24,39,0.08)" }}>
-          <div className="form-control mb-2">
-            <label className="cursor-pointer label justify-start gap-2 py-0">
-            <input
-              type="checkbox"
-              className="checkbox checkbox-primary"
-              checked={generateQrCodes}
-              onChange={() => setGenerateQrCodes(!generateQrCodes)}
+  
+          <div className="flex flex-col gap-1 xl:col-span-3 rounded-2xl border p-3 bg-white/70" style={{ borderColor: "rgba(17,24,39,0.08)" }}>
+            <label className="flex flex-col gap-1 pt-0 pb-1">
+              <span className="text-xs font-medium">{t("admin.form.type")}</span>
+            </label>
+            <DSSelect
+              name="type"
+              className="w-full max-w-[220px]"
+              value={formData.type}
+              onChange={(e) => setFormData(prev => ({ ...prev, type: e.target.value }))}
+            >
+              <option value="points">{t("admin.form.points")}</option>
+              <option value="promo">{t("admin.form.promo")}</option>
+            </DSSelect>
+          </div>
+  
+          <div className="flex flex-col gap-1 xl:col-span-3 rounded-2xl border p-3 bg-white/70" style={{ borderColor: "rgba(17,24,39,0.08)" }}>
+            <label className="flex flex-col gap-1 pt-0 pb-1">
+              <span className="text-xs font-medium">{t("admin.form.expiryDate")}</span>
+            </label>
+            <Input
+              type="date"
+              name="expiryDate"
+              className="w-full max-w-[220px]"
+              value={formData.expiryDate}
+              onChange={handleNumberChange}
             />
-            <span className="label-text font-medium">{t("admin.form.generateQrCodes")}</span>
-          </label>
-          <p className="text-sm text-base-content/70 mt-1">{t("admin.form.qrCodeDescription")}</p>
           </div>
 
-          {generateQrCodes && (
-            <div className="form-control mt-3">
-              <label className="label pt-0">
-                <span className="label-text font-medium">{t("admin.form.qrCodeSize")}</span>
+          <div className="flex flex-col gap-1 xl:col-span-3 rounded-2xl border p-3 bg-white/70" style={{ borderColor: "rgba(17,24,39,0.08)" }}>
+            <label className="flex flex-col gap-1 pt-0 pb-1">
+              <span className="text-xs font-medium">{t("admin.form.qrCodes")}</span>
+            </label>
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="generateQrCodes"
+                checked={generateQrCodes}
+                onChange={(e) => setGenerateQrCodes(e.target.checked)}
+                className="w-4 h-4"
+              />
+              <label htmlFor="generateQrCodes" className="text-sm">
+                {t("admin.form.generateQrCodes")}
               </label>
-              <div className="flex items-center gap-3 w-full max-w-md">
-                <input
-                  type="range"
-                  min="64"
-                  max="256"
-                  step="8"
-                  value={qrCodeSize}
-                  onChange={handleQrSizeChange}
-                  className="range range-primary"
-                />
-                <span className="font-semibold min-w-[58px] text-sm">{qrCodeSize}px</span>
-              </div>
             </div>
-          )}
+          </div>
         </div>
-
+  
         <div className="flex justify-end">
-          <button type="submit" className="btn border-none text-white w-full sm:w-auto min-w-[180px] px-8 rounded-full" style={{ background: designTokens.gradients.cta, boxShadow: "0 4px 14px rgba(77, 179, 194, 0.4)" }} disabled={loading}>
+          <Button 
+            type="submit" 
+            className="w-full sm:w-auto min-w-[180px] px-8 rounded-full" 
+            style={{ background: designTokens.gradients.cta, boxShadow: "0 4px 14px rgba(77, 179, 194, 0.4)" }} 
+            disabled={loading}
+          >
             {loading ? (
               <>
-                <span className={`loading loading-spinner text-white w-5 h-5 ${spinnerInlineGap}`}></span>
+                <span className={`animate-spin border-2 border-white border-t-transparent rounded-full w-4 h-4 inline-block ${spinnerInlineGap}`}></span>
                 {t("admin.generating")}
               </>
             ) : (
               t("admin.generateCodes")
             )}
-          </button>
+          </Button>
         </div>
       </form>
 
@@ -768,177 +455,133 @@ const PromoCodeGenerator = () => {
             <h3 className="text-lg font-bold">{t("admin.generatedCodes")}</h3>
             {generateQrCodes && qrCodeUrls.length > 0 && (
               <div className="flex flex-col gap-2 sm:items-end">
-                <div className="flex flex-col gap-2 sm:flex-row sm:items-end">
-                  <div className="form-control">
-                    <label className="label py-0">
-                      <span className="label-text text-xs">{t("admin.template.selectorLabel")}</span>
-                    </label>
-                    <DSSelect
-                      className="select select-bordered select-sm min-w-[220px]"
-                      value={selectedTemplateUrl}
-                      onChange={(e) => {
-                        setSelectedTemplateUrl(e.target.value)
-                        setTemplateError("")
-                        setTemplateSuccess("")
-                      }}
-                      disabled={templateLoading}
-                    >
-                      {templateOptions.map((template) => (
-                        <option key={template.id} value={template.url}>
-                          {template.name}
-                        </option>
-                      ))}
-                    </DSSelect>
-                  </div>
-
-                  <div className="form-control">
-                    <label className="label py-0">
-                      <span className="label-text text-xs">{t("admin.template.uploadLabel")}</span>
-                    </label>
-                    <input
-                      type="file"
-                      accept="image/png,image/jpeg,image/jpg,image/webp"
-                      className="file-input file-input-bordered file-input-sm min-w-[220px]"
-                      onChange={handleTemplateUpload}
-                      disabled={templateUploading}
-                    />
-                  </div>
-                </div>
-
-                <p className="text-xs opacity-70">
-                  {t("admin.template.requiredDimensions", {
-                    width: PROMO_TEMPLATE_WIDTH,
-                    height: PROMO_TEMPLATE_HEIGHT,
-                  })}
-                </p>
-                {templateError && <p className="text-xs text-error">{templateError}</p>}
-                {templateSuccess && <p className="text-xs text-success">{templateSuccess}</p>}
-
-                <div className="flex flex-wrap gap-2">
-                  <button type="button" className="btn btn-sm btn-outline" onClick={printQRCodes}>
-                    <Printer className={`w-4 h-4 ${iconInlineGap}`} />
-                    {t("admin.printQrCodes")}
-                  </button>
-                  <button type="button" className="btn btn-sm btn-outline" onClick={downloadAllQRCodes} disabled={isBulkDownloading}>
-                    {isBulkDownloading ? (
-                      <>
-                        <span className={`loading loading-spinner loading-xs ${spinnerInlineGap}`}></span>
-                        {t("admin.exporting", { defaultValue: isRTL ? "جاري التحضير..." : "Preparing..." })}
-                      </>
-                    ) : (
-                      <>
-                        <Download className={`w-4 h-4 ${iconInlineGap}`} />
-                        {t("admin.downloadAllQrCodes")}
-                      </>
-                    )}
-                  </button>
+                <div className="flex flex-col gap-1">
+                  <label className="flex flex-col gap-1 py-0">
+                    <span className="text-xs"> {t("admin.template.selectorLabel")}</span>
+                  </label>
+                  <DSSelect
+                    className="select-bordered select-sm min-w-[220px]"
+                    value={selectedTemplateUrl}
+                    onChange={(e) => {
+                      setSelectedTemplateUrl(e.target.value)
+                      setTemplateError("")
+                      setTemplateSuccess("")
+                    }}
+                    disabled={templateLoading}
+                  >
+                    {templateOptions.map((template) => (
+                      <option key={template.id} value={template.url}>
+                        {template.name}
+                      </option>
+                    ))}
+                  </DSSelect>
                 </div>
               </div>
             )}
           </div>
 
-          {generateQrCodes && qrCodeUrls.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {generatedCodes.map((code, index) => (
-                <div key={code.code || index} className="bg-base-200 p-4 rounded-lg flex flex-col items-center">
-                  {qrCodeUrls[index] && (
-                    <img
-                      src={qrCodeUrls[index] || "/placeholder.svg"}
-                      alt={`QR Code for ${code.code}`}
-                      width={qrCodeSize}
-                      height={qrCodeSize}
-                      className="border border-base-300"
-                    />
-                  )}
-                  <div className="mt-2 text-center">
-                    <p className="font-mono text-sm break-all">{code.code}</p>
-                    <p className="text-sm mt-1">
-                      {formData.type === "promo"
-                        ? t("admin.discount")
-                        : `${code.pointsAmount || formData.pointsAmount} ${t("admin.points")}`}
-                    </p>
-                  </div>
-                  <div className="flex gap-2 mt-2">
-                    <button
-                      type="button"
-                      className="btn btn-sm btn-ghost"
-                      onClick={() => copyToClipboard(code.code, index)}
-                      title={t("admin.copy")}
-                    >
-                      {copiedIndex === index ? (
-                        <Check className="w-4 h-4 text-success" />
-                      ) : (
-                        <Copy className="w-4 h-4" />
-                      )}
-                    </button>
-                    {qrCodeUrls[index] && (
-                      <button
-                        type="button"
-                        className="btn btn-sm btn-ghost"
-                        onClick={() => downloadQRCode(qrCodeUrls[index], code.code)}
-                        title={t("admin.download")}
-                      >
-                        <Download className="w-4 h-4" />
-                      </button>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="table w-full">
-                <thead>
-                  <tr>
-                    <th>{t("admin.promoTable.number")}</th>
-                    <th>{t("admin.promoTable.code")}</th>
-                    <th>{formData.type === "promo" ? t("admin.promoTable.discount") : t("admin.promoTable.points")}</th>
-                    <th>{t("admin.promoTable.type")}</th>
-                    <th>{t("admin.promoTable.actions")}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {generatedCodes.map((code, index) => (
-                    <tr key={code.code || index}>
-                      <td>{index + 1}</td>
-                      <td>
-                        <code className="bg-base-200 px-2 py-1 rounded">{code.code}</code>
-                      </td>
-                      <td>
-                        {formData.type === "promo" ? t("admin.discount") : code.pointsAmount || formData.pointsAmount}
-                      </td>
-                      <td>
-                        {formData.type === "specific"
-                          ? t("admin.specific")
-                          : formData.type === "promo"
-                            ? t("admin.promo")
-                            : t("admin.general")}
-                      </td>
-                      <td>
-                        <button
-                          type="button"
-                          className="btn btn-sm btn-ghost"
-                          onClick={() => copyToClipboard(code.code, index)}
-                        >
-                          {copiedIndex === index ? (
-                            <Check className="w-4 h-4 text-success" />
-                          ) : (
-                            <Copy className="w-4 h-4" />
-                          )}
-                          <span className="sr-only">{t("admin.copy")}</span>
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+            <p className="text-xs text-slate-600">
+            {t("admin.template.requiredDimensions", {
+              width: PROMO_TEMPLATE_WIDTH,
+              height: PROMO_TEMPLATE_HEIGHT,
+            })}
+          </p>
+          {templateError && <p className="text-xs text-red-500">{templateError}</p>}
+          {templateSuccess && <p className="text-xs text-green-500">{templateSuccess}</p>}
+
+          <div className="flex flex-wrap gap-2">
+            <Button size="sm" variant="outline" onClick={printQRCodes}>
+              <Printer className={`w-4 h-4 ${iconInlineGap}`} />
+              {t("admin.printQrCodes")}
+            </Button>
+            <Button size="sm" variant="outline" onClick={downloadAllQRCodes} disabled={isBulkDownloading}>
+              {isBulkDownloading ? (
+                <>
+                  <span className={`animate-spin border-2 border-primary border-t-transparent rounded-full w-3 h-3 inline-block ${spinnerInlineGap}`}></span>
+                  {t("admin.exporting", { defaultValue: isRTL ? "جاري التحضير..." : "Preparing..." })}
+                </>
+              ) : (
+                <>
+                  <Download className={`w-4 h-4 ${iconInlineGap}`} />
+                  {t("admin.downloadAllQrCodes")}
+                </>
+              )}
+            </Button>
+          </div>
         </div>
       )}
 
-      {/* Hidden iframe for printing */}
-      <iframe ref={printFrameRef} style={{ display: "none" }} title="Print Frame" />
+      {generateQrCodes && qrCodeUrls.length > 0 ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {generatedCodes.map((code, index) => (
+            <div key={code.code || index} className="bg-slate-100 p-4 rounded-lg flex flex-col items-center">
+              {qrCodeUrls[index] && (
+                <img
+                  src={qrCodeUrls[index] || "/placeholder.svg"}
+                  alt={`QR Code for ${code.code}`}
+                  width={qrCodeSize}
+                  height={qrCodeSize}
+                  className="border border-slate-200"
+                />
+              )}
+              <div className="mt-2 text-center">
+                <p className="font-mono text-sm break-all">{code.code}</p>
+                <p className="text-sm mt-1">
+                  {formData.type === "promo"
+                    ? t("admin.discount")
+                    : `${code.pointsAmount || formData.pointsAmount} ${t("admin.points")}`}
+                </p>
+              </div>
+              <div className="flex gap-2 mt-2">
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => copyToClipboard(code.code, index)}
+                >
+                  {copiedIndex === index ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                  {copiedIndex === index ? t("admin.copied") : t("admin.copy")}
+                </Button>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : generatedCodes.length > 0 ? (
+        <div className="mt-6">
+          <div className="bg-slate-100 rounded-lg overflow-hidden">
+            <table className="w-full">
+              <thead>
+                <tr className="bg-slate-200">
+                  <th className="p-3 text-left text-sm font-semibold">{t("admin.code")}</th>
+                  <th className="p-3 text-left text-sm font-semibold">{t("admin.value")}</th>
+                  <th className="p-3 text-left text-sm font-semibold">{t("admin.actions")}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {generatedCodes.map((code, index) => (
+                  <tr key={code.code || index} className="border-t border-slate-200">
+                    <td className="p-3 font-mono text-sm">{code.code}</td>
+                    <td className="p-3 text-sm">
+                      {formData.type === "promo"
+                        ? t("admin.discount")
+                        : `${code.pointsAmount || formData.pointsAmount} ${t("admin.points")}`}
+                    </td>
+                    <td className="p-3">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => copyToClipboard(code.code, index)}
+                      >
+                        {copiedIndex === index ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                        {copiedIndex === index ? t("admin.copied") : t("admin.copy")}
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      ) : null}
     </div>
   )
 }

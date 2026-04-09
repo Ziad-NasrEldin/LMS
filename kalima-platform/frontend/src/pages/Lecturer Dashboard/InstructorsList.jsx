@@ -7,6 +7,11 @@ import { CreateAssistant, deleteAssistant, updateAssistant } from "../../routes/
 import { BookOpen, Plus, X, Edit, Trash2 } from "lucide-react"
 import { designTokens } from "../../constants/designTokens"
 import { translateErrorMessage } from "../../utils/errorTranslator"
+import Button from "../../components/ui/Button"
+import Input from "../../components/ui/Input"
+import Modal from "../../components/ui/Modal"
+import Badge from "../../components/ui/Badge"
+import Radio from "../../components/ui/Radio"
 
 const TOKENS = designTokens.colors
 const SHADOWS = designTokens.shadows
@@ -213,26 +218,26 @@ export default function InstructorsList() {
     setShowDeleteModal(true)
   }
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-40">
-        <span className="loading loading-spinner loading-lg text-primary"></span>
-      </div>
-    )
-  }
+   if (loading) {
+     return (
+       <div className="flex justify-center items-center h-40">
+         <div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
+       </div>
+     )
+   }
 
   if (error) {
-    return (
-      <div className="text-center py-12 space-y-4">
-        <div className="mx-auto w-24 h-24 bg-base-200 rounded-full flex items-center justify-center">
-          <BookOpen className="h-12 w-12 text-primary" />
+      return (
+        <div className="text-center py-12 space-y-4">
+          <div className="mx-auto w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center">
+            <BookOpen className="h-12 w-12 text-primary" />
+          </div>
+          <h3 className="text-xl font-bold">{t("noAssistants")}</h3>
+          <Button onClick={() => window.location.reload()} variant="primary">
+            {t("tryAgain")}
+          </Button>
         </div>
-        <h3 className="text-xl font-bold">{t("noAssistants")}</h3>
-        <button onClick={() => window.location.reload()} className="btn btn-primary">
-          {t("tryAgain")}
-        </button>
-      </div>
-    )
+      )
   }
 
   return (
@@ -296,22 +301,24 @@ export default function InstructorsList() {
               }}
             >
               <div className={`absolute top-2 z-10 flex gap-2 ${isRTL ? "left-2" : "right-2"}`}>
-                <button
-                  onClick={() => startEdit(assistant)}
-                  className="btn btn-sm btn-circle border-none transition-colors"
-                  style={{ background: TOKENS.lightAquaMist, color: TOKENS.deepTeal }}
-                  title={t("editAssistant")}
-                >
-                  <Edit size={16} />
-                </button>
-                <button
-                  onClick={() => confirmDelete(assistant._id)}
-                  className="btn btn-sm btn-circle border-none transition-colors"
-                  style={{ background: "#FDE8EE", color: "#BE123C" }}
-                  title={t("delete")}
-                >
-                  <Trash2 size={16} />
-                </button>
+                 <Button
+                   onClick={() => startEdit(assistant)}
+                   size="sm"
+                   className="rounded-full border-none transition-colors"
+                   style={{ background: TOKENS.lightAquaMist, color: TOKENS.deepTeal }}
+                   title={t("editAssistant")}
+                 >
+                   <Edit size={16} />
+                 </Button>
+                 <Button
+                   onClick={() => confirmDelete(assistant._id)}
+                   size="sm"
+                   className="rounded-full border-none transition-colors"
+                   style={{ background: "#FDE8EE", color: "#BE123C" }}
+                   title={t("delete")}
+                 >
+                   <Trash2 size={16} />
+                 </Button>
               </div>
               <div className="card-body items-center text-center p-6 sm:p-8">
                 <div className="avatar mb-3">
@@ -332,158 +339,139 @@ export default function InstructorsList() {
                 <p className="text-sm font-medium" style={{ color: TOKENS.slateText }}>
                   {assistant.assignedLecturer?.expertise || t("assistantSpecialty")}
                 </p>
-                <div className="mt-2">
-                  <span className={`badge ${assistant.gender === "male" ? "badge-info" : "badge-accent"}`}>
-                    {assistant.gender === "male" ? t("male") : t("female")}
-                  </span>
-                </div>
+                 <div className="mt-2">
+                   <Badge variant={assistant.gender === "male" ? "info" : "accent"}>
+                     {assistant.gender === "male" ? t("male") : t("female")}
+                   </Badge>
+                 </div>
               </div>
             </div>
           ))}
         </div>
       )}
 
-      {/* Add Delete Confirmation Modal */}
-      {showDeleteModal && (
-        <div className="modal modal-open">
-          <div className="modal-box w-[92vw] max-w-md">
-            <h3 className="font-bold text-lg">{t("confirmDeletion")}</h3>
-            <p className="py-4">{t("areYouSureDelete")}</p>
-            <div className="modal-action flex-col sm:flex-row">
-              <button onClick={() => setShowDeleteModal(false)} className="btn btn-ghost w-full sm:w-auto" disabled={isDeleting}>
-                {t("cancel")}
-              </button>
-              <button onClick={handleDelete} className="btn btn-error w-full sm:w-auto" disabled={isDeleting}>
-                {isDeleting ? <span className="loading loading-spinner"></span> : t("delete")}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+       {/* Add Delete Confirmation Modal */}
+       <Modal 
+         isOpen={showDeleteModal} 
+         onClose={() => setShowDeleteModal(false)} 
+         title={t("confirmDeletion")}
+         size="md"
+         footer={
+           <div className="flex flex-col sm:flex-row gap-2 w-full justify-end">
+             <Button onClick={() => setShowDeleteModal(false)} variant="ghost" className="w-full sm:w-auto" disabled={isDeleting}>
+               {t("cancel")}
+             </Button>
+             <Button onClick={handleDelete} variant="error" className="w-full sm:w-auto" disabled={isDeleting}>
+               {isDeleting ? (
+                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+               ) : (
+                 t("delete")
+               )}
+             </Button>
+           </div>
+         }
+       >
+         <p className="py-4">{t("areYouSureDelete")}</p>
+       </Modal>
 
-      {/* Add Assistant Modal */}
-      {showAddModal && (
-        <div className="modal modal-open">
-          <div className="modal-box relative w-[92vw] max-w-md max-h-[88vh] overflow-y-auto">
-            <button onClick={closeModal} className={`btn btn-sm btn-circle absolute top-2 ${isRTL ? "left-2" : "right-2"}`}>
-              <X size={18} />
-            </button>
+       {/* Add Assistant Modal */}
+       <Modal 
+         isOpen={showAddModal} 
+         onClose={closeModal} 
+         title={editingAssistant ? t("editAssistant") : t("createAssistant")}
+         size="md"
+         footer={
+           <div className="flex justify-end gap-2 w-full">
+             <Button onClick={closeModal} variant="ghost" disabled={isSubmitting}>
+               {t("cancel")}
+             </Button>
+             <Button 
+               type="submit" 
+               variant="primary" 
+               disabled={isSubmitting}
+               onClick={() => {
+                 const form = document.getElementById('assistant-form');
+                 if (form) form.requestSubmit();
+               }}
+             >
+               {isSubmitting ? (
+                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+               ) : editingAssistant ? (
+                 t("editAssistant")
+               ) : (
+                 t("createAssistant")
+               )}
+             </Button>
+           </div>
+         }
+       >
+         {submitError && (
+           <div className="flex items-center gap-2 p-3 mb-4 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">
+             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+             </svg>
+             <span>{submitError}</span>
+           </div>
+         )}
 
-            <h3 className="font-bold text-lg mb-4">{editingAssistant ? t("editAssistant") : t("createAssistant")}</h3>
+         <form 
+           id="assistant-form"
+           onSubmit={editingAssistant ? handleEditSubmit : handleSubmit} 
+           className="space-y-4"
+         >
+           <Input 
+             label={t("fullName")} 
+             name="name"
+             value={formData.name}
+             onChange={handleInputChange}
+             placeholder={t("enterFullName")}
+             error={formErrors.name}
+             required
+           />
 
-            {submitError && (
-              <div className="alert alert-error mb-4">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="stroke-current shrink-0 h-6 w-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-                <span>{submitError}</span>
-              </div>
-            )}
+           <Input 
+             label={t("email")} 
+             type="email"
+             name="email"
+             value={formData.email}
+             onChange={handleInputChange}
+             placeholder={t("enterEmailAddress")}
+             error={formErrors.email}
+             required
+           />
 
-            <form onSubmit={editingAssistant ? handleEditSubmit : handleSubmit} className="space-y-4">
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text">{t("fullName")}*</span>
-                </label>
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  placeholder={t("enterFullName")}
-                  className={`input input-bordered w-full ${formErrors.name ? "input-error" : ""}`}
-                />
-                {formErrors.name && <span className="label-text-alt text-error mt-1">{formErrors.name}</span>}
-              </div>
+           <div className="flex flex-col gap-2">
+             <span className="text-sm font-medium text-neutral">{t("gender")}*</span>
+             <div className="flex gap-4">
+               <Radio 
+                 label={t("male")} 
+                 name="gender"
+                 value="male"
+                 checked={formData.gender === "male"}
+                 onChange={handleInputChange}
+               />
+               <Radio 
+                 label={t("female")} 
+                 name="gender"
+                 value="female"
+                 checked={formData.gender === "female"}
+                 onChange={handleInputChange}
+               />
+             </div>
+           </div>
 
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text">{t("email")}*</span>
-                </label>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  placeholder={t("enterEmailAddress")}
-                  className={`input input-bordered w-full ${formErrors.email ? "input-error" : ""}`}
-                />
-                {formErrors.email && <span className="label-text-alt text-error mt-1">{formErrors.email}</span>}
-              </div>
-
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text">{t("gender")}*</span>
-                </label>
-                <div className="flex gap-4">
-                  <label className="label cursor-pointer gap-2">
-                    <input
-                      type="radio"
-                      name="gender"
-                      value="male"
-                      checked={formData.gender === "male"}
-                      onChange={handleInputChange}
-                      className="radio radio-primary"
-                    />
-                    <span className="label-text">{t("male")}</span>
-                  </label>
-                  <label className="label cursor-pointer gap-2">
-                    <input
-                      type="radio"
-                      name="gender"
-                      value="female"
-                      checked={formData.gender === "female"}
-                      onChange={handleInputChange}
-                      className="radio radio-primary"
-                    />
-                    <span className="label-text">{t("female")}</span>
-                  </label>
-                </div>
-              </div>
-
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text">{t("password")}*</span>
-                </label>
-                <input
-                  type="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleInputChange}
-                  placeholder={t("atLeast6Characters")}
-                  className={`input input-bordered w-full ${formErrors.password ? "input-error" : ""}`}
-                />
-                {formErrors.password && <span className="label-text-alt text-error mt-1">{formErrors.password}</span>}
-              </div>
-
-              <div className="modal-action">
-                <button type="button" onClick={closeModal} className="btn btn-ghost" disabled={isSubmitting}>
-                  {t("cancel")}
-                </button>
-                <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
-                  {isSubmitting ? (
-                    <span className="loading loading-spinner"></span>
-                  ) : editingAssistant ? (
-                    t("editAssistant")
-                  ) : (
-                    t("createAssistant")
-                  )}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+           <Input 
+             label={t("password")} 
+             type="password"
+             name="password"
+             value={formData.password}
+             onChange={handleInputChange}
+             placeholder={t("atLeast6Characters")}
+             error={formErrors.password}
+             required
+           />
+         </form>
+       </Modal>
     </div>
   )
 }

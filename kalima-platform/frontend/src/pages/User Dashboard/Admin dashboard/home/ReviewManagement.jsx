@@ -118,7 +118,7 @@ const ReviewManagement = () => {
             <h1 className="text-3xl font-black" style={{ color: TOKENS.deepTeal }}>
               {t('title')}
             </h1>
-            <p className="mt-1 text-sm opacity-80">
+        <p className="mt-1 text-sm text-slate-700">
               {t('subtitle')}
             </p>
           </div>
@@ -139,21 +139,21 @@ const ReviewManagement = () => {
             className="rounded-xl p-6"
             style={{ background: 'white', boxShadow: SHADOWS.level1 }}
           >
-            <p className="text-sm font-bold opacity-70">{t('stats.totalReviews')}</p>
+          <p className="text-sm font-bold text-slate-700">{t('stats.totalReviews')}</p>
             <p className="text-3xl font-black mt-2" style={{ color: TOKENS.deepTeal }}>{stats.total}</p>
           </div>
           <div 
             className="rounded-xl p-6"
             style={{ background: 'white', boxShadow: SHADOWS.level1 }}
           >
-            <p className="text-sm font-bold opacity-70">{t('stats.pendingApproval')}</p>
+          <p className="text-sm font-bold text-slate-700">{t('stats.pendingApproval')}</p>
             <p className="text-3xl font-black mt-2" style={{ color: TOKENS.warmMango }}>{stats.pending}</p>
           </div>
           <div 
             className="rounded-xl p-6"
             style={{ background: 'white', boxShadow: SHADOWS.level1 }}
           >
-            <p className="text-sm font-bold opacity-70">{t('stats.approved')}</p>
+          <p className="text-sm font-bold text-slate-700">{t('stats.approved')}</p>
             <p className="text-3xl font-black mt-2" style={{ color: '#16a34a' }}>{stats.byStatus?.approved || 0}</p>
           </div>
         </div>

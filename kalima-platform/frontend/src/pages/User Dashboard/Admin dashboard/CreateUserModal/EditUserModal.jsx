@@ -5,6 +5,8 @@ import { useTranslation } from "react-i18next"
 import { updateUser } from "../../../../routes/update-user"
 import { Eye, EyeOff } from "lucide-react"
 import { translateErrorMessage } from "../../../../utils/errorTranslator"
+import Button from "../../../../components/ui/Button"
+import Input from "../../../../components/ui/Input"
 
 const EditUserModal = ({ isOpen, onClose, user, onUserUpdated }) => {
   const { t, i18n } = useTranslation("admin")
@@ -82,18 +84,18 @@ const EditUserModal = ({ isOpen, onClose, user, onUserUpdated }) => {
 
   if (!isOpen) return null
 
-  return (
-    <div className="modal modal-open">
-      <div className="modal-box" dir={isRTL ? "rtl" : "ltr"}>
+   return (
+     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+       <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl" dir={isRTL ? "rtl" : "ltr"}>
         <h3 className={`font-bold text-lg mb-4 ${isRTL ? "text-right" : "text-left"}`}>
           {t("admin.editUser.title", { name: user?.name })}
         </h3>
 
-        {error && (
-          <div className="alert alert-error mb-4">
-            <span>{error}</span>
-          </div>
-        )}
+         {error && (
+           <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 shadow-sm flex items-center gap-3 mb-4">
+             <span>{error}</span>
+           </div>
+         )}
 
         <form onSubmit={handleSubmit}>
           <div className="form-control mb-4">
@@ -101,45 +103,45 @@ const EditUserModal = ({ isOpen, onClose, user, onUserUpdated }) => {
               <span className="label-text mb-1">
                 {t("admin.editUser.name")}</span>
             </label>
-            <input
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              className="input w-full rounded-xl"
-              style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
-              placeholder={t("admin.editUser.namePlaceholder")}
-            />
+               <Input
+                 type="text"
+                 name="name"
+                 value={formData.name}
+                 onChange={handleChange}
+                 className="w-full rounded-xl"
+                 style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
+                 placeholder={t("admin.editUser.namePlaceholder")}
+               />
           </div>
 
           <div className="form-control mb-4">
             <label className="label flex flex-col items-start">
               <span className="label-text mb-1">{t("admin.editUser.email")}</span>
             </label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              className="input w-full rounded-xl"
-              style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
-              placeholder={t("admin.editUser.emailPlaceholder")}
-            />
+               <Input
+                 type="email"
+                 name="email"
+                 value={formData.email}
+                 onChange={handleChange}
+                 className="w-full rounded-xl"
+                 style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
+                 placeholder={t("admin.editUser.emailPlaceholder")}
+               />
           </div>
 
           <div className="form-control mb-4">
             <label className="label flex flex-col items-start">
               <span className="label-text mb-1">{t("admin.editUser.phone")}</span>
             </label>
-            <input
-              type="text"
-              name="phoneNumber"
-              value={formData.phoneNumber}
-              onChange={handleChange}
-              className="input w-full rounded-xl"
-              style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
-              placeholder={t("admin.editUser.phonePlaceholder")}
-            />
+               <Input
+                 type="text"
+                 name="phoneNumber"
+                 value={formData.phoneNumber}
+                 onChange={handleChange}
+                 className="w-full rounded-xl"
+                 style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
+                 placeholder={t("admin.editUser.phonePlaceholder")}
+               />
           </div>
 
           <div className="form-control mb-6">
@@ -147,14 +149,14 @@ const EditUserModal = ({ isOpen, onClose, user, onUserUpdated }) => {
               <span className="label-text mb-1">{t("admin.editUser.password")}</span>
             </label>
             <div className="relative">
-              <input
-                type={showPassword ? "text" : "password"}
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                className="input input-bordered "
-                placeholder={t("admin.editUser.passwordPlaceholder")}
-              />
+               <Input
+                 type={showPassword ? "text" : "password"}
+                 name="password"
+                 value={formData.password}
+                 onChange={handleChange}
+                 className="w-full"
+                 placeholder={t("admin.editUser.passwordPlaceholder")}
+               />
               <button
                 type="button"
                 className={`absolute inset-y-0 ${isRTL ? "left-0 pl-3" : "right-0 pr-3"} flex items-center`}
@@ -168,14 +170,14 @@ const EditUserModal = ({ isOpen, onClose, user, onUserUpdated }) => {
             </label>
           </div>
 
-          <div className="modal-action">
-            <button type="button" className="btn btn-ghost" onClick={onClose}>
-              {t("admin.editUser.cancel")}
-            </button>
-            <button type="submit" className="btn btn-primary" disabled={loading}>
-              {loading ? <span className="loading loading-spinner loading-sm"></span> : t("admin.editUser.save")}
-            </button>
-          </div>
+           <div className="flex justify-end gap-3 mt-6">
+             <Button type="button" variant="ghost" onClick={onClose}>
+               {t("admin.editUser.cancel")}
+             </Button>
+             <Button type="submit" variant="primary" disabled={loading} isLoading={loading}>
+               {t("admin.editUser.save")}
+             </Button>
+           </div>
         </form>
       </div>
     </div>

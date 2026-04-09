@@ -2,6 +2,7 @@ import React from "react";
 import { AlertTriangle } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { designTokens } from "../constants/designTokens";
+import Button from "./ui/Button";
 
 const TOKENS = designTokens.colors;
 
@@ -38,29 +39,31 @@ const SessionConfirmModal = ({ isOpen, onConfirm, onCancel }) => {
             {t("sessionConfirm.message")}
           </p>
 
-          <div className="flex gap-3" dir={isRTL ? "rtl" : "ltr"}>
-            <button
-              onClick={onCancel}
-              className="btn btn-md flex-1 rounded-xl border-2 font-semibold"
-              style={{
-                borderColor: "#E5E7EB",
-                backgroundColor: "white",
-                color: TOKENS.slateText,
-              }}
-            >
-              {t("sessionConfirm.cancel")}
-            </button>
-            <button
-              onClick={onConfirm}
-              className="btn btn-md flex-1 rounded-xl border-0 font-semibold"
-              style={{
-                backgroundColor: TOKENS.deepTeal,
-                color: "white",
-              }}
-            >
-              {t("sessionConfirm.continue")}
-            </button>
-          </div>
+           <div className="flex gap-3" dir={isRTL ? "rtl" : "ltr"}>
+             <Button
+               onClick={onCancel}
+               variant="outline"
+               className="flex-1 rounded-xl border-2 font-semibold"
+               style={{
+                 borderColor: "#E5E7EB",
+                 backgroundColor: "white",
+                 color: TOKENS.slateText,
+               }}
+             >
+               {t("sessionConfirm.cancel")}
+             </Button>
+             <Button
+               onClick={onConfirm}
+               variant="primary"
+               className="flex-1 rounded-xl border-0 font-semibold"
+               style={{
+                 backgroundColor: TOKENS.deepTeal,
+                 color: "white",
+               }}
+             >
+               {t("sessionConfirm.continue")}
+             </Button>
+           </div>
         </div>
       </div>
     </div>

@@ -1,43 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap");
 @import "tailwindcss";
-@plugin "daisyui" {
-  themes: all;
-}
-
-@plugin "daisyui/theme" {
-  name: "a7a";
-  default: true;
-  prefersdark: false;
-  color-scheme: "light";
-  --color-base-100: #F8F3E9; /* creamSurface */
-  --color-base-200: #F1F3F6; /* neutralCloud */
-  --color-base-300: #EBC468; /* goldenSand - for accents on base */
-  --color-base-content: #111827; /* inkText */
-  --color-primary: #0E5563; /* deepTeal */
-  --color-primary-content: #FFFFFF;
-  --color-secondary: #146A78; /* richTeal */
-  --color-secondary-content: #FFFFFF;
-  --color-accent: #F39A3F; /* warmMango */
-  --color-accent-content: #FFFFFF;
-  --color-neutral: #374151; /* slateText */
-  --color-neutral-content: #FFFFFF;
-  --color-info: #4DB3C2; /* softCyanTeal */
-  --color-info-content: #111827; /* inkText */
-  --color-success: oklch(62% 0.194 149.214);
-  --color-success-content: oklch(98% 0.018 155.826);
-  --color-warning: #F39A3F; /* warmMango */
-  --color-warning-content: #111827; /* inkText */
-  --color-error: oklch(58% 0.253 17.585);
-  --color-error-content: oklch(96% 0.015 12.422);
-  --radius-selector: 0.5rem;
-  --radius-field: 0.5rem;
-  --radius-box: 2rem;
-  --size-selector: 0.25rem;
-  --size-field: 0.25rem;
-  --border: 1px;
-  --depth: 0;
-  --noise: 1;
-}
 
 @keyframes shake {
   0%, 100% { transform: translateX(0); }
@@ -346,30 +308,6 @@ select.select option:hover {
   color: #ffffff;
 }
 
-.alert.alert-error {
-  border-radius: 1rem;
-  border: 1px solid var(--fekra-error-border);
-  background: var(--fekra-error-bg);
-  color: var(--fekra-error-text);
-  box-shadow: var(--fekra-error-shadow);
-  font-family: inherit;
-  padding: 0.875rem 1rem;
-}
-
-.alert.alert-error p,
-.alert.alert-error span,
-.alert.alert-error div {
-  color: var(--fekra-error-text);
-}
-
-.alert.alert-error .btn,
-.alert.alert-error button {
-  border: 0;
-  border-radius: 9999px;
-  background: var(--fekra-error-button-bg);
-  color: var(--fekra-error-button-text);
-}
-
 .password-toggle-input::-ms-reveal,
 .password-toggle-input::-ms-clear {
   display: none;
@@ -577,30 +515,10 @@ select.select option:hover {
 }
 
 /* ============================================
-   FEKRA BUTTON SYSTEM - Independent of Daisy UI
-   Uses design tokens for consistent styling
-   ============================================ */
+    FEKRA FORM SYSTEM - Independent of Daisy UI
+    Uses design tokens for consistent styling
+    ============================================ */
 
-/* Base button styles */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 0.625rem 1.25rem;
-  font-size: 0.875rem;
-  font-weight: 600;
-  line-height: 1.25rem;
-  border-radius: 9999px;
-  border: 1.5px solid transparent;
-  cursor: pointer;
-  transition: all 200ms ease;
-  white-space: nowrap;
-  user-select: none;
-  background: rgba(255, 255, 255, 0.8);
-  color: #111827;
-  box-shadow: 0 2px 8px rgba(14, 85, 99, 0.08);
-}
 
 .btn:hover:not(:disabled) {
   transform: translateY(-1px);
@@ -618,201 +536,6 @@ select.select option:hover {
   transform: none !important;
 }
 
-/* Button sizes */
-.btn-xs {
-  padding: 0.375rem 0.75rem;
-  font-size: 0.75rem;
-}
-
-.btn-sm {
-  padding: 0.5rem 1rem;
-  font-size: 0.8125rem;
-}
-
-.btn-lg {
-  padding: 0.75rem 1.5rem;
-  font-size: 1rem;
-}
-
-/* Primary button - Deep Teal */
-.btn-primary {
-  background: linear-gradient(135deg, #0E5563 0%, #146A78 100%);
-  color: #ffffff;
-  border-color: transparent;
-  box-shadow: 0 4px 14px rgba(14, 85, 99, 0.3);
-}
-
-.btn-primary:hover:not(:disabled) {
-  background: linear-gradient(135deg, #0d4a56 0%, #125f6b 100%);
-  box-shadow: 0 6px 20px rgba(14, 85, 99, 0.4);
-}
-
-/* Secondary button - Soft Cyan */
-.btn-secondary {
-  background: linear-gradient(135deg, #4DB3C2 0%, #3da3b2 100%);
-  color: #ffffff;
-  border-color: transparent;
-  box-shadow: 0 4px 14px rgba(77, 179, 194, 0.3);
-}
-
-.btn-secondary:hover:not(:disabled) {
-  background: linear-gradient(135deg, #3da3b2 0%, #2d939f 100%);
-  box-shadow: 0 6px 20px rgba(77, 179, 194, 0.4);
-}
-
-/* Accent button - Warm Mango */
-.btn-accent {
-  background: linear-gradient(135deg, #F39A3F 0%, #e88a2f 100%);
-  color: #ffffff;
-  border-color: transparent;
-  box-shadow: 0 4px 14px rgba(243, 154, 63, 0.3);
-}
-
-.btn-accent:hover:not(:disabled) {
-  background: linear-gradient(135deg, #e88a2f 0%, #d87a1f 100%);
-  box-shadow: 0 6px 20px rgba(243, 154, 63, 0.4);
-}
-
-/* Ghost button - Transparent with hover */
-.btn-ghost {
-  background: transparent;
-  color: #0E5563;
-  border-color: transparent;
-  box-shadow: none;
-}
-
-.btn-ghost:hover:not(:disabled) {
-  background: rgba(14, 85, 99, 0.08);
-  box-shadow: none;
-}
-
-/* Outline button */
-.btn-outline {
-  background: transparent;
-  color: #0E5563;
-  border-color: rgba(14, 85, 99, 0.4);
-  box-shadow: none;
-}
-
-.btn-outline:hover:not(:disabled) {
-  background: rgba(14, 85, 99, 0.08);
-  border-color: #0E5563;
-  box-shadow: 0 2px 8px rgba(14, 85, 99, 0.1);
-}
-
-/* Error/Danger button */
-.btn-error {
-  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-  color: #ffffff;
-  border-color: transparent;
-  box-shadow: 0 4px 14px rgba(220, 38, 38, 0.3);
-}
-
-.btn-error:hover:not(:disabled) {
-  background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%);
-  box-shadow: 0 6px 20px rgba(220, 38, 38, 0.4);
-}
-
-/* Success button */
-.btn-success {
-  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
-  color: #ffffff;
-  border-color: transparent;
-  box-shadow: 0 4px 14px rgba(22, 163, 74, 0.3);
-}
-
-.btn-success:hover:not(:disabled) {
-  background: linear-gradient(135deg, #15803d 0%, #166534 100%);
-  box-shadow: 0 6px 20px rgba(22, 163, 74, 0.4);
-}
-
-/* Neutral button */
-.btn-neutral {
-  background: linear-gradient(135deg, #374151 0%, #1f2937 100%);
-  color: #ffffff;
-  border-color: transparent;
-  box-shadow: 0 4px 14px rgba(55, 65, 81, 0.3);
-}
-
-.btn-neutral:hover:not(:disabled) {
-  background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
-  box-shadow: 0 6px 20px rgba(55, 65, 81, 0.4);
-}
-
-/* Circle button (icon buttons) */
-.btn-circle {
-  padding: 0;
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 50%;
-  min-height: 2.5rem;
-}
-
-.btn-circle.btn-sm {
-  width: 2rem;
-  height: 2rem;
-  min-height: 2rem;
-}
-
-.btn-circle.btn-lg {
-  width: 3rem;
-  height: 3rem;
-  min-height: 3rem;
-}
-
-/* Square button */
-.btn-square {
-  padding: 0;
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 0.75rem;
-}
-
-/* Loading state */
-.btn.loading,
-.btn.loading:hover {
-  color: transparent !important;
-  pointer-events: none;
-}
-
-.btn.loading::after {
-  content: "";
-  position: absolute;
-  width: 1rem;
-  height: 1rem;
-  border: 2px solid currentColor;
-  border-right-color: transparent;
-  border-radius: 50%;
-  animation: btn-spin 1s linear infinite;
-}
-
-@keyframes btn-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-/* Wide button */
-.btn-wide {
-  width: 100%;
-}
-
-/* Block button */
-.btn-block {
-  width: 100%;
-}
-
-@media (max-width: 640px) {
-  .btn {
-    padding: 0.5rem 1rem;
-    font-size: 0.8125rem;
-  }
-  
-  .btn-sm {
-    padding: 0.375rem 0.75rem;
-    font-size: 0.75rem;
-  }
-}
-
 @media (max-width: 640px) {
   .lecture-video-watermark__content {
     --wm-gap: 10px;
@@ -822,17 +545,10 @@ select.select option:hover {
 }
 
 /* ============================================
-   FEKRA FORM SYSTEM - Independent of Daisy UI
-   Uses design tokens for consistent styling
-   ============================================ */
+    FEKRA FORM SYSTEM - Independent of Daisy UI
+    Uses design tokens for consistent styling
+    ============================================ */
 
-/* Form Control Wrapper */
-.form-control {
-  display: flex;
-  flex-direction: column;
-  gap: 0.375rem;
-  width: 100%;
-}
 
 .form-control + .form-control {
   margin-top: 1rem;
@@ -1130,54 +846,10 @@ select.select option:hover {
 }
 
 /* ============================================
-   FEKRA ALERT SYSTEM
-   ============================================ */
+    FEKRA FORM SYSTEM - Independent of Daisy UI
+    Uses design tokens for consistent styling
+    ============================================ */
 
-.alert {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.75rem;
-  padding: 1rem 1.25rem;
-  border-radius: 1rem;
-  border: 1.5px solid transparent;
-  font-size: 0.875rem;
-  font-weight: 500;
-}
-
-.alert svg,
-.alert-icon {
-  flex-shrink: 0;
-  width: 1.25rem;
-  height: 1.25rem;
-}
-
-/* Alert Info (Default) */
-.alert-info {
-  background: rgba(14, 85, 99, 0.08);
-  border-color: rgba(14, 85, 99, 0.25);
-  color: #0E5563;
-}
-
-/* Alert Success */
-.alert-success {
-  background: rgba(22, 163, 74, 0.08);
-  border-color: rgba(22, 163, 74, 0.3);
-  color: #15803d;
-}
-
-/* Alert Warning */
-.alert-warning {
-  background: rgba(243, 154, 63, 0.1);
-  border-color: rgba(243, 154, 63, 0.35);
-  color: #c26a20;
-}
-
-/* Alert Error */
-.alert-error {
-  background: rgba(220, 38, 38, 0.08);
-  border-color: rgba(220, 38, 38, 0.3);
-  color: #b91c1c;
-}
 
 /* ============================================
    FEKRA LOADING SYSTEM
@@ -1255,66 +927,9 @@ select.select option:hover {
 }
 
 /* ============================================
-   FEKRA BADGE SYSTEM
-   ============================================ */
+    FEKRA CARD SYSTEM
+    ============================================ */
 
-.badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.25rem;
-  padding: 0.25rem 0.75rem;
-  font-size: 0.75rem;
-  font-weight: 600;
-  line-height: 1rem;
-  border-radius: 9999px;
-  white-space: nowrap;
-}
-
-.badge-primary {
-  background: rgba(14, 85, 99, 0.12);
-  color: #0E5563;
-}
-
-.badge-secondary {
-  background: rgba(77, 179, 194, 0.15);
-  color: #146A78;
-}
-
-.badge-accent {
-  background: rgba(243, 154, 63, 0.15);
-  color: #c26a20;
-}
-
-.badge-success {
-  background: rgba(22, 163, 74, 0.12);
-  color: #15803d;
-}
-
-.badge-error {
-  background: rgba(220, 38, 38, 0.12);
-  color: #b91c1c;
-}
-
-.badge-neutral {
-  background: rgba(55, 65, 81, 0.12);
-  color: #374151;
-}
-
-.badge-outline {
-  background: transparent;
-  border: 1.5px solid currentColor;
-}
-
-.badge-sm {
-  padding: 0.125rem 0.5rem;
-  font-size: 0.6875rem;
-}
-
-.badge-lg {
-  padding: 0.375rem 1rem;
-  font-size: 0.875rem;
-}
 
 /* ============================================
    FEKRA CARD SYSTEM
@@ -1599,209 +1214,9 @@ select.select option:hover {
 }
 
 /* ============================================
-   FEKRA MODAL SYSTEM
-   ============================================ */
+    FEKRA SIDEBAR SYSTEM
+    ============================================ */
 
-/* Modal container - hidden by default */
-.modal {
-  pointer-events: none;
-  position: fixed;
-  inset: 0;
-  z-index: 999;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.3s ease, visibility 0.3s ease;
-}
-
-/* Modal open state */
-.modal-open,
-.modal[open] {
-  pointer-events: auto;
-  opacity: 1;
-  visibility: visible;
-}
-
-/* Modal backdrop */
-.modal-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-}
-
-/* Modal box */
-.modal-box {
-  position: relative;
-  z-index: 1;
-  width: 100%;
-  max-width: 32rem;
-  max-height: calc(100vh - 5rem);
-  overflow: hidden;
-  background: #ffffff;
-  border: 1.5px solid rgba(17, 24, 39, 0.08);
-  border-radius: 1.5rem;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-  transform: translateY(100%);
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  display: flex;
-  flex-direction: column;
-}
-
-/* Modal open state - box animation */
-.modal-open .modal-box,
-.modal[open] .modal-box {
-  transform: translateY(0);
-}
-
-/* Modal bottom (mobile-first) */
-.modal-bottom {
-  align-items: flex-end;
-}
-
-.modal-bottom .modal-box {
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
-  max-width: 100%;
-}
-
-/* Modal middle (desktop) */
-@media (min-width: 640px) {
-  .modal {
-    align-items: center;
-    padding: 1rem;
-  }
-
-  .modal-bottom {
-    align-items: flex-end;
-  }
-
-  .sm\:modal-middle {
-    align-items: center !important;
-  }
-
-  .sm\:modal-middle .modal-box {
-    border-radius: 1.5rem;
-    max-width: 32rem;
-  }
-
-  .modal-box {
-    max-width: 28rem;
-    border-radius: 1.5rem;
-  }
-
-  .modal-open .modal-box,
-  .modal[open] .modal-box {
-    transform: scale(1);
-  }
-
-  .modal-box {
-    transform: scale(0.95);
-  }
-}
-
-/* Large modal */
-.modal-lg .modal-box {
-  max-width: 42rem;
-}
-
-/* Extra large modal */
-.modal-xl .modal-box {
-  max-width: 72rem;
-  max-height: calc(100vh - 2rem);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-
-/* Large modal content scrolling */
-.modal-xl .modal-box .min-h-0 {
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
-}
-
-.modal-xl .modal-box .min-h-0::-webkit-scrollbar {
-  width: 6px;
-}
-
-.modal-xl .modal-box .min-h-0::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.modal-xl .modal-box .min-h-0::-webkit-scrollbar-thumb {
-  background-color: rgba(0, 0, 0, 0.2);
-  border-radius: 3px;
-}
-
-.modal-xl .modal-box .min-h-0::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(0, 0, 0, 0.3);
-}
-
-/* Full width modal */
-.modal-full .modal-box {
-  max-width: 100%;
-  min-height: 100vh;
-  border-radius: 0;
-}
-
-/* Modal actions (footer) */
-.modal-action {
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.75rem;
-  padding: 1rem 1.5rem;
-  border-top: 1px solid rgba(17, 24, 39, 0.08);
-  margin-top: auto;
-}
-
-/* RTL support for modal actions */
-[dir="rtl"] .modal-action {
-  justify-content: flex-start;
-}
-
-/* Modal header styling */
-.modal-box > .flex.items-start.justify-between,
-.modal-box > header,
-.modal-box > [class*="flex items-center"] {
-  padding: 1.25rem 1.5rem;
-  border-bottom: 1px solid rgba(17, 24, 39, 0.08);
-}
-
-/* Modal close button */
-.modal-box .btn-circle.btn-ghost {
-  position: absolute;
-  right: 1rem;
-  top: 1rem;
-  z-index: 10;
-}
-
-[dir="rtl"] .modal-box .btn-circle.btn-ghost {
-  right: auto;
-  left: 1rem;
-}
-
-/* Success Modal Styling */
-.modal-success .modal-box {
-  background: linear-gradient(135deg, rgba(22, 163, 74, 0.05) 0%, #ffffff 50%);
-  border-color: rgba(22, 163, 74, 0.2);
-}
-
-/* Error Modal Styling */
-.modal-error .modal-box {
-  background: linear-gradient(135deg, rgba(220, 38, 38, 0.05) 0%, #ffffff 50%);
-  border-color: rgba(220, 38, 38, 0.2);
-}
-
-/* Info Modal Styling */
-.modal-info .modal-box {
-  background: linear-gradient(135deg, rgba(14, 85, 99, 0.05) 0%, #ffffff 50%);
-  border-color: rgba(14, 85, 99, 0.2);
-}
 
 /* ============================================
    FEKRA SIDEBAR SYSTEM
@@ -2061,14 +1476,9 @@ select.select option:hover {
 }
 
 /* ============================================
-   FEKRA TAB SYSTEM
-   ============================================ */
+    FEKRA LOADING SYSTEM
+    ============================================ */
 
-.tabs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.25rem;
-}
 
 .tabs-boxed {
   background: rgba(241, 243, 246, 0.7);
@@ -2104,44 +1514,8 @@ select.select option:hover {
 }
 
 /* ============================================
-   FEKRA JOIN (Button Group)
-   ============================================ */
-
-.join {
-  display: inline-flex;
-  border-radius: 0.75rem;
-  overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.join-item {
-  border: none;
-  background: #ffffff;
-  color: #374151;
-  padding: 0.5rem 1rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-  border-right: 1px solid rgba(209, 213, 219, 0.5);
-}
-
-.join-item:last-child {
-  border-right: none;
-}
-
-.join-item:hover:not(:disabled) {
-  background: #f9fafb;
-}
-
-.join-item:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-/* ============================================
-   FEKRA AVATAR
-   ============================================ */
+    FEKRA AVATAR
+    ============================================ */
 
 .avatar {
   position: relative;
@@ -2189,54 +1563,9 @@ select.select option:hover {
 }
 
 /* ============================================
-   FEKRA ALERT STYLES
-   ============================================ */
+    FEKRA FORM CONTROL
+    ============================================ */
 
-.alert-error {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 1rem 1.25rem;
-  background: rgba(220, 38, 38, 0.08);
-  border: 1.5px solid rgba(220, 38, 38, 0.3);
-  border-radius: 1rem;
-  color: #b91c1c;
-  font-size: 0.875rem;
-  font-weight: 500;
-}
-
-.alert-warning {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 1rem 1.25rem;
-  background: rgba(234, 179, 8, 0.08);
-  border: 1.5px solid rgba(234, 179, 8, 0.3);
-  border-radius: 1rem;
-  color: #a16207;
-  font-size: 0.875rem;
-  font-weight: 500;
-}
-
-/* ============================================
-   BASE COLORS REPLACEMENT
-   ============================================ */
-
-.bg-base-100 {
-  background: #ffffff;
-}
-
-.bg-base-200 {
-  background: #f3f4f6;
-}
-
-.border-base-200 {
-  border-color: #e5e7eb;
-}
-
-.text-base-content {
-  color: #1f2937;
-}
 
 /* Primary/Secondary Content Colors */
 .text-primary-content {

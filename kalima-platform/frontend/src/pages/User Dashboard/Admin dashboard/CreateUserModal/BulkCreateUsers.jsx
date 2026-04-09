@@ -4,7 +4,9 @@ import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { Download } from "lucide-react"
 import { bulkCreateUsers } from "../../../../routes/fetch-users"
+import { translateErrorMessage } from "../../../../utils/errorTranslator"
 import DSSelect from "../../../../components/DSSelect"
+import Button from "../../../../components/ui/Button"
 
 const BulkCreateUsers = () => {
   const { t, i18n } = useTranslation("createUser")
@@ -132,13 +134,17 @@ const BulkCreateUsers = () => {
         // Reset the file input
         document.getElementById("file-input").value = ""
       } else {
-        // Handle error message properly
-        const errorMessage = typeof result === "string" ? result : result.error || t("errors.failedToCreateUsers")
+        const errorMessage =
+          result?.rawMessage ||
+          result?.data?.message ||
+          result?.data?.error?.message ||
+          result?.error ||
+          t("errors.failedToCreateUsers")
         setError(errorMessage)
       }
     } catch (err) {
       console.error("Error in form submission:", err)
-      setError(t("errors.unexpectedError"))
+      setError(translateErrorMessage(err, t("errors.unexpectedError")))
     } finally {
       setLoading(false)
     }
@@ -146,56 +152,74 @@ const BulkCreateUsers = () => {
 
   return (
     <div className="container mx-auto p-4" dir={isRTL ? "rtl" : "ltr"}>
-      <div className="card bg-base-100 shadow-xl">
-        <div className="card-body">
-          <h2 className="card-title mb-4">{t("titles.bulkCreate")}</h2>
+      <div className="bg-white shadow-xl rounded-2xl border border-slate-200">
+        <div className="p-6">
+          <h2 className="text-xl font-bold mb-4">{t("titles.bulkCreate")}</h2>
 
-          {error && (
-            <div className="alert alert-error mb-4">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="stroke-current shrink-0 h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-              <span>{error}</span>
-            </div>
-          )}
+           {error && (
+        <div className="mb-4 rounded-2xl border border-error/30 bg-error/10 px-4 py-3 text-sm text-[#991B1B] shadow-sm flex items-center gap-3">
+               <svg
+                 xmlns="http://www.w3.org/2000/svg"
+                 className="stroke-current shrink-0 h-6 w-6"
+                 fill="none"
+                 viewBox="0 0 24 24"
+               >
+                 <path
+                   strokeLinecap="round"
+                   strokeLinejoin="round"
+                   strokeWidth="2"
+                   d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+                 />
+               </svg>
+               <span>{error}</span>
+             </div>
+           )}
+           {success && (
+        <div className="mb-4 rounded-2xl border border-success/30 bg-success/10 px-4 py-3 text-sm text-[#065F46] shadow-sm flex items-center gap-3">
+               <svg
+                 xmlns="http://www.w3.org/2000/svg"
+                 className="stroke-current shrink-0 h-6 w-6"
+                 fill="none"
+                 viewBox="0 0 24 24"
+               >
+                 <path
+                   strokeLinecap="round"
+                   strokeLinejoin="round"
+                   strokeWidth="2"
+                   d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                 />
+               </svg>
+               <span>{success}</span>
+             </div>
+           )}
 
-          {success && (
-            <div className="alert alert-success mb-4">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="stroke-current shrink-0 h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-              <span>{success}</span>
-            </div>
-          )}
+            {success && (
+        <div className="mb-4 rounded-2xl border border-success/30 bg-success/10 px-4 py-3 text-sm text-[#065F46] shadow-sm flex items-center gap-3">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="stroke-current shrink-0 h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                <span>{success}</span>
+              </div>
+            )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="form-control">
-              <label className="label py-0">
-                <span className="label-text font-medium">{t("fields.accountType")}</span>
+            <div className="mb-4">
+              <label className="block mb-1">
+                <span className="text-sm font-medium">{t("fields.accountType")}</span>
               </label>
-              <DSSelect
-                name="accountType"
-                className="select w-full rounded-xl"
+               <DSSelect
+                 name="accountType"
+                 className="border border-slate-200 w-full rounded-xl"
               style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
                 value={accountType}
                 onChange={handleAccountTypeChange}
@@ -205,61 +229,62 @@ const BulkCreateUsers = () => {
                 <option value="parent">{t("roles.parent")}</option>
                 <option value="teacher">{t("roles.teacher")}</option>
               </DSSelect>
-              <label className="label py-0">
-                <span className="label-text-alt text-info">{t("help.selectAccountType")}</span>
+              <label className="block mt-1">
+                <span className="text-xs text-sky-700">{t("help.selectAccountType")}</span>
               </label>
             </div>
 
-            <div className="form-control">
-              <button
+            <div className="mb-4">
+              <Button
                 type="button"
+                variant="outline"
+                className="w-full gap-2"
                 onClick={generateCSVTemplate}
-                className="btn btn-outline w-full gap-2"
               >
                 <Download size={18} />
                 {t("buttons.downloadTemplate")}
-              </button>
-              <label className="label py-0">
-                <span className="label-text-alt text-info">{t("help.downloadTemplate")}</span>
+              </Button>
+              <label className="block mt-1">
+                <span className="text-xs text-sky-700">{t("help.downloadTemplate")}</span>
               </label>
             </div>
 
-            <div className="form-control">
-              <label className="label py-0">
-                <span className="label-text font-medium">{t("fields.uploadCSV")}</span>
+            <div className="mb-4">
+              <label className="block mb-1">
+                <span className="text-sm font-medium">{t("fields.uploadCSV")}</span>
               </label>
               <input
                 id="file-input"
                 type="file"
                 accept=".csv"
-                className="file-input file-input-bordered w-full"
+                  className="w-full text-sm text-slate-600 file:mr-4 file:rounded-full file:border-0 file:bg-primary/10 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-primary hover:file:bg-primary/20"
                 onChange={handleFileChange}
                 required
               />
-              <label className="label py-0">
-                <span className="label-text-alt text-info">{t("help.csvRequiredFields")}</span>
+              <label className="block mt-1">
+                <span className="text-xs text-sky-700">{t("help.csvRequiredFields")}</span>
               </label>
             </div>
 
-            <div className="form-control mt-6">
-              <button type="submit" className="btn btn-primary w-full" disabled={loading || !file}>
+            <div className="mt-6">
+              <Button type="submit" variant="primary" className="w-full" disabled={loading || !file}>
                 {loading ? (
                   <>
-                    <span className="loading loading-spinner"></span>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
                     {t("buttons.uploading")}
                   </>
                 ) : (
                   t("buttons.createUsers")
                 )}
-              </button>
+              </Button>
             </div>
           </form>
 
-          <div className="mt-6 bg-base-200 p-4 rounded-lg">
-            <h3 className="font-medium mb-2">{t("titles.csvGuidelines")}</h3>
-            <p className="text-sm mb-2 text-info">{t("help.requiredFields")}</p>
-            <p className="text-sm mb-2">{t("help.csvFormat")}</p>
-            <ul className="list-disc list-inside text-sm space-y-1">
+           <div className="mt-6 bg-slate-100 p-4 rounded-lg">
+             <h3 className="font-medium mb-2">{t("titles.csvGuidelines")}</h3>
+             <p className="text-sm mb-2 text-info">{t("help.requiredFields")}</p>
+             <p className="text-sm mb-2">{t("help.csvFormat")}</p>
+             <ul className="list-disc list-inside text-sm space-y-1">
               {accountType === "student" && (
                 <>
                   <li className="font-semibold">{t("csvHeaders.student.name")}</li>

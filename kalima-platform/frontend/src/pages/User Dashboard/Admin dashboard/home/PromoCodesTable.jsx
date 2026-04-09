@@ -234,21 +234,23 @@ const PromoCodesTable = () => {
 
           {hasUnredeemedCodes && (
             <div className="flex gap-2">
-              <button
-                className="btn btn-sm border-none text-white"
-                style={{ background: TOKENS.warmMango, boxShadow: "0 8px 18px rgba(243,154,63,0.22)" }}
-                onClick={() => setShowBulkDeleteConfirm(true)}
-                disabled={selectedCodes.length === 0 || isDeleting}
-              >
-                {isDeleting ? (
-                  <ImSpinner8 className="animate-spin" />
-                ) : (
-                  <>
-                    <FaTrash className="mr-1" />
-                    {t("admin.actions.delete")} ({selectedCodes.length})
-                  </>
-                )}
-              </button>
+               <Button
+                 variant="primary"
+                 size="sm"
+                 className="border-none text-white"
+                 style={{ background: TOKENS.warmMango, boxShadow: "0 8px 18px rgba(243,154,63,0.22)" }}
+                 onClick={() => setShowBulkDeleteConfirm(true)}
+                 disabled={selectedCodes.length === 0 || isDeleting}
+               >
+                 {isDeleting ? (
+                   <ImSpinner8 className="animate-spin" />
+                 ) : (
+                   <>
+                     <FaTrash className="mr-1" />
+                     {t("admin.actions.delete")} ({selectedCodes.length})
+                   </>
+                 )}
+               </Button>
             </div>
           )}
         </div>
@@ -260,12 +262,14 @@ const PromoCodesTable = () => {
         ) : (
           <>
             {(state.error || studentsError || deleteError) && (
-              <div className="alert alert-error mb-4">{state.error || studentsError || deleteError}</div>
+               <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 shadow-sm flex items-center gap-3 mb-4">
+                 {state.error || studentsError || deleteError}
+               </div>
             )}
 
             <div className="flex flex-wrap gap-4 mb-4 rounded-[1.4rem] p-4" style={insetCardStyle}>
-              <DSSelect
-                className="select select-bordered"
+               <DSSelect
+                 className="border border-slate-200"
                 value={filters.isRedeemed}
                 onChange={(e) => setFilters((prev) => ({ ...prev, isRedeemed: e.target.value }))}
               >
@@ -275,8 +279,8 @@ const PromoCodesTable = () => {
               </DSSelect>
 
 
-              <DSSelect
-                className="select select-bordered"
+               <DSSelect
+                 className="border border-slate-200"
                 value={filters.type}
                 onChange={(e) => setFilters((prev) => ({ ...prev, type: e.target.value }))}
               >
@@ -286,9 +290,13 @@ const PromoCodesTable = () => {
                 <option value="promo">{t("filters.promo")}</option>
               </DSSelect>
 
-              <button className="btn border-none text-white" style={{ background: TOKENS.deepTeal }} onClick={handleApplyFilters}>
-                {t("filters.apply")}
-              </button>
+               <Button 
+                 variant="primary" 
+                 className="border-none text-white" 
+                 onClick={handleApplyFilters}
+               >
+                 {t("filters.apply")}
+               </Button>
             </div>
 
             <div className="overflow-x-auto rounded-[1.4rem] border" style={{ borderColor: "rgba(17,24,39,0.08)", background: "rgba(255,255,255,0.8)" }}>
@@ -318,9 +326,10 @@ const PromoCodesTable = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {paginatedCodes.map((code) => (
-                    <tr key={code._id} className="hover:bg-base-200/40 transition-colors">
-                      {hasUnredeemedCodes && (
+                    {paginatedCodes.map((code) => (
+                      <tr key={code._id} className="hover:bg-slate-100/40 transition-colors">
+                        {hasUnredeemedCodes && (
+
                         <td className="text-center">
                           {!code.isRedeemed && (
                             <input
@@ -335,31 +344,33 @@ const PromoCodesTable = () => {
                       <td className="font-mono">{code.code}</td>
                       <td>{code.pointsAmount?.toLocaleString() || "0"}</td>
                       <td>
-                        <span
-                          className="badge"
-                          style={{
-                            background: code.isRedeemed ? "rgba(20,106,120,0.12)" : "rgba(243,154,63,0.14)",
-                            color: code.isRedeemed ? TOKENS.deepTeal : TOKENS.warmMango,
-                            border: "none",
-                          }}
-                        >
-                          {code.isRedeemed ? t("status.redeemed") : t("status.active")}
-                        </span>
+                         <span
+                           className="px-2 py-1 text-xs font-medium rounded-full"
+                           style={{
+                             background: code.isRedeemed ? "rgba(20,106,120,0.12)" : "rgba(243,154,63,0.14)",
+                             color: code.isRedeemed ? TOKENS.deepTeal : TOKENS.warmMango,
+                             border: "none",
+                           }}
+                         >
+                           {code.isRedeemed ? t("status.redeemed") : t("status.active")}
+                         </span>
                       </td>
                       <td>{code.redeemedAt ? new Date(code.redeemedAt).toLocaleDateString() : "--"}</td>
                       <td className="truncate max-w-[100px]">{getStudentName(code.redeemedBy)}</td>
                       <td>
                         {!code.isRedeemed && (
-                          <button
-                            className="btn btn-sm border-none text-white"
-                            style={{ background: TOKENS.warmMango }}
-                            onClick={() => {
-                              setCodeToDelete(code.code)
-                              setShowDeleteConfirm(true)
-                            }}
-                          >
-                            <FaTrash />
-                          </button>
+                           <Button
+                             variant="primary"
+                             size="sm"
+                             className="border-none text-white"
+                             style={{ background: TOKENS.warmMango }}
+                             onClick={() => {
+                               setCodeToDelete(code.code)
+                               setShowDeleteConfirm(true)
+                             }}
+                           >
+                             <FaTrash />
+                           </Button>
                         )}
                       </td>
                     </tr>
@@ -373,19 +384,15 @@ const PromoCodesTable = () => {
             )}
 
             <div className="flex justify-between items-center mt-4 sm:w-1/2 mx-auto gap-2">
-              <button className="btn btn-outline" onClick={handlePreviousPage} disabled={state.currentPage === 1}>
-                {t("pagination.previous")}
-              </button>
+               <Button variant="outline" onClick={handlePreviousPage} disabled={state.currentPage === 1}>
+                 {t("pagination.previous")}
+               </Button>
               <span>
                 {t("pagination.page")} {state.currentPage} {t("pagination.of")} {state.totalPages}
               </span>
-              <button
-                className="btn btn-outline"
-                onClick={handleNextPage}
-                disabled={state.currentPage >= state.totalPages}
-              >
-                {t("pagination.next")}
-              </button>
+               <Button variant="outline" onClick={handleNextPage} disabled={state.currentPage >= state.totalPages}>
+                 {t("pagination.next")}
+               </Button>
             </div>
           </>
         )}
@@ -397,21 +404,27 @@ const PromoCodesTable = () => {
             <h3 className="font-bold text-lg mb-4">{t("modals.confirmDelete")}</h3>
             <p>{t("modals.deleteCodeConfirm")}</p>
             <p className="font-mono p-2 rounded my-2" style={{ background: TOKENS.neutralCloud }}>{codeToDelete}</p>
-            <div className="modal-action">
-              <button
-                className="btn btn-outline"
-                onClick={() => {
-                  setShowDeleteConfirm(false)
-                  setCodeToDelete(null)
-                }}
-                disabled={isDeleting}
-              >
-                {t("admin.actions.cancel")}
-              </button>
-              <button className="btn border-none text-white" style={{ background: TOKENS.warmMango }} onClick={handleDeleteCode} disabled={isDeleting}>
-                {isDeleting ? <ImSpinner8 className="animate-spin" /> : t("admin.actions.delete")}
-              </button>
-            </div>
+             <div className="flex justify-end gap-3 mt-6">
+               <Button
+                 variant="outline"
+                 onClick={() => {
+                   setShowDeleteConfirm(false)
+                   setCodeToDelete(null)
+                 }}
+                 disabled={isDeleting}
+               >
+                 {t("admin.actions.cancel")}
+               </Button>
+               <Button 
+                 variant="primary" 
+                 className="border-none text-white" 
+                 style={{ background: TOKENS.warmMango }} 
+                 onClick={handleDeleteCode} 
+                 disabled={isDeleting}
+               >
+                 {isDeleting ? <ImSpinner8 className="animate-spin" /> : t("admin.actions.delete")}
+               </Button>
+             </div>
           </div>
         </div>
       )}
@@ -431,14 +444,24 @@ const PromoCodesTable = () => {
               ))}
             </div>
 
-            <div className="modal-action">
-              <button className="btn btn-outline" onClick={() => setShowBulkDeleteConfirm(false)} disabled={isDeleting}>
-                {t("actions.cancel")}
-              </button>
-              <button className="btn border-none text-white" style={{ background: TOKENS.warmMango }} onClick={handleBulkDelete} disabled={isDeleting}>
-                {isDeleting ? <ImSpinner8 className="animate-spin" /> : t("actions.delete")}
-              </button>
-            </div>
+             <div className="flex justify-end gap-3 mt-6">
+               <Button 
+                 variant="outline" 
+                 onClick={() => setShowBulkDeleteConfirm(false)} 
+                 disabled={isDeleting}
+               >
+                 {t("actions.cancel")}
+               </Button>
+               <Button 
+                 variant="primary" 
+                 className="border-none text-white" 
+                 style={{ background: TOKENS.warmMango }} 
+                 onClick={handleBulkDelete} 
+                 disabled={isDeleting}
+               >
+                 {isDeleting ? <ImSpinner8 className="animate-spin" /> : t("actions.delete")}
+               </Button>
+             </div>
           </div>
         </div>
       )}

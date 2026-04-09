@@ -56,7 +56,7 @@ export default function Footer() {
 
             </div>
 
-            <p className="text-sm leading-relaxed opacity-80 max-w-sm">
+            <p className="max-w-sm text-sm leading-relaxed text-slate-700">
 
               {t('aboutText')}
 
@@ -142,7 +142,7 @@ export default function Footer() {
 
                     to={link.path} 
 
-                    className="inline-block transition-transform hover:translate-x-1 opacity-80 hover:opacity-100"
+                    className="inline-block text-slate-700 transition-transform hover:translate-x-1 hover:text-slate-900"
 
                     style={{ color: TOKENS.inkText }}
 
@@ -170,7 +170,7 @@ export default function Footer() {
 
             <ul className="space-y-4 text-sm">
 
-              <li className="flex items-start gap-3 opacity-80">
+              <li className="flex items-start gap-3 text-slate-700">
 
                 <Phone className="mt-1 h-5 w-5 shrink-0" style={{ color: TOKENS.warmMango }} />
 
@@ -178,7 +178,7 @@ export default function Footer() {
 
               </li>
 
-              <li className="flex items-start gap-3 opacity-80">
+              <li className="flex items-start gap-3 text-slate-700">
 
                 <Mail className="mt-1 h-5 w-5 shrink-0" style={{ color: TOKENS.warmMango }} />
 
@@ -198,7 +198,7 @@ export default function Footer() {
 
         <div 
 
-          className="mt-16 flex flex-col items-center justify-between gap-4 border-t pt-8 text-sm opacity-70 md:flex-row"
+          className="mt-16 flex flex-col items-center justify-between gap-4 border-t pt-8 text-sm text-slate-700 md:flex-row"
 
           style={{ borderColor: TOKENS.lightAquaMist }}
 

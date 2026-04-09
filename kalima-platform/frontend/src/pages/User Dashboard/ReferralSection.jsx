@@ -4,6 +4,14 @@ import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { Check, X, Gift, Info, UserPlus } from "lucide-react"
 import { updateCurrentUser } from "../../routes/update-user"
+import { designTokens } from "../../constants/designTokens"
+import Button from "../../components/ui/Button"
+import Input from "../../components/ui/Input"
+
+
+const TOKENS = designTokens.colors
+const RADIUS = designTokens.radius
+const SHADOWS = designTokens.shadows
 
 const ReferralSection = ({ userInfo, onUserUpdate }) => {
   const { t } = useTranslation("promoCodes")
@@ -13,7 +21,6 @@ const ReferralSection = ({ userInfo, onUserUpdate }) => {
   const [referralError, setReferralError] = useState(null)
   const [referralSuccess, setReferralSuccess] = useState(null)
 
-  // Check if user has already used a referral (you might need to add this field to your user model)
   const hasUsedReferral = userInfo?.referralUsed || userInfo?.referredBy
 
   const handleSubmitReferral = async () => {
@@ -42,7 +49,6 @@ const ReferralSection = ({ userInfo, onUserUpdate }) => {
         setReferralSuccess(t("referral.success"))
         setReferralSerial("")
 
-        // Call the parent component's update function if provided
         if (onUserUpdate) {
           onUserUpdate()
         }
@@ -56,134 +62,120 @@ const ReferralSection = ({ userInfo, onUserUpdate }) => {
     }
   }
 
-  // Don't show the section if user has already used a referral
   if (hasUsedReferral) {
     return (
-      <div className="card bg-base-100 shadow-sm border border-base-200 mb-8">
-        <div className="card-body">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="card-title text-success">
-              <Gift className="w-5 h-5 mr-2" />
-              {t("referral.completedTitle")}
-            </h2>
-            <div className="badge badge-success">
-              <Check className="w-3 h-3 mr-1" />
+      <section className="mb-8 rounded-[2rem] border bg-white p-6" style={{ borderColor: TOKENS.borderSubtle, boxShadow: SHADOWS.level1, borderRadius: RADIUS.section }}>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-black flex items-center gap-2" style={{ color: TOKENS.success }}>
+            <Gift className="w-5 h-5" />
+            {t("referral.completedTitle")}
+          </h2>
+          <div className="rounded-full px-3 py-1 text-xs font-bold text-white" style={{ background: TOKENS.success }}>
+            <div className="flex items-center gap-1">
+              <Check className="w-3 h-3" />
               {t("referral.used")}
             </div>
           </div>
+        </div>
 
-          <div className="bg-success/10 border border-success/20 rounded-lg p-4">
-            <div className="flex items-center gap-2">
-              <Check className="w-5 h-5 text-success" />
-              <span className="text-success font-medium">
-                {t("referral.alreadyApplied")}
-              </span>
-            </div>
+        <div className="rounded-xl p-4 border" style={{ background: TOKENS.successLight, borderColor: TOKENS.successBorder }}>
+          <div className="flex items-center gap-2">
+            <Check className="w-5 h-5" style={{ color: TOKENS.success }} />
+            <span className="font-medium" style={{ color: TOKENS.success }}>
+              {t("referral.alreadyApplied")}
+            </span>
           </div>
         </div>
-      </div>
+      </section>
     )
   }
 
-  return (
-    <div className="card bg-base-100 shadow-sm border border-base-200 mb-8">
-      <div className="card-body">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="card-title">
-            <UserPlus className="w-5 h-5 mr-2 text-primary" />
-            {t("referral.title")}
-          </h2>
-          <div className="badge badge-outline">{t("referral.oneTime")}</div>
-        </div>
+    return (
+      <section className="mb-8 rounded-[2rem] border p-6" style={{ background: TOKENS.neutralCloud, borderColor: TOKENS.borderSubtle, boxShadow: SHADOWS.level1, borderRadius: RADIUS.section }}>
 
-        <div className="space-y-4">
-          {/* Info Section */}
-          <div className="bg-primary/5 border border-primary/20 rounded-lg p-4">
-            <div className="flex items-start gap-3">
-              <Info className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-              <div>
-                <h3 className="font-medium text-primary mb-2">{t("referral.infoTitle")}</h3>
-                <p className="text-sm text-base-content/70">
-                  {t("referral.infoDescription")}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Input Section */}
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text font-medium text-base-content/80">
-                {t("referral.label")}
-              </span>
-              <span className="label-text-alt text-base-content/60">{t("referral.required")}</span>
-            </label>
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={referralSerial}
-                onChange={(e) => setReferralSerial(e.target.value)}
-                placeholder={t("referral.placeholder")}
-                className="input input-bordered flex-1 focus:ring-2 focus:ring-primary focus:border-transparent"
-                disabled={referralLoading}
-              />
-              <button
-                onClick={handleSubmitReferral}
-                disabled={referralLoading || !referralSerial.trim()}
-                className="btn btn-primary min-w-[120px]"
-              >
-                {referralLoading ? (
-                  <span className="loading loading-spinner loading-sm"></span>
-                ) : (
-                  <>
-                    <Gift className="w-4 h-4 mr-2" />
-                    {t("referral.button")}
-                  </>
-                )}
-              </button>
-            </div>
-          </div>
-
-          {/* Error Message */}
-          {referralError && (
-            <div className="alert alert-error shadow-lg">
-              <X className="w-5 h-5 shrink-0" />
-              <span>{referralError}</span>
-            </div>
-          )}
-
-          {/* Success Message */}
-          {referralSuccess && (
-            <div className="alert alert-success shadow-lg">
-              <Check className="w-5 h-5 shrink-0" />
-              <span>{referralSuccess}</span>
-            </div>
-          )}
-
-          {/* Benefits Section */}
-          <div className="bg-base-200/50 rounded-lg p-4">
-            <h4 className="font-medium mb-3 flex items-center">
-              <Gift className="w-4 h-4 mr-2 text-primary" />
-              {t("referral.benefitsTitle")}
-            </h4>
-            <ul className="space-y-2 text-sm">
-              <li className="flex items-start gap-2">
-                <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2 flex-shrink-0"></div>
-                <span>{t("referral.benefit1")}</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2 flex-shrink-0"></div>
-                <span>{t("referral.benefit2")}</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2 flex-shrink-0"></div>
-                <span>{t("referral.benefit3")}</span>
-              </li>
-            </ul>
-          </div>
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-xl font-black flex items-center gap-2" style={{ color: TOKENS.deepTeal }}>
+          <UserPlus className="w-5 h-5" />
+          {t("referral.title")}
+        </h2>
+        <div className="rounded-full border px-3 py-1 text-xs font-medium" style={{ borderColor: "rgba(17,24,39,0.1)", color: TOKENS.slateText }}>
+          {t("referral.oneTime")}
         </div>
       </div>
-    </div>
+
+      <div className="space-y-6">
+        <div className="rounded-xl p-4 border" style={{ background: "rgba(14,85,99,0.05)", borderColor: "rgba(14,85,99,0.1)" }}>
+          <div className="flex items-start gap-3">
+            <Info className="w-5 h-5 mt-0.5 flex-shrink-0" style={{ color: TOKENS.deepTeal }} />
+            <div>
+              <h3 className="font-bold mb-1" style={{ color: TOKENS.deepTeal }}>{t("referral.infoTitle")}</h3>
+              <p className="text-sm" style={{ color: TOKENS.slateText }}>
+                {t("referral.infoDescription")}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-sm font-bold block" style={{ color: TOKENS.slateText }}>
+            {t("referral.label")}
+            <span className="text-xs font-normal opacity-60 ml-1">{t("referral.required")}</span>
+          </label>
+          <div className="flex gap-2">
+            <Input
+              type="text"
+              value={referralSerial}
+              onChange={(e) => setReferralSerial(e.target.value)}
+              placeholder={t("referral.placeholder")}
+              className="flex-1 rounded-full"
+              disabled={referralLoading}
+            />
+
+            <Button
+              onClick={handleSubmitReferral}
+              isDisabled={referralLoading || !referralSerial.trim()}
+              variant="primary"
+              className="rounded-full px-6"
+              isLoading={referralLoading}
+            >
+              <div className="flex items-center gap-2">
+                <Gift className="w-4 h-4" />
+                {t("referral.button")}
+              </div>
+            </Button>
+          </div>
+        </div>
+
+        {referralError && (
+          <div className="flex items-center gap-3 p-3 rounded-xl shadow-sm bg-error/10 text-error border border-error/20">
+            <X className="w-5 h-5 shrink-0" />
+            <span className="text-sm font-medium">{referralError}</span>
+          </div>
+        )}
+
+        {referralSuccess && (
+          <div className="flex items-center gap-3 p-3 rounded-xl shadow-sm bg-success/10 text-success border border-success/20">
+            <Check className="w-5 h-5 shrink-0" />
+            <span className="text-sm font-medium">{referralSuccess}</span>
+          </div>
+        )}
+
+        <div className="rounded-xl p-4 border" style={{ background: "rgba(241,243,246,0.5)", borderColor: "rgba(17,24,39,0.05)" }}>
+          <h4 className="font-bold mb-3 flex items-center gap-2" style={{ color: TOKENS.deepTeal }}>
+            <Gift className="w-4 h-4" />
+            {t("referral.benefitsTitle")}
+          </h4>
+          <ul className="space-y-2 text-sm">
+            {[t("referral.benefit1"), t("referral.benefit2"), t("referral.benefit3")].map((benefit, i) => (
+              <li key={i} className="flex items-start gap-2">
+                <div className="w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0" style={{ background: TOKENS.deepTeal }}></div>
+                <span style={{ color: TOKENS.slateText }}>{benefit}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </section>
   )
 }
 

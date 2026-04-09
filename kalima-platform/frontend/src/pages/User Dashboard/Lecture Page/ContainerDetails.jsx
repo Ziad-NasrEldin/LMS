@@ -556,10 +556,10 @@ const ContainerDetailsPage = () => {
 
                 return (
                   <div key={nodeId} className="flex items-center gap-2">
-                    {index > 0 && <span className="text-base-content/30 px-1">/</span>}
+                    {index > 0 && <span className="text-slate-900/30 px-1">/</span>}
                     <Link
                       to={getContainerRoute(nodeId)}
-                      className={`inline-flex items-center gap-2 rounded-full border px-3 py-2 text-sm font-semibold transition-all duration-200 hover:-translate-y-[1px] max-w-[200px] sm:max-w-[280px] ${isCurrentNode ? "shadow-sm" : "hover:bg-base-200"}`}
+                      className={`inline-flex items-center gap-2 rounded-full border px-3 py-2 text-sm font-semibold transition-all duration-200 hover:-translate-y-[1px] max-w-[200px] sm:max-w-[280px] ${isCurrentNode ? "shadow-sm" : "hover:bg-slate-100"}`}
                       style={{ background: isCurrentNode ? TOKENS.lightAquaMist : "#FFFFFF", color: TOKENS.inkText, borderColor: isCurrentNode ? "rgba(15,118,110,0.18)" : "rgba(17,24,39,0.12)" }}
                     >
                       <FiFolder className="text-base flex-shrink-0" />

@@ -18,6 +18,8 @@ import {
 } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import { useTranslation } from "react-i18next"
+import Button from "../../../components/ui/Button"
+import Input from "../../../components/ui/Input"
 
 const AssistantPage = () => {
   const { t, i18n } = useTranslation("assistantPage")
@@ -91,14 +93,15 @@ const AssistantPage = () => {
 
     return (
       <div className="flex justify-center mt-6" dir={isRTL ? "rtl" : "ltr"}>
-        <div className="join">
-          <button
-            className="join-item btn"
+        <div className="flex items-center gap-1">
+          <Button
+            variant="outline"
+            size="sm"
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1}
           >
             {isRTL ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
-          </button>
+          </Button>
           {Array.from({ length: Math.min(5, totalPages) }).map((_, i) => {
             let pageNum
             if (totalPages <= 5) {
@@ -111,22 +114,24 @@ const AssistantPage = () => {
               pageNum = currentPage - 2 + i
             }
             return (
-              <button
+              <Button
                 key={pageNum}
-                className={`join-item btn ${currentPage === pageNum ? "btn-primary" : ""}`}
+                variant={currentPage === pageNum ? "primary" : "outline"}
+                size="sm"
                 onClick={() => handlePageChange(pageNum)}
               >
                 {pageNum}
-              </button>
+              </Button>
             )
           })}
-          <button
-            className="join-item btn"
+          <Button
+            variant="outline"
+            size="sm"
             onClick={() => handlePageChange(currentPage + 1)}
             disabled={currentPage === totalPages}
           >
             {isRTL ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-          </button>
+          </Button>
         </div>
       </div>
     )
@@ -146,50 +151,51 @@ const AssistantPage = () => {
           </h2>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="table w-full">
-            <thead>
-              <tr>
-                <th>{t("common.name")}</th>
-                <th>{t("common.type")}</th>
-                <th>{t("common.subject")}</th>
-                <th>{t("common.level")}</th>
-                <th>{t("common.price")}</th>
-                <th>{t("common.actions")}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {paginatedContainers.map((container) => (
-                <tr key={container._id} className="hover:bg-base-200">
-                  <td className="font-medium">{container.name}</td>
-                  <td>
-                    <span className="badge badge-outline capitalize">{t(`common.${container.type}`)} </span>
-                  </td>
-                  <td>{container.subject?.name || t("common.notAvailable")}</td>
-                  <td>{container.level?.name || t("common.notAvailable")}</td>
-                  <td>
-                    {container.price > 0 ? t("common.pricePoints", { price: container.price }) : t("common.free")}
-                  </td>
-                  <td>
-                    <button 
-                      className="btn btn-sm btn-primary" 
-                      onClick={() => navigate(`/dashboard/assistant-page/container-details/${container._id}`)}
-                    >
-                      {t("common.details")}
-                    </button>
-                  </td>
-                </tr>
-              ))}
-              {paginatedContainers.length === 0 && (
-                <tr>
-                  <td colSpan="6" className="text-center py-4">
-                    {t("containers.notFound")}
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+         <div className="overflow-x-auto">
+           <table className="w-full text-left border-collapse">
+             <thead>
+               <tr className="border-b border-slate-200 bg-slate-50">
+                 <th className="p-3 font-semibold text-sm">{t("common.name")}</th>
+                 <th className="p-3 font-semibold text-sm">{t("common.type")}</th>
+                 <th className="p-3 font-semibold text-sm">{t("common.subject")}</th>
+                 <th className="p-3 font-semibold text-sm">{t("common.level")}</th>
+                 <th className="p-3 font-semibold text-sm">{t("common.price")}</th>
+                 <th className="p-3 font-semibold text-sm">{t("common.actions")}</th>
+               </tr>
+             </thead>
+             <tbody>
+               {paginatedContainers.map((container) => (
+                 <tr key={container._id} className="border-b border-slate-100 hover:bg-slate-100 transition-colors">
+                   <td className="p-3 font-medium text-sm">{container.name}</td>
+                   <td className="p-3">
+                     <span className="px-2 py-1 text-xs font-medium border border-slate-300 rounded-full capitalize">{t(`common.${container.type}`)} </span>
+                   </td>
+                   <td className="p-3 text-sm">{container.subject?.name || t("common.notAvailable")}</td>
+                   <td className="p-3 text-sm">{container.level?.name || t("common.notAvailable")}</td>
+                   <td className="p-3 text-sm">
+                     {container.price > 0 ? t("common.pricePoints", { price: container.price }) : t("common.free")}
+                   </td>
+                   <td className="p-3">
+                     <Button 
+                       size="sm" 
+                       variant="primary"
+                       onClick={() => navigate(`/dashboard/assistant-page/container-details/${container._id}`)}
+                     >
+                       {t("common.details")}
+                     </Button>
+                   </td>
+                 </tr>
+               ))}
+               {paginatedContainers.length === 0 && (
+                 <tr>
+                   <td colSpan="6" className="text-center py-4 text-sm">
+                     {t("containers.notFound")}
+                   </td>
+                 </tr>
+               )}
+             </tbody>
+           </table>
+         </div>
 
         {renderPagination(filteredContainers.length)}
       </div>
@@ -211,53 +217,57 @@ const AssistantPage = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {paginatedLectures.map((lecture) => (
-            <div key={lecture._id} className="card bg-base-100 shadow-sm border border-base-200">
-              <div className="card-body p-4">
-                <div className="flex justify-between items-start">
-                  <h3 className="card-title text-base line-clamp-1">{lecture.name}</h3>
-                  <div className={`badge ${Number(lecture.price || 0) > 0 ? "badge-primary" : "badge-secondary"}`}>
-                    {Number(lecture.price || 0) > 0 ? t("common.paid") : t("common.free")}
-                  </div>
-                </div>
-                <p className="text-sm opacity-70 line-clamp-2">{lecture.description || t("common.noDescription")}</p>
-                <div className="flex flex-wrap justify-between items-center mt-2 text-xs opacity-70 gap-2">
-                  <span className="flex items-center gap-1">
-                    <Eye className="w-3 h-3 flex-shrink-0" />
-                    {t("lectures.views", { count: lecture.numberOfViews || 0 })}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <GraduationCap className="w-3 h-3 flex-shrink-0" />
-                    {lecture.subject?.name || t("common.noSubject")}
-                  </span>
-                  {lecture.level && (
-                    <span className="flex items-center gap-1">
-                      <Layers className="w-3 h-3 flex-shrink-0" />
-                      {lecture.level.name}
-                    </span>
-                  )}
-                  {lecture.requiresExam && (
-                    <span className="flex items-center gap-1 text-blue-600">
-                      <FileCheck className="w-3 h-3 flex-shrink-0" />
-                      {t("lectures.hasExam")}
-                    </span>
-                  )}
-                </div>
-                <button
-                  className="btn btn-sm btn-outline btn-primary w-full mt-3"
-                  onClick={() => navigate(`/dashboard/assistant-page/detailed-lecture-view/${lecture._id}`)}
-                >
-                  {t("lectures.viewData")}
-                </button>
-                <button
-                  className="btn btn-sm btn-outline btn-primary w-full mt-3"
-                  onClick={() => navigate(`/dashboard/assistant-page/lecture-display/${lecture._id}`)}
-                >
-                  {t("lectures.goToLecture")}
-                </button>
-              </div>
-            </div>
-          ))}
+           {paginatedLectures.map((lecture) => (
+             <div key={lecture._id} className="rounded-xl bg-white shadow-sm border border-slate-200">
+               <div className="p-4">
+                 <div className="flex justify-between items-start">
+                   <h3 className="text-base font-bold line-clamp-1">{lecture.name}</h3>
+                   <div className={`px-2 py-1 text-xs font-medium rounded-full ${Number(lecture.price || 0) > 0 ? "bg-primary text-white" : "bg-secondary text-white"}`}>
+                     {Number(lecture.price || 0) > 0 ? t("common.paid") : t("common.free")}
+                   </div>
+                 </div>
+                  <p className="mt-2 line-clamp-2 text-sm text-slate-600">{lecture.description || t("common.noDescription")}</p>
+                  <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-600">
+                   <span className="flex items-center gap-1">
+                     <Eye className="w-3 h-3 flex-shrink-0" />
+                     {t("lectures.views", { count: lecture.numberOfViews || 0 })}
+                   </span>
+                   <span className="flex items-center gap-1">
+                     <GraduationCap className="w-3 h-3 flex-shrink-0" />
+                     {lecture.subject?.name || t("common.noSubject")}
+                   </span>
+                   {lecture.level && (
+                     <span className="flex items-center gap-1">
+                       <Layers className="w-3 h-3 flex-shrink-0" />
+                       {lecture.level.name}
+                     </span>
+                   )}
+                   {lecture.requiresExam && (
+                     <span className="flex items-center gap-1 text-blue-600">
+                       <FileCheck className="w-3 h-3 flex-shrink-0" />
+                       {t("lectures.hasExam")}
+                     </span>
+                   )}
+                 </div>
+                 <Button
+                   size="sm"
+                   variant="outline"
+                   className="w-full mt-3"
+                   onClick={() => navigate(`/dashboard/assistant-page/detailed-lecture-view/${lecture._id}`)}
+                 >
+                   {t("lectures.viewData")}
+                 </Button>
+                 <Button
+                   size="sm"
+                   variant="outline"
+                   className="w-full mt-3"
+                   onClick={() => navigate(`/dashboard/assistant-page/lecture-display/${lecture._id}`)}
+                 >
+                   {t("lectures.goToLecture")}
+                 </Button>
+               </div>
+             </div>
+           ))}
           {paginatedLectures.length === 0 && (
             <div className="col-span-full text-center py-8">
               <BookOpen className="w-12 h-12 mx-auto text-gray-400 mb-2" />
@@ -287,49 +297,49 @@ const AssistantPage = () => {
           </h2>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="table w-full">
-            <thead>
-              <tr>
-                <th>{t("attachments.fileName")}</th>
-                <th>{t("common.lecture")}</th>
-                <th>{t("common.type")}</th>
-                <th>{t("attachments.uploadedOn")}</th>
-                <th>{t("common.actions")}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {paginatedAttachments.map((attachment) => (
-                <tr key={attachment._id} className="hover:bg-base-200">
-                  <td className="font-medium">{attachment.fileName}</td>
-                  <td>{attachment.lectureId?.name || t("common.notAvailable")}</td>
-                  <td>
-                    <span className="badge badge-outline capitalize">{t(`common.${attachment.type}`)}</span>
-                  </td>
-                  <td>{new Date(attachment.uploadedOn).toLocaleDateString(i18n.language)}</td>
-                  <td>
-                    <a
-                      href={attachment.filePath}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="btn btn-sm btn-outline"
-                    >
-                      <FileText className="w-4 h-4 mr-1" />
-                      {t("common.view")}
-                    </a>
-                  </td>
-                </tr>
-              ))}
-              {paginatedAttachments.length === 0 && (
-                <tr>
-                  <td colSpan="5" className="text-center py-4">
-                    {t("attachments.notFound")}
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+         <div className="overflow-x-auto">
+           <table className="w-full text-left border-collapse">
+             <thead>
+               <tr className="border-b border-slate-200 bg-slate-50">
+                 <th className="p-3 font-semibold text-sm">{t("attachments.fileName")}</th>
+                 <th className="p-3 font-semibold text-sm">{t("common.lecture")}</th>
+                 <th className="p-3 font-semibold text-sm">{t("common.type")}</th>
+                 <th className="p-3 font-semibold text-sm">{t("attachments.uploadedOn")}</th>
+                 <th className="p-3 font-semibold text-sm">{t("common.actions")}</th>
+               </tr>
+             </thead>
+             <tbody>
+               {paginatedAttachments.map((attachment) => (
+                 <tr key={attachment._id} className="border-b border-slate-100 hover:bg-slate-100 transition-colors">
+                   <td className="p-3 font-medium text-sm">{attachment.fileName}</td>
+                   <td className="p-3 text-sm">{attachment.lectureId?.name || t("common.notAvailable")}</td>
+                   <td className="p-3">
+                     <span className="px-2 py-1 text-xs font-medium border border-slate-300 rounded-full capitalize">{t(`common.${attachment.type}`)}</span>
+                   </td>
+                   <td className="p-3 text-sm">{new Date(attachment.uploadedOn).toLocaleDateString(i18n.language)}</td>
+                   <td className="p-3">
+                     <a
+                       href={attachment.filePath}
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       className="inline-flex items-center gap-1 px-3 py-1 text-xs font-medium border border-slate-300 rounded-md hover:bg-slate-50 transition-colors"
+                     >
+                       <FileText className="w-4 h-4 mr-1" />
+                       {t("common.view")}
+                     </a>
+                   </td>
+                 </tr>
+               ))}
+               {paginatedAttachments.length === 0 && (
+                 <tr>
+                   <td colSpan="5" className="text-center py-4 text-sm">
+                     {t("attachments.notFound")}
+                   </td>
+                 </tr>
+               )}
+             </tbody>
+           </table>
+         </div>
 
         {renderPagination(filteredAttachments.length)}
       </div>
@@ -355,55 +365,55 @@ const AssistantPage = () => {
           </h2>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="table w-full">
-            <thead>
-              <tr>
-                <th>{t("common.student")}</th>
-                <th>{t("common.lecture")}</th>
-                <th>{t("common.score")}</th>
-                <th>{t("common.status")}</th>
-                <th>{t("common.submittedAt")}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {paginatedSubmissions.map((submission) => (
-                <tr key={submission._id} className="hover:bg-base-200">
-                  <td className="font-medium">{submission.student?.name || t("common.unknown")}</td>
-                  <td>{submission.lecture?.name || t("common.unknown")}</td>
-                  <td>
-                    {t("common.scoreFormat", {
-                      score: submission.score,
-                      maxScore: submission.maxScore,
-                      percentage: Math.round((submission.score / submission.maxScore) * 100),
-                    })}
-                  </td>
-                  <td>
-                    {submission.passed ? (
-                      <span className="flex items-center text-green-600">
-                        <CheckCircle className="w-4 h-4 mr-1" />
-                        {t("common.passed")}
-                      </span>
-                    ) : (
-                      <span className="flex items-center text-red-600">
-                        <XCircle className="w-4 h-4 mr-1" />
-                        {t("common.failed")}
-                      </span>
-                    )}
-                  </td>
-                  <td>{new Date(submission.submittedAt).toLocaleString(i18n.language)}</td>
-                </tr>
-              ))}
-              {paginatedSubmissions.length === 0 && (
-                <tr>
-                  <td colSpan="5" className="text-center py-4">
-                    {t("examSubmissions.notFound")}
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+         <div className="overflow-x-auto">
+           <table className="w-full text-left border-collapse">
+             <thead>
+               <tr className="border-b border-slate-200 bg-slate-50">
+                 <th className="p-3 font-semibold text-sm">{t("common.student")}</th>
+                 <th className="p-3 font-semibold text-sm">{t("common.lecture")}</th>
+                 <th className="p-3 font-semibold text-sm">{t("common.score")}</th>
+                 <th className="p-3 font-semibold text-sm">{t("common.status")}</th>
+                 <th className="p-3 font-semibold text-sm">{t("common.submittedAt")}</th>
+               </tr>
+             </thead>
+             <tbody>
+               {paginatedSubmissions.map((submission) => (
+                 <tr key={submission._id} className="border-b border-slate-100 hover:bg-slate-100 transition-colors">
+                   <td className="p-3 font-medium text-sm">{submission.student?.name || t("common.unknown")}</td>
+                   <td className="p-3 text-sm">{submission.lecture?.name || t("common.unknown")}</td>
+                   <td className="p-3 text-sm">
+                     {t("common.scoreFormat", {
+                       score: submission.score,
+                       maxScore: submission.maxScore,
+                       percentage: Math.round((submission.score / submission.maxScore) * 100),
+                     })}
+                   </td>
+                   <td className="p-3 text-sm">
+                     {submission.passed ? (
+                       <span className="flex items-center text-green-600">
+                         <CheckCircle className="w-4 h-4 mr-1" />
+                         {t("common.passed")}
+                       </span>
+                     ) : (
+                       <span className="flex items-center text-red-600">
+                         <XCircle className="w-4 h-4 mr-1" />
+                         {t("common.failed")}
+                       </span>
+                     )}
+                   </td>
+                   <td className="p-3 text-sm">{new Date(submission.submittedAt).toLocaleString(i18n.language)}</td>
+                 </tr>
+               ))}
+               {paginatedSubmissions.length === 0 && (
+                 <tr>
+                   <td colSpan="5" className="text-center py-4 text-sm">
+                     {t("examSubmissions.notFound")}
+                   </td>
+                 </tr>
+               )}
+             </tbody>
+           </table>
+         </div>
 
         {renderPagination(filteredSubmissions.length)}
       </div>
@@ -429,55 +439,55 @@ const AssistantPage = () => {
           </h2>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="table w-full">
-            <thead>
-              <tr>
-                <th>{t("common.student")}</th>
-                <th>{t("common.lecture")}</th>
-                <th>{t("common.score")}</th>
-                <th>{t("common.status")}</th>
-                <th>{t("common.submittedAt")}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {paginatedSubmissions.map((submission) => (
-                <tr key={submission._id} className="hover:bg-base-200">
-                  <td className="font-medium">{submission.student?.name || t("common.unknown")}</td>
-                  <td>{submission.lecture?.name || t("common.unknown")}</td>
-                  <td>
-                    {t("common.scoreFormat", {
-                      score: submission.score,
-                      maxScore: submission.maxScore,
-                      percentage: Math.round((submission.score / submission.maxScore) * 100),
-                    })}
-                  </td>
-                  <td>
-                    {submission.passed ? (
-                      <span className="flex items-center text-green-600">
-                        <CheckCircle className="w-4 h-4 mr-1" />
-                        {t("common.passed")}
-                      </span>
-                    ) : (
-                      <span className="flex items-center text-red-600">
-                        <XCircle className="w-4 h-4 mr-1" />
-                        {t("common.failed")}
-                      </span>
-                    )}
-                  </td>
-                  <td>{new Date(submission.submittedAt).toLocaleString(i18n.language)}</td>
-                </tr>
-              ))}
-              {paginatedSubmissions.length === 0 && (
-                <tr>
-                  <td colSpan="5" className="text-center py-4">
-                    {t("homeworkSubmissions.notFound")}
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+         <div className="overflow-x-auto">
+           <table className="w-full text-left border-collapse">
+             <thead>
+               <tr className="border-b border-slate-200 bg-slate-50">
+                 <th className="p-3 font-semibold text-sm">{t("common.student")}</th>
+                 <th className="p-3 font-semibold text-sm">{t("common.lecture")}</th>
+                 <th className="p-3 font-semibold text-sm">{t("common.score")}</th>
+                 <th className="p-3 font-semibold text-sm">{t("common.status")}</th>
+                 <th className="p-3 font-semibold text-sm">{t("common.submittedAt")}</th>
+               </tr>
+             </thead>
+             <tbody>
+               {paginatedSubmissions.map((submission) => (
+                 <tr key={submission._id} className="border-b border-slate-100 hover:bg-slate-100 transition-colors">
+                   <td className="p-3 font-medium text-sm">{submission.student?.name || t("common.unknown")}</td>
+                   <td className="p-3 text-sm">{submission.lecture?.name || t("common.unknown")}</td>
+                   <td className="p-3 text-sm">
+                     {t("common.scoreFormat", {
+                       score: submission.score,
+                       maxScore: submission.maxScore,
+                       percentage: Math.round((submission.score / submission.maxScore) * 100),
+                     })}
+                   </td>
+                   <td className="p-3 text-sm">
+                     {submission.passed ? (
+                       <span className="flex items-center text-green-600">
+                         <CheckCircle className="w-4 h-4 mr-1" />
+                         {t("common.passed")}
+                       </span>
+                     ) : (
+                       <span className="flex items-center text-red-600">
+                         <XCircle className="w-4 h-4 mr-1" />
+                         {t("common.failed")}
+                       </span>
+                     )}
+                   </td>
+                   <td className="p-3 text-sm">{new Date(submission.submittedAt).toLocaleString(i18n.language)}</td>
+                 </tr>
+               ))}
+               {paginatedSubmissions.length === 0 && (
+                 <tr>
+                   <td colSpan="5" className="text-center py-4 text-sm">
+                     {t("homeworkSubmissions.notFound")}
+                   </td>
+                 </tr>
+               )}
+             </tbody>
+           </table>
+         </div>
 
         {renderPagination(filteredSubmissions.length)}
       </div>
@@ -524,19 +534,19 @@ const AssistantPage = () => {
       <div dir={isRTL ? "rtl" : "ltr"}>
         <h2 className="text-xl font-semibold mb-4">{t("stats.title")}</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-          {stats.map((stat, index) => (
-            <div key={index} className="card bg-base-100 shadow-sm border border-base-200">
-              <div className="card-body p-4">
-                <div className="flex items-center gap-3">
-                  <div className={`p-3 rounded-full ${stat.color}`}>{stat.icon}</div>
-                  <div>
-                    <h3 className="text-sm font-medium opacity-70">{stat.title}</h3>
-                    <p className="text-2xl font-bold">{stat.value}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
+           {stats.map((stat, index) => (
+             <div key={index} className="rounded-xl bg-white shadow-sm border border-slate-200">
+               <div className="p-4">
+                 <div className="flex items-center gap-3">
+                   <div className={`p-3 rounded-full ${stat.color}`}>{stat.icon}</div>
+                   <div>
+          <h3 className="text-sm font-medium text-slate-700">{stat.title}</h3>
+                     <p className="text-2xl font-bold">{stat.value}</p>
+                   </div>
+                 </div>
+               </div>
+             </div>
+           ))}
         </div>
       </div>
     )
@@ -545,132 +555,128 @@ const AssistantPage = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="flex flex-col items-center">
-          <span className="loading loading-spinner loading-lg text-primary"></span>
-          <p className="mt-4 text-lg">{t("common.loading")}</p>
-        </div>
+           <div className="flex flex-col items-center">
+             <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+             <p className="mt-4 text-lg">{t("common.loading")}</p>
+           </div>
       </div>
     )
   }
 
   if (error) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="alert alert-error max-w-md">
-          <XCircle className="w-6 h-6" />
-          <span>{error}</span>
-        </div>
-      </div>
-    )
+     return (
+       <div className="min-h-screen flex items-center justify-center">
+         <div className="flex items-center gap-3 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 shadow-sm max-w-md">
+           <XCircle className="w-6 h-6 flex-shrink-0" />
+           <span>{error}</span>
+         </div>
+       </div>
+     )
   }
 
   if (!dashboardData) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="alert alert-warning max-w-md">
-          <span>{t("errors.noData")}</span>
-        </div>
-      </div>
-    )
+     return (
+       <div className="min-h-screen flex items-center justify-center">
+         <div className="flex items-center gap-3 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700 shadow-sm max-w-md">
+           <span>{t("errors.noData")}</span>
+         </div>
+       </div>
+     )
   }
 
   return (
     <div className="container mx-auto px-4 py-8" dir={isRTL ? "rtl" : "ltr"}>
       {/* Header with user info */}
-      <div className="bg-base-100 rounded-xl shadow-sm border border-base-200 p-6 mb-6">
-        <div className="flex flex-col md:flex-row md:items-center gap-4">
-          <div className="avatar avatar-placeholder">
-            <div className="bg-primary text-primary-content rounded-full w-16">
-              <span className="text-xl">{dashboardData.userInfo.name.charAt(0)}</span>
-            </div>
-          </div>
-          <div className="flex-1">
-            <h1 className="text-2xl font-bold">{dashboardData.userInfo.name}</h1>
-            <p className="text-base-content/70">{dashboardData.userInfo.email}</p>
-              <div className="badge badge-primary mt-1 text-white">{t(`roles.${dashboardData.userInfo.role.toLowerCase()}`)}</div>
-          </div>
-          {dashboardData.userInfo.assignedLecturer && (
-            <div className="bg-base-200/50 p-4 rounded-lg flex flex-col md:flex-row items-start md:items-center gap-3">
-              <div className="avatar avatar-placeholder">
-                <div className="bg-secondary text-secondary-content rounded-full w-12">
-                  <span>{dashboardData.userInfo.assignedLecturer.name.charAt(0)}</span>
-                </div>
-              </div>
-              <div>
-                <h2 className="text-lg font-semibold">{dashboardData.userInfo.assignedLecturer.name}</h2>
-                <p className="text-sm text-base-content/70">
-                  {t(`roles.${dashboardData.userInfo.assignedLecturer.role.toLowerCase()}`)}
-                </p>
-                <p className="text-sm">
-                  <span className="font-medium">{t("common.expertise")}:</span>{" "}
-                  {dashboardData.userInfo.assignedLecturer.expertise}
-                </p>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
+       <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-6">
+         <div className="flex flex-col md:flex-row md:items-center gap-4">
+           <div className="flex items-center justify-center w-16 h-16 rounded-full bg-primary text-white text-xl font-bold">
+             {dashboardData.userInfo.name.charAt(0)}
+           </div>
+           <div className="flex-1">
+             <h1 className="text-2xl font-bold">{dashboardData.userInfo.name}</h1>
+             <p className="text-slate-900/70">{dashboardData.userInfo.email}</p>
+               <div className="inline-block px-2 py-1 text-xs font-medium rounded-full bg-primary text-white mt-1">{t(`roles.${dashboardData.userInfo.role.toLowerCase()}`)}</div>
+           </div>
+           {dashboardData.userInfo.assignedLecturer && (
+             <div className="bg-slate-100/50 p-4 rounded-lg flex flex-col md:flex-row items-start md:items-center gap-3">
+               <div className="flex items-center justify-center w-12 h-12 rounded-full bg-secondary text-white text-lg font-bold">
+                 {dashboardData.userInfo.assignedLecturer.name.charAt(0)}
+               </div>
+               <div>
+                 <h2 className="text-lg font-semibold">{dashboardData.userInfo.assignedLecturer.name}</h2>
+                 <p className="text-sm text-slate-900/70">
+                   {t(`roles.${dashboardData.userInfo.assignedLecturer.role.toLowerCase()}`)}
+                 </p>
+                 <p className="text-sm">
+                   <span className="font-medium">{t("common.expertise")}:</span>{" "}
+                   {dashboardData.userInfo.assignedLecturer.expertise}
+                 </p>
+               </div>
+             </div>
+           )}
+         </div>
+       </div>
 
       {/* Stats */}
       {renderStats()}
 
       {/* Search */}
-      <div className="form-control my-4">
-        <div className="input-group">
-          <input
-            type="text"
-            placeholder={t("common.search")}
-            className="input input-bordered w-full"
-            value={searchTerm}
-            onChange={handleSearch}
-          />
-          <button className="btn btn-square">
-            <Search className="w-5 h-5" />
-          </button>
-        </div>
-      </div>
+       <div className="my-4">
+         <div className="flex items-center gap-2">
+           <Input
+             type="text"
+             placeholder={t("common.search")}
+             className="w-full"
+             value={searchTerm}
+             onChange={handleSearch}
+           />
+           <Button variant="outline" size="sm" className="px-3">
+             <Search className="w-5 h-5" />
+           </Button>
+         </div>
+       </div>
 
       {/* Tabs */}
-      <div className="tabs tabs-boxed my-6" dir={isRTL ? "rtl" : "ltr"}>
-        <button
-          className={`tab ${activeTab === "containers" ? "tab-active" : ""}`}
-          onClick={() => handleTabChange("containers")}
-        >
-          <Layers className="w-4 h-4 mr-2" />
-          {t("tabs.containers")}
-        </button>
-        <button
-          className={`tab ${activeTab === "lectures" ? "tab-active" : ""}`}
-          onClick={() => handleTabChange("lectures")}
-        >
-          <BookOpen className="w-4 h-4 mr-2" />
-          {t("tabs.lectures")}
-        </button>
-        <button
-          className={`tab ${activeTab === "attachments" ? "tab-active" : ""}`}
-          onClick={() => handleTabChange("attachments")}
-        >
-          <Paperclip className="w-4 h-4 mr-2" />
-          {t("tabs.attachments")}
-        </button>
-        <button
-          className={`tab ${activeTab === "examSubmissions" ? "tab-active" : ""}`}
-          onClick={() => handleTabChange("examSubmissions")}
-        >
-          <FileCheck className="w-4 h-4 mr-2" />
-          {t("tabs.examSubmissions")}
-        </button>
-        <button
-          className={`tab ${activeTab === "homeworkSubmissions" ? "tab-active" : ""}`}
-          onClick={() => handleTabChange("homeworkSubmissions")}
-        >
-          <FileText className="w-4 h-4 mr-2" />
-          {t("tabs.homeworkSubmissions")}
-        </button>
-      </div>
+       <div className="flex p-1 bg-slate-100 rounded-xl my-6 w-fit" dir={isRTL ? "rtl" : "ltr"}>
+         <button
+           className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${activeTab === "containers" ? "bg-white shadow-sm text-primary" : "text-slate-600 hover:text-slate-900"}`}
+           onClick={() => handleTabChange("containers")}
+         >
+           <Layers className="w-4 h-4" />
+           {t("tabs.containers")}
+         </button>
+         <button
+           className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${activeTab === "lectures" ? "bg-white shadow-sm text-primary" : "text-slate-600 hover:text-slate-900"}`}
+           onClick={() => handleTabChange("lectures")}
+         >
+           <BookOpen className="w-4 h-4" />
+           {t("tabs.lectures")}
+         </button>
+         <button
+           className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${activeTab === "attachments" ? "bg-white shadow-sm text-primary" : "text-slate-600 hover:text-slate-900"}`}
+           onClick={() => handleTabChange("attachments")}
+         >
+           <Paperclip className="w-4 h-4" />
+           {t("tabs.attachments")}
+         </button>
+         <button
+           className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${activeTab === "examSubmissions" ? "bg-white shadow-sm text-primary" : "text-slate-600 hover:text-slate-900"}`}
+           onClick={() => handleTabChange("examSubmissions")}
+         >
+           <FileCheck className="w-4 h-4" />
+           {t("tabs.examSubmissions")}
+         </button>
+         <button
+           className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${activeTab === "homeworkSubmissions" ? "bg-white shadow-sm text-primary" : "text-slate-600 hover:text-slate-900"}`}
+           onClick={() => handleTabChange("homeworkSubmissions")}
+         >
+           <FileText className="w-4 h-4" />
+           {t("tabs.homeworkSubmissions")}
+         </button>
+       </div>
 
       {/* Tab Content */}
-      <div className="bg-base-100 rounded-xl shadow-sm border border-base-200 p-6">
+       <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
         {activeTab === "containers" && renderContainers()}
         {activeTab === "lectures" && renderLectures()}
         {activeTab === "attachments" && renderAttachments()}

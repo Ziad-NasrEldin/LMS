@@ -18,9 +18,98 @@ import { normalizeStudentHobby } from "../../../../constants/studentHobbies"
 import { translateErrorMessage } from "../../../../utils/errorTranslator"
 import { buildLevelHierarchy } from "../../../../utils/levelHierarchy"
 import DSSelect from "../../../../components/DSSelect"
+import Button from "../../../../components/ui/Button"
+import Input from "../../../../components/ui/Input"
 
 const PARENT_RELATIONS = ["mother", "father", "other"]
 const normalizeParentRelation = (value) => String(value || "").trim().toLowerCase()
+const FIELD_ALIASES = {
+  phone: "phoneNumber",
+  phone_number: "phoneNumber",
+  parentPhone: "parentPhoneNumber",
+  parentPhone1: "parentPhoneNumber",
+  parent_relation: "parentPhoneRelation",
+  stageId: "stage",
+  levelId: "level",
+}
+
+const normalizeFieldName = (field) => FIELD_ALIASES[field] || field
+
+const getErrorMessageCandidate = (value) => {
+  if (!value) return ""
+  if (typeof value === "string") return value.trim()
+  if (Array.isArray(value)) {
+    return value.map(getErrorMessageCandidate).filter(Boolean).join("، ")
+  }
+  if (typeof value === "object") {
+    return (
+      getErrorMessageCandidate(value.translatedMessage) ||
+      getErrorMessageCandidate(value.message) ||
+      getErrorMessageCandidate(value.error) ||
+      getErrorMessageCandidate(value.rawMessage) ||
+      getErrorMessageCandidate(value.rawError) ||
+      getErrorMessageCandidate(value.stack)
+    )
+  }
+
+  return ""
+}
+
+const collectFieldErrors = (source, bucket, visited = new WeakSet()) => {
+  if (!source) return bucket
+
+  if (Array.isArray(source)) {
+    source.forEach((item) => collectFieldErrors(item, bucket, visited))
+    return bucket
+  }
+
+  if (typeof source !== "object") return bucket
+  if (visited.has(source)) return bucket
+  visited.add(source)
+
+  if (typeof source.field === "string") {
+    const fieldName = normalizeFieldName(source.field)
+    const fieldMessage =
+      getErrorMessageCandidate(source.message) ||
+      getErrorMessageCandidate(source.rawMessage) ||
+      getErrorMessageCandidate(source.error) ||
+      getErrorMessageCandidate(source.code)
+
+    if (fieldName && fieldMessage && !bucket[fieldName]) {
+      bucket[fieldName] = translateErrorMessage(fieldMessage, fieldMessage)
+    }
+  }
+
+  if (source.errors && typeof source.errors === "object" && !Array.isArray(source.errors)) {
+    Object.entries(source.errors).forEach(([field, value]) => {
+      const fieldName = normalizeFieldName(field)
+      const fieldMessage = getErrorMessageCandidate(value)
+      if (fieldName && fieldMessage && !bucket[fieldName]) {
+        bucket[fieldName] = translateErrorMessage(fieldMessage, fieldMessage)
+      }
+      collectFieldErrors(value, bucket, visited)
+    })
+  }
+
+  ;["data", "error", "details", "issues", "validationErrors"].forEach((key) => {
+    if (source[key]) {
+      collectFieldErrors(source[key], bucket, visited)
+    }
+  })
+
+  return bucket
+}
+
+const isGenericFormError = (message = "") => {
+  const normalized = String(message || "").trim().toLowerCase()
+  return (
+    !normalized ||
+    normalized.includes("unexpected error") ||
+    normalized.includes("failed to create user") ||
+    normalized.includes("unknown error") ||
+    normalized.includes("request failed")
+  )
+}
 
 const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
   const { t, i18n } = useTranslation("createUser")
@@ -65,6 +154,7 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
 
   const [userData, setUserData] = useState(initialUserState)
   const [formError, setFormError] = useState("")
+  const [fieldErrors, setFieldErrors] = useState({})
   const [isBulkMode, setIsBulkMode] = useState(false)
   const [levels, setLevels] = useState([])
   const [levelHierarchy, setLevelHierarchy] = useState({
@@ -89,6 +179,7 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
     if (isOpen) {
       setUserData(initialUserState)
       setFormError("")
+      setFieldErrors({})
       setIsBulkMode(false)
       setShowPassword(false)
       setShowConfirmPassword(false)
@@ -141,9 +232,13 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
   // Display error from parent component
   useEffect(() => {
     if (error) {
-      setFormError(
-        translateErrorMessage(typeof error === "string" ? error : error.message || t("errors.failedToCreateUser"))
-      )
+      const nextFieldErrors = collectFieldErrors(error, {})
+      const explicitMessage = getErrorMessageCandidate(error)
+      const translatedMessage = translateErrorMessage(explicitMessage, t("errors.failedToCreateUser"))
+      const fallbackFieldMessage = Object.values(nextFieldErrors)[0] || ""
+
+      setFieldErrors(nextFieldErrors)
+      setFormError(isGenericFormError(translatedMessage) && fallbackFieldMessage ? fallbackFieldMessage : translatedMessage)
     }
   }, [error, t])
 
@@ -167,6 +262,15 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
 
       return next
     })
+
+    if (name) {
+      setFieldErrors((prev) => {
+        if (!prev[name]) return prev
+        const next = { ...prev }
+        delete next[name]
+        return next
+      })
+    }
   }
 
   const handleRoleChange = (e) => {
@@ -332,6 +436,7 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
       return
     }
 
+    setFieldErrors({})
     const filteredData = filterDataByRole(userData)
 
     onCreateUser(filteredData)
@@ -446,31 +551,72 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
     }
   }
 
+  const renderRoleSpecificFields = () => {
+    const sharedFormProps = {
+      userData,
+      handleChange,
+      handleGovernmentChange,
+      levels,
+      levelHierarchy,
+      governments,
+      administrationZones,
+      loadingZones,
+      t,
+      isRTL,
+      fieldErrors,
+    }
+
+    switch (userData.role) {
+      case "student":
+        return <StudentForm {...sharedFormProps} />
+      case "parent":
+        return <ParentForm {...sharedFormProps} />
+      case "lecturer":
+        return <LecturerForm userData={userData} handleChange={handleChange} subjects={subjects} t={t} />
+      case "assistant":
+        return (
+          <AssistantForm
+            userData={userData}
+            handleChange={handleChange}
+            lecturers={lecturers}
+            t={t}
+            isRTL={isRTL}
+          />
+        )
+      case "teacher":
+        return <TeacherForm {...sharedFormProps} subjects={subjects} />
+      default:
+        return null
+    }
+  }
+
   if (!isOpen) return null
 
-  return (
-    <div className="modal modal-open" dir={isRTL ? "rtl" : "ltr"} style={{ backgroundColor: 'rgba(17,24,39,0.4)' }}>
-      <div
-        className="modal-box max-w-2xl max-h-[90vh] flex flex-col rounded-[2rem] p-0"
-        style={{
-          backgroundColor: TOKENS.neutralCloud,
-          boxShadow: SHADOWS.level2
-        }}
-      >
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4" dir={isRTL ? "rtl" : "ltr"} style={{ backgroundColor: 'rgba(17,24,39,0.4)' }}>
+        <div
+          className="relative w-full max-w-2xl max-h-[90vh] flex flex-col rounded-[2rem] p-0 bg-white"
+          style={{
+            backgroundColor: TOKENS.neutralCloud,
+            boxShadow: SHADOWS.level2
+          }}
+        >
         {/* Header with close button */}
         <div className="flex items-center justify-between p-6 pb-0 sm:px-8">
           <h3 className="font-extrabold text-2xl" style={{ color: TOKENS.inkText }}>
             {isBulkMode ? t("titles.bulkCreate") : t("titles.createNewUser")}
           </h3>
-          <button
-            type="button"
-            onClick={onClose}
-            className="btn btn-ghost btn-circle btn-sm"
-            style={{ color: TOKENS.slateText }}
-            aria-label={t("buttons.close")}
-          >
-            <X size={20} />
-          </button>
+               <Button
+                 type="button"
+                 variant="ghost"
+                 size="sm"
+                 className="rounded-full p-2"
+                 onClick={onClose}
+                 style={{ color: TOKENS.slateText }}
+                 aria-label={t("buttons.close")}
+               >
+              <X size={20} />
+            </Button>
         </div>
 
         <div className="flex bg-white rounded-xl p-1 mb-6 border px-6 sm:px-8" style={{ borderColor: 'rgba(17,24,39,0.05)' }}>
@@ -499,25 +645,25 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
         {/* Scrollable content */}
         <div className="flex-1 overflow-y-auto px-6 pb-6 sm:px-8 sm:pb-8">
 
-        {formError && (
-          <div className="alert border-none rounded-xl mb-6 font-medium" style={{ backgroundColor: "rgba(224,36,36,0.1)", color: "#E02424" }}>
-            <span>{formError}</span>
-          </div>
-        )}
+         {formError && (
+      <div className="mb-6 rounded-xl border border-error/30 bg-error/10 px-4 py-3 text-sm text-[#991B1B] shadow-sm flex items-center gap-3 font-medium">
+             <span>{formError}</span>
+           </div>
+         )}
 
         {isBulkMode ? (
           <BulkCreateUsers />
         ) : loadingDropdowns ? (
           <div className="flex justify-center my-12">
-            <span className="loading loading-spinner loading-lg" style={{ color: TOKENS.deepTeal }}></span>
+            <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" style={{ color: TOKENS.deepTeal }}></div>
           </div>
-        ) : (
+          ) : (
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="form-control">
+              <div className="mb-4">
                 <div className="flex flex-col gap-2">
-                  <label className="label py-0">
-                    <span className="label-text font-bold" style={{ color: TOKENS.inkText }}>{t("fields.accountType")}</span>
+                  <label className="block mb-1">
+                    <span className="text-sm font-bold" style={{ color: TOKENS.inkText }}>{t("fields.accountType")}</span>
                   </label>
                   <DSSelect
                     name="role"
@@ -540,11 +686,10 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
                   </DSSelect>
                 </div>
               </div>
-
-              <div className="form-control">
+              <div className="mb-4">
                 <div className="flex flex-col gap-2">
-                  <label className="label py-0">
-                    <span className="label-text font-bold" style={{ color: TOKENS.inkText }}>{t("fields.gender")}</span>
+                  <label className="block mb-1">
+                    <span className="text-sm font-bold" style={{ color: TOKENS.inkText }}>{t("fields.gender")}</span>
                   </label>
                   <DSSelect
                     name="gender"
@@ -561,54 +706,61 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
               </div>
             </div>
 
-            <div className="form-control">
+           {renderRoleSpecificFields()}
+
+            <div className="mb-4">
               <div className="flex flex-col gap-2">
-                <label className="label py-0">
-                  <span className="label-text font-bold" style={{ color: TOKENS.inkText }}>{t("fields.name")}</span>
+                <label className="block mb-1">
+                  <span className="text-sm font-bold" style={{ color: TOKENS.inkText }}>{t("fields.name")}</span>
                 </label>
-                <input
+                <Input
                   type="text"
                   name="name"
-                  className="input w-full rounded-xl"
+                  className="w-full rounded-xl"
+                  variant={fieldErrors.name ? "error" : "default"}
                   style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: TOKENS.inkText }}
                   value={userData.name}
                   onChange={handleChange}
+                  error={fieldErrors.name}
                   required
                 />
               </div>
             </div>
-
-            <div className="form-control">
+            <div className="mb-4">
               <div className="flex flex-col gap-2">
-                <label className="label py-0">
-                  <span className="label-text font-bold" style={{ color: TOKENS.inkText }}>{t("fields.email")}</span>
+                <label className="block mb-1">
+                  <span className="text-sm font-bold" style={{ color: TOKENS.inkText }}>{t("fields.email")}</span>
                 </label>
-                <input
+                <Input
                   type="email"
                   name="email"
-                  className="input w-full rounded-xl"
+                  className="w-full rounded-xl"
+                  variant={fieldErrors.email ? "error" : "default"}
                   style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: TOKENS.inkText }}
                   value={userData.email}
                   onChange={handleChange}
+                  error={fieldErrors.email}
                   required
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="form-control">
+              <div className="mb-4">
                 <div className="flex flex-col gap-2">
-                  <label className="label py-0">
-                    <span className="label-text font-bold" style={{ color: TOKENS.inkText }}>{t("fields.password")}</span>
+                  <label className="block mb-1">
+                    <span className="text-sm font-bold" style={{ color: TOKENS.inkText }}>{t("fields.password")}</span>
                   </label>
                   <div className="relative">
-                    <input
+                    <Input
                       type={showPassword ? "text" : "password"}
                       name="password"
-                      className="input w-full rounded-xl"
+                      className="w-full rounded-xl"
+                      variant={fieldErrors.password ? "error" : "default"}
                       style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: TOKENS.inkText }}
                       value={userData.password}
                       onChange={handleChange}
+                      error={fieldErrors.password}
                       required
                     />
                     <button
@@ -622,20 +774,21 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
                   </div>
                 </div>
               </div>
-
-              <div className="form-control">
+              <div className="mb-4">
                 <div className="flex flex-col gap-2">
-                  <label className="label py-0">
-                    <span className="label-text font-bold" style={{ color: TOKENS.inkText }}>{t("fields.confirmPassword")}</span>
+                  <label className="block mb-1">
+                    <span className="text-sm font-bold" style={{ color: TOKENS.inkText }}>{t("fields.confirmPassword")}</span>
                   </label>
                   <div className="relative">
-                    <input
+                    <Input
                       type={showConfirmPassword ? "text" : "password"}
                       name="confirmPassword"
-                      className="input w-full rounded-xl"
+                      className="w-full rounded-xl"
+                      variant={fieldErrors.confirmPassword ? "error" : "default"}
                       style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: TOKENS.inkText }}
                       value={userData.confirmPassword}
                       onChange={handleChange}
+                      error={fieldErrors.confirmPassword}
                       required
                     />
                     <button
@@ -651,82 +804,13 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
               </div>
             </div>
 
-            {userData.role === "student" && (
-              <StudentForm
-                userData={userData}
-                handleChange={handleChange}
-                handleGovernmentChange={handleGovernmentChange}
-                levels={levels}
-                levelHierarchy={levelHierarchy}
-                governments={governments}
-                administrationZones={administrationZones}
-                loadingZones={loadingZones}
-                t={t}
-                isRTL={isRTL}
-              />
-            )}
-
-            {userData.role === "parent" && (
-              <ParentForm
-                userData={userData}
-                handleChange={handleChange}
-                handleGovernmentChange={handleGovernmentChange}
-                levelHierarchy={levelHierarchy}
-                governments={governments}
-                administrationZones={administrationZones}
-                loadingZones={loadingZones}
-                t={t}
-                isRTL={isRTL}
-              />
-            )}
-
-            {userData.role === "lecturer" && (
-              <LecturerForm
-                userData={userData}
-                handleChange={handleChange}
-                handleGovernmentChange={handleGovernmentChange}
-                subjects={subjects}
-                governments={governments}
-                administrationZones={administrationZones}
-                loadingZones={loadingZones}
-                t={t}
-                isRTL={isRTL}
-              />
-            )}
-
-            {userData.role === "assistant" && (
-              <AssistantForm
-                userData={userData}
-                handleChange={handleChange}
-                lecturers={lecturers}
-                t={t}
-                isRTL={isRTL}
-              />
-            )}
-
-            {userData.role === "teacher" && (
-              <TeacherForm
-                userData={userData}
-                handleChange={handleChange}
-                handleGovernmentChange={handleGovernmentChange}
-                subjects={subjects}
-                levels={levels}
-                levelHierarchy={levelHierarchy}
-                governments={governments}
-                administrationZones={administrationZones}
-                loadingZones={loadingZones}
-                t={t}
-                isRTL={isRTL}
-              />
-            )}
-
-            <div className="modal-action">
-              <button type="button" className="btn" onClick={onClose}>
+            <div className="flex justify-end gap-3 mt-6">
+              <Button type="button" variant="outline" onClick={onClose}>
                 {t("buttons.cancel")}
-              </button>
-              <button type="submit" className="btn btn-primary" disabled={loadingDropdowns}>
+              </Button>
+              <Button type="submit" variant="primary" disabled={loadingDropdowns}>
                 {t("buttons.create")}
-              </button>
+              </Button>
             </div>
           </form>
         )}

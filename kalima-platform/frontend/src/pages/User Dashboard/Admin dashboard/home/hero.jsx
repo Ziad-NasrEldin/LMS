@@ -87,7 +87,7 @@ const Hero = () => {
           <div className="absolute top-0 right-0 w-32 h-32 bg-[#4DB3C2] opacity-10 rounded-bl-[100px] pointer-events-none" />
           <div className="p-6 md:p-8 flex items-center justify-between relative z-10">
             <div className={isRTL ? 'text-right' : 'text-left'}>
-              <h2 className="text-xl font-bold opacity-80" style={{ color: TOKENS.deepTeal }}>{t('admin.students')}</h2>
+              <h2 className="text-xl font-bold" style={{ color: TOKENS.deepTeal }}>{t('admin.students')}</h2>
               <p className="text-4xl font-extrabold mt-2" style={{ color: TOKENS.inkText }}>
                 {loading ? (
                   <span className="loading loading-dots loading-sm"></span>
@@ -117,7 +117,7 @@ const Hero = () => {
           <div className="absolute top-0 right-0 w-32 h-32 bg-[#F39A3F] opacity-10 rounded-bl-[100px] pointer-events-none" />
           <div className="p-6 md:p-8 flex items-center justify-between relative z-10">
             <div className={isRTL ? 'text-right' : 'text-left'}>
-              <h2 className="text-xl font-bold opacity-80" style={{ color: TOKENS.deepTeal }}>{t('admin.assignedLecturers')}</h2>
+              <h2 className="text-xl font-bold" style={{ color: TOKENS.deepTeal }}>{t('admin.assignedLecturers')}</h2>
               <p className="text-4xl font-extrabold mt-2" style={{ color: TOKENS.inkText }}>
                 {loading ? (
                   <span className="loading loading-dots loading-sm"></span>
@@ -147,7 +147,7 @@ const Hero = () => {
           <div className="absolute top-0 right-0 w-32 h-32 bg-[#EBC468] opacity-15 rounded-bl-[100px] pointer-events-none" />
           <div className="p-6 md:p-8 flex items-center justify-between relative z-10">
             <div className={isRTL ? 'text-right' : 'text-left'}>
-              <h2 className="text-xl font-bold opacity-80" style={{ color: TOKENS.deepTeal }}>{t('admin.assistants')}</h2>
+              <h2 className="text-xl font-bold" style={{ color: TOKENS.deepTeal }}>{t('admin.assistants')}</h2>
               <p className="text-4xl font-extrabold mt-2" style={{ color: TOKENS.inkText }}>
                 {loading ? (
                   <span className="loading loading-dots loading-sm"></span>
@@ -177,7 +177,7 @@ const Hero = () => {
           <div className="absolute top-0 right-0 w-32 h-32 bg-[#146A78] opacity-10 rounded-bl-[100px] pointer-events-none" />
           <div className="p-6 md:p-8 flex items-center justify-between relative z-10">
             <div className={isRTL ? 'text-right' : 'text-left'}>
-              <h2 className="text-xl font-bold opacity-80" style={{ color: TOKENS.deepTeal }}>{t('admin.parents')}</h2>
+              <h2 className="text-xl font-bold" style={{ color: TOKENS.deepTeal }}>{t('admin.parents')}</h2>
               <p className="text-4xl font-extrabold mt-2" style={{ color: TOKENS.inkText }}>
                 {loading ? (
                   <span className="loading loading-dots loading-sm"></span>

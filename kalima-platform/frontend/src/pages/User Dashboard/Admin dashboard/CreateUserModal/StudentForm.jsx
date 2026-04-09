@@ -4,6 +4,8 @@ import { Trash2 } from "lucide-react"
 import { STAGE_KEYS, getGradeOptionsForStage, getStageDisplayName } from "../../../../utils/levelHierarchy"
 import { STUDENT_HOBBIES } from "../../../../constants/studentHobbies"
 import DSSelect from "../../../../components/DSSelect"
+import Button from "../../../../components/ui/Button"
+import Input from "../../../../components/ui/Input"
 
 const EMPTY_STAGE_OPTIONS = STAGE_KEYS.map((stageKey) => ({
   value: stageKey,
@@ -42,12 +44,13 @@ const ParentContactField = ({
           </p>
         </div>
 
-        {showRemove && (
-          <button type="button" className="btn btn-ghost btn-xs gap-2 text-error" onClick={onRemove}>
-            <Trash2 size={14} />
-            {t("buttons.removeParentPhone")}
-          </button>
-        )}
+         {showRemove && (
+           <Button type="button" variant="ghost" size="xs" className="gap-2 text-red-600" onClick={onRemove}>
+             <Trash2 size={14} />
+             {t("buttons.removeParentPhone")}
+           </Button>
+         )}
+
       </div>
 
       <div className="mt-4 space-y-3">
@@ -60,17 +63,18 @@ const ParentContactField = ({
                 </span>
               </label>
             )}
-            <input
-              type="text"
-              inputMode="numeric"
-              name={phoneName}
-              className="input w-full rounded-xl"
-              style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
-              value={phoneValue || ""}
-              onChange={handleChange}
-              placeholder={phonePlaceholder}
-              required
-            />
+             <Input
+               type="text"
+               inputMode="numeric"
+               name={phoneName}
+               className="w-full rounded-xl"
+               style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
+               value={phoneValue || ""}
+               onChange={handleChange}
+               placeholder={phonePlaceholder}
+               required
+             />
+
             {phoneError && <p className="text-sm text-error">{t(`validation.${phoneError}`)}</p>}
           </div>
         </div>
@@ -83,14 +87,15 @@ const ParentContactField = ({
                   {relationLabel}
                 </span>
               </label>
-              <DSSelect
-                name={relationName}
-                className="select w-full rounded-xl"
-                style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
-                value={relationValue || ""}
-                onChange={handleChange}
-                required
-              >
+               <DSSelect
+                 name={relationName}
+                 className="w-full rounded-xl"
+                 style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
+                 value={relationValue || ""}
+                 onChange={handleChange}
+                 required
+               >
+
                 <option value="">{relationPlaceholder}</option>
                 {PARENT_RELATIONS.map((relation) => (
                   <option key={relation} value={relation}>
@@ -118,6 +123,7 @@ const StudentForm = ({
   loadingZones,
   t,
   isRTL,
+  fieldErrors = {},
 }) => {
   const stageOptions = levelHierarchy?.stageOptions?.length
     ? levelHierarchy.stageOptions
@@ -179,14 +185,15 @@ const StudentForm = ({
                 {t("fields.stage") || t("fields.level")}
               </span>
             </label>
-            <DSSelect
-              name="stage"
-              className="select w-full rounded-xl"
-              style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
-              value={userData.stage || ""}
-              onChange={handleStageChange}
-              required
-            >
+             <DSSelect
+               name="stage"
+               className="w-full rounded-xl"
+               style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: fieldErrors.stage ? "#DC2626" : "rgba(17,24,39,0.1)", color: "#1F2937" }}
+               value={userData.stage || ""}
+               onChange={handleStageChange}
+               required
+             >
+
               <option value="">{t("placeholders.selectStage") || t("placeholders.selectLevel") || "Select stage"}</option>
               {stageOptions.map((stage) => (
                 <option key={stage.value} value={stage.value}>
@@ -194,6 +201,7 @@ const StudentForm = ({
                 </option>
               ))}
             </DSSelect>
+            {fieldErrors.stage && <p className="text-sm text-error">{fieldErrors.stage}</p>}
           </div>
         </div>
 
@@ -204,15 +212,16 @@ const StudentForm = ({
                 {t("fields.level")}
               </span>
             </label>
-            <DSSelect
-              name="level"
-              className="select w-full rounded-xl"
-              style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
-              value={userData.level || ""}
-              onChange={handleChange}
-              disabled={!userData.stage}
-              required
-            >
+             <DSSelect
+               name="level"
+               className="w-full rounded-xl"
+               style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: fieldErrors.level ? "#DC2626" : "rgba(17,24,39,0.1)", color: "#1F2937" }}
+               value={userData.level || ""}
+               onChange={handleChange}
+               disabled={!userData.stage}
+               required
+             >
+
               <option value="">
                 {!userData.stage
                   ? t("placeholders.selectStageFirst") || t("placeholders.selectStage") || "Select stage first"
@@ -224,6 +233,7 @@ const StudentForm = ({
                 </option>
               ))}
             </DSSelect>
+            {fieldErrors.level && <p className="text-sm text-error">{fieldErrors.level}</p>}
           </div>
         </div>
       </div>
@@ -236,17 +246,20 @@ const StudentForm = ({
                 {t("fields.phoneNumber")}
               </span>
             </label>
-            <input
-              type="text"
-              inputMode="numeric"
-              name="phoneNumber"
-              className="input w-full rounded-xl"
-              style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
-              value={userData.phoneNumber || ""}
-              onChange={handlePhoneInputChange}
-              placeholder={t("placeholders.phoneNumber") || "Enter phone number"}
-              required
-            />
+             <Input
+               type="text"
+               inputMode="numeric"
+               name="phoneNumber"
+               className="w-full rounded-xl"
+               variant={fieldErrors.phoneNumber ? "error" : "default"}
+               style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
+               value={userData.phoneNumber || ""}
+               onChange={handlePhoneInputChange}
+               placeholder={t("placeholders.phoneNumber") || "Enter phone number"}
+               error={fieldErrors.phoneNumber}
+               required
+             />
+
           </div>
         </div>
 
@@ -257,15 +270,16 @@ const StudentForm = ({
                 {t("fields.sequencedIdOptional")}
               </span>
             </label>
-            <input
-              type="text"
-              name="sequencedId"
-              className="input w-full rounded-xl"
-              style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
-              value={userData.sequencedId || ""}
-              onChange={handleChange}
-              placeholder={t("placeholders.sequencedId")}
-            />
+             <Input
+               type="text"
+               name="sequencedId"
+               className="w-full rounded-xl"
+               style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
+               value={userData.sequencedId || ""}
+               onChange={handleChange}
+               placeholder={t("placeholders.sequencedId")}
+             />
+
           </div>
         </div>
       </div>
@@ -276,8 +290,8 @@ const StudentForm = ({
         relationName="parentPhoneRelation"
         phoneValue={userData.parentPhoneNumber}
         relationValue={userData.parentPhoneRelation}
-        phoneError={null}
-        relationError={null}
+        phoneError={fieldErrors.parentPhoneNumber}
+        relationError={fieldErrors.parentPhoneRelation}
         phoneLabel={t("fields.parentPhoneNumber")}
         relationLabel={t("fields.parentPhoneRelation")}
         phonePlaceholder={t("placeholders.parentPhoneNumber")}
@@ -286,15 +300,18 @@ const StudentForm = ({
         t={t}
       />
 
-      {!hasAdditionalParentContact ? (
-        <button
-          type="button"
-          className="btn btn-sm btn-outline mt-4"
-          onClick={handleAddAdditionalParentPhone}
-        >
-          {t("buttons.addAnotherParentPhone")}
-        </button>
-      ) : (
+       {!hasAdditionalParentContact ? (
+         <Button
+           type="button"
+           variant="outline"
+           size="sm"
+           className="mt-4"
+           onClick={handleAddAdditionalParentPhone}
+         >
+           {t("buttons.addAnotherParentPhone")}
+         </Button>
+       ) : (
+
         <div className="mt-4">
           <ParentContactField
         title={t("fields.parentPhoneNumber2")}
@@ -302,8 +319,8 @@ const StudentForm = ({
         relationName="parentPhoneRelation2"
         phoneValue={userData.parentPhoneNumber2}
         relationValue={userData.parentPhoneRelation2}
-            phoneError={null}
-            relationError={null}
+            phoneError={fieldErrors.parentPhoneNumber2}
+            relationError={fieldErrors.parentPhoneRelation2}
             phoneLabel={t("fields.parentPhoneNumber2")}
             relationLabel={t("fields.parentPhoneRelation2")}
             phonePlaceholder={t("placeholders.additionalParentPhone") || t("placeholders.parentPhoneNumber")}
@@ -324,14 +341,15 @@ const StudentForm = ({
                 {t("fields.government") || "Government"}
               </span>
             </label>
-            <DSSelect
-              name="government"
-              className="select w-full rounded-xl"
-              style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
-              value={userData.government || ""}
-              onChange={handleGovernmentSelect}
-              required
-            >
+             <DSSelect
+               name="government"
+               className="w-full rounded-xl"
+               style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: fieldErrors.government ? "#DC2626" : "rgba(17,24,39,0.1)", color: "#1F2937" }}
+               value={userData.government || ""}
+               onChange={handleGovernmentSelect}
+               required
+             >
+
               <option value="">{t("fields.selectGovernment") || "Select Government"}</option>
               {governments.map((government) => (
                 <option key={government._id} value={government.name}>
@@ -339,6 +357,7 @@ const StudentForm = ({
                 </option>
               ))}
             </DSSelect>
+            {fieldErrors.government && <p className="text-sm text-error">{fieldErrors.government}</p>}
           </div>
         </div>
 
@@ -349,15 +368,16 @@ const StudentForm = ({
                 {t("fields.administrationZone") || (isRTL ? "الإدارة التعليمية" : "Administration Zone")}
               </span>
             </label>
-            <DSSelect
-              disabled={!userData.government || loadingZones}
-              name="administrationZone"
-              className="select w-full rounded-xl"
-              style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
-              value={userData.administrationZone || ""}
-              onChange={handleChange}
-              required
-            >
+             <DSSelect
+               disabled={!userData.government || loadingZones}
+               name="administrationZone"
+               className="w-full rounded-xl"
+               style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: fieldErrors.administrationZone ? "#DC2626" : "rgba(17,24,39,0.1)", color: "#1F2937" }}
+               value={userData.administrationZone || ""}
+               onChange={handleChange}
+               required
+             >
+
               <option value="">
               {loadingZones
                 ? t("fields.loadingZones") || (isRTL ? "جاري تحميل الإدارة التعليمية..." : "Loading administration zones...")
@@ -369,14 +389,16 @@ const StudentForm = ({
                 </option>
               ))}
             </DSSelect>
-            {loadingZones && (
-              <div className="flex items-center gap-2 mt-1">
-                <span className="loading loading-spinner loading-xs"></span>
-              <span className="text-xs text-gray-500">
-                {t("fields.loadingZones") || (isRTL ? "جاري تحميل الإدارة التعليمية..." : "Loading administration zones...")}
-              </span>
-              </div>
-            )}
+            {fieldErrors.administrationZone && <p className="text-sm text-error">{fieldErrors.administrationZone}</p>}
+             {loadingZones && (
+               <div className="flex items-center gap-2 mt-1">
+                 <div className="w-3 h-3 border-2 border-slate-200 border-t-primary rounded-full animate-spin"></div>
+                          <span className="text-xs text-slate-600">
+                 {t("fields.loadingZones") || (isRTL ? "جاري تحميل الإدارة التعليمية..." : "Loading administration zones...")}
+               </span>
+               </div>
+             )}
+
           </div>
         </div>
       </div>
@@ -388,14 +410,15 @@ const StudentForm = ({
               {t("fields.hobby") || t("fields.hobbies")}
             </span>
           </label>
-          <DSSelect
-            name="hobby"
-            className="select w-full rounded-xl"
-            style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
-            value={userData.hobby || ""}
-            onChange={handleChange}
-            required
-          >
+           <DSSelect
+             name="hobby"
+             className="w-full rounded-xl"
+             style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: fieldErrors.hobby ? "#DC2626" : "rgba(17,24,39,0.1)", color: "#1F2937" }}
+             value={userData.hobby || ""}
+             onChange={handleChange}
+             required
+           >
+
             <option value="">{t("placeholders.selectHobby") || "Select hobby"}</option>
             {STUDENT_HOBBIES.map((hobby) => (
               <option key={hobby.id} value={hobby.id}>
@@ -403,6 +426,7 @@ const StudentForm = ({
               </option>
             ))}
           </DSSelect>
+          {fieldErrors.hobby && <p className="text-sm text-error">{fieldErrors.hobby}</p>}
         </div>
       </div>
     </>

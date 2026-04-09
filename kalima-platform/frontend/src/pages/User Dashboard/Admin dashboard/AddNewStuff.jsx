@@ -10,6 +10,9 @@ import { designTokens } from "../../../constants/designTokens"
 import { translateErrorMessage } from "../../../utils/errorTranslator"
 import { buildLevelHierarchy, resolveLevelDisplayName } from "../../../utils/levelHierarchy"
 import DSSelect from "../../../components/DSSelect"
+import Button from "../../../components/ui/Button"
+import Input from "../../../components/ui/Input"
+import Badge from "../../../components/ui/Badge"
 
 const EMPTY_LEVEL_FORM = {
   name: "",
@@ -79,8 +82,7 @@ export default function AdminCreate() {
     background: designTokens.gradients.cta,
     boxShadow: SHADOWS.level1,
   }
-  const PRIMARY_ACTION_CLASS =
-    "btn h-12 w-full rounded-full border-none px-8 font-bold text-white transition-transform duration-200 hover:-translate-y-[1px] active:scale-[0.98] sm:w-auto"
+  // PRIMARY_ACTION_CLASS removed in favor of Button primitive
 
   const sortedLevels = useMemo(
     () => sortLevelsForDisplay(levelHierarchy.levels || []),
@@ -349,7 +351,7 @@ export default function AdminCreate() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <span className="loading loading-spinner loading-lg" style={{ color: TOKENS.deepTeal }} />
+        <div className="w-10 h-10 border-4 border-slate-200 border-t-primary rounded-full animate-spin" style={{ borderColor: TOKENS.deepTeal }}></div>
       </div>
     )
   }
@@ -371,26 +373,28 @@ export default function AdminCreate() {
           {t("pageSubtitle")}
         </p>
 
-        {error && (
-          <div className="alert alert-error mb-6 rounded-xl border-none font-medium">
-            <span>{error}</span>
-            <button className="btn btn-ghost btn-sm" onClick={() => setError(null)}>
-              {t("actions.dismiss")}
-            </button>
-          </div>
-        )}
+         {error && (
+           <div className="flex items-center justify-between gap-3 p-4 mb-6 bg-red-50 border border-red-200 text-red-800 rounded-xl font-medium">
+             <span>{error}</span>
+             <Button variant="ghost" size="sm" onClick={() => setError(null)}>
+               {t("actions.dismiss")}
+             </Button>
+           </div>
+         )}
 
-        {success && (
-          <div
-            className="alert mb-6 rounded-xl border-none shadow-sm"
-            style={{ backgroundColor: "rgba(77,179,194,0.1)", color: TOKENS.deepTeal }}
-          >
-            <span className="font-medium">{success}</span>
-            <button className="btn btn-ghost btn-sm" onClick={() => setSuccess(null)}>
-              {t("actions.dismiss")}
-            </button>
-          </div>
-        )}
+
+         {success && (
+           <div
+             className="flex items-center justify-between gap-3 p-4 mb-6 rounded-xl border shadow-sm"
+             style={{ backgroundColor: "rgba(77,179,194,0.1)", color: TOKENS.deepTeal, borderColor: "rgba(77,179,194,0.2)" }}
+           >
+             <span className="font-medium">{success}</span>
+             <Button variant="ghost" size="sm" onClick={() => setSuccess(null)}>
+               {t("actions.dismiss")}
+             </Button>
+           </div>
+         )}
+
 
         <div className="mb-8 flex flex-wrap gap-2 rounded-2xl border bg-white p-2" style={{ borderColor: "rgba(17,24,39,0.05)" }}>
           <button
@@ -425,24 +429,27 @@ export default function AdminCreate() {
                       {t("forms.subject.name")}
                     </span>
                   </label>
-                  <input
-                    type="text"
-                    value={subjectData.name}
-                    onChange={(e) => setSubjectData((prev) => ({ ...prev, name: e.target.value }))}
-                    placeholder={t("forms.subject.namePlaceholder")}
-                    className="input w-full rounded-xl"
-                    style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: TOKENS.spaceDark }}
-                    required
-                  />
+                   <Input
+                     type="text"
+                     value={subjectData.name}
+                     onChange={(e) => setSubjectData((prev) => ({ ...prev, name: e.target.value }))}
+                     placeholder={t("forms.subject.namePlaceholder")}
+                     className="w-full rounded-xl"
+                     style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: TOKENS.spaceDark }}
+                     required
+                   />
+
                 </div>
               </div>
-              <button
-                type="submit"
-                className={`${PRIMARY_ACTION_CLASS} mt-4`}
-                style={PRIMARY_ACTION_STYLE}
-              >
-                {t("forms.subject.create")}
-              </button>
+               <Button
+                 type="submit"
+                 variant="primary"
+                 className={`mt-4 h-12 w-full rounded-full px-8 font-bold text-white transition-transform duration-200 hover:-translate-y-[1px] active:scale-[0.98] sm:w-auto`}
+                 style={PRIMARY_ACTION_STYLE}
+               >
+                 {t("forms.subject.create")}
+               </Button>
+
             </form>
 
             <div className="mt-10 border-t pt-8" style={{ borderColor: "rgba(17,24,39,0.1)" }}>
@@ -477,15 +484,18 @@ export default function AdminCreate() {
                           {new Date(subject.createdAt).toLocaleDateString(i18n.language)}
                         </div>
                         <div>
-                          {userRole !== "moderator" && (
-                            <button
-                              className="btn btn-ghost btn-sm rounded-xl"
-                              style={{ color: "#E02424", backgroundColor: "rgba(224,36,36,0.1)" }}
-                              onClick={() => handleDeleteSubject(subject._id)}
-                            >
-                              {t("actions.delete")}
-                            </button>
-                          )}
+                             {userRole !== "moderator" && (
+                               <Button
+                                 variant="ghost"
+                                 size="sm"
+                                 className="rounded-xl"
+                                 style={{ color: "#E02424", backgroundColor: "rgba(224,36,36,0.1)" }}
+                                 onClick={() => handleDeleteSubject(subject._id)}
+                               >
+                                 {t("actions.delete")}
+                               </Button>
+                             )}
+
                         </div>
                       </div>
                     ))}
@@ -590,15 +600,16 @@ export default function AdminCreate() {
                         {t("forms.level.nameEn")}
                       </span>
                     </label>
-                    <input
-                      type="text"
-                      value={levelData.name}
-                      onChange={(e) => setLevelData((prev) => ({ ...prev, name: e.target.value }))}
-                      placeholder={isGradeLevel ? t("forms.level.gradeNamePlaceholderEn") : t("forms.level.stageNamePlaceholderEn")}
-                      className="input w-full rounded-xl"
-                      style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: TOKENS.spaceDark }}
-                      required
-                    />
+                     <Input
+                       type="text"
+                       value={levelData.name}
+                       onChange={(e) => setLevelData((prev) => ({ ...prev, name: e.target.value }))}
+                       placeholder={isGradeLevel ? t("forms.level.gradeNamePlaceholderEn") : t("forms.level.stageNamePlaceholderEn")}
+                       className="w-full rounded-xl"
+                       style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: TOKENS.spaceDark }}
+                       required
+                     />
+
                     <p className="mt-2 text-xs font-medium" style={{ color: TOKENS.slateText }}>
                       {t("forms.level.nameEnHelp")}
                     </p>
@@ -610,15 +621,16 @@ export default function AdminCreate() {
                         {t("forms.level.nameAr")}
                       </span>
                     </label>
-                    <input
-                      type="text"
-                      value={levelData.nameAr}
-                      onChange={(e) => setLevelData((prev) => ({ ...prev, nameAr: e.target.value }))}
-                      placeholder={isGradeLevel ? t("forms.level.gradeNamePlaceholderAr") : t("forms.level.stageNamePlaceholderAr")}
-                      className="input w-full rounded-xl"
-                      style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: TOKENS.spaceDark }}
-                      required
-                    />
+                     <Input
+                       type="text"
+                       value={levelData.nameAr}
+                       onChange={(e) => setLevelData((prev) => ({ ...prev, nameAr: e.target.value }))}
+                       placeholder={isGradeLevel ? t("forms.level.gradeNamePlaceholderAr") : t("forms.level.stageNamePlaceholderAr")}
+                       className="w-full rounded-xl"
+                       style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: TOKENS.spaceDark }}
+                       required
+                     />
+
                     <p className="mt-2 text-xs font-medium" style={{ color: TOKENS.slateText }}>
                       {t("forms.level.nameArHelp")}
                     </p>
@@ -641,15 +653,16 @@ export default function AdminCreate() {
                           {t("forms.level.parentStage")}
                         </span>
                       </label>
-                      <DSSelect
-                        name="parentLevel"
-                        value={levelData.parentLevel}
-                        onChange={handleLevelFieldChange}
-                        className="select w-full rounded-xl"
-                        style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: TOKENS.spaceDark }}
-                        required={isGradeLevel}
-                        disabled={parentStageOptions.length === 0}
-                      >
+                       <DSSelect
+                         name="parentLevel"
+                         value={levelData.parentLevel}
+                         onChange={handleLevelFieldChange}
+                         className="w-full rounded-xl"
+                         style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: TOKENS.spaceDark }}
+                         required={isGradeLevel}
+                         disabled={parentStageOptions.length === 0}
+                       >
+
                         <option value="">{t("forms.level.selectParentStage")}</option>
                         {parentStageOptions.map((stage) => (
                           <option key={stage.value} value={stage.value}>
@@ -674,17 +687,18 @@ export default function AdminCreate() {
                         {t("forms.level.sortOrder")}
                       </span>
                     </label>
-                    <input
-                      type="number"
-                      min="0"
-                      step="1"
-                      name="sortOrder"
-                      value={levelData.sortOrder}
-                      onChange={handleLevelFieldChange}
-                      placeholder={t("forms.level.sortOrderPlaceholder")}
-                      className="input w-full rounded-xl"
-                      style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: TOKENS.spaceDark }}
-                    />
+                     <Input
+                       type="number"
+                       min="0"
+                       step="1"
+                       name="sortOrder"
+                       value={levelData.sortOrder}
+                       onChange={handleLevelFieldChange}
+                       placeholder={t("forms.level.sortOrderPlaceholder")}
+                       className="w-full rounded-xl"
+                       style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: TOKENS.spaceDark }}
+                     />
+
                     <p className="mt-2 text-xs font-medium" style={{ color: TOKENS.slateText }}>
                       {t("forms.level.sortOrderHelp")}
                     </p>
@@ -697,13 +711,14 @@ export default function AdminCreate() {
                       </span>
                     </label>
                     <label className="flex h-12 items-center gap-3 rounded-xl border bg-white px-4" style={{ borderColor: "rgba(17,24,39,0.08)" }}>
-                      <input
-                        type="checkbox"
-                        name="isActive"
-                        checked={levelData.isActive}
-                        onChange={handleLevelFieldChange}
-                        className="checkbox"
-                      />
+                       <input
+                         type="checkbox"
+                         name="isActive"
+                         checked={levelData.isActive}
+                         onChange={handleLevelFieldChange}
+                         className="w-4 h-4 accent-primary"
+                       />
+
                       <span className="font-medium" style={{ color: TOKENS.slateText }}>
                         {levelData.isActive ? t("forms.level.statusActive") : t("forms.level.statusInactive")}
                       </span>
@@ -747,26 +762,30 @@ export default function AdminCreate() {
                 </div>
               </div>
 
-              <div className="flex flex-wrap gap-3">
-                <button
-                  type="submit"
-                  disabled={disableLevelSubmit}
-                  className={PRIMARY_ACTION_CLASS}
-                  style={disableLevelSubmit ? { ...PRIMARY_ACTION_STYLE, opacity: 0.6, cursor: "not-allowed" } : PRIMARY_ACTION_STYLE}
-                >
-                  {isEditingLevel ? t("forms.level.update") : t("forms.level.create")}
-                </button>
-                {isEditingLevel && (
-                  <button
-                    type="button"
-                    className="btn h-12 rounded-xl border px-8 font-bold"
-                    style={{ backgroundColor: "white", color: TOKENS.slateText, borderColor: "rgba(17,24,39,0.12)" }}
-                    onClick={handleCancelLevelEdit}
-                  >
-                    {t("forms.level.cancelEdit")}
-                  </button>
-                )}
-              </div>
+                 <div className="flex flex-wrap gap-3">
+                   <Button
+                     type="submit"
+                     disabled={disableLevelSubmit}
+                     variant="primary"
+                     className="h-12 w-full rounded-full px-8 font-bold text-white transition-transform duration-200 hover:-translate-y-[1px] active:scale-[0.98] sm:w-auto"
+                     style={disableLevelSubmit ? { ...PRIMARY_ACTION_STYLE, opacity: 0.6, cursor: "not-allowed" } : PRIMARY_ACTION_STYLE}
+                   >
+                     {isEditingLevel ? t("forms.level.update") : t("forms.level.create")}
+                   </Button>
+                   {isEditingLevel && (
+                     <Button
+                       type="button"
+                       variant="outline"
+                       size="md"
+                       className="h-12 rounded-xl border px-8 font-bold"
+                       style={{ backgroundColor: "white", color: TOKENS.slateText, borderColor: "rgba(17,24,39,0.12)" }}
+                       onClick={handleCancelLevelEdit}
+                     >
+                       {t("forms.level.cancelEdit")}
+                     </Button>
+                   )}
+                 </div>
+
             </form>
 
             <div className="mt-10 border-t pt-8" style={{ borderColor: "rgba(17,24,39,0.1)" }}>
@@ -802,20 +821,18 @@ export default function AdminCreate() {
                                 {t("forms.level.treeGradesCount", { count: stageGrades.length })}
                               </p>
                             </div>
-                            <div className="flex items-center gap-2">
-                              <span
-                                className={`badge ${isInactive ? "badge-ghost" : "badge-success"} badge-sm`}
-                                style={isInactive ? { backgroundColor: "rgba(17,24,39,0.06)", color: TOKENS.slateText } : undefined}
-                              >
-                                {isInactive ? t("forms.level.statusInactive") : t("forms.level.statusActive")}
-                              </span>
-                              <span
-                                className="text-lg font-bold leading-none transition-transform group-open:rotate-90"
-                                style={{ color: TOKENS.slateText }}
-                              >
-                                ›
-                              </span>
-                            </div>
+                               <div className="flex items-center gap-2">
+                                 <Badge variant={isInactive ? "ghost" : "success"} size="sm">
+                                   {isInactive ? t("forms.level.statusInactive") : t("forms.level.statusActive")}
+                                 </Badge>
+                                 <span
+                                   className="text-lg font-bold leading-none transition-transform group-open:rotate-90"
+                                   style={{ color: TOKENS.slateText }}
+                                 >
+                                   ›
+                                 </span>
+                               </div>
+
                           </summary>
 
                           <div className="space-y-3 px-4 pb-4 pt-3">
@@ -829,26 +846,31 @@ export default function AdminCreate() {
                                     {stage.displayName || resolveLevelDisplayName(stage, i18n.language)}
                                   </p>
                                 </div>
-                                {canManageLevels && (
-                                  <div className="flex flex-wrap gap-2">
-                                    <button
-                                      type="button"
-                                      className="btn btn-ghost btn-sm rounded-xl"
-                                      style={{ color: TOKENS.deepTeal, backgroundColor: "rgba(14,85,99,0.1)" }}
-                                      onClick={() => handleStartEditLevel(stage)}
-                                    >
-                                      {t("actions.edit")}
-                                    </button>
-                                    <button
-                                      type="button"
-                                      className="btn btn-ghost btn-sm rounded-xl"
-                                      style={{ color: "#E02424", backgroundColor: "rgba(224,36,36,0.1)" }}
-                                      onClick={() => handleDeleteLevel(stage._id)}
-                                    >
-                                      {t("actions.delete")}
-                                    </button>
-                                  </div>
-                                )}
+                                 {canManageLevels && (
+                                   <div className="flex flex-wrap gap-2">
+                                     <Button
+                                       type="button"
+                                       variant="ghost"
+                                       size="sm"
+                                       className="rounded-xl"
+                                       style={{ color: TOKENS.deepTeal, backgroundColor: "rgba(14,85,99,0.1)" }}
+                                       onClick={() => handleStartEditLevel(stage)}
+                                     >
+                                       {t("actions.edit")}
+                                     </Button>
+                                     <Button
+                                       type="button"
+                                       variant="ghost"
+                                       size="sm"
+                                       className="rounded-xl"
+                                       style={{ color: "#E02424", backgroundColor: "rgba(224,36,36,0.1)" }}
+                                       onClick={() => handleDeleteLevel(stage._id)}
+                                     >
+                                       {t("actions.delete")}
+                                     </Button>
+                                   </div>
+                                 )}
+
                               </div>
                             </div>
 
@@ -871,34 +893,36 @@ export default function AdminCreate() {
                                             {grade.displayName || resolveLevelDisplayName(grade, i18n.language)}
                                           </p>
                                         </div>
-                                        <div className="flex items-center gap-2">
-                                          <span
-                                            className={`badge ${gradeIsInactive ? "badge-ghost" : "badge-success"} badge-sm`}
-                                            style={gradeIsInactive ? { backgroundColor: "rgba(17,24,39,0.06)", color: TOKENS.slateText } : undefined}
-                                          >
-                                            {gradeIsInactive ? t("forms.level.statusInactive") : t("forms.level.statusActive")}
-                                          </span>
-                                          {canManageLevels && (
-                                            <>
-                                              <button
-                                                type="button"
-                                                className="btn btn-ghost btn-sm rounded-xl"
-                                                style={{ color: TOKENS.deepTeal, backgroundColor: "rgba(14,85,99,0.1)" }}
-                                                onClick={() => handleStartEditLevel(grade)}
-                                              >
-                                                {t("actions.edit")}
-                                              </button>
-                                              <button
-                                                type="button"
-                                                className="btn btn-ghost btn-sm rounded-xl"
-                                                style={{ color: "#E02424", backgroundColor: "rgba(224,36,36,0.1)" }}
-                                                onClick={() => handleDeleteLevel(grade._id)}
-                                              >
-                                                {t("actions.delete")}
-                                              </button>
-                                            </>
-                                          )}
-                                        </div>
+                                   <div className="flex items-center gap-2">
+                                     <Badge variant={gradeIsInactive ? "ghost" : "success"} size="sm">
+                                       {gradeIsInactive ? t("forms.level.statusInactive") : t("forms.level.statusActive")}
+                                     </Badge>
+                                     {canManageLevels && (
+                                       <>
+                                         <Button
+                                           type="button"
+                                           variant="ghost"
+                                           size="sm"
+                                           className="rounded-xl"
+                                           style={{ color: TOKENS.deepTeal, backgroundColor: "rgba(14,85,99,0.1)" }}
+                                           onClick={() => handleStartEditLevel(grade)}
+                                         >
+                                           {t("actions.edit")}
+                                         </Button>
+                                         <Button
+                                           type="button"
+                                           variant="ghost"
+                                           size="sm"
+                                           className="rounded-xl"
+                                           style={{ color: "#E02424", backgroundColor: "rgba(224,36,36,0.1)" }}
+                                           onClick={() => handleDeleteLevel(grade._id)}
+                                         >
+                                           {t("actions.delete")}
+                                         </Button>
+                                       </>
+                                     )}
+                                   </div>
+
                                       </div>
                                     </div>
                                   )
@@ -951,34 +975,36 @@ export default function AdminCreate() {
                                   <p className="text-sm font-semibold" style={{ color: TOKENS.spaceDark }}>
                                     {grade.displayName || resolveLevelDisplayName(grade, i18n.language)}
                                   </p>
-                                  <div className="flex items-center gap-2">
-                                    <span
-                                      className={`badge ${gradeIsInactive ? "badge-ghost" : "badge-success"} badge-sm`}
-                                      style={gradeIsInactive ? { backgroundColor: "rgba(17,24,39,0.06)", color: TOKENS.slateText } : undefined}
-                                    >
-                                      {gradeIsInactive ? t("forms.level.statusInactive") : t("forms.level.statusActive")}
-                                    </span>
-                                    {canManageLevels && (
-                                      <>
-                                        <button
-                                          type="button"
-                                          className="btn btn-ghost btn-sm rounded-xl"
-                                          style={{ color: TOKENS.deepTeal, backgroundColor: "rgba(14,85,99,0.1)" }}
-                                          onClick={() => handleStartEditLevel(grade)}
-                                        >
-                                          {t("actions.edit")}
-                                        </button>
-                                        <button
-                                          type="button"
-                                          className="btn btn-ghost btn-sm rounded-xl"
-                                          style={{ color: "#E02424", backgroundColor: "rgba(224,36,36,0.1)" }}
-                                          onClick={() => handleDeleteLevel(grade._id)}
-                                        >
-                                          {t("actions.delete")}
-                                        </button>
-                                      </>
-                                    )}
-                                  </div>
+                                   <div className="flex items-center gap-2">
+                                     <Badge variant={gradeIsInactive ? "ghost" : "success"} size="sm">
+                                       {gradeIsInactive ? t("forms.level.statusInactive") : t("forms.level.statusActive")}
+                                     </Badge>
+                                     {canManageLevels && (
+                                       <>
+                                         <Button
+                                           type="button"
+                                           variant="ghost"
+                                           size="sm"
+                                           className="rounded-xl"
+                                           style={{ color: TOKENS.deepTeal, backgroundColor: "rgba(14,85,99,0.1)" }}
+                                           onClick={() => handleStartEditLevel(grade)}
+                                         >
+                                           {t("actions.edit")}
+                                         </Button>
+                                         <Button
+                                           type="button"
+                                           variant="ghost"
+                                           size="sm"
+                                           className="rounded-xl"
+                                           style={{ color: "#E02424", backgroundColor: "rgba(224,36,36,0.1)" }}
+                                           onClick={() => handleDeleteLevel(grade._id)}
+                                         >
+                                           {t("actions.delete")}
+                                         </Button>
+                                       </>
+                                     )}
+                                   </div>
+
                                 </div>
                               </div>
                             )

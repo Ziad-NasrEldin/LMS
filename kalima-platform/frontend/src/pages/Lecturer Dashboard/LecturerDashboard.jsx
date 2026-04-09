@@ -39,23 +39,25 @@ export default function LecturerDashboard() {
             <InstructorsList />
           </section>
 
-          {/* Course Categories Section */}
-          {/* <section className="mb-16">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold">{t("top_categories")}</h2>
-              <span className="text-sm text-base-content/70">{t("most_popular")}</span>
-            </div>
-            {/* <CourseCategories />
-          </section> */}
+           {/* Course Categories Section */}
+           {/* <section className="mb-16">
+             <div className="flex justify-between items-center mb-6">
+               <h2 className="text-2xl font-bold">{t("top_categories")}</h2>
+                <span className="text-sm text-slate-600">{t("most_popular")}</span>
+             </div>
+             {/* <CourseCategories />
+           </section> */}
 
-          {/* Featured Courses Section */}
-          {/* <section className="mb-16">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold">{t("featured_courses")}</h2>
-              <button className="btn btn-ghost btn-sm text-primary">{t("view_all")}</button>
-            </div>
-            <FeaturedCourses />
-          </section> */}
+
+           {/* Featured Courses Section */}
+           {/* <section className="mb-16">
+             <div className="flex justify-between items-center mb-6">
+               <h2 className="text-2xl font-bold">{t("featured_courses")}</h2>
+               <Button variant="ghost" size="sm" className="text-primary">{t("view_all")}</Button>
+             </div>
+             <FeaturedCourses />
+           </section> */}
+
 
         </div>
       </div>

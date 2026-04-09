@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, memo } from "react"
 import { ChevronDown, Book, Clock, DollarSign, Unlock, Play, Eye } from "lucide-react"
 
 const CONTAINER_TYPE_CONFIG = {
@@ -23,7 +23,7 @@ const formatDuration = (minutes) => {
   return `${mins}m`
 }
 
-export default function SyllabusItem({
+const SyllabusItem = memo(function SyllabusItem({
   item,
   depth = 0,
   isPurchased,
@@ -219,5 +219,7 @@ export default function SyllabusItem({
         </div>
       )}
     </div>
-  )
-}
+  );
+});
+
+export default SyllabusItem

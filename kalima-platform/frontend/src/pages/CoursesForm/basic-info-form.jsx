@@ -8,6 +8,11 @@ import { createContainer, updateContainer } from "../../routes/lectures"
 import { buildContainerPayloadObject, objectToFormData } from "../../utils/contentCreationPayloads"
 import { resolveUploadUrl } from "../../utils/uploadUrl"
 import DSSelect from "../../components/DSSelect"
+import Button from "../../components/ui/Button";
+import Input from "../../components/ui/Input";
+import Checkbox from "../../components/ui/Checkbox";
+import Radio from "../../components/ui/Radio";
+import FormContainer from "../../components/ui/FormContainer";
 
 function BasicInfoForm({
   formData,
@@ -23,9 +28,7 @@ function BasicInfoForm({
   editContainerId = null,
   initialImageUrl = null,
 }) {
-  const compactInput = "w-full input input-bordered input-sm h-10 min-h-10 bg-base-200/80 placeholder-base-content/50"
-  const compactSelect = "w-full select select-bordered select-sm h-10 min-h-10 bg-base-200/80 appearance-none"
-  const compactTextArea = "w-full textarea textarea-bordered textarea-sm bg-base-200/80 placeholder-base-content/50"
+  const compactSelect = "w-full border border-gray-300 bg-slate-100 rounded-lg h-10 min-h-10 appearance-none px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-transparent"
   const [courseImage, setCourseImage] = useState(null)
   const [courseImagePreview, setCourseImagePreview] = useState(null)
   const [courseVideo, setCourseVideo] = useState(null)
@@ -134,7 +137,7 @@ function BasicInfoForm({
   }
 
   return (
-    <form onSubmit={handleCreateParentContainer}>
+    <FormContainer onSubmit={handleCreateParentContainer} isLoading={isSubmitting}>
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -182,14 +185,12 @@ function BasicInfoForm({
           <div className="grid grid-cols-1 md:grid-cols-[62%_38%] gap-3">
             <div className="space-y-3">
               <div>
-                <label className="block text-sm font-medium mb-1">{isRTL ? "اسم الكورس" : "Course Name"}</label>
-                <input
-                  type="text"
+                <Input
+                  label={isRTL ? "اسم الكورس" : "Course Name"}
                   name="courseName"
                   value={formData.courseName}
                   onChange={handleChange}
                   placeholder={isRTL ? "مثل: دوره تقديم اللغة الإنجليزية" : "e.g., English Language Course"}
-                  className={compactInput}
                   required
                 />
               </div>
@@ -238,19 +239,17 @@ function BasicInfoForm({
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">{isRTL ? "مدة الكورس" : "Course Duration"}</label>
-                <input
-                  type="text"
+                <Input
+                  label={isRTL ? "مدة الكورس" : "Course Duration"}
                   name="duration"
                   value={formData.duration}
                   onChange={handleChange}
                   placeholder={isRTL ? "مثل: عدد الأسبوع أو الساعات" : "e.g., Number of weeks or hours"}
-                  className={compactInput}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">{isRTL ? "وصف الكورس" : "Course Description"}</label>
-                <textarea
+                <Input
+                  label={isRTL ? "وصف الكورس" : "Course Description"}
                   name="description"
                   value={formData.description}
                   onChange={handleChange}
@@ -259,13 +258,13 @@ function BasicInfoForm({
                       ? "مثل: تهدف صف الدورة إلى تحسين مهارات المتعلمين في اللغة الإنجليزية من حيث القراءة والمحادثة..."
                       : "e.g., The course aims to improve learners' English language skills in reading and speaking..."
                   }
+                  as="textarea"
                   rows="2"
-                  className={compactTextArea}
-                ></textarea>
+                />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">{isRTL ? "هدف الكورس" : "Course Goal"}</label>
-                <textarea
+                <Input
+                  label={isRTL ? "هدف الكورس" : "Course Goal"}
                   name="goal"
                   value={formData.goal}
                   onChange={handleChange}
@@ -274,9 +273,9 @@ function BasicInfoForm({
                       ? "مثل: تحسين مهارات القراءة والكتابة والمحادثة..."
                       : "e.g., Improve reading, writing and speaking skills..."
                   }
+                  as="textarea"
                   rows="2"
-                  className={compactTextArea}
-                ></textarea>
+                />
               </div>
             </div>
             <div className="space-y-3">
@@ -295,28 +294,30 @@ function BasicInfoForm({
                       <div className="absolute inset-0 bg-black/35" />
                     </>
                   )}
-
-                  <div className="relative z-10 flex flex-col items-center">
-                    <ImageIcon className={`w-8 h-8 mb-2 ${displayedCourseImage ? "text-white" : "text-primary"}`} />
-                    <span
-                      className={`btn btn-sm btn-ghost border-2 mb-2 ${
-                        displayedCourseImage ? "text-white border-white hover:bg-white/15" : "text-primary border-primary"
-                      }`}
-                    >
-                      {isRTL ? "اضف صورة" : "Add Image"}
-                    </span>
-                    <p className={`text-xs ${displayedCourseImage ? "text-white/90" : "text-base-content/50"}`}>
-                      {isRTL ? "المساحة القصوى 1 Gb" : "Max size 1 Gb"}
-                    </p>
-                  </div>
-                  <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+  
+                    <div className="relative z-10 flex flex-col items-center">
+                      <ImageIcon className={`w-8 h-8 mb-2 ${displayedCourseImage ? "text-white" : "text-primary"}`} />
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className={`border-2 mb-2 ${
+                          displayedCourseImage ? "text-white border-white hover:bg-white/15" : "text-primary border-primary"
+                        }`}
+                      >
+                        {isRTL ? "اضف صورة" : "Add Image"}
+                      </Button>
+                      <p className={`text-xs ${displayedCourseImage ? "text-white/90" : "text-neutral/50"}`}>
+                        {isRTL ? "المساحة القصوى 1 Gb" : "Max size 1 Gb"}
+                      </p>
+                    </div>
+                    <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
                 </label>
                 {courseImage && (
                   <p className="text-sm mt-2 text-center">
                     {isRTL ? "تم اختيار: " : "Selected: "} {courseImage.name}
                   </p>
                 )}
-                <p className="mt-2 text-xs text-center text-base-content/55">
+                <p className="mt-2 text-xs text-center text-neutral/55">
                   {isRTL ? "الصورة تظهر في بطاقة الكورس وفي المعاينات." : "This image appears in course cards and previews."}
                 </p>
               </div>
@@ -326,126 +327,108 @@ function BasicInfoForm({
                     {isRTL ? "نوع الكورس" : "Course Type"}
                   </h2>
                   <div className="flex gap-4">
-                    <label className="flex items-center gap-2">
-                      <input
-                        type="radio"
-                        name="courseType"
-                        value="paid"
-                        checked={formData.courseType === "paid"}
-                        onChange={handleChange}
-                        className="radio radio-primary"
-                      />
-                      <span>{isRTL ? "مدفوع" : "Paid"}</span>
-                    </label>
-                    <label className="flex items-center gap-2">
-                      <input
-                        type="radio"
-                        name="courseType"
-                        value="free"
-                        checked={formData.courseType === "free"}
-                        onChange={handleChange}
-                        className="radio radio-primary"
-                      />
-                      <span>{isRTL ? "مجاني" : "Free"}</span>
-                    </label>
+                    <Radio
+                      name="courseType"
+                      value="paid"
+                      checked={formData.courseType === "paid"}
+                      onChange={handleChange}
+                      label={isRTL ? "مدفوع" : "Paid"}
+                    />
+                    <Radio
+                      name="courseType"
+                      value="free"
+                      checked={formData.courseType === "free"}
+                      onChange={handleChange}
+                      label={isRTL ? "مجاني" : "Free"}
+                    />
                   </div>
-                  <p className="mt-2 text-xs text-base-content/60">
+                  <p className="mt-2 text-xs text-neutral/60">
                     {isRTL
                       ? "اختر مجانياً أو مدفوعاً. يمكن تعديل السعر قبل الإطلاق."
                       : "Choose free or paid. You can adjust the price before launch."}
                   </p>
                   {isPaidCourse && (
                     <div className="mt-3">
-                      <label className="block text-sm font-medium mb-1">
-                        {isRTL ? "سعر الكورس" : "Course Price"}
-                      </label>
-                      <input
+                      <Input
+                        label={isRTL ? "سعر الكورس" : "Course Price"}
                         type="number"
                         name="priceFull"
                         value={formData.priceFull}
                         onChange={handleChange}
                         placeholder={isRTL ? "أدخل سعر الكورس" : "Enter course price"}
-                        className={compactInput}
                         min="1"
                         required={isPaidCourse}
                       />
-                      <p className="mt-1 text-xs text-base-content/55">
+                      <p className="mt-1 text-xs text-neutral/55">
                         {isRTL
                           ? "سيتم استخدام هذا السعر للحاوية الرئيسية الأولى."
                           : "This price will be used for the first parent container."}
                       </p>
                     </div>
                   )}
-
-                  <div className="mt-4">
-                    <label className="label cursor-pointer justify-start gap-3 p-0 items-start">
-                      <input
-                        type="checkbox"
-                        name="sameGradeOnly"
-                        checked={formData.sameGradeOnly === true || formData.sameGradeOnly === "true"}
-                        onChange={(e) => handleChange({ target: { name: "sameGradeOnly", value: e.target.checked } })}
-                        className="toggle toggle-primary mt-0.5"
-                      />
-                      <div className="flex flex-col flex-1 min-w-0">
-                        <span className="label-text font-medium text-sm">
-                          {isRTL ? "تقييد الشراء لنفس المرحلة فقط" : "Restrict to same grade only"}
-                        </span>
-                        <span className="label-text-alt text-xs text-base-content/60 whitespace-normal">
-                          {isRTL
-                            ? "عند التفعيل، فقط الطلاب في نفس المرحلة يمكنهم شراء هذا الكورس"
-                            : "When enabled, only students in the same grade level can purchase this course"}
-                        </span>
+  
+                    <div className="mt-6 p-3 rounded-xl border transition-all duration-300" 
+                        style={{ 
+                          borderColor: (formData.sameGradeOnly === true || formData.sameGradeOnly === "true") 
+                            ? "rgba(20,106,120,0.3)" 
+                            : "rgba(20,106,120,0.14)", 
+                          background: (formData.sameGradeOnly === true || formData.sameGradeOnly === "true") 
+                            ? "rgba(188,231,236,0.3)" 
+                            : "rgba(188,231,236,0.12)" 
+                        }}>
+                      <div className="flex items-center gap-3 p-0">
+                        <Checkbox
+                          name="sameGradeOnly"
+                          checked={formData.sameGradeOnly === true || formData.sameGradeOnly === "true"}
+                          onChange={(e) => handleChange({ target: { name: "sameGradeOnly", value: e.target.checked } })}
+                        />
+                        <div className="flex flex-col flex-1 min-w-0">
+                          <span className="text-sm font-bold text-primary">
+                            {isRTL ? "تقييد الشراء لنفس المرحلة فقط" : "Restrict to same grade only"}
+                          </span>
+                          <span className="text-xs text-neutral/70 whitespace-normal leading-relaxed">
+                            {isRTL
+                              ? "عند التفعيل، يمكن فقط للطلاب وأولياء الأمور الذين لديهم أبناء في نفس المرحلة الدراسية شراء هذا الكورس"
+                              : "When enabled, only students and parents with children in the same grade level can purchase this course"}
+                          </span>
+                        </div>
                       </div>
-                    </label>
-                  </div>
+                    </div>
                   <div>
                     <h2 className="block text-primary text-base font-semibold mb-2">
                       {isRTL ? "خصوصية الكورس" : "Course Privacy"}
                     </h2>
                     <div className="flex flex-wrap gap-4">
-                      <label className="flex items-center gap-2">
-                        <input
-                          type="radio"
-                          name="privacy"
-                          value="student"
-                          checked={formData.privacy === "student"}
-                          onChange={handleChange}
-                          className="radio radio-primary"
-                        />
-                        <span>{isRTL ? "طالب / ولی امر" : "Student / Guardian"}</span>
-                      </label>
-                      <label className="flex items-center gap-2">
-                        <input
-                          type="radio"
-                          name="privacy"
-                          value="teacher"
-                          checked={formData.privacy === "teacher"}
-                          onChange={handleChange}
-                          className="radio radio-primary"
-                        />
-                        <span>{isRTL ? "المعلم" : "Teacher"}</span>
-                      </label>
+                      <Radio
+                        name="privacy"
+                        value="student"
+                        checked={formData.privacy === "student"}
+                        onChange={handleChange}
+                        label={isRTL ? "طالب / ولی امر" : "Student / Guardian"}
+                      />
+                      <Radio
+                        name="privacy"
+                        value="teacher"
+                        checked={formData.privacy === "teacher"}
+                        onChange={handleChange}
+                        label={isRTL ? "المعلم" : "Teacher"}
+                      />
                     </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-        <div className="flex justify-center mt-5">
-          <button
-            type="submit"
-            className="btn btn-primary rounded-full px-7 py-2 text-sm sm:text-base"
-            disabled={isSubmitting || (!isEditMode && courseStructure.parent)}
-          >
-            {isSubmitting ? (
-              <span className="loading loading-spinner"></span>
-            ) : !isEditMode && courseStructure.parent ? (
-              isRTL ? (
-                "تم حفظ أساسيات الكورس"
-              ) : (
-                "Course basics saved"
-              )
+          <div className="flex justify-center mt-5">
+            <Button
+              type="submit"
+              variant="primary"
+              className="rounded-full px-7 py-2 text-sm sm:text-base"
+              isDisabled={isSubmitting || (!isEditMode && courseStructure.parent)}
+              isLoading={isSubmitting}
+            >
+              {!isEditMode && courseStructure.parent ? (
+                isRTL ? "تم حفظ أساسيات الكورس" : "Course basics saved"
               ) : isEditMode ? (
                 isRTL ? "حفظ التعديلات" : "Save changes"
               ) : isRTL ? (
@@ -453,16 +436,20 @@ function BasicInfoForm({
               ) : (
                 "Save course basics"
               )}
-          </button>
+            </Button>
+          </div>
+          <p className="mt-2 text-xs text-center text-neutral/55">
+            {isRTL
+              ? "بعد الحفظ ستنتقل لإضافة السنوات والفصول والمحاضرات."
+              : "After saving, you can add years, terms, months, and lectures."}
+          </p>
         </div>
-        <p className="mt-2 text-xs text-center text-base-content/55">
-          {isRTL
-            ? "بعد الحفظ ستنتقل لإضافة السنوات والفصول والمحاضرات."
-            : "After saving, you can add years, terms, months, and lectures."}
-        </p>
       </motion.div>
-    </form>
+    </FormContainer>
   )
 }
+
+
+
 
 export default BasicInfoForm

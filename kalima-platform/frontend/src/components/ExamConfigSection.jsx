@@ -5,6 +5,9 @@ import { useTranslation } from "react-i18next"
 import { getExamConfigs, createExamConfig } from "../routes/examConfigs"
 import { translateErrorMessage } from "../utils/errorTranslator"
 import DSSelect from "./DSSelect"
+import Button from "./ui/Button"
+import Input from "./ui/Input"
+import Textarea from "./ui/Textarea"
 
 const ExamConfigSection = ({
   requiresExam,
@@ -181,7 +184,7 @@ const ExamConfigSection = ({
               )}
               <option value="new">{t("examConfig.createNew", `Create New ${configType.charAt(0).toUpperCase() + configType.slice(1)} Config`)}</option>
             </DSSelect>
-            {examConfigsLoading && <span className="loading loading-spinner"></span>}
+             {examConfigsLoading && <div className="w-4 h-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />}
           </div>
           {examConfigsError && <div className="text-error text-sm">{examConfigsError}</div>}
           {!hasExistingConfigs && !examConfigsError && !examConfigsLoading && (
@@ -192,24 +195,19 @@ const ExamConfigSection = ({
         </div>
       </div>
 
-      {isCreatingNewExamConfig ? (
-        <div className="space-y-4 mb-4 p-4 border border-base-300 rounded-lg">
-          <h4 className="font-medium">{t("examConfig.newConfiguration", `New ${configType.charAt(0).toUpperCase() + configType.slice(1)} Configuration`)}</h4>
+       {isCreatingNewExamConfig ? (
+         <div className="space-y-4 mb-4 p-4 border border-slate-200 rounded-lg">
+           <h4 className="font-medium">{t("examConfig.newConfiguration", `New ${configType.charAt(0).toUpperCase() + configType.slice(1)} Configuration`)}</h4>
 
-          <div className="form-control w-full">
-            <label className="label">
-              <span className="label-text">{t("fields.name", "Name")}</span>
-            </label>
-            <input
-              type="text"
-              placeholder={`Enter ${configType} config name`}
-              className="input input-bordered w-full"
-              value={newExamConfig.name}
-              onChange={(e) => handleInputChange("name", e.target.value)}
-              key={`name-input-${configType}`}
-              required
-            />
-          </div>
+           <Input 
+             label={t("fields.name", "Name")}
+             type="text"
+             placeholder={`Enter ${configType} config name`}
+             value={newExamConfig.name}
+             onChange={(e) => handleInputChange("name", e.target.value)}
+             key={`name-input-${configType}`}
+             required
+           />
 
           {/* Type selection */}
           <div className="form-control w-full">
@@ -231,180 +229,114 @@ const ExamConfigSection = ({
             </label>
           </div>
 
-          <div className="form-control w-full">
-            <label className="label">
-              <span className="label-text">{t("fields.description", "Description")}</span>
-            </label>
-            <textarea
-              placeholder="Enter description"
-              className="textarea textarea-bordered w-full"
-              value={newExamConfig.description}
-              onChange={(e) => handleInputChange("description", e.target.value)}
-              key={`description-textarea-${configType}`}
-              required
-            />
-          </div>
+           <Textarea 
+             label={t("fields.description", "Description")}
+             placeholder="Enter description"
+             value={newExamConfig.description}
+             onChange={(e) => handleInputChange("description", e.target.value)}
+             key={`description-textarea-${configType}`}
+             required
+           />
 
-          {hasFixedMasterSheetId ? (
-            <div className="form-control w-full">
-              <label className="label">
-                <span className="label-text">
-                  {t("examConfig.googleSheetId", "Google Sheet ID")}
-                </span>
-              </label>
-              <input
-                type="text"
-                className="input input-bordered w-full"
-                value={fixedMasterSheetId}
-                disabled
-                readOnly
-              />
-              <label className="label">
-                <span className="label-text-alt">
-                  {t(
-                    "examConfig.googleSheetFixedHelp",
-                    "Organization master sheet is preconfigured and used automatically."
-                  )}
-                </span>
-              </label>
-            </div>
-          ) : (
-            <div className="form-control w-full">
-              <label className="label">
-                <span className="label-text">{t("examConfig.googleSheetId", "Google Sheet ID")}</span>
-              </label>
-              <input
-                type="text"
-                placeholder="Eg : 1Iaosq_KHl7w6__oJB9nFnFr9QYiTDmSSKrWADszUcsM"
-                className="input input-bordered w-full"
-                value={newExamConfig.googleSheetId}
-                onChange={(e) => handleInputChange("googleSheetId", e.target.value)}
-                key={`sheet-id-input-${configType}`}
-                required
-              />
-              <label className="label">
-                <span className="label-text-alt">{t("examConfig.googleSheetHelp", "The ID from your Google Sheet URL")}</span>
-              </label>
-            </div>
+           {hasFixedMasterSheetId ? (
+             <Input 
+               label={t("examConfig.googleSheetId", "Google Sheet ID")}
+               type="text"
+               value={fixedMasterSheetId}
+               disabled
+               readOnly
+               helperText={t("examConfig.googleSheetFixedHelp", "Organization master sheet is preconfigured and used automatically.")}
+             />
+           ) : (
+             <Input 
+               label={t("examConfig.googleSheetId", "Google Sheet ID")}
+               type="text"
+               placeholder="Eg : 1Iaosq_KHl7w6__oJB9nFnFr9QYiTDmSSKrWADszUcsM"
+               value={newExamConfig.googleSheetId}
+               onChange={(e) => handleInputChange("googleSheetId", e.target.value)}
+               key={`sheet-id-input-${configType}`}
+               required
+               helperText={t("examConfig.googleSheetHelp", "The ID from your Google Sheet URL")}
+             />
           )}
 
-          <div className="form-control w-full">
-            <label className="label">
-              <span className="label-text">
-                {t("examConfig.googleSheetTabName", "Google Sheet Tab Name")}
-              </span>
-            </label>
-            <input
-              type="text"
-              placeholder="RAW_SUBMISSIONS"
-              className="input input-bordered w-full"
-              value={newExamConfig.googleSheetTabName}
-              onChange={(e) => handleInputChange("googleSheetTabName", e.target.value)}
-              key={`sheet-tab-input-${configType}`}
-            />
-            <label className="label">
-              <span className="label-text-alt">
-                {t(
-                  "examConfig.googleSheetTabHelp",
-                  "Defaults to RAW_SUBMISSIONS for master-sheet mode."
-                )}
-              </span>
-            </label>
-          </div>
+           <Input 
+             label={t("examConfig.googleSheetTabName", "Google Sheet Tab Name")}
+             type="text"
+             placeholder="RAW_SUBMISSIONS"
+             value={newExamConfig.googleSheetTabName}
+             onChange={(e) => handleInputChange("googleSheetTabName", e.target.value)}
+             key={`sheet-tab-input-${configType}`}
+             helperText={t("examConfig.googleSheetTabHelp", "Defaults to RAW_SUBMISSIONS for master-sheet mode.")}
+           />
 
-          <div className="form-control w-full">
-            <label className="label">
-              <span className="label-text">{t("examConfig.formUrl", "Form URL")}</span>
-            </label>
-            <input
-              type="url"
-              placeholder="Enter Google Form URL"
-              className="input input-bordered w-full"
-              value={newExamConfig.formUrl}
-              onChange={(e) => handleInputChange("formUrl", e.target.value)}
-              key={`form-url-input-${configType}`}
-              required
-            />
-          </div>
+           <Input 
+             label={t("examConfig.formUrl", "Form URL")}
+             type="url"
+             placeholder="Enter Google Form URL"
+             value={newExamConfig.formUrl}
+             onChange={(e) => handleInputChange("formUrl", e.target.value)}
+             key={`form-url-input-${configType}`}
+             required
+           />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="form-control w-full">
-              <label className="label">
-                <span className="label-text">{t("examConfig.studentIdentifierColumn", "Student Identifier Column")}</span>
-              </label>
-              <input
-                type="text"
-                placeholder="Column name"
-                className="input input-bordered w-full"
-                value={newExamConfig.studentIdentifierColumn}
-                onChange={(e) => handleInputChange("studentIdentifierColumn", e.target.value)}
-                key={`student-id-input-${configType}`}
-                required
-              />
-            </div>
+           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+             <Input 
+               label={t("examConfig.studentIdentifierColumn", "Student Identifier Column")}
+               type="text"
+               placeholder="Column name"
+               value={newExamConfig.studentIdentifierColumn}
+               onChange={(e) => handleInputChange("studentIdentifierColumn", e.target.value)}
+               key={`student-id-input-${configType}`}
+               required
+             />
+             <Input 
+               label={t("examConfig.scoreColumn", "Score Column")}
+               type="text"
+               placeholder="Column name"
+               value={newExamConfig.scoreColumn}
+               onChange={(e) => handleInputChange("scoreColumn", e.target.value)}
+               key={`score-column-input-${configType}`}
+               required
+             />
+           </div>
 
-            <div className="form-control w-full">
-              <label className="label">
-                <span className="label-text">{t("examConfig.scoreColumn", "Score Column")}</span>
-              </label>
-              <input
-                type="text"
-                placeholder="Column name"
-                className="input input-bordered w-full"
-                value={newExamConfig.scoreColumn}
-                onChange={(e) => handleInputChange("scoreColumn", e.target.value)}
-                key={`score-column-input-${configType}`}
-                required
-              />
-            </div>
-          </div>
+           <Input 
+             label={t("examConfig.defaultPassingThreshold", "Default Passing Threshold (%)")}
+             type="number"
+             placeholder="Enter threshold"
+             value={newExamConfig.defaultPassingThreshold}
+             onChange={(e) => handleInputChange("defaultPassingThreshold", Number(e.target.value))}
+             key={`threshold-input-${configType}`}
+             min="0"
+             max="100"
+             required
+           />
 
-          <div className="form-control w-full">
-            <label className="label">
-              <span className="label-text">{t("examConfig.defaultPassingThreshold", "Default Passing Threshold (%)")}</span>
-            </label>
-            <input
-              type="number"
-              placeholder="Enter threshold"
-              className="input input-bordered w-full"
-              value={newExamConfig.defaultPassingThreshold}
-              onChange={(e) => handleInputChange("defaultPassingThreshold", Number(e.target.value))}
-              key={`threshold-input-${configType}`}
-              min="0"
-              max="100"
-              required
-            />
-          </div>
-
-          <div className="flex justify-end mt-4">
-            <button
-              type="button"
-              className="btn btn-primary"
-              onClick={handleCreateExamConfig}
-              key={`create-button-${configType}`}
-            >
-              {t("examConfig.createButton", `Create ${configType.charAt(0).toUpperCase() + configType.slice(1)} Config`)}
-            </button>
-          </div>
+           <div className="flex justify-end mt-4">
+             <Button
+               type="button"
+               variant="primary"
+               onClick={handleCreateExamConfig}
+               key={`create-button-${configType}`}
+             >
+               {t("examConfig.createButton", `Create ${configType.charAt(0).toUpperCase() + configType.slice(1)} Config`)}
+             </Button>
+           </div>
         </div>
       ) : (
-        selectedExamConfigId && (
-          <div className="form-control w-full mb-4">
-            <label className="label">
-              <span className="label-text">{t("examConfig.passingThreshold", "Passing Threshold")}</span>
-            </label>
-            <input
-              type="number"
-              placeholder="Enter passing threshold"
-              className="input input-bordered w-full"
-              value={passingThreshold}
-              onChange={(e) => setPassingThreshold(Number(e.target.value))}
-              min="0"
-              max="100"
-              required
-            />
-          </div>
-        )
+         selectedExamConfigId && (
+           <Input 
+             label={t("examConfig.passingThreshold", "Passing Threshold")}
+             type="number"
+             placeholder="Enter passing threshold"
+             value={passingThreshold}
+             onChange={(e) => setPassingThreshold(Number(e.target.value))}
+             min="0"
+             max="100"
+             required
+           />
+         )
       )}
     </>
   )

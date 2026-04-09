@@ -73,7 +73,7 @@ export default function LecturerRevenue() {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-40">
-        <div className="loading loading-spinner loading-lg text-teal-600"></div>
+        <div className="w-10 h-10 border-4 border-slate-200 border-t-teal-600 rounded-full animate-spin"></div>
       </div>
     )
   }
@@ -81,11 +81,11 @@ export default function LecturerRevenue() {
   if (error) {
     return (
       <div className="text-center py-12 space-y-4">
-        <div className="mx-auto w-24 h-24 bg-base-200 rounded-full flex items-center justify-center">
+        <div className="mx-auto w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center">
           <BookOpen className="h-12 w-12 text-primary" />
         </div>
         <h3 className="text-xl font-bold">{t("revenue.errorLoadingRevenue")}</h3>
-        <p className="text-gray-500">{error}</p>
+        <p className="text-slate-600">{error}</p>
       </div>
     )
   }
@@ -95,7 +95,7 @@ export default function LecturerRevenue() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h2 className="text-2xl font-bold md:text-3xl" style={{ color: TOKENS.deepTeal }}>{t("revenue.lecturerRevenue")}</h2>
         <DSSelect
-          className="select select-bordered w-full sm:w-64 font-bold bg-white"
+          className="w-full sm:w-64 font-bold bg-white"
           style={{ 
             color: TOKENS.inkText,
             borderColor: "rgba(17,24,39,0.1)",

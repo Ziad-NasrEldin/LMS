@@ -12,6 +12,7 @@ import StepsIndicator from "./StepsIndicator"
 import NavigationButtons from "./NavigationButtons"
 import { Link, useNavigate } from "react-router-dom"
 import axios from "axios"
+import Button from "../../components/ui/Button"
 import { getAllLevels } from "../../routes/levels"
 import { buildLevelHierarchy } from "../../utils/levelHierarchy"
 import { designTokens } from "../../constants/designTokens"
@@ -683,16 +684,16 @@ export default function StudentRegistration() {
       <div className="pointer-events-none fixed inset-0 -z-10 opacity-45" style={{ background: GRADIENTS.pageAtmosphere }} />
       <div className="mx-auto mb-6 flex w-full max-w-6xl items-center justify-between">
         <h1 className="text-xl font-extrabold sm:text-2xl" style={{ color: TOKENS.deepTeal }}>Fekra</h1>
-        <p className="text-sm text-base-content/70">
-          {t("alreadyHaveAccount", "Already have an account?")} {" "}
-          <Link to="/login" className="btn btn-sm btn-ghost rounded-full font-bold text-primary">
-            {t("login", "Login")}
-          </Link>
-        </p>
+          <p className="text-sm text-slate-900/70">
+            {t("alreadyHaveAccount", "Already have an account?")} {" "}
+            <Link to="/login" className="inline-block rounded-full px-3 py-1 text-xs font-bold text-primary hover:bg-primary/10 transition-colors">
+              {t("login", "Login")}
+            </Link>
+          </p>
       </div>
 
       <div
-        className="mx-auto w-full max-w-6xl overflow-hidden rounded-[1.5rem] border bg-base-100"
+        className="mx-auto w-full max-w-6xl overflow-hidden rounded-[1.5rem] border bg-white"
         style={{
           borderColor: "rgba(17,24,39,0.08)",
           boxShadow: SHADOWS.level2,
@@ -700,7 +701,7 @@ export default function StudentRegistration() {
       >
         <div className="grid min-h-[auto] lg:min-h-[760px] lg:grid-cols-[1fr_1.2fr]">
           {/* Left Side - Dynamic: Hero on step 1, Form fields on other steps */}
-          <section className="relative overflow-hidden p-6 lg:p-8" style={{ background: GRADIENTS.appPanel }}>
+          <section className="relative overflow-hidden p-6 lg:p-8 bg-white" style={{ background: GRADIENTS.appPanel }}>
             <div className="absolute -left-12 top-6 h-48 w-48 rounded-full bg-secondary/20 blur-3xl" />
             <div className="absolute bottom-12 right-8 h-44 w-44 rounded-full bg-primary/15 blur-3xl" />
 
@@ -708,7 +709,7 @@ export default function StudentRegistration() {
               {currentStep === 1 ? (
                 /* Hero content on first step */
                 <>
-                  <h2 className="text-4xl font-black leading-[1.04] text-base-content xl:text-5xl">
+                   <h2 className="text-4xl font-black leading-[1.04] text-slate-900 xl:text-5xl">
                     {t("signupHeroStart", "Start your")}
                     <br />
                     <span style={{ color: TOKENS.deepTeal }}>{t("signupHeroMiddle", "learning")}</span>{" "}
@@ -725,7 +726,7 @@ export default function StudentRegistration() {
                 /* Form summary/progress on other steps */
                 <div className="flex flex-col h-full">
                   <div className="mb-6">
-                    <h3 className="text-2xl font-bold text-base-content">
+                     <h3 className="text-2xl font-bold text-slate-900">
                       {t("signupProgressTitle", "Creating your account")}
                     </h3>
                     <p className="text-sm mt-2" style={{ color: TOKENS.slateText }}>
@@ -737,19 +738,19 @@ export default function StudentRegistration() {
                   <div className="space-y-3 flex-1">
                     {formData.fullName && (
                       <div className="rounded-xl bg-white/60 p-3 border border-white/40">
-                        <p className="text-xs text-slate-500 uppercase tracking-wider">{t("form.fullName")}</p>
+                        <p className="text-xs uppercase tracking-wider text-slate-600">{t("form.fullName")}</p>
                         <p className="text-sm font-semibold text-slate-800">{formData.fullName}</p>
                       </div>
                     )}
                     {formData.email && (
                       <div className="rounded-xl bg-white/60 p-3 border border-white/40">
-                        <p className="text-xs text-slate-500 uppercase tracking-wider">{t("form.email")}</p>
+                        <p className="text-xs uppercase tracking-wider text-slate-600">{t("form.email")}</p>
                         <p className="text-sm font-semibold text-slate-800">{formData.email}</p>
                       </div>
                     )}
                     {formData.parentPhoneNumber && (
                       <div className="rounded-xl bg-white/60 p-3 border border-white/40">
-                        <p className="text-xs text-slate-500 uppercase tracking-wider">{t("form.parentPhone")}</p>
+                        <p className="text-xs uppercase tracking-wider text-slate-600">{t("form.parentPhone")}</p>
                         <p className="text-sm font-semibold text-slate-800">{formData.parentPhoneNumber}</p>
                       </div>
                     )}
@@ -787,14 +788,14 @@ export default function StudentRegistration() {
           </section>
 
           {/* Right Side - Form */}
-          <section className="flex flex-col p-4 sm:p-6 lg:p-8 bg-base-100">
+           <section className="flex flex-col p-4 sm:p-6 lg:p-8 bg-white">
             <div className="flex-1 overflow-hidden flex flex-col">
               {/* Header */}
               <div className="mb-4">
-                <h3 className="text-xl font-extrabold text-base-content sm:text-2xl">
+                 <h3 className="text-xl font-extrabold text-slate-900 sm:text-2xl">
                   {currentStep === 1 ? t("createAccount", "Create Account") : t("stepTitle", { step: currentStep })}
                 </h3>
-                <p className="mt-1 text-sm text-base-content/65">
+                 <p className="mt-1 text-sm text-slate-900/65">
                   {currentStep === 1 
                     ? t("createAccountSub", "Choose your role and fill in your details.")
                     : t("stepSubtitle", { step: currentStep, total: totalSteps[formData.role] })
@@ -805,63 +806,95 @@ export default function StudentRegistration() {
               {/* Role Selector - Only on step 1 */}
               {currentStep === 1 && (
                 <div className="mb-5">
-                  <p className="text-xs font-bold uppercase tracking-widest text-base-content/60 mb-2">
+                   <p className="text-xs font-bold uppercase tracking-widest text-slate-900/60 mb-2">
                     {t("iAmA", "I am a")}
                   </p>
                   <div className="grid grid-cols-3 gap-2">
-                    {["student", "parent", "teacher"].map((itemRole) => (
-                      <button
-                        key={itemRole}
-                        type="button"
-                        onClick={() => handleRoleSelect(itemRole)}
-                        className={`btn h-11 rounded-xl border-2 text-xs transition-all sm:h-12 sm:text-sm ${
-                          formData.role === itemRole
-                            ? "btn-primary border-transparent"
-                            : "bg-white border-[#0E5563]/30 text-[#0E5563] hover:bg-[#0E5563]/5"
-                        }`}
-                      >
-                        {t(`role.${itemRole}`, itemRole)}
-                      </button>
-                    ))}
+                     {["student", "parent", "teacher"].map((itemRole) => (
+                       <Button
+                         key={itemRole}
+                         type="button"
+                         onClick={() => handleRoleSelect(itemRole)}
+                         className={`h-11 rounded-xl border-2 text-xs transition-all sm:h-12 sm:text-sm ${
+                           formData.role === itemRole
+                             ? "border-transparent"
+                             : "bg-white border-[#0E5563]/30 text-[#0E5563] hover:bg-[#0E5563]/5"
+                         }`}
+                         variant={formData.role === itemRole ? "primary" : "outline"}
+                       >
+                         {t(`role.${itemRole}`, itemRole)}
+                       </Button>
+                     ))}
                   </div>
                 </div>
               )}
 
-              {apiError && (
-                <div className="alert alert-error mb-4 animate-fade-in" dir={isRTL ? "rtl" : "ltr"}>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <svg className="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                      </svg>
-                      <div>
-                        <h3 className="font-bold text-sm">{t("errors.errorTitle")}</h3>
-                        <p className="text-xs">{apiError}</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
+               {apiError && (
+      <div className="mb-4 rounded-2xl border border-error/30 bg-error/10 px-4 py-3 text-sm text-[#991B1B] shadow-sm flex items-center gap-3 animate-fade-in" dir={isRTL ? "rtl" : "ltr"}>
+                   <div className="flex-1">
+                     <div className="flex items-center gap-2">
+                       <svg className="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                       </svg>
+                       <div>
+                         <h3 className="font-bold text-sm">{t("errors.errorTitle")}</h3>
+                         <p className="text-xs">{apiError}</p>
+                       </div>
+                     </div>
+                   </div>
+                 </div>
+               )}
 
               {/* Form Content - Full height scrollable */}
               <div className="flex-1 overflow-y-auto custom-scrollbar pr-2">
                 {renderStepContent()}
               </div>
 
-              {/* Navigation */}
-              <div className="mt-4 pt-4 border-t border-base-200">
-                <NavigationButtons
-                  currentStep={currentStep}
-                  handlePrev={() => setCurrentStep((prev) => prev - 1)}
-                  handleNext={handleNext}
-                  t={t}
-                  isRTL={isRTL}
-                  totalSteps={totalSteps}
-                  role={formData.role}
-                />
-              </div>
+{/* Navigation */}
+                <div className="mt-4 pt-4 border-t border-slate-200" style={{minHeight: '60px'}}>
+                  <div className="flex items-center justify-between gap-3 w-full">
+                    <button
+                      onClick={() => setCurrentStep((prev) => prev - 1)}
+                      disabled={currentStep === 1}
+                      type="button"
+                      style={{
+                        height: '40px',
+                        paddingLeft: '24px',
+                        paddingRight: '24px',
+                        fontSize: '14px',
+                        fontWeight: 600,
+                        borderRadius: '8px',
+                        border: '2px solid #64748b',
+                        backgroundColor: 'white',
+                        color: '#334155',
+                        cursor: currentStep === 1 ? 'not-allowed' : 'pointer',
+                        opacity: currentStep === 1 ? 0.5 : 1,
+                      }}
+                    >
+                      {t('buttons.previous')}
+                    </button>
+                    <button
+                      onClick={handleNext}
+                      type="button"
+                      style={{
+                        height: '40px',
+                        paddingLeft: '24px',
+                        paddingRight: '24px',
+                        fontSize: '14px',
+                        fontWeight: 600,
+                        borderRadius: '8px',
+                        border: 'none',
+                        backgroundColor: '#0E5563',
+                        color: 'white',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      {currentStep === totalSteps[formData.role] ? t('buttons.submit') : t('buttons.next')}
+                    </button>
+                  </div>
+                </div>
 
-              <div className="mt-3">
+              <div className="mt-3 mb-4">
                 <StepsIndicator currentStep={currentStep} t={t} role={formData.role} />
               </div>
             </div>

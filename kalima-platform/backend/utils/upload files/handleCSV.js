@@ -9,19 +9,34 @@ const handleCSV = async (fileBuffer, accountType, res, next) => {
     readableStream
       .pipe(csv())
       .on("data", (data) => {
-        const name = data.name?.trim();
-        const phoneNumber = data.phoneNumber?.trim();
-        if (!name || !phoneNumber) return;
-        results.push({
-          name,
-          phoneNumber,
-          email: `${name.replace(/\s+/g, "")}${phoneNumber.slice(
-            -4
-          )}@gmail.com`,
-          gender: "not determined",
-          password: phoneNumber,
-          role: accountType.charAt(0).toUpperCase() + accountType.slice(1),
-        });
+        // Extract fields and trim them
+        const user = {
+          name: data.name?.trim(),
+          phoneNumber: data.phoneNumber?.trim(),
+          parentPhoneNumber: data.parentPhoneNumber?.trim(),
+          parentPhoneRelation: data.parentPhoneRelation?.trim(),
+          stage: data.stage?.trim(),
+          level: data.level?.trim(),
+          gender: data.gender?.trim() || "not determined",
+          password: data.password?.trim(),
+          government: data.government?.trim(),
+          administrationZone: data.administrationZone?.trim(),
+          profession: data.profession?.trim(),
+          subject: data.subject?.trim(),
+        };
+
+        // Minimum required check: name and phoneNumber are essential for most roles
+        if (!user.name || !user.phoneNumber) return;
+
+        // Generate email if not provided in CSV
+        if (!data.email) {
+          user.email = `${user.name.replace(/\s+/g, "").toLowerCase()}${user.phoneNumber.slice(-4)}@gmail.com`;
+        } else {
+          user.email = data.email.trim().toLowerCase();
+        }
+
+        user.role = accountType.charAt(0).toUpperCase() + accountType.slice(1);
+        results.push(user);
       })
       .on("end", resolve)
       .on("error", reject);

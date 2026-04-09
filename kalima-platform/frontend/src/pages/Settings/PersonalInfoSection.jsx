@@ -9,6 +9,9 @@ import { Check, X, Camera, Upload, Pencil } from "lucide-react"
 import { resolveProfileImageUrl } from "../../utils/profileImage"
 import { designTokens } from "../../constants/designTokens"
 import DSSelect from "../../components/DSSelect"
+import Button from "../../components/ui/Button"
+import Input from "../../components/ui/Input"
+import Badge from "../../components/ui/Badge"
 
 const SIGNUP_HOBBY_OPTIONS = [
   "math",
@@ -549,12 +552,12 @@ function PersonalInfoSection() {
           }}
         >
           <div>
-            <div className="alert alert-error">
-              <span>{error}</span>
-              <button className="btn btn-sm btn-outline" onClick={() => window.location.reload()}>
-                {t("retry")}
-              </button>
-            </div>
+             <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 shadow-sm flex items-center gap-3">
+               <span>{error}</span>
+               <Button variant="outline" size="sm" onClick={() => window.location.reload()}>
+                 {t("retry")}
+               </Button>
+             </div>
           </div>
         </div>
       </section>
@@ -659,13 +662,15 @@ function PersonalInfoSection() {
 
               {/* Camera icon overlay for upload */}
               {!formData.profilePic && (
-                <label
-                  htmlFor="profilePicInput"
-                  className="absolute bottom-0 right-0 btn btn-circle btn-sm btn-primary cursor-pointer"
-                  title={t("personalInfo.uploadProfilePic")}
-                >
-                  <Camera className="w-4 h-4" />
-                </label>
+                   <Button
+                     type="button"
+                     variant="ghost"
+                     size="sm"
+                     className="absolute bottom-0 right-0 rounded-full p-2 cursor-pointer"
+                     title={t("personalInfo.uploadProfilePic")}
+                   >
+                     <Camera className="w-4 h-4" />
+                   </Button>
               )}
             </div>
 
@@ -685,22 +690,25 @@ function PersonalInfoSection() {
                   {t("personalInfo.selectedFile")} {formData.profilePic.name}
                 </div>
                 <div className="flex gap-2">
-                  <button
-                    className={`btn btn-primary btn-sm ${profilePicUploading ? "loading" : ""}`}
-                    onClick={handleProfilePicUpload}
-                    disabled={profilePicUploading}
-                  >
-                    {!profilePicUploading && <Upload className="w-4 h-4" />}
-                    {t("personalInfo.uploadButton")}
-                  </button>
-                  <button
-                    className="btn btn-outline btn-sm"
-                    onClick={cancelProfilePicUpload}
-                    disabled={profilePicUploading}
-                  >
-                    <X className="w-4 h-4" />
-                    {t("personalInfo.cancelButton")}
-                  </button>
+                      <Button
+                        isLoading={profilePicUploading}
+                        onClick={handleProfilePicUpload}
+                        variant="primary"
+                        size="sm"
+                      >
+                        {!profilePicUploading && <Upload className="w-4 h-4" />}
+                        {t("personalInfo.uploadButton")}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={cancelProfilePicUpload}
+                        isDisabled={profilePicUploading}
+                      >
+                        <X className="w-4 h-4" />
+                        {t("personalInfo.cancelButton")}
+                      </Button>
+
                 </div>
               </div>
             )}
@@ -717,42 +725,55 @@ function PersonalInfoSection() {
 
             {/* Upload hint for users without profile picture */}
             {!hasProfilePic && !formData.profilePic && (
-              <div className="mt-2 text-sm text-gray-500 text-center">
+              <div className="mt-2 text-center text-sm text-slate-600">
                 {t("personalInfo.noProfilePicHint")}
               </div>
             )}
           </div>
 
           {/* User Role Badge */}
-          <div className="mb-4 flex justify-end">
-            <div className="badge badge-primary badge-lg">
-              {t(`role.${userData?.role?.toLowerCase()}`, { ns: "common" })}
-            </div>
-          </div>
+           <div className="mb-4 flex justify-end">
+              <Badge variant="primary" size="lg">
+                {t(`role.${userData?.role?.toLowerCase()}`, { ns: "common" })}
+              </Badge>
+           </div>
+
 
           {!isRestrictedSettingsRole && (
             <div className={`mb-4 flex gap-2 ${isRTL ? "justify-start" : "justify-end"}`}>
-              {!isEditing ? (
-                <button className="btn btn-sm btn-outline" onClick={startEditing}>
-                  <Pencil className="h-4 w-4" />
-                  {personalInfo.buttons.edit}
-                </button>
-              ) : (
-                <>
-                  <button
-                    className={`btn btn-sm btn-primary ${updateStatus.loading ? "loading" : ""}`}
-                    onClick={handleSaveAll}
-                    disabled={updateStatus.loading || !!emailError}
+               {!isEditing ? (
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={startEditing}
                   >
-                    {!updateStatus.loading && <Check className="h-4 w-4" />}
-                    {t("save")}
-                  </button>
-                  <button className="btn btn-sm btn-outline" onClick={cancelEditing} disabled={updateStatus.loading}>
-                    <X className="h-4 w-4" />
-                    {t("cancel")}
-                  </button>
-                </>
-              )}
+                    <Pencil className="h-4 w-4" />
+                    {personalInfo.buttons.edit}
+                  </Button>
+               ) : (
+                 <>
+                    <Button
+                      isLoading={updateStatus.loading}
+                      onClick={handleSaveAll}
+                      isDisabled={updateStatus.loading || !!emailError}
+                      variant="primary"
+                      size="sm"
+                    >
+                      {!updateStatus.loading && <Check className="h-4 w-4" />}
+                      {t("save")}
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={cancelEditing} 
+                      isDisabled={updateStatus.loading}
+                    >
+                      <X className="h-4 w-4" />
+                      {t("cancel")}
+                    </Button>
+                 </>
+               )}
+
             </div>
           )}
 
@@ -768,16 +789,16 @@ function PersonalInfoSection() {
               </span>
             </label>
             <div className="w-full">
-              <input
-                type="text"
-                name="fullName"
-                value={isEditing ? formData.fullName : userData?.name || ""}
-                onChange={handleInputChange}
-                placeholder={personalInfo.placeholders.fullName}
-                className={`input input-bordered w-full max-w-2xl ${isRTL ? "text-right" : "text-left"}`}
-                dir={isRTL ? "rtl" : "ltr"}
-                readOnly={!isEditing || isRestrictedSettingsRole}
-              />
+               <Input
+                 type="text"
+                 name="fullName"
+                 value={isEditing ? formData.fullName : userData?.name || ""}
+                 onChange={handleInputChange}
+                 placeholder={personalInfo.placeholders.fullName}
+                 className={`w-full max-w-2xl ${isRTL ? "text-right" : "text-left"}`}
+                 dir={isRTL ? "rtl" : "ltr"}
+                 readOnly={!isEditing || isRestrictedSettingsRole}
+               />
             </div>
           </div>
 
@@ -790,16 +811,16 @@ function PersonalInfoSection() {
               </span>
             </label>
             <div className="w-full">
-              <input
-                type="text"
-                name="phoneNumber"
-                value={isEditing ? formData.phoneNumber : userData?.phoneNumber || ""}
-                onChange={handleInputChange}
-                placeholder={personalInfo.placeholders.phoneNumber}
-                className={`input input-bordered w-full max-w-2xl ${isRTL ? "text-right" : "text-left"}`}
-                dir={isRTL ? "rtl" : "ltr"}
-                readOnly={!isEditing || isRestrictedSettingsRole}
-              />
+               <Input
+                 type="text"
+                 name="phoneNumber"
+                 value={isEditing ? formData.phoneNumber : userData?.phoneNumber || ""}
+                 onChange={handleInputChange}
+                 placeholder={personalInfo.placeholders.phoneNumber}
+                 className={`w-full max-w-2xl ${isRTL ? "text-right" : "text-left"}`}
+                 dir={isRTL ? "rtl" : "ltr"}
+                 readOnly={!isEditing || isRestrictedSettingsRole}
+               />
             </div>
           </div>
 
@@ -812,16 +833,16 @@ function PersonalInfoSection() {
               </span>
             </label>
             <div className="w-full">
-              <input
-                type="email"
-                name="email"
-                value={isEditing ? formData.email : userData?.email || ""}
-                onChange={handleInputChange}
-                placeholder={personalInfo.placeholders.email}
-                className={`input input-bordered w-full max-w-2xl ${isRTL ? "text-right" : "text-left"} ${emailError && isEditing ? "input-error animate-shake" : ""}`}
-                dir={isRTL ? "rtl" : "ltr"}
-                readOnly={!isEditing || isRestrictedSettingsRole}
-              />
+               <Input
+                 type="email"
+                 name="email"
+                 value={isEditing ? formData.email : userData?.email || ""}
+                 onChange={handleInputChange}
+                 placeholder={personalInfo.placeholders.email}
+                 className={`w-full max-w-2xl ${isRTL ? "text-right" : "text-left"} ${emailError && isEditing ? "border-error animate-shake" : ""}`}
+                 dir={isRTL ? "rtl" : "ltr"}
+                 readOnly={!isEditing || isRestrictedSettingsRole}
+               />
             </div>
             {emailError && isEditing && <div className="mt-2 text-error text-sm">{emailError}</div>}
           </div>
@@ -869,50 +890,59 @@ function PersonalInfoSection() {
                           dir={isRTL ? "rtl" : "ltr"}
                         />
 
-                        <button
-                          type="button"
-                          className="btn btn-outline btn-square"
-                          onClick={() => removeSocialMediaEntry(index)}
-                          title={t("remove")}
-                        >
-                          <X className="h-4 w-4" />
-                        </button>
-                      </div>
-                    ))}
+                           <Button
+                             type="button"
+                             variant="outline"
+                             size="sm"
+                             className="aspect-square p-0"
+                             onClick={removeSocialMediaEntry}
+                             title={t("remove")}
+                           >
+                             <X className="h-4 w-4" />
+                           </Button>
+                         </div>
+                       ))}
+ 
+                      <Button 
+                        type="button" 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={addSocialMediaEntry}
+                      >
+                        {personalInfo.buttons?.addSocialMedia || personalInfo.buttons?.add}
+                      </Button>
 
-                    <button type="button" className="btn btn-outline btn-sm" onClick={addSocialMediaEntry}>
-                      {personalInfo.buttons?.addSocialMedia || personalInfo.buttons?.add}
-                    </button>
                   </div>
                 ) : lecturerSavedSocialMedia.length > 0 ? (
                   <div className="space-y-2">
                     {lecturerSavedSocialMedia.map((social, index) => {
                       const href = resolveSocialMediaPreviewUrl(social.platform, social.account)
 
-                      if (!href) {
-                        return (
-                          <div
-                            key={`${social.platform}-${index}`}
-                            className="flex items-center justify-between gap-2 rounded-xl border border-base-300 bg-base-100 px-3 py-2 text-sm"
-                          >
-                            <span className="font-semibold">{social.platform}</span>
-                            <span className="truncate text-base-content/75">{social.account}</span>
-                          </div>
-                        )
-                      }
+                       if (!href) {
+                         return (
+                           <div
+                             key={`${social.platform}-${index}`}
+                             className="flex items-center justify-between gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm"
+                           >
+                             <span className="font-semibold">{social.platform}</span>
+                             <span className="truncate text-slate-900/75">{social.account}</span>
+                           </div>
+                         )
+                       }
+ 
+                       return (
+                         <a
+                           key={`${social.platform}-${index}`}
+                           href={href}
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           className="flex items-center justify-between gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm hover:bg-slate-50 transition-colors"
+                         >
+                           <span className="font-semibold">{social.platform}</span>
+                           <span className="truncate text-slate-900/75">{social.account}</span>
+                         </a>
+                       )
 
-                      return (
-                        <a
-                          key={`${social.platform}-${index}`}
-                          href={href}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center justify-between gap-2 rounded-xl border border-base-300 bg-base-100 px-3 py-2 text-sm hover:bg-base-200 transition-colors"
-                        >
-                          <span className="font-semibold">{social.platform}</span>
-                          <span className="truncate text-base-content/75">{social.account}</span>
-                        </a>
-                      )
                     })}
                   </div>
                 ) : (
@@ -954,13 +984,13 @@ function PersonalInfoSection() {
 
               <div className="w-full">
                 {isEditing ? (
-                  <DSSelect
-                    name="hobby"
-                    value={formData.hobby || ""}
-                    onChange={handleInputChange}
-                    className={`select select-bordered w-full max-w-2xl ${isRTL ? "text-right" : "text-left"}`}
-                    dir={isRTL ? "rtl" : "ltr"}
-                  >
+                   <DSSelect
+                     name="hobby"
+                     value={formData.hobby || ""}
+                     onChange={handleInputChange}
+                     className={`border border-slate-200 w-full max-w-2xl ${isRTL ? "text-right" : "text-left"}`}
+                     dir={isRTL ? "rtl" : "ltr"}
+                   >
                     <option value="">{personalInfo.placeholders?.hobby}</option>
                     {studentHobbyOptions.map((option) => (
                       <option key={option} value={option}>
@@ -969,13 +999,13 @@ function PersonalInfoSection() {
                     ))}
                   </DSSelect>
                 ) : (
-                  <input
-                    type="text"
-                    value={studentHobbyLabel}
-                    className={`input input-bordered w-full max-w-2xl ${isRTL ? "text-right" : "text-left"}`}
-                    dir={isRTL ? "rtl" : "ltr"}
-                    readOnly
-                  />
+                   <input
+                     type="text"
+                     value={studentHobbyLabel}
+                     className={`border border-slate-200 w-full max-w-2xl ${isRTL ? "text-right" : "text-left"}`}
+                     dir={isRTL ? "rtl" : "ltr"}
+                     readOnly
+                   />
                 )}
               </div>
             </div>
@@ -987,13 +1017,13 @@ function PersonalInfoSection() {
                 <span className={`label-text ${isRTL ? "text-left" : "text-left"}`}>{personalInfo.labels.level}</span>
               </label>
               <div className="w-full">
-                <input
-                  type="text"
-                  value={studentLevelLabel}
-                  className={`input input-bordered w-full max-w-2xl ${isRTL ? "text-right" : "text-left"}`}
-                  dir={isRTL ? "rtl" : "ltr"}
-                  readOnly
-                />
+                   <input
+                     type="text"
+                     value={studentLevelLabel}
+                     className={`border border-slate-200 w-full max-w-2xl ${isRTL ? "text-right" : "text-left"}`}
+                     dir={isRTL ? "rtl" : "ltr"}
+                     readOnly
+                   />
               </div>
             </div>
           )}
@@ -1001,14 +1031,14 @@ function PersonalInfoSection() {
           {/* Balance display for students */}
           {isStudentRole && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-              <div className="stat rounded-box" style={{ background: TOKENS.neutralCloud }}>
-                <div className="stat-title">{personalInfo.labels.generalPoints}</div>
-                <div className="stat-value">{userData.generalPoints || 0}</div>
-              </div>
-              <div className="stat rounded-box" style={{ background: TOKENS.neutralCloud }}>
-                <div className="stat-title">{personalInfo.labels.totalPoints}</div>
-                <div className="stat-value">{userData.totalPoints || 0}</div>
-              </div>
+               <div className="rounded-2xl p-4" style={{ background: TOKENS.neutralCloud }}>
+                <div className="text-xs font-semibold text-slate-700">{personalInfo.labels.generalPoints}</div>
+                 <div className="text-2xl font-bold">{userData.generalPoints || 0}</div>
+               </div>
+               <div className="rounded-2xl p-4" style={{ background: TOKENS.neutralCloud }}>
+                <div className="text-xs font-semibold text-slate-700">{personalInfo.labels.totalPoints}</div>
+                 <div className="text-2xl font-bold">{userData.totalPoints || 0}</div>
+               </div>
             </div>
           )}
         </div>

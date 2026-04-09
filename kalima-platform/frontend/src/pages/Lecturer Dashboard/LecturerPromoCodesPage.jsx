@@ -5,6 +5,8 @@ import { Link } from "react-router-dom";
 import { getLecturerAnalytics } from "../../routes/lectures";
 import { designTokens } from "../../constants/designTokens";
 import { translateErrorMessage } from "../../utils/errorTranslator";
+import Button from "../../components/ui/Button";
+import Input from "../../components/ui/Input";
 
 const formatNumber = (value, locale) => new Intl.NumberFormat(locale || "en").format(Number(value || 0));
 
@@ -87,135 +89,144 @@ export default function LecturerPromoCodesPage() {
     >
       <div className="transition-all duration-300 ease-in-out pt-14">
         <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 md:px-8 lg:px-10 space-y-6">
-          <section className="rounded-[1.5rem] border border-base-300 bg-base-100 p-5 md:p-6">
+          <section className="rounded-[1.5rem] border border-slate-200 bg-white p-5 md:p-6">
             <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
               <div>
                 <h1 className="text-2xl md:text-3xl font-black text-primary">
                   {t("promoCodesFullPageTitle", { defaultValue: isRTL ? "كل أكواد الشحن" : "All Promo Codes" })}
                 </h1>
-                <p className="text-sm opacity-70 mt-1">
+          <p className="mt-1 text-sm text-slate-700">
                   {t("promoCodesFullPageHint", {
                     defaultValue: isRTL ? "قائمة كاملة بكل أكواد الشحن وتفاصيل الحالة." : "Full list of promo codes with status details.",
                   })}
                 </p>
               </div>
-              <Link to="/dashboard/lecturer-dashboard" className="btn btn-outline rounded-xl">
+              <Button as={Link} to="/dashboard/lecturer-dashboard" variant="outline" className="rounded-xl">
                 <ArrowLeft className="w-4 h-4" />
                 {t("backToDashboard", { defaultValue: isRTL ? "العودة للوحة التحكم" : "Back to dashboard" })}
-              </Link>
+              </Button>
             </div>
 
             <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <input
-                type="text"
-                value={query}
-                onChange={(event) => setQuery(event.target.value)}
-                placeholder={t("searchPromoCodes", { defaultValue: isRTL ? "ابحث بالكود..." : "Search by code..." })}
-                className="input input-bordered w-full sm:max-w-sm"
-              />
-              <label className="flex items-center gap-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  className="toggle toggle-warning toggle-sm"
-                  checked={forceDemoData}
-                  onChange={(event) => setForceDemoData(event.target.checked)}
-                />
-                <span className="text-sm font-semibold">
-                  {t("showDemoData", { defaultValue: isRTL ? "عرض بيانات تجريبية" : "Show demo data" })}
-                </span>
-              </label>
+               <Input
+                 type="text"
+                 value={query}
+                 onChange={(event) => setQuery(event.target.value)}
+                 placeholder={t("searchPromoCodes", { defaultValue: isRTL ? "ابحث بالكود..." : "Search by code..." })}
+                 className="w-full sm:max-w-sm"
+               />
+               <label className="flex items-center gap-3 cursor-pointer">
+                 <input
+                   type="checkbox"
+                   className="w-4 h-4 accent-warning"
+                   checked={forceDemoData}
+                   onChange={(event) => setForceDemoData(event.target.checked)}
+                 />
+                 <span className="text-sm font-semibold">
+                   {t("showDemoData", { defaultValue: isRTL ? "عرض بيانات تجريبية" : "Show demo data" })}
+                 </span>
+               </label>
+
             </div>
           </section>
 
-          {error ? (
-            <div className="alert alert-warning rounded-xl">
-              <AlertCircle className="w-5 h-5" />
-              <span>{error}</span>
-            </div>
-          ) : null}
+           {error ? (
+             <div className="flex items-center gap-3 p-4 mb-6 bg-yellow-50 border border-yellow-200 text-yellow-800 rounded-xl">
+               <AlertCircle className="w-5 h-5" />
+               <span>{error}</span>
+             </div>
+           ) : null}
 
-          <section className="rounded-[1.5rem] border border-base-300 bg-base-100 overflow-hidden">
-            {usesPlaceholder ? (
-              <div className="px-4 py-2 text-xs font-semibold text-warning border-b border-base-300 bg-base-100">
-                {t("sampleDataNotice", {
-                  defaultValue: isRTL ? "بيانات تجريبية للعرض فقط حتى تتوفر بيانات حقيقية." : "Sample data for preview only until real analytics are available.",
-                })}
-              </div>
-            ) : null}
 
-            {loading ? (
-              <div className="p-6 flex justify-center">
-                <span className="loading loading-spinner loading-lg text-primary"></span>
-              </div>
-            ) : paginatedCodes.length ? (
-              <div className="overflow-x-auto">
-                <table className="table">
-                  <thead>
-                    <tr>
-                      <th>{t("promoCodes", { defaultValue: isRTL ? "أكواد الشحن" : "Promo Codes" })}</th>
-                      <th>{t("amount", { defaultValue: isRTL ? "القيمة" : "Amount" })}</th>
-                      <th>{t("status", { defaultValue: isRTL ? "الحالة" : "Status" })}</th>
-                      <th>{t("createdAt", { defaultValue: isRTL ? "تاريخ الإنشاء" : "Created at" })}</th>
-                      <th>{t("redeemedAt", { defaultValue: isRTL ? "تاريخ الاستخدام" : "Redeemed at" })}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {paginatedCodes.map((code) => (
-                      <tr key={code.id}>
-                        <td className="font-semibold tracking-widest">
-                          <div className="flex items-center gap-2">
-                            <Ticket className="w-4 h-4 text-primary" />
-                            {code.code}
-                          </div>
-                        </td>
-                        <td>
-                          {formatNumber(code.pointsAmount, i18n.language)} {t("currency", { defaultValue: isRTL ? "جنيه" : "EGP" })}
-                        </td>
-                        <td>
-                          {code.isRedeemed
-                            ? t("redeemed", { defaultValue: isRTL ? "مستخدم" : "Redeemed" })
-                            : t("available", { defaultValue: isRTL ? "متاح" : "Available" })}
-                        </td>
-                        <td>{new Date(code.createdAt || Date.now()).toLocaleDateString(i18n.language)}</td>
-                        <td>{code.redeemedAt ? new Date(code.redeemedAt).toLocaleDateString(i18n.language) : "-"}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+           <section className="rounded-[1.5rem] border border-slate-200 bg-white overflow-hidden">
+             {usesPlaceholder ? (
+               <div className="px-4 py-2 text-xs font-semibold text-warning border-b border-slate-200 bg-white">
+                 {t("sampleDataNotice", {
+                   defaultValue: isRTL ? "بيانات تجريبية للعرض فقط حتى تتوفر بيانات حقيقية." : "Sample data for preview only until real analytics are available.",
+                 })}
+               </div>
+             ) : null}
+                         
+             {loading ? (
+               <div className="p-6 flex justify-center">
+                 <div className="w-10 h-10 border-4 border-slate-200 border-t-primary rounded-full animate-spin"></div>
+               </div>
+             ) : paginatedCodes.length ? (
+
+               <div className="overflow-x-auto">
+                 <table className="w-full text-left border-collapse">
+                   <thead>
+                     <tr className="border-b border-slate-200 bg-slate-50">
+                       <th className="p-3 font-semibold text-slate-700">{t("promoCodes", { defaultValue: isRTL ? "أكواد الشحن" : "Promo Codes" })}</th>
+                       <th className="p-3 font-semibold text-slate-700">{t("amount", { defaultValue: isRTL ? "القيمة" : "Amount" })}</th>
+                       <th className="p-3 font-semibold text-slate-700">{t("status", { defaultValue: isRTL ? "الحالة" : "Status" })}</th>
+                       <th className="p-3 font-semibold text-slate-700">{t("createdAt", { defaultValue: isRTL ? "تاريخ الإنشاء" : "Created at" })}</th>
+                       <th className="p-3 font-semibold text-slate-700">{t("redeemedAt", { defaultValue: isRTL ? "تاريخ الاستخدام" : "Redeemed at" })}</th>
+                     </tr>
+                   </thead>
+                   <tbody>
+                     {paginatedCodes.map((code) => (
+                       <tr key={code.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
+                         <td className="p-3 font-semibold tracking-widest">
+                           <div className="flex items-center gap-2">
+                             <Ticket className="w-4 h-4 text-primary" />
+                             {code.code}
+                           </div>
+                         </td>
+                         <td className="p-3">
+                           {formatNumber(code.pointsAmount, i18n.language)} {t("currency", { defaultValue: isRTL ? "جنيه" : "EGP" })}
+                         </td>
+                         <td className="p-3">
+                           {code.isRedeemed
+                             ? t("redeemed", { defaultValue: isRTL ? "مستخدم" : "Redeemed" })
+                             : t("available", { defaultValue: isRTL ? "متاح" : "Available" })}
+                         </td>
+                         <td className="p-3">{new Date(code.createdAt || Date.now()).toLocaleDateString(i18n.language)}</td>
+                         <td className="p-3">{code.redeemedAt ? new Date(code.redeemedAt).toLocaleDateString(i18n.language) : "-"}</td>
+                       </tr>
+                     ))}
+                   </tbody>
+                 </table>
+               </div>
+
             ) : (
-              <div className="p-6 text-sm opacity-70">
+              <div className="p-6 text-sm text-slate-600">
                 {t("noPromoCodes", { defaultValue: isRTL ? "لا توجد أكواد شحن بعد." : "No promo codes yet." })}
               </div>
             )}
 
-            {filteredCodes.length > PAGE_SIZE ? (
-              <div className="border-t border-base-300 px-4 py-3 flex items-center justify-between gap-3">
-                <button
-                  type="button"
-                  className="btn btn-sm btn-outline rounded-lg"
-                  onClick={() => setPage((prev) => Math.max(1, prev - 1))}
-                  disabled={page === 1}
-                >
-                  {t("previous", { defaultValue: isRTL ? "السابق" : "Previous" })}
-                </button>
-                <span className="text-xs opacity-70">
-                  {t("pageOf", {
-                    current: page,
-                    total: totalPages,
-                    defaultValue: isRTL ? "صفحة {{current}} من {{total}}" : "Page {{current}} of {{total}}",
-                  })}
-                </span>
-                <button
-                  type="button"
-                  className="btn btn-sm btn-outline rounded-lg"
-                  onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
-                  disabled={page === totalPages}
-                >
-                  {t("next", { defaultValue: isRTL ? "التالي" : "Next" })}
-                </button>
-              </div>
-            ) : null}
+             {filteredCodes.length > PAGE_SIZE ? (
+               <div className="border-t border-slate-200 px-4 py-3 flex items-center justify-between gap-3">
+                 <Button
+                   type="button"
+                   variant="outline"
+                   size="sm"
+                   className="rounded-lg"
+                   onClick={() => setPage((prev) => Math.max(1, prev - 1))}
+                   disabled={page === 1}
+                 >
+                   {t("previous", { defaultValue: isRTL ? "السابق" : "Previous" })}
+                 </Button>
+                <span className="text-xs text-slate-600">
+                   {t("pageOf", {
+                     current: page,
+                     total: totalPages,
+                     defaultValue: isRTL ? "صفحة {{current}} من {{total}}" : "Page {{current}} of {{total}}",
+                   })}
+                 </span>
+                 <Button
+                   type="button"
+                   variant="outline"
+                   size="sm"
+                   className="rounded-lg"
+                   onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
+                   disabled={page === totalPages}
+                 >
+                   {t("next", { defaultValue: isRTL ? "التالي" : "Next" })}
+                 </Button>
+               </div>
+             ) : null}
+
           </section>
         </div>
       </div>

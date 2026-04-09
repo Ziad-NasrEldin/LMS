@@ -4,6 +4,7 @@ import { FileText, Clock, Star } from "lucide-react";
 import { useTranslation } from 'react-i18next';
 import { designTokens } from "../constants/designTokens";
 import { buildTeacherPath } from "../seo/site.mjs";
+import Button from "./ui/Button"
 
 function TeacherCard({ teacher, isRTL }) {
   const { t, i18n } = useTranslation("teachers");
@@ -61,13 +62,14 @@ function TeacherCard({ teacher, isRTL }) {
               <Star key={i} className="h-4 w-4" style={{ fill: TOKENS.goldenSand, color: TOKENS.goldenSand }} />
             ))}
           </div>
-          <button 
-            className="btn btn-sm rounded-full border-none"
-            style={{ background: TOKENS.deepTeal, color: '#F8FCFF' }}
-            onClick={() => navigate(buildTeacherPath({ _id: teacher.id, name: teacher.name }))}
-          >
-            {t('buttons.viewDetails')}
-          </button>
+           <Button 
+             size="sm" 
+             className="rounded-full border-none"
+             style={{ background: TOKENS.deepTeal, color: '#F8FCFF' }}
+             onClick={() => navigate(buildTeacherPath({ _id: teacher.id, name: teacher.name }))}
+           >
+             {t('buttons.viewDetails')}
+           </Button>
         </div>
       </div>
     </motion.div>

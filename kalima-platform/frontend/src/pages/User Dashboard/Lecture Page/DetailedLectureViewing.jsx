@@ -34,6 +34,9 @@ import {
   FiStar,
   FiMessageSquare
 } from "react-icons/fi"
+import Button from "../../../components/ui/Button"
+import Input from "../../../components/ui/Input"
+import Textarea from "../../../components/ui/Textarea"
 // Simple rating component with no external dependencies
 
 const DetailedLectureView = () => {
@@ -436,34 +439,37 @@ const DetailedLectureView = () => {
     if (!attachmentList || attachmentList.length === 0) {
       return null
     }
-
+  
     const Icon = icon
-
+  
     return (
       <div className="mb-6">
         <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
           <Icon className="text-primary" />
           {t(title)}
         </h3>
-        <div className="bg-base-200 rounded-lg p-4">
-          <ul className="divide-y divide-base-300">
+        <div className="bg-slate-100 rounded-lg p-4">
+          <ul className="divide-y divide-slate-200">
             {attachmentList.map((attachment) => (
               <li key={attachment._id} className="py-3 flex flex-col md:flex-row md:items-center md:justify-between">
                 <div className="flex items-center gap-2 mb-2 md:mb-0">
-                  <span className="text-base-content/80">{attachment.fileName}</span>
-                  <span className="text-xs bg-base-300 px-2 py-1 rounded">
+                  <span className="text-slate-900/80">{attachment.fileName}</span>
+                  <span className="text-xs bg-slate-200 px-2 py-1 rounded">
                     {(attachment.fileSize / 1024).toFixed(2)} KB
                   </span>
                 </div>
                 <div className="flex gap-2">
-                  <a
-                    href={attachment.filePath}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn btn-sm btn-outline"
-                  >
-                    <FiEye className={isRTL ? "ml-1" : "mr-1"} /> {t("view")}
-                  </a>
+                    <Button 
+                      as="a"
+                      href={attachment.filePath}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      size="sm"
+                      variant="outline"
+                    >
+                      <FiEye className={isRTL ? "ml-1" : "mr-1"} /> {t("view")}
+                    </Button>
+
                 </div>
               </li>
             ))}
@@ -477,38 +483,38 @@ const DetailedLectureView = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        <div className="loading loading-spinner loading-lg text-primary"></div>
+        <div className="animate-spin border-4 border-primary border-t-transparent rounded-full w-12 h-12"></div>
       </div>
     )
   }
-
+  
   // Error state
   if (error) {
     return (
       <div className="container mx-auto p-4" dir={isRTL ? "rtl" : "ltr"}>
-        <div className="alert alert-error">
+        <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 shadow-sm flex items-center gap-3">
           <FiX className="w-6 h-6" />
           <span>{t('errorGeneric')}</span>
         </div>
-        <button onClick={() => navigate(-1)} className="btn btn-outline mt-4">
+        <Button variant="outline" className="mt-4" onClick={() => navigate(-1)}>
           <FiArrowLeft className={isRTL ? "ml-2" : "mr-2"} />
           {t('back')}
-        </button>
+        </Button>
       </div>
     )
   }
-
+  
   // No lecture found
   if (!lecture) {
     return (
       <div className="container mx-auto p-4" dir={isRTL ? "rtl" : "ltr"}>
-        <div className="alert alert-warning">
+        <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700 shadow-sm flex items-center gap-3">
           <span>{t('lectureNotFound')}</span>
         </div>
-        <button onClick={() => navigate(-1)} className="btn btn-outline mt-4">
+        <Button variant="outline" className="mt-4" onClick={() => navigate(-1)}>
           <FiArrowLeft className={isRTL ? "ml-2" : "mr-2"} />
           {t('back')}
-        </button>
+        </Button>
       </div>
     )
   }
@@ -518,62 +524,62 @@ const DetailedLectureView = () => {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
         <div className="flex items-center gap-2 mb-4 md:mb-0">
-          <button onClick={() => navigate(-1)} className="btn btn-circle btn-ghost">
+          <Button variant="ghost" className="rounded-full p-2" onClick={() => navigate(-1)}>
             <FiArrowLeft className="w-5 h-5" />
-          </button>
+          </Button>
           <h1 className="text-2xl font-bold">{lecture.name}</h1>
-          <span className={`badge ${Number(lecture?.price || 0) > 0 ? "badge-primary" : "badge-secondary"}`}>
+          <span className={`px-2 py-1 text-xs font-medium rounded-full ${Number(lecture?.price || 0) > 0 ? "bg-primary text-white" : "bg-secondary text-white"}`}>
             {lecturePricingLabel}
           </span>
         </div>
-
+  
         {/* Admin/Lecturer Actions */}
         {hasAdminPrivileges && (
           <div className="flex gap-2">
             {canEditLecture && (
-              <button className="btn btn-outline btn-primary btn-sm" onClick={handleEditLecture}>
+              <Button size="sm" variant="outline" className="text-primary border-primary" onClick={handleEditLecture}>
                 <FiEdit className="w-4 h-4" />
                 {t("edit")}
-              </button>
+              </Button>
             )}
-            <button className="btn btn-error btn-sm" onClick={() => setShowDeleteModal(true)}>
+            <Button size="sm" variant="destructive" onClick={() => setShowDeleteModal(true)}>
               {t('deleteLecture')}
-            </button>
+            </Button>
           </div>
         )}
       </div>
-
+  
       {/* Delete confirmation modal */}
       {showDeleteModal && (
-        <div className="modal modal-open">
-          <div className="modal-box">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="bg-white rounded-2xl p-6 shadow-xl max-w-lg w-11/12 relative">
             <h3 className="font-bold text-lg flex items-center gap-2">
-              <FiAlertTriangle className="text-error" />
+              <FiAlertTriangle className="text-red-500" />
               {t('deleteConfirmTitle')}
             </h3>
             <p className="py-4">
               {t('deleteConfirmMessage', { name: lecture.name })}
             </p>
             {deleteError && (
-              <div className="alert alert-error mt-2">
+              <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 shadow-sm flex items-center gap-3 mt-2">
                 <FiX className="w-5 h-5" />
                 <span>{deleteError}</span>
               </div>
             )}
-            <div className="modal-action">
-              <button className="btn btn-outline" onClick={() => setShowDeleteModal(false)} disabled={deleteLoading}>
+            <div className="flex justify-end gap-2 mt-6">
+              <Button variant="outline" onClick={() => setShowDeleteModal(false)} disabled={deleteLoading}>
                 {t('cancel')}
-              </button>
-              <button className="btn btn-error" onClick={handleDeleteLecture} disabled={deleteLoading}>
+              </Button>
+              <Button variant="destructive" onClick={handleDeleteLecture} disabled={deleteLoading}>
                 {deleteLoading ? (
                   <>
-                    <span className="loading loading-spinner loading-sm"></span>
+                    <span className="animate-spin border-2 border-primary border-t-transparent rounded-full w-4 h-4 inline-block mr-2"></span>
                     {t('deleting')}
                   </>
                 ) : (
                   t('confirmDelete')
                 )}
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -581,14 +587,14 @@ const DetailedLectureView = () => {
 
       {/* Submission Viewer Modal */}
       {showSubmissionModal && viewingSubmission && (
-        <div className="modal modal-open">
-          <div className="modal-box max-w-4xl w-11/12 h-5/6 max-h-screen">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="bg-white rounded-2xl p-6 shadow-xl max-w-4xl w-11/12 h-5/6 max-h-screen relative">
             <h3 className="font-bold text-lg flex items-center gap-2 mb-4">
               <FiFile className="text-primary" />
               {viewingSubmission.fileName}
             </h3>
-
-            <div className="bg-base-200 rounded-lg p-2 mb-4 text-sm flex items-center justify-between">
+  
+            <div className="bg-slate-100 rounded-lg p-2 mb-4 text-sm flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <span>
                   {t('type')}: <span className="font-medium">{viewingSubmission.fileType}</span>
@@ -604,8 +610,8 @@ const DetailedLectureView = () => {
                 </span>
               </div>
             </div>
-
-            <div className="bg-base-300 rounded-lg overflow-hidden h-[calc(100%_-_8rem)] flex items-center justify-center">
+  
+            <div className="bg-slate-200 rounded-lg overflow-hidden h-[calc(100%_-_8rem)] flex items-center justify-center">
               {/* File preview based on file type */}
               {viewingSubmission.fileType.includes("image") ? (
                 <div className="w-full h-full flex items-center justify-center p-4">
@@ -621,7 +627,7 @@ const DetailedLectureView = () => {
                     <div className="text-center p-8">
                       <FiFileText className="w-16 h-16 mx-auto text-primary mb-4" />
                       <p className="font-medium mb-2">{t('pdfFile')}</p>
-                      <p className="text-sm opacity-70 mb-4">
+                      <p className="mb-4 text-sm text-slate-600">
                       {t('downloadToView')}
                       </p>
                     </div>
@@ -632,8 +638,8 @@ const DetailedLectureView = () => {
                   <div className="w-full h-full bg-white rounded shadow-inner flex items-center justify-center">
                     <div className="text-center p-8">
                       <FiFileText className="w-16 h-16 mx-auto text-blue-600 mb-4" />
-                     <p className="font-medium mb-2">{t('wordDoc')}</p>
-                      <p className="text-sm opacity-70 mb-4">
+                      <p className="font-medium mb-2">{t('wordDoc')}</p>
+                      <p className="mb-4 text-sm text-slate-600">
                         {t('downloadToView')}
                       </p>
                     </div>
@@ -645,7 +651,7 @@ const DetailedLectureView = () => {
                     <div className="text-center p-8">
                       <FiFileText className="w-16 h-16 mx-auto text-green-600 mb-4" />
                       <p className="font-medium mb-2">{t('excelSheet')}</p>
-                      <p className="text-sm opacity-70 mb-4">
+                      <p className="mb-4 text-sm text-slate-600">
                        {t('downloadToView')}
                       </p>
                     </div>
@@ -657,7 +663,7 @@ const DetailedLectureView = () => {
                     <div className="text-center p-8">
                       <FiFile className="w-16 h-16 mx-auto text-gray-600 mb-4" />
                       <p className="font-medium mb-2">{t('fileNotSupported')}</p>
-                      <p className="text-sm opacity-70 mb-4">
+                      <p className="mb-4 text-sm text-slate-600">
                         {t('downloadToView')}
                       </p>
                     </div>
@@ -665,19 +671,21 @@ const DetailedLectureView = () => {
                 </div>
               )}
             </div>
-
-            <div className="modal-action">
-              <button className="btn btn-outline" onClick={() => setShowSubmissionModal(false)}>
+  
+            <div className="flex justify-end gap-2 mt-6">
+              <Button variant="outline" onClick={() => setShowSubmissionModal(false)}>
                 {t('close')}
-              </button>
-              <a
-                href={`data:${viewingSubmission.fileType};base64,${viewingSubmission.fileData}`}
-                download={viewingSubmission.fileName}
-                className="btn btn-primary"
-              >
-                <FiDownload className={isRTL ? "ml-2" : "mr-2"} />
-                {t('download')}
-              </a>
+              </Button>
+                <Button 
+                  as="a"
+                  href={`data:${viewingSubmission.fileType};base64,${viewingSubmission.fileData}`}
+                  download={viewingSubmission.fileName}
+                  variant="primary"
+                >
+                  <FiDownload className={isRTL ? "ml-2" : "mr-2"} />
+                  {t('download')}
+                </Button>
+
             </div>
           </div>
         </div>
@@ -692,11 +700,11 @@ const DetailedLectureView = () => {
               <FiFileText className="text-primary" />
               {t('description')}
             </h2>
-            <div className="bg-base-200 rounded-lg p-4">
+            <div className="bg-slate-100 rounded-lg p-4">
               <p className="whitespace-pre-line">{lecture.description || t('noDescription')}</p>
             </div>
           </div>
-
+  
           {/* Student Lecture Access */}
           {hasAdminPrivileges && (
             <div className="mb-6">
@@ -704,20 +712,20 @@ const DetailedLectureView = () => {
                 <FiUsers className="text-primary" />
                 {t('studentAccess')}
               </h2>
-
+  
               {accessesLoading ? (
-                <div className="flex justify-center py-8 bg-base-200 rounded-lg">
-                  <div className="loading loading-spinner loading-md"></div>
+                <div className="flex justify-center py-8 bg-slate-100 rounded-lg">
+                  <div className="animate-spin border-4 border-primary border-t-transparent rounded-full w-8 h-8"></div>
                 </div>
               ) : accessesError ? (
-                <div className="alert alert-error">
+                <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 shadow-sm flex items-center gap-3">
                   <FiX className="w-5 h-5" />
                   <span>{accessesError}</span>
                 </div>
               ) : studentLectureAccesses.length > 0 ? (
-                <div className="bg-base-200 rounded-lg p-4">
+                <div className="bg-slate-100 rounded-lg p-4">
                   <div className="overflow-x-auto">
-                    <table className="table w-full">
+                    <table className="w-full text-left">
                       <thead>
                         <tr>
                         <th>{t('student')}</th>
@@ -731,36 +739,37 @@ const DetailedLectureView = () => {
                           <tr key={access._id}>
                             <td>
                               <div className="flex items-center gap-2">
-                                <div className="avatar avatar-placeholder">
-                                  <div className="bg-primary text-primary-content rounded-full w-8">
+                                <div className="flex items-center justify-center">
+                                  <div className="bg-primary text-white rounded-full w-8 h-8 flex items-center justify-center">
                                     <span>{access.student.name.charAt(0)}</span>
                                   </div>
                                 </div>
                                 <div>
                                   <div className="font-bold">{access.student.name}</div>
-                                  <div className="text-xs opacity-70">{access.student.role}</div>
+                          <div className="text-xs text-slate-600">{access.student.role}</div>
                                 </div>
                               </div>
                             </td>
                             <td>
                               {editingAccessId === access._id ? (
                                 <div className="flex items-center gap-2">
-                                  <input
+                                  <Input 
+                                    size="sm" 
+                                    className="w-20"
                                     type="number"
-                                    className="input input-bordered input-sm w-20"
                                     value={remainingViews}
                                     onChange={(e) => setRemainingViews(Number.parseInt(e.target.value) || 0)}
                                     min="0"
                                   />
-                                  {updateAccessError && <span className="text-xs text-error">{updateAccessError}</span>}
+                                  {updateAccessError && <span className="text-xs text-red-500">{updateAccessError}</span>}
                                   {updateAccessSuccess && (
-                                    <span className="text-xs text-success">{t('updateSuccess')}</span>
+                                    <span className="text-xs text-green-500">{t('updateSuccess')}</span>
                                   )}
                                 </div>
                               ) : (
                                 <div className="flex items-center gap-2">
                                   <span className="font-medium">{access.remainingViews}</span>
-                                  <span className="text-xs opacity-70">{t('views')}</span>
+                          <span className="text-xs text-slate-600">{t('views')}</span>
                                 </div>
                               )}
                             </td>
@@ -773,31 +782,33 @@ const DetailedLectureView = () => {
                             <td>
                               {editingAccessId === access._id ? (
                                 <div className="flex gap-2">
-                                  <button
-                                    className="btn btn-sm btn-primary"
+                                  <Button
+                                    size="sm" 
+                                    variant="primary"
                                     onClick={handleSaveAccess}
                                     disabled={updateAccessLoading}
                                   >
                                     {updateAccessLoading ? (
-                                      <span className="loading loading-spinner loading-xs"></span>
+                                      <span className="animate-spin border-2 border-primary border-t-transparent rounded-full w-3 h-3 inline-block mr-1"></span>
                                     ) : (
                                       <FiSave className="w-4 h-4" />
                                     )}
                                     {t('save')}
-                                  </button>
-                                  <button
-                                    className="btn btn-sm btn-outline"
+                                  </Button>
+                                  <Button
+                                    size="sm" 
+                                    variant="outline"
                                     onClick={handleCancelEdit}
                                     disabled={updateAccessLoading}
                                   >
                                     {t('cancel')}
-                                  </button>
+                                  </Button>
                                 </div>
                               ) : (
-                                <button className="btn btn-sm btn-outline" onClick={() => handleEditAccess(access)}>
+                                <Button size="sm" variant="outline" onClick={() => handleEditAccess(access)}>
                                   <FiEdit className="w-4 h-4 ml-1" />
                                   {t('edit')}
-                                </button>
+                                </Button>
                               )}
                             </td>
                           </tr>
@@ -807,247 +818,250 @@ const DetailedLectureView = () => {
                   </div>
                 </div>
               ) : (
-                <div className="alert alert-info">
+                <div className="rounded-2xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-700 shadow-sm flex items-center gap-3">
                   <FiInfo className="w-5 h-5" />
-                <span>{t('noAccess')}</span>
+                  <span>{t('noAccess')}</span>
                 </div>
               )}
             </div>
           )}
 
-          {/* Student Homeworks */}
-          {(hasAdminPrivileges || userRole === "Student") && (
-            <div className="mb-6">
-              <h2 className="text-xl font-semibold mb-3 flex items-center gap-2">
-                <FiUpload className="text-primary" />
-                {hasAdminPrivileges ? t('submissions') : t('mySubmissions')}
-              </h2>
-              {submissionsLoading ? (
-                <div className="flex justify-center py-8 bg-base-200 rounded-lg">
-                  <div className="loading loading-spinner loading-md"></div>
-                </div>
-              ) : submissionsError ? (
-                <div className="alert alert-error">
-                  <FiX className="w-5 h-5" />
-                  <span>{submissionsError}</span>
-                </div>
-              ) : studentSubmissions.length > 0 ? (
-                <div className="bg-base-200 rounded-lg p-4">
-                  <div className="overflow-x-auto">
-                    <table className="table w-full">
-                      <thead>
-                        <tr>
-                          <th>{t('student')}</th>
-                          <th>{t('fileName')}</th>
-                          <th>{t('uploadDate')}</th>
-                          <th>{t('rating')}</th>
-                          <th>{t('comment')}</th>
-                          <th>{t('actions')}</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {studentSubmissions.map((submission) => (
-                          <tr key={submission._id}>
-                            <td>
-                              <div className="flex items-center gap-2">
-                                <div className="avatar avatar-placeholder">
-                                  <div className="bg-primary text-primary-content rounded-full w-8">
-                                    <span>{submission.studentId?.name?.charAt(0) || '?'}</span>
-                                  </div>
-                                </div>
-                                <div>
-                                  <div className="font-bold">{submission.studentId?.name || t('unknown')}</div>
-                                  <div className="text-sm opacity-70">{submission.studentId?.email || ''}</div>
-                                </div>
-                              </div>
-                            </td>
-                            <td>{submission.fileName}</td>
-                            <td>{new Date(submission.uploadedOn).toLocaleDateString()}</td>
-                            <td>
-                              <div className="rating rating-sm">
-                                {[1, 2, 3, 4, 5].map((star) => (
-                                  <input 
-                                    key={star}
-                                    type="radio" 
-                                    name={`rating-${submission._id}`} 
-                                    className="mask mask-star-2 bg-primary" 
-                                    checked={submission.rating === star}
-                                    readOnly
-                                  />
-                                ))}
-                                {submission.rating && <span className="ml-2 text-sm">({submission.rating}/5)</span>}
-                              </div>
-                            </td>
-                            <td className="max-w-xs truncate">
-                              {submission.comment || 'No comment'}
-                            </td>
-                            <td>
-                              <div className="flex gap-2">
-                                <a
+           {/* Student Homeworks */}
+           {(hasAdminPrivileges || userRole === "Student") && (
+             <div className="mb-6">
+               <h2 className="text-xl font-semibold mb-3 flex items-center gap-2">
+                 <FiUpload className="text-primary" />
+                 {hasAdminPrivileges ? t('submissions') : t('mySubmissions')}
+               </h2>
+               {submissionsLoading ? (
+                 <div className="flex justify-center py-8 bg-slate-100 rounded-lg">
+                   <div className="animate-spin border-4 border-primary border-t-transparent rounded-full w-8 h-8"></div>
+                 </div>
+               ) : submissionsError ? (
+                 <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 shadow-sm flex items-center gap-3">
+                   <FiX className="w-5 h-5" />
+                   <span>{submissionsError}</span>
+                 </div>
+               ) : studentSubmissions.length > 0 ? (
+                 <div className="bg-slate-100 rounded-lg p-4">
+                   <div className="overflow-x-auto">
+                     <table className="w-full text-left">
+                       <thead>
+                         <tr>
+                           <th>{t('student')}</th>
+                           <th>{t('fileName')}</th>
+                           <th>{t('uploadDate')}</th>
+                           <th>{t('rating')}</th>
+                           <th>{t('comment')}</th>
+                           <th>{t('actions')}</th>
+                         </tr>
+                       </thead>
+                       <tbody>
+                         {studentSubmissions.map((submission) => (
+                           <tr key={submission._id}>
+                             <td>
+                               <div className="flex items-center gap-2">
+                                 <div className="flex items-center justify-center">
+                                   <div className="bg-primary text-white rounded-full w-8 h-8 flex items-center justify-center">
+                                     <span>{submission.studentId?.name?.charAt(0) || '?'}</span>
+                                   </div>
+                                 </div>
+                                 <div>
+                                   <div className="font-bold">{submission.studentId?.name || t('unknown')}</div>
+            <div className="text-sm text-slate-600">{submission.studentId?.email || ''}</div>
+                                 </div>
+                               </div>
+                             </td>
+                             <td>{submission.fileName}</td>
+                             <td>{new Date(submission.uploadedOn).toLocaleDateString()}</td>
+                             <td>
+                               <div className="flex gap-1">
+                                 {[1, 2, 3, 4, 5].map((star) => (
+                                   <div 
+                                     key={star}
+                                     className={`w-4 h-4 ${submission.rating >= star ? "text-primary" : "text-slate-300"}`}
+                                   >
+                                     ★
+                                   </div>
+                                 ))}
+                                 {submission.rating && <span className="ml-2 text-sm">({submission.rating}/5)</span>}
+                               </div>
+                             </td>
+                             <td className="max-w-xs truncate">
+                               {submission.comment || 'No comment'}
+                             </td>
+                             <td>
+                               <div className="flex gap-2">
+                                <Button 
+                                  as="a"
                                   href={submission.filePath}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="btn btn-sm btn-outline"
+                                  size="sm"
+                                  variant="outline"
                                 >
                                   <FiEye className={isRTL ? "ml-1" : "mr-1"} /> {t('view')}
-                                </a>
-                                <div className="flex gap-1">
-                                  <button 
-                                    className="btn btn-ghost btn-sm" 
-                                    onClick={() => handleViewSubmission(submission)}
-                                  >
-                                    <FiEye className="w-4 h-4" />
-                                  </button>
-                                  {hasAdminPrivileges && (
-                                    <button 
-                                      className="btn btn-ghost btn-sm"
-                                      onClick={() => handleOpenFeedback(submission)}
-                                    >
-                                      <FiMessageSquare className="w-4 h-4" />
-                                    </button>
-                                  )}
-                                </div>
-                              </div>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              ) : userRole === "Student" ? (
-                <div className="alert alert-info">
-                  <FiInfo className="w-5 h-5" />
-                  <span>{t('noHomeworkUploaded')}</span>
-                </div>
-              ) : (
-                <div className="alert alert-info">
-                  <FiUsers className="w-5 h-5" />
-                  <span>{t('noStudentUploads')}</span>
-                </div>
-              )}
+                                </Button>
 
-              {/* Upload Homework Button (for students) */}
-              {userRole === "Student" && (
-                <div className="mt-4">
-                  <button className="btn btn-outline btn-primary">
-                    <FiUpload className={isRTL ? "ml-2" : "mr-2"} />
-                    {t('uploadHomework')}
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
+                                 <div className="flex gap-1">
+                                   <Button 
+                                     size="sm" 
+                                     variant="ghost" 
+                                     onClick={() => handleViewSubmission(submission)}
+                                   >
+                                     <FiEye className="w-4 h-4" />
+                                   </Button>
+                                   {hasAdminPrivileges && (
+                                     <Button 
+                                       size="sm"
+                                       variant="ghost"
+                                       onClick={() => handleOpenFeedback(submission)}
+                                     >
+                                       <FiMessageSquare className="w-4 h-4" />
+                                     </Button>
+                                   )}
+                                 </div>
+                               </div>
+                             </td>
+                           </tr>
+                         ))}
+                       </tbody>
+                     </table>
+                   </div>
+                 </div>
+               ) : userRole === "Student" ? (
+                 <div className="rounded-2xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-700 shadow-sm flex items-center gap-3">
+                   <FiInfo className="w-5 h-5" />
+                   <span>{t('noHomeworkUploaded')}</span>
+                 </div>
+               ) : (
+                 <div className="rounded-2xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-700 shadow-sm flex items-center gap-3">
+                   <FiUsers className="w-5 h-5" />
+                   <span>{t('noStudentUploads')}</span>
+                 </div>
+               )}
+  
+               {/* Upload Homework Button (for students) */}
+               {userRole === "Student" && (
+                 <div className="mt-4">
+                   <Button variant="outline" className="text-primary border-primary">
+                     <FiUpload className={isRTL ? "ml-2" : "mr-2"} />
+                     {t('uploadHomework')}
+                   </Button>
+                 </div>
+               )}
+             </div>
+           )}
 
-          {/* Attachments */}
-           <div className="mb-6">
-            <h2 className="text-xl font-semibold mb-3">{t('attachments')}</h2>
-            {renderAttachments(attachments.booklets, 'booklets', FiBook)}
-            {renderAttachments(attachments.pdfsandimages, 'filesImages', FiFileText)}
-            {renderAttachments(attachments.homeworks, 'homeworks', FiBook)}
-            {renderAttachments(attachments.exams, 'exams', FiFileText)}
-
-            {!attachments.booklets?.length &&
-              !attachments.pdfsandimages?.length &&
-              !attachments.homeworks?.length &&
-              !attachments.exams?.length && (
-                <div className="alert alert-info">
-                  <span>{t('noAttachments')}</span>
-                </div>
-              )}
-          </div>
-        </div>
-
-
-        {/* Sidebar - Lecture Details */}
-        <div className="lg:col-span-1">
-        <div className="bg-base-200 rounded-lg p-4 sticky top-4">
-          <h2 className="text-xl font-semibold mb-4">{t('lectureDetails')}</h2>
-          <ul className="space-y-4">
-            <li className="flex items-center gap-3">
-              <div className="bg-base-300 p-2 rounded-lg">
-                <FiDollarSign className="text-primary" />
-              </div>
-              <div>
-                <span className="text-sm text-base-content/70">{t('price')}</span>
-                <p className="font-medium">{lecture.price} {t('points')}</p>
-              </div>
-            </li>
-
-              {/* Created By */}
-              <li className="flex items-center gap-3">
-                <div className="bg-base-300 p-2 rounded-lg">
-                  <FiUser className="text-primary" />
-                </div>
-                <div>
-                   <span className="text-sm text-base-content/70">{t('lecturer')}</span>
-                  <p className="font-medium">{lecture.createdBy?.name || t('unknown')}</p>
-                </div>
-              </li>
-
-              {/* Subject */}
-              <li className="flex items-center gap-3">
-                <div className="bg-base-300 p-2 rounded-lg">
-                  <FiBook className="text-primary" />
-                </div>
-                <div>
-                  <span className="text-sm text-base-content/70">{t('subject')}</span>
-                  <p className="font-medium">{getSubjectName()}</p>
-                </div>
-              </li>
-
-              {/* Level */}
-              <li className="flex items-center gap-3">
-                <div className="bg-base-300 p-2 rounded-lg">
-                  <FiLayers className="text-primary" />
-                </div>
-                <div>
-                <span className="text-sm text-base-content/70">{t('level')}</span>
-                  <p className="font-medium">{getLevelName()}</p>
-                </div>
-              </li>
-
-              {/* Views */}
-              <li className="flex items-center gap-3">
-                <div className="bg-base-300 p-2 rounded-lg">
-                  <FiEye className="text-primary" />
-                </div>
-                <div>
-                   <span className="text-sm text-base-content/70">{t('viewsCount')}</span>
-                  <p className="font-medium">{lecture.numberOfViews || 0}</p>
-                </div>
-              </li>
-
-              {/* Teacher Allowed */}
-              <li className="flex items-center gap-3">
-                <div className="bg-base-300 p-2 rounded-lg">
-                  {lecture.teacherAllowed ? <FiCheck className="text-success" /> : <FiEyeOff className="text-error" />}
-                </div>
-                <div>
-                  <span className="text-sm text-base-content/70">{t('teacherAllowed')}</span>
-                  <p className="font-medium">{lecture.teacherAllowed ? t('yes') : t('no')}</p>
-                </div>
-              </li>
-
-              {/* Requires Exam */}
-              <li className="flex items-center gap-3">
-                <div className="bg-base-300 p-2 rounded-lg">
-                  {lecture.requiresExam ? <FiCheck className="text-success" /> : <FiX className="text-error" />}
-                </div>
-                <div>
-                  <span className="text-sm text-base-content/70">{t('requiresExam')}</span>
-                  <p className="font-medium">{lecture.requiresExam ? t('yes') : t('no')}</p>
-                </div>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
+           {/* Attachments */}
+            <div className="mb-6">
+             <h2 className="text-xl font-semibold mb-3">{t('attachments')}</h2>
+             {renderAttachments(attachments.booklets, 'booklets', FiBook)}
+             {renderAttachments(attachments.pdfsandimages, 'filesImages', FiFileText)}
+             {renderAttachments(attachments.homeworks, 'homeworks', FiBook)}
+             {renderAttachments(attachments.exams, 'exams', FiFileText)}
+  
+             {!attachments.booklets?.length &&
+               !attachments.pdfsandimages?.length &&
+               !attachments.homeworks?.length &&
+               !attachments.exams?.length && (
+                 <div className="rounded-2xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-700 shadow-sm flex items-center gap-3">
+                   <span>{t('noAttachments')}</span>
+                 </div>
+               )}
+           </div>
+         </div>
+  
+  
+         {/* Sidebar - Lecture Details */}
+         <div className="lg:col-span-1">
+         <div className="bg-slate-100 rounded-lg p-4 sticky top-4">
+           <h2 className="text-xl font-semibold mb-4">{t('lectureDetails')}</h2>
+           <ul className="space-y-4">
+             <li className="flex items-center gap-3">
+               <div className="bg-slate-200 p-2 rounded-lg">
+                 <FiDollarSign className="text-primary" />
+               </div>
+               <div>
+                 <span className="text-sm text-slate-900/70">{t('price')}</span>
+                 <p className="font-medium">{lecture.price} {t('points')}</p>
+               </div>
+             </li>
+  
+               {/* Created By */}
+               <li className="flex items-center gap-3">
+                 <div className="bg-slate-200 p-2 rounded-lg">
+                   <FiUser className="text-primary" />
+                 </div>
+                 <div>
+                    <span className="text-sm text-slate-900/70">{t('lecturer')}</span>
+                   <p className="font-medium">{lecture.createdBy?.name || t('unknown')}</p>
+                 </div>
+               </li>
+  
+               {/* Subject */}
+               <li className="flex items-center gap-3">
+                 <div className="bg-slate-200 p-2 rounded-lg">
+                   <FiBook className="text-primary" />
+                 </div>
+                 <div>
+                   <span className="text-sm text-slate-900/70">{t('subject')}</span>
+                   <p className="font-medium">{getSubjectName()}</p>
+                 </div>
+               </li>
+  
+               {/* Level */}
+               <li className="flex items-center gap-3">
+                 <div className="bg-slate-200 p-2 rounded-lg">
+                   <FiLayers className="text-primary" />
+                 </div>
+                 <div>
+                 <span className="text-sm text-slate-900/70">{t('level')}</span>
+                   <p className="font-medium">{getLevelName()}</p>
+                 </div>
+               </li>
+  
+               {/* Views */}
+               <li className="flex items-center gap-3">
+                 <div className="bg-slate-200 p-2 rounded-lg">
+                   <FiEye className="text-primary" />
+                 </div>
+                 <div>
+                    <span className="text-sm text-slate-900/70">{t('viewsCount')}</span>
+                   <p className="font-medium">{lecture.numberOfViews || 0}</p>
+                 </div>
+               </li>
+  
+               {/* Teacher Allowed */}
+               <li className="flex items-center gap-3">
+                 <div className="bg-slate-200 p-2 rounded-lg">
+                   {lecture.teacherAllowed ? <FiCheck className="text-green-500" /> : <FiEyeOff className="text-red-500" />}
+                 </div>
+                 <div>
+                   <span className="text-sm text-slate-900/70">{t('teacherAllowed')}</span>
+                   <p className="font-medium">{lecture.teacherAllowed ? t('yes') : t('no')}</p>
+                 </div>
+               </li>
+  
+               {/* Requires Exam */}
+               <li className="flex items-center gap-3">
+                 <div className="bg-slate-200 p-2 rounded-lg">
+                   {lecture.requiresExam ? <FiCheck className="text-green-500" /> : <FiX className="text-red-500" />}
+                 </div>
+                 <div>
+                   <span className="text-sm text-slate-900/70">{t('requiresExam')}</span>
+                   <p className="font-medium">{lecture.requiresExam ? t('yes') : t('no')}</p>
+                 </div>
+               </li>
+             </ul>
+           </div>
+         </div>
+       </div>
       
       {/* Feedback Modal */}
       {showFeedbackModal && currentSubmission && (
-        <div className="modal modal-open">
-          <div className="modal-box max-w-2xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="bg-white rounded-2xl p-6 shadow-xl max-w-2xl w-11/12 relative">
             <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
               <FiMessageSquare className="text-primary" />
               {t('provideFeedback')}
@@ -1055,61 +1069,60 @@ const DetailedLectureView = () => {
             
             <div className="space-y-4">
               <div>
-                <label className="label">
-                  <span className="label-text">{t('rating')} (1-5)</span>
+                <label className="block text-sm font-medium mb-2">
+                  {t('rating')} (1-5)
                 </label>
-                <div className="rating rating-lg">
+                <div className="flex gap-2">
                   {[1, 2, 3, 4, 5].map((star) => (
-                    <input 
+                    <div 
                       key={star}
-                      type="radio" 
-                      name="rating" 
-                      className="mask mask-star-2 bg-primary" 
-                      checked={rating === star}
-                      onChange={() => setRating(star)}
-                    />
+                      className={`w-6 h-6 cursor-pointer ${rating >= star ? "text-primary" : "text-slate-300"}`}
+                      onClick={() => setRating(star)}
+                    >
+                      ★
+                    </div>
                   ))}
                 </div>
               </div>
               
               <div>
-                <label className="label">
-                  <span className="label-text">{t('comment')}</span>
+                <label className="block text-sm font-medium mb-2">
+                  {t('comment')}
                 </label>
-                <textarea 
-                  className="textarea textarea-bordered w-full h-32"
+                <Textarea 
+                  className="w-full h-32"
                   placeholder={t('enterYourFeedback')}
                   value={comment}
                   onChange={(e) => setComment(e.target.value)}
-                ></textarea>
+                />
               </div>
               
               {feedbackError && (
-                <div className="alert alert-error">
+                <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 shadow-sm flex items-center gap-3">
                   <FiX className="w-5 h-5" />
                   <span>{feedbackError}</span>
                 </div>
               )}
               
-              <div className="modal-action">
-                <button 
-                  className="btn btn-ghost"
+              <div className="flex justify-end gap-2 mt-6">
+                <Button 
+                  variant="ghost"
                   onClick={() => setShowFeedbackModal(false)}
                   disabled={isSubmittingFeedback}
                 >
                   {t('cancel')}
-                </button>
-                <button 
-                  className="btn btn-primary"
+                </Button>
+                <Button 
+                  variant="primary"
                   onClick={handleSubmitFeedback}
                   disabled={isSubmittingFeedback}
                 >
                   {isSubmittingFeedback ? (
-                    <span className="loading loading-spinner"></span>
+                    <span className="animate-spin border-2 border-primary border-t-transparent rounded-full w-4 h-4 inline-block mr-2"></span>
                   ) : (
                     t('submitFeedback')
                   )}
-                </button>
+                </Button>
               </div>
             </div>
           </div>

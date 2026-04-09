@@ -2,13 +2,15 @@
 import { useState, useEffect } from "react"
 import { getAllUsers, deleteUser, createUser } from "../../../../routes/fetch-users"
 import { useTranslation } from "react-i18next"
-import { FaSync, FaWhatsapp, FaEdit, FaDownload, FaFileExport, FaEye, FaTimes, FaCalculator } from "react-icons/fa"
+import { FaSync, FaWhatsapp, FaEdit, FaDownload, FaFileExport, FaEye, FaTimes } from "react-icons/fa"
 import toast from "react-hot-toast"
 import Pagination from "../../../../components/Pagination"
 import CreateUserModal from "../CreateUserModal/CreateUserModal"
 import EditUserModal from "../CreateUserModal/EditUserModal"
+import Button from "../../../../components/ui/Button"
+import Input from "../../../../components/ui/Input"
+import Textarea from "../../../../components/ui/Textarea"
 import { getUserDashboard } from "../../../../routes/auth-services"
-import { RecalculateInvites } from "../../../../routes/market"
 import { designTokens } from "../../../../constants/designTokens"
 import { translateErrorMessage } from "../../../../utils/errorTranslator"
 import DSSelect from "../../../../components/DSSelect"
@@ -35,15 +37,14 @@ const UserManagementTable = () => {
   const [filteredUsers, setFilteredUsers] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-  const [isRecalculating, setIsRecalculating] = useState(false)
   const [filters, setFilters] = useState({
     name: "",
     phone: "",
     role: "",
     status: "",
-    successfulInvites: "",
   })
   const [showCreateModal, setShowCreateModal] = useState(false)
+  const [createUserError, setCreateUserError] = useState(null)
   const [whatsappModal, setWhatsappModal] = useState({
     isOpen: false,
     phoneNumber: "",
@@ -64,6 +65,7 @@ const UserManagementTable = () => {
   const [isAdmin, setIsAdmin] = useState(false)
   const [isSubAdmin, setIsSubAdmin] = useState(false)
   const [isExporting, setIsExporting] = useState(false)
+  const [exportDropdownOpen, setExportDropdownOpen] = useState(false)
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1)
@@ -94,6 +96,17 @@ const UserManagementTable = () => {
     fetchUsers()
   }, [])
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (exportDropdownOpen) {
+        setExportDropdownOpen(false)
+      }
+    }
+    document.addEventListener('click', handleClickOutside)
+    return () => document.removeEventListener('click', handleClickOutside)
+  }, [exportDropdownOpen])
+
   const fetchUsers = async () => {
     try {
       setLoading(true)
@@ -112,38 +125,6 @@ const UserManagementTable = () => {
     }
   }
 
-  // Fixed recalculate invites function
-  const handleRecalculateInvites = async () => {
-    try {
-      setIsRecalculating(true)
-      setError(null)
-
-      const response = await RecalculateInvites()
-
-      if (response.success) {
-        // Refresh users data after successful recalculation
-        await fetchUsers()
-        alert(t("admin.invites.refreshSuccess") || "Invites refreshed successfully!")
-      } else {
-        const translated = translateErrorMessage(response.message || t("admin.invites.refreshError") || "Error calculating invites data")
-        setError(translated)
-        alert(translated)
-      }
-    } catch (error) {
-      console.error("Error recalculating invites:", error)
-      const errorMessage =
-        error.response?.data?.message ||
-        error.message ||
-        t("admin.invites.refreshError") ||
-        "Error calculating invites data"
-      const translated = translateErrorMessage(errorMessage)
-      setError(translated)
-      alert(translated)
-    } finally {
-      setIsRecalculating(false)
-    }
-  }
-
   // Apply filters when filters or users change
   useEffect(() => {
     applyFilters()
@@ -156,9 +137,7 @@ const UserManagementTable = () => {
         (!filters.name || (user.name && user.name.toLowerCase().includes(filters.name.toLowerCase()))) &&
         (!filters.phone || (user.phoneNumber && user.phoneNumber.includes(filters.phone))) &&
         (!filters.role || (user.role && user.role.toLowerCase() === filters.role.toLowerCase())) &&
-        (!filters.status || getStatus(user) === filters.status) &&
-        (filters.successfulInvites === "" ||
-          (user.successfulInvites || 0) === Number.parseInt(filters.successfulInvites, 10)),
+        (!filters.status || getStatus(user) === filters.status),
     )
     setFilteredUsers(filtered)
   }
@@ -187,17 +166,18 @@ const UserManagementTable = () => {
 
   const handleCreateUser = async (userData) => {
     try {
-      setError(null)
+      setCreateUserError(null)
       const result = await createUser(userData)
       if (result.success) {
         setUsers((prev) => [...prev, result.data])
         setShowCreateModal(false)
+        setCreateUserError(null)
         fetchUsers() // Refresh users after creation
       } else {
-        throw new Error(translateErrorMessage(result.error))
+        setCreateUserError(result)
       }
     } catch (error) {
-      setError(translateErrorMessage(error.message))
+      setCreateUserError(error)
     }
   }
 
@@ -719,14 +699,23 @@ const UserManagementTable = () => {
   if (loading) {
     return (
       <div className="text-center p-8">
-        <span className="loading loading-spinner loading-lg"></span>
+        <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
+      </div>
+    )
+  }
+  if (error && !showCreateModal) {
+    return (
+      <div className="flex items-center justify-center mt-8">
+        <div className="flex items-center gap-3 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 shadow-sm max-w-md">
+          <span>{error}</span>
+        </div>
       </div>
     )
   }
 
   if (error && !showCreateModal) {
     return (
-      <div className="alert alert-error max-w-md mx-auto mt-8">
+      <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 shadow-sm flex items-center gap-3 max-w-md mx-auto mt-8">
         <span>{error}</span>
       </div>
     )
@@ -751,53 +740,98 @@ const UserManagementTable = () => {
           <p className="text-base font-medium" style={{ color: TOKENS.slateText }}>{t("admin.userManagement.subtitle") || "Manage and export user data"}</p>
         </div>
         {/* Export Dropdown */}
-        <div className="dropdown dropdown-end">
-          <div tabIndex={0} role="button" className="btn btn-outline btn-primary" disabled={isExporting}>
-            {isExporting ? (
-              <>
-                <span className="loading loading-spinner loading-sm"></span>
-                {t("admin.export.exporting")}
-              </>
-            ) : (
-              <>
-                <FaDownload className="mr-2" />
-                {t("admin.export.export")}
-              </>
-            )}
-          </div>
-          <ul tabIndex={0} className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-64">
+          <div className="dropdown dropdown-end">
+            <Button 
+              variant="primary" 
+              disabled={isExporting}
+              onClick={(e) => {
+                e.stopPropagation()
+                setExportDropdownOpen(!exportDropdownOpen)
+              }}
+            >
+              {isExporting ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                  {t("admin.export.exporting")}
+                </>
+              ) : (
+                <>
+                  <FaDownload className="mr-2" />
+                  {t("admin.export.export")}
+                </>
+              )}
+            </Button>
+            {exportDropdownOpen && (
+            <ul className="dropdown-content z-[1] menu p-2 shadow bg-white rounded-xl w-64 absolute mt-2">
             <li className="menu-title">
               <span>{t("admin.export.xlsxFormat", { defaultValue: isRTL ? "تنسيق XLSX" : "XLSX Format" })}</span>
             </li>
-            <li>
-              <button onClick={() => exportUsers({ format: "xlsx", exportAll: false })} disabled={isExporting || filteredUsers.length === 0}>
-                <FaFileExport className="mr-2" />
-                {t("admin.export.exportFiltered")} ({filteredUsers.length})
-              </button>
-            </li>
-            <li>
-              <button onClick={() => exportUsers({ format: "xlsx", exportAll: true })} disabled={isExporting || users.length === 0}>
-                <FaFileExport className="mr-2" />
-                {t("admin.export.exportAll")} ({users.length})
-              </button>
-            </li>
-            <div className="divider my-1"></div>
-            <li className="menu-title">
-              <span>{t("admin.export.csvFormat")}</span>
-            </li>
-            <li>
-              <button onClick={() => exportUsers({ format: "csv", exportAll: false })} disabled={isExporting || filteredUsers.length === 0}>
-                <FaFileExport className="mr-2" />
-                {t("admin.export.exportFiltered")} ({filteredUsers.length})
-              </button>
-            </li>
-            <li>
-              <button onClick={() => exportUsers({ format: "csv", exportAll: true })} disabled={isExporting || users.length === 0}>
-                <FaFileExport className="mr-2" />
-                {t("admin.export.exportAll")} ({users.length})
-              </button>
-            </li>
-          </ul>
+             <li>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="w-full justify-start"
+                  onClick={() => {
+                    setExportDropdownOpen(false)
+                    exportUsers({ format: "xlsx", exportAll: false })
+                  }} 
+                  disabled={isExporting || filteredUsers.length === 0}
+                >
+                  <FaFileExport className="mr-2" />
+                  {t("admin.export.exportFiltered")} ({filteredUsers.length})
+                </Button>
+              </li>
+              <li>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="w-full justify-start"
+                  onClick={() => {
+                    setExportDropdownOpen(false)
+                    exportUsers({ format: "xlsx", exportAll: true })
+                  }} 
+                  disabled={isExporting || users.length === 0}
+                >
+                  <FaFileExport className="mr-2" />
+                  {t("admin.export.exportAll")} ({users.length})
+                </Button>
+              </li>
+             <div className="divider my-1"></div>
+             <li className="menu-title">
+               <span>{t("admin.export.csvFormat")}</span>
+             </li>
+             <li>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="w-full justify-start"
+                  onClick={() => {
+                    setExportDropdownOpen(false)
+                    exportUsers({ format: "csv", exportAll: false })
+                  }} 
+                  disabled={isExporting || filteredUsers.length === 0}
+                >
+                  <FaFileExport className="mr-2" />
+                  {t("admin.export.exportFiltered")} ({filteredUsers.length})
+                </Button>
+              </li>
+              <li>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="w-full justify-start"
+                  onClick={() => {
+                    setExportDropdownOpen(false)
+                    exportUsers({ format: "csv", exportAll: true })
+                  }} 
+                  disabled={isExporting || users.length === 0}
+                >
+                   <FaFileExport className="mr-2" />
+                   {t("admin.export.exportFiltered")} ({filteredUsers.length})
+                 </Button>
+              </li>
+           </ul>
+           )}
         </div>
       </div>
 
@@ -821,245 +855,209 @@ const UserManagementTable = () => {
       </div>
 
       {/* Filters and Actions */}
-      <div className="flex flex-wrap gap-4 mb-8 justify-between items-center bg-white p-4 rounded-[1.4rem] border" style={{ borderColor: "rgba(17,24,39,0.08)", boxShadow: SHADOWS.level1 }}>
-        <div className="flex gap-4 flex-wrap w-full md:w-auto">
-          <input
-            type="text"
-            placeholder={t("admin.filters.name")}
-            className="input flex-1 md:w-auto font-medium border-2 focus:outline-none focus:ring-0 rounded-full transition-colors"
-            style={{ 
-              backgroundColor: TOKENS.neutralCloud, 
-              borderColor: "transparent", 
-              color: TOKENS.deepTeal 
-            }}
-            onFocus={(e) => { e.target.style.borderColor = TOKENS.softCyanTeal; e.target.style.backgroundColor = "#fff"; }}
-            onBlur={(e) => { e.target.style.borderColor = "transparent"; e.target.style.backgroundColor = TOKENS.neutralCloud; }}
-            value={filters.name}
-            onChange={(e) => setFilters({ ...filters, name: e.target.value })}
-          />
-          <input
-            type="text"
-            placeholder={t("admin.filters.phone")}
-            className="input flex-1 md:w-auto font-medium border-2 focus:outline-none focus:ring-0 rounded-full transition-colors"
-            style={{ 
-              backgroundColor: TOKENS.neutralCloud, 
-              borderColor: "transparent", 
-              color: TOKENS.deepTeal 
-            }}
-            onFocus={(e) => { e.target.style.borderColor = TOKENS.softCyanTeal; e.target.style.backgroundColor = "#fff"; }}
-            onBlur={(e) => { e.target.style.borderColor = "transparent"; e.target.style.backgroundColor = TOKENS.neutralCloud; }}
-            value={filters.phone}
-            onChange={(e) => setFilters({ ...filters, phone: e.target.value })}
-          />
-          <DSSelect
-            className="select flex-1 md:w-auto font-medium border-2 focus:outline-none focus:ring-0 rounded-full transition-colors font-sans"
-            style={{ 
-              backgroundColor: TOKENS.neutralCloud, 
-              borderColor: "transparent", 
-              color: TOKENS.deepTeal 
-            }}
-            onFocus={(e) => { e.target.style.borderColor = TOKENS.softCyanTeal; e.target.style.backgroundColor = "#fff"; }}
-            onBlur={(e) => { e.target.style.borderColor = "transparent"; e.target.style.backgroundColor = TOKENS.neutralCloud; }}
-            value={filters.role}
-            onChange={(e) => setFilters({ ...filters, role: e.target.value })}
-          >
-            <option value="" className="font-medium bg-white">{t("admin.filters.allTypes")}</option>
-            {["student", "parent", "lecturer", "Teacher", "moderator", "subAdmin"].map((role) => (
-              <option key={role} value={role} className="font-medium bg-white">
-                {t(`admin.roles.${role}`)}
-              </option>
-            ))}
-          </DSSelect>
-          <DSSelect
-            className="select flex-1 md:w-auto font-medium border-2 focus:outline-none focus:ring-0 rounded-full transition-colors font-sans"
-            style={{ 
-              backgroundColor: TOKENS.neutralCloud, 
-              borderColor: "transparent", 
-              color: TOKENS.deepTeal 
-            }}
-            onFocus={(e) => { e.target.style.borderColor = TOKENS.softCyanTeal; e.target.style.backgroundColor = "#fff"; }}
-            onBlur={(e) => { e.target.style.borderColor = "transparent"; e.target.style.backgroundColor = TOKENS.neutralCloud; }}
-            value={filters.status}
-            onChange={(e) => setFilters({ ...filters, status: e.target.value })}
-          >
-            <option value="" className="font-medium bg-white">{t("admin.filters.allStatus")}</option>
-            <option value={t("admin.status.valid")} className="font-medium bg-white">{t("admin.status.valid")}</option>
-            <option value={t("admin.status.missingData")} className="font-medium bg-white">{t("admin.status.missingData")}</option>
-          </DSSelect>
-          <input
-            type="number"
-            min="0"
-            placeholder={t("admin.filters.invites")}
-            className="input flex-1 md:w-auto font-medium border-2 focus:outline-none focus:ring-0 rounded-full transition-colors"
-            style={{ 
-              backgroundColor: TOKENS.neutralCloud, 
-              borderColor: "transparent", 
-              color: TOKENS.deepTeal 
-            }}
-            onFocus={(e) => { e.target.style.borderColor = TOKENS.softCyanTeal; e.target.style.backgroundColor = "#fff"; }}
-            onBlur={(e) => { e.target.style.borderColor = "transparent"; e.target.style.backgroundColor = TOKENS.neutralCloud; }}
-            value={filters.successfulInvites}
-            onChange={(e) => setFilters({ ...filters, successfulInvites: e.target.value })}
-          />
+      <div
+        className="mb-8 grid gap-4 rounded-[1.4rem] border bg-white p-4 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-end"
+        style={{ borderColor: "rgba(17,24,39,0.08)", boxShadow: SHADOWS.level1 }}
+      >
+        <div className="grid w-full gap-4 sm:grid-cols-2 2xl:grid-cols-4">
+           <Input
+             type="text"
+             placeholder={t("admin.filters.name")}
+             className="w-full font-medium rounded-full transition-colors"
+             value={filters.name}
+             onChange={(e) => setFilters({ ...filters, name: e.target.value })}
+           />
+           <Input
+             type="text"
+             placeholder={t("admin.filters.phone")}
+             className="w-full font-medium rounded-full transition-colors"
+             value={filters.phone}
+             onChange={(e) => setFilters({ ...filters, phone: e.target.value })}
+           />
+           <DSSelect
+             className="w-full font-medium border-2 focus:outline-none focus:ring-0 rounded-full transition-colors font-sans"
+             style={{ 
+               backgroundColor: TOKENS.neutralCloud, 
+               borderColor: "transparent", 
+               color: TOKENS.deepTeal 
+             }}
+             onFocus={(e) => { e.target.style.borderColor = TOKENS.softCyanTeal; e.target.style.backgroundColor = "#fff"; }}
+             onBlur={(e) => { e.target.style.borderColor = "transparent"; e.target.style.backgroundColor = TOKENS.neutralCloud; }}
+             value={filters.role}
+             onChange={(e) => setFilters({ ...filters, role: e.target.value })}
+           >
+             <option value="" className="font-medium bg-white">{t("admin.filters.allTypes")}</option>
+             {["student", "parent", "lecturer", "Teacher", "moderator", "subAdmin"].map((role) => (
+               <option key={role} value={role} className="font-medium bg-white">
+                 {t(`admin.roles.${role}`)}
+               </option>
+             ))}
+           </DSSelect>
+           <DSSelect
+             className="w-full font-medium border-2 focus:outline-none focus:ring-0 rounded-full transition-colors font-sans"
+             style={{ 
+               backgroundColor: TOKENS.neutralCloud, 
+               borderColor: "transparent", 
+               color: TOKENS.deepTeal 
+             }}
+             onFocus={(e) => { e.target.style.borderColor = TOKENS.softCyanTeal; e.target.style.backgroundColor = "#fff"; }}
+             onBlur={(e) => { e.target.style.borderColor = "transparent"; e.target.style.backgroundColor = TOKENS.neutralCloud; }}
+             value={filters.status}
+             onChange={(e) => setFilters({ ...filters, status: e.target.value })}
+           >
+             <option value="" className="font-medium bg-white">{t("admin.filters.allStatus")}</option>
+             <option value={t("admin.status.valid")} className="font-medium bg-white">{t("admin.status.valid")}</option>
+             <option value={t("admin.status.missingData")} className="font-medium bg-white">{t("admin.status.missingData")}</option>
+           </DSSelect>
         </div>
-        <div className="flex gap-3 w-full md:w-auto justify-end">
-          <button 
-            className="btn border-none text-white font-bold rounded-full" 
-            style={{ background: TOKENS.warmMango, boxShadow: "0 4px 14px rgba(255, 171, 92, 0.4)" }}
-            onClick={() => setShowCreateModal(true)}
-          >
-            {t("admin.userManagement.createUser")}
-          </button>
-          <button 
-            className="btn btn-outline border-2 rounded-full font-bold" 
-            style={{ borderColor: TOKENS.deepTeal, color: TOKENS.deepTeal }}
-            onClick={fetchUsers}
-          >
-            <FaSync />
-          </button>
-          <button 
-            className="btn border-none text-white font-bold rounded-full" 
-            style={{ background: TOKENS.richTeal, boxShadow: "0 4px 10px rgba(58, 142, 155, 0.3)" }}
-            onClick={handleRecalculateInvites} 
-            disabled={isRecalculating}
-          >
-            {isRecalculating ? (
-              <>
-                <span className="loading loading-spinner loading-sm"></span>
-                {t("admin.invites.calculating") || "Calculating..."}
-              </>
-            ) : (
-              <>
-                <FaCalculator className="mr-2" />
-                {t("admin.invites.refresh") || "Refresh Invites"}
-              </>
-            )}
-          </button>
-        </div>
+         <div className="flex w-full flex-col gap-3 sm:flex-row xl:w-auto xl:justify-end">
+           <Button 
+             className="w-full rounded-full font-bold sm:w-auto" 
+             style={{ background: TOKENS.warmMango, boxShadow: "0 4px 14px rgba(255, 171, 92, 0.4)" }}
+             onClick={() => setShowCreateModal(true)}
+           >
+             {t("admin.userManagement.createUser")}
+           </Button>
+           <Button 
+             variant="outline" 
+             className="w-full rounded-full font-bold sm:w-auto" 
+             style={{ borderColor: TOKENS.deepTeal, color: TOKENS.deepTeal }}
+             onClick={fetchUsers}
+           >
+             <FaSync />
+           </Button>
+         </div>
       </div>
 
       {/* Export Summary */}
-      {(filters.name || filters.phone || filters.role || filters.status) && (
-        <div className="alert alert-info mb-4">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            className="stroke-current shrink-0 w-6 h-6"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-            ></path>
-          </svg>
-          <span>
-            {t("admin.export.filterInfo")} {filteredUsers.length} {t("admin.export.of")} {users.length}{" "}
-            {t("admin.export.usersShown")}
-          </span>
-        </div>
-      )}
+       {(filters.name || filters.phone || filters.role || filters.status) && (
+         <div className="mb-4 rounded-2xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-700 shadow-sm flex items-center gap-3">
+           <svg
+             xmlns="http://www.w3.org/2000/svg"
+             fill="none"
+             viewBox="0 0 24 24"
+             className="stroke-current shrink-0 w-6 h-6"
+           >
+             <path
+               strokeLinecap="round"
+               strokeLinejoin="round"
+               strokeWidth={2}
+               d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+             ></path>
+           </svg>
+           <span>
+             {t("admin.export.filterInfo")} {filteredUsers.length} {t("admin.export.of")} {users.length} {t("admin.export.usersShown")}
+           </span>
+         </div>
+       )}
 
       {/* Users Table */}
-      <div className="w-full overflow-x-auto bg-white rounded-[1.4rem] border" style={{ borderColor: "rgba(17,24,39,0.08)", boxShadow: SHADOWS.level1 }}>
-        <table className="table w-full border-collapse">
-          <thead style={{ background: "rgba(77, 179, 194, 0.05)" }}>
-            <tr>
-              {["name", "phone", "accountType", "status", "successfulInvites", "actions"].map((header) => (
-                <th key={header} className="p-4 text-sm md:text-base font-bold whitespace-nowrap" style={{ color: TOKENS.deepTeal, borderBottom: "2px solid rgba(17,24,39,0.05)" }}>
-                  {t(`admin.table.${header}`)}
-                </th>
+       <div className="w-full overflow-x-auto bg-white rounded-[1.4rem] border" style={{ borderColor: "rgba(17,24,39,0.08)", boxShadow: SHADOWS.level1 }}>
+         <table className="w-full text-left border-collapse">
+           <thead style={{ background: "rgba(77, 179, 194, 0.05)" }}>
+             <tr>
+               {["name", "phone", "accountType", "status", "successfulInvites", "actions"].map((header) => (
+                 <th key={header} className="p-4 text-sm md:text-base font-bold whitespace-nowrap" style={{ color: TOKENS.deepTeal, borderBottom: "2px solid rgba(17,24,39,0.05)" }}>
+                   {t(`admin.table.${header}`)}
+                 </th>
+               ))}
+             </tr>
+           </thead>
+           <tbody>
+             {currentUsers.map((user) => (
+               <tr key={user._id} className="transition-colors hover:bg-slate-100" style={{ borderBottom: "1px solid rgba(17,24,39,0.05)" }}>
+                 <td className="p-4 whitespace-nowrap font-medium" style={{ color: TOKENS.inkText }}>{user.name || t("admin.NA")}</td>
+                 <td className="p-4 whitespace-nowrap font-medium font-mono" style={{ color: TOKENS.slateText }}>{user.phoneNumber || t("admin.NA")}</td>
+                 <td className="p-4 whitespace-nowrap">
+                   <span className="inline-flex items-center rounded-full px-3 py-1 text-xs font-bold" style={{ backgroundColor: "rgba(77,179,194,0.1)", color: TOKENS.deepTeal }}>
+                     {getRoleLabel(user.role)}
+                   </span>
+                 </td>
+                 <td className="p-4 whitespace-nowrap font-medium" style={{ color: getStatus(user) === t("admin.status.valid") ? "#10B981" : TOKENS.vibrantCoral }}>{getStatus(user)}</td>
+                 <td className="p-4 whitespace-nowrap font-bold" style={{ color: TOKENS.slateText }}>{user.successfulInvites || 0}</td>
+                 <td className="p-4 whitespace-nowrap">
+                   <div className="flex items-center gap-2">
+                     <Button
+                       variant="ghost"
+                       size="sm"
+                       className="rounded-full p-2"
+                       style={{ color: TOKENS.deepTeal }}
+                       onClick={() => openUserDetailsModal(user)}
+                       title={t("admin.actions.viewDetails")}
+                     >
+                       <FaEye size={16} />
+                     </Button>
+                     {isAdmin | isSubAdmin && (
+                       <Button
+                         variant="ghost"
+                         size="sm"
+                         className="rounded-full p-2"
+                         style={{ color: TOKENS.richTeal }}
+                         onClick={() => openEditModal(user)}
+                         title={t("admin.actions.edit")}
+                       >
+                         <FaEdit size={16} />
+                       </Button>
+                     )}
+                     {user.phoneNumber && (
+                       <Button
+                         variant="ghost"
+                         size="sm"
+                         className="rounded-full p-2 text-green-500"
+                         onClick={() => openWhatsappModal(user.phoneNumber, user.name)}
+                         title={t("admin.actions.whatsapp")}
+                       >
+                         <FaWhatsapp size={18} />
+                       </Button>
+                     )}
+                     <Button 
+                       variant="ghost"
+                       size="sm"
+                       className="rounded-full p-2" 
+                       style={{ color: TOKENS.vibrantCoral }} 
+                       onClick={() => handleDelete(user._id)}
+                       title={t("admin.actions.delete")}
+                     >
+                       <FaTimes size={16} />
+                     </Button>
+                   </div>
+                  </td>
+                </tr>
               ))}
-            </tr>
-          </thead>
-          <tbody>
-            {currentUsers.map((user) => (
-              <tr key={user._id} className="transition-colors hover:bg-gray-50" style={{ borderBottom: "1px solid rgba(17,24,39,0.05)" }}>
-                <td className="p-4 whitespace-nowrap font-medium" style={{ color: TOKENS.inkText }}>{user.name || t("admin.NA")}</td>
-                <td className="p-4 whitespace-nowrap font-medium font-mono" style={{ color: TOKENS.slateText }}>{user.phoneNumber || t("admin.NA")}</td>
-                <td className="p-4 whitespace-nowrap">
-                  <span className="inline-flex items-center rounded-full px-3 py-1 text-xs font-bold" style={{ backgroundColor: "rgba(77,179,194,0.1)", color: TOKENS.deepTeal }}>
-                    {getRoleLabel(user.role)}
-                  </span>
-                </td>
-                <td className="p-4 whitespace-nowrap font-medium" style={{ color: getStatus(user) === t("admin.status.valid") ? "#10B981" : TOKENS.vibrantCoral }}>{getStatus(user)}</td>
-                <td className="p-4 whitespace-nowrap font-bold" style={{ color: TOKENS.slateText }}>{user.successfulInvites || 0}</td>
-                <td className="p-4 whitespace-nowrap">
-                  <div className="flex items-center gap-2">
-                    <button
-                      className="btn btn-sm btn-circle btn-ghost"
-                      style={{ color: TOKENS.deepTeal }}
-                      onClick={() => openUserDetailsModal(user)}
-                      title={t("admin.actions.viewDetails")}
-                    >
-                      <FaEye size={16} />
-                    </button>
-                    {isAdmin | isSubAdmin && (
-                      <button
-                        className="btn btn-sm btn-circle btn-ghost"
-                        style={{ color: TOKENS.richTeal }}
-                        onClick={() => openEditModal(user)}
-                        title={t("admin.actions.edit")}
-                      >
-                        <FaEdit size={16} />
-                      </button>
-                    )}
-                    {user.phoneNumber && (
-                      <button
-                        className="btn btn-sm btn-circle btn-ghost text-green-500"
-                        onClick={() => openWhatsappModal(user.phoneNumber, user.name)}
-                        title={t("admin.actions.whatsapp")}
-                      >
-                        <FaWhatsapp size={18} />
-                      </button>
-                    )}
-                    <button 
-                      className="btn btn-sm btn-circle btn-ghost" 
-                      style={{ color: TOKENS.vibrantCoral }} 
-                      onClick={() => handleDelete(user._id)}
-                      title={t("admin.actions.delete")}
-                    >
-                      <FaTimes size={16} />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </tbody>
+          </table>
+        </div>
 
       {/* Empty State */}
-      {filteredUsers.length === 0 && !loading && (
-        <div className="text-center py-12 bg-base-200/30 rounded-xl">
-          <div className="flex flex-col items-center justify-center text-base-content/60">
-            <div className="bg-base-200 p-4 rounded-full mb-4">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="w-8 h-8"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"
-                />
-              </svg>
-            </div>
-            <p className="text-lg font-medium mb-2">{t("admin.noUsers") || "No users found"}</p>
-            <p className="text-sm opacity-70 max-w-md">
-              {filters.name || filters.phone || filters.role || filters.status
-                ? t("admin.noUsersFiltered") ||
-                "No users match your current filters. Try adjusting your search criteria."
-                : t("admin.noUsersYet") || "No users have registered yet. Check back later."}
-            </p>
-          </div>
-        </div>
-      )}
+       {filteredUsers.length === 0 && !loading && (
+         <div className="text-center py-12 bg-slate-100/30 rounded-xl">
+      <div className="flex flex-col items-center justify-center text-slate-600">
+             <div className="bg-slate-100 p-4 rounded-full mb-4">
+               <svg
+                 xmlns="http://www.w3.org/2000/svg"
+                 className="w-8 h-8"
+                 fill="none"
+                 viewBox="0 0 24 24"
+                 stroke="currentColor"
+               >
+                 <path
+                   strokeLinecap="round"
+                   strokeLinejoin="round"
+                   strokeWidth={2}
+                   d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"
+                 />
+               </svg>
+             </div>
+             <p className="text-lg font-medium mb-2">{t("admin.noUsers") || "No users found"}</p>
+        <p className="max-w-md text-sm text-slate-600">
+               {filters.name || filters.phone || filters.role || filters.status
+                 ? t("admin.noUsersFiltered") ||
+                 "No users match your current filters. Try adjusting your search criteria."
+                 : t("admin.noUsersYet") || "No users have registered yet. Check back later."}
+             </p>
+           </div>
+         </div>
+       )}
 
       {/* Pagination */}
       {filteredUsers.length > 0 && (
@@ -1080,9 +1078,12 @@ const UserManagementTable = () => {
       {/* Create User Modal */}
       <CreateUserModal
         isOpen={showCreateModal}
-        onClose={() => setShowCreateModal(false)}
+        onClose={() => {
+          setShowCreateModal(false)
+          setCreateUserError(null)
+        }}
         onCreateUser={handleCreateUser}
-        error={error}
+        error={createUserError}
       />
 
       {/* Edit User Modal */}
@@ -1094,51 +1095,86 @@ const UserManagementTable = () => {
       />
 
       {/* User Details Modal */}
-      {userDetailsModal.isOpen && (
-        <div className="modal modal-open">
-          <div className="modal-box max-w-4xl" dir={dir}>
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="font-bold text-xl">
-                {t("admin.userDetails.title")} - {userDetailsModal.user?.name}
-              </h3>
-              <button
-                className="btn btn-sm btn-circle btn-ghost"
-                onClick={() => setUserDetailsModal({ isOpen: false, user: null })}
-              >
-                <FaTimes />
-              </button>
-            </div>
-            {renderUserDetails(userDetailsModal.user)}
-            <div className="modal-action">
-              <button className="btn btn-ghost" onClick={() => setUserDetailsModal({ isOpen: false, user: null })}>
-                {t("admin.userDetails.close")}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+       {userDetailsModal.isOpen && (
+         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 p-4">
+           <div className="bg-white rounded-2xl max-w-4xl w-full overflow-hidden shadow-2xl" dir={dir}>
+             <div className="flex justify-between items-center p-4 border-b border-slate-200">
+               <h3 className="font-bold text-xl">
+                 {t("admin.userDetails.title")} - {userDetailsModal.user?.name}
+               </h3>
+               <Button 
+                 variant="ghost" 
+                 size="sm" 
+                 className="rounded-full p-2"
+                 onClick={() => setUserDetailsModal({ isOpen: false, user: null })}
+               >
+                 <FaTimes />
+               </Button>
+             </div>
+             <div className="p-6">
+               {renderUserDetails(userDetailsModal.user)}
+             </div>
+             <div className="flex justify-end p-4 border-t border-slate-200">
+               <Button 
+                 variant="ghost" 
+                 onClick={() => setUserDetailsModal({ isOpen: false, user: null })}
+               >
+                 {t("admin.userDetails.close")}
+               </Button>
+             </div>
+           </div>
+         </div>
+       )}
+       {whatsappModal.isOpen && (
+         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 p-4">
+           <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl" dir={dir}>
+             <h3 className="font-bold text-lg mb-4">{t("admin.whatsappModal.title", { name: whatsappModal.userName })}</h3>
+             <Textarea
+               className="w-full mt-4"
+               placeholder={t("admin.whatsappModal.placeholder")}
+               value={whatsappMessage}
+               onChange={(e) => setWhatsappMessage(e.target.value)}
+             />
+             <div className="flex justify-end gap-3 mt-6">
+               <Button 
+                 variant="ghost" 
+                 onClick={() => setWhatsappModal({ isOpen: false, phoneNumber: "", userName: "" })}
+               >
+                 {t("admin.whatsappModal.cancel")}
+               </Button>
+               <Button 
+                 variant="primary" 
+                 onClick={sendWhatsappMessage} 
+                 disabled={!whatsappMessage.trim()}
+               >
+                 {t("admin.whatsappModal.send")}
+               </Button>
+             </div>
+           </div>
+         </div>
+       )}
 
       {/* WhatsApp Modal */}
       {whatsappModal.isOpen && (
-        <div className="modal modal-open">
-          <div className="modal-box" dir={dir}>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl" dir={dir}>
             <h3 className="font-bold text-lg">{t("admin.whatsappModal.title", { name: whatsappModal.userName })}</h3>
-            <textarea
-              className="textarea textarea-bordered w-full mt-4"
+            <Textarea
+              className="w-full mt-4"
               placeholder={t("admin.whatsappModal.placeholder")}
               value={whatsappMessage}
               onChange={(e) => setWhatsappMessage(e.target.value)}
-            ></textarea>
-            <div className="modal-action">
-              <button
-                className="btn btn-ghost"
+            />
+            <div className="flex justify-end gap-3 mt-6">
+              <Button 
+                variant="ghost"
                 onClick={() => setWhatsappModal({ isOpen: false, phoneNumber: "", userName: "" })}
               >
                 {t("admin.whatsappModal.cancel")}
-              </button>
-              <button className="btn btn-primary" onClick={sendWhatsappMessage} disabled={!whatsappMessage.trim()}>
+              </Button>
+              <Button variant="primary" onClick={sendWhatsappMessage} disabled={!whatsappMessage.trim()}>
                 {t("admin.whatsappModal.send")}
-              </button>
+              </Button>
             </div>
           </div>
         </div>

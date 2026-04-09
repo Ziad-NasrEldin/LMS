@@ -9,6 +9,7 @@ import {
   logoutUser,
 } from "../routes/auth-services";
 import { Layout } from "lucide-react";
+import Button from "./ui/Button";
 
 const NavBar = () => {
   const { t, i18n } = useTranslation("common");
@@ -152,28 +153,42 @@ const NavBar = () => {
               <LanguageSwitcher />
               {userRole ? (
                 <>
-                  <Link to={getDashboardPath(userRole)} className="btn btn-sm border-none bg-[#CFE8ED] text-[#0F4F5B] hover:bg-[#BFDFE6] rounded-full">
-                    {t("dashboard")}
-                    <Layout className="h-4 w-4" />
-                  </Link>
-                  <button onClick={handleLogout} className="btn btn-sm btn-ghost rounded-full text-[#2F2F2F] hover:bg-white/70">
-                    {t("logout")}
-                  </button>
+                   <Button 
+                     to={getDashboardPath(userRole)} 
+                     variant="outline" 
+                     size="sm" 
+                     className="border-none bg-[#CFE8ED] text-[#0F4F5B] hover:bg-[#BFDFE6] rounded-full"
+                   >
+                     {t("dashboard")}
+                     <Layout className="h-4 w-4" />
+                   </Button>
+                   <Button 
+                     onClick={handleLogout} 
+                     variant="ghost" 
+                     size="sm" 
+                     className="rounded-full text-[#2F2F2F] hover:bg-white/70"
+                   >
+                     {t("logout")}
+                   </Button>
                 </>
               ) : (
                 <div className="flex items-center gap-2">
-                  <Link
-                    to="/login"
-                    className="btn btn-sm rounded-full bg-white/70 text-[#2F2F2F] hover:bg-white"
-                  >
-                    {t("login")}
-                  </Link>
-                  <Link
-                    to="/register"
-                    className="btn btn-sm rounded-full border-none bg-[linear-gradient(135deg,#E4C65F,#D4AD3F)] px-5 text-[#232323] hover:brightness-95"
-                  >
-                    {t("startNow", { defaultValue: isAr ? "ابدأ الآن" : "Start Now" })}
-                  </Link>
+                   <Button 
+                     to="/login"
+                     variant="outline" 
+                     size="sm" 
+                     className="rounded-full bg-white/70 text-[#2F2F2F] hover:bg-white"
+                   >
+                     {t("login")}
+                   </Button>
+                   <Button 
+                     to="/register"
+                     variant="primary" 
+                     size="sm" 
+                     className="rounded-full border-none bg-[linear-gradient(135deg,#E4C65F,#D4AD3F)] px-5 text-[#232323] hover:brightness-95"
+                   >
+                     {t("startNow", { defaultValue: isAr ? "ابدأ الآن" : "Start Now" })}
+                   </Button>
                 </div>
               )}
             </div>

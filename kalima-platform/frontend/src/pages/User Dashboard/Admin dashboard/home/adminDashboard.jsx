@@ -3,6 +3,7 @@ import UserManagementTable from "./userManageTable";
 import { useTranslation } from 'react-i18next';
 import { Link } from "react-router-dom";
 import { designTokens } from "../../../../constants/designTokens";
+import Button from "../../../../components/ui/Button";
 
 const AdminDashboard = () => {
   const { i18n } = useTranslation('admin');
@@ -34,7 +35,7 @@ const AdminDashboard = () => {
               <h2 className="text-xl font-bold" style={{ color: TOKENS.deepTeal }}>
                 {isRTL ? "إدارة أكواد الشحن" : "Promo Codes Management"}
               </h2>
-              <p className="mt-1 text-sm opacity-80">
+        <p className="mt-1 text-sm text-slate-700">
                 {isRTL
                   ? "انتقل مباشرةً إلى صفحة إنشاء وإدارة أكواد الشحن."
                   : "Jump directly to the page for creating and managing promo codes."}
@@ -43,9 +44,11 @@ const AdminDashboard = () => {
 
             <Link
               to="/dashboard/admin-dashboard/promo-codes-management"
-              className="btn btn-primary w-full sm:w-auto"
+              className="inline-block w-full sm:w-auto"
             >
-              {isRTL ? "فتح الصفحة" : "Open Page"}
+              <Button variant="primary" className="w-full">
+                {isRTL ? "فتح الصفحة" : "Open Page"}
+              </Button>
             </Link>
           </div>
         </section>

@@ -10,6 +10,12 @@ export const designTokens = {
     neutralCloud: "#F1F3F6",
     inkText: "#111827",
     slateText: "#374151",
+    borderSubtle: "rgba(17,24,39,0.08)",
+    success: "#16A34A",
+    error: "#DC2626",
+    successLight: "rgba(22,163,74,0.1)",
+    successBorder: "rgba(22,163,74,0.2)",
+    deepTealSubtle: "rgba(14,85,99,0.2)",
   },
   radius: {
     section: "2rem",

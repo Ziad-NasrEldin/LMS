@@ -35,18 +35,18 @@ function CourseStructureVisualization({ courseStructure, isRTL }) {
   const yearContainers = courseStructure.containers.filter((c) => c.type === CONTAINER_TYPES.YEAR)
 
   return (
-    <div className="bg-base-100 rounded-xl shadow-md p-6">
+    <div className="bg-white rounded-xl shadow-md p-6">
       <h2 className="text-lg font-bold mb-6 text-primary text-center">
         {isRTL ? "هيكل المحتوى التعليمي" : "Educational Content Structure"}
       </h2>
-
-      <div className="mb-6 bg-base-200 p-4 rounded-lg">
+ 
+      <div className="mb-6 bg-slate-100 p-4 rounded-lg">
         <h3 className="text-base font-medium mb-3 text-primary">{isRTL ? "هيكل الكورس" : "Course Structure"}</h3>
 
         <div className="pl-4 border-l-2 border-primary">
           <div className="mb-2">
             <span className="font-medium">{courseStructure.parent.name}</span>
-            <span className="text-xs text-base-content/70"> ({getContainerTypeLabel(CONTAINER_TYPES.COURSE)})</span>
+      <span className="text-xs text-slate-600"> ({getContainerTypeLabel(CONTAINER_TYPES.COURSE)})</span>
           </div>
 
           {yearContainers.length > 0 && (
@@ -61,7 +61,7 @@ function CourseStructureVisualization({ courseStructure, isRTL }) {
                   <div key={year.id} className="mb-2">
                     <div className="mb-1">
                       <span className="font-medium">{year.name}</span>
-                      <span className="text-xs text-base-content/70">
+              <span className="text-xs text-slate-600">
                         {" "}
                         ({getContainerTypeLabel(CONTAINER_TYPES.YEAR)})
                       </span>
@@ -79,7 +79,7 @@ function CourseStructureVisualization({ courseStructure, isRTL }) {
                             <div key={term.id} className="mb-2">
                               <div className="mb-1">
                                 <span className="font-medium">{term.name}</span>
-                                <span className="text-xs text-base-content/70">
+              <span className="text-xs text-slate-600">
                                   {" "}
                                   ({getContainerTypeLabel(CONTAINER_TYPES.TERM)})
                                 </span>
@@ -97,7 +97,7 @@ function CourseStructureVisualization({ courseStructure, isRTL }) {
                                       <div key={month.id} className="mb-2">
                                         <div className="mb-1">
                                           <span className="font-medium">{month.name}</span>
-                                          <span className="text-xs text-base-content/70">
+              <span className="text-xs text-slate-600">
                                             {" "}
                                             ({getContainerTypeLabel(CONTAINER_TYPES.MONTH)})
                                           </span>

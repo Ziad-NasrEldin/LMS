@@ -167,7 +167,6 @@ exports.purchaseLecturerPoints = catchAsync(async (req, res, next) => {
     if (error.code === 11000) {
       return next(new AppError("You have already purchased this lecture", 400));
     }
-    console.log(error);
     return next(new AppError("Failed to purchase lecture", 500));
   } finally {
     await session.endSession();
@@ -352,6 +351,38 @@ exports.purchaseContainerWithPoints = catchAsync(async (req, res, next) => {
       return next(new AppError(`User not found with ID: ${userId}`, 404));
     }
 
+    // Grade level restriction check
+    if (item.sameGradeOnly) {
+      const role = req.user.role;
+      
+      // Apply restriction only to Students and Parents
+      if (role === "Student" || role === "Parent") {
+        const userLevel = userModel.level ? userModel.level.toString() : null;
+        const itemLevel = item.level ? item.level.toString() : null;
+
+        if (role === "Student") {
+          // Students MUST be in the exact grade and level
+          if (!userLevel || !itemLevel || userLevel !== itemLevel) {
+            await session.abortTransaction();
+            return next(new AppError("This course is restricted to students in the exact same grade level only", 400));
+          }
+        } else if (role === "Parent") {
+          // Parents can buy if it's their level OR any of their children's stages
+          const userStages = userModel.stages && Array.isArray(userModel.stages) 
+            ? userModel.stages.map(s => s.toString()) 
+            : [];
+          
+          const isLevelMatch = itemLevel && userLevel === itemLevel;
+          const isStageMatch = itemLevel && userStages.includes(itemLevel);
+
+          if (!isLevelMatch && !isStageMatch) {
+            await session.abortTransaction();
+            return next(new AppError("This course is restricted to parents with children in the same grade level only", 400));
+          }
+        }
+      }
+    }
+
     // Check if user has enough balance for this lecturer
     const lecturerPoints = userModel.getLecturerPointsBalance(lecturerId);
     const generalPoints = userModel.generalPoints || 0;
@@ -431,7 +462,6 @@ exports.purchaseContainerWithPoints = catchAsync(async (req, res, next) => {
       },
     });
   } catch (error) {
-    console.error("Transaction error:", error);
     await session.abortTransaction();
     return next(new AppError(error.message, 500));
   } finally {
