@@ -3,6 +3,12 @@ import { getAllLecturers, getAllAssistants, getAllParents, getAllStudents } from
 import { useTranslation } from 'react-i18next';
 import { designTokens } from "../../../../constants/designTokens";
 
+const toList = (payload) => {
+  if (Array.isArray(payload)) return payload;
+  if (Array.isArray(payload?.data)) return payload.data;
+  return [];
+};
+
 const Hero = () => {
   const { t, i18n } = useTranslation('admin');
   // ... rest of state
@@ -16,47 +22,74 @@ const Hero = () => {
   const dir = isRTL ? 'rtl' : 'ltr';
 
   useEffect(() => {
-  const fetchData = async () => {
-    try {
-      setLoading(true);
-      setError(null);
+    let isMounted = true;
 
-      // Fetch data one at a time (sequentially)
-      const lecturerResponse = await getAllLecturers();
-      if (!lecturerResponse.success) {
-        throw new Error("Failed to fetch lecturers");
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const [lecturerResult, assistantResult, parentResult, studentResult] = await Promise.allSettled([
+          getAllLecturers(),
+          getAllAssistants(),
+          getAllParents(),
+          getAllStudents(),
+        ]);
+
+        if (!isMounted) return;
+
+        const resolveResult = (result) => {
+          if (result.status !== "fulfilled") return { list: [], failed: true };
+          if (!result.value?.success) return { list: [], failed: true };
+          return { list: toList(result.value.data), failed: false };
+        };
+
+        const lecturersState = resolveResult(lecturerResult);
+        const assistantsState = resolveResult(assistantResult);
+        const parentsState = resolveResult(parentResult);
+        const studentsState = resolveResult(studentResult);
+
+        setLecturers(lecturersState.list);
+        setAssistants(assistantsState.list);
+        setParents(parentsState.list);
+        setStudents(studentsState.list);
+
+        const failedCount = [
+          lecturersState.failed,
+          assistantsState.failed,
+          parentsState.failed,
+          studentsState.failed,
+        ].filter(Boolean).length;
+
+        if (failedCount > 0) {
+          setError(
+            t('admin.errors.fetchUsers', {
+              defaultValue: isRTL ? 'تعذر تحميل بعض بيانات المستخدمين' : 'Some user data could not be loaded',
+            }),
+          );
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+        if (isMounted) {
+          setError(
+            t('admin.errors.fetchUsers', {
+              defaultValue: isRTL ? 'فشل في تحميل بيانات المستخدمين' : 'Failed to load user data',
+            }),
+          );
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
       }
-      setLecturers(Array.isArray(lecturerResponse.data) ? lecturerResponse.data : Array.isArray(lecturerResponse.data?.data) ? lecturerResponse.data.data : []);
+    };
 
-      const assistantResponse = await getAllAssistants();
-      if (!assistantResponse.success) {
-        throw new Error("Failed to fetch assistants");
-      }
-      setAssistants(Array.isArray(assistantResponse.data) ? assistantResponse.data : Array.isArray(assistantResponse.data?.data) ? assistantResponse.data.data : []);
+    fetchData();
 
-      const parentResponse = await getAllParents();
-      if (!parentResponse.success) {
-        throw new Error("Failed to fetch parents");
-      }
-      setParents(Array.isArray(parentResponse.data) ? parentResponse.data : Array.isArray(parentResponse.data?.data) ? parentResponse.data.data : []);
-
-      const studentResponse = await getAllStudents();
-      if (!studentResponse.success) {
-        throw new Error("Failed to fetch students");
-      }
-      setStudents(Array.isArray(studentResponse.data) ? studentResponse.data : Array.isArray(studentResponse.data?.data) ? studentResponse.data.data : []);
-      
-    } catch (error) {
-      console.error("Error fetching user data:", error);
-      setError(error.message || "Failed to fetch data");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  fetchData();
-}, []);
- // Empty dependency array means this runs once on mount
+    return () => {
+      isMounted = false;
+    };
+  }, [isRTL, t]);
 
   const TOKENS = designTokens.colors;
   const SHADOWS = designTokens.shadows;
@@ -85,9 +118,9 @@ const Hero = () => {
           }}
         >
           <div className="absolute top-0 right-0 w-32 h-32 bg-[#4DB3C2] opacity-10 rounded-bl-[100px] pointer-events-none" />
-          <div className="p-6 md:p-8 flex items-center justify-between relative z-10">
-            <div className={isRTL ? 'text-right' : 'text-left'}>
-              <h2 className="text-xl font-bold" style={{ color: TOKENS.deepTeal }}>{t('admin.students')}</h2>
+          <div className="relative z-10 flex items-center justify-between gap-4 p-6 md:p-8">
+            <div className={`${isRTL ? 'text-right' : 'text-left'} min-w-0 flex-1`}>
+              <h2 className="text-lg font-bold leading-snug md:text-xl" style={{ color: TOKENS.deepTeal }}>{t('admin.students')}</h2>
               <p className="text-4xl font-extrabold mt-2" style={{ color: TOKENS.inkText }}>
                 {loading ? (
                   <span className="loading loading-dots loading-sm"></span>
@@ -115,9 +148,9 @@ const Hero = () => {
           }}
         >
           <div className="absolute top-0 right-0 w-32 h-32 bg-[#F39A3F] opacity-10 rounded-bl-[100px] pointer-events-none" />
-          <div className="p-6 md:p-8 flex items-center justify-between relative z-10">
-            <div className={isRTL ? 'text-right' : 'text-left'}>
-              <h2 className="text-xl font-bold" style={{ color: TOKENS.deepTeal }}>{t('admin.assignedLecturers')}</h2>
+          <div className="relative z-10 flex items-center justify-between gap-4 p-6 md:p-8">
+            <div className={`${isRTL ? 'text-right' : 'text-left'} min-w-0 flex-1`}>
+              <h2 className="text-lg font-bold leading-snug md:text-xl" style={{ color: TOKENS.deepTeal }}>{t('admin.assignedLecturers')}</h2>
               <p className="text-4xl font-extrabold mt-2" style={{ color: TOKENS.inkText }}>
                 {loading ? (
                   <span className="loading loading-dots loading-sm"></span>
@@ -145,9 +178,9 @@ const Hero = () => {
           }}
         >
           <div className="absolute top-0 right-0 w-32 h-32 bg-[#EBC468] opacity-15 rounded-bl-[100px] pointer-events-none" />
-          <div className="p-6 md:p-8 flex items-center justify-between relative z-10">
-            <div className={isRTL ? 'text-right' : 'text-left'}>
-              <h2 className="text-xl font-bold" style={{ color: TOKENS.deepTeal }}>{t('admin.assistants')}</h2>
+          <div className="relative z-10 flex items-center justify-between gap-4 p-6 md:p-8">
+            <div className={`${isRTL ? 'text-right' : 'text-left'} min-w-0 flex-1`}>
+              <h2 className="text-lg font-bold leading-snug md:text-xl" style={{ color: TOKENS.deepTeal }}>{t('admin.assistants')}</h2>
               <p className="text-4xl font-extrabold mt-2" style={{ color: TOKENS.inkText }}>
                 {loading ? (
                   <span className="loading loading-dots loading-sm"></span>
@@ -175,9 +208,9 @@ const Hero = () => {
           }}
         >
           <div className="absolute top-0 right-0 w-32 h-32 bg-[#146A78] opacity-10 rounded-bl-[100px] pointer-events-none" />
-          <div className="p-6 md:p-8 flex items-center justify-between relative z-10">
-            <div className={isRTL ? 'text-right' : 'text-left'}>
-              <h2 className="text-xl font-bold" style={{ color: TOKENS.deepTeal }}>{t('admin.parents')}</h2>
+          <div className="relative z-10 flex items-center justify-between gap-4 p-6 md:p-8">
+            <div className={`${isRTL ? 'text-right' : 'text-left'} min-w-0 flex-1`}>
+              <h2 className="text-lg font-bold leading-snug md:text-xl" style={{ color: TOKENS.deepTeal }}>{t('admin.parents')}</h2>
               <p className="text-4xl font-extrabold mt-2" style={{ color: TOKENS.inkText }}>
                 {loading ? (
                   <span className="loading loading-dots loading-sm"></span>

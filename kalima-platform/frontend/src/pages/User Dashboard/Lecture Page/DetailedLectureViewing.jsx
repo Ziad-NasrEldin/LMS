@@ -6,11 +6,12 @@ import { getLectureById, getLectureAttachments, deleteLecture } from "../../../r
 import { getAllSubjects } from "../../../routes/courses"
 import { getAllLevels } from "../../../routes/levels"
 import { getUserDashboard } from "../../../routes/auth-services"
-import { getLectureHomeworks } from "../../../routes/homeworks"
+import { getLectureHomeworks, updateHomeworkFeedback } from "../../../routes/homeworks"
 import { downloadAttachmentById } from "../../../routes/lectures"
 import { useTranslation } from "react-i18next"
 import { getAllStudentLectureAccess, updateStudentLectureAccess } from "../../../routes/student-lecture-access"
 import { translateErrorMessage } from "../../../utils/errorTranslator"
+import { designTokens } from "../../../constants/designTokens"
 import {
   FiArrowLeft,
   FiDownload,
@@ -37,11 +38,16 @@ import {
 import Button from "../../../components/ui/Button"
 import Input from "../../../components/ui/Input"
 import Textarea from "../../../components/ui/Textarea"
+import CommunityTab from "../../../components/lecture-community/CommunityTab"
 // Simple rating component with no external dependencies
 
 const DetailedLectureView = () => {
   const { t, i18n } = useTranslation("lectureDisplay")
   const isRTL = i18n.language === 'ar'
+  const TOKENS = designTokens.colors
+  const SHADOWS = designTokens.shadows
+  const RADIUS = designTokens.radius
+  const GRADIENTS = designTokens.gradients
   const { lectureId } = useParams()
   const navigate = useNavigate()
   const [lecture, setLecture] = useState(null)
@@ -83,6 +89,32 @@ const DetailedLectureView = () => {
   const [updateAccessError, setUpdateAccessError] = useState(null)
   const lecturePricingLabel = Number(lecture?.price || 0) > 0 ? t("paid") : t("free", "Free")
   const [updateAccessSuccess, setUpdateAccessSuccess] = useState(false)
+
+  const pageShellStyle = {
+    background: `${GRADIENTS.pageAtmosphere}, ${TOKENS.creamSurface}`,
+    borderColor: TOKENS.borderSubtle,
+    borderRadius: RADIUS.section,
+    boxShadow: SHADOWS.level1,
+  }
+
+  const sectionPanelStyle = {
+    background: "rgba(255,255,255,0.78)",
+    borderColor: TOKENS.borderSubtle,
+    borderRadius: RADIUS.card,
+    boxShadow: SHADOWS.level1,
+  }
+
+  const innerPanelStyle = {
+    background: "rgba(255,255,255,0.72)",
+    borderColor: TOKENS.borderSubtle,
+    borderRadius: "1.1rem",
+  }
+
+  const iconChipStyle = {
+    background: "rgba(188,231,236,0.35)",
+    border: `1px solid ${TOKENS.deepTealSubtle}`,
+    color: TOKENS.deepTeal,
+  }
 
   // Check if user has admin-like privileges
   const hasAdminPrivileges = ["Lecturer", "Assistant", "Admin", "SubAdmin", "Moderator"].includes(userRole)
@@ -147,7 +179,7 @@ const DetailedLectureView = () => {
 
         if (lectureResult.success) {
           if (lectureResult.status === "restricted") {
-            setError(lectureResult.message || t("noAccessToLecture"))
+            setError(translateErrorMessage(lectureResult.message || t("noAccessToLecture"), t))
             return
           }
 
@@ -197,7 +229,7 @@ const DetailedLectureView = () => {
           }
         } else {
           setStudentSubmissions([]);
-          setSubmissionsError(res.error || t("failedToFetchStudentSubmissions"));
+          setSubmissionsError(translateErrorMessage(res.error || t("failedToFetchStudentSubmissions"), t));
         }
       } catch (err) {
         setStudentSubmissions([]);
@@ -225,7 +257,7 @@ const DetailedLectureView = () => {
         if (result.success) {
           setStudentLectureAccesses(result.data || [])
         } else {
-          setAccessesError(result.error || t("failedToFetchStudentAccesses"))
+          setAccessesError(translateErrorMessage(result.error || t("failedToFetchStudentAccesses"), t))
         }
       } catch (err) {
         console.error("Error fetching student lecture accesses:", err)
@@ -288,19 +320,27 @@ const DetailedLectureView = () => {
     setFeedbackError(null)
     
     try {
-      // Here you'll need to implement the actual API call to save the feedback
-      // For now, we'll just update the local state
-      const updatedSubmissions = studentSubmissions.map(sub => 
-        sub._id === currentSubmission._id 
-          ? { ...sub, rating, comment, feedbackDate: new Date().toISOString() }
-          : sub
+      const result = await updateHomeworkFeedback(currentSubmission._id, {
+        rating,
+        comment,
+      })
+
+      if (!result.success) {
+        setFeedbackError(result.error || t("failedToSubmitFeedback", "Failed to submit feedback"))
+        return
+      }
+
+      setStudentSubmissions((prevSubmissions) =>
+        prevSubmissions.map((submission) =>
+          submission._id === currentSubmission._id
+            ? { ...submission, ...result.data }
+            : submission
+        )
       )
-      
-      setStudentSubmissions(updatedSubmissions)
       setShowFeedbackModal(false)
-      
-      // Show success message
-      alert('Feedback submitted successfully')
+      setCurrentSubmission(null)
+      setRating(0)
+      setComment("")
     } catch (error) {
       console.error('Error submitting feedback:', error)
       setFeedbackError(translateErrorMessage('Failed to submit feedback. Please try again.'))
@@ -448,7 +488,7 @@ const DetailedLectureView = () => {
           <Icon className="text-primary" />
           {t(title)}
         </h3>
-        <div className="bg-slate-100 rounded-lg p-4">
+        <div className="border p-4" style={innerPanelStyle}>
           <ul className="divide-y divide-slate-200">
             {attachmentList.map((attachment) => (
               <li key={attachment._id} className="py-3 flex flex-col md:flex-row md:items-center md:justify-between">
@@ -491,10 +531,10 @@ const DetailedLectureView = () => {
   // Error state
   if (error) {
     return (
-      <div className="container mx-auto p-4" dir={isRTL ? "rtl" : "ltr"}>
+      <div className="mx-auto max-w-7xl px-4 py-4 md:px-6" dir={isRTL ? "rtl" : "ltr"}>
         <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 shadow-sm flex items-center gap-3">
           <FiX className="w-6 h-6" />
-          <span>{t('errorGeneric')}</span>
+          <span>{error || t('errorGeneric')}</span>
         </div>
         <Button variant="outline" className="mt-4" onClick={() => navigate(-1)}>
           <FiArrowLeft className={isRTL ? "ml-2" : "mr-2"} />
@@ -507,7 +547,7 @@ const DetailedLectureView = () => {
   // No lecture found
   if (!lecture) {
     return (
-      <div className="container mx-auto p-4" dir={isRTL ? "rtl" : "ltr"}>
+      <div className="mx-auto max-w-7xl px-4 py-4 md:px-6" dir={isRTL ? "rtl" : "ltr"}>
         <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700 shadow-sm flex items-center gap-3">
           <span>{t('lectureNotFound')}</span>
         </div>
@@ -520,14 +560,15 @@ const DetailedLectureView = () => {
   }
 
   return (
-    <div className="container mx-auto p-4" dir={isRTL ? "rtl" : "ltr"}>
+    <div className="mx-auto max-w-7xl px-4 py-4 md:px-6 lg:py-6" dir={isRTL ? "rtl" : "ltr"}>
+      <div className="border p-4 md:p-6 lg:p-8" style={pageShellStyle}>
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+      <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between">
         <div className="flex items-center gap-2 mb-4 md:mb-0">
           <Button variant="ghost" className="rounded-full p-2" onClick={() => navigate(-1)}>
             <FiArrowLeft className="w-5 h-5" />
           </Button>
-          <h1 className="text-2xl font-bold">{lecture.name}</h1>
+          <h1 className="text-2xl font-black" style={{ color: TOKENS.deepTeal }}>{lecture.name}</h1>
           <span className={`px-2 py-1 text-xs font-medium rounded-full ${Number(lecture?.price || 0) > 0 ? "bg-primary text-white" : "bg-secondary text-white"}`}>
             {lecturePricingLabel}
           </span>
@@ -551,13 +592,13 @@ const DetailedLectureView = () => {
   
       {/* Delete confirmation modal */}
       {showDeleteModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="bg-white rounded-2xl p-6 shadow-xl max-w-lg w-11/12 relative">
-            <h3 className="font-bold text-lg flex items-center gap-2">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+          <div className="relative w-full max-w-lg border p-6 shadow-xl" style={pageShellStyle}>
+            <h3 className="flex items-center gap-2 text-lg font-black" style={{ color: TOKENS.deepTeal }}>
               <FiAlertTriangle className="text-red-500" />
               {t('deleteConfirmTitle')}
             </h3>
-            <p className="py-4">
+            <p className="py-4" style={{ color: TOKENS.inkText }}>
               {t('deleteConfirmMessage', { name: lecture.name })}
             </p>
             {deleteError && (
@@ -587,14 +628,14 @@ const DetailedLectureView = () => {
 
       {/* Submission Viewer Modal */}
       {showSubmissionModal && viewingSubmission && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="bg-white rounded-2xl p-6 shadow-xl max-w-4xl w-11/12 h-5/6 max-h-screen relative">
-            <h3 className="font-bold text-lg flex items-center gap-2 mb-4">
-              <FiFile className="text-primary" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+          <div className="relative max-h-screen h-5/6 w-11/12 max-w-4xl border p-6 shadow-xl" style={pageShellStyle}>
+            <h3 className="mb-4 flex items-center gap-2 text-lg font-black" style={{ color: TOKENS.deepTeal }}>
+              <FiFile style={{ color: TOKENS.deepTeal }} />
               {viewingSubmission.fileName}
             </h3>
   
-            <div className="bg-slate-100 rounded-lg p-2 mb-4 text-sm flex items-center justify-between">
+            <div className="mb-4 flex items-center justify-between border p-3 text-sm" style={innerPanelStyle}>
               <div className="flex items-center gap-4">
                 <span>
                   {t('type')}: <span className="font-medium">{viewingSubmission.fileType}</span>
@@ -611,7 +652,7 @@ const DetailedLectureView = () => {
               </div>
             </div>
   
-            <div className="bg-slate-200 rounded-lg overflow-hidden h-[calc(100%_-_8rem)] flex items-center justify-center">
+            <div className="flex h-[calc(100%_-_8rem)] items-center justify-center overflow-hidden border" style={innerPanelStyle}>
               {/* File preview based on file type */}
               {viewingSubmission.fileType.includes("image") ? (
                 <div className="w-full h-full flex items-center justify-center p-4">
@@ -623,7 +664,7 @@ const DetailedLectureView = () => {
                 </div>
               ) : viewingSubmission.fileType.includes("pdf") ? (
                 <div className="w-full h-full p-4">
-                  <div className="w-full h-full bg-white rounded shadow-inner flex items-center justify-center">
+                  <div className="flex h-full w-full items-center justify-center rounded-xl border shadow-inner" style={{ ...sectionPanelStyle, background: "rgba(255,255,255,0.84)" }}>
                     <div className="text-center p-8">
                       <FiFileText className="w-16 h-16 mx-auto text-primary mb-4" />
                       <p className="font-medium mb-2">{t('pdfFile')}</p>
@@ -635,7 +676,7 @@ const DetailedLectureView = () => {
                 </div>
               ) : viewingSubmission.fileType.includes("word") || viewingSubmission.fileType.includes("document") ? (
                 <div className="w-full h-full p-4">
-                  <div className="w-full h-full bg-white rounded shadow-inner flex items-center justify-center">
+                  <div className="flex h-full w-full items-center justify-center rounded-xl border shadow-inner" style={{ ...sectionPanelStyle, background: "rgba(255,255,255,0.84)" }}>
                     <div className="text-center p-8">
                       <FiFileText className="w-16 h-16 mx-auto text-blue-600 mb-4" />
                       <p className="font-medium mb-2">{t('wordDoc')}</p>
@@ -647,7 +688,7 @@ const DetailedLectureView = () => {
                 </div>
               ) : viewingSubmission.fileType.includes("sheet") || viewingSubmission.fileType.includes("excel") ? (
                 <div className="w-full h-full p-4">
-                  <div className="w-full h-full bg-white rounded shadow-inner flex items-center justify-center">
+                  <div className="flex h-full w-full items-center justify-center rounded-xl border shadow-inner" style={{ ...sectionPanelStyle, background: "rgba(255,255,255,0.84)" }}>
                     <div className="text-center p-8">
                       <FiFileText className="w-16 h-16 mx-auto text-green-600 mb-4" />
                       <p className="font-medium mb-2">{t('excelSheet')}</p>
@@ -659,7 +700,7 @@ const DetailedLectureView = () => {
                 </div>
               ) : (
                 <div className="w-full h-full p-4">
-                  <div className="w-full h-full bg-white rounded shadow-inner flex items-center justify-center">
+                  <div className="flex h-full w-full items-center justify-center rounded-xl border shadow-inner" style={{ ...sectionPanelStyle, background: "rgba(255,255,255,0.84)" }}>
                     <div className="text-center p-8">
                       <FiFile className="w-16 h-16 mx-auto text-gray-600 mb-4" />
                       <p className="font-medium mb-2">{t('fileNotSupported')}</p>
@@ -691,30 +732,30 @@ const DetailedLectureView = () => {
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Main Content */}
         <div className="lg:col-span-2">
           {/* Description */}
-          <div className="mb-6">
-            <h2 className="text-xl font-semibold mb-3 flex items-center gap-2">
+          <div className="mb-6 border p-5 md:p-6" style={sectionPanelStyle}>
+            <h2 className="mb-3 flex items-center gap-2 text-xl font-black" style={{ color: TOKENS.deepTeal }}>
               <FiFileText className="text-primary" />
               {t('description')}
             </h2>
-            <div className="bg-slate-100 rounded-lg p-4">
+            <div className="border p-4" style={innerPanelStyle}>
               <p className="whitespace-pre-line">{lecture.description || t('noDescription')}</p>
             </div>
           </div>
   
           {/* Student Lecture Access */}
           {hasAdminPrivileges && (
-            <div className="mb-6">
-              <h2 className="text-xl font-semibold mb-3 flex items-center gap-2">
+            <div className="mb-6 border p-5 md:p-6" style={sectionPanelStyle}>
+              <h2 className="mb-3 flex items-center gap-2 text-xl font-black" style={{ color: TOKENS.deepTeal }}>
                 <FiUsers className="text-primary" />
                 {t('studentAccess')}
               </h2>
   
               {accessesLoading ? (
-                <div className="flex justify-center py-8 bg-slate-100 rounded-lg">
+                <div className="flex justify-center border py-8" style={innerPanelStyle}>
                   <div className="animate-spin border-4 border-primary border-t-transparent rounded-full w-8 h-8"></div>
                 </div>
               ) : accessesError ? (
@@ -723,7 +764,7 @@ const DetailedLectureView = () => {
                   <span>{accessesError}</span>
                 </div>
               ) : studentLectureAccesses.length > 0 ? (
-                <div className="bg-slate-100 rounded-lg p-4">
+                <div className="border p-4" style={innerPanelStyle}>
                   <div className="overflow-x-auto">
                     <table className="w-full text-left">
                       <thead>
@@ -828,13 +869,13 @@ const DetailedLectureView = () => {
 
            {/* Student Homeworks */}
            {(hasAdminPrivileges || userRole === "Student") && (
-             <div className="mb-6">
-               <h2 className="text-xl font-semibold mb-3 flex items-center gap-2">
+             <div className="mb-6 border p-5 md:p-6" style={sectionPanelStyle}>
+               <h2 className="mb-3 flex items-center gap-2 text-xl font-black" style={{ color: TOKENS.deepTeal }}>
                  <FiUpload className="text-primary" />
                  {hasAdminPrivileges ? t('submissions') : t('mySubmissions')}
                </h2>
                {submissionsLoading ? (
-                 <div className="flex justify-center py-8 bg-slate-100 rounded-lg">
+                 <div className="flex justify-center border py-8" style={innerPanelStyle}>
                    <div className="animate-spin border-4 border-primary border-t-transparent rounded-full w-8 h-8"></div>
                  </div>
                ) : submissionsError ? (
@@ -843,7 +884,7 @@ const DetailedLectureView = () => {
                    <span>{submissionsError}</span>
                  </div>
                ) : studentSubmissions.length > 0 ? (
-                 <div className="bg-slate-100 rounded-lg p-4">
+                 <div className="border p-4" style={innerPanelStyle}>
                    <div className="overflow-x-auto">
                      <table className="w-full text-left">
                        <thead>
@@ -954,8 +995,8 @@ const DetailedLectureView = () => {
            )}
 
            {/* Attachments */}
-            <div className="mb-6">
-             <h2 className="text-xl font-semibold mb-3">{t('attachments')}</h2>
+           <div className="mb-6 border p-5 md:p-6" style={sectionPanelStyle}>
+             <h2 className="mb-3 text-xl font-black" style={{ color: TOKENS.deepTeal }}>{t('attachments')}</h2>
              {renderAttachments(attachments.booklets, 'booklets', FiBook)}
              {renderAttachments(attachments.pdfsandimages, 'filesImages', FiFileText)}
              {renderAttachments(attachments.homeworks, 'homeworks', FiBook)}
@@ -966,90 +1007,102 @@ const DetailedLectureView = () => {
                !attachments.homeworks?.length &&
                !attachments.exams?.length && (
                  <div className="rounded-2xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-700 shadow-sm flex items-center gap-3">
-                   <span>{t('noAttachments')}</span>
-                 </div>
-               )}
+                 <span>{t('noAttachments')}</span>
+               </div>
+             )}
+           </div>
+
+           <div className="mb-6 border p-5 md:p-6" style={sectionPanelStyle}>
+             <h2 className="mb-3 flex items-center gap-2 text-xl font-black" style={{ color: TOKENS.deepTeal }}>
+               <FiMessageSquare className="text-primary" />
+               {t("community", "Community")}
+             </h2>
+             <CommunityTab
+               lectureId={lectureId}
+               userId={userId}
+               userRole={userRole}
+             />
            </div>
          </div>
   
   
          {/* Sidebar - Lecture Details */}
          <div className="lg:col-span-1">
-         <div className="bg-slate-100 rounded-lg p-4 sticky top-4">
-           <h2 className="text-xl font-semibold mb-4">{t('lectureDetails')}</h2>
+         <div className="sticky top-4 border p-4 md:p-5" style={sectionPanelStyle}>
+           <h2 className="mb-4 text-xl font-black" style={{ color: TOKENS.deepTeal }}>{t('lectureDetails')}</h2>
            <ul className="space-y-4">
              <li className="flex items-center gap-3">
-               <div className="bg-slate-200 p-2 rounded-lg">
-                 <FiDollarSign className="text-primary" />
+               <div className="rounded-lg p-2" style={iconChipStyle}>
+                 <FiDollarSign />
                </div>
                <div>
-                 <span className="text-sm text-slate-900/70">{t('price')}</span>
+                 <span className="text-sm" style={{ color: TOKENS.slateText }}>{t('price')}</span>
                  <p className="font-medium">{lecture.price} {t('points')}</p>
                </div>
              </li>
   
                {/* Created By */}
                <li className="flex items-center gap-3">
-                 <div className="bg-slate-200 p-2 rounded-lg">
-                   <FiUser className="text-primary" />
+                 <div className="rounded-lg p-2" style={iconChipStyle}>
+                   <FiUser />
                  </div>
                  <div>
-                    <span className="text-sm text-slate-900/70">{t('lecturer')}</span>
+                    <span className="text-sm" style={{ color: TOKENS.slateText }}>{t('lecturer')}</span>
                    <p className="font-medium">{lecture.createdBy?.name || t('unknown')}</p>
                  </div>
                </li>
   
                {/* Subject */}
                <li className="flex items-center gap-3">
-                 <div className="bg-slate-200 p-2 rounded-lg">
-                   <FiBook className="text-primary" />
+                 <div className="rounded-lg p-2" style={iconChipStyle}>
+                   <FiBook />
                  </div>
                  <div>
-                   <span className="text-sm text-slate-900/70">{t('subject')}</span>
+                   <span className="text-sm" style={{ color: TOKENS.slateText }}>{t('subject')}</span>
                    <p className="font-medium">{getSubjectName()}</p>
                  </div>
                </li>
   
                {/* Level */}
                <li className="flex items-center gap-3">
-                 <div className="bg-slate-200 p-2 rounded-lg">
-                   <FiLayers className="text-primary" />
+                 <div className="rounded-lg p-2" style={iconChipStyle}>
+                   <FiLayers />
                  </div>
                  <div>
-                 <span className="text-sm text-slate-900/70">{t('level')}</span>
+                 <span className="text-sm" style={{ color: TOKENS.slateText }}>{t('level')}</span>
                    <p className="font-medium">{getLevelName()}</p>
                  </div>
                </li>
   
                {/* Views */}
                <li className="flex items-center gap-3">
-                 <div className="bg-slate-200 p-2 rounded-lg">
-                   <FiEye className="text-primary" />
+                 <div className="rounded-lg p-2" style={iconChipStyle}>
+                   <FiEye />
                  </div>
                  <div>
-                    <span className="text-sm text-slate-900/70">{t('viewsCount')}</span>
+                    <span className="text-sm" style={{ color: TOKENS.slateText }}>{t('viewsCount')}</span>
                    <p className="font-medium">{lecture.numberOfViews || 0}</p>
                  </div>
                </li>
   
                {/* Teacher Allowed */}
                <li className="flex items-center gap-3">
-                 <div className="bg-slate-200 p-2 rounded-lg">
+                 <div className="rounded-lg p-2" style={iconChipStyle}>
                    {lecture.teacherAllowed ? <FiCheck className="text-green-500" /> : <FiEyeOff className="text-red-500" />}
                  </div>
                  <div>
-                   <span className="text-sm text-slate-900/70">{t('teacherAllowed')}</span>
+                   <span className="text-sm" style={{ color: TOKENS.slateText }}>{t('teacherAllowed')}</span>
                    <p className="font-medium">{lecture.teacherAllowed ? t('yes') : t('no')}</p>
                  </div>
                </li>
   
                {/* Requires Exam */}
                <li className="flex items-center gap-3">
-                 <div className="bg-slate-200 p-2 rounded-lg">
+                 <div className="rounded-lg p-2" style={iconChipStyle}>
                    {lecture.requiresExam ? <FiCheck className="text-green-500" /> : <FiX className="text-red-500" />}
                  </div>
                  <div>
-                   <span className="text-sm text-slate-900/70">{t('requiresExam')}</span>
+                   <span className="text-sm" style={{ color: TOKENS.slateText }}>{t('requiresExam')}</span>
                    <p className="font-medium">{lecture.requiresExam ? t('yes') : t('no')}</p>
                  </div>
                </li>
@@ -1057,19 +1110,20 @@ const DetailedLectureView = () => {
            </div>
          </div>
        </div>
+      </div>
       
       {/* Feedback Modal */}
       {showFeedbackModal && currentSubmission && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="bg-white rounded-2xl p-6 shadow-xl max-w-2xl w-11/12 relative">
-            <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
-              <FiMessageSquare className="text-primary" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+          <div className="relative w-full max-w-2xl border p-6 shadow-xl" style={pageShellStyle}>
+            <h3 className="mb-4 flex items-center gap-2 text-lg font-black" style={{ color: TOKENS.deepTeal }}>
+              <FiMessageSquare style={{ color: TOKENS.deepTeal }} />
               {t('provideFeedback')}
             </h3>
             
             <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-2">
+              <div className="border p-4" style={innerPanelStyle}>
+                <label className="block text-sm font-medium mb-2" style={{ color: TOKENS.deepTeal }}>
                   {t('rating')} (1-5)
                 </label>
                 <div className="flex gap-2">
@@ -1085,8 +1139,8 @@ const DetailedLectureView = () => {
                 </div>
               </div>
               
-              <div>
-                <label className="block text-sm font-medium mb-2">
+              <div className="border p-4" style={innerPanelStyle}>
+                <label className="block text-sm font-medium mb-2" style={{ color: TOKENS.deepTeal }}>
                   {t('comment')}
                 </label>
                 <Textarea 

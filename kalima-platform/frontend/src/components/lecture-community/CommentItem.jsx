@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { FiMessageSquare, FiThumbsUp, FiEdit2, FiTrash2, FiChevronDown, FiChevronUp } from "react-icons/fi";
 import Button from "../ui/Button";
 import Badge from "../ui/Badge";
@@ -8,6 +9,8 @@ import toast from "react-hot-toast";
 import { designTokens } from "../../constants/designTokens";
 
 const CommentItem = ({ comment, userRole, userId, onCommentUpdate }) => {
+    const { t, i18n } = useTranslation("lectureDisplay");
+    const isRTL = i18n.language === "ar";
     const commentAuthor = comment?.userId && typeof comment.userId === "object" ? comment.userId : null;
     const commentAuthorId = commentAuthor?._id || comment?.userId || null;
     const commentAuthorName = commentAuthor?.name || "User";
@@ -42,7 +45,7 @@ const CommentItem = ({ comment, userRole, userId, onCommentUpdate }) => {
                 setReplies(result.data);
             }
         } catch (error) {
-            toast.error(error?.message || "Failed to load replies");
+            toast.error(error?.message || t("failedToLoadComments"));
         } finally {
             setLoadingReplies(false);
         }
@@ -73,13 +76,13 @@ const CommentItem = ({ comment, userRole, userId, onCommentUpdate }) => {
                 setIsLiked(result.data.isLiked);
             }
         } catch (error) {
-            toast.error(error?.message || "Failed to like comment");
+            toast.error(error?.message || t("failedToLikeComment"));
         }
     };
 
     const handleSaveEdit = async () => {
         if (!editContent.trim()) {
-            toast.error("Comment content cannot be empty");
+            toast.error(t("commentCannotBeEmpty"));
             return;
         }
 
@@ -88,23 +91,23 @@ const CommentItem = ({ comment, userRole, userId, onCommentUpdate }) => {
             if (result.status === "success") {
                 onCommentUpdate();
                 setIsEditing(false);
-                toast.success("Comment updated");
+                toast.success(t("commentUpdated"));
             }
         } catch (error) {
-            toast.error(error?.message || "Failed to update comment");
+            toast.error(error?.message || t("failedToUpdateComment"));
         }
     };
 
     const handleDelete = async () => {
-        if (!window.confirm("Are you sure you want to delete this comment?")) return;
+        if (!window.confirm(t("confirmDeleteComment"))) return;
         try {
             const result = await deleteComment(comment._id);
             if (result.status === "success") {
                 onCommentUpdate();
-                toast.success("Comment deleted");
+                toast.success(t("commentDeleted"));
             }
         } catch (error) {
-            toast.error(error?.message || "Failed to delete comment");
+            toast.error(error?.message || t("failedToDeleteComment"));
         }
     };
 
@@ -133,7 +136,7 @@ const CommentItem = ({ comment, userRole, userId, onCommentUpdate }) => {
             <div className="flex justify-between items-start">
                 <div className="flex items-center gap-2">
                     <div
-                        className="flex items-center justify-center rounded-full w-10 h-10 text-[#F8FAFC] font-black"
+                        className="flex items-center justify-center rounded-full w-10 h-10 text-[#F8FCFF] font-black"
                         style={{ background: isLecturer ? GRADIENTS.cta : TOKENS.deepTeal }}
                     >
                         <span>{commentAuthorName.charAt(0).toUpperCase()}</span>
@@ -141,7 +144,7 @@ const CommentItem = ({ comment, userRole, userId, onCommentUpdate }) => {
                     <div>
                         <span className="font-bold text-sm" style={{ color: TOKENS.deepTeal }}>{commentAuthorName}</span>
                         {isLecturer && (
-                            <Badge variant="primary" size="sm" className="ml-2">Lecturer</Badge>
+                            <Badge variant="primary" size="sm" className="ml-2">{t("lecturer", "Lecturer")}</Badge>
                         )}
                         <span className="text-xs ml-2" style={{ color: TOKENS.slateText }}>
                             {new Date(comment.createdAt).toLocaleDateString()}
@@ -195,10 +198,10 @@ const CommentItem = ({ comment, userRole, userId, onCommentUpdate }) => {
                                 setIsEditing(false);
                             }}
                         >
-                            Cancel
+                            {t("cancel", "Cancel")}
                         </Button>
                         <Button variant="primary" size="sm" onClick={handleSaveEdit}>
-                            Save
+                            {t("save", "Save")}
                         </Button>
                     </div>
                 </div>
@@ -220,7 +223,7 @@ const CommentItem = ({ comment, userRole, userId, onCommentUpdate }) => {
                         className="flex items-center gap-1 text-xs font-semibold"
                         style={{ color: TOKENS.slateText }}
                     >
-                        <FiMessageSquare /> Reply
+                        <FiMessageSquare /> {t("reply", "Reply")}
                     </button>
                 )}
                 <button
@@ -228,7 +231,7 @@ const CommentItem = ({ comment, userRole, userId, onCommentUpdate }) => {
                     className="flex items-center gap-1 text-xs font-semibold"
                     style={{ color: TOKENS.slateText }}
                 >
-                    <FiMessageSquare /> {replyCount} Replies
+                    <FiMessageSquare /> {replyCount} {t("replies", "Replies")}
                     {showReplies ? <FiChevronUp /> : <FiChevronDown />}
                 </button>
             </div>
@@ -244,8 +247,8 @@ const CommentItem = ({ comment, userRole, userId, onCommentUpdate }) => {
                             parentId={comment._id}
                             compact
                             title={null}
-                            placeholder="Write your reply here..."
-                            submitLabel="Reply"
+                            placeholder={t("writeReplyPlaceholder", "Write your reply here...")}
+                            submitLabel={t("reply", "Reply")}
                             onCommentCreated={async () => {
                                 setShowReplyInput(false);
                                 await handleNestedCommentUpdate();
@@ -270,7 +273,7 @@ const CommentItem = ({ comment, userRole, userId, onCommentUpdate }) => {
                             />
                         ))
                     ) : (
-                        <p className="text-xs italic" style={{ color: TOKENS.slateText }}>No replies yet.</p>
+                        <p className="text-xs italic" style={{ color: TOKENS.slateText }}>{t("noRepliesYet", "No replies yet.")}</p>
                     )}
                 </div>
             )}

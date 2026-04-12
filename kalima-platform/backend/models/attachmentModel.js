@@ -22,6 +22,27 @@ const attachmentSchema = new mongoose.Schema({
   fileSize: { type: String, required: true },
   publicId: { type: String, required: false },
   uploadedOn: { type: Date, default: Date.now },
+  rating: {
+    type: Number,
+    min: 1,
+    max: 5,
+    default: null,
+  },
+  comment: {
+    type: String,
+    trim: true,
+    default: "",
+  },
+  feedbackDate: {
+    type: Date,
+    default: null,
+  },
+  feedbackBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: false,
+    default: null,
+  },
 });
 attachmentSchema.index({ lectureId: 1, type: 1 });
 attachmentSchema.index({ studentId: 1, type: 1 });

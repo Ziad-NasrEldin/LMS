@@ -6,6 +6,7 @@ import { ImageIcon, Video, ChevronDown } from "lucide-react"
 import toast from "react-hot-toast"
 import { createContainer, updateContainer } from "../../routes/lectures"
 import { buildContainerPayloadObject, objectToFormData } from "../../utils/contentCreationPayloads"
+import { translateErrorMessage } from "../../utils/errorTranslator"
 import { resolveUploadUrl } from "../../utils/uploadUrl"
 import DSSelect from "../../components/DSSelect"
 import Button from "../../components/ui/Button";
@@ -61,33 +62,29 @@ function BasicInfoForm({
     if (file.size <= 1024 * 1024 * 1024) {
       setCourseImage(file)
     } else {
-      toast.error(isRTL ? "حجم الملف يجب أن يكون أقل من 1 جيجابايت" : "File size must be less than 1GB")
+      toast.error(translateErrorMessage("File size must be less than 1GB"))
     }
   }
 
   const handleCreateParentContainer = async (e) => {
     e.preventDefault()
     if (!formData.courseName || !formData.gradeLevel || !formData.subject) {
-      toast.error(isRTL ? "يرجى ملء جميع الحقول المطلوبة" : "Please fill all required fields")
+      toast.error(translateErrorMessage("Please fill all required fields"))
       return
     }
 
     if (!formData.description?.trim()) {
-      toast.error(isRTL ? "يرجى إدخال وصف للكورس" : "Please enter a course description")
+      toast.error(translateErrorMessage("Please enter a course description"))
       return
     }
 
     if (!formData.goal?.trim()) {
-      toast.error(isRTL ? "يرجى إدخال هدف الكورس" : "Please enter a course goal")
+      toast.error(translateErrorMessage("Please enter a course goal"))
       return
     }
 
     if (isPaidCourse && (!formData.priceFull || Number(formData.priceFull) <= 0)) {
-      toast.error(
-        isRTL
-          ? "يرجى إدخال سعر أكبر من صفر للكورس المدفوع"
-          : "Please enter a price greater than zero for the paid course",
-      )
+      toast.error(translateErrorMessage("Please enter a price greater than zero for the paid course"))
       return
     }
 
@@ -125,12 +122,12 @@ function BasicInfoForm({
         })
         toast.success(isEditMode ? (isRTL ? "تم تحديث الحاوية الرئيسية بنجاح" : "Parent container updated successfully") : (isRTL ? "تم إنشاء الحاوية الرئيسية بنجاح" : "Parent container created successfully"))
       } else {
-        toast.error(isRTL ? "فشل حفظ الحاوية الرئيسية" : "Failed to save parent container")
+        toast.error(translateErrorMessage("Failed to save parent container"))
       }
     } catch (error) {
       console.error("Error creating parent container:", error)
-      const errorMessage = error.response?.data?.message || "حدث خطأ أثناء حفظ الحاوية الرئيسية"
-      toast.error(isRTL ? errorMessage : "Error saving parent container")
+      const errorMessage = error.response?.data?.message || error.message || "Error saving parent container"
+      toast.error(translateErrorMessage(errorMessage))
     } finally {
       setIsSubmitting(false)
     }

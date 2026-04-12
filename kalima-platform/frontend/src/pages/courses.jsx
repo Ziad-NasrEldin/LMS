@@ -183,7 +183,7 @@ export default function CoursesPage() {
       }
     } catch (err) {
       console.error("Error fetching containers:", err)
-      setError("حدث خطأ أثناء تحميل البيانات")
+      setError(translateErrorMessage("Failed to load data"))
     } finally {
       setLoading(false)
     }

@@ -17,6 +17,7 @@ import {
   getYouTubeId,
   pickFirstUrl,
 } from "./lectureDisplay.utils"
+import { translateErrorMessage } from "../../../utils/errorTranslator"
 import { verifyExamSubmission, checkLectureAccess } from "../../../routes/examsAndHomeworks"
 import { uploadHomework, getLectureHomeworks } from "../../../routes/homeworks"
 import { getUserDashboard, getUserFromToken } from "../../../routes/auth-services"
@@ -260,11 +261,11 @@ const LectureDisplay = () => {
  
   const handleCopyEmail = () => {
     if (!userEmail) {
-      toast.error(t("noEmailFound") || "No email found to copy");
+      toast.error(t("studentEmailUnavailableToast") || "No email found to copy");
       return;
     }
     navigator.clipboard.writeText(userEmail);
-    toast.success(t("emailCopied") || "Email copied to clipboard!");
+    toast.success(t("emailCopiedToast") || "Email copied to clipboard!");
   }
  
   // Fetch all page data in one go
@@ -283,6 +284,8 @@ const LectureDisplay = () => {
         setUserRole(user.role);
         setUserId(user.id);
         setUserEmail(user.email || "");
+        setStudentFullName(user.name || user.fullName || "");
+        setStudentSequenceId(user.sequenceId || user.studentId || "");
 
         // 2. Set Attachments
         setAttachments(attachments);
@@ -325,7 +328,7 @@ const LectureDisplay = () => {
           setHomeworks(homeworks);
         }
       } else {
-        setError(result.error || t("failedToLoadLecture"));
+        setError(translateErrorMessage(result.error || t("failedToLoadLecture"), t));
       }
     } catch (err) {
       setError(t("failedToLoadLectureTryAgain"));
@@ -385,8 +388,7 @@ const LectureDisplay = () => {
         const handleBeforeUnload = (e) => {
           // Only show the warning if they haven't watched 50% of the video
           if (progress < 50) {
-            const message =
-              t("exitWarningMessage") || "You haven't completed 50% of this lecture yet. Are you sure you want to leave?"
+            const message = t("exitWarningMessage")
             e.preventDefault()
             e.returnValue = message
             setHasAttemptedToLeave(true)
@@ -790,7 +792,7 @@ const LectureDisplay = () => {
           const result = await uploadHomework(lectureId, homeworkData);
 
           if (!result.success) {
-            throw new Error(result.error || t("homeworkUploadFailed"));
+            throw new Error(translateErrorMessage(result.error || t("homeworkUploadFailed"), t));
           }
         }
 
@@ -810,9 +812,10 @@ const LectureDisplay = () => {
         }
       } catch (err) {
         console.error("Error uploading homework:", err);
-        setHomeworkError(`${t("homeworkUploadFailed")}: ${err.message}`);
+        const translatedError = translateErrorMessage(err.message, t);
+        setHomeworkError(`${t("homeworkUploadFailed")}: ${translatedError}`);
 
-        toast.error(`${t("homeworkUploadFailed")}: ${err.message}`);
+        toast.error(`${t("homeworkUploadFailed")}: ${translatedError}`);
       } finally {
         setIsSubmittingHomework(false);
       }
@@ -875,7 +878,7 @@ const LectureDisplay = () => {
           }
         } catch (fallbackErr) {
           console.error("Fallback download failed:", fallbackErr);
-          setError(`${t("downloadFailure")}: ${err.message}`);
+          setError(`${t("downloadFailure")}: ${translateErrorMessage(err.message, t)}`);
         }
       } finally {
         setIsDownloading(false);
@@ -1383,7 +1386,7 @@ const LectureDisplay = () => {
             <div>
               <FiAlertTriangle className="stroke-current shrink-0 h-6 w-6" />
               <span>
-                {t("exitWarningMessage") || "You haven't completed 50% of this lecture yet. Please continue watching."}
+                {t("exitWarningMessage")}
               </span>
             </div>
           </div>
@@ -2123,20 +2126,20 @@ const LectureDisplay = () => {
          <Modal 
            isOpen={showExitConfirmation} 
            onClose={handleCancelNavigation} 
-           title={t("exitWarningTitle") || "Leaving so soon?"}
+           title={t("exitWarningTitle")}
            footer={
              <div className="flex justify-end gap-2">
                <Button 
                  variant="outline" 
                  onClick={handleCancelNavigation}
                >
-                 {t("stayOnPage") || "Stay on page"}
+                 {t("stayOnPage")}
                </Button>
                <Button 
                  variant="primary" 
                  onClick={handleConfirmNavigation}
                >
-                 {t("leavePage") || "Leave anyway"}
+                 {t("leavePage")}
                </Button>
              </div>
            }

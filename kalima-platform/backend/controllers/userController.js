@@ -126,10 +126,77 @@ const normalizeLecturerSocialMedia = (rawValue) => {
   return normalized;
 };
 
-const RESTRICTED_SELF_UPDATE_ROLES = new Set(["student", "parent", "teacher"]);
+const RESTRICTED_SELF_UPDATE_ROLES = new Set(["student", "parent", "teacher", "admin", "subadmin"]);
 
 const getAllUsers = catchAsync(async (req, res, next) => {
-  const users = await User.find().select("-password").lean();
+  // Fetch students separately to ensure proper population of level field
+  const students = await Student.find()
+    .select("-password")
+    .populate({
+      path: "level",
+      select: "name nameAr kind parentLevel",
+      populate: {
+        path: "parentLevel",
+        select: "name nameAr"
+      }
+    })
+    .lean();
+  
+  // Fetch teachers separately to populate subject and level
+  const teachers = await Teacher.find()
+    .select("-password")
+    .populate({
+      path: "level",
+      select: "name nameAr kind parentLevel",
+      populate: {
+        path: "parentLevel",
+        select: "name nameAr"
+      }
+    })
+    .lean();
+  
+  // Fetch lecturers separately
+  const lecturers = await Lecturer.find()
+    .select("-password")
+    .lean();
+  
+  // Fetch all other users (parents, assistants, etc.)
+  const otherUsers = await User.find({ 
+    role: { $nin: ["Student", "Teacher", "Lecturer"] } 
+  })
+    .select("-password")
+    .populate({
+      path: "level",
+      select: "name nameAr kind parentLevel",
+      populate: {
+        path: "parentLevel",
+        select: "name nameAr"
+      }
+    })
+    .lean();
+  
+  // Convert student discriminator objects to plain objects
+  const studentsData = students.map(s => {
+    const obj = s.toObject ? s.toObject() : s;
+    obj.role = "Student";
+    return obj;
+  });
+  
+  // Convert teacher discriminator objects to plain objects
+  const teachersData = teachers.map(t => {
+    const obj = t.toObject ? t.toObject() : t;
+    obj.role = "Teacher";
+    return obj;
+  });
+  
+  // Convert lecturer discriminator objects to plain objects
+  const lecturersData = lecturers.map(l => {
+    const obj = l.toObject ? l.toObject() : l;
+    obj.role = "Lecturer";
+    return obj;
+  });
+  
+  const users = [...studentsData, ...teachersData, ...lecturersData, ...otherUsers];
 
   if (!users.length) return next(new AppError("Couldn't find users.", 404));
   res.json(users);
@@ -162,6 +229,20 @@ const updateUser = catchAsync(async (req, res, next) => {
   const { name, email, address, password, children, ...restBody } = req.body;
 
   const userId = req.params.userId;
+
+  // Check if admin/subadmin is trying to change their own password - prevent this
+  const currentUserRole = req.user?.role;
+  const currentUserId = req.user?.id?.toString();
+  const targetUserId = userId.toString();
+  
+  const isAdminEditingOwnAccount = currentUserId === targetUserId && ["admin", "subadmin"].includes(currentUserRole?.toLowerCase());
+  
+  if (isAdminEditingOwnAccount) {
+    // Admin cannot change their own credentials at all
+    if (password || name || email) {
+      return next(new AppError("Admin cannot change their own credentials. Please contact system administrator.", 403));
+    }
+  }
 
   // If password is provided, hash it and allow update
   let hashedPassword = null;

@@ -8,11 +8,12 @@ import { translateErrorMessage } from "../../utils/errorTranslator"
 import Button from "../../components/ui/Button"
 import Input from "../../components/ui/Input"
 
-function SecuritySection() {
+function SecuritySection({ userRole }) {
   const { t, i18n } = useTranslation("settings")
   const isRTL = i18n.language === 'ar'
   const TOKENS = designTokens.colors
   const SHADOWS = designTokens.shadows
+
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
@@ -25,6 +26,13 @@ function SecuritySection() {
     success: false,
     error: null
   })
+
+  const normalizedRole = String(userRole || "").trim().toLowerCase()
+  const isAdminRole = ["admin", "subadmin"].includes(normalizedRole)
+  
+  if (isAdminRole) {
+    return null
+  }
 
   const handleInputChange = (e) => {
     const { name, value } = e.target

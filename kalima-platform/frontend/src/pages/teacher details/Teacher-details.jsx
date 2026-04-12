@@ -6,12 +6,66 @@ import { Loader, BookOpen, GraduationCap, Star, Award, Users } from "lucide-reac
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom"
 import { getLecturerById } from "../../routes/fetch-users"
 import { getContainersByLecturerId, getContainerById } from "../../routes/lectures"
+import { getCourseReviews } from "../../routes/reviews.jsx"
 import { buildCoursePath, buildTeacherPath } from "../../seo/site.mjs"
 import { useSeo } from "../../seo/useSeo"
 import { buildBreadcrumbSchema, buildPersonSchema } from "../../seo/structuredData.mjs"
 import { resolveProfileImageUrl } from "../../utils/profileImage"
 import { resolveUploadUrl } from "../../utils/uploadUrl"
+import { translateErrorMessage } from "../../utils/errorTranslator"
 import Button from "../../components/ui/Button"
+
+const resolveContainerImage = (container) => {
+  const imageCandidates = [
+    container?.image?.url,
+    container?.image,
+    container?.containerImage?.url,
+    container?.containerImage,
+    container?.inheritedImage?.image?.url,
+    container?.inheritedImage?.image,
+    container?.inheritedImage?.url,
+    container?.thumbnailLink,
+    container?.thumbnail,
+    container?.imageUrl,
+    container?.coverImage?.url,
+    container?.coverImage,
+  ]
+
+  for (const candidate of imageCandidates) {
+    const resolved = resolveUploadUrl(candidate, "product_thumbnails")
+    if (resolved) {
+      return resolved
+    }
+  }
+
+  return null
+}
+
+const resolveCourseRatingValue = (container) => {
+  const ratingCandidates = [
+    container?.reviewStats?.average,
+    container?.averageRating,
+    container?.rating?.average,
+    container?.rating,
+  ]
+
+  for (const candidate of ratingCandidates) {
+    const numericRating = Number(candidate)
+    if (Number.isFinite(numericRating) && numericRating >= 0) {
+      return numericRating
+    }
+  }
+
+  return null
+}
+
+const formatCourseRating = (ratingValue) => {
+  if (!Number.isFinite(ratingValue)) {
+    return "0.0"
+  }
+
+  return ratingValue.toFixed(1)
+}
 
 const TeacherInfoHeader = () => {
   const { t } = useTranslation("teacherDetails");
@@ -47,7 +101,7 @@ const CourseCard = ({ course }) => {
         {/* Floating badge for rating */}
         <div className="absolute top-5 right-5 bg-slate-900/90 backdrop-blur-sm px-3 py-1.5 rounded-full text-sm font-semibold flex items-center gap-1 shadow-sm">
           <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-          <span className="text-white">{course.rating || "5.0"}</span>
+          <span className="text-white">{course.ratingLabel ?? formatCourseRating(course.rating)}</span>
         </div>
       </figure>
   
@@ -326,12 +380,33 @@ export default function TeacherDetails() {
           const containersData = await getContainersByLecturerId(userId, { type: "course" });
           if (containersData?.data?.containers) {
             const fullContainers = await Promise.all(
-              containersData.data.containers.map(c => getContainerById(c._id).then(r => r?.data ?? c))
+              containersData.data.containers.map(async (containerSummary) => {
+                const [containerResult, reviewsResult] = await Promise.all([
+                  getContainerById(containerSummary._id),
+                  getCourseReviews(containerSummary._id),
+                ])
+
+                const mergedContainer = {
+                  ...containerSummary,
+                  ...(containerResult?.data || {}),
+                }
+
+                const reviewAverage =
+                  reviewsResult?.status === "success"
+                    ? Number(reviewsResult?.data?.stats?.average)
+                    : NaN
+
+                if (Number.isFinite(reviewAverage)) {
+                  mergedContainer.averageRating = reviewAverage
+                }
+
+                return mergedContainer
+              })
             );
             setContainers(fullContainers);
           }
         } else {
-          setError(teacherResult.error || t('error.failed'));
+          setError(translateErrorMessage(teacherResult.error || t('error.failed'), t));
         }
       } catch (err) {
         console.error("Error fetching data:", err);
@@ -457,16 +532,11 @@ export default function TeacherDetails() {
                     subject: container.subject?.name || 'Unknown Subject',
                     class: container.level?.name || 'Unknown Level',
                     grade: container.level?.name || 'Unknown Level',
-                    rating: 5,
+                    rating: resolveCourseRatingValue(container),
+                    ratingLabel: formatCourseRating(resolveCourseRatingValue(container)),
                     duration: 12,
                     type: container.type,
-                    thumbnail: resolveUploadUrl(
-                      container?.image?.url ||
-                      container?.containerImage?.url ||
-                      container?.inheritedImage?.image?.url ||
-                      container?.thumbnail,
-                      "product_thumbnails"
-                    ),
+                    thumbnail: resolveContainerImage(container),
                   }}
                 />
               ))

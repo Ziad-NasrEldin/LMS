@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom';
 
 const Button = ({ 
   children, 
@@ -9,6 +10,7 @@ const Button = ({
   isLoading = false, 
   isDisabled = false, 
   as: Component = 'button',
+  to,
   style,
   ...props 
 }) => {
@@ -37,6 +39,28 @@ const Button = ({
     className,
   ].filter(Boolean).join(' ');
 
+  const buttonContent = (
+    <>
+      {isLoading && Component === 'button' ? (
+        <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2" />
+      ) : null}
+      {!isLoading && children}
+    </>
+  );
+
+  if (to) {
+    return (
+      <Link 
+        to={to}
+        className={combinedClasses}
+        style={style}
+        {...props}
+      >
+        {buttonContent}
+      </Link>
+    );
+  }
+
   return (
     <Component 
       className={combinedClasses} 
@@ -44,10 +68,7 @@ const Button = ({
       style={style}
       {...props}
     >
-      {isLoading && Component === 'button' ? (
-        <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2" />
-      ) : null}
-      {!isLoading && children}
+      {buttonContent}
     </Component>
   );
 };
@@ -59,6 +80,7 @@ Button.propTypes = {
   className: PropTypes.string,
   isLoading: PropTypes.bool,
   isDisabled: PropTypes.bool,
+  to: PropTypes.string,
   style: PropTypes.object,
 };
 

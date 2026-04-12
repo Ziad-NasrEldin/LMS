@@ -1,7 +1,10 @@
 import axios from "axios";
 import { normalizeApiError, normalizeApiErrorWithEmpty404 } from "../utils/apiError";
 
-const API_URL = import.meta.env.VITE_API_URL;
+const rawApiUrl = (import.meta.env.VITE_API_URL || "").replace(/\/+$/, "");
+const API_URL = /\/api\/v1$/i.test(rawApiUrl)
+  ? rawApiUrl
+  : `${rawApiUrl || ""}/api/v1`;
 
 export const getAuthHeader = () => {
   const token = localStorage.getItem("accessToken");
@@ -56,6 +59,23 @@ export const getAllAssistants = async () => {
   } catch (error) {
     console.error("API Error:", error);
     return normalizeApiErrorWithEmpty404(error, "Failed to fetch assistants");
+  }
+};
+
+export const getAllTeachers = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/users/role/teacher`, {
+      headers: getAuthHeader(),
+    });
+    console.log("Fetched teachers:", response);
+
+    return {
+      success: true,
+      data: response.data,
+    };
+  } catch (error) {
+    console.error("API Error:", error);
+    return normalizeApiErrorWithEmpty404(error, "Failed to fetch teachers");
   }
 };
 

@@ -4,6 +4,7 @@ import { Book, ChevronDown, ChevronRight } from "lucide-react"
 import { getContainerHierarchy } from "../routes/lectures"
 import { motion, AnimatePresence } from "framer-motion"
 import SyllabusItem from "./SyllabusItem"
+import { translateErrorMessage } from "../utils/errorTranslator"
 
 const Syllabus = memo(function Syllabus({
   courseId,
@@ -34,10 +35,17 @@ const Syllabus = memo(function Syllabus({
         if (result?.status === "success" && result.data) {
           setHierarchy(result.data.container)
         } else if (result?.status === "restricted") {
-          // Handle restricted access
-          setError(t("errors.accessRestricted", "Access to this content is restricted"))
+          setError(
+            result?.message
+              ? translateErrorMessage(result.message)
+              : t("errors.accessRestricted", "Access to this content is restricted")
+          )
         } else {
-          setError(result?.message || t("errors.fetchError", "Failed to load syllabus"))
+          setError(
+            result?.message
+              ? translateErrorMessage(result.message)
+              : t("errors.fetchError", "Failed to load syllabus")
+          )
         }
       } catch (err) {
         console.error("Error fetching hierarchy:", err)

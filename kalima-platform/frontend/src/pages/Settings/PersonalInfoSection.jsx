@@ -7,6 +7,7 @@ import { getUserDashboard } from "../../routes/auth-services"
 import { updateCurrentUser } from "../../routes/update-user"
 import { Check, X, Camera, Upload, Pencil } from "lucide-react"
 import { resolveProfileImageUrl } from "../../utils/profileImage"
+import { translateErrorMessage } from "../../utils/errorTranslator"
 import { designTokens } from "../../constants/designTokens"
 import DSSelect from "../../components/DSSelect"
 import Button from "../../components/ui/Button"
@@ -239,7 +240,7 @@ function PersonalInfoSection() {
         setUpdateStatus({
           loading: false,
           success: false,
-          error: result.error || "Failed to upload profile picture",
+          error: translateErrorMessage(result.error || "Failed to upload profile picture"),
         })
       }
     } catch (error) {
@@ -247,7 +248,7 @@ function PersonalInfoSection() {
       setUpdateStatus({
         loading: false,
         success: false,
-        error: "An unexpected error occurred while uploading",
+        error: translateErrorMessage("An unexpected error occurred while uploading"),
       })
     } finally {
       setProfilePicUploading(false)
@@ -281,11 +282,11 @@ function PersonalInfoSection() {
             profilePic: null,
           })
         } else {
-          setError(result.error || "Failed to fetch user data")
+          setError(translateErrorMessage(result.error || "Failed to fetch user data"))
         }
       } catch (error) {
         console.error("Error fetching user data:", error)
-        setError("An error occurred while fetching your information")
+        setError(translateErrorMessage("An error occurred while fetching your information"))
       } finally {
         setLoading(false)
       }
@@ -372,6 +373,18 @@ function PersonalInfoSection() {
     const isRestrictedSettingsRole = ["student", "parent", "teacher"].includes(normalizedRole)
     if (isRestrictedSettingsRole) return
 
+    const isAdminRole = ["admin", "subadmin"].includes(normalizedRole)
+    if (isAdminRole) {
+      setUpdateStatus({
+        loading: false,
+        success: false,
+        error: i18n.language === "ar" 
+          ? "لا يمكن للمشرف تعديل بياناته من هنا. يرجى التواصل مع مسؤول النظام."
+          : "Admin cannot edit their credentials from here. Please contact system administrator."
+      })
+      return
+    }
+
     setFormData((prev) => ({
       ...prev,
       fullName: userData?.name || "",
@@ -401,6 +414,18 @@ function PersonalInfoSection() {
     const normalizedRole = String(userData?.role || "").trim().toLowerCase()
     const isRestrictedSettingsRole = ["student", "parent", "teacher"].includes(normalizedRole)
     if (isRestrictedSettingsRole) return
+
+    const isAdminRole = ["admin", "subadmin"].includes(normalizedRole)
+    if (isAdminRole) {
+      setUpdateStatus({
+        loading: false,
+        success: false,
+        error: i18n.language === "ar" 
+          ? "لا يمكن للمشرف تعديل بياناته من هنا. يرجى التواصل مع مسؤول النظام."
+          : "Admin cannot edit their credentials from here. Please contact system administrator."
+      })
+      return
+    }
 
     if (emailError) return
 
@@ -503,7 +528,7 @@ function PersonalInfoSection() {
         setUpdateStatus({
           loading: false,
           success: false,
-          error: result.error || "Failed to update",
+          error: translateErrorMessage(result.error || "Failed to update"),
         })
       }
     } catch (error) {
@@ -511,7 +536,7 @@ function PersonalInfoSection() {
       setUpdateStatus({
         loading: false,
         success: false,
-        error: "An unexpected error occurred",
+        error: translateErrorMessage("An unexpected error occurred"),
       })
     }
   }

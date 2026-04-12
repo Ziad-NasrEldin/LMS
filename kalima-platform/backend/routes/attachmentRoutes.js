@@ -11,6 +11,10 @@ router
   .get(AttachmentController.getAttachment)
   .delete(AttachmentController.deleteAttachment);
 
+router
+  .route("/:attachmentId/feedback")
+  .patch(verifyJWT, AttachmentController.updateHomeworkFeedback);
+
 // Secure the upload route with JWT verification
 router.use("/upload-homework/:lectureId", verifyJWT);
 

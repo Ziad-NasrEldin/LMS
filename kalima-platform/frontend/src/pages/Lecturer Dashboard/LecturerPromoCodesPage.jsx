@@ -51,7 +51,7 @@ export default function LecturerPromoCodesPage() {
       if (res.success) {
         setAnalytics(res.data || null);
       } else {
-        setError(translateErrorMessage(res.message || (isRTL ? "تعذر تحميل أكواد الشحن." : "Failed to load promo codes.")));
+        setError(translateErrorMessage(res.message || "Failed to load promo codes"));
       }
       setLoading(false);
     };

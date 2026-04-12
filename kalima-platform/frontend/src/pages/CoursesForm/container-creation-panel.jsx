@@ -141,12 +141,12 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
     e.preventDefault()
 
     if (!selectedParentId) {
-      toast.error(isRTL ? "يرجى تحديد الحاوية الأب" : "Please select a parent container")
+      toast.error(translateErrorMessage("Please select a parent container"))
       return
     }
 
     if (!containerName) {
-      toast.error(isRTL ? "يرجى إدخال اسم الحاوية" : "Please enter a container name")
+      toast.error(translateErrorMessage("Please enter a container name"))
       return
     }
 
@@ -155,20 +155,20 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
     try {
       if (containerType === CONTAINER_TYPES.LECTURE) {
         if (!lectureLink) {
-          toast.error(isRTL ? "يرجى إدخال رابط المحاضرة" : "Please enter a lecture link")
+          toast.error(translateErrorMessage("Please enter a lecture link"))
           setIsSubmitting(false)
           return
         }
 
         // Create the base lecture data object
         if (requiresExam && !examFormUrl) {
-          toast.error(isRTL ? "يرجى إدخال رابط امتحان" : "Please provide an exam form URL")
+          toast.error(translateErrorMessage("Please provide an exam form URL"))
           setIsSubmitting(false)
           return
         }
 
         if (requiresHomework && !homeworkFormUrl) {
-          toast.error(isRTL ? "يرجى إدخال رابط واجب" : "Please provide a homework form URL")
+          toast.error(translateErrorMessage("Please provide a homework form URL"))
           setIsSubmitting(false)
           return
         }
@@ -255,13 +255,13 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
         const isCourseContainer = containerType === CONTAINER_TYPES.COURSE
 
         if (isCourseContainer && !description.trim()) {
-          toast.error(isRTL ? "يرجى إدخال وصف الكورس" : "Please enter a course description")
+          toast.error(translateErrorMessage("Please enter a course description"))
           setIsSubmitting(false)
           return
         }
 
         if (isCourseContainer && !goal.trim()) {
-          toast.error(isRTL ? "يرجى إدخال هدف الكورس" : "Please enter a course goal")
+          toast.error(translateErrorMessage("Please enter a course goal"))
           setIsSubmitting(false)
           return
         }
@@ -331,9 +331,10 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
     } catch (error) {
       console.error(`Error creating ${containerType}:`, error)
       toast.error(
-        isRTL
-          ? `حدث خطأ أثناء إنشاء ${containerType === CONTAINER_TYPES.LECTURE ? "المحاضرة" : "الحاوية"}`
-          : `Error creating ${containerType === CONTAINER_TYPES.LECTURE ? "lecture" : "container"}`,
+        translateErrorMessage(
+          error?.message ||
+            `Error creating ${containerType === CONTAINER_TYPES.LECTURE ? "lecture" : "container"}`
+        )
       )
     } finally {
       setIsSubmitting(false)

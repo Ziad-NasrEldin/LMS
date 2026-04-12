@@ -8,6 +8,7 @@ import { LoadingSpinner } from "../../components/LoadingSpinner"
 import { ErrorAlert } from "../../components/ErrorAlert"
 import { Star, MessageSquare, CheckCircle, XCircle, Trash2, Send, Search, Filter } from "lucide-react"
 import { toast } from "react-hot-toast"
+import { translateErrorMessage } from "../../utils/errorTranslator"
 
 export default function LecturerReviewsManagementPage() {
   const { t, i18n } = useTranslation("lecturerDashboard")
@@ -34,10 +35,10 @@ export default function LecturerReviewsManagementPage() {
         }))
         setReviews(reviewsWithCourse)
       } else {
-        setError(result?.error || t("fetchReviewsError", "Failed to fetch reviews"))
+        setError(translateErrorMessage(result?.error || t("fetchReviewsError", "Failed to fetch reviews"), t))
       }
     } catch (err) {
-      setError(err.message)
+      setError(translateErrorMessage(err.message, t))
     } finally {
       setLoading(false)
     }
@@ -55,10 +56,10 @@ export default function LecturerReviewsManagementPage() {
         toast.success(t("reviewApproved", "Review approved"))
         fetchReviews()
       } else {
-        toast.error(result?.error || t("approveError", "Failed to approve review"))
+        toast.error(translateErrorMessage(result?.error || t("approveError", "Failed to approve review"), t))
       }
     } catch (err) {
-      toast.error(err.message)
+      toast.error(translateErrorMessage(err.message, t))
     } finally {
       setActionLoading(false)
     }
@@ -72,10 +73,10 @@ export default function LecturerReviewsManagementPage() {
         toast.success(t("reviewRejected", "Review rejected"))
         fetchReviews()
       } else {
-        toast.error(result?.error || t("rejectError", "Failed to reject review"))
+        toast.error(translateErrorMessage(result?.error || t("rejectError", "Failed to reject review"), t))
       }
     } catch (err) {
-      toast.error(err.message)
+      toast.error(translateErrorMessage(err.message, t))
     } finally {
       setActionLoading(false)
     }
@@ -93,10 +94,10 @@ export default function LecturerReviewsManagementPage() {
         toast.success(t("reviewDeleted", "Review deleted"))
         fetchReviews()
       } else {
-        toast.error(result?.error || t("deleteError", "Failed to delete review"))
+        toast.error(translateErrorMessage(result?.error || t("deleteError", "Failed to delete review"), t))
       }
     } catch (err) {
-      toast.error(err.message)
+      toast.error(translateErrorMessage(err.message, t))
     } finally {
       setActionLoading(false)
     }
@@ -113,10 +114,10 @@ export default function LecturerReviewsManagementPage() {
         setSelectedReview(null)
         fetchReviews()
       } else {
-        toast.error(result?.error || t("responseError", "Failed to send response"))
+        toast.error(translateErrorMessage(result?.error || t("responseError", "Failed to send response"), t))
       }
     } catch (err) {
-      toast.error(err.message)
+      toast.error(translateErrorMessage(err.message, t))
     } finally {
       setActionLoading(false)
     }

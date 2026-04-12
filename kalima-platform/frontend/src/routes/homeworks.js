@@ -1,6 +1,7 @@
 import axios from "axios";
 import { getToken } from "./auth-services";
 import { translateErrorMessage } from "../utils/errorTranslator";
+import { normalizeApiError } from "../utils/apiError";
 
 /**
  * Upload homework for a lecture
@@ -97,5 +98,33 @@ export const getLectureHomeworks = async (
         error.message ||
         "Failed to fetch lecture homeworks",
     };
+  }
+};
+
+export const updateHomeworkFeedback = async (attachmentId, feedbackData) => {
+  try {
+    if (!attachmentId) {
+      throw new Error(translateErrorMessage("Attachment ID is required"));
+    }
+
+    const response = await axios.patch(
+      `${import.meta.env.VITE_API_URL}/attachments/${attachmentId}/feedback`,
+      feedbackData,
+      {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    return {
+      success: response.data.status === "success",
+      data: response.data.data?.attachment || null,
+      status: response.data.status,
+    };
+  } catch (error) {
+    console.error("Error updating homework feedback:", error);
+    return normalizeApiError(error, "Failed to update homework feedback");
   }
 };

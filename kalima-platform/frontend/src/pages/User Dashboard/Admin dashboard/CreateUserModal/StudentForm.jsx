@@ -365,7 +365,7 @@ const StudentForm = ({
           <div className="flex flex-col gap-2">
             <label className="label py-0">
               <span className="label-text font-bold" style={{ color: "#1F2937" }}>
-                {t("fields.administrationZone") || (isRTL ? "الإدارة التعليمية" : "Administration Zone")}
+                {t("fields.administrationZone")}
               </span>
             </label>
              <DSSelect
@@ -380,8 +380,8 @@ const StudentForm = ({
 
               <option value="">
               {loadingZones
-                ? t("fields.loadingZones") || (isRTL ? "جاري تحميل الإدارة التعليمية..." : "Loading administration zones...")
-                : t("fields.selectAdministrationZone") || (isRTL ? "اختر الإدارة التعليمية" : "Select Administration Zone")}
+                ? t("fields.loadingZones")
+                : t("fields.selectAdministrationZone")}
               </option>
               {administrationZones.map((zone, index) => (
                 <option key={index} value={zone}>
@@ -394,7 +394,7 @@ const StudentForm = ({
                <div className="flex items-center gap-2 mt-1">
                  <div className="w-3 h-3 border-2 border-slate-200 border-t-primary rounded-full animate-spin"></div>
                           <span className="text-xs text-slate-600">
-                 {t("fields.loadingZones") || (isRTL ? "جاري تحميل الإدارة التعليمية..." : "Loading administration zones...")}
+                 {t("fields.loadingZones")}
                </span>
                </div>
              )}

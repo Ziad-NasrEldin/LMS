@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Mail } from 'lucide-react';
 import { requestPasswordReset } from '../../routes/auth-services';
 import { designTokens } from '../../constants/designTokens';
+import { translateErrorMessage } from '../../utils/errorTranslator';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 
@@ -29,18 +30,18 @@ const ForgotPassword = () => {
     try {
       const response = await requestPasswordReset(email);
       if (response.status !== 'success') {
-        setError(response.message || t('errors.requestFailed'));
+        setError(translateErrorMessage(response.message || t('errors.requestFailed'), t));
         return;
       }
       if (response.status === 'success') {
-        setSuccess(response.message);
+        setSuccess(translateErrorMessage(response.message, t));
         navigate('/verify-otp', { state: { email } });
       }
     } catch (err) {
       const errorMessage = err.response?.data?.error ||
                          err.message ||
                          t('errors.generalError');
-      setError(errorMessage);
+      setError(translateErrorMessage(errorMessage, t));
       console.error(err);
     } finally {
       setLoading(false);

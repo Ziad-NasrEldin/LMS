@@ -1,9 +1,12 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import CommentInput from "./CommentInput";
 import CommentList from "./CommentList";
 import { designTokens } from "../../constants/designTokens";
 
 const CommunityTab = ({ lectureId, userId, userRole }) => {
+    const { t, i18n } = useTranslation("lectureDisplay");
+    const isRTL = i18n.language === "ar";
     const [refreshKey, setRefreshKey] = useState(0);
     const TOKENS = designTokens.colors;
     const SHADOWS = designTokens.shadows;
@@ -35,13 +38,13 @@ const CommunityTab = ({ lectureId, userId, userRole }) => {
                                 border: `1px solid ${TOKENS.deepTealSubtle}`,
                             }}
                         >
-                            Community
+                            {t("communityTitle", "Community")}
                         </span>
                         <h2 className="mt-3 text-3xl font-black tracking-tight" style={{ color: TOKENS.deepTeal }}>
-                            Questions, replies, and lecture discussion
+                            {t("communitySubtitle", "Questions, replies, and lecture discussion")}
                         </h2>
                         <p className="mt-2 max-w-2xl text-sm md:text-base" style={{ color: TOKENS.slateText }}>
-                            Keep the conversation tied to this lecture, ask for clarification, and respond in threaded discussions.
+                            {t("communityDescription", "Keep the conversation tied to this lecture, ask for clarification, and respond in threaded discussions.")}
                         </p>
                     </div>
                     <div className="grid grid-cols-2 gap-3 md:min-w-[260px]">
@@ -50,10 +53,10 @@ const CommunityTab = ({ lectureId, userId, userRole }) => {
                             style={{ background: TOKENS.neutralCloud, borderColor: TOKENS.borderSubtle }}
                         >
                             <p className="text-xs font-bold uppercase tracking-[0.14em]" style={{ color: TOKENS.slateText }}>
-                                Threaded
+                                {t("threaded", "Threaded")}
                             </p>
                             <p className="mt-1 text-base font-black" style={{ color: TOKENS.deepTeal }}>
-                                Replies
+                                {t("replies", "Replies")}
                             </p>
                         </div>
                         <div
@@ -61,10 +64,10 @@ const CommunityTab = ({ lectureId, userId, userRole }) => {
                             style={{ background: TOKENS.neutralCloud, borderColor: TOKENS.borderSubtle }}
                         >
                             <p className="text-xs font-bold uppercase tracking-[0.14em]" style={{ color: TOKENS.slateText }}>
-                                Live
+                                {t("live", "Live")}
                             </p>
                             <p className="mt-1 text-base font-black" style={{ color: TOKENS.deepTeal }}>
-                                Feedback
+                                {t("feedback", "Feedback")}
                             </p>
                         </div>
                     </div>

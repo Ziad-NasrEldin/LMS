@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { requestPasswordReset, verifyOtp } from '../../routes/auth-services';
+import { translateErrorMessage } from '../../utils/errorTranslator';
 import WaveBackground from './WaveBackground';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
@@ -40,11 +41,11 @@ const VerifyOtp = () => {
     try {
       const response = await requestPasswordReset(email);
       if (response.status !== 'success') {
-        setError(response.message || t('errors.requestFailed'));
+        setError(translateErrorMessage(response.message || t('errors.requestFailed'), t));
         return;
       }
       if (response.status === 'success') {
-        setSuccess(response.message);
+        setSuccess(translateErrorMessage(response.message, t));
         setResendDisabled(true);
         setCountdown(60);
       }
@@ -52,7 +53,7 @@ const VerifyOtp = () => {
       const errorMessage = err.response?.data?.error || 
                          err.message || 
                          t('errors.generalError');
-      setError(errorMessage);
+      setError(translateErrorMessage(errorMessage, t));
     } finally {
       setLoading(false);
     }
@@ -67,18 +68,18 @@ const VerifyOtp = () => {
     try {
       const response = await verifyOtp(email, otp);
       if (response.status !== 'success') {
-        setError(response.message || t('errors.invalidOtp'));
+        setError(translateErrorMessage(response.message || t('errors.invalidOtp'), t));
         return;
       }
       if (response.status === 'success') {
-        setSuccess(response.message);
+        setSuccess(translateErrorMessage(response.message, t));
         navigate('/reset-password', { state: { email, resetToken: response.resetToken } });
       }
     } catch (err) {
       const errorMessage = err.response?.data?.error || 
                          err.message || 
                          t('errors.generalError');
-      setError(errorMessage);
+      setError(translateErrorMessage(errorMessage, t));
   } finally {
       setLoading(false);
     }

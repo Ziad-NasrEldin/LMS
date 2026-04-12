@@ -55,11 +55,11 @@ const PromoCodeGenerator = () => {
         if (response.success) {
           setLecturers(Array.isArray(response.data) ? response.data : [])
         } else {
-          setError(t("admin.errors.fetchLecturers"))
+          setError(t("errors.fetchLecturers"))
         }
       } catch (err) {
         console.error("Error fetching lecturers:", err)
-        setError(t("admin.errors.fetchLecturers"))
+        setError(t("errors.fetchLecturers"))
       } finally {
         setLoading(false)
       }
@@ -77,11 +77,11 @@ const PromoCodeGenerator = () => {
         if (response.success) {
           setPromoTemplates(Array.isArray(response.data) ? response.data : [])
         } else {
-          setTemplateError(response.error || t("admin.template.loadFailed"))
+          setTemplateError(response.error || t("template.loadFailed"))
         }
       } catch (err) {
         console.error("Error fetching promo templates:", err)
-        setTemplateError(t("admin.template.loadFailed"))
+        setTemplateError(t("template.loadFailed"))
       } finally {
         setTemplateLoading(false)
       }
@@ -153,8 +153,8 @@ const PromoCodeGenerator = () => {
 
       if (result.success) {
         setGeneratedCodes(result.data || [])
-        setSuccess(t("admin.codesGenerated"))
-        toast.success(t("admin.codesGenerated"))
+        setSuccess(t("success.codesGenerated"))
+        toast.success(t("success.codesGenerated"))
       } else {
         const translatedError = translateErrorMessage(result.error, t)
         setError(translatedError)
@@ -190,16 +190,17 @@ const PromoCodeGenerator = () => {
     try {
       const result = await uploadPromoCodeTemplate(file)
       if (result.success) {
-        setTemplateSuccess(t("admin.template.uploadSuccess"))
+        setTemplateSuccess(t("template.uploadSuccess"))
         setPromoTemplates(prev => [...prev, result.data])
         setSelectedTemplateUrl(result.data.url)
-        toast.success(t("admin.template.uploadSuccess"))
+        toast.success(t("template.uploadSuccess"))
       } else {
-        setTemplateError(result.error || t("admin.template.uploadFailed"))
-        toast.error(result.error || t("admin.template.uploadFailed"))
+        const translatedError = translateErrorMessage(result.error || t("template.uploadFailed"), t)
+        setTemplateError(translatedError)
+        toast.error(translatedError)
       }
     } catch (err) {
-      setTemplateError(t("admin.template.uploadFailed"))
+      setTemplateError(t("template.uploadFailed"))
     } finally {
       setTemplateUploading(false)
     }
@@ -228,10 +229,10 @@ const PromoCodeGenerator = () => {
       link.click()
       URL.revokeObjectURL(link.href)
       
-      toast.success(t("admin.downloadSuccess"))
+      toast.success(t("downloadSuccess"))
     } catch (err) {
       console.error("Error downloading QR codes:", err)
-      toast.error(t("admin.downloadFailed"))
+      toast.error(t("downloadFailed"))
     } finally {
       setIsBulkDownloading(false)
     }
@@ -254,7 +255,7 @@ const PromoCodeGenerator = () => {
     printWindow.document.write(`
       <html>
         <head>
-          <title>${t("admin.printQrCodes")}</title>
+          <title>${t("printQrCodes")}</title>
           <style>
             body { font-family: Arial, sans-serif; display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; }
           </style>
@@ -292,7 +293,7 @@ const PromoCodeGenerator = () => {
         <div className="p-3 rounded-2xl" style={{ background: "rgba(77,179,194,0.1)" }}>
           <Ticket className="w-8 h-8" style={{ color: TOKENS.deepTeal }} />
         </div>
-        <h2 className="text-2xl font-extrabold" style={{ color: TOKENS.deepTeal }}>{t("admin.generatePromoCodes")}</h2>
+        <h2 className="text-2xl font-extrabold" style={{ color: TOKENS.deepTeal }}>{t("generatePromoCodes")}</h2>
       </div>
 
       {error && (
@@ -313,7 +314,7 @@ const PromoCodeGenerator = () => {
         <div className="grid grid-cols-1 xl:grid-cols-12 gap-3 md:gap-4 mb-4">
           <div className="flex flex-col gap-1 xl:col-span-3 rounded-2xl border p-3 bg-white/70" style={{ borderColor: "rgba(17,24,39,0.08)" }}>
             <label className="flex flex-col gap-1 pt-0 pb-1">
-              <span className="text-xs font-medium">{t("admin.form.amountAfter")}</span>
+              <span className="text-xs font-medium">{t("form.amountAfter")}</span>
             </label>
             <Input
               type="number"
@@ -331,7 +332,7 @@ const PromoCodeGenerator = () => {
   
           <div className="flex flex-col gap-1 xl:col-span-3 rounded-2xl border p-3 bg-white/70" style={{ borderColor: "rgba(17,24,39,0.08)" }}>
             <label className="flex flex-col gap-1 pt-0 pb-1">
-              <span className="text-xs font-medium">{t("admin.form.amountBefore")}</span>
+              <span className="text-xs font-medium">{t("form.amountBefore")}</span>
             </label>
             <Input
               type="number"
@@ -341,16 +342,16 @@ const PromoCodeGenerator = () => {
               onChange={handleNumberChange}
               min="1"
               inputMode="numeric"
-              placeholder={t("admin.form.amountBeforePlaceholder")}
+              placeholder={t("form.amountBeforePlaceholder")}
             />
                     <span className="mt-2 text-xs leading-5 text-slate-600">
-              {t("admin.form.amountBeforeHint")}
+              {t("form.amountBeforeHint")}
             </span>
           </div>
   
           <div className="flex flex-col gap-1 xl:col-span-3 rounded-2xl border p-3 bg-white/70" style={{ borderColor: "rgba(17,24,39,0.08)" }}>
             <label className="flex flex-col gap-1 pt-0 pb-1">
-              <span className="text-xs font-medium">{t("admin.form.count")}</span>
+              <span className="text-xs font-medium">{t("form.numCodes")}</span>
             </label>
             <Input
               type="number"
@@ -366,7 +367,7 @@ const PromoCodeGenerator = () => {
   
           <div className="flex flex-col gap-1 xl:col-span-3 rounded-2xl border p-3 bg-white/70" style={{ borderColor: "rgba(17,24,39,0.08)" }}>
             <label className="flex flex-col gap-1 pt-0 pb-1">
-              <span className="text-xs font-medium">{t("admin.form.lecturer")}</span>
+              <span className="text-xs font-medium">{t("form.lecturer")}</span>
             </label>
             <DSSelect
               name="lecturer"
@@ -374,7 +375,7 @@ const PromoCodeGenerator = () => {
               value={formData.lecturer}
               onChange={(e) => setFormData(prev => ({ ...prev, lecturer: e.target.value }))}
             >
-              <option value="">{t("admin.form.allLecturers")}</option>
+              <option value="">{t("form.allLecturers")}</option>
               {lecturers.map(lecturer => (
                 <option key={lecturer._id} value={lecturer._id}>
                   {lecturer.name}
@@ -385,7 +386,7 @@ const PromoCodeGenerator = () => {
   
           <div className="flex flex-col gap-1 xl:col-span-3 rounded-2xl border p-3 bg-white/70" style={{ borderColor: "rgba(17,24,39,0.08)" }}>
             <label className="flex flex-col gap-1 pt-0 pb-1">
-              <span className="text-xs font-medium">{t("admin.form.type")}</span>
+              <span className="text-xs font-medium">{t("form.codeType")}</span>
             </label>
             <DSSelect
               name="type"
@@ -393,14 +394,14 @@ const PromoCodeGenerator = () => {
               value={formData.type}
               onChange={(e) => setFormData(prev => ({ ...prev, type: e.target.value }))}
             >
-              <option value="points">{t("admin.form.points")}</option>
-              <option value="promo">{t("admin.form.promo")}</option>
+              <option value="points">{t("form.points")}</option>
+              <option value="promo">{t("form.promo")}</option>
             </DSSelect>
           </div>
   
           <div className="flex flex-col gap-1 xl:col-span-3 rounded-2xl border p-3 bg-white/70" style={{ borderColor: "rgba(17,24,39,0.08)" }}>
             <label className="flex flex-col gap-1 pt-0 pb-1">
-              <span className="text-xs font-medium">{t("admin.form.expiryDate")}</span>
+              <span className="text-xs font-medium">{t("form.expiryDate")}</span>
             </label>
             <Input
               type="date"
@@ -413,7 +414,7 @@ const PromoCodeGenerator = () => {
 
           <div className="flex flex-col gap-1 xl:col-span-3 rounded-2xl border p-3 bg-white/70" style={{ borderColor: "rgba(17,24,39,0.08)" }}>
             <label className="flex flex-col gap-1 pt-0 pb-1">
-              <span className="text-xs font-medium">{t("admin.form.qrCodes")}</span>
+              <span className="text-xs font-medium">{t("form.qrCodes")}</span>
             </label>
             <div className="flex items-center gap-2">
               <input
@@ -424,7 +425,7 @@ const PromoCodeGenerator = () => {
                 className="w-4 h-4"
               />
               <label htmlFor="generateQrCodes" className="text-sm">
-                {t("admin.form.generateQrCodes")}
+                {t("form.generateQrCodes")}
               </label>
             </div>
           </div>
@@ -440,10 +441,10 @@ const PromoCodeGenerator = () => {
             {loading ? (
               <>
                 <span className={`animate-spin border-2 border-white border-t-transparent rounded-full w-4 h-4 inline-block ${spinnerInlineGap}`}></span>
-                {t("admin.generating")}
+                {t("generating")}
               </>
             ) : (
-              t("admin.generateCodes")
+              t("generateCodes")
             )}
           </Button>
         </div>
@@ -452,12 +453,12 @@ const PromoCodeGenerator = () => {
       {generatedCodes.length > 0 && (
         <div className="mt-6">
           <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center mb-3">
-            <h3 className="text-lg font-bold">{t("admin.generatedCodes")}</h3>
+            <h3 className="text-lg font-bold">{t("generatedCodes")}</h3>
             {generateQrCodes && qrCodeUrls.length > 0 && (
               <div className="flex flex-col gap-2 sm:items-end">
                 <div className="flex flex-col gap-1">
                   <label className="flex flex-col gap-1 py-0">
-                    <span className="text-xs"> {t("admin.template.selectorLabel")}</span>
+                    <span className="text-xs"> {t("template.selectorLabel")}</span>
                   </label>
                   <DSSelect
                     className="select-bordered select-sm min-w-[220px]"
@@ -481,7 +482,7 @@ const PromoCodeGenerator = () => {
           </div>
 
             <p className="text-xs text-slate-600">
-            {t("admin.template.requiredDimensions", {
+            {t("template.requiredDimensions", {
               width: PROMO_TEMPLATE_WIDTH,
               height: PROMO_TEMPLATE_HEIGHT,
             })}
@@ -492,18 +493,18 @@ const PromoCodeGenerator = () => {
           <div className="flex flex-wrap gap-2">
             <Button size="sm" variant="outline" onClick={printQRCodes}>
               <Printer className={`w-4 h-4 ${iconInlineGap}`} />
-              {t("admin.printQrCodes")}
+              {t("printQrCodes")}
             </Button>
             <Button size="sm" variant="outline" onClick={downloadAllQRCodes} disabled={isBulkDownloading}>
               {isBulkDownloading ? (
                 <>
                   <span className={`animate-spin border-2 border-primary border-t-transparent rounded-full w-3 h-3 inline-block ${spinnerInlineGap}`}></span>
-                  {t("admin.exporting", { defaultValue: isRTL ? "جاري التحضير..." : "Preparing..." })}
+                  {t("exporting", { defaultValue: isRTL ? "جاري التحضير..." : "Preparing..." })}
                 </>
               ) : (
                 <>
                   <Download className={`w-4 h-4 ${iconInlineGap}`} />
-                  {t("admin.downloadAllQrCodes")}
+                  {t("downloadAllQrCodes")}
                 </>
               )}
             </Button>
@@ -528,8 +529,8 @@ const PromoCodeGenerator = () => {
                 <p className="font-mono text-sm break-all">{code.code}</p>
                 <p className="text-sm mt-1">
                   {formData.type === "promo"
-                    ? t("admin.discount")
-                    : `${code.pointsAmount || formData.pointsAmount} ${t("admin.points")}`}
+                    ? t("promoTable.discount")
+                    : `${code.pointsAmount || formData.pointsAmount} ${t("points")}`}
                 </p>
               </div>
               <div className="flex gap-2 mt-2">
@@ -539,7 +540,7 @@ const PromoCodeGenerator = () => {
                   onClick={() => copyToClipboard(code.code, index)}
                 >
                   {copiedIndex === index ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                  {copiedIndex === index ? t("admin.copied") : t("admin.copy")}
+                  {copiedIndex === index ? t("copied") : t("copy")}
                 </Button>
               </div>
             </div>
@@ -551,9 +552,9 @@ const PromoCodeGenerator = () => {
             <table className="w-full">
               <thead>
                 <tr className="bg-slate-200">
-                  <th className="p-3 text-left text-sm font-semibold">{t("admin.code")}</th>
-                  <th className="p-3 text-left text-sm font-semibold">{t("admin.value")}</th>
-                  <th className="p-3 text-left text-sm font-semibold">{t("admin.actions")}</th>
+                  <th className="p-3 text-left text-sm font-semibold">{t("promoTable.code")}</th>
+                  <th className="p-3 text-left text-sm font-semibold">{t("promoTable.points")}</th>
+                  <th className="p-3 text-left text-sm font-semibold">{t("promoTable.actions")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -562,8 +563,8 @@ const PromoCodeGenerator = () => {
                     <td className="p-3 font-mono text-sm">{code.code}</td>
                     <td className="p-3 text-sm">
                       {formData.type === "promo"
-                        ? t("admin.discount")
-                        : `${code.pointsAmount || formData.pointsAmount} ${t("admin.points")}`}
+                        ? t("promoTable.discount")
+                        : `${code.pointsAmount || formData.pointsAmount} ${t("points")}`}
                     </td>
                     <td className="p-3">
                       <Button
@@ -572,7 +573,7 @@ const PromoCodeGenerator = () => {
                         onClick={() => copyToClipboard(code.code, index)}
                       >
                         {copiedIndex === index ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                        {copiedIndex === index ? t("admin.copied") : t("admin.copy")}
+                        {copiedIndex === index ? t("copied") : t("copy")}
                       </Button>
                     </td>
                   </tr>

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { FiSend } from "react-icons/fi";
 import Button from "../ui/Button";
 import toast from "react-hot-toast";
@@ -9,11 +10,12 @@ const CommentInput = ({
     lectureId,
     parentId = null,
     onCommentCreated,
-    placeholder = "Write your comment here...",
-    title = "Ask a question or leave a comment",
-    submitLabel = null,
+    placeholder,
+    title,
+    submitLabel,
     compact = false,
 }) => {
+    const { t } = useTranslation("lectureDisplay");
     const [content, setContent] = useState("");
     const [loading, setLoading] = useState(false);
     const TOKENS = designTokens.colors;
@@ -34,10 +36,10 @@ const CommentInput = ({
             if (result.status === "success") {
                 setContent("");
                 onCommentCreated?.(result.data);
-                toast.success(parentId ? "Reply posted successfully" : "Comment posted successfully");
+                toast.success(parentId ? t("replyPostedSuccess") : t("commentPostedSuccess"));
             }
         } catch (error) {
-            toast.error(error?.message || "Failed to post comment");
+            toast.error(error?.message || t("failedToPostComment"));
         } finally {
             setLoading(false);
         }
@@ -53,14 +55,14 @@ const CommentInput = ({
                 boxShadow: SHADOWS.level1,
             }}
         >
-            {title ? (
+            {title !== null ? (
                 <div>
                     <h3 className="mb-1 text-sm font-black uppercase tracking-[0.12em]" style={{ color: TOKENS.deepTeal }}>
-                        {title}
+                        {title || t("askQuestionTitle", "Ask a question or leave a comment")}
                     </h3>
                     {!compact ? (
                         <p className="text-sm" style={{ color: TOKENS.slateText }}>
-                            Start a focused thread for this lecture.
+                            {t("startFocusedThread", "Start a focused thread for this lecture.")}
                         </p>
                     ) : null}
                 </div>
@@ -68,7 +70,7 @@ const CommentInput = ({
             <div className={`flex gap-2 ${compact ? "items-end" : ""}`}>
                 <textarea
                     className={`w-full p-3 text-sm outline-none transition-all duration-200 ${compact ? "min-h-[72px]" : "min-h-[108px]"}`}
-                    placeholder={placeholder}
+                    placeholder={placeholder || t("writeCommentPlaceholder", "Write your comment here...")}
                     value={content}
                     onChange={(e) => setContent(e.target.value)}
                     style={{

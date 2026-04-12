@@ -122,25 +122,44 @@ const BulkCreateUsers = () => {
 
     try {
       const formData = new FormData()
-      // Make sure this matches exactly what your API expects
       formData.append("accountType", accountType)
       formData.append("file", file)
 
       const result = await bulkCreateUsers(formData)
 
-      if (result.success) {
-        setSuccess(t("success.usersCreated"))
+      if (result.success && result.data?.status === "success") {
+        const data = result.data
+        const createdCount = data.data?.createdUsers?.count || 0
+        const duplicateCount = data.data?.duplicatedUsers?.count || 0
+        const failedCount = data.data?.failedUsers?.count || 0
+        const failedUsers = data.data?.failedUsers?.users || []
+
+        if (failedCount > 0) {
+          const errorDetails = failedUsers
+            .slice(0, 3)
+            .map((u) => `${u.name || u.email}: ${u.error}`)
+            .join(" | ")
+          
+          const fullErrorMsg = t("errors.bulkPartialFailure", {
+            created: createdCount,
+            failed: failedCount,
+            details: errorDetails
+          })
+          setError(fullErrorMsg)
+        } else {
+          setSuccess(t("success.usersCreated", { count: createdCount }))
+        }
+        
         setFile(null)
-        // Reset the file input
         document.getElementById("file-input").value = ""
       } else {
-        const errorMessage =
+        const rawMessage = 
           result?.rawMessage ||
           result?.data?.message ||
           result?.data?.error?.message ||
           result?.error ||
           t("errors.failedToCreateUsers")
-        setError(errorMessage)
+        setError(translateErrorMessage(rawMessage, t("errors.failedToCreateUsers")))
       }
     } catch (err) {
       console.error("Error in form submission:", err)
@@ -174,27 +193,8 @@ const BulkCreateUsers = () => {
                <span>{error}</span>
              </div>
            )}
-           {success && (
-        <div className="mb-4 rounded-2xl border border-success/30 bg-success/10 px-4 py-3 text-sm text-[#065F46] shadow-sm flex items-center gap-3">
-               <svg
-                 xmlns="http://www.w3.org/2000/svg"
-                 className="stroke-current shrink-0 h-6 w-6"
-                 fill="none"
-                 viewBox="0 0 24 24"
-               >
-                 <path
-                   strokeLinecap="round"
-                   strokeLinejoin="round"
-                   strokeWidth="2"
-                   d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                 />
-               </svg>
-               <span>{success}</span>
-             </div>
-           )}
-
             {success && (
-        <div className="mb-4 rounded-2xl border border-success/30 bg-success/10 px-4 py-3 text-sm text-[#065F46] shadow-sm flex items-center gap-3">
+              <div className="mb-4 rounded-2xl border border-success/30 bg-success/10 px-4 py-3 text-sm text-[#065F46] shadow-sm flex items-center gap-3">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="stroke-current shrink-0 h-6 w-6"

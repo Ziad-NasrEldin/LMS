@@ -20,21 +20,22 @@
     "levelOptional": "الصف الدراسي (اختياري)",
     "phoneNumber": "رقم الهاتف",
     "parentPhoneNumber": "رقم هاتف ولي الأمر",
+    "parentPhoneNumberOptional": "رقم هاتف ولي الأمر (اختياري)",
     "parentPhoneRelation": "صلة ولي الأمر",
     "parentPhoneNumber2": "رقم هاتف ولي أمر إضافي",
     "parentPhoneRelation2": "صلة ولي الأمر الإضافي",
     "profession": "المهنة",
     "hobby": "الهواية",
+    "hobbies": "الاهتمامات",
+    "hobbiesOptional": "الاهتمامات (اختياري)",
     "sequencedId": "الرقم التسلسلي",
+    "sequencedIdOptional": "الرقم التسلسلي (اختياري)",
     "school": "المدرسة",
     "subjects": "المواد الدراسية",
+    "subject": "المادة",
     "expertise": "التخصص",
     "bio": "السيرة الذاتية",
     "assignedLecturer": "المحاضر المسؤول",
-    "sequencedIdOptional": "الرقم التسلسلي (اختياري)",
-    "parentPhoneNumberOptional": "رقم هاتف ولي الأمر (اختياري)",
-    "hobbies": "الاهتمامات",
-    "hobbiesOptional": "الاهتمامات (اختياري)",
     "uploadCSV": "تحميل ملف CSV",
     "government": "المحافظة",
     "administrationZone": "الإدارة التعليمية",
@@ -44,10 +45,22 @@
     "profilePic": "صورة الملف الشخصي",
     "referralSerial": "رقم التسلسل المرجعي",
     "phoneNumber2": "رقم الهاتف (اختياري)",
-    "subject": "المادة",
     "levels": "مراحل التدريس",
     "teachesAtType": "أين تدرس؟",
-    "socialMedia": "وسائل التواصل الاجتماعي"
+    "socialMedia": "وسائل التواصل الاجتماعي",
+    "faction": "الفئة",
+    "views": "المشاهدات",
+    "center": "المركز",
+    "male": "ذكر",
+    "female": "أنثى",
+    "studentInfo": "معلومات الطالب",
+    "parentInfo": "معلومات ولي الأمر",
+    "teacherInfo": "معلومات المعلم",
+    "lecturerInfo": "معلومات المحاضر",
+    "assistantInfo": "معلومات المساعد",
+    "enterLevel": "أدخل المرحلة",
+    "selectLecturer": "اختر المحاضر",
+    "teachingLocationType": "نوع مكان التدريس"
   },
   "placeholders": {
     "selectAccountType": "اختر نوع الحساب",
@@ -80,9 +93,10 @@
     "socialLink": "لينك الحساب",
     "facebook": "فيسبوك",
     "twitter": "تويتر",
-    "instagram": "إنستاغرام",
-    "phoneNumber2": "رقم الهاتف (اختياري)",
-    "noFileSelected": "لم يتم اختيار ملف"
+    "instagram": "انستغرام",
+    "noFileSelected": "لم يتم اختيار ملف",
+    "enterLevel": "أدخل المرحلة",
+    "enterCenterName": "أدخل اسم المركز"
   },
   "roles": {
     "subadmin": "مدير فرعي",
@@ -169,10 +183,14 @@
     "failedToLoadDropdowns": "فشل في تحميل بيانات القوائم المنسدلة",
     "failedToCreateUser": "فشل في إنشاء المستخدم",
     "failedToCreateUsers": "فشل في إنشاء المستخدمين. يرجى المحاولة مجددًا.",
-    "unexpectedError": "حدث خطأ غير متوقع. يرجى المحاولة مجددًا."
+    "unexpectedError": "حدث خطأ غير متوقع. يرجى المحاولة مجددًا.",
+    "bulkPartialFailure": "تم إنشاء {{created}} مستخدم. فشل {{failed}}. {{details}}",
+    "bulkNoUsersCreated": "لم يتم إنشاء أي مستخدمين. يرجى التحقق من الملف والمحاولة مجددًا.",
+    "bulkFileError": "خطأ في معالجة الملف: {{error}}"
   },
   "success": {
-    "usersCreated": "تم إنشاء المستخدمين بنجاح!"
+    "usersCreated": "تم إنشاء {{count}} مستخدم بنجاح!",
+    "bulkCreateSuccess": "تم إنشاء {{count}} حساب جديد بنجاح"
   },
   "help": {
     "holdCtrlToSelectMultiple": "اضغط Ctrl (أو Cmd) لتحديد خيارات متعددة",

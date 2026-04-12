@@ -18,6 +18,7 @@ import {
 } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import { useTranslation } from "react-i18next"
+import { translateErrorMessage } from "../../../utils/errorTranslator"
 import Button from "../../../components/ui/Button"
 import Input from "../../../components/ui/Input"
 
@@ -42,7 +43,7 @@ const AssistantPage = () => {
         if (result.success) {
           setDashboardData(result.data.data)
         } else {
-          setError(result.error || t("errors.fetchFailed"))
+          setError(translateErrorMessage(result.error || t("errors.fetchFailed"), t))
         }
       } catch (err) {
         setError(t("errors.occurred"))

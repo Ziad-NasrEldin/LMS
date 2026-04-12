@@ -299,8 +299,8 @@ const TeacherForm = ({
           >
             <option value="">
               {loadingZones
-                ? t("fields.loadingZones") || (isRTL ? "جاري تحميل الإدارة التعليمية..." : "Loading administration zones...")
-                : t("fields.selectAdministrationZone") || (isRTL ? "اختر الإدارة التعليمية" : "Select Administration Zone")}
+                ? t("fields.loadingZones")
+                : t("fields.selectAdministrationZone")}
             </option>
             {administrationZones?.map((zone) => (
               <option key={zone._id} value={zone.name}>

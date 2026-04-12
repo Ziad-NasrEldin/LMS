@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next"
 import { Check, X, Gift, Info, UserPlus } from "lucide-react"
 import { updateCurrentUser } from "../../routes/update-user"
 import { designTokens } from "../../constants/designTokens"
+import { translateErrorMessage } from "../../utils/errorTranslator"
 import Button from "../../components/ui/Button"
 import Input from "../../components/ui/Input"
 
@@ -53,7 +54,7 @@ const ReferralSection = ({ userInfo, onUserUpdate }) => {
           onUserUpdate()
         }
       } else {
-        setReferralError(result.error || t("referral.errors.generic"))
+        setReferralError(translateErrorMessage(result.error || t("referral.errors.generic"), t))
       }
     } catch (error) {
       setReferralError(t("referral.errors.generic"))

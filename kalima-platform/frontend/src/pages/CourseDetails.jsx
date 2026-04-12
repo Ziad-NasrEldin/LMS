@@ -1,8 +1,9 @@
 "use client"
 
-import { useState, useEffect, useMemo, useCallback, useRef } from "react"
-import { useParams, useNavigate, useLocation } from "react-router-dom"
+import { useState, useEffect, useMemo } from "react"
 import { useTranslation } from "react-i18next"
+import { useParams, useNavigate, useLocation } from "react-router-dom"
+import toast from "react-hot-toast"
 import { getContainerById, purchaseContainer, getEnrollmentCount } from "../routes/lectures"
 import { getUserDashboard, isLoggedIn } from "../routes/auth-services"
 import { LoadingSpinner } from "../components/LoadingSpinner"
@@ -16,6 +17,7 @@ import { getCourseReviews, getMyReview, createReview, updateMyReview, deleteMyRe
 import { buildCoursePath } from "../seo/site.mjs"
 import { useSeo } from "../seo/useSeo"
 import { buildBreadcrumbSchema, buildCourseSchema } from "../seo/structuredData.mjs"
+import { translateErrorMessage } from "../utils/errorTranslator"
 import { 
   Star, 
   Users, 
@@ -380,7 +382,9 @@ export default function CourseDetails() {
       try {
         setLoading(true)
 
-        const [courseResult, dashboardResult, enrollmentResult, reviewsResult] = await Promise.all([
+        const isAuth = await isLoggedIn()
+        
+        const requests = [
           getContainerById(courseId),
           getUserDashboard({
             params: {
@@ -389,7 +393,14 @@ export default function CourseDetails() {
           }),
           getEnrollmentCount(courseId),
           getCourseReviews(courseId),
-        ])
+        ]
+
+        // Only fetch user's review if logged in
+        if (isAuth) {
+          requests.push(getMyReview(courseId))
+        }
+
+        const [courseResult, dashboardResult, enrollmentResult, reviewsResult, myReviewResult] = await Promise.all(requests)
 
         if (courseResult?.status === "success" && courseResult.data) {
           setCourseData(courseResult.data)
@@ -411,6 +422,12 @@ export default function CourseDetails() {
         if (reviewsResult?.status === 'success') {
           setReviews(reviewsResult.data.reviews || [])
           setReviewStats(reviewsResult.data.stats || { average: 0, total: 0, distribution: { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 } })
+        }
+
+        // Set user's own review if exists
+        if (myReviewResult?.status === 'success' && myReviewResult.data) {
+          setMyReview(myReviewResult.data)
+          setReviewForm({ rating: myReviewResult.data.rating || 5, comment: myReviewResult.data.comment || '' })
         }
       } catch (err) {
         console.error("Error fetching data:", err)
@@ -560,6 +577,7 @@ export default function CourseDetails() {
 
       if (response && response.data && response.data.status === "success") {
         setPurchaseSuccess(true)
+        toast.success(tCommon("purchase.purchaseSuccess", "Purchase successful!"))
 
         if (response.data.data && response.data.data.remainingLecturerPoints !== undefined) {
           setRemainingPoints(response.data.data.remainingLecturerPoints)
@@ -589,11 +607,15 @@ export default function CourseDetails() {
         // Refresh enrollment count to show updated number immediately
         refreshEnrollmentCount()
       } else {
-        setPurchaseError(response?.error || response?.data?.message || t("purchase.purchaseError"))
+        const errorMsg = response?.error || response?.data?.message || tCommon("errors.purchaseFailed", { entity: tCommon("entities.course") })
+        setPurchaseError(errorMsg)
+        toast.error(errorMsg)
       }
     } catch (err) {
       console.error("Purchase error:", err)
-      setPurchaseError(err.response?.data?.message || t("errors.purchaseProcessError"))
+      const errorMessage = err.response?.data?.message || err.message || tCommon("errors.purchaseProcessError")
+      setPurchaseError(errorMessage)
+      toast.error(errorMessage)
     } finally {
       setPurchaseInProgress(null)
     }
@@ -692,10 +714,12 @@ export default function CourseDetails() {
         }
         setTimeout(() => setReviewSuccess(''), 3000)
       } else {
-        setReviewError(result.message || t('reviews.submitError'))
+        // Use rawMessage to get the original error, then translate it
+        const errorMsg = result.rawMessage || result.message || t('reviews.submitError')
+        setReviewError(translateErrorMessage(errorMsg, t('reviews.submitError')))
       }
     } catch (err) {
-      setReviewError(t('reviews.unexpectedError'))
+      setReviewError(translateErrorMessage(err, t('reviews.unexpectedError')))
     } finally {
       setReviewLoading(false)
     }

@@ -323,6 +323,70 @@ exports.getAllHomeWork = catchAsync(async (req, res, next) => {
     },
   });
 });
+
+exports.updateHomeworkFeedback = catchAsync(async (req, res, next) => {
+  const { attachmentId } = req.params;
+  const { rating, comment } = req.body;
+
+  if (!mongoose.isValidObjectId(attachmentId)) {
+    return next(new AppError("Invalid attachment ID", 400));
+  }
+
+  const attachment = await Attachment.findById(attachmentId);
+  if (!attachment) {
+    return next(new AppError("Attachment not found", 404));
+  }
+
+  if (attachment.type !== "homeworks" || !attachment.studentId) {
+    return next(new AppError("Feedback can only be added to homework submissions", 400));
+  }
+
+  const lecture = await Lecture.findById(attachment.lectureId).select("createdBy");
+  if (!lecture) {
+    return next(new AppError("Lecture not found", 404));
+  }
+
+  const canManageAttachments = await canManageLectureAttachments(req.user, lecture);
+  if (!canManageAttachments) {
+    return next(new AppError("You are not authorized to update homework feedback for this lecture", 403));
+  }
+
+  const hasRating = rating !== undefined && rating !== null && rating !== "";
+  const normalizedComment = typeof comment === "string" ? comment.trim() : "";
+
+  if (!hasRating && !normalizedComment) {
+    return next(new AppError("Please provide a rating or comment", 400));
+  }
+
+  if (hasRating) {
+    const parsedRating = Number(rating);
+    if (!Number.isInteger(parsedRating) || parsedRating < 1 || parsedRating > 5) {
+      return next(new AppError("Rating must be an integer between 1 and 5", 400));
+    }
+    attachment.rating = parsedRating;
+  } else {
+    attachment.rating = null;
+  }
+
+  attachment.comment = normalizedComment;
+  attachment.feedbackDate = hasRating || normalizedComment ? new Date() : null;
+  attachment.feedbackBy = hasRating || normalizedComment ? req.user._id : null;
+
+  await attachment.save();
+
+  const populatedAttachment = await Attachment.findById(attachment._id)
+    .populate("studentId", "name email")
+    .populate("feedbackBy", "name role")
+    .lean();
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      attachment: populatedAttachment,
+    },
+  });
+});
+
 exports.deleteAttachment = catchAsync(async (req, res, next) => {
   const { attachmentId } = req.params;
 

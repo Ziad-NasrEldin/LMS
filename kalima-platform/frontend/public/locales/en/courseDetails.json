@@ -70,7 +70,11 @@
     "watch": "Watch",
     "noContent": "No content available yet",
     "modulesCount": "{{modules}} Modules • {{lectures}} Lectures",
-    "courseContent": "Course Content"
+    "courseContent": "Course Content",
+    "loading": "Loading syllabus...",
+    "collapseAll": "Collapse All",
+    "expandAll": "Expand All",
+    "title": "Course Content"
   },
 
   "reviews": {
@@ -234,7 +238,9 @@
     "unexpected": "An unexpected error occurred",
     "purchaseError": "Purchase failed. Please try again.",
     "purchaseProcessError": "An error occurred during purchase",
-    "courseNotFound": "Course not found"
+    "courseNotFound": "Course not found",
+    "accessRestricted": "Access to this content is restricted",
+    "error": "Error"
   },
 
   "containerTypes": {
@@ -307,5 +313,12 @@
   "purchaseSuccessDesc": "Your purchase was successful and is now available in your dashboard. Would you like to go to your dashboard now?",
   "courseDetailsTitle": "Course Details",
   "whoIsThisFor": "Who is this course for",
-  "whatYouWillGet": "What you'll get out of this"
+  "whatYouWillGet": "What you'll get out of this",
+  "loginPrompt": {
+    "title": "Login Required",
+    "message": "Please create an account or login to purchase this course",
+    "loginButton": "Login",
+    "registerButton": "Create Account",
+    "cancel": "Cancel"
+  }
 }

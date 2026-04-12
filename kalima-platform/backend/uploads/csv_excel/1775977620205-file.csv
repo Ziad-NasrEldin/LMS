@@ -1,0 +1,3 @@
+name,phoneNumber,parentPhoneNumber,parentPhoneRelation,stage,level,government,administrationZone,hobby,gender,email,password
+أحمد محمد,01012345678,01112345678,father,Primary,Grade 1,Cairo,Nasr City,football,male,ahmed@example.com,password123
+فاطمة علي,01212345678,01312345678,mother,Primary,Grade 2,Giza,Dokki,reading,female,fatima@example.com,password123

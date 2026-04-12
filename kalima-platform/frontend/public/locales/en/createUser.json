@@ -47,7 +47,20 @@
     "subject": "Subject",
     "levels": "Teaching Stages",
     "teachesAtType": "Where do you teach?",
-    "socialMedia": "Social Media"
+    "socialMedia": "Social Media",
+    "faction": "Faction",
+    "views": "Views",
+    "center": "Center",
+    "male": "Male",
+    "female": "Female",
+    "studentInfo": "Student Information",
+    "parentInfo": "Parent Information",
+    "teacherInfo": "Teacher Information",
+    "lecturerInfo": "Lecturer Information",
+    "assistantInfo": "Assistant Information",
+    "enterLevel": "Enter level",
+    "selectLecturer": "Select Lecturer",
+    "teachingLocationType": "Teaching Location Type"
   },
   "placeholders": {
     "selectAccountType": "Select Account Type",
@@ -82,7 +95,9 @@
     "twitter": "Twitter",
     "instagram": "Instagram",
     "phoneNumber2": "Phone Number (Optional)",
-    "noFileSelected": "No file selected"
+    "noFileSelected": "No file selected",
+    "enterLevel": "Enter level",
+    "enterCenterName": "Enter center name"
   },
   "roles": {
     "subadmin": "Sub Admin",
@@ -169,10 +184,14 @@
     "failedToLoadDropdowns": "Failed to load dropdown data",
     "failedToCreateUser": "Failed to create user",
     "failedToCreateUsers": "Failed to create users. Please try again.",
-    "unexpectedError": "An unexpected error occurred. Please try again."
+    "unexpectedError": "An unexpected error occurred. Please try again.",
+    "bulkPartialFailure": "Created {{created}} users. {{failed}} failed. {{details}}",
+    "bulkNoUsersCreated": "No users were created. Please check your file and try again.",
+    "bulkFileError": "Error processing file: {{error}}"
   },
   "success": {
-    "usersCreated": "Users created successfully!"
+    "usersCreated": "{{count}} user(s) created successfully!",
+    "bulkCreateSuccess": "Successfully created {{count}} new accounts"
   },
   "help": {
     "holdCtrlToSelectMultiple": "Hold Ctrl (or Cmd) to select multiple options",

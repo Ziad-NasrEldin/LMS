@@ -1,10 +1,12 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import { useTranslation } from "react-i18next"
 import PageHeader from "./PageHeader"
 import PersonalInfoSection from "./PersonalInfoSection"
 import SecuritySection from "./SecuritySection"
 import { designTokens } from "../../constants/designTokens"
+import { getUserDashboard } from "../../routes/auth-services"
 
 function SettingsPage() {
   const { t, i18n } = useTranslation("settings")
@@ -12,6 +14,18 @@ function SettingsPage() {
   const TOKENS = designTokens.colors
   const SHADOWS = designTokens.shadows
   const GRADIENTS = designTokens.gradients
+
+  const [userRole, setUserRole] = useState("")
+
+  useEffect(() => {
+    const fetchUserRole = async () => {
+      const result = await getUserDashboard()
+      if (result?.success && result?.data?.data?.userInfo) {
+        setUserRole(result.data.data.userInfo.role)
+      }
+    }
+    fetchUserRole()
+  }, [])
 
   return (
     <div
@@ -35,7 +49,7 @@ function SettingsPage() {
 
           <div className="space-y-6">
             <PersonalInfoSection />
-            <SecuritySection />
+            <SecuritySection userRole={userRole} />
           </div>
         </div>
       </div>

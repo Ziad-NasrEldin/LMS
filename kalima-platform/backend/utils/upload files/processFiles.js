@@ -5,8 +5,20 @@ const Level = require("../../models/levelModel");
 
 const resolveLevelId = async (levelName) => {
   if (!levelName) return null;
-  const level = await Level.findOne({ name: { $regex: new RegExp(`^${levelName}$`, "i") } });
-  return level ? level._id : null;
+  
+  // Try exact match first
+  let level = await Level.findOne({ name: { $regex: new RegExp(`^${levelName}$`, "i") } });
+  if (level) return level._id;
+  
+  // Try matching against nameAr (Arabic name)
+  level = await Level.findOne({ nameAr: { $regex: new RegExp(`^${levelName}$`, "i") } });
+  if (level) return level._id;
+  
+  // Try partial match on name
+  level = await Level.findOne({ name: { $regex: new RegExp(levelName, "i") } });
+  if (level) return level._id;
+  
+  return null;
 };
 
 const processAndInsertUsers = async (results, accountType, res, next) => {
@@ -45,14 +57,60 @@ const processAndInsertUsers = async (results, accountType, res, next) => {
         // Role-based enrichment
         if (accountType === "student") {
           cleanData.hobby = cleanData.hobby || "other"; // Required by model
-          cleanData.level = await resolveLevelId(cleanData.level || cleanData.stage);
+          const resolvedLevel = await resolveLevelId(cleanData.level || cleanData.stage);
+          if (!resolvedLevel) {
+            failedUsers.push({
+              name: userData.name,
+              email: userData.email,
+              error: `Invalid level or stage: ${cleanData.level || cleanData.stage}. Please use a valid grade level name.`,
+            });
+            continue;
+          }
+          cleanData.level = resolvedLevel;
         } else if (accountType === "parent") {
-          cleanData.level = await resolveLevelId(cleanData.level);
+          const resolvedLevel = await resolveLevelId(cleanData.level);
+          if (cleanData.level && !resolvedLevel) {
+            failedUsers.push({
+              name: userData.name,
+              email: userData.email,
+              error: `Invalid level: ${cleanData.level}. Please use a valid grade level name.`,
+            });
+            continue;
+          }
+          cleanData.level = resolvedLevel;
         } else if (accountType === "teacher") {
           // Teachers have an array of levels
           const levelName = cleanData.level || cleanData.stage;
           const levelId = await resolveLevelId(levelName);
-          cleanData.level = levelId ? [levelId] : [];
+          if (!levelId) {
+            failedUsers.push({
+              name: userData.name,
+              email: userData.email,
+              error: `Invalid level or stage: ${levelName}. Please use a valid stage name.`,
+            });
+            continue;
+          }
+          cleanData.level = [levelId];
+          
+          // Validate subject is provided for teacher
+          if (!cleanData.subject) {
+            failedUsers.push({
+              name: userData.name,
+              email: userData.email,
+              error: "Subject is required for teacher accounts.",
+            });
+            continue;
+          }
+          
+          // Validate teachesAtType is provided for teacher
+          if (!cleanData.teachesAtType) {
+            failedUsers.push({
+              name: userData.name,
+              email: userData.email,
+              error: "Teaching location (teachesAtType) is required for teacher accounts.",
+            });
+            continue;
+          }
         }
 
         // Hash password
@@ -67,10 +125,11 @@ const processAndInsertUsers = async (results, accountType, res, next) => {
         const savedUser = await user.save();
         createdUsers.push(savedUser);
       } catch (err) {
+        const errorMessage = err.message || "Unknown error";
         failedUsers.push({
           name: userData.name,
           email: userData.email,
-          error: err.message,
+          error: errorMessage,
         });
       }
     }

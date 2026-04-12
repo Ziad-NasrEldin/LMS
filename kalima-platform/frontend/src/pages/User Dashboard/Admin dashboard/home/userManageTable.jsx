@@ -25,7 +25,23 @@ import {
 } from "../../../../utils/exportUtils"
 
 const UserManagementTable = () => {
-  const { t, i18n } = useTranslation("admin")
+  const { t: baseT, i18n } = useTranslation("admin")
+  const t = (key, options) => {
+    const translated = baseT(key, options)
+
+    if (translated !== key || !String(key).startsWith("admin.")) {
+      return translated
+    }
+
+    const fallbackKey = String(key).slice("admin.".length)
+    const fallback = baseT(fallbackKey, options)
+
+    if (fallback !== fallbackKey) {
+      return fallback
+    }
+
+    return options?.defaultValue ?? translated
+  }
   const isRTL = i18n.language === "ar"
   const exportLocale = getExportLocale(i18n.language)
   const dir = isRTL ? "rtl" : "ltr"
@@ -110,16 +126,18 @@ const UserManagementTable = () => {
   const fetchUsers = async () => {
     try {
       setLoading(true)
+      setError(null)
       const result = await getAllUsers()
       if (result.success) {
         const usersData = Array.isArray(result.data) ? result.data : Array.isArray(result.data?.data) ? result.data.data : []
         setUsers(usersData)
         setFilteredUsers(usersData)
+        setError(null)
       } else {
-        setError(t("admin.errors.fetchUsers"))
+        setError(translateErrorMessage(result.error || result.message || t("admin.errors.fetchUsers")))
       }
     } catch (error) {
-      setError(t("admin.errors.fetchUsers"))
+      setError(translateErrorMessage(error?.message || t("admin.errors.fetchUsers")))
     } finally {
       setLoading(false)
     }
@@ -146,7 +164,7 @@ const UserManagementTable = () => {
 
   const getStatus = (user) => {
     if (!user.phoneNumber) return t("admin.status.missingData")
-    if (user.role === "student" && !user.level) return t("admin.status.missingData")
+    if (String(user.role || "").toLowerCase() === "student" && !user.level) return t("admin.status.missingData")
     return t("admin.status.valid")
   }
 
@@ -384,302 +402,355 @@ const UserManagementTable = () => {
   const renderUserDetails = (user) => {
     if (!user) return null
 
-    const commonFields = (
-      <>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t("admin.userDetails.name")}</label>
-            <p className="text-sm text-gray-900 bg-gray-50 p-2 rounded">{user.name || t("admin.NA")}</p>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t("admin.userDetails.email")}</label>
-            <p className="text-sm text-gray-900 bg-gray-50 p-2 rounded">{user.email || t("admin.NA")}</p>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t("admin.userDetails.gender")}</label>
-            <p className="text-sm text-gray-900 bg-gray-50 p-2 rounded">{user.gender || t("admin.NA")}</p>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t("admin.userDetails.phoneNumber")}</label>
-            <p className="text-sm text-gray-900 bg-gray-50 p-2 rounded">{user.phoneNumber || t("admin.NA")}</p>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t("admin.userDetails.role")}</label>
-            <p className="text-sm text-gray-900 bg-gray-50 p-2 rounded">{getRoleLabel(user.role)}</p>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t("admin.userDetails.joinedDate")}</label>
-            <p className="text-sm text-gray-900 bg-gray-50 p-2 rounded">{formatDate(user.createdAt)}</p>
-          </div>
-          {user.government && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                {t("admin.userDetails.government")}
-              </label>
-              <p className="text-sm text-gray-900 bg-gray-50 p-2 rounded">{user.government}</p>
-            </div>
-          )}
-          {user.administrationZone && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                {t("admin.userDetails.administrationZone")}
-              </label>
-              <p className="text-sm text-gray-900 bg-gray-50 p-2 rounded">{user.administrationZone}</p>
-            </div>
-          )}
-          {user.isEmailVerified !== undefined && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                {t("admin.userDetails.emailVerified")}
-              </label>
-              <p className="text-sm text-gray-900 bg-gray-50 p-2 rounded">
-                {user.isEmailVerified ? t("admin.yes") : t("admin.no")}
-              </p>
-            </div>
-          )}
-          {user.successfulInvites !== undefined && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                {t("admin.userDetails.successfulInvites")}
-              </label>
-              <p className="text-sm text-gray-900 bg-gray-50 p-2 rounded">{user.successfulInvites || 0}</p>
-            </div>
-          )}
-        </div>
-      </>
-    )
+    const getLevelName = (level) => {
+      if (!level) return t("admin.NA")
+      if (typeof level === "object") {
+        return level.name || level.nameAr || level._id
+      }
+      return level
+    }
 
-    const roleSpecificFields = () => {
-      const role = user.role ? user.role.toLowerCase() : "";
-      switch (role) {
-        case "student":
-          return (
-            <div className="border-t pt-4">
-              <h4 className="text-lg font-semibold mb-3 text-blue-600">{t("admin.userDetails.studentInfo")}</h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {user.level && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      {t("admin.userDetails.level")}
-                    </label>
-                    <p className="text-sm text-gray-900 bg-blue-50 p-2 rounded">
-                      {typeof user.level === "object" ? user.level.name || user.level._id : user.level}
-                    </p>
-                  </div>
-                )}
-                {user.sequencedId && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      {t("admin.userDetails.sequenceId")}
-                    </label>
-                    <p className="text-sm text-gray-900 bg-blue-50 p-2 rounded">{user.sequencedId}</p>
-                  </div>
-                )}
-                {user.parentPhoneNumber && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      {t("admin.userDetails.parentPhone")}
-                    </label>
-                    <p className="text-sm text-gray-900 bg-blue-50 p-2 rounded">{user.parentPhoneNumber}</p>
-                  </div>
-                )}
-                {user.faction && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      {t("admin.userDetails.faction")}
-                    </label>
-                    <p className="text-sm text-gray-900 bg-blue-50 p-2 rounded">{user.faction}</p>
-                  </div>
-                )}
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {t("admin.userDetails.hobbies")}
-                  </label>
-                  {user.hobbies && user.hobbies.length > 0 ? (
-                    <div className="flex flex-wrap gap-2">
-                      {user.hobbies.map((hobby, index) => (
-                        <span key={index} className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
-                          {hobby}
-                        </span>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-sm text-gray-900 bg-blue-50 p-2 rounded">{t("admin.NA")}</p>
-                  )}
-                </div>
-                {user.generalPoints !== undefined && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      {t("admin.userDetails.generalPoints")}
-                    </label>
-                    <p className="text-sm text-gray-900 bg-blue-50 p-2 rounded">{user.generalPoints || 0}</p>
-                  </div>
-                )}
-                {user.totalPoints !== undefined && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      {t("admin.userDetails.totalPoints")}
-                    </label>
-                    <p className="text-sm text-gray-900 bg-blue-50 p-2 rounded">{user.totalPoints || 0}</p>
-                  </div>
-                )}
-              </div>
-            </div>
-          )
+    const getLevelInfo = (level) => {
+      // Handle case where level is an ObjectId string (not populated)
+      if (!level) return { stage: null, grade: null }
+      
+      if (typeof level === "string") {
+        if (level.match(/^[0-9a-fA-F]{24}$/)) {
+          // It's an unpopulated ObjectId - try to get from cache or show loading
+          return { stage: null, grade: null, unpopulated: true, objectId: level }
+        }
+        return { stage: null, grade: level }
+      }
+      
+      if (typeof level === "object") {
+        // Check if it's a populated level object with parentLevel
+        if (level.parentLevel) {
+          const stage = level.parentLevel.name || level.parentLevel.nameAr || level.parentLevel._id
+          const grade = level.name || level.nameAr || level._id
+          return { stage, grade }
+        }
+        
+        // If it's a stage level (kind === "stage"), it's the stage itself
+        if (level.kind === "stage") {
+          return { stage: level.name || level.nameAr, grade: null }
+        }
+        
+        // If it's a grade level (kind === "grade"), show it as grade
+        if (level.kind === "grade") {
+          return { stage: null, grade: level.name || level.nameAr }
+        }
+        
+        // Fallback for any other object structure
+        return { stage: level.name || level.nameAr, grade: null }
+      }
+      
+      return { stage: null, grade: level }
+    }
 
-        case "parent":
-          return (
-            <div className="border-t pt-4">
-              <h4 className="text-lg font-semibold mb-3 text-green-600">{t("admin.userDetails.parentInfo")}</h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {user.children && (
-                  <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      {t("admin.userDetails.children")} ({user.children.length})
-                    </label>
-                    <p className="text-sm text-gray-900 bg-green-50 p-2 rounded">
-                      {user.children.length > 0 ? user.children.join(", ") : t("admin.userDetails.noChildren")}
-                    </p>
-                  </div>
-                )}
-                {user.views !== undefined && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      {t("admin.userDetails.views")}
-                    </label>
-                    <p className="text-sm text-gray-900 bg-green-50 p-2 rounded">{user.views || 0}</p>
-                  </div>
-                )}
-              </div>
-            </div>
-          )
-
-        case "teacher":
-          return (
-            <div className="border-t pt-4">
-              <h4 className="text-lg font-semibold mb-3 text-purple-600">{t("admin.userDetails.teacherInfo")}</h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {user.subject && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      {t("admin.userDetails.subject")}
-                    </label>
-                    <p className="text-sm text-gray-900 bg-purple-50 p-2 rounded">
-                      {typeof user.subject === "object" ? user.subject.name || user.subject._id : user.subject}
-                    </p>
-                  </div>
-                )}
-                {user.level && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      {t("admin.userDetails.teachingLevel")}
-                    </label>
-                    <p className="text-sm text-gray-900 bg-purple-50 p-2 rounded">
-                      {Array.isArray(user.level) ? user.level.join(", ") : user.level}
-                    </p>
-                  </div>
-                )}
-                {user.school && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      {t("admin.userDetails.school")}
-                    </label>
-                    <p className="text-sm text-gray-900 bg-purple-50 p-2 rounded">{user.school}</p>
-                  </div>
-                )}
-                {user.teachesAtType && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      {t("admin.userDetails.teachesAt")}
-                    </label>
-                    <p className="text-sm text-gray-900 bg-purple-50 p-2 rounded">{user.teachesAtType}</p>
-                  </div>
-                )}
-                {user.centers && user.centers.length > 0 && (
-                  <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      {t("admin.userDetails.centers")}
-                    </label>
-                    <p className="text-sm text-gray-900 bg-purple-50 p-2 rounded">{user.centers.join(", ")}</p>
-                  </div>
-                )}
-                {user.phoneNumber2 && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      {t("admin.userDetails.secondPhone")}
-                    </label>
-                    <p className="text-sm text-gray-900 bg-purple-50 p-2 rounded">{user.phoneNumber2}</p>
-                  </div>
-                )}
-                {user.socialMedia && user.socialMedia.length > 0 && (
-                  <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      {t("admin.userDetails.socialMedia")}
-                    </label>
-                    <div className="space-y-2">
-                      {user.socialMedia.map((social, index) => (
-                        <div key={index} className="flex items-center space-x-2 bg-purple-50 p-2 rounded">
-                          <span className="font-medium">{social.platform}:</span>
-                          <span>{social.account}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          )
-
-        case "lecturer":
-        case "lecturers":
-          return (
-            <div className="border-t pt-4">
-              <h4 className="text-lg font-semibold mb-3 text-indigo-600">{t("admin.userDetails.lecturerInfo")}</h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {user.bio && (
-                  <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">{t("admin.userDetails.bio")}</label>
-                    <p className="text-sm text-gray-900 bg-indigo-50 p-2 rounded">{user.bio}</p>
-                  </div>
-                )}
-                {user.expertise && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      {t("admin.userDetails.expertise")}
-                    </label>
-                    <p className="text-sm text-gray-900 bg-indigo-50 p-2 rounded">{user.expertise}</p>
-                  </div>
-                )}
-              </div>
-            </div>
-          )
-
-        case "assistant":
-          return (
-            <div className="border-t pt-4">
-              <h4 className="text-lg font-semibold mb-3 text-orange-600">{t("admin.userDetails.assistantInfo")}</h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {user.assignedLecturer && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      {t("admin.userDetails.assignedLecturer")}
-                    </label>
-                    <p className="text-sm text-gray-900 bg-orange-50 p-2 rounded">{user.assignedLecturer}</p>
-                  </div>
-                )}
-              </div>
-            </div>
-          )
-
-        default:
-          return null
+    const getRoleBadgeColor = (role) => {
+      const r = role?.toLowerCase()
+      switch (r) {
+        case "student": return "bg-blue-100 text-blue-700"
+        case "parent": return "bg-green-100 text-green-700"
+        case "teacher": return "bg-purple-100 text-purple-700"
+        case "lecturer": return "bg-orange-100 text-orange-700"
+        default: return "bg-gray-100 text-gray-700"
       }
     }
 
+    const getGenderIcon = (gender) => {
+      if (gender?.toLowerCase() === "female") return "👩"
+      if (gender?.toLowerCase() === "male") return "👨"
+      return "👤"
+    }
+
     return (
-      <div className="max-h-96 overflow-y-auto">
-        {commonFields}
-        {roleSpecificFields()}
+      <div className="space-y-4">
+        {/* Header Section */}
+        <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-primary/5 to-primary/10 rounded-xl border border-primary/10">
+          <div className="w-14 h-14 rounded-full bg-primary/20 flex items-center justify-center text-2xl font-bold text-primary">
+            {user.name?.charAt(0) || "?"}
+          </div>
+          <div className="flex-1 min-w-0">
+            <h3 className="text-lg font-bold text-gray-900 truncate">{user.name}</h3>
+            <p className="text-sm text-gray-500 truncate">{user.email}</p>
+          </div>
+          <div className="flex flex-col items-end gap-2">
+            <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getRoleBadgeColor(user.role)}`}>
+              {getRoleLabel(user.role)}
+            </span>
+            <span className="text-xs text-gray-500">
+              {t("admin.userDetails.joinedDate")}: {formatDate(user.createdAt)}
+            </span>
+          </div>
+        </div>
+
+        {/* Basic Info Grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          <div className="bg-gray-50 rounded-lg p-3">
+            <span className="text-xs text-gray-500 block">{t("admin.userDetails.gender")}</span>
+            <span className="text-sm font-medium text-gray-900 flex items-center gap-1">
+              {getGenderIcon(user.gender)} {user.gender === "female" ? t("admin.userDetails.female") : user.gender === "male" ? t("admin.userDetails.male") : t("admin.NA")}
+            </span>
+          </div>
+          <div className="bg-gray-50 rounded-lg p-3">
+            <span className="text-xs text-gray-500 block">{t("admin.userDetails.phoneNumber")}</span>
+            <span className="text-sm font-medium text-gray-900">{user.phoneNumber || t("admin.NA")}</span>
+          </div>
+          {user.isEmailVerified !== undefined && (
+            <div className="bg-gray-50 rounded-lg p-3">
+              <span className="text-xs text-gray-500 block">{t("admin.userDetails.emailVerified")}</span>
+              <span className={`text-sm font-medium ${user.isEmailVerified ? "text-green-600" : "text-red-500"}`}>
+                {user.isEmailVerified ? t("admin.yes") : t("admin.no")}
+              </span>
+            </div>
+          )}
+          {user.government && (
+            <div className="bg-gray-50 rounded-lg p-3">
+              <span className="text-xs text-gray-500 block">{t("admin.userDetails.government")}</span>
+              <span className="text-sm font-medium text-gray-900">{user.government}</span>
+            </div>
+          )}
+          {user.administrationZone && (
+            <div className="bg-gray-50 rounded-lg p-3">
+              <span className="text-xs text-gray-500 block">{t("admin.userDetails.administrationZone")}</span>
+              <span className="text-sm font-medium text-gray-900">{user.administrationZone}</span>
+            </div>
+          )}
+          {user.successfulInvites !== undefined && (
+            <div className="bg-gray-50 rounded-lg p-3">
+              <span className="text-xs text-gray-500 block">{t("admin.userDetails.successfulInvites")}</span>
+              <span className="text-sm font-medium text-gray-900">{user.successfulInvites || 0}</span>
+            </div>
+          )}
+        </div>
+
+        {/* Role-specific Info */}
+        {user.role?.toLowerCase() === "student" && (
+          <div className="border-t pt-4 mt-4">
+            <h4 className="text-sm font-bold text-blue-600 mb-3 flex items-center gap-2">
+              <span className="w-1 h-4 bg-blue-500 rounded-full"></span>
+              {t("admin.userDetails.studentInfo")}
+            </h4>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {user.level && (() => {
+                const levelInfo = getLevelInfo(user.level)
+                const isFullyPopulated = levelInfo.stage || levelInfo.grade
+                const isUnpopulated = levelInfo.unpopulated && levelInfo.objectId
+                
+                return (
+                  <>
+                    {levelInfo.stage && (
+                      <div className="bg-blue-50 rounded-lg p-3">
+                        <span className="text-xs text-blue-600 block">{t("admin.userDetails.stage")}</span>
+                        <span className="text-sm font-bold text-blue-900">{levelInfo.stage}</span>
+                      </div>
+                    )}
+                    {levelInfo.grade && (
+                      <div className="bg-blue-50 rounded-lg p-3">
+                        <span className="text-xs text-blue-600 block">{t("admin.userDetails.level")}</span>
+                        <span className="text-sm font-bold text-blue-900">{levelInfo.grade}</span>
+                      </div>
+                    )}
+                    {!isFullyPopulated && !isUnpopulated && (
+                      <div className="bg-blue-50 rounded-lg p-3">
+                        <span className="text-xs text-blue-600 block">{t("admin.userDetails.level")}</span>
+                        <span className="text-sm font-bold text-blue-900">{getLevelName(user.level)}</span>
+                      </div>
+                    )}
+                    {isUnpopulated && (
+                      <div className="bg-yellow-50 rounded-lg p-3">
+                        <span className="text-xs text-yellow-600 block">{t("admin.userDetails.level")}</span>
+                        <span className="text-sm font-bold text-yellow-800">{levelInfo.objectId}</span>
+                      </div>
+                    )}
+                  </>
+                )
+              })()}
+              {user.sequencedId && (
+                <div className="bg-blue-50 rounded-lg p-3">
+                  <span className="text-xs text-blue-600 block">{t("admin.userDetails.sequenceId")}</span>
+                  <span className="text-sm font-bold text-blue-900">#{user.sequencedId}</span>
+                </div>
+              )}
+              {user.parentPhoneNumber && (
+                <div className="bg-blue-50 rounded-lg p-3">
+                  <span className="text-xs text-blue-600 block">{t("admin.userDetails.parentPhone")}</span>
+                  <span className="text-sm font-medium text-blue-900">{user.parentPhoneNumber}</span>
+                </div>
+              )}
+              {user.faction && (
+                <div className="bg-blue-50 rounded-lg p-3">
+                  <span className="text-xs text-blue-600 block">{t("admin.userDetails.faction")}</span>
+                  <span className="text-sm font-bold text-blue-900">{user.faction}</span>
+                </div>
+              )}
+              {user.generalPoints !== undefined && (
+                <div className="bg-blue-50 rounded-lg p-3">
+                  <span className="text-xs text-blue-600 block">{t("admin.userDetails.generalPoints")}</span>
+                  <span className="text-sm font-bold text-blue-900">{user.generalPoints || 0}</span>
+                </div>
+              )}
+              {user.totalPoints !== undefined && (
+                <div className="bg-blue-50 rounded-lg p-3">
+                  <span className="text-xs text-blue-600 block">{t("admin.userDetails.totalPoints")}</span>
+                  <span className="text-sm font-bold text-blue-900">{user.totalPoints || 0}</span>
+                </div>
+              )}
+              <div className="col-span-2 sm:col-span-3">
+                <span className="text-xs text-blue-600 block mb-1">{t("admin.userDetails.hobbies")}</span>
+                {user.hobbies && user.hobbies.length > 0 ? (
+                  <div className="flex flex-wrap gap-1">
+                    {user.hobbies.map((hobby, index) => (
+                      <span key={index} className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full font-medium">
+                        {hobby}
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  <span className="text-sm text-gray-500">{t("admin.NA")}</span>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {user.role?.toLowerCase() === "parent" && (
+          <div className="border-t pt-4 mt-4">
+            <h4 className="text-sm font-bold text-green-600 mb-3 flex items-center gap-2">
+              <span className="w-1 h-4 bg-green-500 rounded-full"></span>
+              {t("admin.userDetails.parentInfo")}
+            </h4>
+            <div className="grid grid-cols-2 gap-3">
+              {user.children && user.children.length > 0 && (
+                <div className="col-span-2 bg-green-50 rounded-lg p-3">
+                  <span className="text-xs text-green-600 block">{t("admin.userDetails.children")} ({user.children.length})</span>
+                  <div className="flex flex-wrap gap-1 mt-1">
+                    {user.children.map((child, index) => (
+                      <span key={index} className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full font-medium">
+                        {typeof child === "object" ? child.name || child._id : child}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {user.profession && (
+                <div className="bg-green-50 rounded-lg p-3">
+                  <span className="text-xs text-green-600 block">{t("admin.userDetails.profession")}</span>
+                  <span className="text-sm font-medium text-green-900">{user.profession}</span>
+                </div>
+              )}
+              {user.views !== undefined && (
+                <div className="bg-green-50 rounded-lg p-3">
+                  <span className="text-xs text-green-600 block">{t("admin.userDetails.views")}</span>
+                  <span className="text-sm font-bold text-green-900">{user.views || 0}</span>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {user.role?.toLowerCase() === "teacher" && (
+          <div className="border-t pt-4 mt-4">
+            <h4 className="text-sm font-bold text-purple-600 mb-3 flex items-center gap-2">
+              <span className="w-1 h-4 bg-purple-500 rounded-full"></span>
+              {t("admin.userDetails.teacherInfo")}
+            </h4>
+            <div className="grid grid-cols-2 gap-3">
+              {user.subject && (
+                <div className="bg-purple-50 rounded-lg p-3">
+                  <span className="text-xs text-purple-600 block">{t("admin.userDetails.subject")}</span>
+                  <span className="text-sm font-bold text-purple-900">
+                    {typeof user.subject === "object" ? (user.subject.name || user.subject.nameAr || user.subject._id) : user.subject}
+                  </span>
+                </div>
+              )}
+              {user.level && (
+                <div className="bg-purple-50 rounded-lg p-3">
+                  <span className="text-xs text-purple-600 block">{t("admin.userDetails.teachingLevel")}</span>
+                  <span className="text-sm font-medium text-purple-900">
+                    {Array.isArray(user.level) 
+                      ? user.level.map(l => getLevelName(l)).filter(Boolean).join(", ") 
+                      : getLevelName(user.level)}
+                  </span>
+                </div>
+              )}
+              {user.school && (
+                <div className="bg-purple-50 rounded-lg p-3">
+                  <span className="text-xs text-purple-600 block">{t("admin.userDetails.school")}</span>
+                  <span className="text-sm font-medium text-purple-900">{user.school}</span>
+                </div>
+              )}
+              {user.teachesAtType && (
+                <div className="bg-purple-50 rounded-lg p-3">
+                  <span className="text-xs text-purple-600 block">{t("admin.userDetails.teachesAt")}</span>
+                  <span className="text-sm font-medium text-purple-900">{user.teachesAtType}</span>
+                </div>
+              )}
+              {user.phoneNumber2 && (
+                <div className="bg-purple-50 rounded-lg p-3">
+                  <span className="text-xs text-purple-600 block">{t("admin.userDetails.secondPhone")}</span>
+                  <span className="text-sm font-medium text-purple-900">{user.phoneNumber2}</span>
+                </div>
+              )}
+              {user.centers && user.centers.length > 0 && (
+                <div className="col-span-2 bg-purple-50 rounded-lg p-3">
+                  <span className="text-xs text-purple-600 block">{t("admin.userDetails.centers")}</span>
+                  <div className="flex flex-wrap gap-1 mt-1">
+                    {user.centers.map((center, index) => (
+                      <span key={index} className="px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-full font-medium">
+                        {center}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {(user.role?.toLowerCase() === "lecturer" || user.role?.toLowerCase() === "lecturers") && (
+          <div className="border-t pt-4 mt-4">
+            <h4 className="text-sm font-bold text-orange-600 mb-3 flex items-center gap-2">
+              <span className="w-1 h-4 bg-orange-500 rounded-full"></span>
+              {t("admin.userDetails.lecturerInfo")}
+            </h4>
+            <div className="grid grid-cols-2 gap-3">
+              {user.bio && (
+                <div className="col-span-2 bg-orange-50 rounded-lg p-3">
+                  <span className="text-xs text-orange-600 block">{t("admin.userDetails.bio")}</span>
+                  <span className="text-sm font-medium text-orange-900">{user.bio}</span>
+                </div>
+              )}
+              {user.expertise && (
+                <div className="bg-orange-50 rounded-lg p-3">
+                  <span className="text-xs text-orange-600 block">{t("admin.userDetails.expertise")}</span>
+                  <span className="text-sm font-medium text-orange-900">{user.expertise}</span>
+                </div>
+              )}
+              {user.subject && (
+                <div className="bg-orange-50 rounded-lg p-3">
+                  <span className="text-xs text-orange-600 block">{t("admin.userDetails.subject")}</span>
+                  <span className="text-sm font-medium text-orange-900">
+                    {typeof user.subject === "object" ? (user.subject.name || user.subject.nameAr || user.subject._id) : user.subject}
+                  </span>
+                </div>
+              )}
+              {user.socialMedia && user.socialMedia.length > 0 && (
+                <div className="col-span-2 bg-orange-50 rounded-lg p-3">
+                  <span className="text-xs text-orange-600 block">{t("admin.userDetails.socialMedia")}</span>
+                  <div className="flex flex-wrap gap-1 mt-1">
+                    {user.socialMedia.map((social, index) => (
+                      <span key={index} className="px-2 py-1 bg-orange-100 text-orange-700 text-xs rounded-full font-medium">
+                        {social.platform}: {social.account}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     )
   }
@@ -703,24 +774,6 @@ const UserManagementTable = () => {
       </div>
     )
   }
-  if (error && !showCreateModal) {
-    return (
-      <div className="flex items-center justify-center mt-8">
-        <div className="flex items-center gap-3 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 shadow-sm max-w-md">
-          <span>{error}</span>
-        </div>
-      </div>
-    )
-  }
-
-  if (error && !showCreateModal) {
-    return (
-      <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 shadow-sm flex items-center gap-3 max-w-md mx-auto mt-8">
-        <span>{error}</span>
-      </div>
-    )
-  }
-
   return (
     <div 
       className="font-sans w-full mx-auto p-6 md:p-8 my-10" 
@@ -732,6 +785,12 @@ const UserManagementTable = () => {
         border: "1px solid rgba(17,24,39,0.05)"
       }}
     >
+      {error && !showCreateModal && (
+        <div className="mb-6 flex items-center gap-3 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 shadow-sm">
+          <span>{error}</span>
+        </div>
+      )}
+
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4 border-b pb-6" style={{ borderColor: "rgba(17,24,39,0.1)" }}>
         <div>
           <h1 className={`text-3xl font-extrabold mb-2 ${isRTL ? "text-right" : "text-left"}`} style={{ color: TOKENS.deepTeal }}>
@@ -827,7 +886,7 @@ const UserManagementTable = () => {
                   disabled={isExporting || users.length === 0}
                 >
                    <FaFileExport className="mr-2" />
-                   {t("admin.export.exportFiltered")} ({filteredUsers.length})
+                   {t("admin.export.exportAll")} ({users.length})
                  </Button>
               </li>
            </ul>
@@ -987,7 +1046,7 @@ const UserManagementTable = () => {
                      >
                        <FaEye size={16} />
                      </Button>
-                     {isAdmin | isSubAdmin && (
+                    {(isAdmin || isSubAdmin) && (
                        <Button
                          variant="ghost"
                          size="sm"
@@ -1095,36 +1154,37 @@ const UserManagementTable = () => {
       />
 
       {/* User Details Modal */}
-       {userDetailsModal.isOpen && (
-         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 p-4">
-           <div className="bg-white rounded-2xl max-w-4xl w-full overflow-hidden shadow-2xl" dir={dir}>
-             <div className="flex justify-between items-center p-4 border-b border-slate-200">
-               <h3 className="font-bold text-xl">
-                 {t("admin.userDetails.title")} - {userDetailsModal.user?.name}
-               </h3>
-               <Button 
-                 variant="ghost" 
-                 size="sm" 
-                 className="rounded-full p-2"
-                 onClick={() => setUserDetailsModal({ isOpen: false, user: null })}
-               >
-                 <FaTimes />
-               </Button>
-             </div>
-             <div className="p-6">
-               {renderUserDetails(userDetailsModal.user)}
-             </div>
-             <div className="flex justify-end p-4 border-t border-slate-200">
-               <Button 
-                 variant="ghost" 
-                 onClick={() => setUserDetailsModal({ isOpen: false, user: null })}
-               >
-                 {t("admin.userDetails.close")}
-               </Button>
-             </div>
-           </div>
-         </div>
-       )}
+        {userDetailsModal.isOpen && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 p-4">
+            <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden shadow-2xl" dir={dir}>
+              <div className="flex justify-between items-center px-4 py-3 border-b border-slate-200 bg-slate-50">
+                <h3 className="font-bold text-lg text-slate-800">
+                  {t("admin.userDetails.title")}
+                </h3>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="rounded-full p-1.5 hover:bg-slate-200"
+                  onClick={() => setUserDetailsModal({ isOpen: false, user: null })}
+                >
+                  <FaTimes />
+                </Button>
+              </div>
+              <div className="p-4 overflow-y-auto max-h-[calc(90vh-120px)]">
+                {renderUserDetails(userDetailsModal.user)}
+              </div>
+              <div className="flex justify-end px-4 py-3 border-t border-slate-200 bg-slate-50">
+                <Button 
+                  variant="primary" 
+                  size="sm"
+                  onClick={() => setUserDetailsModal({ isOpen: false, user: null })}
+                >
+                  {t("admin.userDetails.close")}
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
        {whatsappModal.isOpen && (
          <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 p-4">
            <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl" dir={dir}>

@@ -21,7 +21,14 @@ import {
   FaComment,
 } from "react-icons/fa";
 import { Edit, Lightbulb } from "lucide-react";
-import { getAllUsers } from "../routes/fetch-users";
+import {
+  getAllAssistants,
+  getAllLecturers,
+  getAllParents,
+  getAllStudents,
+  getAllTeachers,
+  getAllUsers,
+} from "../routes/fetch-users";
 import {
   getImpersonationSession,
   getCachedUserSummary,
@@ -46,6 +53,14 @@ const ALLOWED_IMPERSONATION_TARGETS = {
   admin: ["lecturer", "student", "parent", "teacher", "assistant"],
   lecturer: ["student", "parent"],
   assistant: ["student"],
+};
+
+const IMPERSONATION_TARGET_FETCHERS = {
+  assistant: getAllAssistants,
+  lecturer: getAllLecturers,
+  parent: getAllParents,
+  student: getAllStudents,
+  teacher: getAllTeachers,
 };
 
 const getDashboardPathByRole = (role) => {
@@ -179,7 +194,7 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
         setError(translateErrorMessage("Failed to fetch user data"));
       }
     } catch (fetchError) {
-      setError("Failed to fetch user data");
+      setError(translateErrorMessage("Failed to fetch user data"));
       console.error("Error fetching user data:", fetchError);
     } finally {
       setLoading(false);
@@ -260,7 +275,9 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
     setTargetSearch("");
 
     try {
-      const result = await getAllUsers();
+      const normalizedTargetRole = normalizeRole(targetRole);
+      const roleFetcher = IMPERSONATION_TARGET_FETCHERS[normalizedTargetRole];
+      const result = roleFetcher ? await roleFetcher() : await getAllUsers();
       if (!result?.success) {
         setTargetsError(
           translateImpersonationError(
@@ -278,7 +295,11 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
           ? result.data.data
           : [];
 
-      const normalizedTargetRole = normalizeRole(targetRole);
+      if (roleFetcher) {
+        setTargets(allUsers);
+        return;
+      }
+
       const roleFiltered = allUsers.filter(
         (user) => normalizeRole(user?.role) === normalizedTargetRole,
       );

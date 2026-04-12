@@ -111,7 +111,7 @@ export default function LecturerOverviewPanel() {
           throw new Error(translateErrorMessage(analyticsRes.message || "Failed to fetch analytics"));
       }
       } catch (err) {
-        setError(translateErrorMessage(err.message || (isRTL ? "تعذر تحميل بيانات الملخص" : "Failed to load overview data")));
+        setError(translateErrorMessage(err.message || "Failed to load overview data"));
       } finally {
         setLoading(false);
       }

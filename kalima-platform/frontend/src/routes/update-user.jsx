@@ -2,7 +2,10 @@ import axios from "axios"
 import { getToken } from "./auth-services"
 import { normalizeApiError } from "../utils/apiError"
 
-const API_URL = import.meta.env.VITE_API_URL
+const rawApiUrl = (import.meta.env.VITE_API_URL || "").replace(/\/+$/, "")
+const API_URL = /\/api\/v1$/i.test(rawApiUrl)
+  ? rawApiUrl
+  : `${rawApiUrl || ""}/api/v1`
 
 
 

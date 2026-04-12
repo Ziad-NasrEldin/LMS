@@ -58,7 +58,69 @@ const exactMessages = new Map([
   ["Network Error", () => t("errors.network")],
   ["Refresh token not found, please login again", () => t("errors.refreshTokenNotFound")],
   ["Refresh token is expired, please login again", () => t("errors.refreshTokenExpired")],
+  ["Refresh token is expired, plese login again", () => t("errors.refreshTokenExpired")],
   ["Access token required", () => t("errors.accessTokenRequired")],
+  ["You should provide one of these account types: parent, teacher, student", () => t("errors.invalidAccountType")],
+  ["Unsupported file type. Please upload a CSV or Excel file", () => t("errors.invalidFileTypeCSV")],
+  ["Invalid file type. Please upload a CSV or Excel document", () => t("errors.invalidFileTypeCSV")],
+  ["No valid data found in the uploaded file", () => t("errors.noValidData")],
+  ["Creation failed", () => t("errors.creationFailed")],
+  ["Invalid level or stage", () => t("errors.invalidLevel")],
+  ["Invalid level", () => t("errors.invalidLevel")],
+  ["Subject is required for teacher accounts", () => t("errors.teacherSubjectRequired")],
+  ["Teaching location (teachesAtType) is required for teacher accounts", () => t("errors.teacherLocationRequired")],
+  ["Only image files are allowed for promo templates", () => t("errors.imageOnly")],
+  ["Please upload only images", () => t("errors.imageOnly")],
+  ["Invalid image file. Please upload a valid image.", () => t("errors.imageOnly")],
+  ["Link attachments should be opened directly from the stored URL", () => t("errors.directAttachmentLinkOnly")],
+  ["Attachment URL is invalid or not publicly reachable", () => t("errors.invalidAttachmentUrl")],
+  ["Please provide lectureId and content", () => t("errors.lectureCommentFieldsRequired")],
+  ["Reply must belong to the same lecture", () => t("errors.commentLectureMismatch")],
+  ["You must purchase the lecture to post a comment", () => t("errors.commentPurchaseRequired")],
+  ["Comment content cannot be empty", () => t("errors.commentEmpty")],
+  ["You already have an active promo code", () => t("errors.activePromoCodeExists")],
+  ["No codes deleted. They may not exist or have been redeemed.", () => t("errors.noCodesDeleted")],
+  ["This code is not properly configured", () => t("errors.invalidPromoCodeConfiguration")],
+  ["Only students and parents can access purchased course containers", () => t("errors.permissionDenied")],
+  ["Only parents can access their children's data", () => t("errors.permissionDenied")],
+  ["Purchase does not belong to this student", () => t("errors.permissionDenied")],
+  ["Referral code already set and cannot be changed.", () => t("errors.referralAlreadySet")],
+  ["OTP expired or not found. Please request a new one", () => t("errors.otpExpired")],
+  ["Invalid OTP", () => t("errors.invalidOtp")],
+  ["The selected level is inactive", () => t("errors.levelInactive")],
+  ["Selected grade does not belong to the selected stage", () => t("errors.gradeStageMismatch")],
+  ["Selected grade does not belong to the selected stage.", () => t("errors.gradeStageMismatch")],
+  ["Type must be either 'exam' or 'homework'", () => t("errors.invalidAssessmentType")],
+  ["Container has no children to calculate duration from.", () => t("errors.containerDurationChildrenMissing")],
+  ["Please log in as a lecturer or assistant to access your containers.", () => t("errors.containersAccessRoleRequired")],
+  ["Failed to fetch user data", () => t("errors.userDataFetchFailed")],
+  ["Failed to upload profile picture", () => t("errors.profileUploadFailed")],
+  ["An error occurred while fetching your information", () => t("errors.userInfoFetchFailed")],
+  ["An unexpected error occurred while uploading", () => t("errors.uploadUnexpected")],
+  ["Failed to update", () => t("errors.updateFailed", { entity: t("entities.data") })],
+  ["Failed to load linked students", () => t("errors.linkedStudentsLoadFailed")],
+  ["Failed to load linked students.", () => t("errors.linkedStudentsLoadFailed")],
+  ["Failed to load overview data", () => t("errors.overviewLoadFailed")],
+  ["Failed to load promo codes", () => t("errors.promoCodesLoadFailed")],
+  ["Failed to load promo codes.", () => t("errors.promoCodesLoadFailed")],
+  ["File size must be less than 1GB", () => t("errors.fileTooLarge1GB")],
+  ["Please fill all required fields", () => t("errors.allRequiredFields")],
+  ["Please enter a course description", () => t("errors.courseDescriptionRequired")],
+  ["Please enter a course goal", () => t("errors.courseGoalRequired")],
+  ["Please enter a price greater than zero for the paid course", () => t("errors.paidCoursePriceRequired")],
+  ["Please select a parent container", () => t("errors.parentContainerRequired")],
+  ["Please enter a container name", () => t("errors.containerNameRequired")],
+  ["Please enter a lecture link", () => t("errors.lectureLinkRequired")],
+  ["Please provide an exam form URL", () => t("errors.examFormUrlRequired")],
+  ["Please provide a homework form URL", () => t("errors.homeworkFormUrlRequired")],
+  // Review-specific errors
+  ["Please provide containerId, rating, and comment", () => t("errors.reviewMissingFields")],
+  ["Rating must be between 1 and 5", () => t("errors.reviewRatingRange")],
+  ["Course not found", () => t("errors.reviewCourseNotFound")],
+  ["You can only review courses you have purchased", () => t("errors.reviewNotPurchased")],
+  ["You have already reviewed this course. Please update your existing review instead.", () => t("errors.reviewAlreadyExists")],
+  ["Review submitted successfully and is pending approval", () => t("errors.reviewPendingApproval")],
+  ["Unauthorized - User role must be Student", () => t("errors.reviewStudentOnly")],
 ]);
 
 const fieldLabels = {
@@ -99,6 +161,8 @@ const fieldLabels = {
   studentId: () => t("fields.studentId"),
   purchaseId: () => t("fields.purchaseId"),
   eventId: () => t("fields.eventId"),
+  comment: () => t("fields.comment"),
+  rating: () => t("fields.rating"),
 };
 
 const entityLabels = {
@@ -181,6 +245,59 @@ const translatePattern = (message) => {
       run: (match) => translatePattern(match[1]) || t("errors.invalidInput"),
     },
     {
+      regex: /^Path `(.+?)` \(`.+?`\) is shorter than the minimum allowed length \((\d+)\)\.?$/i,
+      run: (match) => t("errors.minLengthRequired", { field: labelForField(match[1]), min: match[2] }),
+    },
+    {
+      regex: /^Path `(.+?)` is shorter than the minimum allowed length \((\d+)\)\.?$/i,
+      run: (match) => t("errors.minLengthRequired", { field: labelForField(match[1]), min: match[2] }),
+    },
+    {
+      regex: /^Path `(.+?)` is shorter than the minimum allowed length \((\d+)\)\.?$/i,
+      run: (match) => t("errors.minLengthRequired", { field: labelForField(match[1]), min: match[2] }),
+    },
+    // Review-specific validation errors
+    {
+      regex: /^Path `rating` is required\.?$/i,
+      run: () => t("errors.reviewRatingRequired"),
+    },
+    {
+      regex: /^Path `rating` \(?(\d+)?\) is less than minimum allowed value \((\d+)\)\.?$/i,
+      run: (match) => t("errors.reviewRatingMin", { min: match[2] }),
+    },
+    {
+      regex: /^Path `rating` \(?(\d+)?\) is greater than maximum allowed value \((\d+)\)\.?$/i,
+      run: (match) => t("errors.reviewRatingMax", { max: match[2] }),
+    },
+    {
+      regex: /^Path `comment` is required\.?$/i,
+      run: () => t("errors.reviewCommentRequired"),
+    },
+    {
+      regex: /^Path `comment` \(`.+?`\) is shorter than the minimum allowed length \((\d+)\)\.?$/i,
+      run: (match) => t("errors.minLengthRequired", { field: t("fields.comment"), min: match[1] }),
+    },
+    {
+      regex: /^Path `comment` is shorter than the minimum allowed length \((\d+)\)\.?$/i,
+      run: (match) => t("errors.minLengthRequired", { field: t("fields.comment"), min: match[1] }),
+    },
+    {
+      regex: /^Path `comment` \(`.+?`\) is longer than the maximum allowed length \((\d+)\)\.?$/i,
+      run: (match) => t("errors.maxLengthExceeded", { field: t("fields.comment"), max: match[1] }),
+    },
+    {
+      regex: /^Path `comment` is longer than the maximum allowed length \((\d+)\)\.?$/i,
+      run: (match) => t("errors.maxLengthExceeded", { field: t("fields.comment"), max: match[1] }),
+    },
+    {
+      regex: /^Path `container` is required\.?$/i,
+      run: () => t("errors.reviewContainerRequired"),
+    },
+    {
+      regex: /^Path `student` is required\.?$/i,
+      run: () => t("errors.reviewStudentRequired"),
+    },
+    {
       regex: /^Duplicate field value:\s*(.+?)\.?\s*Please use another value!?$/i,
       run: (match) => t("errors.alreadyExists", { field: humanize(match[1]) }),
     },
@@ -205,6 +322,10 @@ const translatePattern = (message) => {
       run: (match) => t("errors.fieldInvalid", { field: labelForField(match[1]) }),
     },
     {
+      regex: /^sortOrder must be a number\.?$/i,
+      run: () => t("errors.fieldInvalid", { field: labelForField("sortOrder") }),
+    },
+    {
       regex: /^(.+?) must be one of .+$/i,
       run: (match) => t("errors.fieldInvalid", { field: labelForField(match[1]) }),
     },
@@ -218,6 +339,14 @@ const translatePattern = (message) => {
     },
     {
       regex: /^(.+?) must be at least (\d+) characters\.?$/i,
+      run: (match) => t("errors.minLengthRequired", { field: labelForField(match[1]), min: match[2] }),
+    },
+    {
+      regex: /^Path `(.+?)` \(`.+?`\) is shorter than the minimum allowed length \((\d+)\)\.?$/i,
+      run: (match) => t("errors.minLengthRequired", { field: labelForField(match[1]), min: match[2] }),
+    },
+    {
+      regex: /^Path `(.+?)` is shorter than the minimum allowed length \((\d+)\)\.?$/i,
       run: (match) => t("errors.minLengthRequired", { field: labelForField(match[1]), min: match[2] }),
     },
     {
@@ -249,12 +378,61 @@ const translatePattern = (message) => {
       run: () => t("errors.insufficientBalance"),
     },
     {
+      regex: /Not enough balance\. Required: (\d+), Available lecturer balance: ([\d.]+), Available general balance: ([\d.]+)/i,
+      run: (match) => {
+        const required = parseInt(match[1]) || 0;
+        const lecturerBalance = parseFloat(match[2]) || 0;
+        const generalBalance = parseFloat(match[3]) || 0;
+        return t("errors.insufficientBalanceDetailed", { required, lecturerBalance, generalBalance });
+      },
+    },
+    {
       regex: /(?:Not an image|Please upload only images)/i,
       run: () => t("errors.imageOnly"),
     },
     {
+      regex: /^Invalid image type(?: for profile picture)?\.?$/i,
+      run: () => t("errors.imageOnly"),
+    },
+    {
+      regex: /^Invalid document type\.?$/i,
+      run: () => t("errors.invalidInput"),
+    },
+    {
+      regex: /^Invalid file type for payment screenshot\.?$/i,
+      run: () => t("errors.invalidInput"),
+    },
+    {
+      regex: /^Invalid file type for field:\s*(.+)$/i,
+      run: (match) => t("errors.fieldInvalid", { field: labelForField(match[1] || "file") }),
+    },
+    {
+      regex: /^Invalid .+ link\. Please provide a valid public HTTP\/HTTPS URL$/i,
+      run: () => t("errors.invalidPublicUrl"),
+    },
+    {
+      regex: /^Form URL must be a valid public HTTP\/HTTPS URL$/i,
+      run: () => t("errors.invalidPublicUrl"),
+    },
+    {
+      regex: /^Image dimensions must be exactly (.+) px$/i,
+      run: (match) => t("errors.imageDimensionsRequired", { dimensions: `${match[1]} px` }),
+    },
+    {
+      regex: /^This route is not for password updates\. Please use \/update\/password$/i,
+      run: () => t("errors.passwordChangeRouteHint"),
+    },
+    {
+      regex: /^The selected level must be a (.+)$/i,
+      run: (match) => t("errors.fieldInvalid", { field: match[1] }),
+    },
+    {
       regex: /(?:No file uploaded|File is required|A file is required)/i,
       run: () => t("errors.fileRequired"),
+    },
+    {
+      regex: /Invalid (?:level|stage)(?: or stage)?:?\s*(.+)/i,
+      run: (match) => t("errors.invalidLevelWithValue", { value: match[1] || "" }),
     },
     {
       regex: /(?:Invalid role selected|Invalid role|Invalid or missing role)/i,
@@ -279,6 +457,10 @@ const translatePattern = (message) => {
     {
       regex: /^(Failed to|Error) .*$/i,
       run: () => t("errors.operationFailed"),
+    },
+    {
+      regex: /Creation failed: (.+)/i,
+      run: (match) => t("errors.creationFailedWithDetails", { details: match[1] }),
     },
   ];
 

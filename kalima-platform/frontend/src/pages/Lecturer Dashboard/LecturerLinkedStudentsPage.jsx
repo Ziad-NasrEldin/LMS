@@ -4,6 +4,7 @@ import { AlertCircle, ArrowLeft, Users } from "lucide-react";
 import { Link } from "react-router-dom";
 import { getLecturerAnalytics } from "../../routes/lectures";
 import { designTokens } from "../../constants/designTokens";
+import { translateErrorMessage } from "../../utils/errorTranslator";
 import Button from "../../components/ui/Button";
 import Input from "../../components/ui/Input";
 
@@ -48,7 +49,7 @@ export default function LecturerLinkedStudentsPage() {
       if (res.success) {
         setAnalytics(res.data || null);
       } else {
-        setError(res.message || (isRTL ? "تعذر تحميل بيانات الطلاب المرتبطين." : "Failed to load linked students."));
+        setError(translateErrorMessage(res.message || "Failed to load linked students"));
       }
       setLoading(false);
     };

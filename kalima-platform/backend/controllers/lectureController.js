@@ -364,6 +364,10 @@ exports.loadLecturePage = catchAsync(async (req, res, next) => {
         id: user._id,
         role: user.role,
         email: user.email,
+        name: user.name,
+        fullName: user.fullName,
+        sequenceId: user.sequencedId || user.sequenceId,
+        studentId: user.sequencedId,
       },
     },
   });

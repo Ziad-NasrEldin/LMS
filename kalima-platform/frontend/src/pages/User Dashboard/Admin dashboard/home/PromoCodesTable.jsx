@@ -7,7 +7,9 @@ import { FaTrash } from "react-icons/fa"
 import { getPromoCodes, deletePromoCode, deleteBulkPromoCodes } from "../../../../routes/codes"
 import { getAllStudents } from "../../../../routes/fetch-users"
 import { designTokens } from "../../../../constants/designTokens"
+import { translateErrorMessage } from "../../../../utils/errorTranslator"
 import DSSelect from "../../../../components/DSSelect"
+import Button from "../../../../components/ui/Button"
 
 const TOKENS = designTokens.colors
 const SHADOWS = designTokens.shadows
@@ -83,7 +85,7 @@ const PromoCodesTable = () => {
           ...prev,
           isLoading: false,
           promoCodes: [],
-          error: promoResult.error || t("errors.invalidResponse"),
+          error: translateErrorMessage(promoResult.error || t("errors.invalidResponse"), t),
         }))
       }
 
@@ -91,7 +93,7 @@ const PromoCodesTable = () => {
         setStudents(studentsResult.data)
         setStudentsError(null)
       } else {
-        setStudentsError(studentsResult.error || t("errors.failedToFetchStudents"))
+        setStudentsError(translateErrorMessage(studentsResult.error || t("errors.failedToFetchStudents"), t))
       }
 
       setStudentsLoading(false)
@@ -144,10 +146,10 @@ const PromoCodesTable = () => {
         setShowDeleteConfirm(false)
         setCodeToDelete(null)
       } else {
-        setDeleteError(result.error || t("errors.deleteFailed"))
+        setDeleteError(translateErrorMessage(result.error || t("errors.deleteFailed"), t))
       }
     } catch (error) {
-      setDeleteError(error.message || t("errors.unexpectedError"))
+      setDeleteError(translateErrorMessage(error.message || t("errors.unexpectedError"), t))
     } finally {
       setIsDeleting(false)
     }
@@ -172,10 +174,10 @@ const PromoCodesTable = () => {
         setSelectedCodes([])
         setShowBulkDeleteConfirm(false)
       } else {
-        setDeleteError(result.error || t("errors.bulkDeleteFailed"))
+        setDeleteError(translateErrorMessage(result.error || t("errors.bulkDeleteFailed"), t))
       }
     } catch (error) {
-      setDeleteError(error.message || t("errors.unexpectedError"))
+      setDeleteError(translateErrorMessage(error.message || t("errors.unexpectedError"), t))
     } finally {
       setIsDeleting(false)
     }
@@ -247,7 +249,7 @@ const PromoCodesTable = () => {
                  ) : (
                    <>
                      <FaTrash className="mr-1" />
-                     {t("admin.actions.delete")} ({selectedCodes.length})
+                     {t("actions.delete")} ({selectedCodes.length})
                    </>
                  )}
                </Button>
@@ -413,7 +415,7 @@ const PromoCodesTable = () => {
                  }}
                  disabled={isDeleting}
                >
-                 {t("admin.actions.cancel")}
+                 {t("actions.cancel")}
                </Button>
                <Button 
                  variant="primary" 
@@ -422,7 +424,7 @@ const PromoCodesTable = () => {
                  onClick={handleDeleteCode} 
                  disabled={isDeleting}
                >
-                 {isDeleting ? <ImSpinner8 className="animate-spin" /> : t("admin.actions.delete")}
+                 {isDeleting ? <ImSpinner8 className="animate-spin" /> : t("actions.delete")}
                </Button>
              </div>
           </div>

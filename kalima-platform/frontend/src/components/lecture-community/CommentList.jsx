@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { getLectureComments } from "../../routes/comments";
 import CommentItem from "./CommentItem";
 import Button from "../ui/Button";
@@ -6,6 +7,7 @@ import toast from "react-hot-toast";
 import { designTokens } from "../../constants/designTokens";
 
 const CommentList = ({ lectureId, userId, userRole }) => {
+    const { t } = useTranslation("lectureDisplay");
     const [comments, setComments] = useState([]);
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
@@ -28,11 +30,11 @@ const CommentList = ({ lectureId, userId, userRole }) => {
                 setPage(currentPage);
             }
         } catch (error) {
-            toast.error(error?.message || "Failed to load comments");
+            toast.error(error?.message || t("failedToLoadComments"));
         } finally {
             setLoading(false);
         }
-    }, [lectureId]);
+    }, [lectureId, t]);
 
     useEffect(() => {
         fetchComments();
@@ -58,10 +60,10 @@ const CommentList = ({ lectureId, userId, userRole }) => {
                     }}
                 >
                     <p className="text-lg font-black" style={{ color: TOKENS.deepTeal }}>
-                        No comments yet
+                        {t("noCommentsYet", "No comments yet")}
                     </p>
                     <p className="mt-2 italic">
-                        Be the first to ask a question.
+                        {t("beFirstToAsk", "Be the first to ask a question.")}
                     </p>
                 </div>
             ) : (
@@ -90,7 +92,7 @@ const CommentList = ({ lectureId, userId, userRole }) => {
                             background: "rgba(255,255,255,0.78)",
                         }}
                     >
-                        {loading ? "Loading..." : "Load More"}
+                        {loading ? t("loading", "Loading...") : t("loadMore", "Load More")}
                     </Button>
                         </div>
                     )}

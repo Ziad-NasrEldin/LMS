@@ -11,20 +11,23 @@
       "generatePromoCodes": "Generate Promo Codes",
       "promo": "Promo Code",
       "discount": "Discount",
-       "editUser": {
-        "title": "Edit User",
-        "name": "Name",
-        "namePlaceholder": "Name",
-        "phone": "Phone Number",
-        "phonePlaceholder": "Phone Number",
-        "email": "Email",
-        "emailPlaceholder": "Email",
-        "password": "Password",
-        "passwordPlaceholder": "Password",
-        "passwordHint": "Please enter password",
-        "save": "Save",
-        "cancel": "Cancel"
-      },
+"editUser": {
+         "title": "Edit User",
+         "name": "Name",
+         "namePlaceholder": "Name",
+         "phone": "Phone Number",
+         "phonePlaceholder": "Phone Number",
+         "email": "Email",
+         "emailPlaceholder": "Email",
+         "password": "Password",
+         "passwordPlaceholder": "New Password",
+         "passwordHint": "Leave blank to keep current password",
+         "passwordDisabled": "Password cannot be changed",
+         "passwordLocked": "Admin credentials are locked for security",
+         "cannotEditOwnCredentials": "Admin cannot edit their own credentials. Please contact system administrator.",
+         "save": "Save",
+         "cancel": "Cancel"
+       },
       "userDetails": {
       "name": "Name",
       "email": "Email",
@@ -38,6 +41,7 @@
       "successfulInvites": "Successful Invites",
       "studentInfo": "Student Information",
       "level": "Level",
+      "stage": "Stage",
       "sequenceId": "Sequence ID",
       "parentPhone": "Parent Phone",
       "faction": "Faction",
@@ -63,9 +67,45 @@
       "assistantInfo": "Assistant Information",
       "assignedLecturer": "Assigned Lecturer",
       "title": "User Details",
-      "close": "Close"
-    },
-    "invites": {
+      "close": "Close",
+      "male": "Male",
+      "female": "Female"
+    }
+  },
+  "fields": {
+    "stage": "Stage",
+    "level": "Grade Level",
+    "sequencedIdOptional": "Sequenced ID (Optional)",
+    "hobby": "Hobby",
+    "faction": "Faction",
+    "school": "School",
+    "parentPhoneNumber": "Parent Phone Number",
+    "parentPhoneNumber2": "Additional Parent Phone Number",
+    "government": "Government",
+    "selectGovernment": "Select Government",
+    "administrationZone": "Administration Zone",
+    "selectAdministrationZone": "Select Administration Zone",
+    "loadingZones": "Loading administration zones...",
+    "views": "Views",
+    "subject": "Subject",
+    "expertise": "Expertise",
+    "bio": "Bio",
+    "assignedLecturer": "Assigned Lecturer",
+    "selectLecturer": "Select Lecturer",
+    "studentInfo": "Student Information",
+    "parentInfo": "Parent Information",
+    "teacherInfo": "Teacher Information",
+    "lecturerInfo": "Lecturer Information",
+    "assistantInfo": "Assistant Information"
+  },
+  "placeholders": {
+    "selectStage": "Select Stage",
+    "selectStageFirst": "Select a stage first",
+    "selectGradeLevel": "Select Grade Level",
+    "selectHobby": "Select Hobby",
+    "selectParentRelation": "Select Relation"
+  },
+  "invites": {
       "invite": "Invite",
       "invites": "Invites",
       "refreshSuccess": "Invites refreshed successfully!",
@@ -127,12 +167,18 @@
         "amountBeforePlaceholder": "Enter old amount",
         "amountBeforeHint": "Optional. Used only on the print template as the crossed-out old amount.",
         "numCodes": "Number of Codes",
+        "count": "Number of Codes",
         "codeType": "Code Type",
+        "type": "Code Type",
         "general": "General",
         "specific": "Specific",
+        "points": "Points",
         "promo": "Promo",
         "lecturer": "Lecturer",
         "lecturerPlaceholder": "Select Lecturer",
+        "allLecturers": "All Lecturers",
+        "expiryDate": "Expiry Date",
+        "qrCodes": "QR Codes",
         "generateQrCodes": "Generate QR Codes",
         "qrCodeDescription": "Generate QR codes for easy code redemption",
         "qrCodeSize": "QR Code Size"
@@ -175,6 +221,9 @@
     "generating": "Generating...",
     "generateCodes": "Generate Codes",
     "generatedCodes": "Generated Codes",
+    "copied": "Copied",
+    "downloadSuccess": "QR codes downloaded successfully",
+    "downloadFailed": "Failed to download QR codes",
     "promoTable": {
       "number": "#",
       "code": "Promo Code",
@@ -360,8 +409,7 @@
         "sequenceId": "Sequence ID",
         "joinedDate": "Joined Date"
       }
-    }
-  },
+    },
     "promoCodes": {
       "title": "Promo Codes Management",
       "subtitle": "Manage promo code lifecycle and usage",

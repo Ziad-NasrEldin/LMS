@@ -28,6 +28,7 @@ import { getToken, getUserDashboard } from "../../routes/auth-services"
 import { redeemPromoCode } from "../../routes/codes"
 import { getChildrenData } from "../../routes/parents"
 import { updateCurrentUser } from "../../routes/update-user"
+import { translateErrorMessage } from "../../utils/errorTranslator"
 import ReferralSection from "./ReferralSection"
 import Button from "../../components/ui/Button"
 import Input from "../../components/ui/Input"
@@ -415,7 +416,7 @@ const PromoCodes = () => {
         const result = await getUserDashboard({ page: pageToFetch, limit: 10 })
 
         if (!result.success) {
-          setFetchError(result.error || t("errors.fetchFailed"))
+          setFetchError(translateErrorMessage(result.error || t("errors.fetchFailed"), t))
           return
         }
 
@@ -622,7 +623,7 @@ const PromoCodes = () => {
     try {
       const result = await redeemPromoCode(redeemCode)
       if (!result.success) {
-        setRedeemError(result.error || t("redeem.errors.generic"))
+        setRedeemError(translateErrorMessage(result.error || t("redeem.errors.generic"), t))
       } else {
         setRedeemSuccess(t("redeem.success"))
         setRedeemCode("")
@@ -649,7 +650,7 @@ const PromoCodes = () => {
     try {
       const result = await updateCurrentUser({ children: [sequencedId] })
       if (!result.success) {
-        setAddChildError(result.error || t("addChild.errors.generic"))
+        setAddChildError(translateErrorMessage(result.error || t("addChild.errors.generic"), t))
       } else {
         setAddChildSuccess(t("addChild.success"))
         setSequencedId("")

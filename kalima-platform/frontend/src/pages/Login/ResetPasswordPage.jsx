@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { resetPassword } from '../../routes/auth-services';
+import { translateErrorMessage } from '../../utils/errorTranslator';
 import WaveBackground from './WaveBackground';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
@@ -32,7 +33,7 @@ const ResetPassword = () => {
     try {
       const response = await resetPassword(resetToken, password, confirmPassword);
       if (response.status !== 'success') {
-        setError(response.message || t('errors.resetFailed'));
+        setError(translateErrorMessage(response.message || t('errors.resetFailed'), t));
         return;
       }
       if (response.status === 'success') {
@@ -45,7 +46,7 @@ const ResetPassword = () => {
       const errorMessage = err.response?.data?.error || 
                          err.message || 
                          t('errors.generalError');
-      setError(errorMessage);
+      setError(translateErrorMessage(errorMessage, t));
     } finally {
       setLoading(false);
     }
