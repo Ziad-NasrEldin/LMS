@@ -303,7 +303,17 @@ export const updateLecture = async (lectureId, lectureData) => {
 
 export const createContainer = async (formData) => {
   try {
-    const response = await axios.post(`${API_URL}/containers`, formData, authConfig());
+    const isFormData = formData instanceof FormData
+
+    const response = await axios.post(
+      `${API_URL}/containers`,
+      formData,
+      authConfig({
+        headers: {
+          "Content-Type": isFormData ? "multipart/form-data" : "application/json",
+        },
+      })
+    )
     return response.data;
   } catch (error) {
     throw new Error(error.response?.data?.message || "Error creating container");

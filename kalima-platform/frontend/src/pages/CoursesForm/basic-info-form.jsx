@@ -33,10 +33,12 @@ function BasicInfoForm({
   initialImageUrl = null,
 }) {
   const compactSelect = "w-full border border-gray-300 bg-slate-100 rounded-lg h-10 min-h-10 appearance-none px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-transparent"
+  const COURSE_IMAGE_MAX_SIZE_BYTES = 5 * 1024 * 1024
   const [courseImage, setCourseImage] = useState(null)
   const [courseImagePreview, setCourseImagePreview] = useState(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const submitLockRef = useRef(false)
+  const fileInputRef = useRef(null)
   const isPaidCourse = formData.courseType === "paid"
   const gradeOptions = useMemo(
     () => (formData.stage ? getGradeOptionsForStage(levelHierarchy, formData.stage) : []),
@@ -64,13 +66,25 @@ function BasicInfoForm({
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0]
+    e.target.value = ""
+
     if (!file) return
 
-    if (file.size <= 1024 * 1024 * 1024) {
-      setCourseImage(file)
-    } else {
-      toast.error(translateErrorMessage("File size must be less than 1GB"))
+    if (!file.type?.startsWith("image/")) {
+      toast.error(translateErrorMessage("Please upload only images"))
+      return
     }
+
+    if (file.size > COURSE_IMAGE_MAX_SIZE_BYTES) {
+      toast.error(isRTL ? "يجب أن يكون حجم الصورة أقل من 5 ميجابايت" : "Image size must be less than 5MB")
+      return
+    }
+
+    setCourseImage(file)
+  }
+
+  const openFilePicker = () => {
+    fileInputRef.current?.click()
   }
 
   const handleCreateParentContainer = async (e) => {
@@ -325,7 +339,19 @@ function BasicInfoForm({
                 <h2 className="block text-base text-primary font-semibold mb-2">
                   {isRTL ? "صورة الكورس" : "Course Image"}
                 </h2>
-                <label className="relative border border-dashed border-primary/25 rounded-xl p-4 flex flex-col items-center justify-center h-36 cursor-pointer bg-white overflow-hidden">
+                <div
+                  className="relative border border-dashed border-primary/25 rounded-xl p-4 flex flex-col items-center justify-center h-36 cursor-pointer bg-white overflow-hidden"
+                  onClick={openFilePicker}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault()
+                      openFilePicker()
+                    }
+                  }}
+                  role="button"
+                  tabIndex={0}
+                  aria-label={isRTL ? "رفع صورة الكورس" : "Upload course image"}
+                >
                   {displayedCourseImage && (
                     <>
                       <img
@@ -346,15 +372,19 @@ function BasicInfoForm({
                         className={`border-2 mb-2 ${
                           displayedCourseImage ? "text-white border-white hover:bg-white/15" : "text-primary border-primary"
                         }`}
+                        onClick={(event) => {
+                          event.stopPropagation()
+                          openFilePicker()
+                        }}
                       >
-                        {isRTL ? "اضف صورة" : "Add Image"}
+                        {isRTL ? "اختر صورة" : "Choose image"}
                       </Button>
                       <p className={`text-xs ${displayedCourseImage ? "text-white/90" : "text-neutral/50"}`}>
-                        {isRTL ? "المساحة القصوى 1 Gb" : "Max size 1 Gb"}
+                        {isRTL ? "الحد الأقصى 5 ميجابايت" : "Max size 5MB"}
                       </p>
                     </div>
-                    <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
-                </label>
+                    <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+                </div>
                 {courseImage && (
                   <p className="text-sm mt-2 text-center">
                     {isRTL ? "تم اختيار: " : "Selected: "} {courseImage.name}
