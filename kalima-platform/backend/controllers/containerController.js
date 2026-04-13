@@ -403,7 +403,7 @@ exports.getContainerById = catchAsync(async (req, res, next) => {
         ])
         .lean(),
       LectureModel.find({ _id: { $in: childIds } })
-        .select("name type level subject price description numberOfViews thumbnail")
+        .select("name type level subject price description numberOfViews thumbnail limitedAvailabilityEnabled limitedAvailabilityDurationHours limitedAvailabilityStartsAt limitedAvailabilityEndsAt")
         .populate([
           { path: "subject", select: "name" },
           { path: "level", select: "name" },
@@ -562,7 +562,7 @@ exports.getContainerHierarchy = catchAsync(async (req, res, next) => {
           ])
           .lean(),
         Lecture.find({ _id: { $in: childIds } })
-          .select("name type level subject price description numberOfViews thumbnail videoLink duration")
+          .select("name type level subject price description numberOfViews thumbnail videoLink duration limitedAvailabilityEnabled limitedAvailabilityDurationHours limitedAvailabilityStartsAt limitedAvailabilityEndsAt")
           .populate([
             { path: "subject", select: "name" },
             { path: "level", select: "name" },

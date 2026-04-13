@@ -9,6 +9,7 @@ const Lecturer = require("../models/lecturerModel"); // Add this import
 const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
 const studentLectureAccess = require("../models/studentLectureAccessModel");
+const { getLimitedLectureAvailabilityStatus } = require("../utils/limitedLectureAvailability");
 
 const QueryFeatures = require("../utils/queryFeatures");
 
@@ -69,6 +70,43 @@ const resolvePointsUserModel = async ({ userId, session, roleHint, populate }) =
   }
 
   return null;
+};
+
+const toIdString = (value) => {
+  if (!value) return null;
+  if (typeof value === "string") return value;
+  if (value._id) return String(value._id);
+  return value.toString ? value.toString() : null;
+};
+
+const getParentEligibleLevelIds = async ({ parentUser, session }) => {
+  const childProfileLevelIds = Array.isArray(parentUser?.childProfiles)
+    ? parentUser.childProfiles.map((profile) => toIdString(profile?.level)).filter(Boolean)
+    : [];
+
+  if (childProfileLevelIds.length > 0) {
+    return [...new Set(childProfileLevelIds)];
+  }
+
+  const childIds = Array.isArray(parentUser?.children)
+    ? parentUser.children.map((child) => toIdString(child)).filter(Boolean)
+    : [];
+
+  if (childIds.length === 0) {
+    return [];
+  }
+
+  let childrenQuery = Student.find({ _id: { $in: childIds } }).select("level");
+  if (session) {
+    childrenQuery = childrenQuery.session(session);
+  }
+
+  const children = await childrenQuery;
+  return [
+    ...new Set(
+      children.map((child) => toIdString(child?.level)).filter(Boolean)
+    ),
+  ];
 };
 
 // updated version
@@ -351,7 +389,7 @@ exports.purchaseContainerWithPoints = catchAsync(async (req, res, next) => {
       return next(new AppError(`User not found with ID: ${userId}`, 404));
     }
 
-    // Grade level restriction check
+    // Exact grade restriction check
     if (item.sameGradeOnly) {
       const role = req.user.role;
       
@@ -361,25 +399,35 @@ exports.purchaseContainerWithPoints = catchAsync(async (req, res, next) => {
         const itemLevel = item.level ? item.level.toString() : null;
 
         if (role === "Student") {
-          // Students MUST be in the exact grade and level
+          // Students must match the course grade exactly.
           if (!userLevel || !itemLevel || userLevel !== itemLevel) {
             await session.abortTransaction();
             return next(new AppError("This course is restricted to students in the exact same grade level only", 400));
           }
         } else if (role === "Parent") {
-          // Parents can buy if it's their level OR any of their children's stages
-          const userStages = userModel.stages && Array.isArray(userModel.stages) 
-            ? userModel.stages.map(s => s.toString()) 
-            : [];
-          
-          const isLevelMatch = itemLevel && userLevel === itemLevel;
-          const isStageMatch = itemLevel && userStages.includes(itemLevel);
+          // Parents can purchase when any registered child matches the exact course grade.
+          const eligibleParentLevels = await getParentEligibleLevelIds({
+            parentUser: userModel,
+            session,
+          });
 
-          if (!isLevelMatch && !isStageMatch) {
+          if (
+            !itemLevel ||
+            eligibleParentLevels.length === 0 ||
+            !eligibleParentLevels.includes(itemLevel)
+          ) {
             await session.abortTransaction();
             return next(new AppError("This course is restricted to parents with children in the same grade level only", 400));
           }
         }
+      }
+    }
+
+    if (isLecture && item.limitedAvailabilityEnabled) {
+      const availabilityStatus = getLimitedLectureAvailabilityStatus(item)
+      if (!availabilityStatus.isPurchasable) {
+        await session.abortTransaction();
+        return next(new AppError("This lecture is no longer available for purchase", 400));
       }
     }
 

@@ -4,13 +4,21 @@ const assert = require("node:assert/strict")
 const studentLectureAccessController = require("../../controllers/studentLectureAccessController")
 const Lecture = require("../../models/LectureModel")
 const StudentExamSubmission = require("../../models/studentExamSubmissionModel")
+const Purchase = require("../../models/purchaseModel")
 
 const originalLectureFindById = Lecture.findById
 const originalSubmissionFindOne = StudentExamSubmission.findOne
+const originalPurchaseFindOne = Purchase.findOne
 
 const makeLectureQuery = (lectureDoc) => ({
+  select() {
+    return this
+  },
   populate() {
     return this
+  },
+  lean() {
+    return Promise.resolve(lectureDoc)
   },
   then(resolve, reject) {
     return Promise.resolve(lectureDoc).then(resolve, reject)
@@ -24,6 +32,14 @@ const runCheckLectureAccess = ({ lectureDoc, examSubmission = null, homeworkSubm
     if (query.type === "homework") return homeworkSubmission
     return null
   }
+  Purchase.findOne = () => ({
+    select() {
+      return this
+    },
+    lean() {
+      return Promise.resolve({ _id: "purchase-1" })
+    },
+  })
 
   return new Promise((resolve, reject) => {
     const req = {
@@ -56,6 +72,7 @@ const runCheckLectureAccess = ({ lectureDoc, examSubmission = null, homeworkSubm
 const restoreModelMethods = () => {
   Lecture.findById = originalLectureFindById
   StudentExamSubmission.findOne = originalSubmissionFindOne
+  Purchase.findOne = originalPurchaseFindOne
 }
 
 test("checkLectureAccess returns restricted when required exam is not passed", async () => {

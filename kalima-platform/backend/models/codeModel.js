@@ -8,7 +8,7 @@ const codeSchema = new mongoose.Schema({
   },
   type: {
     type: String,
-    enum: ["general", "specific", "promo"],
+    enum: ["general", "specific"],
     required: true,
   },
   pointsAmount: {

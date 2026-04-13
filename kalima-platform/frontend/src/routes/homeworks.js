@@ -3,6 +3,20 @@ import { getToken } from "./auth-services";
 import { translateErrorMessage } from "../utils/errorTranslator";
 import { normalizeApiError } from "../utils/apiError";
 
+const API_URL = import.meta.env.VITE_API_URL
+
+const authHeaders = (extraHeaders = {}) => ({
+  Authorization: `Bearer ${getToken()}`,
+  ...extraHeaders,
+})
+
+const buildHomeworkResult = (response) => ({
+  success: response.data.status === "success",
+  data: response.data.data,
+  status: response.data.status,
+  results: response.data.result,
+})
+
 /**
  * Upload homework for a lecture
  * @param {string} lectureId - The ID of the lecture
@@ -24,24 +38,13 @@ export const uploadHomework = async (lectureId, homeworkData) => {
     formData.append("type", homeworkData.type || "homeworks");
     formData.append("file", homeworkData.attachment); // Changed from attachment to file to match backend
 
-    const response = await axios.post(
-      `${
-        import.meta.env.VITE_API_URL
-      }/attachments/upload-homework/${lectureId}`,
-      formData,
-      {
-        headers: {
-          Authorization: `Bearer ${getToken()}`,
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
+    const response = await axios.post(`${API_URL}/attachments/upload-homework/${lectureId}`, formData, {
+      headers: authHeaders({
+        "Content-Type": "multipart/form-data",
+      }),
+    });
 
-    return {
-      success: response.data.status === "success",
-      data: response.data.data,
-      status: response.data.status,
-    };
+    return buildHomeworkResult(response);
   } catch (error) {
     console.error("Error uploading homework:", error);
     return {
@@ -71,24 +74,13 @@ export const getLectureHomeworks = async (
 
     const { limit, page } = options;
 
-    const response = await axios.get(
-      `${
-        import.meta.env.VITE_API_URL
-      }/lectures/${lectureId}/homework?limit=${limit}&page=${page}`,
-      {
-        headers: {
-          Authorization: `Bearer ${getToken()}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const response = await axios.get(`${API_URL}/lectures/${lectureId}/homework?limit=${limit}&page=${page}`, {
+      headers: authHeaders({
+        "Content-Type": "application/json",
+      }),
+    });
 
-    return {
-      success: response.data.status === "success",
-      data: response.data.data,
-      status: response.data.status,
-      results: response.data.result,
-    };
+    return buildHomeworkResult(response);
   } catch (error) {
     console.error("Error fetching lecture homeworks:", error);
     return {
@@ -108,13 +100,12 @@ export const updateHomeworkFeedback = async (attachmentId, feedbackData) => {
     }
 
     const response = await axios.patch(
-      `${import.meta.env.VITE_API_URL}/attachments/${attachmentId}/feedback`,
+      `${API_URL}/attachments/${attachmentId}/feedback`,
       feedbackData,
       {
-        headers: {
-          Authorization: `Bearer ${getToken()}`,
+        headers: authHeaders({
           "Content-Type": "application/json",
-        },
+        }),
       }
     );
 

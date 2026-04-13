@@ -34,7 +34,7 @@ const PromoCodesTable = () => {
   }
   const [filters, setFilters] = useState({
     isRedeemed: "", // 'true' | 'false' | ''
-    type: "general", //general | specific | false
+    type: "", // general | specific | ''
   })
   const [state, setState] = useState({
     promoCodes: [],
@@ -289,7 +289,6 @@ const PromoCodesTable = () => {
                 <option value="">{t("filters.all")}</option>
                 <option value="specific">{t("filters.specific")}</option>
                 <option value="general">{t("filters.general")}</option>
-                <option value="promo">{t("filters.promo")}</option>
               </DSSelect>
 
                <Button 

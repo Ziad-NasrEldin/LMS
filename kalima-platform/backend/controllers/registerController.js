@@ -17,6 +17,30 @@ const { createSignupError, mapLevelHierarchyAppError } = require("../utils/signu
 
 const allowedParentRelations = ["mother", "father", "other"];
 
+const resolveChildReferences = async (childValues = []) => {
+  const childrenById = [];
+  const invalidChildren = [];
+
+  for (const childValue of childValues) {
+    const value = String(childValue || "").trim();
+    if (!value) continue;
+
+    if (mongoose.Types.ObjectId.isValid(value)) {
+      childrenById.push(value);
+      continue;
+    }
+
+    const student = await Student.findOne({ sequencedId: value }).lean();
+    if (student) {
+      childrenById.push(student._id);
+    } else {
+      invalidChildren.push(value);
+    }
+  }
+
+  return { childrenById, invalidChildren };
+};
+
 const validatePassword = (password) => {
   const value = String(password || "");
   const requiredLength = 8;
@@ -150,26 +174,8 @@ const registerNewUser = catchAsync(async (req, res, next) => {
     return next(createSignupError("SIGNUP_PHONE_ALREADY_EXISTS"));
   }
 
-  const childrenById = [];
-  const invalidChildren = [];
-  if (children) {
-    const requestedChildren = Array.isArray(children) ? children : [children];
-    for (const childValue of requestedChildren) {
-      const value = String(childValue || "").trim();
-      if (!value) continue;
-      if (mongoose.Types.ObjectId.isValid(value)) {
-        childrenById.push(value);
-        continue;
-      }
-
-      const student = await Student.findOne({ sequencedId: value }).lean();
-      if (student) {
-        childrenById.push(student._id);
-      } else {
-        invalidChildren.push(value);
-      }
-    }
-  }
+  const requestedChildren = children ? (Array.isArray(children) ? children : [children]) : [];
+  const { childrenById, invalidChildren } = await resolveChildReferences(requestedChildren);
   if (invalidChildren.length > 0) {
     return next(
       createSignupError("SIGNUP_CHILD_REFERENCE_INVALID", {
@@ -358,6 +364,49 @@ const registerNewUser = catchAsync(async (req, res, next) => {
       break;
     }
     case "parent": {
+      const rawChildProfiles = Array.isArray(newUser.childProfiles)
+        ? newUser.childProfiles
+        : newUser.childProfiles
+          ? [newUser.childProfiles]
+          : [];
+
+      if (rawChildProfiles.length === 0) {
+        return next(createSignupError("SIGNUP_FIELD_REQUIRED", {
+          field: "childProfiles",
+          message: "At least one child profile is required for parent registration.",
+        }));
+      }
+
+      const normalizedChildProfiles = rawChildProfiles.map((profile) => ({
+        sequenceId: String(profile?.sequenceId || "").trim(),
+        stage: profile?.stage,
+        level: profile?.level,
+      }));
+
+      const profileSequenceIds = normalizedChildProfiles
+        .map((profile) => profile.sequenceId)
+        .filter(Boolean);
+
+      if (profileSequenceIds.length > 0) {
+        const profileChildrenResolution = await resolveChildReferences(profileSequenceIds);
+        if (profileChildrenResolution.invalidChildren.length > 0) {
+          return next(
+            createSignupError("SIGNUP_CHILD_REFERENCE_INVALID", {
+              details: { invalidChildren: profileChildrenResolution.invalidChildren },
+            })
+          );
+        }
+
+        const mergedChildIds = [
+          ...childrenById.map((id) => String(id)),
+          ...profileChildrenResolution.childrenById.map((id) => String(id)),
+        ];
+        newUser.children = [...new Set(mergedChildIds)];
+      }
+
+      newUser.childProfiles = normalizedChildProfiles;
+      newUser.stages = [...new Set(normalizedChildProfiles.map((profile) => String(profile.stage || "")).filter(Boolean))];
+
       if (newUser.level) {
         try {
           const resolvedParentLevel = await validateOptionalLevel(newUser.level);

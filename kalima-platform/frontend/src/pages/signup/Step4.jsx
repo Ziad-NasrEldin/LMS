@@ -72,6 +72,8 @@ export default function Step4({ formData, t, hobbiesList = [], levelHierarchy })
     return "-"
   }
 
+  const parentChildProfiles = Array.isArray(formData.childProfiles) ? formData.childProfiles : []
+
   return (
     <div className="space-y-6">
       <div className="rounded-lg bg-slate-100 p-6">
@@ -157,21 +159,48 @@ export default function Step4({ formData, t, hobbiesList = [], levelHierarchy })
           {formData.role === "parent" && (
             <>
               <ReviewItem label={t("form.profession")} value={formData.profession} />
-              {formData.stage && (
-                <ReviewItem
-                  label={t("form.stage", {
-                    defaultValue: isRTL ? "المرحلة" : "Stage",
-                  })}
-                  value={getLevelName(formData.stage)}
-                />
-              )}
               <ReviewItem
-                label={t("form.level", {
-                  defaultValue: isRTL ? "المستوى التعليمي" : "Learning Level",
+                label={t("form.childCount", {
+                  defaultValue: isRTL ? "عدد الأبناء" : "Number of children",
                 })}
-                value={getLevelName(formData.level)}
+                value={String(formData.childCount || parentChildProfiles.length || 0)}
               />
-              <ReviewItem label={t("form.children")} value={formData.children.join(", ")} />
+              <div className="col-span-2">
+                <p className="text-sm text-slate-600">
+                  {t("form.childrenEducationDetails", {
+                    defaultValue: isRTL ? "بيانات الأبناء الدراسية" : "Children education details",
+                  })}
+                </p>
+                <div className="mt-2 space-y-3">
+                  {parentChildProfiles.length > 0 ? (
+                    parentChildProfiles.map((profile, index) => (
+                      <div key={`review-child-${index}`} className="rounded-xl border border-slate-200 bg-white p-3">
+                        <p className="font-medium">
+                          {t("form.childCardTitle", {
+                            count: index + 1,
+                            defaultValue: isRTL ? `الابن ${index + 1}` : `Child ${index + 1}`,
+                          })}
+                        </p>
+                        <p className="text-sm text-slate-600">
+                          {t("form.stage", { defaultValue: isRTL ? "المرحلة" : "Stage" })}: {getLevelName(profile.stage)}
+                        </p>
+                        <p className="text-sm text-slate-600">
+                          {t("form.level", { defaultValue: isRTL ? "الصف الدراسي" : "Grade level" })}: {getLevelName(profile.level)}
+                        </p>
+                        {profile.sequenceId && (
+                          <p className="text-sm text-slate-600">
+                            {t("form.childSequenceId", {
+                              defaultValue: isRTL ? "رقم تسلسل الابن" : "Child sequence ID",
+                            })}: {profile.sequenceId}
+                          </p>
+                        )}
+                      </div>
+                    ))
+                  ) : (
+                    <p className="font-medium">-</p>
+                  )}
+                </div>
+              </div>
             </>
           )}
         </div>

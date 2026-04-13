@@ -230,28 +230,35 @@ exports.createAttachment = catchAsync(async (req, res, next) => {
 });
 
 exports.uploadHomeWork = catchAsync(async (req, res, next) => {
-  if (!req.file && !req.file.filename) {
+  if (!req.file || !req.file.filename) {
     return next(new AppError(`No file uploaded`, 404));
   }
   const session = await mongoose.startSession();
   session.startTransaction();
+  const uploadedPublicId = req.file?.filename || null;
   try {
     const { lectureId } = req.params;
     const { type } = req.body;
 
     // Check if user is a student
     if (!req.user || req.user.role !== "Student") {
-      await cloudinary.uploader.destroy(req.file.filename);
+      if (uploadedPublicId) {
+        await cloudinary.uploader.destroy(uploadedPublicId);
+      }
       throw new AppError(`You are not authorized to upload homework`, 403);
     }
 
     if (!type || type !== "homeworks") {
-      await cloudinary.uploader.destroy(req.file.filename);
+      if (uploadedPublicId) {
+        await cloudinary.uploader.destroy(uploadedPublicId);
+      }
       throw new AppError(`Invalid file type`, 404);
     }
 
     if (!mongoose.isValidObjectId(lectureId)) {
-      await cloudinary.uploader.destroy(req.file.filename);
+      if (uploadedPublicId) {
+        await cloudinary.uploader.destroy(uploadedPublicId);
+      }
       throw new AppError(`Invalid Schema ID`, 404);
     }
 
@@ -260,7 +267,9 @@ exports.uploadHomeWork = catchAsync(async (req, res, next) => {
       .session(session);
 
     if (!lecture) {
-      await cloudinary.uploader.destroy(req.file.filename);
+      if (uploadedPublicId) {
+        await cloudinary.uploader.destroy(uploadedPublicId);
+      }
       throw new AppError(`Lecture not found`, 404);
     }
 
@@ -279,7 +288,9 @@ exports.uploadHomeWork = catchAsync(async (req, res, next) => {
 
     const savedAttachment = await attachment.save({ session });
     if (!savedAttachment) {
-      await cloudinary.uploader.destroy(req.file.filename);
+      if (uploadedPublicId) {
+        await cloudinary.uploader.destroy(uploadedPublicId);
+      }
       throw new AppError("Error saving attachment", 500);
     }
 
@@ -295,7 +306,9 @@ exports.uploadHomeWork = catchAsync(async (req, res, next) => {
   } catch (error) {
     await session.abortTransaction();
     session.endSession();
-    await cloudinary.uploader.destroy(req.file.filename);
+    if (uploadedPublicId) {
+      await cloudinary.uploader.destroy(uploadedPublicId);
+    }
     return next(error);
   }
 });

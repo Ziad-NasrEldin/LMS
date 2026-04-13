@@ -2,11 +2,12 @@
 
 import { useState, useEffect, useMemo, useCallback } from "react"
 import { Search, ChevronDown, ChevronUp } from "lucide-react"
-import { Link } from "react-router-dom"
+import { Link, useLocation, useNavigate } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import { motion, AnimatePresence } from "framer-motion"
+import toast from "react-hot-toast"
 
-import { getAllContainers } from "../routes/lectures"
+import { deleteContainerById, getAllContainers } from "../routes/lectures"
 import { getAllSubjects } from "../routes/courses"
 import { getAllLevels } from "../routes/levels"
 import { FilterDropdown } from "../../src/components/FilterDropdown"
@@ -20,8 +21,16 @@ import { buildLevelHierarchy, resolveLevelDisplayName } from "../utils/levelHier
 import { buildCoursePath } from "../seo/site.mjs"
 import { useSeo } from "../seo/useSeo"
 import { buildBreadcrumbSchema } from "../seo/structuredData.mjs"
+import {
+  filterCourseContainers,
+  findLevelRecord,
+  mapCoursesToCardData,
+  sortByNewest,
+} from "./CoursesForm/course-form-helpers"
 
 export default function CoursesPage() {
+  const location = useLocation()
+  const navigate = useNavigate()
   const TOKENS = designTokens.colors
   const SHADOWS = designTokens.shadows
   const GRADIENTS = designTokens.gradients
@@ -42,6 +51,7 @@ export default function CoursesPage() {
 
   const { t, i18n } = useTranslation("courses")
   const isRTL = i18n.language === "ar"
+  const isLecturerDashboardView = location.pathname.startsWith("/dashboard/lecturer-dashboard/courses-page")
 
   useSeo({
     title: isRTL
@@ -61,48 +71,16 @@ export default function CoursesPage() {
     ],
   })
 
-  const sortByNewest = useCallback((list = []) => {
-    return [...list].sort((left, right) => {
-      const leftDate = new Date(left.createdAt || left._id || 0).getTime()
-      const rightDate = new Date(right.createdAt || right._id || 0).getTime()
-      return rightDate - leftDate
-    })
-  }, [])
-
-  const normalizeText = (value) =>
-    String(value || "")
-      .trim()
-      .toLowerCase()
-      .replace(/\s+/g, " ")
-
-  const normalizeId = (value) => {
-    if (!value) return ""
-    if (typeof value === "string") return value
-    if (typeof value === "object") {
-      return value._id || value.id || ""
-    }
-    return String(value)
-  }
-
-  const getLevelRecord = (levelLike) => {
-    if (!levelLike) return null
-
-    const targetId = normalizeId(levelLike)
-    if (targetId) {
-      const matchedById = levels.find((level) => normalizeId(level._id) === targetId)
-      if (matchedById) return matchedById
-    }
-
-    const targetName = normalizeText(typeof levelLike === "object" ? levelLike?.name : levelLike)
-    if (!targetName) return null
-
-    return (
-      levels.find((level) => {
-        const displayName = normalizeText(resolveLevelDisplayName(level, i18n.language))
-        return normalizeText(level.name) === targetName || displayName === targetName
-      }) || null
-    )
-  }
+  const getLevelRecord = useCallback(
+    (levelLike) =>
+      findLevelRecord({
+        levels,
+        levelLike,
+        language: i18n.language,
+        resolveLevelDisplayName,
+      }),
+    [i18n.language, levels],
+  )
 
   // Filter states
   const [selectedSubject, setSelectedSubject] = useState("")
@@ -209,80 +187,21 @@ export default function CoursesPage() {
 
   const getFilteredCourseContainers = useCallback(
     (sourceContainers = containers) => {
-      let filtered = sortByNewest(sourceContainers.filter((container) => container.type === "course"))
-
-      if (selectedSubject) {
-        filtered = filtered.filter((container) => container.subject?.name === selectedSubject)
-      }
-
-      if (selectedCourseType) {
-        let apiType = "course"
-        switch (selectedCourseType) {
-          case t("types.course"):
-            apiType = "course"
-            break
-          case t("types.year"):
-            apiType = "year"
-            break
-          case t("types.term"):
-            apiType = "term"
-            break
-          case t("types.month"):
-            apiType = "month"
-            break
-          default:
-            apiType = selectedCourseType
-        }
-        filtered = filtered.filter((container) => container.type === apiType)
-      }
-
-      if (selectedCourseStatus) {
-        filtered = filtered.filter((container) => {
-          const price = container.price || 0
-          return selectedCourseStatus === t("status.free") ? price === 0 : price > 0
-        })
-      }
-
-      if (selectedPrice) {
-        const [min, max] = selectedPrice.split("-").map(Number)
-        filtered = filtered.filter((container) => {
-          const price = container.price || 0
-          return price >= min && (max === 0 || price <= max)
-        })
-      }
-
-      const normalizedSearch = searchQuery.trim().toLowerCase()
-      if (normalizedSearch) {
-        filtered = filtered.filter((container) => {
-          const teacherId = container.createdBy?._id || container.createdBy
-          const matchedLecturer = lecturers.find((lecturer) => lecturer._id === teacherId)
-          const levelRecord = getLevelRecord(container.level)
-          const stageRecord =
-            levelRecord?.kind === "stage"
-              ? levelRecord
-              : getLevelRecord(levelRecord?.parentLevelId || levelRecord?.parentLevel)
-          const gradeName = resolveLevelDisplayName(levelRecord || container.level, i18n.language)
-          const stageName = stageRecord ? resolveLevelDisplayName(stageRecord, i18n.language) : ""
-
-          const searchableText = [
-            container.name,
-            container.subject?.name,
-            gradeName,
-            stageName,
-            matchedLecturer?.name,
-            matchedLecturer?.role,
-          ]
-            .filter(Boolean)
-            .join(" ")
-            .toLowerCase()
-
-          return searchableText.includes(normalizedSearch)
-        })
-      }
-
-      return filtered
+      return filterCourseContainers({
+        containers: sourceContainers,
+        lecturers,
+        levels,
+        searchQuery,
+        selectedSubject,
+        selectedCourseType,
+        selectedCourseStatus,
+        selectedPrice,
+        language: i18n.language,
+        t,
+        resolveLevelDisplayName,
+      })
     },
-    [containers, lecturers, levels, searchQuery, selectedCourseStatus, selectedCourseType, selectedPrice, selectedSubject, sortByNewest, t],
+    [containers, i18n.language, lecturers, levels, searchQuery, selectedCourseStatus, selectedCourseType, selectedPrice, selectedSubject, t],
   )
 
   useEffect(() => {
@@ -303,62 +222,6 @@ export default function CoursesPage() {
     setTotalPages(nextTotalPages)
   }, [containers, currentPage, getFilteredCourseContainers, ITEMS_PER_PAGE])
 
-  const generateCourseData = (containersData) =>
-    containersData.map((container, index) => {
-      const levelRecord = getLevelRecord(container.level)
-      const stageRecord =
-        levelRecord?.kind === "stage"
-          ? levelRecord
-          : getLevelRecord(levelRecord?.parentLevelId || levelRecord?.parentLevel)
-      const grade = resolveLevelDisplayName(levelRecord || container.level, i18n.language)
-      const stage = stageRecord ? resolveLevelDisplayName(stageRecord, i18n.language) : ""
-
-      const isFree = container.price === 0
-      const status = isFree ? t("status.free") : t("status.paid")
-
-      let type = t("types.course")
-      switch (container.type) {
-        case "course":
-          type = t("types.course")
-          break
-        case "year":
-          type = t("types.year")
-          break
-        case "term":
-          type = t("types.term")
-          break
-        case "month":
-          type = t("types.month")
-          break
-        default:
-          type = container.type || t("types.course")
-      }
-
-      const teacherId = container.createdBy?._id || container.createdBy
-      const matchedLecturer = lecturers.find((lecturer) => lecturer._id === teacherId)
-
-      // Get container image URL if available
-      const containerImageUrl = container.containerImage?.url || container.image?.url || null
-
-      return {
-        id: container._id,
-        image: `/course-${(index % 6) + 1}.png`, // Fallback image pattern
-        containerImage: containerImageUrl, // Pass the actual container image URL
-        title: container.name,
-        subject: container.subject?.name || "",
-        teacher: matchedLecturer?.name || t("unknownTeacher"),
-        teacherRole: matchedLecturer?.role || t("lecturer"),
-        grade,
-        rating: 4 + (index % 2) * 0.5,
-        stage,
-        type,
-        status,
-        price: container.price || 0,
-        childrenCount: container.children?.length || 0,
-        containerType: container.type || "lecture",
-      }
-    })
-
   // Handle page change
   const handlePageChange = (newPage) => {
     if (newPage >= 1 && newPage <= totalPages) {
@@ -366,7 +229,49 @@ export default function CoursesPage() {
     }
   }
 
-  const memoizedFilteredCourses = useMemo(() => generateCourseData(filteredContainers), [filteredContainers, lecturers])
+  const handleEditCourse = (courseId) => {
+    navigate(`/dashboard/lecturer-dashboard/CoursesForm/${courseId}`)
+  }
+
+  const handleDeleteCourse = async (courseId, courseTitle) => {
+    const confirmed = window.confirm(
+      isRTL
+        ? `هل تريد حذف الكورس "${courseTitle}" نهائيًا؟`
+        : `Do you want to permanently delete the course "${courseTitle}"?`,
+    )
+
+    if (!confirmed) {
+      return
+    }
+
+    const result = await deleteContainerById(courseId)
+
+    if (result?.success || result?.status === "success") {
+      setContainers((prev) => prev.filter((container) => container._id !== courseId && container.id !== courseId))
+      toast.success(isRTL ? "تم حذف الكورس بنجاح" : "Course deleted successfully")
+      return
+    }
+
+    toast.error(
+      translateErrorMessage(
+        result?.message || result?.error || (isRTL ? "فشل حذف الكورس" : "Failed to delete course"),
+      ),
+    )
+  }
+
+  const memoizedFilteredCourses = useMemo(
+    () =>
+      mapCoursesToCardData({
+        containers: filteredContainers,
+        lecturers,
+        levels,
+        language: i18n.language,
+        isRTL,
+        t,
+        resolveLevelDisplayName,
+      }),
+    [filteredContainers, i18n.language, isRTL, lecturers, levels, t],
+  )
 
   // Create subject options from fetched subjects
   const subjectOptions = useMemo(() => {
@@ -609,7 +514,38 @@ export default function CoursesPage() {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -20 }}
                       transition={{ duration: 0.4 }}
+                      className="relative"
                     >
+                      {isLecturerDashboardView && (
+                        <div
+                          className={`absolute top-3 z-10 flex gap-2 ${isRTL ? "left-3" : "right-3"}`}
+                        >
+                          <button
+                            type="button"
+                            className="rounded-full bg-white/95 px-3 py-1.5 text-xs font-bold shadow-sm transition-transform duration-200 hover:-translate-y-[1px]"
+                            style={{ color: TOKENS.deepTeal }}
+                            onClick={(event) => {
+                              event.preventDefault()
+                              event.stopPropagation()
+                              handleEditCourse(course.id)
+                            }}
+                          >
+                            {isRTL ? "تعديل" : "Edit"}
+                          </button>
+                          <button
+                            type="button"
+                            className="rounded-full px-3 py-1.5 text-xs font-bold text-white shadow-sm transition-transform duration-200 hover:-translate-y-[1px]"
+                            style={{ background: TOKENS.vibrantCoral }}
+                            onClick={(event) => {
+                              event.preventDefault()
+                              event.stopPropagation()
+                              handleDeleteCourse(course.id, course.title)
+                            }}
+                          >
+                            {isRTL ? "حذف" : "Delete"}
+                          </button>
+                        </div>
+                      )}
                       <Link to={buildCoursePath({ _id: course.id, name: course.title })}>
                         <CourseCard {...course} isRTL={isRTL} />
                       </Link>

@@ -119,7 +119,7 @@ const PromoCodeGenerator = () => {
 
   const [formData, setFormData] = useState({
     lecturer: "",
-    type: "points",
+    type: "general",
     pointsAmount: "",
     amountBefore: "",
     count: 1,
@@ -139,12 +139,14 @@ const PromoCodeGenerator = () => {
     try {
       setLoading(true)
 
+      const resolvedType = formData.type === "specific" ? "specific" : "general";
+
       const payload = {
-        lecturerId: formData.lecturer,
-        type: formData.type,
-        pointsAmount: parseInt(formData.pointsAmount),
+        lecturerId: resolvedType === "specific" ? formData.lecturer : undefined,
+        type: resolvedType,
+        pointsAmount: parseInt(formData.pointsAmount, 10),
         amountBefore: formData.amountBefore ? parseInt(formData.amountBefore) : undefined,
-        count: parseInt(formData.count),
+        numOfCodes: parseInt(formData.count, 10),
         expiryDate: formData.expiryDate || undefined,
         generateQrCodes
       }
@@ -152,7 +154,7 @@ const PromoCodeGenerator = () => {
       const result = await generatePromoCodes(payload)
 
       if (result.success) {
-        setGeneratedCodes(result.data || [])
+        setGeneratedCodes(Array.isArray(result.data) ? result.data : [])
         setSuccess(t("success.codesGenerated"))
         toast.success(t("success.codesGenerated"))
       } else {
@@ -394,8 +396,8 @@ const PromoCodeGenerator = () => {
               value={formData.type}
               onChange={(e) => setFormData(prev => ({ ...prev, type: e.target.value }))}
             >
-              <option value="points">{t("form.points")}</option>
-              <option value="promo">{t("form.promo")}</option>
+              <option value="general">{t("form.general", { defaultValue: isRTL ? "عام" : "General" })}</option>
+              <option value="specific">{t("form.specific", { defaultValue: isRTL ? "لمحاضر محدد" : "Specific lecturer" })}</option>
             </DSSelect>
           </div>
   
@@ -527,11 +529,7 @@ const PromoCodeGenerator = () => {
               )}
               <div className="mt-2 text-center">
                 <p className="font-mono text-sm break-all">{code.code}</p>
-                <p className="text-sm mt-1">
-                  {formData.type === "promo"
-                    ? t("promoTable.discount")
-                    : `${code.pointsAmount || formData.pointsAmount} ${t("points")}`}
-                </p>
+                <p className="text-sm mt-1">{`${code.pointsAmount || formData.pointsAmount} ${t("points")}`}</p>
               </div>
               <div className="flex gap-2 mt-2">
                 <Button
@@ -552,21 +550,19 @@ const PromoCodeGenerator = () => {
             <table className="w-full">
               <thead>
                 <tr className="bg-slate-200">
-                  <th className="p-3 text-left text-sm font-semibold">{t("promoTable.code")}</th>
-                  <th className="p-3 text-left text-sm font-semibold">{t("promoTable.points")}</th>
-                  <th className="p-3 text-left text-sm font-semibold">{t("promoTable.actions")}</th>
+                  <th className={`p-3 text-sm font-semibold ${isRTL ? "text-right" : "text-left"}`}>{t("promoTable.code")}</th>
+                  <th className={`p-3 text-sm font-semibold ${isRTL ? "text-right" : "text-left"}`}>{t("promoTable.points")}</th>
+                  <th className={`p-3 text-sm font-semibold ${isRTL ? "text-right" : "text-left"}`}>{t("promoTable.actions")}</th>
                 </tr>
               </thead>
               <tbody>
                 {generatedCodes.map((code, index) => (
                   <tr key={code.code || index} className="border-t border-slate-200">
-                    <td className="p-3 font-mono text-sm">{code.code}</td>
-                    <td className="p-3 text-sm">
-                      {formData.type === "promo"
-                        ? t("promoTable.discount")
-                        : `${code.pointsAmount || formData.pointsAmount} ${t("points")}`}
+                    <td className={`p-3 font-mono text-sm ${isRTL ? "text-right" : "text-left"}`} dir="ltr">{code.code}</td>
+                    <td className={`p-3 text-sm ${isRTL ? "text-right" : "text-left"}`}>
+                      {`${code.pointsAmount || formData.pointsAmount} ${t("points")}`}
                     </td>
-                    <td className="p-3">
+                    <td className={`p-3 ${isRTL ? "text-right" : "text-left"}`}>
                       <Button
                         size="sm"
                         variant="ghost"

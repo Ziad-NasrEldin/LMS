@@ -1,14 +1,7 @@
 "use client"
 import { ChevronDown, FileText } from "lucide-react"
 import Button from "../../components/ui/Button"
-
-const CONTAINER_TYPES = {
-  COURSE: "course",
-  YEAR: "year",
-  TERM: "term",
-  MONTH: "month",
-  LECTURE: "lecture",
-}
+import { CONTAINER_TYPES } from "./course-form-helpers"
 
 function ContainerList({ courseStructure, isRTL, selectedParentId, setSelectedParentId, expandedItems, toggleExpand }) {
   const yearContainers = (courseStructure.containers || []).filter((c) => c.type === CONTAINER_TYPES.YEAR)

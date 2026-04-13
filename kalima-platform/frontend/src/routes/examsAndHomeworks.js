@@ -1,31 +1,39 @@
 import axios from "axios"
 import { getToken } from "./auth-services"
-import { getAuthHeader } from "./fetch-users"
 import { normalizeApiError } from "../utils/apiError"
+import { translateErrorMessage } from "../utils/errorTranslator"
+
+const API_URL = import.meta.env.VITE_API_URL
+
+const authHeaders = (extraHeaders = {}) => ({
+  Authorization: `Bearer ${getToken()}`,
+  ...extraHeaders,
+})
+
+const buildWorkflowResult = (response) => ({
+  success: true,
+  status: response.data.status,
+  data: response.data.data,
+  passed: response.data.data?.passed || false,
+})
 
 export const verifyExamSubmission = async (lectureId) => {
   try {
     if (!lectureId) {
-      throw new Error("Lecture ID is required")
+      throw new Error(translateErrorMessage("Lecture ID is required"))
     }
 
     const response = await axios.post(
-      `${import.meta.env.VITE_API_URL}/exam-submissions/verify/${lectureId}`,
+      `${API_URL}/exam-submissions/verify/${lectureId}`,
       {},
       {
-        headers: {
-          Authorization: `Bearer ${getToken()}`,
+        headers: authHeaders({
           "Content-Type": "application/json",
-        },
+        }),
       },
     )
 
-    return {
-      success: true,
-      status: response.data.status,
-      data: response.data.data,
-      passed: response.data.data?.passed || false,
-    }
+    return buildWorkflowResult(response)
   } catch (error) {
     console.error("Error verifying exam submission:", error)
     const normalizedError = normalizeApiError(error, "Failed to verify exam submission")
@@ -40,25 +48,21 @@ export const verifyExamSubmission = async (lectureId) => {
 export const checkLectureAccess = async (lectureId) => {
   try {
     if (!lectureId) {
-      throw new Error("Lecture ID is required")
+      throw new Error(translateErrorMessage("Lecture ID is required"))
     }
 
     const response = await axios.get(
-      `${import.meta.env.VITE_API_URL}/student-lecture-access/check/${lectureId}`,
+      `${API_URL}/student-lecture-access/check/${lectureId}`,
       {
-        headers: {
-          Authorization: `Bearer ${getToken()}`,
+        headers: authHeaders({
           "Content-Type": "application/json",
-        },
+        }),
       },
     )
 
-    return response.data
+    return buildWorkflowResult(response)
   } catch (error) {
     console.error("Error checking lecture access:", error)
-    return {
-      status: "error",
-      message: error.response?.data?.message || error.message || "Failed to check lecture access",
-    }
+    return normalizeApiError(error, "Failed to check lecture access")
   }
 }

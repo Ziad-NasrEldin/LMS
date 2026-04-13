@@ -405,7 +405,7 @@ export default function CourseDetails() {
         if (courseResult?.status === "success" && courseResult.data) {
           setCourseData(courseResult.data)
         } else {
-          setError(t("errors.fetchError"))
+          setError(translateErrorMessage(courseResult?.message || courseResult?.error || t("errors.fetchError")))
         }
 
         if (dashboardResult?.success) {
@@ -431,7 +431,7 @@ export default function CourseDetails() {
         }
       } catch (err) {
         console.error("Error fetching data:", err)
-        setError(t("errors.unexpected"))
+        setError(translateErrorMessage(err?.message || t("errors.unexpected")))
       } finally {
         setLoading(false)
       }

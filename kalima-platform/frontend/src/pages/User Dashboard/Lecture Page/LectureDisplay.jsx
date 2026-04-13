@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import toast from "react-hot-toast";
@@ -18,10 +18,17 @@ import {
   pickFirstUrl,
 } from "./lectureDisplay.utils"
 import { translateErrorMessage } from "../../../utils/errorTranslator"
-import { verifyExamSubmission, checkLectureAccess } from "../../../routes/examsAndHomeworks"
-import { uploadHomework, getLectureHomeworks } from "../../../routes/homeworks"
-import { getUserDashboard, getUserFromToken } from "../../../routes/auth-services"
-import { checkStudentLectureAccess, accountStudentLecturePlayStart, getStudentLectureAccessByLectureId } from "../../../routes/student-lecture-access"
+import { uploadHomework } from "../../../routes/homeworks"
+import { getUserFromToken } from "../../../routes/auth-services"
+import { accountStudentLecturePlayStart } from "../../../routes/student-lecture-access"
+import {
+  createEmptyAssessments,
+  createEmptyAttachmentGroups,
+  flattenLectureAttachments,
+  normalizeLecturePageData,
+  resolveAssessmentFormUrls,
+  uploadLectureHomeworkFiles,
+} from "./lecture-submission-workflow"
 import {
   FiUpload,
   FiDownload,
@@ -62,16 +69,7 @@ import {
 import "@vidstack/react/player/styles/default/theme.css";
 import "@vidstack/react/player/styles/default/layouts/video.css";
 
-const LEGACY_ATTACHMENT_GROUPS = ["pdfsandimages", "homeworks", "exams", "booklets"];
 const DEFAULT_LECTURE_ATTACHMENT_TYPE = "pdfsandimages";
-
-const flattenLectureAttachments = (attachmentGroups = {}) =>
-  LEGACY_ATTACHMENT_GROUPS.flatMap((groupKey) =>
-    (attachmentGroups?.[groupKey] || []).map((attachment) => ({
-      ...attachment,
-      sourceType: attachment?.sourceType || groupKey,
-    }))
-  );
 
 const LectureDisplay = () => {
   const { t, i18n } = useTranslation("lectureDisplay");
@@ -112,12 +110,7 @@ const LectureDisplay = () => {
   const [lecture, setLecture] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [attachments, setAttachments] = useState({
-    exams: [],
-    booklets: [],
-    homeworks: [],
-    pdfsandimages: [],
-  });
+  const [attachments, setAttachments] = useState(createEmptyAttachmentGroups);
   const [allAttachments, setAllAttachments] = useState([]);
   const [showFiftyPercentWarning, setShowFiftyPercentWarning] = useState(false);
   const [remainingViews, setRemainingViews] = useState(null);
@@ -181,10 +174,7 @@ const LectureDisplay = () => {
   const [hasAttemptedToLeave, setHasAttemptedToLeave] = useState(false)
 
   // Consolidated assessment state (replaces 12 separate state variables)
-  const [assessments, setAssessments] = useState({
-    exam: { required: false, verified: false, data: null, submission: null, url: "" },
-    homework: { required: false, verified: false, data: null, submission: null, url: "" },
-  });
+  const [assessments, setAssessments] = useState(createEmptyAssessments);
   const [verificationLoading, setVerificationLoading] = useState(false);
 
   // Attachment uploads
@@ -231,16 +221,12 @@ const LectureDisplay = () => {
   };
 
   const canEditLecture = ["Lecturer", "Admin", "SubAdmin", "Moderator"].includes(userRole)
-  const legacyExamFormUrl = pickFirstUrl(
-    lecture?.examLink, lecture?.examFormLink, lecture?.examUrl,
-    findFirstAttachmentLinkUrl(attachments?.exams),
+  const assessmentFormUrls = useMemo(
+    () => resolveAssessmentFormUrls({ lecture, attachments, assessments }),
+    [assessments, attachments, lecture],
   )
-  const legacyHomeworkFormUrl = pickFirstUrl(
-    lecture?.homeworkFormLink, lecture?.homeworkLink, lecture?.homeworkUrl,
-    findFirstAttachmentLinkUrl(attachments?.homeworks),
-  )
-  const resolvedExamFormUrl = pickFirstUrl(assessments.exam.data?.examUrl, assessments.exam.data?.url, assessments.exam.url, legacyExamFormUrl)
-  const resolvedHomeworkFormUrl = pickFirstUrl(assessments.homework.data?.homeworkUrl, assessments.homework.data?.url, assessments.homework.url, legacyHomeworkFormUrl)
+  const resolvedExamFormUrl = assessmentFormUrls.exam
+  const resolvedHomeworkFormUrl = assessmentFormUrls.homework
 
   const handleEditLecture = () => {
     if (!lecture || !canEditLecture) {
@@ -277,7 +263,8 @@ const LectureDisplay = () => {
       const result = await loadLecturePage(lectureId);
 
       if (result.success) {
-        const { lecture, attachments, accessData, requirements, homeworks, user } = result.data;
+        const pageData = normalizeLecturePageData(result, lectureId)
+        const { lecture, attachments, accessData, assessments, homeworks, user } = pageData
 
         // 1. Set Lecture & User Info
         setLecture(lecture);
@@ -289,7 +276,7 @@ const LectureDisplay = () => {
 
         // 2. Set Attachments
         setAttachments(attachments);
-        setAllAttachments(flattenLectureAttachments(attachments));
+        setAllAttachments(pageData.allAttachments);
 
         // 3. Set Access & Views (Student Only)
         if (user.role === "Student") {
@@ -303,30 +290,11 @@ const LectureDisplay = () => {
           }
           setAccessDataLoaded(true);
           accessResolvedForLectureRef.current = lectureId;
-
-          // Set Requirements
-          if (requirements) {
-            setAssessments({
-              exam: {
-                required: requirements.exam?.required || false,
-                verified: requirements.exam?.passed || false,
-                data: requirements.exam?.data || null,
-                url: requirements.exam?.url || "",
-              },
-              homework: {
-                required: requirements.homework?.required || false,
-                verified: requirements.homework?.passed || false,
-                data: requirements.homework?.data || null,
-                url: requirements.homework?.url || "",
-              },
-            });
-          }
         }
+        setAssessments(assessments)
 
         // 4. Set Homeworks (Privileged)
-        if (homeworks) {
-          setHomeworks(homeworks);
-        }
+        setHomeworks(homeworks);
       } else {
         setError(translateErrorMessage(result.error || t("failedToLoadLecture"), t));
       }
@@ -782,26 +750,13 @@ const LectureDisplay = () => {
       setHomeworkError(null);
 
       try {
-        // Upload each file sequentially using the new homework API
-        for (const file of homeworkFiles) {
-          const homeworkData = {
-            type: "homeworks",
-            attachment: file,
-          };
+        await uploadLectureHomeworkFiles({
+          lectureId,
+          files: homeworkFiles,
+          uploadHomework,
+        })
 
-          const result = await uploadHomework(lectureId, homeworkData);
-
-          if (!result.success) {
-            throw new Error(translateErrorMessage(result.error || t("homeworkUploadFailed"), t));
-          }
-        }
-
-        // Refresh attachments after successful upload
-        const result = await getLectureAttachments(lectureId);
-        if (result.status === "success") {
-          setAttachments(result.data);
-          setAllAttachments(flattenLectureAttachments(result.data));
-        }
+        await fetchPageData()
 
         toast.success(t("homeworkUploadSuccess"));
 

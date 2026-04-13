@@ -20,6 +20,7 @@ function formatEgyptianPhoneNumber(number) {
 const mongoose = require('mongoose');
 const User = require('./userModel');
 const Level = require("./levelModel");
+const { validateStudentLevelSelection } = require("../utils/levelHierarchy");
 
 const lecturerPointsSchema = new mongoose.Schema({
   lecturer: {
@@ -33,8 +34,30 @@ const lecturerPointsSchema = new mongoose.Schema({
   }
 }, { _id: false });
 
+const childProfileSchema = new mongoose.Schema({
+  sequenceId: {
+    type: String,
+    trim: true,
+    default: "",
+  },
+  stage: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Level",
+    required: true,
+  },
+  level: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Level",
+    required: true,
+  },
+}, { _id: false });
+
 const parentSchema = new mongoose.Schema({
   children: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Student' }],
+  childProfiles: {
+    type: [childProfileSchema],
+    default: [],
+  },
   views: { type: Number, default: 0 },
   phoneNumber: { type: String, required: true },
   profession: { type: String, required: true, trim: true },
@@ -145,6 +168,27 @@ parentSchema.pre("validate", async function (next) {
           this.invalidate("level", "Selected level does not exist.");
         } else if (levelDoc.isActive === false) {
           this.invalidate("level", "Selected level is inactive.");
+        }
+      }
+    }
+
+    if (Array.isArray(this.childProfiles) && this.childProfiles.length > 0) {
+      for (const [index, childProfile] of this.childProfiles.entries()) {
+        if (!childProfile?.stage || !childProfile?.level) {
+          this.invalidate(
+            `childProfiles.${index}`,
+            "Each child profile must include both stage and level."
+          );
+          continue;
+        }
+
+        try {
+          await validateStudentLevelSelection({
+            stageId: childProfile.stage,
+            levelId: childProfile.level,
+          });
+        } catch (error) {
+          this.invalidate(`childProfiles.${index}.level`, error.message);
         }
       }
     }

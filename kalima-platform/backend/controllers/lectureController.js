@@ -26,6 +26,10 @@ const {
 const { normalizeExternalUrl } = require("../utils/urlValidation")
 const { fetchYouTubeDuration } = require("../utils/youtubeDuration")
 const {
+  resolveLimitedLectureCreateFields,
+  resolveLimitedLectureUpdateFields,
+} = require("../utils/limitedLectureAvailability")
+const {
   MASTER_ASSESSMENT_SHEET_ID,
   MASTER_ASSESSMENT_IDENTIFIER_COLUMN,
   MASTER_ASSESSMENT_SCORE_COLUMN,
@@ -346,10 +350,15 @@ exports.loadLecturePage = catchAsync(async (req, res, next) => {
   // 4. Privileged homework fetch
   const privilegedRoles = ["Lecturer", "Admin", "SubAdmin", "Moderator", "Assistant"];
   if (privilegedRoles.includes(user.role)) {
-    homeworks = await StudentExamSubmission.find({
-      lecture: lectureId,
-      type: "homework",
-    }).populate("student", "name sequencedId").lean();
+    homeworks = await Attachment.find({
+      lectureId,
+      type: "homeworks",
+      studentId: { $ne: null },
+    })
+      .populate("studentId", "name sequencedId email")
+      .populate("feedbackBy", "name role")
+      .sort({ uploadedOn: -1, _id: -1 })
+      .lean();
   }
 
   res.status(200).json({
@@ -404,6 +413,8 @@ exports.createLecture = catchAsync(async (req, res, next) => {
         homeworkConfig,
         homeworkFormUrl,
         homeworkPassingThreshold,
+        limitedAvailabilityEnabled,
+        limitedAvailabilityDurationHours,
       } = req.body
 
       const parsedRequiresExam = requiresExam !== undefined ? parseBoolean(requiresExam) : false
@@ -414,6 +425,7 @@ exports.createLecture = catchAsync(async (req, res, next) => {
         : 0
       const parsedPassingThreshold = parseOptionalNumber(passingThreshold)
       const parsedHomeworkPassingThreshold = parseOptionalNumber(homeworkPassingThreshold)
+      let limitedAvailabilityFields
 
       const thumbnailPath = req.file ? req.file.path : null
 
@@ -454,6 +466,15 @@ exports.createLecture = catchAsync(async (req, res, next) => {
 
       validateThresholdRange(parsedPassingThreshold, "Exam passing threshold")
       validateThresholdRange(parsedHomeworkPassingThreshold, "Homework passing threshold")
+      try {
+        limitedAvailabilityFields = resolveLimitedLectureCreateFields({
+          limitedAvailabilityEnabled,
+          limitedAvailabilityDurationHours,
+        })
+      } catch (error) {
+        if (thumbnailPath) deleteFile(thumbnailPath)
+        throw new AppError(error.message, 400)
+      }
 
       let resolvedExamConfigId = null
       let normalizedExamFormUrl = null
@@ -568,6 +589,7 @@ exports.createLecture = catchAsync(async (req, res, next) => {
             homeworkConfig: parsedRequiresHomework ? resolvedHomeworkConfigId : undefined,
             homeworkLink: parsedRequiresHomework ? normalizedHomeworkFormUrl : undefined,
             homeworkPassingThreshold: parsedRequiresHomework ? parsedHomeworkPassingThreshold : undefined,
+            ...limitedAvailabilityFields,
           },
         ],
         { session },
@@ -707,7 +729,7 @@ exports.getAllLecturesPublic = catchAsync(async (req, res, next) => {
   ])
 
   // Always select only basic, non-sensitive fields for this public route
-  query = query.select("name type subject level createdBy price description teacherAllowed thumbnail")
+  query = query.select("name type subject level createdBy price description teacherAllowed thumbnail limitedAvailabilityEnabled limitedAvailabilityDurationHours limitedAvailabilityStartsAt limitedAvailabilityEndsAt")
 
   const features = new QueryFeatures(query, req.query).filter().sort().paginate()
 
@@ -720,7 +742,7 @@ exports.getAllLecturesPublic = catchAsync(async (req, res, next) => {
     { path: "subject", select: "name" },
     { path: "level", select: "name nameAr kind sortOrder parentLevel isActive" },
   ]);
-  containerQuery = containerQuery.select("name type subject level createdBy price description teacherAllowed image");
+  containerQuery = containerQuery.select("name type subject level createdBy price description teacherAllowed image limitedAvailabilityEnabled limitedAvailabilityDurationHours limitedAvailabilityStartsAt limitedAvailabilityEndsAt");
 
   const containerFeatures = new QueryFeatures(containerQuery, req.query).filter().sort().paginate();
   const containerLectures = await containerFeatures.query.lean();
@@ -842,6 +864,8 @@ exports.updatelectures = catchAsync(async (req, res, next) => {
       homeworkConfig,
       homeworkFormUrl,
       homeworkPassingThreshold,
+      limitedAvailabilityEnabled,
+      limitedAvailabilityDurationHours,
     } = req.body
 
     const session = await mongoose.startSession()
@@ -872,6 +896,7 @@ exports.updatelectures = catchAsync(async (req, res, next) => {
         numberOfViews,
         teacherAllowed: teacherAllowed !== undefined ? parseBoolean(teacherAllowed) : undefined,
       }
+      let limitedAvailabilityFields
 
       // Fetch new YouTube duration if videoLink is being updated
       if (videoLink && videoLink !== currentLecture.videoLink) {
@@ -884,6 +909,18 @@ exports.updatelectures = catchAsync(async (req, res, next) => {
 
       validateThresholdRange(parsedPassingThreshold, "Exam passing threshold")
       validateThresholdRange(parsedHomeworkPassingThreshold, "Homework passing threshold")
+      try {
+        limitedAvailabilityFields = resolveLimitedLectureUpdateFields({
+          currentLecture,
+          limitedAvailabilityEnabled,
+          limitedAvailabilityDurationHours,
+        })
+      } catch (error) {
+        if (req.file && req.file.path) {
+          deleteFile(req.file.path)
+        }
+        throw new AppError(error.message, 400)
+      }
 
       if (req.file && req.file.path) {
         // Delete old thumbnail if it exists
@@ -1014,6 +1051,7 @@ exports.updatelectures = catchAsync(async (req, res, next) => {
         const levelDoc = await checkDoc(Level, level, session)
         obj.level = levelDoc._id
       }
+      Object.assign(obj, limitedAvailabilityFields)
       const updatedContainer = await Lecture.findByIdAndUpdate(req.params.lectureId, obj, {
         new: true,
         runValidators: true,

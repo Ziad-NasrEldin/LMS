@@ -34,6 +34,23 @@ const lectureSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    limitedAvailabilityEnabled: {
+      type: Boolean,
+      default: false,
+    },
+    limitedAvailabilityDurationHours: {
+      type: Number,
+      default: null,
+      min: [24, "Limited lecture duration must be at least 24 hours"],
+    },
+    limitedAvailabilityStartsAt: {
+      type: Date,
+      default: null,
+    },
+    limitedAvailabilityEndsAt: {
+      type: Date,
+      default: null,
+    },
     createdBy: {
       type: mongoose.Schema.ObjectId,
       ref: "Lecturer",
@@ -149,6 +166,13 @@ lectureSchema.pre("save", function (next) {
       this.teacherAllowed = this.teacherAllowed.toLowerCase() === "true"
     } else {
       this.teacherAllowed = Boolean(this.teacherAllowed)
+    }
+  }
+  if (this.limitedAvailabilityEnabled !== undefined) {
+    if (typeof this.limitedAvailabilityEnabled === "string") {
+      this.limitedAvailabilityEnabled = this.limitedAvailabilityEnabled.toLowerCase() === "true"
+    } else {
+      this.limitedAvailabilityEnabled = Boolean(this.limitedAvailabilityEnabled)
     }
   }
   next()

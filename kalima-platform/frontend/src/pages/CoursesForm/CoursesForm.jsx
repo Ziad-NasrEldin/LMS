@@ -1,7 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { useMemo } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { CheckCircle2, ChevronLeft, ChevronRight, Circle, ListChecks } from "lucide-react"
 import { motion } from "framer-motion"
@@ -17,6 +16,14 @@ import { Link } from "react-router-dom"
 import { designTokens } from "../../constants/designTokens"
 import { translateErrorMessage } from "../../utils/errorTranslator"
 import { buildLevelHierarchy } from "../../utils/levelHierarchy"
+import {
+  EMPTY_LEVEL_HIERARCHY,
+  INITIAL_COURSE_FORM_DATA,
+  INITIAL_COURSE_STRUCTURE,
+  buildChecklistItems,
+  buildCourseSnapshot,
+  findLevelRecord,
+} from "./course-form-helpers"
 
 function CourseCreationForm() {
   const { t, i18n } = useTranslation()
@@ -27,33 +34,12 @@ function CourseCreationForm() {
   const GRADIENTS = designTokens.gradients
 
   // Form state
-  const [formData, setFormData] = useState({
-    courseName: "",
-    teacherName: "",
-    gradeLevel: "",
-    subject: "",
-    duration: "",
-    description: "",
-    goal: "",
-    courseType: "paid",
-    priceFull: "",
-    priceMonthly: "",
-    priceSession: "",
-    privacy: "student",
-    sameGradeOnly: false,
-  })
+  const [formData, setFormData] = useState(INITIAL_COURSE_FORM_DATA)
 
   // Data fetching states
   const [subjects, setSubjects] = useState([])
   const [levels, setLevels] = useState([])
-  const [levelHierarchy, setLevelHierarchy] = useState({
-    levels: [],
-    stages: [],
-    grades: [],
-    gradesByStageId: {},
-    stageOptions: [],
-    gradeOptions: [],
-  })
+  const [levelHierarchy, setLevelHierarchy] = useState(EMPTY_LEVEL_HIERARCHY)
   const [teachers, setTeachers] = useState([])
   const [createdBy, setCreatedBy] = useState("")
   const [initialCourseImageUrl, setInitialCourseImageUrl] = useState(null)
@@ -61,24 +47,22 @@ function CourseCreationForm() {
   const [error, setError] = useState(null)
 
   // Course structure state
-  const [courseStructure, setCourseStructure] = useState({
-    parent: null,
-    containers: [],
-    lectures: [],
-  })
+  const [courseStructure, setCourseStructure] = useState(INITIAL_COURSE_STRUCTURE)
 
   // Fetch data on mount
   useEffect(() => {
     const fetchData = async () => {
       try {
         setIsLoading(true)
+        let resolvedLevelHierarchy = EMPTY_LEVEL_HIERARCHY
 
         // Fetch levels from API
         const levelsResponse = await getAllLevels()
         if (levelsResponse.success) {
-          const hierarchy = levelsResponse.hierarchy || buildLevelHierarchy(levelsResponse.data || [], i18n.language)
-          setLevelHierarchy(hierarchy)
-          setLevels(hierarchy.grades || [])
+          resolvedLevelHierarchy =
+            levelsResponse.hierarchy || buildLevelHierarchy(levelsResponse.data || [], i18n.language)
+          setLevelHierarchy(resolvedLevelHierarchy)
+          setLevels(resolvedLevelHierarchy.grades || [])
         } else {
           console.error("Failed to fetch levels:", levelsResponse)
         }
@@ -107,6 +91,11 @@ function CourseCreationForm() {
 
         if (containerId) {
           const containerResponse = await getContainerById(containerId)
+
+          if (containerResponse?.status === "error") {
+            throw new Error(containerResponse?.message || translateErrorMessage("Failed to load the selected course"))
+          }
+
           const containerData = containerResponse?.data?.container || containerResponse?.data || containerResponse?.container
 
           if (!containerData) {
@@ -120,10 +109,19 @@ function CourseCreationForm() {
               null,
           )
 
+          const selectedLevelId = containerData.level?._id || containerData.level || ""
+          const selectedLevelRecord = findLevelRecord({
+            levels: resolvedLevelHierarchy?.grades || [],
+            levelLike: selectedLevelId,
+            language: i18n.language,
+            resolveLevelDisplayName: (level) => level?.displayName || level?.name || "",
+          })
+
           setFormData((prev) => ({
             ...prev,
             courseName: containerData.name || "",
-            gradeLevel: containerData.level?._id || containerData.level || "",
+            stage: selectedLevelRecord?.parentLevelId || "",
+            gradeLevel: selectedLevelId,
             subject: containerData.subject?._id || containerData.subject || "",
             description: containerData.description || "",
             goal: Array.isArray(containerData.goal) ? containerData.goal.join("\n") : containerData.goal || "",
@@ -153,55 +151,33 @@ function CourseCreationForm() {
       }
     }
     fetchData()
-  }, [containerId])
+  }, [containerId, i18n.language])
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "radio" ? (checked ? value : prev[name]) : value,
-    }))
+    setFormData((prev) => {
+      const nextValue = type === "radio" ? (checked ? value : prev[name]) : value
+      const nextState = {
+        ...prev,
+        [name]: nextValue,
+      }
+
+      if (name === "stage") {
+        nextState.gradeLevel = ""
+      }
+
+      return nextState
+    })
   }
 
   const updateCourseStructure = (newStructure) => {
     setCourseStructure(newStructure)
   }
 
-  const checklistItems = [
-    {
-      id: "basic",
-      label: isRTL ? "أدخل البيانات الأساسية" : "Fill basic information",
-      hint: isRTL ? "اسم الكورس + المرحلة + المادة" : "Course name + level + subject",
-      done: Boolean(formData.courseName && formData.gradeLevel && formData.subject),
-    },
-    {
-      id: "parent",
-      label: isRTL ? "أنشئ الحاوية الرئيسية" : "Create parent container",
-      hint: isRTL ? "اضغط زر إنشاء الحاوية الرئيسية" : "Use the create parent container button",
-      done: Boolean(courseStructure.parent),
-    },
-    {
-      id: "container",
-      label: isRTL ? "أضف أول حاوية فرعية" : "Add first sub-container",
-      hint: isRTL ? "مثل سنة أو فصل أو شهر" : "Example: year, term, or month",
-      done: courseStructure.containers.length > 0,
-    },
-    {
-      id: "lecture",
-      label: isRTL ? "أضف أول محاضرة" : "Add first lecture",
-      hint: isRTL ? "أدخل رابط المحاضرة وتفاصيلها" : "Set lecture link and details",
-      done: courseStructure.lectures.length > 0,
-    },
-    {
-      id: "review",
-      label: isRTL ? "راجع الهيكل قبل المغادرة" : "Review your structure",
-      hint: isRTL ? "تأكد من التسلسل قبل النشر" : "Check sequence before publishing",
-      done: Boolean(
-        courseStructure.parent &&
-          (courseStructure.containers.length > 0 || courseStructure.lectures.length > 0),
-      ),
-    },
-  ]
+  const checklistItems = useMemo(
+    () => buildChecklistItems({ formData, courseStructure, isRTL }),
+    [courseStructure, formData, isRTL],
+  )
 
   const completedSteps = checklistItems.filter((item) => item.done).length
   const progressPercent = Math.round((completedSteps / checklistItems.length) * 100)
@@ -209,23 +185,10 @@ function CourseCreationForm() {
     () => checklistItems.find((item) => !item.done) || checklistItems[checklistItems.length - 1],
     [checklistItems]
   )
-  const courseSnapshot = useMemo(() => {
-    const levelName = levels.find((level) => level._id === formData.gradeLevel)?.displayName ||
-      levels.find((level) => level._id === formData.gradeLevel)?.name
-    const subjectName = subjects.find((subject) => subject._id === formData.subject)?.name
-
-    return {
-      title: formData.courseName?.trim() || (isRTL ? "اسم الكورس سيظهر هنا" : "Course title will appear here"),
-      level: levelName || (isRTL ? "لم يتم الاختيار" : "Not selected"),
-      subject: subjectName || (isRTL ? "لم يتم الاختيار" : "Not selected"),
-      pricing: formData.courseType === "free"
-        ? (isRTL ? "مجاني" : "Free")
-        : `${formData.priceFull || 0} ${isRTL ? "جنيه" : "EGP"}`,
-      privacy: formData.privacy === "teacher"
-        ? (isRTL ? "المعلم فقط" : "Teacher only")
-        : (isRTL ? "الطلاب / أولياء الأمور" : "Students / guardians"),
-    }
-  }, [formData.courseName, formData.courseType, formData.gradeLevel, formData.priceFull, formData.privacy, formData.subject, isRTL, levels, subjects])
+  const courseSnapshot = useMemo(
+    () => buildCourseSnapshot({ formData, levels, subjects, isRTL }),
+    [formData, isRTL, levels, subjects],
+  )
 
   if (isLoading) {
       return (
@@ -398,6 +361,7 @@ function CourseCreationForm() {
               handleChange={handleChange}
               subjects={subjects}
               levels={levels}
+              levelHierarchy={levelHierarchy}
               isRTL={isRTL}
               courseStructure={courseStructure}
               updateCourseStructure={updateCourseStructure}

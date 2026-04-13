@@ -65,6 +65,8 @@ export default function StudentRegistration() {
     hasAdditionalParentPhone: false,
     profession: "",
     children: [""],
+    childCount: 1,
+    childProfiles: [{ sequenceId: "", stage: "", level: "" }],
     subject: "",
     teachesAtType: "",
     centers: [""],
@@ -192,8 +194,34 @@ export default function StudentRegistration() {
         errors.profession = "professionRequired"
       }
 
-      if (role === "parent" && (!formData.stages || formData.stages.length === 0)) {
-        errors.stages = "required"
+      if (role === "parent") {
+        const profiles = Array.isArray(formData.childProfiles) ? formData.childProfiles : []
+
+        if (profiles.length === 0) {
+          errors.childProfiles = "required"
+        } else {
+          const profileErrors = {}
+
+          profiles.forEach((profile, index) => {
+            const currentProfileErrors = {}
+
+            if (!profile?.stage) {
+              currentProfileErrors.stage = "required"
+            }
+
+            if (!profile?.level) {
+              currentProfileErrors.level = "required"
+            }
+
+            if (Object.keys(currentProfileErrors).length > 0) {
+              profileErrors[index] = currentProfileErrors
+            }
+          })
+
+          if (Object.keys(profileErrors).length > 0) {
+            errors.childProfiles = profileErrors
+          }
+        }
       }
 
 
@@ -384,6 +412,67 @@ export default function StudentRegistration() {
     }
   }
 
+  const handleParentChildCountChange = (value) => {
+    const parsedCount = Math.min(9, Math.max(1, parseInt(value, 10) || 1))
+
+    setFormData((prev) => {
+      const currentProfiles = Array.isArray(prev.childProfiles) ? [...prev.childProfiles] : []
+      const nextProfiles = Array.from({ length: parsedCount }, (_, index) => (
+        currentProfiles[index] || { sequenceId: "", stage: "", level: "" }
+      ))
+
+      return {
+        ...prev,
+        childCount: parsedCount,
+        childProfiles: nextProfiles,
+        children: nextProfiles.map((profile) => profile.sequenceId || ""),
+        stages: [...new Set(nextProfiles.map((profile) => profile.stage).filter(Boolean))],
+      }
+    })
+
+    setErrors((prev) => ({ ...prev, childProfiles: undefined }))
+  }
+
+  const handleParentChildProfileChange = (index, field, value) => {
+    setFormData((prev) => {
+      const currentProfiles = Array.isArray(prev.childProfiles) ? [...prev.childProfiles] : []
+      const nextProfiles = currentProfiles.length > 0 ? currentProfiles : [{ sequenceId: "", stage: "", level: "" }]
+      const existingProfile = nextProfiles[index] || { sequenceId: "", stage: "", level: "" }
+      const updatedProfile = {
+        ...existingProfile,
+        [field]: value,
+      }
+
+      if (field === "stage") {
+        updatedProfile.level = ""
+      }
+
+      nextProfiles[index] = updatedProfile
+
+      return {
+        ...prev,
+        childProfiles: nextProfiles,
+        children: nextProfiles.map((profile) => profile.sequenceId || ""),
+        stages: [...new Set(nextProfiles.map((profile) => profile.stage).filter(Boolean))],
+      }
+    })
+
+    setErrors((prev) => {
+      const nextErrors = { ...prev }
+      if (nextErrors.childProfiles && typeof nextErrors.childProfiles === "object") {
+        const childProfileErrors = { ...nextErrors.childProfiles }
+        if (childProfileErrors[index]) {
+          childProfileErrors[index] = {
+            ...childProfileErrors[index],
+            [field]: undefined,
+          }
+        }
+        nextErrors.childProfiles = childProfileErrors
+      }
+      return nextErrors
+    })
+  }
+
   const handleSubmit = async () => {
     try {
       setApiError(null);
@@ -472,17 +561,8 @@ export default function StudentRegistration() {
 
         case "parent":
           data.append("profession", formData.profession.trim());
-          // Handle stages as array for parents
-          if (formData.stages && Array.isArray(formData.stages)) {
-            formData.stages.forEach((stageValue, index) => {
-              data.append(`stages[${index}]`, stageValue);
-            });
-          }
-          formData.children
-            .filter((c) => c.trim() !== "")
-            .forEach((child, index) => {
-              data.append(`children[${index}]`, child.trim());
-            });
+          data.append("childProfiles", JSON.stringify(formData.childProfiles || []))
+          data.append("childCount", String(formData.childCount || formData.childProfiles?.length || 1))
           break;
 
         case "teacher":
@@ -616,6 +696,8 @@ export default function StudentRegistration() {
                 <StepParent
                   formData={formData}
                   handleChildrenChange={handleChildrenChange}
+                  handleParentChildCountChange={handleParentChildCountChange}
+                  handleParentChildProfileChange={handleParentChildProfileChange}
                   handleInputChange={handleInputChange}
                   t={t}
                   gradeLevels={gradeLevels}

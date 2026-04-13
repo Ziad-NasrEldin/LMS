@@ -16,6 +16,7 @@ const Pagination = ({
     showing: "عرض",
     of: "من"
   },
+  itemLabel = "مستخدم",
   className = ""
 }) => {
   const totalPages = Math.ceil(totalItems / itemsPerPage);
@@ -117,7 +118,7 @@ const Pagination = ({
 
       {/* Results summary */}
       <div className="text-center mt-4 text-sm font-medium" style={{ color: TOKENS.slateText }}>
-        {labels.showing} {indexOfFirstItem + 1}-{Math.min(indexOfLastItem, totalItems)} {labels.of} {totalItems} مستخدم
+        {labels.showing} {indexOfFirstItem + 1}-{Math.min(indexOfLastItem, totalItems)} {labels.of} {totalItems} {itemLabel}
       </div>
     </div>
   );

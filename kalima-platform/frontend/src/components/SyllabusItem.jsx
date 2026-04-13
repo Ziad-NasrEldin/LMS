@@ -1,5 +1,9 @@
 import { useState, memo } from "react"
 import { ChevronDown, Book, Clock, DollarSign, Unlock, Play, Eye } from "lucide-react"
+import {
+  formatLimitedLectureRemaining,
+  getLimitedLectureAvailabilityStatus,
+} from "../utils/limitedLectureAvailability"
 
 const CONTAINER_TYPE_CONFIG = {
   course: { bg: "#0e556320", text: "#0e5563" },
@@ -41,6 +45,8 @@ const SyllabusItem = memo(function SyllabusItem({
   const isLecture = item.type === "lecture" || item.isLecture
   const purchased = parentPurchased || isPurchased(item._id)
   const childCount = item.children?.length || 0
+  const limitedAvailability = getLimitedLectureAvailabilityStatus(item)
+  const directPurchaseBlocked = isLecture && !purchased && limitedAvailability.isExpired
 
   const typeConfig = CONTAINER_TYPE_CONFIG[item.type] || {
     bg: `${tokens.lightAquaMist}30`,
@@ -139,6 +145,19 @@ const SyllabusItem = memo(function SyllabusItem({
                   {t("syllabus.unlocked")}
                 </span>
               )}
+              {isLecture && limitedAvailability.isLimited && !purchased && (
+                <span
+                  className="text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0"
+                  style={{
+                    background: limitedAvailability.isExpired ? "rgba(239,68,68,0.12)" : "rgba(245,158,11,0.12)",
+                    color: limitedAvailability.isExpired ? "#b91c1c" : "#b45309",
+                  }}
+                >
+                  {limitedAvailability.isExpired
+                    ? (isRTL ? "انتهت الإتاحة" : "Expired")
+                    : (isRTL ? `متاح ${formatLimitedLectureRemaining(limitedAvailability.remainingMs, { isRTL })}` : `${formatLimitedLectureRemaining(limitedAvailability.remainingMs, { isRTL })} left`)}
+                </span>
+              )}
             </div>
             <div className="flex items-center gap-3 mt-0.5 flex-wrap">
               {childCount > 0 && !isLecture && (
@@ -152,6 +171,13 @@ const SyllabusItem = memo(function SyllabusItem({
                   style={{ color: tokens.slateText }}
                 >
                   <Clock size={10} /> {formatDuration(item.duration || item.totalDuration)}
+                </span>
+              )}
+              {isLecture && limitedAvailability.isLimited && limitedAvailability.endsAt && !purchased && (
+                <span className="text-[11px]" style={{ color: tokens.slateText }}>
+                  {limitedAvailability.isExpired
+                    ? (isRTL ? "أُغلقت هذه المحاضرة للشراء المباشر" : "Direct purchase closed")
+                    : `${isRTL ? "تنتهي في" : "Ends"} ${limitedAvailability.endsAt.toLocaleString(isRTL ? "ar-EG" : "en-US")}`}
                 </span>
               )}
             </div>
@@ -177,14 +203,20 @@ const SyllabusItem = memo(function SyllabusItem({
         ) : !purchased && typeof item.price === "number" && item.price >= 0 ? (
           <button
             onClick={handlePurchaseClick}
-            disabled={purchaseInProgress !== null}
+            disabled={purchaseInProgress !== null || directPurchaseBlocked}
             className="flex-shrink-0 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold text-white transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:transform-none shadow-sm whitespace-nowrap self-start sm:self-center"
             style={{
-              background: item.price > 0 ? tokens.warmMango : tokens.softCyanTeal,
+              background: directPurchaseBlocked
+                ? "#94a3b8"
+                : item.price > 0
+                  ? tokens.warmMango
+                  : tokens.softCyanTeal,
             }}
           >
             {purchaseInProgress === item._id ? (
               <span className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            ) : directPurchaseBlocked ? (
+              <>{isRTL ? "غير متاح" : "Unavailable"}</>
             ) : item.price > 0 ? (
               <>
                 <DollarSign size={10} /> {item.price}

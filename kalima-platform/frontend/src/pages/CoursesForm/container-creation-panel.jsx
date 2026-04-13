@@ -17,44 +17,51 @@ import {
   buildLecturePayloadObject,
   objectToFormData,
 } from "../../utils/contentCreationPayloads"
-
-const CONTAINER_TYPES = {
-  COURSE: "course",
-  YEAR: "year",
-  TERM: "term",
-  MONTH: "month",
-  LECTURE: "lecture",
-}
+import {
+  CONTAINER_TYPES,
+  DEFAULT_LECTURE_ATTACHMENT_TYPE,
+  getAvailableParentsForType,
+  getNextChildType,
+  getSuggestedParentIdForType,
+  INITIAL_CREATION_PANEL_STATE,
+  normalizeStructureId,
+  resetCreationPanelState,
+} from "./course-form-helpers"
+import { MIN_LIMITED_LECTURE_DURATION_HOURS } from "../../utils/limitedLectureAvailability"
 
 function ContainerCreationPanel({ courseStructure, updateCourseStructure, formData, createdBy, isRTL }) {
-  const [containerName, setContainerName] = useState("")
-  const [containerType, setContainerType] = useState(CONTAINER_TYPES.YEAR)
-  const [selectedParentId, setSelectedParentId] = useState(courseStructure.parent?.id || null)
-  const [lectureLink, setLectureLink] = useState("")
-  const [attachmentFile, setAttachmentFile] = useState(null)
+  const [containerName, setContainerName] = useState(INITIAL_CREATION_PANEL_STATE.containerName)
+  const [containerType, setContainerType] = useState(INITIAL_CREATION_PANEL_STATE.containerType)
+  const [selectedParentId, setSelectedParentId] = useState(courseStructure.parent?.id || INITIAL_CREATION_PANEL_STATE.selectedParentId)
+  const [lectureLink, setLectureLink] = useState(INITIAL_CREATION_PANEL_STATE.lectureLink)
+  const [attachmentFile, setAttachmentFile] = useState(INITIAL_CREATION_PANEL_STATE.attachmentFile)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [subjects, setSubjects] = useState([])
-  const [numberOfViews, setNumberOfViews] = useState(0)
-  const [lecturePrice, setLecturePrice] = useState(0)
-  const [requiresExam, setRequiresExam] = useState(false)
-  const [examFormUrl, setExamFormUrl] = useState("")
-  const [passingThreshold, setPassingThreshold] = useState(60)
-  const [requiresHomework, setRequiresHomework] = useState(false)
-  const [homeworkFormUrl, setHomeworkFormUrl] = useState("")
-  const [homeworkPassingThreshold, setHomeworkPassingThreshold] = useState(60)
-  const [containerPrice, setContainerPrice] = useState(0)
-  const [description, setDescription] = useState("")
-  const [goal, setGoal] = useState("")
-  const [imageFile, setImageFile] = useState(null)
+  const [numberOfViews, setNumberOfViews] = useState(INITIAL_CREATION_PANEL_STATE.numberOfViews)
+  const [lecturePrice, setLecturePrice] = useState(INITIAL_CREATION_PANEL_STATE.lecturePrice)
+  const [limitedAvailabilityEnabled, setLimitedAvailabilityEnabled] = useState(
+    INITIAL_CREATION_PANEL_STATE.limitedAvailabilityEnabled,
+  )
+  const [limitedAvailabilityDurationHours, setLimitedAvailabilityDurationHours] = useState(
+    INITIAL_CREATION_PANEL_STATE.limitedAvailabilityDurationHours,
+  )
+  const [requiresExam, setRequiresExam] = useState(INITIAL_CREATION_PANEL_STATE.requiresExam)
+  const [examFormUrl, setExamFormUrl] = useState(INITIAL_CREATION_PANEL_STATE.examFormUrl)
+  const [passingThreshold, setPassingThreshold] = useState(INITIAL_CREATION_PANEL_STATE.passingThreshold)
+  const [requiresHomework, setRequiresHomework] = useState(INITIAL_CREATION_PANEL_STATE.requiresHomework)
+  const [homeworkFormUrl, setHomeworkFormUrl] = useState(INITIAL_CREATION_PANEL_STATE.homeworkFormUrl)
+  const [homeworkPassingThreshold, setHomeworkPassingThreshold] = useState(INITIAL_CREATION_PANEL_STATE.homeworkPassingThreshold)
+  const [containerPrice, setContainerPrice] = useState(INITIAL_CREATION_PANEL_STATE.containerPrice)
+  const [description, setDescription] = useState(INITIAL_CREATION_PANEL_STATE.description)
+  const [goal, setGoal] = useState(INITIAL_CREATION_PANEL_STATE.goal)
+  const [imageFile, setImageFile] = useState(INITIAL_CREATION_PANEL_STATE.imageFile)
   const [expandedItems, setExpandedItems] = useState({})
-  const [attachmentType, setAttachmentType] = useState("homeworks")
-
-  const normalizeId = (value) => value?._id || value?.id || value || null
+  const attachmentType = DEFAULT_LECTURE_ATTACHMENT_TYPE
 
   const getContainerById = (containerId) => {
     if (!containerId) return null
 
-    const rootId = normalizeId(courseStructure.parent)
+    const rootId = normalizeStructureId(courseStructure.parent)
     if (rootId && String(rootId) === String(containerId)) {
       return courseStructure.parent
     }
@@ -62,46 +69,9 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
     return courseStructure.containers.find((container) => String(container.id) === String(containerId)) || null
   }
 
-  const getNextChildType = (parentType) => {
-    switch (String(parentType || "").toLowerCase()) {
-      case CONTAINER_TYPES.COURSE:
-        return CONTAINER_TYPES.YEAR
-      case CONTAINER_TYPES.YEAR:
-        return CONTAINER_TYPES.TERM
-      case CONTAINER_TYPES.TERM:
-        return CONTAINER_TYPES.MONTH
-      case CONTAINER_TYPES.MONTH:
-        return CONTAINER_TYPES.LECTURE
-      default:
-        return null
-    }
-  }
-
-  const getSuggestedParentIdForType = (nextType) => {
-    switch (nextType) {
-      case CONTAINER_TYPES.YEAR:
-        return normalizeId(courseStructure.parent)
-      case CONTAINER_TYPES.TERM: {
-        const latestYear = [...courseStructure.containers].filter((container) => container.type === CONTAINER_TYPES.YEAR).slice(-1)[0]
-        return normalizeId(latestYear)
-      }
-      case CONTAINER_TYPES.MONTH: {
-        const latestTerm = [...courseStructure.containers].filter((container) => container.type === CONTAINER_TYPES.TERM).slice(-1)[0]
-        return normalizeId(latestTerm)
-      }
-      case CONTAINER_TYPES.LECTURE: {
-        const latestMonth = [...courseStructure.containers].filter((container) => container.type === CONTAINER_TYPES.MONTH).slice(-1)[0]
-        return normalizeId(latestMonth)
-      }
-      case CONTAINER_TYPES.COURSE:
-      default:
-        return normalizeId(courseStructure.parent)
-    }
-  }
-
   const handleContainerTypeChange = (nextType) => {
     setContainerType(nextType)
-    const suggestedParentId = getSuggestedParentIdForType(nextType)
+    const suggestedParentId = getSuggestedParentIdForType(courseStructure, nextType)
     setSelectedParentId(suggestedParentId || "")
   }
 
@@ -173,6 +143,19 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
           return
         }
 
+        if (
+          limitedAvailabilityEnabled &&
+          Number(limitedAvailabilityDurationHours) < MIN_LIMITED_LECTURE_DURATION_HOURS
+        ) {
+          toast.error(
+            isRTL
+              ? `مدة إتاحة المحاضرة يجب ألا تقل عن ${MIN_LIMITED_LECTURE_DURATION_HOURS} ساعة`
+              : `Limited lecture duration must be at least ${MIN_LIMITED_LECTURE_DURATION_HOURS} hours`,
+          )
+          setIsSubmitting(false)
+          return
+        }
+
         const lectureData = buildLecturePayloadObject({
           name: containerName,
           price: Number(lecturePrice),
@@ -190,6 +173,8 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
           requiresHomework,
           homeworkFormUrl,
           homeworkPassingThreshold: Number(homeworkPassingThreshold),
+          limitedAvailabilityEnabled,
+          limitedAvailabilityDurationHours: Number(limitedAvailabilityDurationHours),
         })
 
         const response = await createLecture(lectureData)
@@ -306,22 +291,25 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
       }
 
       // Reset form fields
-      setContainerName("")
-      setLectureLink("")
-      setAttachmentFile(null)
-      setNumberOfViews(0)
-      setLecturePrice(0)
-      setRequiresExam(false)
-      setExamFormUrl("")
-      setPassingThreshold(60)
-      setRequiresHomework(false)
-      setHomeworkFormUrl("")
-      setHomeworkPassingThreshold(60)
-      setContainerPrice(0)
-      setDescription("")
-      setGoal("")
-      setImageFile(null)
-      setAttachmentType("homeworks")
+      resetCreationPanelState({
+        setContainerName,
+        setLectureLink,
+        setAttachmentFile,
+        setNumberOfViews,
+        setLecturePrice,
+        setLimitedAvailabilityEnabled,
+        setLimitedAvailabilityDurationHours,
+        setRequiresExam,
+        setExamFormUrl,
+        setPassingThreshold,
+        setRequiresHomework,
+        setHomeworkFormUrl,
+        setHomeworkPassingThreshold,
+        setContainerPrice,
+        setDescription,
+        setGoal,
+        setImageFile,
+      })
 
       toast.success(
         isRTL
@@ -341,20 +329,7 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
     }
   }
 
-  const getAvailableParents = () => {
-    switch (containerType) {
-      case CONTAINER_TYPES.YEAR:
-        return [courseStructure.parent].filter(Boolean)
-      case CONTAINER_TYPES.TERM:
-        return courseStructure.containers.filter((c) => c.type === CONTAINER_TYPES.YEAR)
-      case CONTAINER_TYPES.MONTH:
-        return courseStructure.containers.filter((c) => c.type === CONTAINER_TYPES.TERM)
-      case CONTAINER_TYPES.LECTURE:
-        return courseStructure.containers.filter((c) => c.type === CONTAINER_TYPES.MONTH)
-      default:
-        return [courseStructure.parent].filter(Boolean)
-    }
-  }
+  const availableParents = getAvailableParentsForType(courseStructure, containerType)
 
   return (
     <div className="rounded-[1.4rem] border bg-white/90 p-4 shadow-md sm:p-5" style={{ borderColor: "rgba(17,24,39,0.08)" }}>
@@ -397,16 +372,16 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
               required
             >
               <option value={CONTAINER_TYPES.COURSE}>{isRTL ? "دورة" : "Course"}</option>
-              <option value={CONTAINER_TYPES.YEAR} disabled={!getSuggestedParentIdForType(CONTAINER_TYPES.YEAR)}>
+              <option value={CONTAINER_TYPES.YEAR} disabled={!getSuggestedParentIdForType(courseStructure, CONTAINER_TYPES.YEAR)}>
                 {isRTL ? "سنة دراسية" : "Academic Year"}
               </option>
-              <option value={CONTAINER_TYPES.TERM} disabled={!getSuggestedParentIdForType(CONTAINER_TYPES.TERM)}>
+              <option value={CONTAINER_TYPES.TERM} disabled={!getSuggestedParentIdForType(courseStructure, CONTAINER_TYPES.TERM)}>
                 {isRTL ? "فصل دراسي" : "Term"}
               </option>
-              <option value={CONTAINER_TYPES.MONTH} disabled={!getSuggestedParentIdForType(CONTAINER_TYPES.MONTH)}>
+              <option value={CONTAINER_TYPES.MONTH} disabled={!getSuggestedParentIdForType(courseStructure, CONTAINER_TYPES.MONTH)}>
                 {isRTL ? "شهر" : "Month"}
               </option>
-              <option value={CONTAINER_TYPES.LECTURE} disabled={!getSuggestedParentIdForType(CONTAINER_TYPES.LECTURE)}>
+              <option value={CONTAINER_TYPES.LECTURE} disabled={!getSuggestedParentIdForType(courseStructure, CONTAINER_TYPES.LECTURE)}>
                 {isRTL ? "محاضرة" : "Lecture"}
               </option>
             </DSSelect>
@@ -435,7 +410,7 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
               <option value="" disabled>
                 {isRTL ? "اختر الحاوية الأب" : "Select parent container"}
               </option>
-              {getAvailableParents().map((container) => (
+              {availableParents.map((container) => (
                 <option key={container.id} value={container.id}>
                   {container.name}
                 </option>
@@ -549,6 +524,47 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
               />
               </div>
             </div>
+            <div className="mt-3 rounded-xl border border-gray-200 bg-gray-50 p-3">
+              <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    {isRTL ? "محاضرة بمدة إتاحة محدودة؟" : "Limited Lecture?"}
+                  </label>
+                  <DSSelect
+                    value={limitedAvailabilityEnabled}
+                    onChange={(e) => setLimitedAvailabilityEnabled(e.target.value === "true")}
+                    className="w-full h-10 bg-slate-100/80"
+                  >
+                    <option value={false}>{isRTL ? "لا" : "No"}</option>
+                    <option value={true}>{isRTL ? "نعم" : "Yes"}</option>
+                  </DSSelect>
+                </div>
+                {limitedAvailabilityEnabled && (
+                  <div>
+                    <label className="block text-sm font-medium mb-1">
+                      {isRTL ? "مدة الإتاحة بالساعات" : "Availability Duration (Hours)"}
+                    </label>
+                    <Input
+                      type="number"
+                      value={limitedAvailabilityDurationHours}
+                      onChange={(e) => setLimitedAvailabilityDurationHours(e.target.value)}
+                      size="sm"
+                      className="h-10 bg-slate-100/80"
+                      min={MIN_LIMITED_LECTURE_DURATION_HOURS}
+                    />
+                  </div>
+                )}
+              </div>
+              <p className="mt-2 text-xs text-slate-600">
+                {limitedAvailabilityEnabled
+                  ? isRTL
+                    ? "يمكن شراء هذه المحاضرة مباشرة خلال هذه المدة فقط. بعد انتهاء المدة يجب إيقاف الميزة ثم تفعيلها مرة أخرى لإعادة فتح الشراء."
+                    : "This lecture can be purchased directly only during this window. After expiry, disable it and enable it again to reopen purchases."
+                  : isRTL
+                    ? "عند التفعيل، يمكن تحديد نافذة شراء تبدأ من 24 ساعة فأكثر."
+                    : "Enable this to make the lecture purchasable only for a limited time window of at least 24 hours."}
+              </p>
+            </div>
             <div className="mt-3">
               <label className="block text-sm font-medium mb-1">
                 {isRTL ? "هل تحتاج إلى امتحان؟" : "Requires Exam?"}
@@ -647,38 +663,27 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
               </div>
             )}
 
-            <div className="mt-3">
-              <label className="block text-sm font-medium mb-1">{isRTL ? "نوع المرفق" : "Attachment Type"}</label>
-              <DSSelect
-                className="w-full h-10 bg-slate-100/80"
-                value={attachmentType}
-                onChange={(e) => setAttachmentType(e.target.value)}
-              >
-                <option value="pdfsandimages">{isRTL ? "ملفات PDF وصور" : "PDFs and Images"}</option>
-                <option value="booklets">{isRTL ? "كتيبات" : "Booklets"}</option>
-                <option value="homeworks">{isRTL ? "واجبات منزلية" : "Homeworks"}</option>
-                <option value="exams">{isRTL ? "امتحانات" : "Exams"}</option>
-              </DSSelect>
-            </div>
-
-            <div className="mt-3">
-              <label className="block text-sm font-medium mb-1">
-                {isRTL ? "إرفاق واجب (اختياري، .pdf فقط)" : "Attach Homework (Optional, .pdf only)"}
-              </label>
-              <div className="relative">
-                <input
-                  type="file"
-                  onChange={(e) => setAttachmentFile(e.target.files[0])}
-                  className="w-full text-sm text-neutral border border-gray-300 rounded-lg p-2 bg-slate-100/80 file:mr-4 file:py-1 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-primary/90"
-                  accept=".pdf,.jpg,.jpeg,.png"
-                />
-                <Paperclip className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-primary pointer-events-none" />
-              </div>
-              {attachmentFile && (
-                <p className="mt-2 text-sm text-slate-900/70">
-                  {isRTL ? "الملف المختار:" : "Selected file:"} {attachmentFile.name}
+              <div className="mt-3">
+                <label className="block text-sm font-medium mb-1">
+                  {isRTL ? "إرفاق ملف إضافي (اختياري)" : "Attach Supporting File (Optional)"}
+                </label>
+                <div className="relative">
+                  <input
+                    type="file"
+                    onChange={(e) => setAttachmentFile(e.target.files[0])}
+                    className="w-full text-sm text-neutral border border-gray-300 rounded-lg p-2 bg-slate-100/80 file:mr-4 file:py-1 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-primary/90"
+                    accept=".pdf,.jpg,.jpeg,.png"
+                  />
+                  <Paperclip className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-primary pointer-events-none" />
+                </div>
+                <p className="mt-1 text-xs text-slate-900/55">
+                  {isRTL ? "يتم حفظ كل المرفقات في مسار واحد بدل تقسيمها إلى أنواع متعددة." : "Attachments are now stored through one unified path instead of multiple categories."}
                 </p>
-              )}
+                {attachmentFile && (
+                  <p className="mt-2 text-sm text-slate-900/70">
+                    {isRTL ? "الملف المختار:" : "Selected file:"} {attachmentFile.name}
+                  </p>
+                )}
             </div>
           </>
         ) : (

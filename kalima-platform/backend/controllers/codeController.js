@@ -85,13 +85,12 @@ const createCodes = catchAsync(async (req, res, next) => {
     return next(new AppError("Code type and number of codes are required"));
   }
 
-  // For promo codes, we'll set a very large amount (e.g., 1,000,000)
-  // so users can purchase anything they want
-  const actualPointsAmount = type === "promo" ? 1000000 : pointsAmount;
+  if (!["general", "specific"].includes(type)) {
+    return next(new AppError("Code type must be either general or specific", 400));
+  }
 
-  // Validate amount for non-promo codes
-  if (type !== "promo" && !pointsAmount) {
-    return next(new AppError("Amount is required for non-promo codes"));
+  if (!pointsAmount) {
+    return next(new AppError("Amount is required"));
   }
 
   let lecturer = null;
@@ -108,7 +107,7 @@ const createCodes = catchAsync(async (req, res, next) => {
   const newCodes = [];
   for (let i = 0; i < numOfCodes; i++) {
     const codeDoc = new Code({
-      pointsAmount: actualPointsAmount,
+      pointsAmount,
       type,
       lecturerId: lecturer ? lecturer._id : null,
     });
@@ -323,11 +322,6 @@ const redeemCode = catchAsync(async (req, res, next) => {
       const Student = require('../models/studentModel');
       currentUser = await Student.findById(req.user._id).session(session);
 
-      // For promo codes, check if the student already has an active promo
-      if (isExistCode.type === "promo" && currentUser.hasPromoCode) {
-        await session.abortTransaction();
-        return next(new AppError("You already have an active promo code", 400));
-      }
     } else if (baseUser.role === 'Parent') {
       const Parent = require('../models/parentModel');
       currentUser = await Parent.findById(req.user._id).session(session);
@@ -345,16 +339,8 @@ const redeemCode = catchAsync(async (req, res, next) => {
     let responseMessage;
 
     if (isExistCode.type === "promo") {
-      // For promo codes: Mark the user as having a promo code
-      if (currentUser.hasPromoCode !== undefined) {
-        currentUser.hasPromoCode = true;
-        currentUser.hasUsedPromoCode = false; // Reset this flag if they're redeeming a new promo code
-
-        // Store promo balance separately instead of adding to general balance
-        currentUser.promoPoints = isExistCode.pointsAmount;
-      }
-
-      responseMessage = "Your promotional code has been redeemed successfully. You can use it for one purchase of any value!";
+      await session.abortTransaction();
+      return next(new AppError("Promo codes are no longer supported", 400));
     } else if (isExistCode.type === "specific") {
       // For specific lecturer codes: Add balance to the specific lecturer's balance
       if (!isExistCode.lecturerId) {
@@ -375,7 +361,7 @@ const redeemCode = catchAsync(async (req, res, next) => {
       responseMessage = `Your code has been redeemed successfully, +${isExistCode.pointsAmount} general balance`;
     }
 
-    // Redeeming a code only updates balance/promo flags; skip full-profile validation
+    // Redeeming a code only updates balance fields; skip full-profile validation
     // so legacy accounts with incomplete optional profile data can still redeem.
     await currentUser.save({ session, validateBeforeSave: false });
 

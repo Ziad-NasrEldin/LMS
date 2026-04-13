@@ -201,7 +201,7 @@ const DetailedLectureView = () => {
         }
       } catch (err) {
         console.error("Error in fetchLectureData:", err)
-        setError(t("failedToLoadLectureData", { error: err.message }))
+        setError(translateErrorMessage(err?.message || t("failedToLoadLectureData", { error: err?.message || "" }), t))
       } finally {
         setLoading(false)
       }
@@ -233,7 +233,7 @@ const DetailedLectureView = () => {
         }
       } catch (err) {
         setStudentSubmissions([]);
-        setSubmissionsError(t("unexpectedErrorFetchingSubmissions"));
+        setSubmissionsError(translateErrorMessage(err?.message || t("unexpectedErrorFetchingSubmissions"), t));
       } finally {
         setSubmissionsLoading(false);
       }
@@ -261,7 +261,7 @@ const DetailedLectureView = () => {
         }
       } catch (err) {
         console.error("Error fetching student lecture accesses:", err)
-        setAccessesError(t("unexpectedErrorFetchingAccesses"))
+        setAccessesError(translateErrorMessage(err?.message || t("unexpectedErrorFetchingAccesses"), t))
       } finally {
         setAccessesLoading(false)
       }
@@ -343,7 +343,7 @@ const DetailedLectureView = () => {
       setComment("")
     } catch (error) {
       console.error('Error submitting feedback:', error)
-      setFeedbackError(translateErrorMessage('Failed to submit feedback. Please try again.'))
+      setFeedbackError(translateErrorMessage(error?.message || 'Failed to submit feedback. Please try again.', t))
     } finally {
       setIsSubmittingFeedback(false)
     }
@@ -387,7 +387,7 @@ const DetailedLectureView = () => {
       }
     } catch (err) {
       console.error("Error updating student lecture access:", err)
-      setUpdateAccessError(t("unexpectedErrorUpdatingAccess"))
+      setUpdateAccessError(translateErrorMessage(err?.message || t("unexpectedErrorUpdatingAccess"), t))
     } finally {
       setUpdateAccessLoading(false)
     }
@@ -433,7 +433,7 @@ const DetailedLectureView = () => {
       }
     } catch (err) {
       console.error("Error deleting lecture:", err)
-      setDeleteError(t("unexpectedErrorDeletingLecture"))
+      setDeleteError(translateErrorMessage(err?.message || t("unexpectedErrorDeletingLecture"), t))
       setShowDeleteModal(false)
     } finally {
       setDeleteLoading(false)

@@ -10,6 +10,11 @@ import { resolveUploadUrl } from "../utils/uploadUrl"
 import { translateErrorMessage } from "../utils/errorTranslator"
 import { buildLecturePayloadObject } from "../utils/contentCreationPayloads"
 import { buildLevelHierarchy } from "../utils/levelHierarchy"
+import {
+  MIN_LIMITED_LECTURE_DURATION_HOURS,
+  formatLimitedLectureRemaining,
+  getLimitedLectureAvailabilityStatus,
+} from "../utils/limitedLectureAvailability"
 import DSSelect from "./DSSelect"
 import Button from "./ui/Button"
 import Input from "./ui/Input"
@@ -203,6 +208,8 @@ const LectureCreationModal = ({
     price: 0,
     videoLink: "",
     numberOfViews: 0,
+    limitedAvailabilityEnabled: false,
+    limitedAvailabilityDurationHours: MIN_LIMITED_LECTURE_DURATION_HOURS,
   })
 
   const [assessmentConfig, setAssessmentConfig] = useState({
@@ -242,7 +249,15 @@ const LectureCreationModal = ({
   }, [])
 
   const resetForm = useCallback(() => {
-    setFormData({ name: "", description: "", price: 0, videoLink: "", numberOfViews: 0 })
+    setFormData({
+      name: "",
+      description: "",
+      price: 0,
+      videoLink: "",
+      numberOfViews: 0,
+      limitedAvailabilityEnabled: false,
+      limitedAvailabilityDurationHours: MIN_LIMITED_LECTURE_DURATION_HOURS,
+    })
     setAssessmentConfig({
       exam: { enabled: false, formUrl: "", passingThreshold: 50 },
       homework: { enabled: false, formUrl: "", passingThreshold: 50 },
@@ -270,6 +285,9 @@ const LectureCreationModal = ({
       price: initialData.price ?? 0,
       videoLink: initialData.videoLink || "",
       numberOfViews: initialData.numberOfViews ?? 0,
+      limitedAvailabilityEnabled: Boolean(initialData.limitedAvailabilityEnabled),
+      limitedAvailabilityDurationHours:
+        initialData.limitedAvailabilityDurationHours ?? MIN_LIMITED_LECTURE_DURATION_HOURS,
     })
 
     setAssessmentConfig({
@@ -432,13 +450,23 @@ const LectureCreationModal = ({
     if (!metadata.level) throw new Error(t("validation.levelRequired"))
     if (!metadata.subject) throw new Error(t("validation.subjectRequired"))
     if (!formData.videoLink) throw new Error(t("validation.videoLinkRequired"))
+    if (
+      formData.limitedAvailabilityEnabled &&
+      Number(formData.limitedAvailabilityDurationHours) < MIN_LIMITED_LECTURE_DURATION_HOURS
+    ) {
+      throw new Error(
+        isRTL
+          ? `مدة إتاحة المحاضرة يجب ألا تقل عن ${MIN_LIMITED_LECTURE_DURATION_HOURS} ساعة`
+          : `Limited lecture duration must be at least ${MIN_LIMITED_LECTURE_DURATION_HOURS} hours`,
+      )
+    }
     if (assessmentConfig.exam.enabled && !assessmentConfig.exam.formUrl) {
       throw new Error(t("validation.examFormUrlRequired", "Exam form URL is required"))
     }
     if (assessmentConfig.homework.enabled && !assessmentConfig.homework.formUrl) {
       throw new Error(t("validation.homeworkFormUrlRequired", "Homework form URL is required"))
     }
-  }, [formData, metadata, assessmentConfig, usesSelectableParent, t])
+  }, [formData, metadata, assessmentConfig, usesSelectableParent, t, isRTL])
 
   const handleSubmit = useCallback(async (e) => {
     e.preventDefault()
@@ -457,6 +485,8 @@ const LectureCreationModal = ({
         numberOfViews: Number(formData.numberOfViews) || 0,
         videoLink: formData.videoLink,
         teacherAllowed: true,
+        limitedAvailabilityEnabled: formData.limitedAvailabilityEnabled,
+        limitedAvailabilityDurationHours: Number(formData.limitedAvailabilityDurationHours),
         requiresExam: assessmentConfig.exam.enabled,
         examFormUrl: assessmentConfig.exam.formUrl,
         passingThreshold: Number(assessmentConfig.exam.passingThreshold),
@@ -567,6 +597,16 @@ const LectureCreationModal = ({
   if (!isOpen) return null
 
   const titleText = isEditMode ? (isRTL ? "تعديل المحاضرة" : "Edit Lecture") : t("titles.createNewLecture")
+  const limitedAvailabilityStatus = getLimitedLectureAvailabilityStatus({
+    limitedAvailabilityEnabled: formData.limitedAvailabilityEnabled,
+    limitedAvailabilityStartsAt: initialData?.limitedAvailabilityStartsAt,
+    limitedAvailabilityEndsAt: initialData?.limitedAvailabilityEndsAt,
+  })
+  const limitedAvailabilityStatusLabel = !formData.limitedAvailabilityEnabled
+    ? (isRTL ? "غير مفعلة" : "Disabled")
+    : limitedAvailabilityStatus.isExpired
+      ? (isRTL ? "منتهية" : "Expired")
+      : (isRTL ? "نشطة" : "Active")
 
     return (
       <div className={`fixed inset-0 z-50 flex items-center justify-center p-4 ${isOpen ? "block" : "hidden"}`} onClick={handleBackdropClick}>
@@ -676,7 +716,7 @@ const LectureCreationModal = ({
                        required
                      />
                    </FormField>
-                    <FormField label={t("fields.videoURL")} fullWidth>
+                   <FormField label={t("fields.videoURL")} fullWidth>
                       <Input
                         type="url"
                         placeholder={t("placeholders.enterVideoLink")}
@@ -686,6 +726,64 @@ const LectureCreationModal = ({
                         required
                       />
                     </FormField>
+                    <div className="md:col-span-2">
+                      <ToggleCard
+                        title={isRTL ? "محاضرة بمدة إتاحة محدودة" : "Limited lecture availability"}
+                        enabled={formData.limitedAvailabilityEnabled}
+                        onToggle={(enabled) =>
+                          setFormData((prev) => ({ ...prev, limitedAvailabilityEnabled: enabled }))
+                        }
+                        t={t}
+                      >
+                        <FormField label={isRTL ? "مدة الإتاحة بالساعات" : "Availability Duration (Hours)"}>
+                          <Input
+                            type="number"
+                            className={`w-full ${TOKENS.radius.section}`}
+                            value={formData.limitedAvailabilityDurationHours}
+                            onChange={(e) =>
+                              setFormData((prev) => ({
+                                ...prev,
+                                limitedAvailabilityDurationHours: e.target.value,
+                              }))
+                            }
+                            min={MIN_LIMITED_LECTURE_DURATION_HOURS}
+                          />
+                        </FormField>
+                        <p className={TOKENS.typography.hint}>
+                          {isRTL
+                            ? "يمكن شراء هذه المحاضرة مباشرة خلال هذه المدة فقط. بعد انتهاء المدة، أوقف الميزة ثم فعّلها مجددًا لإعادة فتح الشراء."
+                            : "This lecture can be purchased directly only during this window. After expiry, disable it and enable it again to reopen purchases."}
+                        </p>
+                        {isEditMode && (
+                          <div className={`${TOKENS.radius.card} bg-white px-3 py-2 text-sm text-slate-700`}>
+                            <p>
+                              {isRTL ? "الحالة الحالية:" : "Current status:"}{" "}
+                              <span className="font-semibold text-slate-900">{limitedAvailabilityStatusLabel}</span>
+                            </p>
+                            {initialData?.limitedAvailabilityEndsAt && (
+                              <p className="mt-1">
+                                {limitedAvailabilityStatus.isExpired
+                                  ? (isRTL ? "انتهت الإتاحة في:" : "Expired at:")
+                                  : (isRTL ? "تنتهي الإتاحة في:" : "Expires at:")}{" "}
+                                <span className="font-semibold text-slate-900">
+                                  {new Date(initialData.limitedAvailabilityEndsAt).toLocaleString(
+                                    isRTL ? "ar-EG" : "en-US",
+                                  )}
+                                </span>
+                              </p>
+                            )}
+                            {formData.limitedAvailabilityEnabled && !limitedAvailabilityStatus.isExpired && initialData?.limitedAvailabilityEndsAt && (
+                              <p className="mt-1">
+                                {isRTL ? "الوقت المتبقي:" : "Time remaining:"}{" "}
+                                <span className="font-semibold text-slate-900">
+                                  {formatLimitedLectureRemaining(limitedAvailabilityStatus.remainingMs, { isRTL })}
+                                </span>
+                              </p>
+                            )}
+                          </div>
+                        )}
+                      </ToggleCard>
+                    </div>
                   </div>
                 </section>
 
@@ -1014,6 +1112,14 @@ const LectureCreationModal = ({
                     <SummaryRow label={t("fields.subject")} value={selectedLabels.subject || t("notSpecified", "غير محدد")} loading={loading.subjects} />
                     <SummaryRow label={t("fields.price")} value={`${Number(formData.price) || 0}`} />
                     <SummaryRow label={t("fields.numberOfViews")} value={`${Number(formData.numberOfViews) || 0}`} />
+                    <SummaryRow
+                      label={isRTL ? "الإتاحة المحدودة" : "Limited availability"}
+                      value={
+                        formData.limitedAvailabilityEnabled
+                          ? `${Number(formData.limitedAvailabilityDurationHours) || MIN_LIMITED_LECTURE_DURATION_HOURS} ${isRTL ? "ساعة" : "hours"}`
+                          : (isRTL ? "غير مفعلة" : "Disabled")
+                      }
+                    />
                     <SummaryRow label={t("fields.requiresExam")} value={assessmentConfig.exam.enabled ? t("options.yes") : t("options.no")} />
                     <SummaryRow label={t("fields.requiresHomework")} value={assessmentConfig.homework.enabled ? t("options.yes") : t("options.no")} />
                     <SummaryRow label={t("sections.attachments")} value={String(attachmentStats.total)} />

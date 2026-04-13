@@ -1,8 +1,8 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { motion } from "framer-motion"
-import { ImageIcon, Video, ChevronDown } from "lucide-react"
+import { ImageIcon, ChevronDown } from "lucide-react"
 import toast from "react-hot-toast"
 import { createContainer, updateContainer } from "../../routes/lectures"
 import { buildContainerPayloadObject, objectToFormData } from "../../utils/contentCreationPayloads"
@@ -14,12 +14,15 @@ import Input from "../../components/ui/Input";
 import Checkbox from "../../components/ui/Checkbox";
 import Radio from "../../components/ui/Radio";
 import FormContainer from "../../components/ui/FormContainer";
+import { CONTAINER_TYPES } from "./course-form-helpers";
+import { getGradeOptionsForStage } from "../../utils/levelHierarchy";
 
 function BasicInfoForm({
   formData,
   handleChange,
   subjects,
   levels,
+  levelHierarchy,
   isRTL,
   courseStructure,
   updateCourseStructure,
@@ -32,9 +35,13 @@ function BasicInfoForm({
   const compactSelect = "w-full border border-gray-300 bg-slate-100 rounded-lg h-10 min-h-10 appearance-none px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-transparent"
   const [courseImage, setCourseImage] = useState(null)
   const [courseImagePreview, setCourseImagePreview] = useState(null)
-  const [courseVideo, setCourseVideo] = useState(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const submitLockRef = useRef(false)
   const isPaidCourse = formData.courseType === "paid"
+  const gradeOptions = useMemo(
+    () => (formData.stage ? getGradeOptionsForStage(levelHierarchy, formData.stage) : []),
+    [formData.stage, levelHierarchy],
+  )
   const existingCourseImagePreview = useMemo(
     () => (initialImageUrl ? resolveUploadUrl(initialImageUrl, "product_thumbnails") || initialImageUrl : null),
     [initialImageUrl],
@@ -68,7 +75,16 @@ function BasicInfoForm({
 
   const handleCreateParentContainer = async (e) => {
     e.preventDefault()
-    if (!formData.courseName || !formData.gradeLevel || !formData.subject) {
+
+    if (
+      submitLockRef.current ||
+      isSubmitting ||
+      (!isEditMode && courseStructure.parent)
+    ) {
+      return
+    }
+
+    if (!formData.courseName || !formData.stage || !formData.gradeLevel || !formData.subject) {
       toast.error(translateErrorMessage("Please fill all required fields"))
       return
     }
@@ -88,12 +104,13 @@ function BasicInfoForm({
       return
     }
 
+    submitLockRef.current = true
     setIsSubmitting(true)
 
     try {
       const containerPayload = buildContainerPayloadObject({
         name: formData.courseName,
-        type: "course",
+        type: CONTAINER_TYPES.COURSE,
         createdBy,
         level: formData.gradeLevel,
         subject: formData.subject,
@@ -129,6 +146,7 @@ function BasicInfoForm({
       const errorMessage = error.response?.data?.message || error.message || "Error saving parent container"
       toast.error(translateErrorMessage(errorMessage))
     } finally {
+      submitLockRef.current = false
       setIsSubmitting(false)
     }
   }
@@ -192,20 +210,47 @@ function BasicInfoForm({
                 />
               </div>
               <div className="relative">
-                <label className="block text-sm font-medium mb-1">{isRTL ? "المستوى التعليمي" : "Learning Level"}</label>
+                <label className="block text-sm font-medium mb-1">{isRTL ? "المرحلة الدراسية" : "Academic Stage"}</label>
                 <DSSelect
-                  name="gradeLevel"
-                  value={formData.gradeLevel}
+                  name="stage"
+                  value={formData.stage}
                   onChange={handleChange}
                   className={compactSelect}
                   required
                 >
                   <option value="" disabled>
-                    {isRTL ? "اختر المرحلة" : "Select Level"}
+                    {isRTL ? "اختر المرحلة" : "Select stage"}
                   </option>
-                  {levels.map((level) => (
-                    <option key={level._id} value={level._id}>
-                      {level.name}
+                  {(levelHierarchy?.stageOptions || []).map((stage) => (
+                    <option key={stage.value} value={stage.value}>
+                      {stage.label}
+                    </option>
+                  ))}
+                </DSSelect>
+                <ChevronDown
+                  className={`h-4 w-4 absolute top-9 ${isRTL ? "left-3" : "right-3"} pointer-events-none`}
+                />
+              </div>
+              <div className="relative">
+                <label className="block text-sm font-medium mb-1">{isRTL ? "الصف الدراسي" : "Grade Level"}</label>
+                <DSSelect
+                  name="gradeLevel"
+                  value={formData.gradeLevel}
+                  onChange={handleChange}
+                  className={compactSelect}
+                  disabled={!formData.stage || gradeOptions.length === 0}
+                  required
+                >
+                  <option value="" disabled>
+                    {!formData.stage
+                      ? (isRTL ? "اختر المرحلة أولاً" : "Select stage first")
+                      : gradeOptions.length === 0
+                        ? (isRTL ? "لا توجد صفوف متاحة" : "No grades available")
+                        : (isRTL ? "اختر الصف" : "Select grade")}
+                  </option>
+                  {gradeOptions.map((level) => (
+                    <option key={level.value} value={level.value}>
+                      {level.label}
                     </option>
                   ))}
                 </DSSelect>
@@ -295,6 +340,7 @@ function BasicInfoForm({
                     <div className="relative z-10 flex flex-col items-center">
                       <ImageIcon className={`w-8 h-8 mb-2 ${displayedCourseImage ? "text-white" : "text-primary"}`} />
                       <Button 
+                        type="button"
                         variant="ghost" 
                         size="sm" 
                         className={`border-2 mb-2 ${
@@ -381,12 +427,12 @@ function BasicInfoForm({
                         />
                         <div className="flex flex-col flex-1 min-w-0">
                           <span className="text-sm font-bold text-primary">
-                            {isRTL ? "تقييد الشراء لنفس المرحلة فقط" : "Restrict to same grade only"}
+                            {isRTL ? "تقييد الشراء لنفس الصف الدراسي فقط" : "Restrict purchase to the exact same grade only"}
                           </span>
                           <span className="text-xs text-neutral/70 whitespace-normal leading-relaxed">
                             {isRTL
-                              ? "عند التفعيل، يمكن فقط للطلاب وأولياء الأمور الذين لديهم أبناء في نفس المرحلة الدراسية شراء هذا الكورس"
-                              : "When enabled, only students and parents with children in the same grade level can purchase this course"}
+                              ? "عند التفعيل، يمكن فقط للطلاب وأولياء الأمور الذين لديهم أبناء في نفس الصف الدراسي بالضبط شراء هذا الكورس"
+                              : "When enabled, only students and parents with children in the exact same grade can purchase this course"}
                           </span>
                         </div>
                       </div>

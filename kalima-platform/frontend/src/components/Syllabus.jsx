@@ -49,7 +49,7 @@ const Syllabus = memo(function Syllabus({
         }
       } catch (err) {
         console.error("Error fetching hierarchy:", err)
-        setError(t("errors.unexpected", "An unexpected error occurred"))
+        setError(translateErrorMessage(err?.message || t("errors.unexpected", "An unexpected error occurred")))
       } finally {
         setLoading(false)
       }

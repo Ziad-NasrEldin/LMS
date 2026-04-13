@@ -13,6 +13,7 @@ import { getStageDisplayName, resolveLevelDisplayName } from "../utils/levelHier
 import { resolveProfileImageUrl } from "../utils/profileImage";
 import { useSeo } from "../seo/useSeo";
 import { buildBreadcrumbSchema } from "../seo/structuredData.mjs";
+import { translateErrorMessage } from "../utils/errorTranslator";
 
 export default function Teachers() {
   const TOKENS = designTokens.colors;
@@ -104,11 +105,11 @@ export default function Teachers() {
         setTotalResults(lecturers.length);
         setTotalPages(Math.ceil(lecturers.length / ITEMS_PER_PAGE));
       } else {
-        setError(t('errors.loadTeachers'));
+        setError(translateErrorMessage(result?.message || result?.error || t('errors.loadTeachers')));
       }
     } catch (err) {
       console.error("Error fetching teachers:", err);
-      setError(t('errors.generic'));
+      setError(translateErrorMessage(err?.message || t('errors.generic')));
     } finally {
       setLoading(false);
     }

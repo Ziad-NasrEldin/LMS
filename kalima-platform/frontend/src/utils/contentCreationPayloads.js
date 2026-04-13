@@ -100,6 +100,8 @@ export const buildLecturePayloadObject = ({
   homeworkFormUrl,
   homeworkConfig,
   homeworkPassingThreshold,
+  limitedAvailabilityEnabled = false,
+  limitedAvailabilityDurationHours,
 }) => {
   const payload = {
     name,
@@ -113,6 +115,7 @@ export const buildLecturePayloadObject = ({
     numberOfViews: Number(numberOfViews) || 0,
     requiresExam: Boolean(requiresExam),
     requiresHomework: Boolean(requiresHomework),
+    limitedAvailabilityEnabled: Boolean(limitedAvailabilityEnabled),
   }
 
   if (parent) {
@@ -149,6 +152,10 @@ export const buildLecturePayloadObject = ({
     if (homeworkPassingThreshold !== undefined && homeworkPassingThreshold !== null && homeworkPassingThreshold !== "") {
       payload.homeworkPassingThreshold = Number(homeworkPassingThreshold)
     }
+  }
+
+  if (limitedAvailabilityDurationHours !== undefined && limitedAvailabilityDurationHours !== null && limitedAvailabilityDurationHours !== "") {
+    payload.limitedAvailabilityDurationHours = Number(limitedAvailabilityDurationHours)
   }
 
   return payload

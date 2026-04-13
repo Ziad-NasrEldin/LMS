@@ -604,6 +604,22 @@ const getMyData = catchAsync(async (req, res, next) => {
           select: "name level sequencedId",
         })
         .populate({
+          path: "childProfiles.stage",
+          select: "name nameAr kind parentLevel",
+          populate: {
+            path: "parentLevel",
+            select: "name nameAr kind",
+          },
+        })
+        .populate({
+          path: "childProfiles.level",
+          select: "name nameAr kind parentLevel",
+          populate: {
+            path: "parentLevel",
+            select: "name nameAr kind",
+          },
+        })
+        .populate({
           path: "lecturerPoints.lecturer",
           select: "name subject expertise",
         })
@@ -620,6 +636,8 @@ const getMyData = catchAsync(async (req, res, next) => {
         profession: parent.profession,
         level: parent.level,
         children: parent.children,
+        childProfiles: parent.childProfiles || [],
+        childCount: Array.isArray(parent.childProfiles) ? parent.childProfiles.length : 0,
         generalPoints: parent.generalPoints || 0,
         profilePic: parent.profilePic || responseData.userInfo.profilePic || null,
       };

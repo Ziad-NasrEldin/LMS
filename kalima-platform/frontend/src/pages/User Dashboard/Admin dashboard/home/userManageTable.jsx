@@ -14,6 +14,7 @@ import { getUserDashboard } from "../../../../routes/auth-services"
 import { designTokens } from "../../../../constants/designTokens"
 import { translateErrorMessage } from "../../../../utils/errorTranslator"
 import DSSelect from "../../../../components/DSSelect"
+import { getAllSubjects } from "../../../../routes/courses"
 import {
   buildExportFileDate,
   exportCsvFile,
@@ -45,12 +46,23 @@ const UserManagementTable = () => {
   const isRTL = i18n.language === "ar"
   const exportLocale = getExportLocale(i18n.language)
   const dir = isRTL ? "rtl" : "ltr"
+  const filterLabels = {
+    name: t("admin.filters.name", { defaultValue: isRTL ? "الاسم" : "Name" }),
+    phone: t("admin.filters.phone", { defaultValue: isRTL ? "رقم الهاتف" : "Phone Number" }),
+    allTypes: t("admin.filters.allTypes", { defaultValue: isRTL ? "كل الأنواع" : "All Types" }),
+    allStatus: t("admin.filters.allStatus", { defaultValue: isRTL ? "كل الحالات" : "All Statuses" }),
+  }
+  const statusLabels = {
+    valid: t("admin.status.valid", { defaultValue: isRTL ? "صالح" : "Valid" }),
+    missingData: t("admin.status.missingData", { defaultValue: isRTL ? "بيانات ناقصة" : "Missing Data" }),
+  }
   
   const TOKENS = designTokens.colors;
   const SHADOWS = designTokens.shadows;
 
   const [users, setUsers] = useState([])
   const [filteredUsers, setFilteredUsers] = useState([])
+  const [subjects, setSubjects] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [filters, setFilters] = useState({
@@ -112,6 +124,21 @@ const UserManagementTable = () => {
     fetchUsers()
   }, [])
 
+  useEffect(() => {
+    const fetchSubjects = async () => {
+      try {
+        const result = await getAllSubjects()
+        if (result.success) {
+          setSubjects(Array.isArray(result.data) ? result.data : [])
+        }
+      } catch (fetchError) {
+        console.error("Failed to fetch subjects for user details:", fetchError)
+      }
+    }
+
+    fetchSubjects()
+  }, [])
+
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -163,9 +190,9 @@ const UserManagementTable = () => {
   const getRoleLabel = (role) => role ? t(`admin.roles.${role.toLowerCase()}`) : t("admin.NA")
 
   const getStatus = (user) => {
-    if (!user.phoneNumber) return t("admin.status.missingData")
-    if (String(user.role || "").toLowerCase() === "student" && !user.level) return t("admin.status.missingData")
-    return t("admin.status.valid")
+    if (!user.phoneNumber) return statusLabels.missingData
+    if (String(user.role || "").toLowerCase() === "student" && !user.level) return statusLabels.missingData
+    return statusLabels.valid
   }
 
   const handleDelete = async (userId) => {
@@ -261,6 +288,21 @@ const UserManagementTable = () => {
     return String(value)
   }
 
+  const getSubjectName = (subjectValue) => {
+    if (!subjectValue) return ""
+
+    if (Array.isArray(subjectValue)) {
+      return subjectValue.map((item) => getSubjectName(item)).filter(Boolean).join(", ")
+    }
+
+    if (typeof subjectValue === "object") {
+      return subjectValue.nameAr || subjectValue.name || subjectValue.label || subjectValue._id || ""
+    }
+
+    const matchedSubject = subjects.find((subject) => String(subject._id) === String(subjectValue))
+    return matchedSubject?.nameAr || matchedSubject?.name || String(subjectValue)
+  }
+
   const boolLabel = (value) =>
     value
       ? t("admin.yes", { defaultValue: isRTL ? "نعم" : "Yes" })
@@ -317,7 +359,7 @@ const UserManagementTable = () => {
     sequencedId: user.sequencedId || "",
     stage: formatObjectDisplay(user.stage),
     level: formatObjectDisplay(user.level),
-    subject: formatObjectDisplay(user.subject),
+    subject: getSubjectName(user.subject),
     profession: user.profession || "",
     school: user.school || "",
     teachesAtType: user.teachesAtType || "",
@@ -463,6 +505,8 @@ const UserManagementTable = () => {
       if (gender?.toLowerCase() === "male") return "👨"
       return "👤"
     }
+
+    const subjectDisplay = getSubjectName(user.subject)
 
     return (
       <div className="space-y-4">
@@ -660,9 +704,7 @@ const UserManagementTable = () => {
               {user.subject && (
                 <div className="bg-purple-50 rounded-lg p-3">
                   <span className="text-xs text-purple-600 block">{t("admin.userDetails.subject")}</span>
-                  <span className="text-sm font-bold text-purple-900">
-                    {typeof user.subject === "object" ? (user.subject.name || user.subject.nameAr || user.subject._id) : user.subject}
-                  </span>
+                  <span className="text-sm font-bold text-purple-900">{subjectDisplay}</span>
                 </div>
               )}
               {user.level && (
@@ -731,9 +773,7 @@ const UserManagementTable = () => {
               {user.subject && (
                 <div className="bg-orange-50 rounded-lg p-3">
                   <span className="text-xs text-orange-600 block">{t("admin.userDetails.subject")}</span>
-                  <span className="text-sm font-medium text-orange-900">
-                    {typeof user.subject === "object" ? (user.subject.name || user.subject.nameAr || user.subject._id) : user.subject}
-                  </span>
+                  <span className="text-sm font-medium text-orange-900">{subjectDisplay}</span>
                 </div>
               )}
               {user.socialMedia && user.socialMedia.length > 0 && (
@@ -921,14 +961,14 @@ const UserManagementTable = () => {
         <div className="grid w-full gap-4 sm:grid-cols-2 2xl:grid-cols-4">
            <Input
              type="text"
-             placeholder={t("admin.filters.name")}
+             placeholder={filterLabels.name}
              className="w-full font-medium rounded-full transition-colors"
              value={filters.name}
              onChange={(e) => setFilters({ ...filters, name: e.target.value })}
            />
            <Input
              type="text"
-             placeholder={t("admin.filters.phone")}
+             placeholder={filterLabels.phone}
              className="w-full font-medium rounded-full transition-colors"
              value={filters.phone}
              onChange={(e) => setFilters({ ...filters, phone: e.target.value })}
@@ -945,7 +985,7 @@ const UserManagementTable = () => {
              value={filters.role}
              onChange={(e) => setFilters({ ...filters, role: e.target.value })}
            >
-             <option value="" className="font-medium bg-white">{t("admin.filters.allTypes")}</option>
+             <option value="" className="font-medium bg-white">{filterLabels.allTypes}</option>
              {["student", "parent", "lecturer", "Teacher", "moderator", "subAdmin"].map((role) => (
                <option key={role} value={role} className="font-medium bg-white">
                  {t(`admin.roles.${role}`)}
@@ -964,9 +1004,9 @@ const UserManagementTable = () => {
              value={filters.status}
              onChange={(e) => setFilters({ ...filters, status: e.target.value })}
            >
-             <option value="" className="font-medium bg-white">{t("admin.filters.allStatus")}</option>
-             <option value={t("admin.status.valid")} className="font-medium bg-white">{t("admin.status.valid")}</option>
-             <option value={t("admin.status.missingData")} className="font-medium bg-white">{t("admin.status.missingData")}</option>
+             <option value="" className="font-medium bg-white">{filterLabels.allStatus}</option>
+             <option value={statusLabels.valid} className="font-medium bg-white">{statusLabels.valid}</option>
+             <option value={statusLabels.missingData} className="font-medium bg-white">{statusLabels.missingData}</option>
            </DSSelect>
         </div>
          <div className="flex w-full flex-col gap-3 sm:flex-row xl:w-auto xl:justify-end">
@@ -1032,7 +1072,7 @@ const UserManagementTable = () => {
                      {getRoleLabel(user.role)}
                    </span>
                  </td>
-                 <td className="p-4 whitespace-nowrap font-medium" style={{ color: getStatus(user) === t("admin.status.valid") ? "#10B981" : TOKENS.vibrantCoral }}>{getStatus(user)}</td>
+                 <td className="p-4 whitespace-nowrap font-medium" style={{ color: getStatus(user) === statusLabels.valid ? "#10B981" : TOKENS.vibrantCoral }}>{getStatus(user)}</td>
                  <td className="p-4 whitespace-nowrap font-bold" style={{ color: TOKENS.slateText }}>{user.successfulInvites || 0}</td>
                  <td className="p-4 whitespace-nowrap">
                    <div className="flex items-center gap-2">
@@ -1126,11 +1166,12 @@ const UserManagementTable = () => {
           itemsPerPage={usersPerPage}
           onPageChange={handlePageChange}
           labels={{
-            previous: t("admin.pagination.previous"),
-            next: t("admin.pagination.next"),
-            showing: t("admin.pagination.showing"),
-            of: t("admin.pagination.of"),
+            previous: t("admin.pagination.previous", { defaultValue: isRTL ? "السابق" : "Previous" }),
+            next: t("admin.pagination.next", { defaultValue: isRTL ? "التالي" : "Next" }),
+            showing: t("admin.pagination.showing", { defaultValue: isRTL ? "عرض" : "Showing" }),
+            of: t("admin.pagination.of", { defaultValue: isRTL ? "من" : "of" }),
           }}
+          itemLabel={t("admin.pagination.users", { defaultValue: isRTL ? "مستخدم" : "users" })}
         />
       )}
 

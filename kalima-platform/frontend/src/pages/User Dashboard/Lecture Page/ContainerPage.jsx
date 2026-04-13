@@ -1,11 +1,12 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Link, useLocation } from "react-router-dom"
+import { Link, useLocation, useNavigate } from "react-router-dom"
 import { useTranslation } from 'react-i18next';
 import { getCachedUserSummary, getMyPurchasedCourseContainers } from "../../../routes/auth-services"
-import { getContainersByLecturerId } from "../../../routes/lectures"
+import { deleteContainerById, getContainersByLecturerId } from "../../../routes/lectures"
 import { FiArrowLeft, FiArrowRight, FiChevronDown } from "react-icons/fi"
+import toast from "react-hot-toast"
 import { designTokens } from "../../../constants/designTokens"
 import { translateErrorMessage } from "../../../utils/errorTranslator"
 import DSSelect from "../../../components/DSSelect"
@@ -14,6 +15,7 @@ import Button from "../../../components/ui/Button"
 const ContainersPage = () => {
   const { t, i18n } = useTranslation('lecturesPage');
   const location = useLocation();
+  const navigate = useNavigate();
   const isRTL = i18n.language === "ar";
   const TOKENS = designTokens.colors
   const SHADOWS = designTokens.shadows
@@ -54,7 +56,7 @@ const ContainersPage = () => {
           })
 
           if (result.status !== "success") {
-            setError(translateErrorMessage("Failed to load data"));
+            setError(translateErrorMessage(result?.message || result?.error || "Failed to load data"));
             return;
           }
 
@@ -71,7 +73,7 @@ const ContainersPage = () => {
         })
 
         if (!result.success) {
-          setError(translateErrorMessage("Failed to load data"))
+          setError(translateErrorMessage(result?.message || result?.error || "Failed to load data"))
           return
         }
 
@@ -79,7 +81,7 @@ const ContainersPage = () => {
         setUserRole(userInfo.role)
         setAllContainers(containers)
       } catch (err) {
-        setError(translateErrorMessage("Failed to load data. Please try again later."));
+        setError(translateErrorMessage(err?.message || "Failed to load data. Please try again later."));
         console.error("Error:", err);
       } finally {
         setLoading(false);
@@ -113,6 +115,36 @@ const ContainersPage = () => {
   const handleItemsPerPageChange = (e) => {
     setItemsPerPage(Number(e.target.value));
     setCurrentPage(1); // Reset to first page
+  };
+
+  const handleEditCourse = (containerId) => {
+    navigate(`/dashboard/lecturer-dashboard/CoursesForm/${containerId}`);
+  };
+
+  const handleDeleteCourse = async (containerId, containerName) => {
+    const confirmed = window.confirm(
+      isRTL
+        ? `هل تريد حذف الكورس "${containerName}" نهائيًا؟`
+        : `Do you want to permanently delete the course "${containerName}"?`
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    const result = await deleteContainerById(containerId);
+
+    if (result?.success || result?.status === "success") {
+      setAllContainers((prev) => prev.filter((container) => container._id !== containerId && container.id !== containerId));
+      toast.success(isRTL ? "تم حذف الكورس بنجاح" : "Course deleted successfully");
+      return;
+    }
+
+    toast.error(
+      translateErrorMessage(
+        result?.message || result?.error || (isRTL ? "فشل حذف الكورس" : "Failed to delete course")
+      )
+    );
   };
 
   const getVisiblePages = () => {
@@ -291,21 +323,47 @@ const ContainersPage = () => {
                     </p>
                   )}
   
-                  <div className={`flex gap-2 mt-4 ${isRTL ? "justify-start" : "justify-end"}`}>
+                  <div className={`flex flex-wrap gap-2 mt-4 ${isRTL ? "justify-start" : "justify-end"}`}>
                     {userRole === 'Lecturer' ? (
-                      <Link
-                        to={`/dashboard/lecturer-dashboard/container-details/${container._id}`}
-                        className={`inline-flex w-full items-center justify-center gap-2 rounded-full border px-5 py-2 text-sm font-semibold transition-all duration-200 hover:-translate-y-[1px] sm:w-auto ${isRTL ? "flex-row-reverse" : ""}`}
-                        style={{
-                          background: TOKENS.deepTeal,
-                          color: "#F8FCFF",
-                          borderColor: TOKENS.deepTeal,
-                        }}
-                        state={{ userRole: 'Lecturer' }}
-                      >
-                        {t('containersPage.buttons.viewDetails')}
-                        {isRTL ? <FiArrowLeft className="h-4 w-4" /> : <FiArrowRight className="h-4 w-4" />}
-                      </Link>
+                      <>
+                        <Button
+                          type="button"
+                          className="rounded-full px-5 py-2 text-sm font-semibold"
+                          style={{
+                            background: "#FFFFFF",
+                            color: TOKENS.deepTeal,
+                            borderColor: TOKENS.deepTeal,
+                          }}
+                          onClick={() => handleEditCourse(container._id)}
+                        >
+                          {t('containersPage.buttons.edit', { defaultValue: isRTL ? "تعديل" : "Edit" })}
+                        </Button>
+                        <Button
+                          type="button"
+                          className="rounded-full px-5 py-2 text-sm font-semibold"
+                          style={{
+                            background: "#DC2626",
+                            color: "#FFFFFF",
+                            borderColor: "#DC2626",
+                          }}
+                          onClick={() => handleDeleteCourse(container._id, container.name)}
+                        >
+                          {t('containersPage.buttons.delete', { defaultValue: isRTL ? "حذف" : "Delete" })}
+                        </Button>
+                        <Link
+                          to={`/dashboard/lecturer-dashboard/container-details/${container._id}`}
+                          className={`inline-flex w-full items-center justify-center gap-2 rounded-full border px-5 py-2 text-sm font-semibold transition-all duration-200 hover:-translate-y-[1px] sm:w-auto ${isRTL ? "flex-row-reverse" : ""}`}
+                          style={{
+                            background: TOKENS.deepTeal,
+                            color: "#F8FCFF",
+                            borderColor: TOKENS.deepTeal,
+                          }}
+                          state={{ userRole: 'Lecturer' }}
+                        >
+                          {t('containersPage.buttons.viewDetails')}
+                          {isRTL ? <FiArrowLeft className="h-4 w-4" /> : <FiArrowRight className="h-4 w-4" />}
+                        </Link>
+                      </>
                     ) : (
                       <Link
                         to={`/dashboard/student-dashboard/container-details/${container._id}`}

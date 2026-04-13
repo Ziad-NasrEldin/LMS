@@ -38,42 +38,45 @@ export const generatePromoCodes = async (data) => {
       throw new Error(translateErrorMessage("Promo code data is required"));
     }
 
+    const normalizedNumOfCodes = Number(data.numOfCodes ?? data.count);
+    const normalizedType = data.type;
+    const normalizedPointsAmount = Number(data.pointsAmount);
+
     // Validate required fields for all types
-    const requiredFields = ['numOfCodes', 'type'];
-    for (const field of requiredFields) {
-      if (!data[field]) {
-        throw new Error(translateErrorMessage(`${field} is required`));
-      }
+    if (!normalizedNumOfCodes || Number.isNaN(normalizedNumOfCodes)) {
+      throw new Error(translateErrorMessage("numOfCodes is required"));
+    }
+
+    if (!normalizedType) {
+      throw new Error(translateErrorMessage("type is required"));
     }
 
     // Validate type is one of the allowed values
-    const allowedTypes = ['general', 'specific', 'promo'];
-    if (!allowedTypes.includes(data.type)) {
+    const allowedTypes = ['general', 'specific'];
+    if (!allowedTypes.includes(normalizedType)) {
       throw new Error(translateErrorMessage(`Invalid type. Must be one of: ${allowedTypes.join(', ')}`));
     }
 
     // Validate type-specific requirements
-    if (data.type === "specific" && !data.lecturerId) {
+    if (normalizedType === "specific" && !data.lecturerId) {
       throw new Error(translateErrorMessage("Lecturer ID is required for specific promo codes"));
     }
 
-    if (data.type !== "promo" && !data.pointsAmount) {
-      throw new Error(translateErrorMessage("Amount is required for non-promo codes"));
+    if (!normalizedPointsAmount || Number.isNaN(normalizedPointsAmount)) {
+      throw new Error(translateErrorMessage("Amount is required"));
     }
 
     // Prepare the payload based on type
     const payload = {
-      numOfCodes: data.numOfCodes,
-      type: data.type
+      numOfCodes: normalizedNumOfCodes,
+      type: normalizedType
     };
 
     // Only include amount if not promo type
-    if (data.type !== "promo") {
-      payload.pointsAmount = data.pointsAmount;
-    }
+    payload.pointsAmount = normalizedPointsAmount;
 
     // Only include lecturerId if specific type
-    if (data.type === "specific") {
+    if (normalizedType === "specific") {
       payload.lecturerId = data.lecturerId;
     }
 
@@ -91,20 +94,20 @@ export const generatePromoCodes = async (data) => {
 
     if (response.data && response.data.status === "success") {
       return {
-        status: "success",
-        data: response.data.data
+        success: true,
+        data: response.data?.data?.codes || []
       };
     } else {
       console.error("Unexpected API response structure:", response.data);
       return {
-        status: "error",
-        message: translateErrorMessage("Unexpected API response structure")
+        success: false,
+        error: translateErrorMessage("Unexpected API response structure")
       };
     }
   } catch (error) {
     return {
-      status: "error",
-      message: `Failed to generate promo codes: ${error.message}`
+      success: false,
+      error: `Failed to generate promo codes: ${error.message}`
     };
   }
 };

@@ -9,6 +9,7 @@ import { Check, X, Camera, Upload, Pencil } from "lucide-react"
 import { resolveProfileImageUrl } from "../../utils/profileImage"
 import { translateErrorMessage } from "../../utils/errorTranslator"
 import { designTokens } from "../../constants/designTokens"
+import { getStageDisplayName, resolveLevelDisplayName } from "../../utils/levelHierarchy"
 import DSSelect from "../../components/DSSelect"
 import Button from "../../components/ui/Button"
 import Input from "../../components/ui/Input"
@@ -644,6 +645,7 @@ function PersonalInfoSection() {
 
   const normalizedRole = String(userData?.role || "").trim().toLowerCase()
   const isStudentRole = normalizedRole === "student"
+  const isParentRole = normalizedRole === "parent"
   const isLecturerRole = normalizedRole === "lecturer"
   const isRestrictedSettingsRole = ["student", "parent", "teacher"].includes(normalizedRole)
   const lecturerSavedSocialMedia = normalizeSocialMediaEntries(userData?.socialMedia)
@@ -651,6 +653,7 @@ function PersonalInfoSection() {
     Array.isArray(formData.socialMedia) && formData.socialMedia.length > 0
       ? formData.socialMedia
       : [createEmptySocialMediaEntry()]
+  const parentChildProfiles = Array.isArray(userData?.childProfiles) ? userData.childProfiles : []
 
   return (
     <section>
@@ -996,6 +999,60 @@ function PersonalInfoSection() {
                   dir={isRTL ? "rtl" : "ltr"}
                   readOnly
                 />
+              </div>
+            </div>
+          )}
+
+          {isParentRole && (
+            <div className="form-control mb-4">
+              <label className={`label pb-1 ${isRTL ? "justify-end" : "justify-start"}`}>
+                <span className={`label-text ${isRTL ? "text-left" : "text-left"}`}>
+                  {personalInfo.labels.childCount || (isRTL ? "عدد الأبناء" : "Number of children")}
+                </span>
+              </label>
+              <div className="w-full">
+                <input
+                  type="text"
+                  value={String(userData?.childCount || parentChildProfiles.length || 0)}
+                  className={`input input-bordered w-full max-w-2xl ${isRTL ? "text-right" : "text-left"}`}
+                  dir={isRTL ? "rtl" : "ltr"}
+                  readOnly
+                />
+              </div>
+            </div>
+          )}
+
+          {isParentRole && parentChildProfiles.length > 0 && (
+            <div className="form-control mb-4">
+              <label className={`label pb-1 ${isRTL ? "justify-end" : "justify-start"}`}>
+                <span className={`label-text ${isRTL ? "text-left" : "text-left"}`}>
+                  {personalInfo.labels.childProfiles || (isRTL ? "بيانات الأبناء الدراسية" : "Children education details")}
+                </span>
+              </label>
+              <div className="w-full max-w-2xl space-y-3">
+                {parentChildProfiles.map((profile, index) => {
+                  const stageLabel = getStageDisplayName(profile?.stage, i18n.language)
+                  const levelLabel = resolveLevelDisplayName(profile?.level, i18n.language)
+
+                  return (
+                    <div key={`settings-child-profile-${index}`} className="rounded-2xl border border-slate-200 bg-white px-4 py-3">
+                      <div className="text-sm font-semibold text-slate-900">
+                        {(personalInfo.labels.childProfileItem || (isRTL ? "الابن" : "Child"))} {index + 1}
+                      </div>
+                      <div className="mt-2 text-sm text-slate-700">
+                        {(personalInfo.labels.stage || (isRTL ? "المرحلة" : "Stage"))}: {stageLabel || "-"}
+                      </div>
+                      <div className="mt-1 text-sm text-slate-700">
+                        {(personalInfo.labels.gradeLevel || (isRTL ? "الصف الدراسي" : "Grade level"))}: {levelLabel || "-"}
+                      </div>
+                      {profile?.sequenceId && (
+                        <div className="mt-1 text-sm text-slate-700">
+                          {(personalInfo.labels.childSequenceId || (isRTL ? "رقم تسلسل الابن" : "Child sequence ID"))}: {profile.sequenceId}
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
               </div>
             </div>
           )}

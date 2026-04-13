@@ -28,6 +28,24 @@ const parentValidation = userValidation.concat(
 
       }),
     profession: Joi.string().trim().required(),
+    childCount: Joi.number().integer().min(1).max(9).optional(),
+    childProfiles: Joi.array().items(
+      Joi.object({
+        sequenceId: Joi.string().trim().allow("").optional(),
+        stage: Joi.string()
+          .regex(/^[0-9a-fA-F]{24}$/)
+          .required()
+          .messages({
+            "string.pattern.base": "Each child stage must be a valid MongoDB ObjectId.",
+          }),
+        level: Joi.string()
+          .regex(/^[0-9a-fA-F]{24}$/)
+          .required()
+          .messages({
+            "string.pattern.base": "Each child level must be a valid MongoDB ObjectId.",
+          }),
+      })
+    ).optional(),
     stages: Joi.array().items(
       Joi.string()
         .regex(/^[0-9a-fA-F]{24}$/)

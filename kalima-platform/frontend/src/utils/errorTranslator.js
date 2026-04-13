@@ -90,6 +90,11 @@ const exactMessages = new Map([
   ["The selected level is inactive", () => t("errors.levelInactive")],
   ["Selected grade does not belong to the selected stage", () => t("errors.gradeStageMismatch")],
   ["Selected grade does not belong to the selected stage.", () => t("errors.gradeStageMismatch")],
+  ["Item is not associated with any lecturer", () => t("errors.itemLecturerAssociationMissing")],
+  ["You are not allowed to purchase this item", () => t("errors.itemPurchaseNotAllowed")],
+  ["This course is restricted to students in the exact same grade level only", () => t("errors.studentSameGradeRestriction")],
+  ["This course is restricted to parents with children in the same grade level only", () => t("errors.parentSameGradeRestriction")],
+  ["This lecture is no longer available for purchase", () => t("errors.limitedLectureExpired")],
   ["Type must be either 'exam' or 'homework'", () => t("errors.invalidAssessmentType")],
   ["Container has no children to calculate duration from.", () => t("errors.containerDurationChildrenMissing")],
   ["Please log in as a lecturer or assistant to access your containers.", () => t("errors.containersAccessRoleRequired")],
@@ -391,6 +396,22 @@ const translatePattern = (message) => {
       run: () => t("errors.imageOnly"),
     },
     {
+      regex: /^Item is not associated with any lecturer\.?$/i,
+      run: () => t("errors.itemLecturerAssociationMissing"),
+    },
+    {
+      regex: /^You are not allowed to purchase this item\.?$/i,
+      run: () => t("errors.itemPurchaseNotAllowed"),
+    },
+    {
+      regex: /^This course is restricted to students in the exact same grade level only\.?$/i,
+      run: () => t("errors.studentSameGradeRestriction"),
+    },
+    {
+      regex: /^This course is restricted to parents with children in the same grade level only\.?$/i,
+      run: () => t("errors.parentSameGradeRestriction"),
+    },
+    {
       regex: /^Invalid image type(?: for profile picture)?\.?$/i,
       run: () => t("errors.imageOnly"),
     },
@@ -515,6 +536,14 @@ export const translateErrorMessage = (input, fallback = "") => {
 
     const fallbackPattern = translatePattern(fallbackMessage);
     if (fallbackPattern) return fallbackPattern;
+  }
+
+  if (message) {
+    return message;
+  }
+
+  if (fallbackMessage) {
+    return fallbackMessage;
   }
 
   return t("errors.unexpected");
