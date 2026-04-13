@@ -28,6 +28,22 @@ export const loadLecturePage = async (lectureId) => {
   }
 };
 
+export const recheckAssessmentAccess = async (lectureId) => {
+  try {
+    const response = await axios.post(
+      `${API_URL}/lectures/recheck-assessment/${lectureId}`,
+      {},
+      authConfig()
+    );
+    return {
+      success: true,
+      data: response.data.data,
+    };
+  } catch (error) {
+    return normalizeApiError(error, "Failed to recheck assessment access");
+  }
+};
+
 // Function to get all containers
 export const getAllContainers = async (queryParams = {}) => {
   try {

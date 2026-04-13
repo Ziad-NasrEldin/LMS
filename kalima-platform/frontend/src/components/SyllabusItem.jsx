@@ -212,7 +212,19 @@ const SyllabusItem = memo(function SyllabusItem({
 
         {/* Action Buttons */}
         <div className="mt-3 flex w-full sm:mt-0 sm:w-auto sm:flex-shrink-0 sm:justify-end">
-          {isLecture && purchased ? (
+          {purchased && !isLecture ? (
+            <div
+              className="flex w-full items-center justify-center gap-1.5 rounded-2xl px-3 py-2 text-[12px] font-bold shadow-sm sm:w-auto sm:rounded-full sm:px-3 sm:py-1.5 sm:text-[11px]"
+              style={{
+                background: "rgba(22,163,74,0.12)",
+                color: "#15803d",
+                border: "1px solid rgba(22,163,74,0.2)",
+              }}
+            >
+              <Unlock size={11} />
+              <span>{t("syllabus.unlocked", "Unlocked")}</span>
+            </div>
+          ) : isLecture && purchased ? (
             <button
               onClick={(e) => {
                 e.stopPropagation()

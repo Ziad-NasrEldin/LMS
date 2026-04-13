@@ -598,7 +598,7 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
                   </div>
                   <div>
                     <label className="block text-sm font-medium mb-1">
-                      {isRTL ? "حد النجاح" : "Passing Threshold"}
+                      {isRTL ? "حد النجاح (%)" : "Passing Threshold (%)"}
                     </label>
                     <Input
                       type="number"
@@ -606,6 +606,11 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
                       onChange={(e) => setPassingThreshold(e.target.value)}
                       size="sm"
                       className="h-10 bg-slate-100/80"
+                      helperText={
+                        isRTL
+                          ? "استخدم نسبة مئوية وليس عدد النقاط. مثال: 60 تعني 60٪."
+                          : "Use a percentage, not raw points. Example: 60 means 60%."
+                      }
                       min="0"
                       max="100"
                     />
@@ -647,7 +652,7 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
                   </div>
                   <div>
                     <label className="block text-sm font-medium mb-1">
-                      {isRTL ? "حد النجاح" : "Passing Threshold"}
+                      {isRTL ? "حد النجاح (%)" : "Passing Threshold (%)"}
                     </label>
                     <Input
                       type="number"
@@ -655,6 +660,11 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
                       onChange={(e) => setHomeworkPassingThreshold(e.target.value)}
                       size="sm"
                       className="h-10 bg-slate-100/80"
+                      helperText={
+                        isRTL
+                          ? "استخدم نسبة مئوية وليس عدد النقاط. مثال: 60 تعني 60٪."
+                          : "Use a percentage, not raw points. Example: 60 means 60%."
+                      }
                       min="0"
                       max="100"
                     />

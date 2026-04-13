@@ -10,6 +10,7 @@ const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
 const studentLectureAccess = require("../models/studentLectureAccessModel");
 const { getLimitedLectureAvailabilityStatus } = require("../utils/limitedLectureAvailability");
+const { upsertStudentLectureAccess } = require("../utils/lectureAccessResolver");
 
 const QueryFeatures = require("../utils/queryFeatures");
 
@@ -389,6 +390,40 @@ exports.purchaseContainerWithPoints = catchAsync(async (req, res, next) => {
       return next(new AppError(`User not found with ID: ${userId}`, 404));
     }
 
+    const existingPurchaseFilter = isLecture
+      ? { student: userId, lecture: containerId }
+      : { student: userId, container: containerId };
+
+    const existingPurchase = await Purchase.findOne(existingPurchaseFilter)
+      .session(session)
+      .lean();
+
+    if (existingPurchase) {
+      let lectureInfo = null;
+
+      if (isLecture) {
+        await upsertStudentLectureAccess(userId, item, {
+          StudentLectureAccessModel: studentLectureAccess,
+        });
+
+        const Lecture = require("../models/LectureModel");
+        lectureInfo = await Lecture.findById(containerId).lean();
+      }
+
+      await session.commitTransaction();
+      return res.status(200).json({
+        status: "success",
+        data: {
+          purchase: existingPurchase,
+          lecture: lectureInfo,
+          remainingLecturerPoints: userModel.getLecturerPointsBalance(lecturerId),
+          remainingGeneralPoints: userModel.generalPoints,
+          usedPointsType: "already-owned",
+          promoUsed: false,
+        },
+      });
+    }
+
     // Exact grade restriction check
     if (item.sameGradeOnly) {
       const role = req.user.role;
@@ -484,15 +519,9 @@ exports.purchaseContainerWithPoints = catchAsync(async (req, res, next) => {
     // Grant access if it's a lecture
     let lectureInfo = null;
     if (isLecture) {
-      await studentLectureAccess.create([
-        {
-          student: userId,
-          lecture: containerId,
-          remainingViews: item.numberOfViews !== undefined && item.numberOfViews !== null
-            ? item.numberOfViews
-            : 3, // Only default to 3 if numberOfViews is not set
-        },
-      ], { session });
+      await upsertStudentLectureAccess(userId, item, {
+        StudentLectureAccessModel: studentLectureAccess,
+      });
       // Populate lecture info for response
       const Lecture = require("../models/LectureModel");
       lectureInfo = await Lecture.findById(containerId).lean();

@@ -2,7 +2,9 @@
 
 
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo, useCallback, lazy, Suspense } from "react"
+
+import { ChevronDown, ChevronUp } from "lucide-react"
 
 import { Link, useLocation, useNavigate } from "react-router-dom"
 
@@ -18,7 +20,7 @@ import { createLecture, updateLecture, createLectureAttachment, getLectureById, 
 
 import { getAllLectures } from "../../../routes/lectures"
 
-import LectureCreationModal from "../../../components/LectureCreationModal"
+const LectureModalLazy = lazy(() => import("../../../components/LectureCreationModal"))
 
 import { designTokens } from "../../../constants/designTokens"
 
@@ -27,6 +29,8 @@ import { resolveUploadUrl } from "../../../utils/uploadUrl"
 import { translateErrorMessage } from "../../../utils/errorTranslator"
 
 import { objectToFormData } from "../../../utils/contentCreationPayloads"
+
+import { useDebounce } from "../../../utils/useDebounce"
 
 import DSSelect from "../../../components/DSSelect";
 import Button from "../../../components/ui/Button";
@@ -188,10 +192,9 @@ const buildLecturerLectureTargets = (containers = []) => {
 
 
 
-  return { courseOptions, containerOptionsByCourse }
+return { courseOptions, containerOptionsByCourse }
 
-}
-
+  }
 
 
 const MyLecturesPage = () => {
@@ -295,9 +298,13 @@ const MyLecturesPage = () => {
 
   const [selectedLevelFilter, setSelectedLevelFilter] = useState("")
 
-  const [searchTerm, setSearchTerm] = useState("")
+const [searchTerm, setSearchTerm] = useState("")
 
-  const [currentPage, setCurrentPage] = useState(1)
+  const debouncedSearchTerm = useDebounce(searchTerm, 300)
+
+  const [showFilters, setShowFilters] = useState(false)
+
+const [currentPage, setCurrentPage] = useState(1)
 
   const [itemsPerPage, setItemsPerPage] = useState(8)
 
@@ -307,13 +314,15 @@ const MyLecturesPage = () => {
 
   const isAdminLikeRole = ["Admin", "Subadmin", "Moderator"].includes(userRole)
 
+  const activeFiltersCount = [searchTerm.trim(), selectedSubjectFilter, selectedLevelFilter].filter(Boolean).length
 
 
-  const openCreateLectureModal = () => {
+
+  const openCreateLectureModal = useCallback(() => {
 
     setLectureModalState({ mode: "create", target: null })
 
-  }
+  }, [])
 
 
 
@@ -397,11 +406,11 @@ const MyLecturesPage = () => {
 
 
 
-  const closeLectureModal = () => {
+  const closeLectureModal = useCallback(() => {
 
     setLectureModalState({ mode: null, target: null })
 
-  }
+  }, [])
 
 
 
@@ -413,22 +422,28 @@ const MyLecturesPage = () => {
 
     if (!window.confirm(t("lecturesPage.buttons.confirmDelete", "Are you sure you want to delete this lecture? This action cannot be undone."))) return
 
+    const previousLectures = [...lectures]
+    const previousAllLectures = [...allLectures]
+
+    setLectures((prev) => prev.filter((l) => (l._id || l.id) !== lectureId))
+    setAllLectures((prev) => prev.filter((l) => (l._id || l.id) !== lectureId))
+
     try {
 
       const result = await deleteLecture(lectureId)
 
-      if (result?.success) {
+      if (!result?.success) {
 
-        setLectures((prev) => prev.filter((l) => (l._id || l.id) !== lectureId))
-
-      } else {
-
+        setLectures(previousLectures)
+        setAllLectures(previousAllLectures)
         setError(translateErrorMessage(result?.message || t("lecturesPage.buttons.deleteError", "Failed to delete lecture")))
 
       }
 
     } catch (err) {
 
+      setLectures(previousLectures)
+      setAllLectures(previousAllLectures)
       setError(translateErrorMessage(t("lecturesPage.buttons.deleteError", "Failed to delete lecture")))
 
     }
@@ -941,9 +956,9 @@ const MyLecturesPage = () => {
 
 
 
-    if (searchTerm.trim()) {
+    if (debouncedSearchTerm.trim()) {
 
-      const normalizedSearch = searchTerm.trim().toLowerCase()
+      const normalizedSearch = debouncedSearchTerm.trim().toLowerCase()
 
       filteredLectures = filteredLectures.filter((lecture) => {
 
@@ -995,25 +1010,25 @@ const MyLecturesPage = () => {
 
     setTotalPages(computedTotalPages)
 
-  }, [allLectures, selectedSubjectFilter, selectedLevelFilter, searchTerm, currentPage, itemsPerPage, isAdminLikeRole])
+  }, [allLectures, selectedSubjectFilter, selectedLevelFilter, debouncedSearchTerm, currentPage, itemsPerPage, isAdminLikeRole])
 
 
 
-  const handlePageChange = (newPage) => {
+  const handlePageChange = useCallback((newPage) => {
 
     if (newPage >= 1 && newPage <= totalPages) setCurrentPage(newPage)
 
-  }
+  }, [totalPages])
 
 
 
-  const handleItemsPerPageChange = (e) => {
+  const handleItemsPerPageChange = useCallback((e) => {
 
     setItemsPerPage(Number(e.target.value))
 
     setCurrentPage(1)
 
-  }
+  }, [])
 
 
 
@@ -1459,30 +1474,30 @@ const MyLecturesPage = () => {
               </p>
             </div>
 
-            <div className="grid gap-3 sm:grid-cols-3">
-              <div className="min-w-[9rem] rounded-[1.4rem] border px-4 py-3" style={{ background: "rgba(255,255,255,0.12)", borderColor: "rgba(255,255,255,0.14)" }}>
-                <p className="text-xs uppercase tracking-[0.2em]" style={{ color: "rgba(248,252,255,0.68)" }}>
+<div className="grid grid-cols-3 gap-2 sm:gap-3">
+              <div className="rounded-[1.4rem] border px-2 py-2 sm:px-4 sm:py-3" style={{ background: "rgba(255,255,255,0.12)", borderColor: "rgba(255,255,255,0.14)" }}>
+                <p className="text-[0.6rem] sm:text-xs uppercase tracking-[0.2em]" style={{ color: "rgba(248,252,255,0.68)" }}>
                   {t("lecturesPage.tableHeaders.name")}
                 </p>
-                <p className="mt-2 text-2xl font-semibold" style={{ color: "#F8FCFF" }}>
+                <p className="mt-1 text-xl sm:text-2xl font-semibold" style={{ color: "#F8FCFF" }}>
                   {lectures.length}
                 </p>
               </div>
-              <div className="min-w-[9rem] rounded-[1.4rem] border px-4 py-3" style={{ background: "rgba(255,255,255,0.12)", borderColor: "rgba(255,255,255,0.14)" }}>
-                <p className="text-xs uppercase tracking-[0.2em]" style={{ color: "rgba(248,252,255,0.68)" }}>
+              <div className="rounded-[1.4rem] border px-2 py-2 sm:px-4 sm:py-3" style={{ background: "rgba(255,255,255,0.12)", borderColor: "rgba(255,255,255,0.14)" }}>
+                <p className="text-[0.6rem] sm:text-xs uppercase tracking-[0.2em]" style={{ color: "rgba(248,252,255,0.68)" }}>
                   {t("lecturesPage.tableHeaders.subject")}
                 </p>
-                <p className="mt-2 text-sm font-semibold" style={{ color: "#F8FCFF" }}>
+                <p className="mt-1 text-xs sm:text-sm font-semibold" style={{ color: "#F8FCFF" }}>
                   {selectedSubjectFilter
                     ? subjects?.find((subject) => subject._id === selectedSubjectFilter)?.name || t("lecturesPage.filters.allSubjects")
                     : t("lecturesPage.filters.allSubjects")}
                 </p>
               </div>
-              <div className="min-w-[9rem] rounded-[1.4rem] border px-4 py-3" style={{ background: "rgba(255,255,255,0.12)", borderColor: "rgba(255,255,255,0.14)" }}>
-                <p className="text-xs uppercase tracking-[0.2em]" style={{ color: "rgba(248,252,255,0.68)" }}>
+              <div className="rounded-[1.4rem] border px-2 py-2 sm:px-4 sm:py-3" style={{ background: "rgba(255,255,255,0.12)", borderColor: "rgba(255,255,255,0.14)" }}>
+                <p className="text-[0.6rem] sm:text-xs uppercase tracking-[0.2em]" style={{ color: "rgba(248,252,255,0.68)" }}>
                   {t("lecturesPage.tableHeaders.level")}
                 </p>
-                <p className="mt-2 text-sm font-semibold" style={{ color: "#F8FCFF" }}>
+                <p className="mt-1 text-xs sm:text-sm font-semibold" style={{ color: "#F8FCFF" }}>
                   {selectedLevelFilter
                     ? t(`gradeLevels.${levels?.find((level) => level._id === selectedLevelFilter)?.name}`, { ns: "common" }) ||
                       levels?.find((level) => level._id === selectedLevelFilter)?.name ||
@@ -1545,144 +1560,169 @@ const MyLecturesPage = () => {
 
 
 
-        <section className="p-4 sm:p-5" style={softPanelStyle}>
+<section className="p-4 sm:p-5" style={softPanelStyle}>
 
-          <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
-
-            <div className="grid flex-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
-
-              <label className="flex flex-col gap-2 md:col-span-2 xl:col-span-1">
-                <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: TOKENS.slateText }}>
-                  {t("lecturesPage.filters.searchLecture")}
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex flex-wrap items-center gap-3">
+              <Button
+                type="button"
+                variant="outline"
+                className="border-none px-5 py-3"
+                style={{ background: "#FFFFFF", color: TOKENS.deepTeal, boxShadow: SHADOWS.level1 }}
+                onClick={() => setShowFilters((prev) => !prev)}
+                aria-expanded={showFilters}
+                aria-controls="lectures-filters-panel"
+              >
+                <span className="inline-flex items-center gap-2">
+                  {showFilters
+                    ? t("lecturesPage.buttons.hideFilters", "Hide Filters")
+                    : t("lecturesPage.buttons.showFilters", "Show Filters")}
+                  {showFilters ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                 </span>
-                <input
-                  type="text"
-                  className="w-full px-4 py-3 text-sm font-medium outline-none transition-colors"
-                  style={inputSurfaceStyle}
-                  onFocus={(e) => { e.target.style.borderColor = TOKENS.softCyanTeal; e.target.style.boxShadow = `0 0 0 4px rgba(77,179,194,0.12)` }}
-                  onBlur={(e) => { e.target.style.borderColor = TOKENS.borderSubtle; e.target.style.boxShadow = "inset 0 1px 0 rgba(255,255,255,0.55)" }}
-                  value={searchTerm}
-                  placeholder={t("lecturesPage.filters.searchLecture")}
-                  onChange={(e) => {
-                    setSearchTerm(e.target.value)
-                    setCurrentPage(1)
-                  }}
-                />
-              </label>
+              </Button>
 
-              <label className="flex flex-col gap-2">
-                <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: TOKENS.slateText }}>
-                  {t("lecturesPage.filters.allSubjects")}
-                </span>
-                <DSSelect
-                  className="w-full px-4 py-3 text-sm font-medium outline-none transition-colors"
-                  style={inputSurfaceStyle}
-                  value={selectedSubjectFilter}
-                  onFocus={(e) => { e.target.style.borderColor = TOKENS.softCyanTeal; e.target.style.boxShadow = `0 0 0 4px rgba(77,179,194,0.12)` }}
-                  onBlur={(e) => { e.target.style.borderColor = TOKENS.borderSubtle; e.target.style.boxShadow = "inset 0 1px 0 rgba(255,255,255,0.55)" }}
-                  onChange={(e) => {
-                    setSelectedSubjectFilter(e.target.value)
-                    setCurrentPage(1)
-                  }}
+              {activeFiltersCount > 0 && (
+                <Badge
+                  className="border-none px-3 py-2 text-xs font-semibold"
+                  style={{ background: "rgba(20,106,120,0.12)", color: TOKENS.deepTeal }}
                 >
-                  <option value="">{t("lecturesPage.filters.allSubjects")}</option>
-                  {subjects?.map((subject) => (
-                    <option key={subject._id} value={subject._id}>
-                      {subject.name}
-                    </option>
-                  ))}
-                </DSSelect>
-              </label>
-
-              <label className="flex flex-col gap-2">
-                <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: TOKENS.slateText }}>
-                  {t("lecturesPage.filters.allLevels")}
-                </span>
-                <DSSelect
-                  className="w-full px-4 py-3 text-sm font-medium outline-none transition-colors"
-                  style={inputSurfaceStyle}
-                  value={selectedLevelFilter}
-                  onFocus={(e) => { e.target.style.borderColor = TOKENS.softCyanTeal; e.target.style.boxShadow = `0 0 0 4px rgba(77,179,194,0.12)` }}
-                  onBlur={(e) => { e.target.style.borderColor = TOKENS.borderSubtle; e.target.style.boxShadow = "inset 0 1px 0 rgba(255,255,255,0.55)" }}
-                  onChange={(e) => {
-                    setSelectedLevelFilter(e.target.value)
-                    setCurrentPage(1)
-                  }}
-                >
-                  <option value="">{t("lecturesPage.filters.allLevels")}</option>
-                  {levels?.map((level) => (
-                    <option key={level._id} value={level._id}>
-                      {t(`gradeLevels.${level.name}`, { ns: "common" })}
-                    </option>
-                  ))}
-                </DSSelect>
-              </label>
-
-            </div>
-
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-              {userRole === "Lecturer" && (
-                <Button
-                  onClick={openCreateLectureModal}
-                  className="border-none px-5 py-3"
-                  style={{ background: GRADIENTS.cta, color: "#F8FCFF", boxShadow: SHADOWS.level1 }}
-                >
-                  {t("lecturesPage.buttons.createNewLecture")}
-                </Button>
+                  {t("lecturesPage.filters.activeFilters", {
+                    count: activeFiltersCount,
+                    defaultValue: `${activeFiltersCount} active filters`,
+                  })}
+                </Badge>
               )}
-
-              <label className="flex min-w-[13rem] flex-col gap-2">
-                <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: TOKENS.slateText }}>
-                  {pageCountLabel}
-                </span>
-                <DSSelect
-                  className="w-full px-4 py-3 text-sm font-medium outline-none transition-colors"
-                  style={inputSurfaceStyle}
-                  value={itemsPerPage}
-                  onFocus={(e) => { e.target.style.borderColor = TOKENS.softCyanTeal; e.target.style.boxShadow = `0 0 0 4px rgba(77,179,194,0.12)` }}
-                  onBlur={(e) => { e.target.style.borderColor = TOKENS.borderSubtle; e.target.style.boxShadow = "inset 0 1px 0 rgba(255,255,255,0.55)" }}
-                  onChange={handleItemsPerPageChange}
-                >
-                  <option value={8}>{t("lecturesPage.itemsPerPage", { count: 8 })}</option>
-                </DSSelect>
-              </label>
             </div>
 
+            {userRole === "Lecturer" && (
+              <Button
+                onClick={openCreateLectureModal}
+                className="border-none px-5 py-3"
+                style={{ background: GRADIENTS.cta, color: "#F8FCFF", boxShadow: SHADOWS.level1 }}
+              >
+                {t("lecturesPage.buttons.createNewLecture")}
+              </Button>
+            )}
           </div>
+
+          {showFilters && (
+            <div id="lectures-filters-panel" className="mt-4 flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
+
+              <div className="grid flex-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
+
+                <label className="flex flex-col gap-2 md:col-span-2 xl:col-span-1">
+                  <span className="flex min-h-10 items-end text-xs font-semibold uppercase tracking-[0.18em] leading-5" style={{ color: TOKENS.slateText }}>
+                    {t("lecturesPage.filters.searchLecture")}
+                  </span>
+                  <input
+                    type="text"
+                    className="w-full px-4 py-3 text-sm font-medium outline-none transition-colors"
+                    style={inputSurfaceStyle}
+                    onFocus={(e) => { e.target.style.borderColor = TOKENS.softCyanTeal; e.target.style.boxShadow = `0 0 0 4px rgba(77,179,194,0.12)` }}
+                    onBlur={(e) => { e.target.style.borderColor = TOKENS.borderSubtle; e.target.style.boxShadow = "inset 0 1px 0 rgba(255,255,255,0.55)" }}
+                    value={searchTerm}
+                    placeholder={t("lecturesPage.filters.searchLecture")}
+                    onChange={(e) => {
+                      setSearchTerm(e.target.value)
+                      setCurrentPage(1)
+                    }}
+                  />
+                </label>
+
+                <label className="flex flex-col gap-2">
+                  <span className="flex min-h-10 items-end text-xs font-semibold uppercase tracking-[0.18em] leading-5" style={{ color: TOKENS.slateText }}>
+                    {t("lecturesPage.filters.allSubjects")}
+                  </span>
+                  <DSSelect
+                    className="w-full px-4 py-3 text-sm font-medium outline-none transition-colors"
+                    style={inputSurfaceStyle}
+                    value={selectedSubjectFilter}
+                    onFocus={(e) => { e.target.style.borderColor = TOKENS.softCyanTeal; e.target.style.boxShadow = `0 0 0 4px rgba(77,179,194,0.12)` }}
+                    onBlur={(e) => { e.target.style.borderColor = TOKENS.borderSubtle; e.target.style.boxShadow = "inset 0 1px 0 rgba(255,255,255,0.55)" }}
+                    onChange={(e) => {
+                      setSelectedSubjectFilter(e.target.value)
+                      setCurrentPage(1)
+                    }}
+                  >
+                    <option value="">{t("lecturesPage.filters.allSubjects")}</option>
+                    {subjects?.map((subject) => (
+                      <option key={subject._id} value={subject._id}>
+                        {subject.name}
+                      </option>
+                    ))}
+                  </DSSelect>
+                </label>
+
+                <label className="flex flex-col gap-2">
+                  <span className="flex min-h-10 items-end text-xs font-semibold uppercase tracking-[0.18em] leading-5" style={{ color: TOKENS.slateText }}>
+                    {t("lecturesPage.filters.allLevels")}
+                  </span>
+                  <DSSelect
+                    className="w-full px-4 py-3 text-sm font-medium outline-none transition-colors"
+                    style={inputSurfaceStyle}
+                    value={selectedLevelFilter}
+                    onFocus={(e) => { e.target.style.borderColor = TOKENS.softCyanTeal; e.target.style.boxShadow = `0 0 0 4px rgba(77,179,194,0.12)` }}
+                    onBlur={(e) => { e.target.style.borderColor = TOKENS.borderSubtle; e.target.style.boxShadow = "inset 0 1px 0 rgba(255,255,255,0.55)" }}
+                    onChange={(e) => {
+                      setSelectedLevelFilter(e.target.value)
+                      setCurrentPage(1)
+                    }}
+                  >
+                    <option value="">{t("lecturesPage.filters.allLevels")}</option>
+                    {levels?.map((level) => (
+                      <option key={level._id} value={level._id}>
+                        {t(`gradeLevels.${level.name}`, { ns: "common" })}
+                      </option>
+                    ))}
+                  </DSSelect>
+                </label>
+
+              </div>
+
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+                <label className="flex min-w-[13rem] flex-col gap-2">
+                  <span className="flex min-h-10 items-end text-xs font-semibold uppercase tracking-[0.18em] leading-5" style={{ color: TOKENS.slateText }}>
+                    {pageCountLabel}
+                  </span>
+                  <DSSelect
+                    className="w-full px-4 py-3 text-sm font-medium outline-none transition-colors"
+                    style={inputSurfaceStyle}
+                    value={itemsPerPage}
+                    onFocus={(e) => { e.target.style.borderColor = TOKENS.softCyanTeal; e.target.style.boxShadow = `0 0 0 4px rgba(77,179,194,0.12)` }}
+                    onBlur={(e) => { e.target.style.borderColor = TOKENS.borderSubtle; e.target.style.boxShadow = "inset 0 1px 0 rgba(255,255,255,0.55)" }}
+                    onChange={handleItemsPerPageChange}
+                  >
+                    <option value={8}>{t("lecturesPage.itemsPerPage", { count: 8 })}</option>
+                  </DSSelect>
+                </label>
+              </div>
+
+            </div>
+          )}
 
         </section>
 
 
 
-        <LectureCreationModal
-
-          isOpen={Boolean(lectureModalState.mode)}
-
-          onClose={closeLectureModal}
-
-          onSubmit={handleLectureSubmit}
-
-          containerId={null}
-
-          userId={userId}
-
-          containerLevel={null}
-
-          containerSubject={null}
-
-          containerType="month"
-
-          lecturerCourseOptions={lectureCreationTargets.courseOptions}
-
-          lecturerContainerOptionsByCourse={lectureCreationTargets.containerOptionsByCourse}
-
-          mode={lectureModalState.mode || "create"}
-
-          initialData={lectureModalState.target}
-
-          lectureId={lectureModalState.target?.id || lectureModalState.target?._id || null}
-
-        />
+        {lectureModalState.mode && (
+          <Suspense fallback={null}>
+            <LectureModalLazy
+              isOpen={Boolean(lectureModalState.mode)}
+              onClose={closeLectureModal}
+              onSubmit={handleLectureSubmit}
+              containerId={null}
+              userId={userId}
+              containerLevel={null}
+              containerSubject={null}
+              containerType="month"
+              lecturerCourseOptions={lectureCreationTargets.courseOptions}
+              lecturerContainerOptionsByCourse={lectureCreationTargets.containerOptionsByCourse}
+              mode={lectureModalState.mode || "create"}
+              initialData={lectureModalState.target}
+              lectureId={lectureModalState.target?.id || lectureModalState.target?._id || null}
+            />
+          </Suspense>
+        )}
 
 
 
@@ -1722,9 +1762,11 @@ const MyLecturesPage = () => {
                         className="h-16 w-16 overflow-hidden rounded-[1.05rem] border shrink-0"
                         style={{ borderColor: TOKENS.borderSubtle, boxShadow: SHADOWS.level1 }}
                       >
-                        <img
+<img
                           src={resolveUploadUrl(lecture.thumbnail, "lecture_thumbnails") || "/placeholder.svg"}
                           alt={lecture.name}
+                          loading="lazy"
+                          decoding="async"
                           className="h-full w-full object-cover"
                           onError={(e) => {
                             e.currentTarget.src = "/registration-image.png"

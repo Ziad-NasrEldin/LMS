@@ -304,10 +304,14 @@ const ExamConfigSection = ({
            <Input 
              label={t("examConfig.defaultPassingThreshold", "Default Passing Threshold (%)")}
              type="number"
-             placeholder="Enter threshold"
+             placeholder={t("examConfig.defaultPassingThresholdPlaceholder", "Enter percentage from 0 to 100")}
              value={newExamConfig.defaultPassingThreshold}
              onChange={(e) => handleInputChange("defaultPassingThreshold", Number(e.target.value))}
              key={`threshold-input-${configType}`}
+             helperText={t(
+               "examConfig.thresholdHelper",
+               "Use a percentage, not raw points. Example: 60 means 60%."
+             )}
              min="0"
              max="100"
              required
@@ -327,11 +331,15 @@ const ExamConfigSection = ({
       ) : (
          selectedExamConfigId && (
            <Input 
-             label={t("examConfig.passingThreshold", "Passing Threshold")}
+             label={t("examConfig.passingThreshold", "Passing Threshold (%)")}
              type="number"
-             placeholder="Enter passing threshold"
+             placeholder={t("examConfig.passingThresholdPlaceholder", "Enter percentage from 0 to 100")}
              value={passingThreshold}
              onChange={(e) => setPassingThreshold(Number(e.target.value))}
+             helperText={t(
+               "examConfig.thresholdHelper",
+               "Use a percentage, not raw points. Example: 60 means 60%."
+             )}
              min="0"
              max="100"
              required

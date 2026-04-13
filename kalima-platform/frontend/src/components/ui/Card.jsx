@@ -6,12 +6,19 @@ const Card = ({
   title, 
   actions, 
   className = '', 
+  style,
   ...props 
 }) => {
+  const defaultBorder = "1px solid rgba(17,24,39,0.08)";
+  
   return (
-    <div className={`bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden ${className}`} {...props}>
+    <div 
+      className={`bg-white rounded-2xl shadow-sm overflow-hidden ${className}`} 
+      style={style}
+      {...props}
+    >
       <div className="p-6">
-        {title && <h2 className="text-lg font-bold text-neutral mb-4">{title}</h2>}
+        {title && <h2 className="text-lg font-bold text-[#111827]">{title}</h2>}
         {children}
         {actions && (
           <div className="mt-6 flex justify-end gap-2">

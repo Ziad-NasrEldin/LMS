@@ -199,9 +199,12 @@
     "formUrl": "رابط النموذج",
     "studentIdentifierColumn": "عمود معرّف الطالب",
     "scoreColumn": "عمود الدرجة",
-    "defaultPassingThreshold": "حد النجاح الافتراضي",
+    "defaultPassingThreshold": "حد النجاح الافتراضي (%)",
+    "defaultPassingThresholdPlaceholder": "أدخل نسبة مئوية من 0 إلى 100",
     "createButton": "إنشاء الإعداد",
-    "passingThreshold": "حد النجاح"
+    "passingThreshold": "حد النجاح (%)",
+    "passingThresholdPlaceholder": "أدخل نسبة مئوية من 0 إلى 100",
+    "thresholdHelper": "استخدم نسبة مئوية وليس عدد النقاط. مثال: 60 تعني 60٪."
   },
   "attachmentTypes": {
     "pdfsAndImages": "ملفات PDF وصور",

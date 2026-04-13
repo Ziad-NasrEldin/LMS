@@ -25,6 +25,7 @@ const {
 } = require("../utils/lectureAccessResolver")
 const { normalizeExternalUrl } = require("../utils/urlValidation")
 const { fetchYouTubeDuration } = require("../utils/youtubeDuration")
+const { processAssessmentSubmissionFromSheet } = require("../utils/examSubmissionSync")
 const {
   resolveLimitedLectureCreateFields,
   resolveLimitedLectureUpdateFields,
@@ -378,6 +379,118 @@ exports.loadLecturePage = catchAsync(async (req, res, next) => {
         sequenceId: user.sequencedId || user.sequenceId,
         studentId: user.sequencedId,
       },
+    },
+  });
+});
+
+exports.recheckAssessmentAccess = catchAsync(async (req, res, next) => {
+  const { lectureId } = req.params;
+  const user = req.user;
+
+  if (!mongoose.Types.ObjectId.isValid(lectureId)) {
+    throw new AppError("Invalid lecture ID", 400);
+  }
+
+  if (user.role !== "Student" && user.role !== "Parent") {
+    throw new AppError("Only students and parents can recheck assessment access", 403);
+  }
+
+  const lecture = await Lecture.findById(lectureId).populate([
+    { path: "examConfig", select: "name formUrl googleSheetId googleSheetTabName defaultPassingThreshold" },
+    { path: "homeworkConfig", select: "name formUrl googleSheetId googleSheetTabName defaultPassingThreshold" },
+  ]);
+
+  if (!lecture) {
+    throw new AppError("Lecture not found", 404);
+  }
+
+  let studentIds = [user._id];
+
+  if (user.role === "Parent") {
+    const Parent = require("../models/parentModel");
+    const parent = await Parent.findById(user._id).lean();
+    if (parent?.children?.length > 0) {
+      studentIds = parent.children.map(childId => 
+        typeof childId === "object" ? childId : new mongoose.Types.ObjectId(childId)
+      );
+    }
+  }
+
+  const results = {
+    exam: null,
+    homework: null,
+    errors: [],
+  };
+
+  for (const studentId of studentIds) {
+    const studentIdentifier = user.email || user.name;
+
+    if (lecture.requiresExam && lecture.examConfig) {
+      try {
+        const examResult = await processAssessmentSubmissionFromSheet({
+          lecture,
+          lectureId,
+          studentId,
+          studentIdentifier,
+          assessmentType: "exam",
+          syncSource: "manual-recheck",
+          upsertPendingOnMissing: true,
+        });
+
+        if (examResult) {
+          results.exam = {
+            passed: examResult.passed,
+            status: examResult.status,
+            score: examResult.submission?.score,
+            maxScore: examResult.submission?.maxScore,
+            requiredScore: examResult.requiredScore,
+            url: examResult.examUrl,
+          };
+        }
+      } catch (error) {
+        results.errors.push({ assessment: "exam", error: error.message });
+      }
+    }
+
+    if (lecture.requiresHomework && lecture.homeworkConfig) {
+      try {
+        const homeworkResult = await processAssessmentSubmissionFromSheet({
+          lecture,
+          lectureId,
+          studentId,
+          studentIdentifier,
+          assessmentType: "homework",
+          syncSource: "manual-recheck",
+          upsertPendingOnMissing: true,
+        });
+
+        if (homeworkResult) {
+          results.homework = {
+            passed: homeworkResult.passed,
+            status: homeworkResult.status,
+            score: homeworkResult.submission?.score,
+            maxScore: homeworkResult.submission?.maxScore,
+            requiredScore: homeworkResult.requiredScore,
+            url: homeworkResult.homeworkUrl,
+          };
+        }
+      } catch (error) {
+        results.errors.push({ assessment: "homework", error: error.message });
+      }
+    }
+  }
+
+  const examPassed = results.exam?.passed ?? true;
+  const homeworkPassed = results.homework?.passed ?? true;
+  const allPassed = (!lecture.requiresExam || examPassed) && (!lecture.requiresHomework || homeworkPassed);
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      hasAccess: allPassed,
+      results,
+      requiresExam: lecture.requiresExam,
+      requiresHomework: lecture.requiresHomework,
     },
   });
 });

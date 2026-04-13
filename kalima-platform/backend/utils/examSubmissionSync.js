@@ -65,7 +65,7 @@ const parseSubmissionScore = (rawScore) => {
   }
 
   if (typeof rawScore === "number" && Number.isFinite(rawScore)) {
-    return { score: rawScore, maxScore: rawScore };
+    return { score: rawScore, maxScore: null };
   }
 
   const rawText = normalizeString(rawScore);
@@ -87,8 +87,64 @@ const parseSubmissionScore = (rawScore) => {
 
   return {
     score: parsedScore,
-    maxScore: parsedScore,
+    maxScore: null,
   };
+};
+
+const calculateThresholdComparableScore = (score, maxScore) => {
+  if (!Number.isFinite(score)) return null;
+
+  if (Number.isFinite(maxScore) && maxScore > 0) {
+    return (score / maxScore) * 100;
+  }
+
+  return score;
+};
+
+const compareRowsByRecency = (left, right) => {
+  if (right.submittedAt.getTime() !== left.submittedAt.getTime()) {
+    return right.submittedAt - left.submittedAt;
+  }
+
+  return right.sourceRowNumber - left.sourceRowNumber;
+};
+
+const compareRowsByBestPassingAttempt = (left, right) => {
+  const comparableDiff =
+    (right.thresholdComparableScore ?? Number.NEGATIVE_INFINITY) -
+    (left.thresholdComparableScore ?? Number.NEGATIVE_INFINITY);
+  if (comparableDiff !== 0) {
+    return comparableDiff;
+  }
+
+  const rawScoreDiff =
+    (right.score ?? Number.NEGATIVE_INFINITY) - (left.score ?? Number.NEGATIVE_INFINITY);
+  if (rawScoreDiff !== 0) {
+    return rawScoreDiff;
+  }
+
+  return compareRowsByRecency(left, right);
+};
+
+const selectRelevantSubmissionRow = (rows, passingThreshold) => {
+  if (!Array.isArray(rows) || rows.length === 0) {
+    return null;
+  }
+
+  const normalizedThreshold = Number(passingThreshold);
+  if (Number.isFinite(normalizedThreshold)) {
+    const passingRows = rows.filter(
+      (row) =>
+        Number.isFinite(row.thresholdComparableScore) &&
+        row.thresholdComparableScore >= normalizedThreshold
+    );
+
+    if (passingRows.length > 0) {
+      return [...passingRows].sort(compareRowsByBestPassingAttempt)[0];
+    }
+  }
+
+  return [...rows].sort(compareRowsByRecency)[0];
 };
 
 const toComparableLower = (value) => normalizeString(value).toLowerCase();
@@ -296,31 +352,32 @@ const getExamResultsFromSheet = async (
               row,
               score: parsedScore.score,
               maxScore: parsedScore.maxScore,
+              thresholdComparableScore: calculateThresholdComparableScore(
+                parsedScore.score,
+                parsedScore.maxScore
+              ),
               submittedAt,
               sourceRowNumber: Number.isFinite(sourceRowNumber)
                 ? sourceRowNumber
                 : rowIndex + 2,
             };
           })
-          .filter(Boolean)
-          .sort((left, right) => {
-            if (right.submittedAt.getTime() !== left.submittedAt.getTime()) {
-              return right.submittedAt - left.submittedAt;
-            }
-            return right.sourceRowNumber - left.sourceRowNumber;
-          });
+          .filter(Boolean);
 
-        const latestRow = filteredRows[0];
-        if (!latestRow) {
+        const selectedRow = selectRelevantSubmissionRow(
+          filteredRows,
+          options.passingThreshold
+        );
+        if (!selectedRow) {
           lastError = `No submission found in '${sheetTabName}' for the provided student`;
           continue;
         }
 
         return {
           found: true,
-          score: latestRow.score,
-          maxScore: latestRow.maxScore,
-          studentRow: latestRow.row,
+          score: selectedRow.score,
+          maxScore: selectedRow.maxScore,
+          studentRow: selectedRow.row,
           fetchTime: new Date().toISOString(),
           sheetTabName,
         };
@@ -341,39 +398,56 @@ const getExamResultsFromSheet = async (
       }
 
       const comparableIdentifier = toComparableLower(studentIdentifier);
-      const studentRows = dataRows.filter((row) => {
-        const rowIdentifier = toComparableLower(row[identifierColIndex]);
-        return rowIdentifier && rowIdentifier === comparableIdentifier;
-      });
+      const studentRows = dataRows
+        .map((row, rowIndex) => ({ row, rowIndex }))
+        .filter(({ row }) => {
+          const rowIdentifier = toComparableLower(row[identifierColIndex]);
+          return rowIdentifier && rowIdentifier === comparableIdentifier;
+        });
 
       if (studentRows.length === 0) {
         lastError = `No submission found for student with identifier: ${studentIdentifier}`;
         continue;
       }
 
-      studentRows.sort((leftRow, rightRow) => {
-        const leftDate =
-          parseDateValue(
-            submittedAtIndex === -1 ? leftRow[0] : leftRow[submittedAtIndex]
-          ) || new Date(0);
-        const rightDate =
-          parseDateValue(
-            submittedAtIndex === -1 ? rightRow[0] : rightRow[submittedAtIndex]
-          ) || new Date(0);
-        return rightDate - leftDate;
-      });
+      const parsedRows = studentRows
+        .map(({ row, rowIndex }) => {
+          const parsedScore = parseSubmissionScore(row[scoreColIndex]);
+          if (!parsedScore) return null;
 
-      const parsedScore = parseSubmissionScore(studentRows[0][scoreColIndex]);
-      if (!parsedScore) {
+          const submittedAt =
+            parseDateValue(
+              submittedAtIndex === -1 ? row[0] : row[submittedAtIndex]
+            ) || new Date(0);
+
+          return {
+            row,
+            score: parsedScore.score,
+            maxScore: parsedScore.maxScore,
+            thresholdComparableScore: calculateThresholdComparableScore(
+              parsedScore.score,
+              parsedScore.maxScore
+            ),
+            submittedAt,
+            sourceRowNumber: rowIndex + 2,
+          };
+        })
+        .filter(Boolean);
+
+      const selectedRow = selectRelevantSubmissionRow(
+        parsedRows,
+        options.passingThreshold
+      );
+      if (!selectedRow) {
         lastError = `Invalid score format for student: ${studentIdentifier}`;
         continue;
       }
 
       return {
         found: true,
-        score: parsedScore.score,
-        maxScore: parsedScore.maxScore,
-        studentRow: studentRows[0],
+        score: selectedRow.score,
+        maxScore: selectedRow.maxScore,
+        studentRow: selectedRow.row,
         fetchTime: new Date().toISOString(),
         sheetTabName,
       };
@@ -574,6 +648,7 @@ const processAssessmentSubmissionFromSheet = async ({
     assessmentType,
     lecturerId: lecture?.createdBy || configDoc.lecturer,
     formUrl: configDoc.formUrl,
+    passingThreshold,
   });
 
   if (!sheetResult.found) {
@@ -635,7 +710,13 @@ const processAssessmentSubmissionFromSheet = async ({
     });
   }
 
-  const passed = sheetResult.score >= passingThreshold;
+  const thresholdComparableScore = calculateThresholdComparableScore(
+    sheetResult.score,
+    sheetResult.maxScore
+  );
+  const passed =
+    Number.isFinite(thresholdComparableScore) &&
+    thresholdComparableScore >= passingThreshold;
   const submission = await upsertAssessmentSubmission({
     studentId,
     lectureId,
@@ -672,6 +753,7 @@ module.exports = {
   detectDynamicFormResponseTabs,
   normalizeAssessmentType,
   parseSubmissionScore,
+  calculateThresholdComparableScore,
   getExamResultsFromSheet,
   resolveAssessmentConfigDoc,
   upsertAssessmentSubmission,

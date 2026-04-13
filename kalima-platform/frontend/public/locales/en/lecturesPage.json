@@ -198,9 +198,12 @@
     "formUrl": "Form URL",
     "studentIdentifierColumn": "Student Identifier Column",
     "scoreColumn": "Score Column",
-    "defaultPassingThreshold": "Default Passing Threshold",
+    "defaultPassingThreshold": "Default Passing Threshold (%)",
+    "defaultPassingThresholdPlaceholder": "Enter percentage from 0 to 100",
     "createButton": "Create Configuration",
-    "passingThreshold": "Passing Threshold"
+    "passingThreshold": "Passing Threshold (%)",
+    "passingThresholdPlaceholder": "Enter percentage from 0 to 100",
+    "thresholdHelper": "Use a percentage, not raw points. Example: 60 means 60%."
   },
   "attachmentTypes": {
     "pdfsAndImages": "PDFs and Images",

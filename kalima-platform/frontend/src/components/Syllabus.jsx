@@ -69,7 +69,13 @@ const Syllabus = memo(function Syllabus({
       const purchasedIds = new Set(
         purchaseHistory
           .map((p) => {
-            const id = p.container?._id || p.container?.id || p.container
+            const id =
+              p.container?._id ||
+              p.container?.id ||
+              p.container ||
+              p.lecture?._id ||
+              p.lecture?.id ||
+              p.lecture
             return id?.toString()
           })
           .filter(Boolean)

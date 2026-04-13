@@ -134,7 +134,11 @@ const AssessmentConfig = ({ type, config, onToggle, onUrlChange, onThresholdChan
   const title = isExam ? t("fields.requiresExam") : t("fields.requiresHomework")
   const urlLabel = t("attachments.formUrl", "Google Form URL")
   const urlPlaceholder = t("attachments.formUrlPlaceholder", isExam ? "Paste exam form URL" : "Paste homework form URL")
-  const thresholdLabel = t("examConfig.passingThreshold", "Passing Threshold")
+  const thresholdLabel = t("examConfig.passingThreshold", "Passing Threshold (%)")
+  const thresholdHelper = t(
+    "examConfig.thresholdHelper",
+    "Use a percentage, not raw points. Example: 60 means 60%."
+  )
   return (
     <ToggleCard title={title} enabled={enabled} onToggle={onToggle} t={t}>
       <FormField label={urlLabel}>
@@ -152,6 +156,7 @@ const AssessmentConfig = ({ type, config, onToggle, onUrlChange, onThresholdChan
           className={`w-full ${TOKENS.radius.section}`}
           value={passingThreshold}
           onChange={(e) => onThresholdChange(Number(e.target.value))}
+          helperText={thresholdHelper}
           min="0"
           max="100"
         />

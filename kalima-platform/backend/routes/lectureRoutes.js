@@ -12,6 +12,9 @@ router.use(verifyJWT);
 // Unified endpoint for loading the lecture page
 router.get("/load-page/:lectureId", lectureController.loadLecturePage);
 
+// Recheck assessment access - syncs from Google Sheets
+router.post("/recheck-assessment/:lectureId", lectureController.recheckAssessmentAccess);
+
 // New public route for non-sensitive lecture data
 router.route("/public").get(lectureController.getAllLecturesPublic);
 

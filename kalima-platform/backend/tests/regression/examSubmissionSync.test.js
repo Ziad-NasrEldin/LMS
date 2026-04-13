@@ -286,3 +286,49 @@ test("getExamResultsFromSheet returns clean error when configured tab does not e
     restorePatches();
   }
 });
+
+test("calculateThresholdComparableScore treats scored forms as percentages when maxScore is present", () => {
+  const normalizedScore = examSubmissionSync.calculateThresholdComparableScore(5, 10);
+  assert.equal(normalizedScore, 50);
+
+  const rawScore = examSubmissionSync.calculateThresholdComparableScore(75, null);
+  assert.equal(rawScore, 75);
+});
+
+test("getExamResultsFromSheet prefers an older passing attempt over a newer failing attempt when threshold is provided", async () => {
+  try {
+    googleApiConfig.configureGoogleSheets = () => ({
+      spreadsheets: {
+        values: {
+          get: async ({ range }) => {
+            assert.equal(range, "Form_Responses");
+            return {
+              data: {
+                values: [
+                  ["Timestamp", "Email Address", "Untitled Question", "Score", "Column 4"],
+                  ["4/14/2026 1:13:28", "student@example.com", "Option 2", "5 / 10", "Option 2"],
+                  ["4/14/2026 1:16:29", "student@example.com", "Option 1", "0 / 10", "Option 2"],
+                ],
+              },
+            };
+          },
+        },
+      },
+    });
+
+    const result = await examSubmissionSync.getExamResultsFromSheet({
+      sheetId: "master-sheet-id",
+      sheetTabName: "Form_Responses",
+      studentIdentifier: "student@example.com",
+      studentEmail: "student@example.com",
+      passingThreshold: 50,
+    });
+
+    assert.equal(result.found, true);
+    assert.equal(result.score, 5);
+    assert.equal(result.maxScore, 10);
+    assert.equal(result.sheetTabName, "Form_Responses");
+  } finally {
+    restorePatches();
+  }
+});
