@@ -141,7 +141,7 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, le
           ) : (
             <div className="flex flex-wrap gap-x-4 gap-y-2">
               {stageOptions.map((levelOption) => (
-                <label key={levelOption.value} className="flex cursor-pointer items-center gap-2 whitespace-nowrap">
+                <label key={levelOption.value} className="flex cursor-pointer items-center gap-2">
                   <input
                     type="checkbox"
                     className="rounded border-slate-300"

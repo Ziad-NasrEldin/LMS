@@ -22,6 +22,7 @@ import Textarea from "./ui/Textarea"
 import Badge from "./ui/Badge"
 
 const ATTACHMENT_BUCKET_KEYS = ["pdfsandimages", "booklets", "homeworks", "exams"]
+const ATTACHMENT_FILE_BUCKET_KEY = "pdfsandimages"
 const FORM_LINK_KEYS = ["homeworks", "exams"]
 
 const createEmptyAttachmentBuckets = () =>
@@ -173,7 +174,7 @@ const AttachmentListItem = ({ attachment, categoryLabel }) => (
   <li className={`${TOKENS.spacing.tight} flex flex-col ${TOKENS.radius.card} bg-slate-100 px-3 py-2`}>
     <div className="flex items-center justify-between">
       <span className="font-medium text-slate-900">{attachment.fileName}</span>
-      <Badge>{categoryLabel || attachment.category}</Badge>
+      {categoryLabel ? <Badge>{categoryLabel}</Badge> : null}
     </div>
     <a href={attachment.filePath} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 break-all text-xs text-primary hover:underline">
       <FiLink className="h-3 w-3" />
@@ -552,7 +553,7 @@ const LectureCreationModal = ({
   const handleAttachmentFilesChange = useCallback((files) => {
     setAttachments((prev) => ({
       ...prev,
-      files: { ...createEmptyAttachmentBuckets(), pdfsandimages: files },
+      files: { ...createEmptyAttachmentBuckets(), [ATTACHMENT_FILE_BUCKET_KEY]: files },
     }))
   }, [])
 
@@ -573,7 +574,7 @@ const LectureCreationModal = ({
 
   const attachmentStats = useMemo(() => {
     const saved = flattenAttachmentBuckets(attachments.existing)
-    const newFiles = attachments.files.pdfsandimages || []
+    const newFiles = attachments.files[ATTACHMENT_FILE_BUCKET_KEY] || []
     const existingTotal = Object.values(attachments.existing).reduce((count, files) => count + (files?.length || 0), 0)
     const newTotal = Object.values(attachments.files).reduce((count, files) => count + (files?.length || 0), 0)
 
@@ -583,16 +584,6 @@ const LectureCreationModal = ({
 
     return { saved, newFiles, total: newTotal + existingTotal, existingLinks }
   }, [attachments, t])
-
-  const attachmentCategoryLabels = useMemo(
-    () => ({
-      pdfsandimages: t("attachmentTypes.pdfsAndImages"),
-      booklets: t("attachmentTypes.booklets"),
-      homeworks: t("attachmentTypes.homeworks"),
-      exams: t("attachmentTypes.exams"),
-    }),
-    [t]
-  )
 
   if (!isOpen) return null
 
@@ -950,7 +941,11 @@ const LectureCreationModal = ({
                           </p>
                           <ul className={`${TOKENS.spacing.tight} flex flex-col`}>
                             {attachmentStats.saved.map((attachment) => (
-                              <AttachmentListItem key={attachment.id} attachment={attachment} categoryLabel={attachmentCategoryLabels[attachment.category]} />
+                              <AttachmentListItem
+                                key={attachment.id}
+                                attachment={attachment}
+                                categoryLabel={t("attachments.fileLabel", "File")}
+                              />
                             ))}
                           </ul>
                         </Card>

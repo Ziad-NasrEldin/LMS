@@ -19,7 +19,7 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
   const fieldClass = "w-full rounded-xl text-base";
   const inputClass = `input ${fieldClass}`;
   const selectClass = `select ${fieldClass}`;
-  const exactHeight = { height: '48px', minHeight: '48px', maxHeight: '48px', boxSizing: 'border-box' };
+  const exactHeight = { minHeight: '48px', boxSizing: 'border-box' };
   
   // Section header component
   const SectionHeader = ({ title, subtitle }) => (

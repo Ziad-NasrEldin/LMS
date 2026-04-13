@@ -853,12 +853,6 @@ export default function CourseDetails() {
       color: TOKENS.deepTeal
     },
     {
-      icon: Users,
-      label: t('stats.students', 'Students'),
-      value: `${course.students} ${t('enrolled', 'Enrolled')}`,
-      color: TOKENS.deepTeal
-    },
-    {
       icon: Clock,
       label: t('stats.duration', 'Duration'),
       value: course.duration,
@@ -1043,23 +1037,23 @@ export default function CourseDetails() {
         </section>
 
         {/* Quick Stats Grid */}
-         <div className="relative z-30 -mt-16 grid grid-cols-1 gap-4 px-4 sm:grid-cols-2 lg:grid-cols-4 lg:px-0">
+         <div className="relative z-30 -mt-8 grid grid-cols-3 gap-2 px-4 sm:-mt-10 sm:gap-3 lg:grid-cols-3 lg:px-0">
            {quickStats.map((stat, index) => (
              <Card 
                key={index}
-               className="flex items-center gap-4 p-6"
+               className="flex min-w-0 items-center gap-2 p-2.5 sm:gap-3 sm:p-4"
              >
                <div 
-                 className="rounded-xl p-3"
+                 className="rounded-lg p-1.5 sm:p-2"
                  style={{ background: `${TOKENS.lightAquaMist}20`, color: TOKENS.deepTeal }}
                >
-                 <stat.icon className="h-6 w-6" />
+                 <stat.icon className="h-4 w-4 sm:h-5 sm:w-5" />
                </div>
-               <div>
-                 <p className="text-xs font-bold uppercase tracking-wider" style={{ color: TOKENS.slateText }}>
+               <div className="min-w-0">
+                 <p className="text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.08em] sm:tracking-[0.12em] leading-tight" style={{ color: TOKENS.slateText }}>
                    {stat.label}
                  </p>
-                 <p className="text-lg font-bold" style={{ color: TOKENS.inkText }}>
+                 <p className="text-[12px] sm:text-sm lg:text-base font-bold leading-tight truncate" style={{ color: TOKENS.inkText }}>
                    {stat.value}
                  </p>
                </div>

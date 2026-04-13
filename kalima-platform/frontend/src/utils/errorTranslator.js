@@ -222,6 +222,23 @@ const labelForEntity = (entity) => entityLabels[entity]?.() || humanize(entity);
 const translateExact = (message) => exactMessages.get(message)?.();
 
 const translatePattern = (message) => {
+  const compoundParts = String(message || "")
+    .split(/\s*,\s*(?=(?:"[^"]+"|[A-Za-z_][A-Za-z0-9_]*))/)
+    .map((part) => part.trim())
+    .filter(Boolean);
+
+  if (compoundParts.length > 1) {
+    const translatedParts = compoundParts.map((part) => {
+      const exact = translateExact(part);
+      if (exact) return exact;
+      return translatePattern(part) || part;
+    });
+
+    if (translatedParts.some((part, index) => part !== compoundParts[index])) {
+      return translatedParts.join("، ");
+    }
+  }
+
   const patterns = [
     {
       regex: /^([A-Za-z0-9_ ]+?) validation failed: (.+)$/i,
@@ -315,7 +332,15 @@ const translatePattern = (message) => {
       run: (match) => t("errors.fieldRequired", { field: labelForField(match[1]) }),
     },
     {
+      regex: /^"([^"]+)" is not allowed to be empty\.?$/i,
+      run: (match) => t("errors.fieldRequired", { field: labelForField(match[1]) }),
+    },
+    {
       regex: /^Path `([^`]+)` is invalid\.?$/i,
+      run: (match) => t("errors.fieldInvalid", { field: labelForField(match[1]) }),
+    },
+    {
+      regex: /^"([^"]+)" is not allowed\.?$/i,
       run: (match) => t("errors.fieldInvalid", { field: labelForField(match[1]) }),
     },
     {
@@ -324,6 +349,10 @@ const translatePattern = (message) => {
     },
     {
       regex: /^(.+?) must be a valid (.+)\.?$/i,
+      run: (match) => t("errors.fieldInvalid", { field: labelForField(match[1]) }),
+    },
+    {
+      regex: /^"([^"]+)" must be one of \[(.+)\]\.?$/i,
       run: (match) => t("errors.fieldInvalid", { field: labelForField(match[1]) }),
     },
     {

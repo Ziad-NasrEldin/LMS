@@ -12,7 +12,7 @@
   },
 
   "stats": {
-    "level": "المستوى",
+    "level": "الصف",
     "students": "الطلاب",
     "duration": "المدة",
     "updated": "آخر تحديث"
@@ -24,11 +24,11 @@
     "teacherName": "أ.يوسف عثمان",
     "lectures": "عدد المحاضرات",
     "lecturesCount": "10",
-    "grade": "المستوى",
+    "grade": "الصف",
     "gradeLevel": "جميع المستويات",
     "views": "المشاهدات",
     "viewsCount": "1240 مشاهدة",
-    "level": "المستوى",
+    "level": "الصف",
     "totalEnrolled": "إجمالي المسجلين",
     "language": "اللغة",
     "certification": "الشهادة"

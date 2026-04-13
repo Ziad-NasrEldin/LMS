@@ -981,7 +981,7 @@ select.select option:hover {
 
 .ds-select-trigger {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   width: 100%;
   padding: 0.625rem 1rem;
@@ -1022,9 +1022,14 @@ select.select option:hover {
 
 .ds-select-label {
   flex: 1;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  min-width: 0;
+  overflow: visible;
+  text-overflow: clip;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  line-height: 1.35;
+  text-align: start;
 }
 
 .ds-select-chevron {
@@ -1114,9 +1119,13 @@ select.select option:hover {
 
 .ds-select-option-label {
   flex: 1;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  min-width: 0;
+  overflow: visible;
+  text-overflow: clip;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  line-height: 1.35;
 }
 
 .ds-select-check {
@@ -1126,18 +1135,18 @@ select.select option:hover {
 
 /* Size variants for DSSelect to match inputs */
 .ds-select-trigger.h-12 {
-  height: 3rem !important;
   min-height: 3rem !important;
+  height: auto !important;
 }
 
 .ds-select-trigger.h-11 {
-  height: 2.75rem !important;
   min-height: 2.75rem !important;
+  height: auto !important;
 }
 
 .ds-select-trigger.h-10 {
-  height: 2.5rem !important;
   min-height: 2.5rem !important;
+  height: auto !important;
 }
 
 /* ============================================
@@ -1163,9 +1172,9 @@ select.select option:hover {
 
 .form-control .input,
 .form-control .ds-select-trigger {
-  height: 3rem !important;
   min-height: 3rem !important;
-  max-height: 3rem !important;
+  height: auto !important;
+  max-height: none !important;
 }
 
 .custom-scrollbar::-webkit-scrollbar {

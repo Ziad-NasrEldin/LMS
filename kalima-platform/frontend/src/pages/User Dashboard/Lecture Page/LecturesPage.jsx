@@ -1686,133 +1686,8 @@ const MyLecturesPage = () => {
 
 
 
-        {lectures.length > 0 && (
-          <div className="grid gap-4 md:hidden">
-
-            {lectures?.map((lecture) => (
-
-              <article key={lecture.id} className="overflow-hidden p-4" style={softPanelStyle}>
-
-                <div className="flex items-start gap-4">
-
-                  {lecture.thumbnail ? (
-
-                    <img
-
-                      src={resolveUploadUrl(lecture.thumbnail, "lecture_thumbnails") || "/placeholder.svg"}
-
-                      alt={lecture.name}
-
-                      className="h-16 w-16 rounded-[1.1rem] object-cover flex-shrink-0"
-
-                    />
-
-                  ) : (
-
-                    <div
-
-                      className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-[1.1rem] text-lg font-semibold"
-
-                      style={{ background: TOKENS.lightAquaMist, color: TOKENS.deepTeal }}
-
-                    >
-
-                      {lecture.name?.charAt(0)?.toUpperCase() || "?"}
-
-                    </div>
-
-                  )}
-
-
-
-                  <div className="min-w-0 flex-1">
-                    <Link
-                      to={`/dashboard/${isStudentLikeRole ? "student" : "lecturer"}-dashboard/${isStudentLikeRole ? "lecture-display" : "detailed-lecture-view"}/${lecture?.id}`}
-                      className="block"
-                      style={{ color: TOKENS.deepTeal }}
-                    >
-                      <h3 className="text-base font-semibold leading-6">{lecture?.name || "-"}</h3>
-                    </Link>
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      <Badge className="border-none px-3 py-1 text-xs" style={{ background: TOKENS.creamSurface, color: TOKENS.deepTeal }}>
-                        {lecture?.subject?.name || t("lecturesPage.notSpecified")}
-                      </Badge>
-                      <Badge className="border-none px-3 py-1 text-xs" style={{ background: TOKENS.lightAquaMist, color: TOKENS.deepTeal }}>
-                        {t(`gradeLevels.${lecture?.level?.name}`, { ns: "common" }) || lecture?.level?.name || t("lecturesPage.notSpecified")}
-                      </Badge>
-                    </div>
-                  </div>
-
-                </div>
-
-
-
-                <div className="mt-4 grid gap-2 text-sm" style={{ color: TOKENS.slateText }}>
-
-                  {(isStudentLikeRole || isAdminLikeRole) && (
-
-                    <p><span className="font-semibold" style={{ color: TOKENS.inkText }}>{t("lecturesPage.tableHeaders.lecturer")}: </span>{lecture?.lecturer?.name || t("lecturesPage.unknown")}</p>
-
-                  )}
-
-                  <p><span className="font-semibold" style={{ color: TOKENS.inkText }}>{t("lecturesPage.tableHeaders.price")}: </span>{getLecturePricingLabel(lecture)}</p>
-
-                  <p><span className="font-semibold" style={{ color: TOKENS.inkText }}>{t("lecturesPage.tableHeaders.points")}: </span>{lecture?.price || 0} {t("lecturesPage.points")}</p>
-
-                  {isStudentLikeRole && <p><span className="font-semibold" style={{ color: TOKENS.inkText }}>{t("lecturesPage.tableHeaders.purchaseDate")}: </span>{lecture?.purchasedAt}</p>}
-
-                </div>
-
-
-
-                <div className="mt-4 flex flex-wrap gap-2">
-                  <Link
-                    to={`/dashboard/${isStudentLikeRole ? "student" : "lecturer"}-dashboard/${isStudentLikeRole ? "lecture-display" : "detailed-lecture-view"}/${lecture.id}`}
-                    className="flex-1 min-w-[9rem]"
-                  >
-                    <Button
-                      size="sm"
-                      className="w-full border-none"
-                      style={{ background: GRADIENTS.cta, color: "#F8FCFF", boxShadow: SHADOWS.level1 }}
-                    >
-                      {isStudentLikeRole ? t("lecturesPage.buttons.view") : t("lecturesPage.buttons.details")}
-                    </Button>
-                  </Link>
-                  {!isStudentLikeRole && (
-                    <Button
-                      type="button"
-                      size="sm"
-                      className="border-none"
-                      style={{ background: TOKENS.warmMango, color: "#fff" }}
-                      onClick={() => openEditLectureModal(lecture)}
-                    >
-                      {t("lecturesPage.buttons.edit", "Edit")}
-                    </Button>
-                  )}
-                  {!isStudentLikeRole && (
-                    <Button
-                      type="button"
-                      size="sm"
-                      className="border-none"
-                      style={{ background: TOKENS.error, color: "#fff" }}
-                      onClick={() => handleDeleteLecture(lecture)}
-                    >
-                      {t("lecturesPage.buttons.delete", "Delete")}
-                    </Button>
-                  )}
-                </div>
-
-              </article>
-
-            ))}
-
-          </div>
-        )}
-
-
-
         {lectures.length > 0 ? (
-          <section className="hidden overflow-hidden md:block" style={softPanelStyle}>
+          <section className="overflow-hidden" style={softPanelStyle}>
             <div
               className="flex items-center justify-between border-b px-6 py-4"
               style={{ borderColor: TOKENS.borderSubtle, background: "rgba(248,243,233,0.62)" }}
@@ -1830,80 +1705,129 @@ const MyLecturesPage = () => {
               </Badge>
             </div>
 
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse" style={{ tableLayout: "auto" }}>
-                <thead>
-                  <tr style={{ background: "rgba(14,85,99,0.04)" }}>
-                    <th className="w-20 px-6 py-4 text-center text-xs font-semibold uppercase tracking-[0.16em]" style={{ color: TOKENS.slateText }}>{t("lecturesPage.tableHeaders.thumbnail")}</th>
-                    <th className="min-w-[220px] px-6 py-4 text-start text-xs font-semibold uppercase tracking-[0.16em]" style={{ color: TOKENS.slateText }}>{t("lecturesPage.tableHeaders.name")}</th>
-                    {(isStudentLikeRole || isAdminLikeRole) && <th className="px-6 py-4 text-start text-xs font-semibold uppercase tracking-[0.16em]" style={{ color: TOKENS.slateText }}>{t("lecturesPage.tableHeaders.lecturer")}</th>}
-                    <th className="px-6 py-4 text-start text-xs font-semibold uppercase tracking-[0.16em]" style={{ color: TOKENS.slateText }}>{t("lecturesPage.tableHeaders.subject")}</th>
-                    <th className="px-6 py-4 text-start text-xs font-semibold uppercase tracking-[0.16em]" style={{ color: TOKENS.slateText }}>{t("lecturesPage.tableHeaders.level")}</th>
-                    <th className="px-6 py-4 text-start text-xs font-semibold uppercase tracking-[0.16em]" style={{ color: TOKENS.slateText }}>{t("lecturesPage.tableHeaders.price")}</th>
-                    <th className="px-6 py-4 text-start text-xs font-semibold uppercase tracking-[0.16em]" style={{ color: TOKENS.slateText }}>{t("lecturesPage.tableHeaders.points")}</th>
-                    {isStudentLikeRole && <th className="px-6 py-4 text-start text-xs font-semibold uppercase tracking-[0.16em]" style={{ color: TOKENS.slateText }}>{t("lecturesPage.tableHeaders.purchaseDate")}</th>}
-                    <th className="px-6 py-4 text-start text-xs font-semibold uppercase tracking-[0.16em]" style={{ color: TOKENS.slateText }}>{t("lecturesPage.tableHeaders.actions")}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {lectures?.map((lecture, index) => (
-                    <tr key={lecture.id} style={{ background: index % 2 === 0 ? "rgba(255,255,255,0.72)" : "rgba(14,85,99,0.025)" }}>
-                      <td className="px-6 py-4 align-middle">
-                        {lecture.thumbnail ? (
-                          <div className="h-14 w-14 overflow-hidden rounded-[1rem] border" style={{ borderColor: TOKENS.borderSubtle, boxShadow: SHADOWS.level1 }}>
-                            <img
-                              src={resolveUploadUrl(lecture.thumbnail, "lecture_thumbnails") || "/placeholder.svg"}
-                              alt={lecture.name}
-                              className="h-full w-full object-cover"
-                              onError={(e) => {
-                                e.currentTarget.src = "/registration-image.png"
-                              }}
-                            />
-                          </div>
-                        ) : (
-                          <div className="flex h-14 w-14 items-center justify-center rounded-[1rem] text-sm font-semibold" style={{ background: TOKENS.lightAquaMist, color: TOKENS.deepTeal }}>
-                            {lecture.name?.charAt(0)?.toUpperCase() || "?"}
-                          </div>
-                        )}
-                      </td>
-                      <td className="px-6 py-4 align-middle">
-                        <Link
-                          to={`/dashboard/${isStudentLikeRole ? "student" : "lecturer"}-dashboard/${isStudentLikeRole ? "lecture-display" : "detailed-lecture-view"}/${lecture?.id}`}
-                          className="block"
-                          style={{ color: TOKENS.deepTeal }}
-                        >
-                          <span className="text-sm font-semibold">{lecture?.name || "-"}</span>
-                        </Link>
-                      </td>
-                      {(isStudentLikeRole || isAdminLikeRole) && <td className="px-6 py-4 align-middle text-sm" style={{ color: TOKENS.slateText }}>{lecture.lecturer?.name || t("lecturesPage.unknown")}</td>}
-                      <td className="px-6 py-4 align-middle text-sm" style={{ color: TOKENS.slateText }}>{lecture.subject?.name || t("lecturesPage.notSpecified")}</td>
-                      <td className="px-6 py-4 align-middle text-sm" style={{ color: TOKENS.slateText }}>{t(`gradeLevels.${lecture.level?.name}`, { ns: "common" }) || lecture.level?.name || t("lecturesPage.notSpecified")}</td>
-                      <td className="px-6 py-4 align-middle text-sm font-medium" style={{ color: TOKENS.inkText }}>{getLecturePricingLabel(lecture)}</td>
-                      <td className="px-6 py-4 align-middle text-sm" style={{ color: TOKENS.slateText }}>{lecture.price || 0} {t("lecturesPage.points")}</td>
-                      {isStudentLikeRole && <td className="px-6 py-4 align-middle text-sm" style={{ color: TOKENS.slateText }}>{lecture.purchasedAt}</td>}
-                      <td className="px-6 py-4 align-middle">
-                        <div className="flex flex-wrap gap-2">
-                          <Link to={`/dashboard/${isStudentLikeRole ? "student" : "lecturer"}-dashboard/${isStudentLikeRole ? "lecture-display" : "detailed-lecture-view"}/${lecture.id}`}>
-                            <Button variant="primary" size="sm" className="border-none" style={{ background: GRADIENTS.cta, color: "#F8FCFF", minWidth: "6rem" }}>
-                              {isStudentLikeRole ? t("lecturesPage.buttons.view") : t("lecturesPage.buttons.details")}
-                            </Button>
-                          </Link>
-                          {!isStudentLikeRole && (
-                            <Button type="button" variant="outline" size="sm" className="border-none" style={{ background: TOKENS.warmMango, color: "#fff" }} onClick={() => openEditLectureModal(lecture)}>
-                              {t("lecturesPage.buttons.edit", "Edit")}
-                            </Button>
-                          )}
-                          {!isStudentLikeRole && (
-                            <Button type="button" variant="error" size="sm" className="border-none" style={{ background: TOKENS.error, color: "#fff" }} onClick={() => handleDeleteLecture(lecture)}>
-                              {t("lecturesPage.buttons.delete", "Delete")}
-                            </Button>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <div className="grid gap-4 p-4 sm:grid-cols-2 xl:grid-cols-3">
+              {lectures?.map((lecture) => (
+                <article
+                  key={lecture.id}
+                  className="flex h-full flex-col overflow-hidden rounded-[1.35rem] border p-4"
+                  style={{
+                    background: "rgba(255,255,255,0.76)",
+                    borderColor: TOKENS.borderSubtle,
+                    boxShadow: SHADOWS.level1,
+                  }}
+                >
+                  <div className="flex items-start gap-4">
+                    {lecture.thumbnail ? (
+                      <div
+                        className="h-16 w-16 overflow-hidden rounded-[1.05rem] border shrink-0"
+                        style={{ borderColor: TOKENS.borderSubtle, boxShadow: SHADOWS.level1 }}
+                      >
+                        <img
+                          src={resolveUploadUrl(lecture.thumbnail, "lecture_thumbnails") || "/placeholder.svg"}
+                          alt={lecture.name}
+                          className="h-full w-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.src = "/registration-image.png"
+                          }}
+                        />
+                      </div>
+                    ) : (
+                      <div
+                        className="flex h-16 w-16 shrink-0 items-center justify-center rounded-[1.05rem] text-lg font-semibold"
+                        style={{ background: TOKENS.lightAquaMist, color: TOKENS.deepTeal }}
+                      >
+                        {lecture.name?.charAt(0)?.toUpperCase() || "?"}
+                      </div>
+                    )}
+
+                    <div className="min-w-0 flex-1">
+                      <Link
+                        to={`/dashboard/${isStudentLikeRole ? "student" : "lecturer"}-dashboard/${isStudentLikeRole ? "lecture-display" : "detailed-lecture-view"}/${lecture?.id}`}
+                        className="block"
+                        style={{ color: TOKENS.deepTeal }}
+                      >
+                        <h3 className="text-base font-semibold leading-6 sm:text-lg">{lecture?.name || "-"}</h3>
+                      </Link>
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        <Badge className="border-none px-3 py-1 text-xs" style={{ background: TOKENS.creamSurface, color: TOKENS.deepTeal }}>
+                          {lecture?.subject?.name || t("lecturesPage.notSpecified")}
+                        </Badge>
+                        <Badge className="border-none px-3 py-1 text-xs" style={{ background: TOKENS.lightAquaMist, color: TOKENS.deepTeal }}>
+                          {t(`gradeLevels.${lecture?.level?.name}`, { ns: "common" }) || lecture?.level?.name || t("lecturesPage.notSpecified")}
+                        </Badge>
+                        <Badge className="border-none px-3 py-1 text-xs" style={{ background: "rgba(243,154,63,0.12)", color: TOKENS.deepTeal }}>
+                          {getLecturePricingLabel(lecture)}
+                        </Badge>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 grid gap-2 text-sm" style={{ color: TOKENS.slateText }}>
+                    {(isStudentLikeRole || isAdminLikeRole) && (
+                      <p>
+                        <span className="font-semibold" style={{ color: TOKENS.inkText }}>
+                          {t("lecturesPage.tableHeaders.lecturer")}:{" "}
+                        </span>
+                        {lecture?.lecturer?.name || t("lecturesPage.unknown")}
+                      </p>
+                    )}
+                    <p>
+                      <span className="font-semibold" style={{ color: TOKENS.inkText }}>
+                        {t("lecturesPage.tableHeaders.points")}:{" "}
+                      </span>
+                      {lecture?.price || 0} {t("lecturesPage.points")}
+                    </p>
+                    {isStudentLikeRole && (
+                      <p>
+                        <span className="font-semibold" style={{ color: TOKENS.inkText }}>
+                          {t("lecturesPage.tableHeaders.purchaseDate")}:{" "}
+                        </span>
+                        {lecture?.purchasedAt}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="mt-4 flex flex-wrap gap-2 pt-2">
+                    <Link
+                      to={`/dashboard/${isStudentLikeRole ? "student" : "lecturer"}-dashboard/${isStudentLikeRole ? "lecture-display" : "detailed-lecture-view"}/${lecture.id}`}
+                      className="flex-1 min-w-[10rem]"
+                    >
+                      <Button
+                        variant="primary"
+                        size="sm"
+                        className="w-full border-none"
+                        style={{ background: GRADIENTS.cta, color: "#F8FCFF", minWidth: "6rem" }}
+                      >
+                        {isStudentLikeRole ? t("lecturesPage.buttons.view") : t("lecturesPage.buttons.details")}
+                      </Button>
+                    </Link>
+                    {!isStudentLikeRole && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="border-none"
+                        style={{ background: TOKENS.warmMango, color: "#fff" }}
+                        onClick={() => openEditLectureModal(lecture)}
+                      >
+                        {t("lecturesPage.buttons.edit", "Edit")}
+                      </Button>
+                    )}
+                    {!isStudentLikeRole && (
+                      <Button
+                        type="button"
+                        variant="error"
+                        size="sm"
+                        className="border-none"
+                        style={{ background: TOKENS.error, color: "#fff" }}
+                        onClick={() => handleDeleteLecture(lecture)}
+                      >
+                        {t("lecturesPage.buttons.delete", "Delete")}
+                      </Button>
+                    )}
+                  </div>
+                </article>
+              ))}
             </div>
           </section>
         ) : (

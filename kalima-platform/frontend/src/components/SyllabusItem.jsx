@@ -47,6 +47,10 @@ const SyllabusItem = memo(function SyllabusItem({
   const childCount = item.children?.length || 0
   const limitedAvailability = getLimitedLectureAvailabilityStatus(item)
   const directPurchaseBlocked = isLecture && !purchased && limitedAvailability.isExpired
+  const limitedAvailabilityCountdownLabel =
+    limitedAvailability.isLimited && !limitedAvailability.isExpired
+      ? formatLimitedLectureRemaining(limitedAvailability.remainingMs, { isRTL })
+      : null
 
   const typeConfig = CONTAINER_TYPE_CONFIG[item.type] || {
     bg: `${tokens.lightAquaMist}30`,
@@ -57,7 +61,7 @@ const SyllabusItem = memo(function SyllabusItem({
     ? t(`containerTypes.${item.type}`, item.type.charAt(0).toUpperCase() + item.type.slice(1))
     : t("containerTypes.module", "Module")
 
-  const indentPx = depth * 16
+  const nestedPaddingPx = depth > 0 ? 10 + depth * 8 : 0
 
   const borderAccentColors = [
     tokens.deepTeal,
@@ -83,7 +87,7 @@ const SyllabusItem = memo(function SyllabusItem({
   return (
     <div
       className="border-b last:border-b-0"
-      style={{ borderColor: "rgba(17,24,39,0.06)", marginInlineStart: `${indentPx}px` }}
+      style={{ borderColor: "rgba(17,24,39,0.06)" }}
     >
       {/* Item Header */}
       <div
@@ -91,16 +95,18 @@ const SyllabusItem = memo(function SyllabusItem({
         role="button"
         tabIndex={hasChildren || isLecture ? 0 : -1}
         onKeyDown={(e) => e.key === "Enter" && handleClick()}
-        className="w-full flex flex-col sm:flex-row sm:items-center gap-3 text-left transition-colors hover:bg-black/[0.02] focus:outline-none cursor-pointer p-3 sm:px-4"
+        className="w-full cursor-pointer rounded-2xl px-3 py-3 text-left transition-colors hover:bg-black/[0.02] focus:outline-none sm:flex sm:items-center sm:gap-3 sm:rounded-none sm:px-4"
         style={{
-          borderInlineStart: depth > 0 ? `3px solid ${accentColor}30` : "none",
+          paddingInlineStart: depth > 0 ? `${nestedPaddingPx}px` : undefined,
+          background: depth > 0 ? `linear-gradient(90deg, ${accentColor}08, transparent 70%)` : "transparent",
+          borderInlineStart: depth > 0 ? `2px solid ${accentColor}35` : "none",
         }}
       >
-        <div className="flex items-center gap-3 flex-1 min-w-0">
+        <div className="flex items-start gap-3 min-w-0 sm:flex-1 sm:items-center">
           {/* Icon */}
           {hasChildren && !isLecture ? (
             <div
-              className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center transition-transform duration-200"
+              className="mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full transition-transform duration-200 sm:mt-0 sm:h-7 sm:w-7"
               style={{ background: `${accentColor}18`, border: `1.5px solid ${accentColor}30` }}
             >
               <ChevronDown
@@ -111,14 +117,14 @@ const SyllabusItem = memo(function SyllabusItem({
             </div>
           ) : isLecture ? (
             <div
-              className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center"
+              className="mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full sm:mt-0 sm:h-7 sm:w-7"
               style={{ background: `${tokens.softCyanTeal}18` }}
             >
               <Play size={12} style={{ color: tokens.softCyanTeal }} />
             </div>
           ) : (
             <div
-              className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center"
+              className="mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full sm:mt-0 sm:h-7 sm:w-7"
               style={{ background: tokens.neutralCloud }}
             >
               <Book size={13} style={{ color: tokens.slateText }} />
@@ -128,7 +134,7 @@ const SyllabusItem = memo(function SyllabusItem({
           {/* Title & Meta */}
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="font-bold text-sm leading-snug" style={{ color: tokens.inkText }}>
+              <span className="font-bold text-[15px] leading-snug sm:text-sm" style={{ color: tokens.inkText }}>
                 {item.name}
               </span>
               <span
@@ -155,84 +161,112 @@ const SyllabusItem = memo(function SyllabusItem({
                 >
                   {limitedAvailability.isExpired
                     ? (isRTL ? "انتهت الإتاحة" : "Expired")
-                    : (isRTL ? `متاح ${formatLimitedLectureRemaining(limitedAvailability.remainingMs, { isRTL })}` : `${formatLimitedLectureRemaining(limitedAvailability.remainingMs, { isRTL })} left`)}
+                    : (isRTL ? "محاضرة محدودة" : "Limited lecture")}
                 </span>
               )}
             </div>
-            <div className="flex items-center gap-3 mt-0.5 flex-wrap">
+            <div className="mt-1 flex items-center gap-3 flex-wrap">
               {childCount > 0 && !isLecture && (
-                <span className="text-[11px]" style={{ color: tokens.slateText }}>
+                <span className="text-[12px] sm:text-[11px]" style={{ color: tokens.slateText }}>
                   {childCount} {t("syllabus.items")}
                 </span>
               )}
               {(item.duration > 0 || item.totalDuration > 0) && (
                 <span
-                  className="text-[11px] flex items-center gap-1"
+                  className="text-[12px] sm:text-[11px] flex items-center gap-1"
                   style={{ color: tokens.slateText }}
                 >
                   <Clock size={10} /> {formatDuration(item.duration || item.totalDuration)}
                 </span>
               )}
-              {isLecture && limitedAvailability.isLimited && limitedAvailability.endsAt && !purchased && (
-                <span className="text-[11px]" style={{ color: tokens.slateText }}>
-                  {limitedAvailability.isExpired
-                    ? (isRTL ? "أُغلقت هذه المحاضرة للشراء المباشر" : "Direct purchase closed")
-                    : `${isRTL ? "تنتهي في" : "Ends"} ${limitedAvailability.endsAt.toLocaleString(isRTL ? "ar-EG" : "en-US")}`}
-                </span>
-              )}
             </div>
+
+            {isLecture && limitedAvailability.isLimited && !purchased && (
+              <div className="mt-2 flex flex-wrap items-center gap-2">
+                {!limitedAvailability.isExpired && limitedAvailabilityCountdownLabel && (
+                  <div
+                    className="inline-flex items-center gap-2 rounded-2xl px-3 py-2 text-[13px] font-extrabold shadow-sm"
+                    style={{
+                      background: "linear-gradient(135deg, rgba(245,158,11,0.16), rgba(251,191,36,0.08))",
+                      color: "#92400e",
+                      border: "1px solid rgba(245,158,11,0.22)",
+                    }}
+                  >
+                    <Clock size={14} />
+                    <span>
+                      {isRTL ? `متاح لمدة ${limitedAvailabilityCountdownLabel}` : `${limitedAvailabilityCountdownLabel} left to buy`}
+                    </span>
+                  </div>
+                )}
+                {limitedAvailability.endsAt && (
+                  <span className="text-[12px] font-medium" style={{ color: tokens.slateText }}>
+                    {limitedAvailability.isExpired
+                      ? (isRTL ? "أُغلقت هذه المحاضرة للشراء المباشر" : "Direct purchase closed")
+                      : `${isRTL ? "تنتهي في" : "Ends"} ${limitedAvailability.endsAt.toLocaleString(isRTL ? "ar-EG" : "en-US")}`}
+                  </span>
+                )}
+              </div>
+            )}
           </div>
         </div>
 
         {/* Action Buttons */}
-        {isLecture && purchased ? (
-          <button
-            onClick={(e) => {
-              e.stopPropagation()
-              onNavigate(`/dashboard/student-dashboard/lecture-display/${item._id}`)
-            }}
-            className="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold text-white transition-all hover:scale-105 active:scale-95 shadow-sm whitespace-nowrap self-start sm:self-center"
-            style={{
-              background: `linear-gradient(135deg, ${tokens.deepTeal}, ${tokens.softCyanTeal})`,
-            }}
-          >
-            <Eye size={10} />
-            <span className="hidden sm:inline">{t("syllabus.quickView")}</span>
-            <span className="sm:hidden">{t("syllabus.watch", "Watch")}</span>
-          </button>
-        ) : !purchased && typeof item.price === "number" && item.price >= 0 ? (
-          <button
-            onClick={handlePurchaseClick}
-            disabled={purchaseInProgress !== null || directPurchaseBlocked}
-            className="flex-shrink-0 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold text-white transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:transform-none shadow-sm whitespace-nowrap self-start sm:self-center"
-            style={{
-              background: directPurchaseBlocked
-                ? "#94a3b8"
-                : item.price > 0
-                  ? tokens.warmMango
-                  : tokens.softCyanTeal,
-            }}
-          >
-            {purchaseInProgress === item._id ? (
-              <span className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
-            ) : directPurchaseBlocked ? (
-              <>{isRTL ? "غير متاح" : "Unavailable"}</>
-            ) : item.price > 0 ? (
-              <>
-                <DollarSign size={10} /> {item.price}
-              </>
-            ) : (
-              <>
-                <Unlock size={10} /> {t("purchase.getFree", "Get")}
-              </>
-            )}
-          </button>
-        ) : null}
+        <div className="mt-3 flex w-full sm:mt-0 sm:w-auto sm:flex-shrink-0 sm:justify-end">
+          {isLecture && purchased ? (
+            <button
+              onClick={(e) => {
+                e.stopPropagation()
+                onNavigate(`/dashboard/student-dashboard/lecture-display/${item._id}`)
+              }}
+              className="flex w-full items-center justify-center gap-1.5 rounded-2xl px-3 py-2 text-[12px] font-bold text-white transition-all hover:scale-[1.01] active:scale-[0.99] shadow-sm sm:w-auto sm:rounded-full sm:px-3 sm:py-1.5 sm:text-[11px]"
+              style={{
+                background: `linear-gradient(135deg, ${tokens.deepTeal}, ${tokens.softCyanTeal})`,
+              }}
+            >
+              <Eye size={11} />
+              <span className="hidden sm:inline">{t("syllabus.quickView")}</span>
+              <span className="sm:hidden">{t("syllabus.watch", "Watch")}</span>
+            </button>
+          ) : !purchased && typeof item.price === "number" && item.price >= 0 ? (
+            <button
+              onClick={handlePurchaseClick}
+              disabled={purchaseInProgress !== null || directPurchaseBlocked}
+              className="flex w-full items-center justify-center gap-1.5 rounded-2xl px-3 py-2 text-[12px] font-bold text-white transition-all hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50 disabled:transform-none shadow-sm sm:w-auto sm:rounded-full sm:px-3 sm:py-1.5 sm:text-[11px]"
+              style={{
+                background: directPurchaseBlocked
+                  ? "#94a3b8"
+                  : item.price > 0
+                    ? tokens.warmMango
+                    : tokens.softCyanTeal,
+              }}
+            >
+              {purchaseInProgress === item._id ? (
+                <span className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              ) : directPurchaseBlocked ? (
+                <>{isRTL ? "غير متاح" : "Unavailable"}</>
+              ) : item.price > 0 ? (
+                <>
+                  <DollarSign size={11} /> {item.price}
+                </>
+              ) : (
+                <>
+                  <Unlock size={11} /> {t("purchase.getFree", "Get")}
+                </>
+              )}
+            </button>
+          ) : null}
+        </div>
       </div>
 
       {/* Children */}
       {isOpen && hasChildren && (
-        <div style={{ background: depth === 0 ? "rgba(14,85,99,0.016)" : "transparent" }}>
+        <div
+          className="pb-1"
+          style={{
+            background: depth === 0 ? "rgba(14,85,99,0.016)" : "transparent",
+            paddingInlineStart: depth === 0 ? "6px" : "0px",
+          }}
+        >
           {item.children.map((child, idx) => (
             <SyllabusItem
               key={child._id || child.id || idx}

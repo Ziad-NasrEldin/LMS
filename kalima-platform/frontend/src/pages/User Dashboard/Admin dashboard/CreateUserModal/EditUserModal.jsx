@@ -19,6 +19,83 @@ import Input from "../../../../components/ui/Input"
 
 const PARENT_RELATIONS = ["mother", "father", "other"]
 
+const FIELD_ALIASES = {
+  phone: "phoneNumber",
+  phone_number: "phoneNumber",
+  parentPhone: "parentPhoneNumber",
+  parentPhone1: "parentPhoneNumber",
+  parent_relation: "parentPhoneRelation",
+  stageId: "stage",
+  levelId: "level",
+}
+
+const normalizeFieldName = (field) => FIELD_ALIASES[field] || field
+
+const getErrorMessageCandidate = (value) => {
+  if (!value) return ""
+  if (typeof value === "string") return value.trim()
+  if (Array.isArray(value)) {
+    return value.map(getErrorMessageCandidate).filter(Boolean).join("، ")
+  }
+  if (typeof value === "object") {
+    return (
+      getErrorMessageCandidate(value.translatedMessage) ||
+      getErrorMessageCandidate(value.message) ||
+      getErrorMessageCandidate(value.error) ||
+      getErrorMessageCandidate(value.rawMessage) ||
+      getErrorMessageCandidate(value.rawError) ||
+      getErrorMessageCandidate(value.stack)
+    )
+  }
+
+  return ""
+}
+
+const collectFieldErrors = (source, bucket, visited = new WeakSet()) => {
+  if (!source) return bucket
+
+  if (Array.isArray(source)) {
+    source.forEach((item) => collectFieldErrors(item, bucket, visited))
+    return bucket
+  }
+
+  if (typeof source !== "object") return bucket
+  if (visited.has(source)) return bucket
+  visited.add(source)
+
+  if (typeof source.field === "string") {
+    const fieldName = normalizeFieldName(source.field)
+    const fieldMessage =
+      getErrorMessageCandidate(source.message) ||
+      getErrorMessageCandidate(source.rawMessage) ||
+      getErrorMessageCandidate(source.error) ||
+      getErrorMessageCandidate(source.code)
+
+    if (fieldName && fieldMessage && !bucket[fieldName]) {
+      bucket[fieldName] = translateErrorMessage(fieldMessage, fieldMessage)
+    }
+  }
+
+  if (source.errors && typeof source.errors === "object" && !Array.isArray(source.errors)) {
+    Object.entries(source.errors).forEach(([field, value]) => {
+      const fieldName = normalizeFieldName(field)
+      const fieldMessage = getErrorMessageCandidate(value)
+      if (fieldName && fieldMessage && !bucket[fieldName]) {
+        bucket[fieldName] = translateErrorMessage(fieldMessage, fieldMessage)
+      }
+      collectFieldErrors(value, bucket, visited)
+    })
+  }
+
+  ;["data", "error", "details", "issues", "validationErrors"].forEach((key) => {
+    if (source[key]) {
+      collectFieldErrors(source[key], bucket, visited)
+    }
+  })
+
+  return bucket
+}
+
 const EditUserModal = ({ isOpen, onClose, user, onUserUpdated }) => {
   const { t: baseT, i18n } = useTranslation("admin")
   const t = (key, options) => {
@@ -58,6 +135,7 @@ const EditUserModal = ({ isOpen, onClose, user, onUserUpdated }) => {
 
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
+  const [fieldErrors, setFieldErrors] = useState({})
   const [showPassword, setShowPassword] = useState(false)
   
   const [levels, setLevels] = useState([])
@@ -198,6 +276,12 @@ const EditUserModal = ({ isOpen, onClose, user, onUserUpdated }) => {
       ...prev,
       [name]: value
     }))
+    setFieldErrors((prev) => {
+      if (!prev[name]) return prev
+      const next = { ...prev }
+      delete next[name]
+      return next
+    })
   }
 
   const handleStageChange = (e) => {
@@ -229,6 +313,7 @@ const EditUserModal = ({ isOpen, onClose, user, onUserUpdated }) => {
     e.preventDefault()
     setLoading(true)
     setError(null)
+    setFieldErrors({})
 
     if (isCurrentUserAdmin) {
       setError(t("admin.editUser.cannotEditOwnCredentials") || "Admin cannot edit their own credentials.")
@@ -292,7 +377,16 @@ const EditUserModal = ({ isOpen, onClose, user, onUserUpdated }) => {
         onUserUpdated(user._id, dataToUpdate)
         onClose()
       } else {
-        setError(translateErrorMessage(result.error))
+        const nextFieldErrors = collectFieldErrors(result, {})
+        const translatedMessage = translateErrorMessage(
+          result?.data?.translatedMessage ||
+            result?.data?.message ||
+            result?.rawMessage ||
+            result?.error,
+          "An error occurred while updating the user"
+        )
+        setFieldErrors(nextFieldErrors)
+        setError(Object.values(nextFieldErrors)[0] || translatedMessage)
       }
     } catch (err) {
       setError(translateErrorMessage(err.message || "An error occurred while updating the user"))
@@ -362,8 +456,10 @@ const EditUserModal = ({ isOpen, onClose, user, onUserUpdated }) => {
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
+                variant={fieldErrors.name ? "error" : "default"}
                 className="w-full rounded-xl"
                 style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
+                error={fieldErrors.name}
                 required
                 disabled={isCurrentUserAdmin}
               />
@@ -378,8 +474,10 @@ const EditUserModal = ({ isOpen, onClose, user, onUserUpdated }) => {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
+                variant={fieldErrors.email ? "error" : "default"}
                 className="w-full rounded-xl"
                 style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
+                error={fieldErrors.email}
                 required
                 disabled={isCurrentUserAdmin}
               />
@@ -394,8 +492,10 @@ const EditUserModal = ({ isOpen, onClose, user, onUserUpdated }) => {
                 name="phoneNumber"
                 value={formData.phoneNumber}
                 onChange={handleChange}
+                variant={fieldErrors.phoneNumber ? "error" : "default"}
                 className="w-full rounded-xl"
                 style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
+                error={fieldErrors.phoneNumber}
                 disabled={isCurrentUserAdmin}
               />
             </div>
@@ -519,14 +619,14 @@ const EditUserModal = ({ isOpen, onClose, user, onUserUpdated }) => {
 
                 <div className="form-control">
                   <label className="label py-0"><span className="label-text font-bold" style={{ color: "#1F2937" }}>{t("fields.school")}</span></label>
-                  <Input type="text" name="school" className="w-full rounded-xl" style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }} value={formData.school || ""} onChange={handleChange} />
+                  <Input type="text" name="school" className="w-full rounded-xl" variant={fieldErrors.school ? "error" : "default"} style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }} value={formData.school || ""} onChange={handleChange} error={fieldErrors.school} />
                 </div>
               </div>
 
               <div className="mt-4">
                 <div className="form-control">
                   <label className="label py-0"><span className="label-text font-bold" style={{ color: "#1F2937" }}>{t("fields.parentPhoneNumber")}</span></label>
-                  <Input type="text" inputMode="numeric" name="parentPhoneNumber" className="w-full rounded-xl" style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }} value={formData.parentPhoneNumber || ""} onChange={handleChange} />
+                  <Input type="text" inputMode="numeric" name="parentPhoneNumber" className="w-full rounded-xl" variant={fieldErrors.parentPhoneNumber ? "error" : "default"} style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }} value={formData.parentPhoneNumber || ""} onChange={handleChange} error={fieldErrors.parentPhoneNumber} />
                 </div>
                 {formData.parentPhoneNumber && (
                   <div className="mt-2">
@@ -536,6 +636,9 @@ const EditUserModal = ({ isOpen, onClose, user, onUserUpdated }) => {
                         <option key={relation} value={relation}>{t(`parentRelations.${relation}`)}</option>
                       ))}
                     </DSSelect>
+                    {fieldErrors.parentPhoneRelation && (
+                      <p className="mt-1 text-sm text-red-600">{fieldErrors.parentPhoneRelation}</p>
+                    )}
                   </div>
                 )}
               </div>
@@ -548,13 +651,16 @@ const EditUserModal = ({ isOpen, onClose, user, onUserUpdated }) => {
                     <p className="font-bold" style={{ color: "#1F2937" }}>{t("fields.parentPhoneNumber2")}</p>
                     <Button type="button" variant="ghost" size="xs" className="gap-2 text-red-600" onClick={handleRemoveAdditionalParentPhone}><Trash2 size={14} />{t("buttons.removeParentPhone")}</Button>
                   </div>
-                  <Input type="text" inputMode="numeric" name="parentPhoneNumber2" className="w-full rounded-xl mb-2" style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }} value={formData.parentPhoneNumber2 || ""} onChange={handleChange} />
+                  <Input type="text" inputMode="numeric" name="parentPhoneNumber2" className="w-full rounded-xl mb-2" variant={fieldErrors.parentPhoneNumber2 ? "error" : "default"} style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }} value={formData.parentPhoneNumber2 || ""} onChange={handleChange} error={fieldErrors.parentPhoneNumber2} />
                   <DSSelect name="parentPhoneRelation2" className="w-full rounded-xl" style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }} value={formData.parentPhoneRelation2 || ""} onChange={handleChange}>
                     <option value="">{t("placeholders.selectParentRelation") || "Select relation"}</option>
                     {PARENT_RELATIONS.map((relation) => (
                       <option key={relation} value={relation}>{t(`parentRelations.${relation}`)}</option>
                     ))}
                   </DSSelect>
+                  {fieldErrors.parentPhoneRelation2 && (
+                    <p className="mt-1 text-sm text-red-600">{fieldErrors.parentPhoneRelation2}</p>
+                  )}
                 </div>
               )}
 
