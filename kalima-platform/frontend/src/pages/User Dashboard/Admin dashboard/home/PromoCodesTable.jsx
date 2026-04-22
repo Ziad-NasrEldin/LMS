@@ -24,12 +24,12 @@ const PromoCodesTable = () => {
     background: "linear-gradient(180deg, rgba(248,243,233,0.96) 0%, rgba(241,243,246,0.98) 100%)",
     boxShadow: SHADOWS.level1,
     borderRadius: RADIUS.section,
-    border: "1px solid rgba(17,24,39,0.06)",
+    border: "1px solid transparent",
   }
 
   const insetCardStyle = {
     background: "rgba(255,255,255,0.72)",
-    border: "1px solid rgba(17,24,39,0.06)",
+    border: "1px solid transparent",
     borderRadius: RADIUS.card,
   }
   const [filters, setFilters] = useState({
@@ -226,7 +226,7 @@ const PromoCodesTable = () => {
         ...cardStyle,
       }}
     >
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 border-b pb-4" style={{ borderColor: "rgba(17,24,39,0.1)" }}>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 border-b pb-4" style={{ borderColor: "rgba(0,0,0,0.06)" }}>
         <div>
           <h2 className="text-2xl font-extrabold" style={{ color: TOKENS.deepTeal }}>{t("promoCodes.title")}</h2>
           <p className="mt-1 text-sm" style={{ color: TOKENS.slateText }}>
@@ -300,7 +300,7 @@ const PromoCodesTable = () => {
                </Button>
             </div>
 
-            <div className="overflow-x-auto rounded-[1.4rem] border" style={{ borderColor: "rgba(17,24,39,0.08)", background: "rgba(255,255,255,0.8)" }}>
+            <div className="overflow-x-auto rounded-[1.4rem]" style={{ background: "rgba(255,255,255,0.8)" }}>
               <table className="table w-full">
                 <thead style={{ background: "rgba(77,179,194,0.06)" }}>
                   <tr>

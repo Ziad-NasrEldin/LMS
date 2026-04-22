@@ -99,6 +99,8 @@
     "twitter": "Twitter",
     "instagram": "Instagram",
     "phoneNumber2": "Phone Number (Optional)",
+    "selectTeachingType": "Select Type",
+    "selectLevels": "Select Level to Add",
     "noFileSelected": "No file selected",
     "enterLevel": "Enter level",
     "enterCenterName": "Enter center name",
@@ -114,6 +116,11 @@
     "parent": "Parent",
     "lecturer": "Lecturer",
     "teacher": "Teacher"
+  },
+  "options": {
+    "center": "Center",
+    "school": "School",
+    "both": "Both"
   },
   "gender": {
     "male": "Male",

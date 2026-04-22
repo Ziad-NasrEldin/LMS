@@ -24,7 +24,7 @@ const PromoCodesManagementPage = () => {
       />
 
       <div className="mx-auto w-full max-w-7xl space-y-6 md:space-y-8">
-        <div className={`rounded-3xl border bg-white/80 p-4 md:p-6 ${isRTL ? "text-right" : "text-left"}`}>
+        <div className={`rounded-3xl bg-white/80 p-4 md:p-6 ${isRTL ? "text-right" : "text-left"}`}>
           <h1 className="text-2xl font-bold md:text-3xl" style={{ color: TOKENS.deepTeal }}>
             {t("promoCodesManagement", { defaultValue: isRTL ? "إدارة أكواد الشحن" : "Promo Codes Management" })}
           </h1>
@@ -35,11 +35,11 @@ const PromoCodesManagementPage = () => {
           </p>
         </div>
 
-        <section className="rounded-3xl border bg-white/80 p-3 md:p-5">
+        <section className="rounded-3xl bg-white/80 p-3 md:p-5">
           <PromoCodeGenerator />
         </section>
 
-        <section className="rounded-3xl border bg-white/80 p-3 md:p-5">
+        <section className="rounded-3xl bg-white/80 p-3 md:p-5">
           <PromoCodesTable />
         </section>
       </div>
