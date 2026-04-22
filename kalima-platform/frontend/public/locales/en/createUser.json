@@ -60,7 +60,11 @@
     "assistantInfo": "Assistant Information",
     "enterLevel": "Enter level",
     "selectLecturer": "Select Lecturer",
-    "teachingLocationType": "Teaching Location Type"
+    "teachingLocationType": "Teaching Location Type",
+    "children": "Children",
+    "child": "Child",
+    "stages": "Stages",
+    "studentId": "Student ID (optional)"
   },
   "placeholders": {
     "selectAccountType": "Select Account Type",
@@ -97,7 +101,10 @@
     "phoneNumber2": "Phone Number (Optional)",
     "noFileSelected": "No file selected",
     "enterLevel": "Enter level",
-    "enterCenterName": "Enter center name"
+    "enterCenterName": "Enter center name",
+    "selectStages": "Select stage to add",
+    "noChildrenAdded": "No children added yet. Click \"Add Child\" to add a student.",
+    "studentId": "Enter student ID"
   },
   "roles": {
     "subadmin": "Sub Admin",
@@ -133,6 +140,8 @@
     "close": "Close",
     "addAnotherParentPhone": "Add another parent phone",
     "removeParentPhone": "Remove",
+    "addChild": "Add Child",
+    "remove": "Remove",
     "chooseFile": "Choose File",
     "downloadTemplate": "Download CSV Template"
   },
@@ -178,7 +187,9 @@
     "match": "Fields do not match",
     "number": "Must be a number",
     "positive": "Must be a positive number",
-    "integer": "Must be an integer"
+    "integer": "Must be an integer",
+    "childStageRequired": "Each child must have a stage selected",
+    "childLevelRequired": "Each child must have a grade level selected"
   },
   "errors": {
     "failedToLoadDropdowns": "Failed to load dropdown data",

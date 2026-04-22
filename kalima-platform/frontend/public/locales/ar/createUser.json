@@ -60,7 +60,11 @@
     "assistantInfo": "معلومات المساعد",
     "enterLevel": "أدخل المرحلة",
     "selectLecturer": "اختر المحاضر",
-    "teachingLocationType": "نوع مكان التدريس"
+    "teachingLocationType": "نوع مكان التدريس",
+    "children": "الأبناء",
+    "child": "طفل",
+    "stages": "المراحل",
+    "studentId": "الرقم التسلسلي للطالب (اختياري)"
   },
   "placeholders": {
     "selectAccountType": "اختر نوع الحساب",
@@ -96,7 +100,10 @@
     "instagram": "انستغرام",
     "noFileSelected": "لم يتم اختيار ملف",
     "enterLevel": "أدخل المرحلة",
-    "enterCenterName": "أدخل اسم المركز"
+    "enterCenterName": "أدخل اسم المركز",
+    "selectStages": "اختر مرحلة لإضافتها",
+    "noChildrenAdded": "لم يتم إضافة أبناء بعد. اضغط \"إضافة ابن\" لإضافة طالب.",
+    "studentId": "أدخل الرقم التسلسلي للطالب"
   },
   "roles": {
     "subadmin": "مدير فرعي",
@@ -130,6 +137,8 @@
     "add": "إضافة",
     "addAnotherParentPhone": "إضافة هاتف ولي أمر آخر",
     "removeParentPhone": "إزالة",
+    "addChild": "إضافة ابن",
+    "remove": "إزالة",
     "chooseFile": "اختر ملف",
     "createUsers": "إنشاء مستخدمين",
     "uploading": "جاري التحميل...",
@@ -177,7 +186,9 @@
     "match": "الحقول غير متطابقة",
     "number": "يجب أن يكون رقم",
     "positive": "يجب أن يكون رقم موجب",
-    "integer": "يجب أن يكون عدد صحيح"
+    "integer": "يجب أن يكون عدد صحيح",
+    "childStageRequired": "يجب اختيار المرحلة لكل ابن",
+    "childLevelRequired": "يجب اختيار الصف الدراسي لكل ابن"
   },
   "errors": {
     "failedToLoadDropdowns": "فشل في تحميل بيانات القوائم المنسدلة",
