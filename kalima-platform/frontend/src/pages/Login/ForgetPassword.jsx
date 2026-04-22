@@ -62,7 +62,7 @@ const ForgotPassword = () => {
         <div
           className="w-full max-w-md overflow-hidden rounded-[1.5rem] border bg-white"
           style={{
-            borderColor: 'rgba(17,24,39,0.08)',
+            borderColor: 'transparent',
             boxShadow: SHADOWS.level2,
           }}
         >

@@ -461,7 +461,7 @@ const TeacherLogin = () => {
 
         style={{
 
-          borderColor: "rgba(17,24,39,0.08)",
+          borderColor: "transparent",
 
           boxShadow: SHADOWS.level2,
 

@@ -206,7 +206,7 @@ export default function LecturerReviewsManagementPage() {
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full pl-10 pr-4 py-2.5 rounded-xl border text-sm"
-                  style={{ borderColor: "rgba(17,24,39,0.15)" }}
+                  style={{ borderColor: "transparent" }}
                 />
               </div>
 
@@ -217,7 +217,7 @@ export default function LecturerReviewsManagementPage() {
                   value={filter}
                   onChange={(e) => setFilter(e.target.value)}
                   className="px-4 py-2.5 rounded-xl border text-sm"
-                  style={{ borderColor: "rgba(17,24,39,0.15)" }}
+                  style={{ borderColor: "transparent" }}
                 >
                   <option value="all">{t("allReviews", "All Reviews")}</option>
                   <option value="pending">{t("pendingReviews", "Pending")}</option>
@@ -405,7 +405,7 @@ export default function LecturerReviewsManagementPage() {
                   onChange={(e) => setResponseText(e.target.value)}
                   placeholder={t("responsePlaceholder", "Write your response...")}
                   className="w-full p-4 rounded-xl border text-sm resize-none mb-4"
-                  style={{ borderColor: "rgba(17,24,39,0.15)", minHeight: "120px" }}
+                  style={{ borderColor: "transparent", minHeight: "120px" }}
                 />
                 <div className="flex gap-3">
                   <button

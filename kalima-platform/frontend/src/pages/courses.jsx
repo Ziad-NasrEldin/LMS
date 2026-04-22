@@ -400,14 +400,14 @@ export default function CoursesPage() {
 
             <button
               className="rounded-full px-5 py-2 text-sm font-semibold transition-transform duration-200 hover:-translate-y-[1px]"
-              style={{ background: "#FFFFFF", border: "1px solid rgba(17,24,39,0.1)", color: TOKENS.deepTeal }}
+              style={{ background: "#FFFFFF", border: "1px solid transparent", color: TOKENS.deepTeal }}
               onClick={resetFilters}
             >
               {t("filters.reset")}
             </button>
             <label
               className={`flex min-w-[280px] flex-1 items-center gap-2 rounded-full border bg-white px-4 py-2 text-sm shadow-sm ${isRTL ? "flex-row-reverse" : ""}`}
-              style={{ borderColor: "rgba(17,24,39,0.1)", color: TOKENS.deepTeal }}
+              style={{ borderColor: "transparent", color: TOKENS.deepTeal }}
             >
               <Search className="h-4 w-4 shrink-0" />
               <span className="sr-only">{t("search.label")}</span>
@@ -495,7 +495,7 @@ export default function CoursesPage() {
                   searchQuery) && (
                   <button
                     className="mt-4 rounded-full px-5 py-2 text-sm font-semibold"
-                    style={{ border: "1px solid rgba(17,24,39,0.15)", color: TOKENS.deepTeal }}
+                    style={{ border: "1px solid transparent", color: TOKENS.deepTeal }}
                     onClick={resetFilters}
                   >
                     {t("filters.reset")}

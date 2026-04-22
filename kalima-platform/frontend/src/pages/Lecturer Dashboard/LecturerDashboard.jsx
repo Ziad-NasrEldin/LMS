@@ -20,7 +20,7 @@ export default function LecturerDashboard() {
     >
       <div className="transition-all duration-300 ease-in-out pt-14">
         <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 md:px-8 lg:px-10 space-y-10 md:space-y-12">
-          <div className="rounded-[2rem] border px-5 py-6 md:px-8 md:py-7" style={{ background: TOKENS.neutralCloud, borderColor: "rgba(17,24,39,0.08)" }}>
+          <div className="rounded-[2rem] border px-5 py-6 md:px-8 md:py-7" style={{ background: TOKENS.neutralCloud, borderColor: "transparent" }}>
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight" style={{ color: TOKENS.deepTeal }}>
               {t("courseManagement")}
             </h1>
@@ -30,12 +30,12 @@ export default function LecturerDashboard() {
           </div>
 
           {/* Course Grid Section */}
-          <section className="rounded-[2rem] border p-5 md:p-6" style={{ background: TOKENS.neutralCloud, borderColor: "rgba(17,24,39,0.08)" }}>
+          <section className="rounded-[2rem] border p-5 md:p-6" style={{ background: TOKENS.neutralCloud, borderColor: "transparent" }}>
             <CourseGrid />
           </section>
 
           {/* Instructors List Section */}
-          <section className="rounded-[2rem] border p-5 md:p-6" style={{ background: TOKENS.neutralCloud, borderColor: "rgba(17,24,39,0.08)" }}>
+          <section className="rounded-[2rem] border p-5 md:p-6" style={{ background: TOKENS.neutralCloud, borderColor: "transparent" }}>
             <InstructorsList />
           </section>
 

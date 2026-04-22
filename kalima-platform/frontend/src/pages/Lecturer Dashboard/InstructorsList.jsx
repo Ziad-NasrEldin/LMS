@@ -265,7 +265,7 @@ export default function InstructorsList() {
         <div
           className="card border bg-white"
           style={{
-            borderColor: "rgba(17,24,39,0.08)",
+            borderColor: "transparent",
             borderRadius: RADIUS.section,
             boxShadow: SHADOWS.level1,
           }}
@@ -295,7 +295,7 @@ export default function InstructorsList() {
               key={assistant._id}
               className="card border bg-white hover:-translate-y-1 transition-all duration-300 rounded-[2rem] relative"
               style={{
-                borderColor: "rgba(17,24,39,0.08)",
+                borderColor: "transparent",
                 borderRadius: RADIUS.section,
                 boxShadow: SHADOWS.level1,
               }}

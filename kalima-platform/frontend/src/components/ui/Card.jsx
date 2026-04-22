@@ -9,7 +9,7 @@ const Card = ({
   style,
   ...props 
 }) => {
-  const defaultBorder = "1px solid rgba(17,24,39,0.08)";
+  const defaultBorder = "1px solid transparent";
   
   return (
     <div 

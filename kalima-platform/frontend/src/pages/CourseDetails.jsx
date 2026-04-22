@@ -68,7 +68,7 @@ const getPurchaseContainerId = (purchase) => normalizeId(purchase?.container) ||
 const DetailItem = ({ label, value, icon, tokens }) => (
   <div
     className="flex flex-col gap-2 border-b py-3 last:border-b-0 sm:flex-row sm:items-center sm:justify-between"
-    style={{ borderColor: "rgba(17,24,39,0.08)" }}
+    style={{ borderColor: "transparent" }}
   >
     <div className="flex items-center gap-2" style={{ color: tokens.slateText }}>
       {icon}

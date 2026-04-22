@@ -563,7 +563,7 @@ const Services = () => {
 
 
 
-            <div className="mx-auto w-fit rounded-[1.3rem] border bg-white p-3" style={{ borderColor: "rgba(17,24,39,0.08)", boxShadow: SHADOWS.level1 }}>
+            <div className="mx-auto w-fit rounded-[1.3rem] border bg-white p-3" style={{ borderColor: "transparent", boxShadow: SHADOWS.level1 }}>
 
               <img
 
