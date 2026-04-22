@@ -103,7 +103,10 @@
     "selectStageFirst": "Select a stage first",
     "selectGradeLevel": "Select Grade Level",
     "selectHobby": "Select Hobby",
-    "selectParentRelation": "Select Relation"
+    "selectParentRelation": "Select Relation",
+    "selectSubject": "Select Subject",
+    "selectLevel": "Select Level",
+    "selectTeachesAtType": "Select Teaching At"
   },
   "invites": {
       "invite": "Invite",
@@ -509,6 +512,44 @@
     "administrationZone": "Administration Zone",
     "sequenceId": "Sequence ID",
     "joinedDate": "Joined Date"
+  },
+  "parentRelations": {
+    "mother": "Mother",
+    "father": "Father",
+    "other": "Other"
+  },
+  "buttons": {
+    "addAnotherParentPhone": "Add another parent phone",
+    "removeParentPhone": "Remove"
+  },
+  "fields": {
+    "stage": "Stage",
+    "level": "Level",
+    "grade": "Grade",
+    "sequencedIdOptional": "Sequence ID (Optional)",
+    "hobby": "Hobby",
+    "faction": "Faction",
+    "school": "School",
+    "parentPhoneNumber": "Parent Phone Number",
+    "parentPhoneNumber2": "Additional Parent Phone",
+    "parentPhoneRelation": "Relation to Parent",
+    "government": "Government",
+    "administrationZone": "Administration Zone",
+    "views": "Views",
+    "subject": "Subject",
+    "teachesAtType": "Teaching At",
+    "centers": "Centers",
+    "expertise": "Expertise",
+    "bio": "Bio",
+    "assignedLecturer": "Assigned Lecturer",
+    "selectGovernment": "Select Government",
+    "selectAdministrationZone": "Select Administration Zone",
+    "loadingZones": "Loading...",
+    "selectStage": "Select Stage",
+    "selectGradeLevel": "Select Grade Level",
+    "selectHobby": "Select Hobby",
+    "phoneNumber": "Phone Number",
+    "profession": "Profession"
   }
 }
   

@@ -15,6 +15,7 @@ import { STUDENT_HOBBIES } from "../../../../constants/studentHobbies"
 import { designTokens } from "../../../../constants/designTokens"
 import DSSelect from "../../../../components/DSSelect"
 import Button from "../../../../components/ui/Button"
+import Badge from "../../../../components/ui/Badge"
 import Input from "../../../../components/ui/Input"
 
 const PARENT_RELATIONS = ["mother", "father", "other"]
@@ -71,7 +72,7 @@ const collectFieldErrors = (source, bucket, visited = new WeakSet()) => {
       getErrorMessageCandidate(source.error) ||
       getErrorMessageCandidate(source.code)
 
-    if (fieldName && fieldMessage && !bucket[fieldName]) {
+if (fieldName && fieldMessage && !bucket[fieldName]) {
       bucket[fieldName] = translateErrorMessage(fieldMessage, fieldMessage)
     }
   }
@@ -146,6 +147,10 @@ const EditUserModal = ({ isOpen, onClose, user, onUserUpdated }) => {
   const [lecturers, setLecturers] = useState([])
   const [levelHierarchy, setLevelHierarchy] = useState(null)
 
+  // Teacher-specific state
+  const [selectedLevels, setSelectedLevels] = useState([])
+  const [selectedCenters, setSelectedCenters] = useState([])
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -172,6 +177,12 @@ const EditUserModal = ({ isOpen, onClose, user, onUserUpdated }) => {
     subject: [],
     views: "",
     children: [],
+    // Parent-specific fields
+    phoneNumber: "",
+    profession: "",
+    // Teacher-specific fields
+    teachesAtType: "",
+    centers: [],
   })
 
   useEffect(() => {
@@ -189,7 +200,10 @@ const EditUserModal = ({ isOpen, onClose, user, onUserUpdated }) => {
           const hierarchy = buildLevelHierarchy(levelsRes.data)
           setLevelHierarchy(hierarchy)
         }
-        if (subjectsRes?.success && subjectsRes?.data) setSubjects(subjectsRes.data)
+        if (subjectsRes?.success && subjectsRes?.data) {
+          console.log("Subjects loaded, count:", subjectsRes.data.length, "first subject:", subjectsRes.data[0])
+          setSubjects(subjectsRes.data)
+        }
         if (governmentsRes?.success && Array.isArray(governmentsRes?.data)) setGovernments(governmentsRes.data)
         if (lecturersRes?.success && lecturersRes?.data) setLecturers(lecturersRes.data)
       } catch (err) {
@@ -203,6 +217,29 @@ const EditUserModal = ({ isOpen, onClose, user, onUserUpdated }) => {
     if (user) {
       const userRole = user.role || ""
       
+      // Extract stage - handle both string and object formats
+      const stageValue = user.stage?._id || user.stage || ""
+      
+      // Extract level - handle both string and object formats
+      const levelValue = user.level?._id || user.level || ""
+      
+      // For teachers, level can be an array
+      const teacherLevelValue = Array.isArray(user.level) 
+        ? user.level.map(l => l?._id || l)
+        : (user.level?._id || user.level || "")
+
+      // Extract subject - handle both string, object, and array formats
+      const extractSubjectArray = (subject) => {
+        console.log("extractSubjectArray input:", subject, "type:", typeof subject)
+        if (!subject) return []
+        if (Array.isArray(subject)) return subject
+        if (typeof subject === "string") return subject ? [subject] : []
+        if (subject._id) return [subject._id]
+        return []
+      }
+      const subjectArray = extractSubjectArray(user.subject)
+      console.log("Teacher user.subject:", user.subject, "extracted subjectArray:", subjectArray)
+      
       setFormData({
         name: user.name || "",
         email: user.email || "",
@@ -210,8 +247,8 @@ const EditUserModal = ({ isOpen, onClose, user, onUserUpdated }) => {
         password: "",
         gender: user.gender || "male",
         role: userRole,
-        stage: user.stage || "",
-        level: user.level?._id || user.level || "",
+        stage: stageValue,
+        level: userRole === "teacher" ? teacherLevelValue : levelValue,
         parentPhoneNumber: user.parentPhoneNumber || "",
         parentPhoneRelation: user.parentPhoneRelation || "",
         parentPhoneNumber2: user.parentPhoneNumber2 || "",
@@ -226,13 +263,28 @@ const EditUserModal = ({ isOpen, onClose, user, onUserUpdated }) => {
         bio: user.bio || "",
         expertise: user.expertise || "",
         assignedLecturer: user.assignedLecturer?._id || user.assignedLecturer || "",
-        subject: user.subject || [],
+        subject: subjectArray,
         views: user.views || "",
         children: user.children || [],
+        // Parent-specific fields
+        phoneNumber: user.phoneNumber || "",
+        profession: user.profession || "",
+        // Teacher-specific fields
+        teachesAtType: user.teachesAtType || "",
+        centers: user.centers || [],
       })
 
       if (user.government) {
         fetchZones(user.government)
+      }
+
+      // Sync teacher-specific state
+      if (userRole === "teacher") {
+        const levelsArray = Array.isArray(user.level) 
+          ? user.level.map(l => l?._id || l)
+          : user.level ? [user.level?._id || user.level] : []
+        setSelectedLevels(levelsArray.filter(Boolean))
+        setSelectedCenters(Array.isArray(user.centers) ? user.centers : [])
       }
     }
   }, [user])
@@ -309,6 +361,66 @@ const EditUserModal = ({ isOpen, onClose, user, onUserUpdated }) => {
     }))
   }
 
+  // Teacher-specific handlers
+  const flattenLevels = (hierarchy) => {
+    if (!hierarchy || !Array.isArray(hierarchy.grades)) return []
+    return hierarchy.grades.map((grade) => ({
+      value: grade._id || grade.value || grade.name,
+      label: grade.displayName || (isRTL ? grade.nameAr || grade.name : grade.name),
+      stageKey: grade.parentLevelId,
+      raw: grade,
+    }))
+  }
+
+  const addLevel = (levelValue) => {
+    if (levelValue && !selectedLevels.includes(levelValue)) {
+      const newLevels = [...selectedLevels, levelValue]
+      setSelectedLevels(newLevels)
+      setFormData(prev => ({ ...prev, level: newLevels }))
+    }
+  }
+
+  const removeLevel = (levelValue) => {
+    const newLevels = selectedLevels.filter((level) => level !== levelValue)
+    setSelectedLevels(newLevels)
+    setFormData(prev => ({ ...prev, level: newLevels }))
+  }
+
+  const addCenter = () => {
+    const centerInput = document.getElementById("centerInput")
+    const centerName = centerInput?.value?.trim()
+    if (centerName && !selectedCenters.includes(centerName)) {
+      const newCenters = [...selectedCenters, centerName]
+      setSelectedCenters(newCenters)
+      setFormData(prev => ({ ...prev, centers: newCenters }))
+      if (centerInput) {
+        centerInput.value = ""
+      }
+    }
+  }
+
+  const removeCenter = (center) => {
+    const newCenters = selectedCenters.filter((c) => c !== center)
+    setSelectedCenters(newCenters)
+    setFormData(prev => ({ ...prev, centers: newCenters }))
+  }
+
+  const getSubjectNameById = (subjectId) => {
+    const subject = subjects.find((s) => s._id === subjectId)
+    return subject ? (isRTL ? subject.nameAr || subject.name : subject.name) : subjectId
+  }
+
+  const getLevelNameById = (levelId) => {
+    const allLevels = flattenLevels(levelHierarchy)
+    const level = allLevels.find(l => l.value === levelId)
+    return level ? level.label : levelId
+  }
+
+  const shouldShowCenters = formData.teachesAtType === "Both" || formData.teachesAtType === "Center"
+  const shouldShowSchool = formData.teachesAtType === "Both" || formData.teachesAtType === "School"
+
+  const levelOptions = flattenLevels(levelHierarchy)
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setLoading(true)
@@ -347,15 +459,42 @@ const EditUserModal = ({ isOpen, onClose, user, onUserUpdated }) => {
       updateData.administrationZone = formData.administrationZone
       updateData.sequencedId = formData.sequencedId
       updateData.faction = formData.faction
-      updateData.school = formData.school
+      // Only include school if it has a value
+      if (formData.school) {
+        updateData.school = formData.school
+      }
     } else if (role === "parent") {
-      updateData.children = formData.children
-      updateData.views = formData.views
-    } else if (role === "teacher") {
-      updateData.subject = formData.subject
-      updateData.level = formData.level
+      updateData.phoneNumber = formData.phoneNumber
+      updateData.profession = formData.profession
       updateData.government = formData.government
       updateData.administrationZone = formData.administrationZone
+      // Only include level if it has a value
+      if (formData.level) {
+        updateData.level = formData.level
+      }
+    } else if (role === "teacher") {
+      // Subject should be a single string for teacher
+      console.log("formData.subject before processing:", formData.subject, "type:", typeof formData.subject, "isArray:", Array.isArray(formData.subject))
+      const subjectValue = Array.isArray(formData.subject) ? formData.subject[0] || "" : formData.subject || ""
+      // Level should be an array of strings for teacher
+      const levelValue = Array.isArray(formData.level) ? formData.level.filter(Boolean) : formData.level ? [formData.level] : []
+      
+      console.log("Teacher update - subject:", subjectValue, "level:", levelValue)
+      
+      updateData.subject = subjectValue
+      updateData.level = levelValue
+      updateData.government = formData.government
+      updateData.administrationZone = formData.administrationZone
+      updateData.teachesAtType = formData.teachesAtType
+      updateData.centers = formData.centers
+      // Only include faction if it has a value
+      if (formData.faction) {
+        updateData.faction = formData.faction
+      }
+      // Only include school if it has a value
+      if (formData.school) {
+        updateData.school = formData.school
+      }
     } else if (role === "lecturer") {
       updateData.bio = formData.bio
       updateData.expertise = formData.expertise
@@ -692,28 +831,42 @@ const EditUserModal = ({ isOpen, onClose, user, onUserUpdated }) => {
               <h4 className="font-bold text-md mb-3 text-green-600">{isRTL ? "معلومات ولي الأمر" : "Parent Information"}</h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="form-control">
-                  <label className="label py-0"><span className="label-text font-bold" style={{ color: "#1F2937" }}>{t("fields.views")}</span></label>
-                  <Input type="number" name="views" className="w-full rounded-xl" style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }} value={formData.views || ""} onChange={handleChange} />
+                  <label className="label py-0"><span className="label-text font-bold" style={{ color: "#1F2937" }}>{t("fields.phoneNumber")}</span></label>
+                  <Input 
+                    type="text" 
+                    inputMode="numeric"
+                    name="phoneNumber" 
+                    className="w-full rounded-xl" 
+                    style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }} 
+                    value={formData.phoneNumber || ""} 
+                    onChange={handleChange} 
+                  />
                 </div>
-              </div>
-            </div>
-          )}
-
-          {role === "teacher" && (
-            <div className="border-t pt-4 mb-4">
-              <h4 className="font-bold text-md mb-3 text-purple-600">{isRTL ? "معلومات المعلم" : "Teacher Information"}</h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="form-control">
-                  <label className="label py-0"><span className="label-text font-bold" style={{ color: "#1F2937" }}>{t("fields.subject")}</span></label>
-                  <DSSelect multiple name="subject" className="w-full rounded-xl" style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }} value={formData.subject || []} onChange={(e) => setFormData(prev => ({ ...prev, subject: Array.from(e.target.selectedOptions, option => option.value) }))}>
-                    {Array.isArray(subjects) && subjects.map((subject) => (
-                      <option key={subject._id} value={subject._id}>{subject.name}</option>
-                    ))}
-                  </DSSelect>
+                  <label className="label py-0"><span className="label-text font-bold" style={{ color: "#1F2937" }}>{t("fields.profession")}</span></label>
+                  <Input 
+                    type="text" 
+                    name="profession" 
+                    className="w-full rounded-xl" 
+                    style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }} 
+                    value={formData.profession || ""} 
+                    onChange={handleChange} 
+                  />
                 </div>
                 <div className="form-control">
                   <label className="label py-0"><span className="label-text font-bold" style={{ color: "#1F2937" }}>{t("fields.level")}</span></label>
-                  <Input type="text" name="level" className="w-full rounded-xl" style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }} value={formData.level || ""} onChange={handleChange} />
+                  <DSSelect 
+                    name="level" 
+                    className="w-full rounded-xl" 
+                    style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }} 
+                    value={formData.level || ""} 
+                    onChange={handleChange}
+                  >
+                    <option value="">{t("placeholders.selectLevel") || "Select Level"}</option>
+                    {(levelOptions || []).map((level) => (
+                      <option key={level.value} value={level.value}>{level.label}</option>
+                    ))}
+                  </DSSelect>
                 </div>
                 <div className="form-control">
                   <label className="label py-0"><span className="label-text font-bold" style={{ color: "#1F2937" }}>{t("fields.government")}</span></label>
@@ -733,6 +886,173 @@ const EditUserModal = ({ isOpen, onClose, user, onUserUpdated }) => {
                     ))}
                   </DSSelect>
                 </div>
+                <div className="form-control md:col-span-2">
+                  <label className="label py-0"><span className="label-text font-bold" style={{ color: "#1F2937" }}>{isRTL ? "الأبناء المرتبطون" : "Linked Children"}</span></label>
+                  <div className="text-sm text-slate-600">
+                    {formData.children?.length > 0 ? (
+                      <div className="flex flex-wrap gap-2">
+                        {formData.children.map((child, index) => (
+                          <span key={index} className="badge badge-primary">{child?.name || child}</span>
+                        ))}
+                      </div>
+                    ) : (
+                      <span className="italic">{isRTL ? "لا يوجد أطفال مرتبطون" : "No linked children"}</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {role === "teacher" && (
+<div className="border-t pt-4 mb-4">
+              <h4 className="font-bold text-md mb-3 text-purple-600">{isRTL ? "معلومات المعلم" : "Teacher Information"}</h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="form-control">
+                  <label className="label py-0"><span className="label-text font-bold" style={{ color: "#1F2937" }}>{t("fields.subject")}</span></label>
+                  <DSSelect 
+                    name="subject" 
+                    className="w-full rounded-xl" 
+                    style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }} 
+                    value={formData.subject?.[0] || ""} 
+                    onChange={(e) => {
+                      const value = e.target?.value || e
+                      console.log("Teacher onChange - raw value:", value, "full event:", e)
+                      if (value) {
+                        setFormData(prev => ({ ...prev, subject: [value] }))
+                      }
+                    }}
+                  >
+                    <option value="">{t("placeholders.selectSubject")}</option>
+                    {Array.isArray(subjects) && subjects.map((subject) => (
+                      <option key={subject._id} value={subject._id}>{isRTL ? subject.nameAr || subject.name : subject.name}</option>
+                    ))}
+                  </DSSelect>
+                  {Array.isArray(formData.subject) && formData.subject.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mt-2">
+                      {formData.subject.map((subjectId) => (
+                        <Badge key={subjectId} variant="secondary" className="gap-1">
+                          {getSubjectNameById(subjectId)}
+                          <button
+                            type="button"
+                            className="ml-1 hover:text-red-500"
+                            onClick={() => {
+                              setFormData(prev => ({
+                                ...prev,
+                                subject: Array.isArray(prev.subject) ? prev.subject.filter(id => id !== subjectId) : []
+                              }))
+                            }}
+                          >
+                            ×
+                          </button>
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <div className="form-control">
+                  <label className="label py-0"><span className="label-text font-bold" style={{ color: "#1F2937" }}>{t("fields.level")}</span></label>
+                  <DSSelect 
+                    className="w-full rounded-xl" 
+                    style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
+                    onChange={(e) => {
+                      const value = e.target.value
+                      if (value) addLevel(value)
+                    }}
+                    value=""
+                  >
+                    <option value="">{t("placeholders.selectLevel")}</option>
+                    {(levelOptions || []).filter(level => !(selectedLevels || []).includes(level.value)).map((level) => (
+                      <option key={level.value} value={level.value}>{level.label}</option>
+                    ))}
+                  </DSSelect>
+                  {(selectedLevels || []).length > 0 && (
+                    <div className="flex flex-wrap gap-1 mt-2">
+                      {selectedLevels.map((levelId) => (
+                        <Badge key={levelId} variant="primary" className="gap-1">
+                          {getLevelNameById(levelId)}
+                          <button
+                            type="button"
+                            className="ml-1 hover:text-red-500"
+                            onClick={() => removeLevel(levelId)}
+                          >
+                            ×
+                          </button>
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <div className="form-control">
+                  <label className="label py-0"><span className="label-text font-bold" style={{ color: "#1F2937" }}>{t("fields.government")}</span></label>
+                  <DSSelect name="government" className="w-full rounded-xl" style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }} value={formData.government || ""} onChange={(e) => handleGovernmentChange(e.target.value)}>
+                    <option value="">{t("fields.selectGovernment")}</option>
+                    {governments.map((government) => (
+                      <option key={government._id} value={government.name}>{government.name}</option>
+                    ))}
+                  </DSSelect>
+                </div>
+                <div className="form-control">
+                  <label className="label py-0"><span className="label-text font-bold" style={{ color: "#1F2937" }}>{t("fields.administrationZone")}</span></label>
+                  <DSSelect disabled={!formData.government || loadingZones} name="administrationZone" className="w-full rounded-xl" style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }} value={formData.administrationZone || ""} onChange={handleChange}>
+                    <option value="">{loadingZones ? t("fields.loadingZones") : t("fields.selectAdministrationZone")}</option>
+                    {Array.isArray(administrationZones) && administrationZones.map((zone, index) => (
+                      <option key={index} value={zone}>{zone}</option>
+                    ))}
+                  </DSSelect>
+                </div>
+                <div className="form-control">
+                  <label className="label py-0"><span className="label-text font-bold" style={{ color: "#1F2937" }}>{t("fields.teachesAtType") || "Teaching At"}</span></label>
+                  <DSSelect name="teachesAtType" className="w-full rounded-xl" style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }} value={formData.teachesAtType || ""} onChange={handleChange}>
+                    <option value="">{t("placeholders.selectTeachesAtType")}</option>
+                    <option value="Center">{isRTL ? "مركز" : "Center"}</option>
+                    <option value="School">{isRTL ? "مدرسة" : "School"}</option>
+                    <option value="Both">{isRTL ? "كلاهما" : "Both"}</option>
+                  </DSSelect>
+                </div>
+                {shouldShowSchool && (
+                  <div className="form-control">
+                    <label className="label py-0"><span className="label-text font-bold" style={{ color: "#1F2937" }}>{t("fields.school")}</span></label>
+                    <Input type="text" name="school" className="w-full rounded-xl" style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }} value={formData.school || ""} onChange={handleChange} />
+                  </div>
+                )}
+                {shouldShowCenters && (
+                  <div className="form-control md:col-span-2">
+                    <label className="label py-0"><span className="label-text font-bold" style={{ color: "#1F2937" }}>{t("fields.centers")}</span></label>
+                    <div className="flex gap-2">
+                      <Input 
+                        id="centerInput" 
+                        type="text" 
+                        className="w-full rounded-xl" 
+                        style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }} 
+                        placeholder={isRTL ? "أضف مركزًا" : "Add a center"} 
+                      />
+                      <Button type="button" variant="outline" size="sm" onClick={addCenter}>
+                        {isRTL ? "إضافة" : "Add"}
+                      </Button>
+                    </div>
+                    {(selectedCenters || []).length > 0 && (
+                      <div className="flex flex-wrap gap-1 mt-2">
+                        {selectedCenters.map((center, index) => (
+                          <Badge key={index} variant="info" className="gap-1">
+                            {center}
+                            <button
+                              type="button"
+                              className="ml-1 hover:text-red-500"
+                              onClick={() => removeCenter(center)}
+                            >
+                              ×
+                            </button>
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+                <div className="form-control">
+                  <label className="label py-0"><span className="label-text font-bold" style={{ color: "#1F2937" }}>{t("fields.faction")}</span></label>
+                  <Input type="text" name="faction" className="w-full rounded-xl" style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }} value={formData.faction || ""} onChange={handleChange} />
+                </div>
               </div>
             </div>
           )}
@@ -747,11 +1067,44 @@ const EditUserModal = ({ isOpen, onClose, user, onUserUpdated }) => {
                 </div>
                 <div className="form-control">
                   <label className="label py-0"><span className="label-text font-bold" style={{ color: "#1F2937" }}>{t("fields.subject")}</span></label>
-                  <DSSelect multiple name="subject" className="w-full rounded-xl" style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }} value={formData.subject || []} onChange={(e) => setFormData(prev => ({ ...prev, subject: Array.from(e.target.selectedOptions, option => option.value) }))}>
+                  <DSSelect 
+                    name="subject" 
+                    className="w-full rounded-xl" 
+                    style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }} 
+                    value={formData.subject?.[0] || ""} 
+                    onChange={(e) => {
+                      const value = e.target.value
+                      if (value) {
+                        setFormData(prev => ({ ...prev, subject: [value] }))
+                      }
+                    }}
+                  >
+                    <option value="">{t("placeholders.selectSubject")}</option>
                     {Array.isArray(subjects) && subjects.map((subject) => (
-                      <option key={subject._id} value={subject._id}>{subject.name}</option>
+                      <option key={subject._id} value={subject._id}>{isRTL ? subject.nameAr || subject.name : subject.name}</option>
                     ))}
                   </DSSelect>
+                  {Array.isArray(formData.subject) && formData.subject.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mt-2">
+                      {formData.subject.map((subjectId) => (
+                        <Badge key={subjectId} variant="secondary" className="gap-1">
+                          {getSubjectNameById(subjectId)}
+                          <button
+                            type="button"
+                            className="ml-1 hover:text-red-500"
+                            onClick={() => {
+                              setFormData(prev => ({
+                                ...prev,
+                                subject: Array.isArray(prev.subject) ? prev.subject.filter(id => id !== subjectId) : []
+                              }))
+                            }}
+                          >
+                            ×
+                          </button>
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
                 </div>
                 <div className="form-control md:col-span-2">
                   <label className="label py-0"><span className="label-text font-bold" style={{ color: "#1F2937" }}>{t("fields.bio")}</span></label>

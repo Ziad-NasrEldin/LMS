@@ -65,7 +65,7 @@ const ReferralSection = ({ userInfo, onUserUpdate }) => {
 
   if (hasUsedReferral) {
     return (
-      <section className="mb-8 rounded-[2rem] border bg-white p-6" style={{ borderColor: TOKENS.borderSubtle, boxShadow: SHADOWS.level1, borderRadius: RADIUS.section }}>
+      <section className="mb-8 rounded-[2rem] bg-white p-6" style={{ borderColor: TOKENS.borderSubtle, boxShadow: SHADOWS.level1, borderRadius: RADIUS.section }}>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-black flex items-center gap-2" style={{ color: TOKENS.success }}>
             <Gift className="w-5 h-5" />
@@ -92,20 +92,20 @@ const ReferralSection = ({ userInfo, onUserUpdate }) => {
   }
 
     return (
-      <section className="mb-8 rounded-[2rem] border p-6" style={{ background: TOKENS.neutralCloud, borderColor: TOKENS.borderSubtle, boxShadow: SHADOWS.level1, borderRadius: RADIUS.section }}>
+      <section className="mb-8 rounded-[2rem] p-6" style={{ background: TOKENS.neutralCloud, borderColor: TOKENS.borderSubtle, boxShadow: SHADOWS.level1, borderRadius: RADIUS.section }}>
 
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-black flex items-center gap-2" style={{ color: TOKENS.deepTeal }}>
           <UserPlus className="w-5 h-5" />
           {t("referral.title")}
         </h2>
-        <div className="rounded-full border px-3 py-1 text-xs font-medium" style={{ borderColor: "rgba(17,24,39,0.1)", color: TOKENS.slateText }}>
+        <div className="rounded-full px-3 py-1 text-xs font-medium" style={{ borderColor: "transparent", color: TOKENS.slateText }}>
           {t("referral.oneTime")}
         </div>
       </div>
 
       <div className="space-y-6">
-        <div className="rounded-xl p-4 border" style={{ background: "rgba(14,85,99,0.05)", borderColor: "rgba(14,85,99,0.1)" }}>
+        <div className="rounded-xl p-4" style={{ background: "rgba(14,85,99,0.05)", borderColor: "rgba(14,85,99,0.1)" }}>
           <div className="flex items-start gap-3">
             <Info className="w-5 h-5 mt-0.5 flex-shrink-0" style={{ color: TOKENS.deepTeal }} />
             <div>
@@ -161,7 +161,7 @@ const ReferralSection = ({ userInfo, onUserUpdate }) => {
           </div>
         )}
 
-        <div className="rounded-xl p-4 border" style={{ background: "rgba(241,243,246,0.5)", borderColor: "rgba(17,24,39,0.05)" }}>
+        <div className="rounded-xl p-4" style={{ background: "rgba(241,243,246,0.5)", borderColor: "transparent" }}>
           <h4 className="font-bold mb-3 flex items-center gap-2" style={{ color: TOKENS.deepTeal }}>
             <Gift className="w-4 h-4" />
             {t("referral.benefitsTitle")}

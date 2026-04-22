@@ -204,6 +204,8 @@
     "fieldRequired": "{{field}} مطلوب",
     "fieldInvalid": "{{field}} غير صالح",
     "fieldMustBeDifferent": "{{field}} يجب أن يكون مختلفًا",
+    "fieldMustBeString": "{{field}} يجب أن يكون نصًا",
+    "fieldMustBeNumber": "{{field}} يجب أن يكون رقمًا",
     "fieldMustBeArray": "{{field}} يجب أن يكون مصفوفة",
     "maxLengthExceeded": "لا يمكن أن يتجاوز {{field}} عدد {{max}} حرفًا",
     "minLengthRequired": "يجب ألا يقل {{field}} عن {{min}} حرفًا",

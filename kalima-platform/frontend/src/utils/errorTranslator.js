@@ -378,6 +378,54 @@ const translatePattern = (message) => {
       run: (match) => t("errors.minLengthRequired", { field: labelForField(match[1]), min: match[2] }),
     },
     {
+      regex: /^\[([^\]]+)\](?: must be)? (.+)$/i,
+      run: (match) => {
+        const fieldName = match[1].replace(/\[\d+\]/g, "");
+        return t("errors.fieldInvalid", { field: labelForField(fieldName) });
+      },
+    },
+    {
+      regex: /^(.+?)\[(\d+)\](?: must be)? (.+)$/i,
+      run: (match) => {
+        const fieldName = match[1];
+        return t("errors.fieldInvalid", { field: labelForField(fieldName) });
+      },
+    },
+    {
+      regex: /^"([^"]+)" must be a string\.?$/i,
+      run: (match) => t("errors.fieldMustBeString", { field: labelForField(match[1]) }),
+    },
+    {
+      regex: /^"([^"]+)" must be a number\.?$/i,
+      run: (match) => t("errors.fieldMustBeNumber", { field: labelForField(match[1]) }),
+    },
+    {
+      regex: /^"([^"]+)" must be an array\.?$/i,
+      run: (match) => t("errors.fieldMustBeArray", { field: labelForField(match[1]) }),
+    },
+    {
+      regex: /^"([^"]+)\[(\d+)\]" must be a string\.?$/i,
+      run: (match) => {
+        const fieldName = match[1];
+        return t("errors.fieldMustBeString", { field: labelForField(fieldName) });
+      },
+    },
+    {
+      regex: /^"([^"]+)\[(\d+)\]" must be a number\.?$/i,
+      run: (match) => {
+        const fieldName = match[1];
+        return t("errors.fieldMustBeNumber", { field: labelForField(fieldName) });
+      },
+    },
+    {
+      regex: /^"([^"]+)\[(\d+)\]" must be of type (string|number|array|object)\.?$/i,
+      run: (match) => t("errors.fieldInvalid", { field: labelForField(match[1]) }),
+    },
+    {
+      regex: /^"([^"]+)" must be of type (string|number|array|object)\.?$/i,
+      run: (match) => t("errors.fieldInvalid", { field: labelForField(match[1]) }),
+    },
+    {
       regex: /^Path `(.+?)` \(`.+?`\) is shorter than the minimum allowed length \((\d+)\)\.?$/i,
       run: (match) => t("errors.minLengthRequired", { field: labelForField(match[1]), min: match[2] }),
     },

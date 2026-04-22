@@ -24,10 +24,10 @@ const AdminDashboard = () => {
 
       <div className="transition-all duration-300 space-y-8 relative z-10">
         <section
-          className={`rounded-3xl border p-4 sm:p-5 ${isRTL ? "text-right" : "text-left"}`}
+          className={`rounded-3xl p-4 sm:p-5 ${isRTL ? "text-right" : "text-left"}`}
           style={{
             background: "rgba(255,255,255,0.8)",
-            borderColor: "rgba(17,24,39,0.08)",
+            borderColor: "transparent",
           }}
         >
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

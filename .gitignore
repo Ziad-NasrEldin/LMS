@@ -89,3 +89,5 @@ Skills/
 # Service account credentials
 curious-ocean-390413-90076f9c2e4d.json
 
+# Added by code-review-graph
+.code-review-graph/

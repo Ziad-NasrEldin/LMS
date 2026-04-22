@@ -219,7 +219,7 @@ const AssistantPage = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
            {paginatedLectures.map((lecture) => (
-             <div key={lecture._id} className="rounded-xl bg-white shadow-sm border border-slate-200">
+             <div key={lecture._id} className="rounded-xl bg-white shadow-sm">
                <div className="p-4">
                  <div className="flex justify-between items-start">
                    <h3 className="text-base font-bold line-clamp-1">{lecture.name}</h3>
@@ -536,7 +536,7 @@ const AssistantPage = () => {
         <h2 className="text-xl font-semibold mb-4">{t("stats.title")}</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
            {stats.map((stat, index) => (
-             <div key={index} className="rounded-xl bg-white shadow-sm border border-slate-200">
+             <div key={index} className="rounded-xl bg-white shadow-sm">
                <div className="p-4">
                  <div className="flex items-center gap-3">
                    <div className={`p-3 rounded-full ${stat.color}`}>{stat.icon}</div>
@@ -588,7 +588,7 @@ const AssistantPage = () => {
   return (
     <div className="container mx-auto px-4 py-8" dir={isRTL ? "rtl" : "ltr"}>
       {/* Header with user info */}
-       <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-6">
+       <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
          <div className="flex flex-col md:flex-row md:items-center gap-4">
            <div className="flex items-center justify-center w-16 h-16 rounded-full bg-primary text-white text-xl font-bold">
              {dashboardData.userInfo.name.charAt(0)}
@@ -677,7 +677,7 @@ const AssistantPage = () => {
        </div>
 
       {/* Tab Content */}
-       <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+       <div className="bg-white rounded-xl shadow-sm p-6">
         {activeTab === "containers" && renderContainers()}
         {activeTab === "lectures" && renderLectures()}
         {activeTab === "attachments" && renderAttachments()}

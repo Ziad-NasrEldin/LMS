@@ -332,7 +332,7 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
   const availableParents = getAvailableParentsForType(courseStructure, containerType)
 
   return (
-    <div className="rounded-[1.4rem] border bg-white/90 p-4 shadow-md sm:p-5" style={{ borderColor: "rgba(17,24,39,0.08)" }}>
+    <div className="rounded-[1.4rem] bg-white/90 p-4 shadow-md sm:p-5" style={{ borderColor: "transparent" }}>
       <div className="mb-4 rounded-2xl border p-4" style={{ borderColor: "rgba(14,85,99,0.16)", background: "linear-gradient(135deg, rgba(188,231,236,0.42), rgba(248,243,233,0.9))" }}>
         <h2 className={`text-base sm:text-lg font-bold text-primary ${isRTL ? "text-right" : "text-left"}`}>
           {isRTL ? "إضافة محتوى تعليمي" : "Add Educational Content"}

@@ -103,7 +103,7 @@ export default function StepParent({
         </div>
       </div>
 
-      <div className="rounded-2xl border border-slate-200 bg-white p-4">
+      <div className="rounded-2xl bg-white p-4">
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
             <p className="text-lg font-semibold">
@@ -155,7 +155,7 @@ export default function StepParent({
             return (
               <div
                 key={`child-profile-${index}`}
-                className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4"
+                className="rounded-2xl bg-slate-50/70 p-4"
               >
                 <div className="mb-3 flex items-center justify-between">
                   <h4 className="font-semibold text-slate-900">

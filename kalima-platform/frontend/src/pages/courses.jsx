@@ -341,9 +341,9 @@ export default function CoursesPage() {
 
       <div className="mx-auto max-w-[1160px] space-y-8 md:space-y-10">
         <section
-          className="relative overflow-hidden rounded-[2rem] border p-6 md:p-10"
+          className="relative overflow-hidden rounded-[2rem] p-6 md:p-10"
           style={{
-            borderColor: "rgba(255,255,255,0.2)",
+            borderColor: "transparent",
             background: GRADIENTS.hero,
             boxShadow: SHADOWS.level2,
             color: "#F8FCFF",
@@ -372,9 +372,9 @@ export default function CoursesPage() {
         </section>
 
         <section
-          className="rounded-[2rem] border p-6 md:p-8"
+          className="rounded-[2rem] p-6 md:p-8"
           style={{
-            borderColor: "rgba(17,24,39,0.08)",
+            borderColor: "transparent",
             background: TOKENS.neutralCloud,
             boxShadow: SHADOWS.level1,
           }}
@@ -384,7 +384,7 @@ export default function CoursesPage() {
               className={`inline-flex items-center gap-2 rounded-full px-5 py-2 text-sm font-bold transition-transform duration-200 hover:-translate-y-[1px] ${isRTL ? "flex-row-reverse" : ""}`}
               style={{
                 background: "#FFFFFF",
-                border: "1px solid rgba(17,24,39,0.12)",
+                border: "1px solid transparent",
                 color: TOKENS.deepTeal,
                 boxShadow: SHADOWS.level1,
               }}
@@ -483,8 +483,8 @@ export default function CoursesPage() {
             <ErrorAlert error={error} onRetry={fetchContainers} />
           ) : memoizedFilteredCourses.length === 0 ? (
             <div
-              className={`rounded-[1.4rem] border bg-white py-12 ${isRTL ? "text-right" : "text-left"}`}
-              style={{ borderColor: "rgba(17,24,39,0.08)", boxShadow: SHADOWS.level1 }}
+              className={`rounded-[1.4rem] bg-white py-12 ${isRTL ? "text-right" : "text-left"}`}
+              style={{ borderColor: "transparent", boxShadow: SHADOWS.level1 }}
             >
               <div className="px-6">
                 <p className="text-lg">{t("noCourses")}</p>

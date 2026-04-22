@@ -585,7 +585,7 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
 
       <div
         id="user-sidebar"
-        className={`fixed z-40 flex w-[17.5rem] flex-col overflow-hidden rounded-[1.75rem] border border-white/50 text-slate-900 shadow-[0_24px_55px_rgba(14,33,38,0.20)] backdrop-blur-xl transition-all duration-300 ease-out ${isOpen
+        className={`fixed z-40 flex w-[17.5rem] flex-col overflow-hidden rounded-[1.75rem] border-transparent text-slate-900 shadow-[0_24px_55px_rgba(14,33,38,0.20)] backdrop-blur-xl transition-all duration-300 ease-out ${isOpen
           ? "scale-100 translate-x-0 opacity-100"
           : isRTL
             ? "translate-x-[120%] scale-[0.98] opacity-0"
@@ -617,7 +617,7 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
         </div>
 
         {userData && (
-          <div className="relative mx-3 mt-3 rounded-2xl border border-white/70 bg-white/65 px-3 py-3 shadow-sm">
+          <div className="relative mx-3 mt-3 rounded-2xl border-transparent bg-white/65 px-3 py-3 shadow-sm">
              <div className="flex items-center gap-3">
                <div className="h-11 w-11 rounded-full overflow-hidden border-2 border-white shadow-sm">
                  <img
@@ -826,7 +826,7 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
       {showImpersonationModal && (
         <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/40 p-4">
           <div
-            className={`w-full max-w-2xl rounded-2xl border border-white/70 bg-white p-4 shadow-2xl ${isRTL ? "text-right" : "text-left"
+            className={`w-full max-w-2xl rounded-2xl border-transparent bg-white p-4 shadow-2xl ${isRTL ? "text-right" : "text-left"
               }`}
             dir={isRTL ? "rtl" : "ltr"}
           >

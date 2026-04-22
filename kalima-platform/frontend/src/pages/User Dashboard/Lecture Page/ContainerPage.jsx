@@ -167,10 +167,10 @@ const ContainersPage = () => {
         style={{ background: `${GRADIENTS.pageAtmosphere}, ${TOKENS.creamSurface}` }}
       >
         <div
-          className="rounded-2xl border px-6 py-5"
-          style={{
-            background: TOKENS.neutralCloud,
-            borderColor: "rgba(17,24,39,0.08)",
+className="rounded-2xl px-6 py-5"
+           style={{
+             background: TOKENS.neutralCloud,
+             borderColor: "transparent",
             boxShadow: SHADOWS.level1,
             color: TOKENS.slateText,
           }}
@@ -225,10 +225,10 @@ const ContainersPage = () => {
     >
       <div className="mx-auto w-full max-w-7xl px-4 pb-10 pt-8 sm:px-6">
         <div
-          className="rounded-[2rem] border p-4 sm:p-6 lg:p-8"
-          style={{
-            background: TOKENS.neutralCloud,
-            borderColor: "rgba(17,24,39,0.08)",
+className="rounded-[2rem] p-4 sm:p-6 lg:p-8"
+           style={{
+             background: TOKENS.neutralCloud,
+             borderColor: "transparent",
             boxShadow: SHADOWS.level1,
           }}
         >
@@ -268,10 +268,10 @@ const ContainersPage = () => {
             {containers.map(container => (
               <div
                 key={container._id}
-                className="rounded-2xl border p-6 transition-all duration-200 hover:-translate-y-1"
+                className="rounded-2xl p-6 transition-all duration-200 hover:-translate-y-1"
                 style={{
                   background: "#FFFFFF",
-                  borderColor: "rgba(17,24,39,0.08)",
+                  borderColor: "transparent",
                   boxShadow: SHADOWS.level1,
                 }}
               >

@@ -230,10 +230,9 @@ function CourseCreationForm() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-6 relative overflow-hidden rounded-[1.75rem] border p-5 sm:p-6"
+          className="mb-6 relative overflow-hidden rounded-[1.75rem] p-5 sm:p-6"
           style={{
             background: "linear-gradient(135deg, rgba(14,85,99,0.95), rgba(20,106,120,0.92))",
-            borderColor: "rgba(255,255,255,0.18)",
             boxShadow: SHADOWS.level2,
           }}
         >
@@ -270,10 +269,10 @@ function CourseCreationForm() {
             <motion.div
               initial={{ opacity: 0, y: 18 }}
               animate={{ opacity: 1, y: 0 }}
-              className="rounded-[1.3rem] border p-4 sm:p-5 lg:sticky lg:top-24"
+              className="rounded-[1.3rem] p-4 sm:p-5 lg:sticky lg:top-24"
               style={{
                 background: "rgba(255,255,255,0.9)",
-                borderColor: "rgba(17,24,39,0.08)",
+                borderColor: "transparent",
                 boxShadow: SHADOWS.level1,
               }}
             >

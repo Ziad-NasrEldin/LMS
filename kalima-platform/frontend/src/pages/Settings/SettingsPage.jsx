@@ -38,10 +38,10 @@ function SettingsPage() {
     >
       <div className="mx-auto w-full max-w-6xl px-4 pb-10 pt-16 md:px-6 lg:px-8">
         <div
-          className={`rounded-[2rem] border p-4 md:p-6 lg:p-8 ${isRTL ? 'text-right' : 'text-left'}`}
+          className={`rounded-[2rem] p-4 md:p-6 lg:p-8 ${isRTL ? 'text-right' : 'text-left'}`}
           style={{
             background: TOKENS.neutralCloud,
-            borderColor: "rgba(17,24,39,0.08)",
+            borderColor: "transparent",
             boxShadow: SHADOWS.level1,
           }}
         >

@@ -822,7 +822,7 @@ const UserManagementTable = () => {
         background: TOKENS.neutralCloud, 
         boxShadow: SHADOWS.level1, 
         borderRadius: "2rem",
-        border: "1px solid rgba(17,24,39,0.05)"
+        border: "1px solid transparent"
       }}
     >
       {error && !showCreateModal && (
@@ -935,19 +935,19 @@ const UserManagementTable = () => {
       </div>
 
       <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-4">
-        <div className="rounded-2xl border bg-white p-3" style={{ borderColor: "rgba(17,24,39,0.08)" }}>
+        <div className="rounded-2xl bg-white p-3">
           <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: TOKENS.slateText }}>{t("admin.metrics.totalFiltered")}</p>
           <p className="mt-1 text-2xl font-extrabold" style={{ color: TOKENS.deepTeal }}>{filteredUsers.length}</p>
         </div>
-        <div className="rounded-2xl border bg-white p-3" style={{ borderColor: "rgba(17,24,39,0.08)" }}>
+        <div className="rounded-2xl bg-white p-3">
           <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: TOKENS.slateText }}>{t("admin.assignedLecturers")}</p>
           <p className="mt-1 text-2xl font-extrabold" style={{ color: TOKENS.deepTeal }}>{filteredLecturers}</p>
         </div>
-        <div className="rounded-2xl border bg-white p-3" style={{ borderColor: "rgba(17,24,39,0.08)" }}>
+        <div className="rounded-2xl bg-white p-3">
           <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: TOKENS.slateText }}>{t("admin.assistants")}</p>
           <p className="mt-1 text-2xl font-extrabold" style={{ color: TOKENS.deepTeal }}>{filteredAssistants}</p>
         </div>
-        <div className="rounded-2xl border bg-white p-3" style={{ borderColor: "rgba(17,24,39,0.08)" }}>
+        <div className="rounded-2xl bg-white p-3">
           <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: TOKENS.slateText }}>{t("admin.students")}</p>
           <p className="mt-1 text-2xl font-extrabold" style={{ color: TOKENS.deepTeal }}>{filteredStudents}</p>
         </div>
@@ -955,8 +955,8 @@ const UserManagementTable = () => {
 
       {/* Filters and Actions */}
       <div
-        className="mb-8 grid gap-4 rounded-[1.4rem] border bg-white p-4 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-end"
-        style={{ borderColor: "rgba(17,24,39,0.08)", boxShadow: SHADOWS.level1 }}
+className="mb-8 grid gap-4 rounded-[1.4rem] bg-white p-4 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-end"
+        style={{ borderColor: "transparent", boxShadow: SHADOWS.level1 }}
       >
         <div className="grid w-full gap-4 sm:grid-cols-2 2xl:grid-cols-4">
            <Input

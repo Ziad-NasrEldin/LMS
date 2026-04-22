@@ -50,7 +50,7 @@ const CommentList = ({ lectureId, userId, userRole }) => {
         <div className="flex flex-col gap-4">
             {comments.length === 0 && !loading ? (
                 <div
-                    className="border px-5 py-10 text-center"
+                    className="px-5 py-10 text-center"
                     style={{
                         background: "rgba(255,255,255,0.72)",
                         borderColor: TOKENS.borderSubtle,

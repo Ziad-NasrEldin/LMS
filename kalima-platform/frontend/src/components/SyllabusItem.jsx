@@ -87,7 +87,7 @@ const SyllabusItem = memo(function SyllabusItem({
   return (
     <div
       className="border-b last:border-b-0"
-      style={{ borderColor: "rgba(17,24,39,0.06)" }}
+      style={{ borderColor: "transparent" }}
     >
       {/* Item Header */}
       <div

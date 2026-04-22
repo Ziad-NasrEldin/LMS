@@ -19,9 +19,9 @@ const LoginPromptModal = ({ isOpen, onClose, onLogin, onRegister, isRTL }) => {
       }}
     >
       <div
-        className="relative w-full max-w-md rounded-[2rem] border bg-white p-8 shadow-2xl"
+        className="relative w-full max-w-md rounded-[2rem] bg-white p-8 shadow-2xl"
         style={{
-          borderColor: "rgba(17,24,39,0.08)",
+          borderColor: "transparent",
           boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
         }}
         dir={isRTL ? "rtl" : "ltr"}

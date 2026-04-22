@@ -20,7 +20,7 @@ const CommunityTab = ({ lectureId, userId, userRole }) => {
     return (
         <div className="mx-auto max-w-4xl px-2 py-4 sm:px-4">
             <section
-                className="mb-6 overflow-hidden border p-5 md:p-6"
+                className="mb-6 overflow-hidden p-5 md:p-6"
                 style={{
                     background: `${GRADIENTS.pageAtmosphere}, rgba(255,255,255,0.78)`,
                     borderColor: TOKENS.borderSubtle,
@@ -49,7 +49,7 @@ const CommunityTab = ({ lectureId, userId, userRole }) => {
                     </div>
                     <div className="grid grid-cols-2 gap-3 md:min-w-[260px]">
                         <div
-                            className="rounded-2xl border px-4 py-3"
+                            className="rounded-2xl px-4 py-3"
                             style={{ background: TOKENS.neutralCloud, borderColor: TOKENS.borderSubtle }}
                         >
                             <p className="text-xs font-bold uppercase tracking-[0.14em]" style={{ color: TOKENS.slateText }}>
@@ -60,7 +60,7 @@ const CommunityTab = ({ lectureId, userId, userRole }) => {
                             </p>
                         </div>
                         <div
-                            className="rounded-2xl border px-4 py-3"
+                            className="rounded-2xl px-4 py-3"
                             style={{ background: TOKENS.neutralCloud, borderColor: TOKENS.borderSubtle }}
                         >
                             <p className="text-xs font-bold uppercase tracking-[0.14em]" style={{ color: TOKENS.slateText }}>

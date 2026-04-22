@@ -264,6 +264,7 @@ const LectureDisplay = () => {
       setError(null);
 
       const result = await loadLecturePage(lectureId);
+      console.log("[DEBUG] loadLecturePage result:", result);
 
       if (result.success) {
         const pageData = normalizeLecturePageData(result, lectureId)

@@ -18,10 +18,10 @@ const DashboardStatCard = ({
 }) => {
   return (
     <div
-      className={`border p-5 sm:p-6 ${className}`}
+      className={`p-5 sm:p-6 ${className}`}
       style={{
         background: TOKENS.neutralCloud,
-        borderColor: "rgba(17,24,39,0.08)",
+        borderColor: "transparent",
         boxShadow: SHADOWS.level1,
         borderRadius: RADIUS.card,
         ...style,

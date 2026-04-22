@@ -125,7 +125,7 @@ const CommentItem = ({ comment, userRole, userId, onCommentUpdate }) => {
 
     return (
         <div
-            className="flex flex-col gap-3 border p-4 md:p-5"
+            className="flex flex-col gap-3 p-4 md:p-5"
             style={{
                 background: "rgba(255,255,255,0.88)",
                 borderColor: TOKENS.borderSubtle,

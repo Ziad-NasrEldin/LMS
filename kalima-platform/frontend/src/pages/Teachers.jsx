@@ -212,9 +212,9 @@ export default function Teachers() {
 
       <div className="mx-auto max-w-[1160px] space-y-8 md:space-y-10">
         <section
-          className="relative overflow-hidden rounded-[2rem] border p-6 md:p-10"
+          className="relative overflow-hidden rounded-[2rem] p-6 md:p-10"
           style={{
-            borderColor: 'rgba(255,255,255,0.2)',
+            borderColor: 'transparent',
             background: GRADIENTS.hero,
             boxShadow: SHADOWS.level2,
             color: '#F8FCFF',
@@ -245,9 +245,9 @@ export default function Teachers() {
         </section>
 
         <section
-          className="rounded-[2rem] border p-6 md:p-8"
+          className="rounded-[2rem] p-6 md:p-8"
           style={{
-            borderColor: 'rgba(17,24,39,0.08)',
+            borderColor: 'transparent',
             background: TOKENS.neutralCloud,
             boxShadow: SHADOWS.level1,
           }}
@@ -357,8 +357,8 @@ export default function Teachers() {
             <ErrorAlert error={error} onRetry={fetchTeachers} retryLabel={t('buttons.tryAgain')} />
           ) : filteredTeachers.length === 0 ? (
             <div
-              className={`rounded-[1.4rem] border bg-white py-12 ${isRTL ? 'text-right' : 'text-left'}`}
-              style={{ borderColor: 'rgba(17,24,39,0.08)', boxShadow: SHADOWS.level1 }}
+              className={`rounded-[1.4rem] bg-white py-12 ${isRTL ? 'text-right' : 'text-left'}`}
+              style={{ borderColor: 'transparent', boxShadow: SHADOWS.level1 }}
             >
               <div className="px-6">
                 <p className="text-lg">{t('noTeachers')}</p>

@@ -89,7 +89,7 @@ export default function LecturerPromoCodesPage() {
     >
       <div className="transition-all duration-300 ease-in-out pt-14">
         <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 md:px-8 lg:px-10 space-y-6">
-          <section className="rounded-[1.5rem] border border-slate-200 bg-white p-5 md:p-6">
+          <section className="rounded-[1.5rem] bg-white p-5 md:p-6">
             <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
               <div>
                 <h1 className="text-2xl md:text-3xl font-black text-primary">
@@ -138,7 +138,7 @@ export default function LecturerPromoCodesPage() {
            ) : null}
 
 
-           <section className="rounded-[1.5rem] border border-slate-200 bg-white overflow-hidden">
+           <section className="rounded-[1.5rem] bg-white overflow-hidden">
              {usesPlaceholder ? (
                <div className="px-4 py-2 text-xs font-semibold text-warning border-b border-slate-200 bg-white">
                  {t("sampleDataNotice", {

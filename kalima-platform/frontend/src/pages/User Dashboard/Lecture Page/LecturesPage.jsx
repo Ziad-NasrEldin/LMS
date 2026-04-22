@@ -222,17 +222,17 @@ const MyLecturesPage = () => {
     minHeight: "100vh",
   }
 
-  const panelStyle = {
+const panelStyle = {
     background: "rgba(255,255,255,0.82)",
-    border: `1px solid ${TOKENS.borderSubtle}`,
+    border: "1px solid transparent",
     borderRadius: RADIUS.section,
     boxShadow: SHADOWS.level2,
     backdropFilter: "blur(16px)",
   }
 
-  const softPanelStyle = {
+const softPanelStyle = {
     background: "rgba(255,255,255,0.88)",
-    border: `1px solid ${TOKENS.borderSubtle}`,
+    border: "1px solid transparent",
     borderRadius: RADIUS.card,
     boxShadow: SHADOWS.level1,
     backdropFilter: "blur(10px)",
@@ -1420,7 +1420,7 @@ const [currentPage, setCurrentPage] = useState(1)
 
       <div className="px-4 py-8 sm:px-6" style={shellStyle}>
         <div className="mx-auto max-w-7xl">
-          <div className="flex min-h-[60vh] items-center justify-center rounded-[2rem] border px-6 py-16" style={panelStyle}>
+          <div className="flex min-h-[60vh] items-center justify-center rounded-[2rem] px-6 py-16" style={panelStyle}>
             <div className="flex flex-col items-center gap-4 text-center">
               <div
                 className="h-14 w-14 animate-spin rounded-full border-4 border-t-transparent"
@@ -1475,7 +1475,7 @@ const [currentPage, setCurrentPage] = useState(1)
             </div>
 
 <div className="grid grid-cols-3 gap-2 sm:gap-3">
-              <div className="rounded-[1.4rem] border px-2 py-2 sm:px-4 sm:py-3" style={{ background: "rgba(255,255,255,0.12)", borderColor: "rgba(255,255,255,0.14)" }}>
+              <div className="rounded-[1.4rem] px-2 py-2 sm:px-4 sm:py-3" style={{ background: "rgba(255,255,255,0.12)", borderColor: "transparent" }}>
                 <p className="text-[0.6rem] sm:text-xs uppercase tracking-[0.2em]" style={{ color: "rgba(248,252,255,0.68)" }}>
                   {t("lecturesPage.tableHeaders.name")}
                 </p>
@@ -1483,7 +1483,7 @@ const [currentPage, setCurrentPage] = useState(1)
                   {lectures.length}
                 </p>
               </div>
-              <div className="rounded-[1.4rem] border px-2 py-2 sm:px-4 sm:py-3" style={{ background: "rgba(255,255,255,0.12)", borderColor: "rgba(255,255,255,0.14)" }}>
+              <div className="rounded-[1.4rem] px-2 py-2 sm:px-4 sm:py-3" style={{ background: "rgba(255,255,255,0.12)", borderColor: "transparent" }}>
                 <p className="text-[0.6rem] sm:text-xs uppercase tracking-[0.2em]" style={{ color: "rgba(248,252,255,0.68)" }}>
                   {t("lecturesPage.tableHeaders.subject")}
                 </p>
@@ -1493,7 +1493,7 @@ const [currentPage, setCurrentPage] = useState(1)
                     : t("lecturesPage.filters.allSubjects")}
                 </p>
               </div>
-              <div className="rounded-[1.4rem] border px-2 py-2 sm:px-4 sm:py-3" style={{ background: "rgba(255,255,255,0.12)", borderColor: "rgba(255,255,255,0.14)" }}>
+              <div className="rounded-[1.4rem] px-2 py-2 sm:px-4 sm:py-3" style={{ background: "rgba(255,255,255,0.12)", borderColor: "transparent" }}>
                 <p className="text-[0.6rem] sm:text-xs uppercase tracking-[0.2em]" style={{ color: "rgba(248,252,255,0.68)" }}>
                   {t("lecturesPage.tableHeaders.level")}
                 </p>
@@ -1749,7 +1749,7 @@ const [currentPage, setCurrentPage] = useState(1)
               {lectures?.map((lecture) => (
                 <article
                   key={lecture.id}
-                  className="flex h-full flex-col overflow-hidden rounded-[1.35rem] border p-4"
+                  className="flex h-full flex-col overflow-hidden rounded-[1.35rem] p-4"
                   style={{
                     background: "rgba(255,255,255,0.76)",
                     borderColor: TOKENS.borderSubtle,
@@ -1759,7 +1759,7 @@ const [currentPage, setCurrentPage] = useState(1)
                   <div className="flex items-start gap-4">
                     {lecture.thumbnail ? (
                       <div
-                        className="h-16 w-16 overflow-hidden rounded-[1.05rem] border shrink-0"
+                        className="h-16 w-16 overflow-hidden rounded-[1.05rem] shrink-0"
                         style={{ borderColor: TOKENS.borderSubtle, boxShadow: SHADOWS.level1 }}
                       >
 <img

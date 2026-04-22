@@ -1075,7 +1075,7 @@ export default function CourseDetails() {
 
 
             {/* Tab Content */}
-            <div className="rounded-xl bg-white p-8 shadow-sm" style={{ borderColor: 'rgba(17,24,39,0.08)' }}>
+            <div className="rounded-xl bg-white p-8 shadow-sm" style={{ borderColor: 'transparent' }}>
               {activeTab === 'syllabus' && (
                 <Syllabus
                   courseId={courseId}
@@ -1498,7 +1498,7 @@ export default function CourseDetails() {
                           {/* Stats */}
                           <div
                             className="grid grid-cols-2 gap-6 mt-7 pt-6 border-t"
-                            style={{ borderColor: 'rgba(17,24,39,0.08)' }}
+                            style={{ borderColor: 'transparent' }}
                           >
                             <div>
                               <p className="text-xs uppercase tracking-widest font-black mb-1" style={{ color: TOKENS.slateText }}>
@@ -1534,7 +1534,7 @@ export default function CourseDetails() {
                       >
                         <h4
                           className="text-xs font-black uppercase tracking-widest mb-4 pb-3 border-b"
-                          style={{ color: TOKENS.slateText, borderColor: 'rgba(17,24,39,0.08)' }}
+                          style={{ color: TOKENS.slateText, borderColor: 'transparent' }}
                         >
                           {t('instructors.courseInfo', 'Course Information')}
                         </h4>
@@ -1628,7 +1628,7 @@ export default function CourseDetails() {
               style={{ 
                 background: 'rgba(255, 255, 255, 0.9)',
                 backdropFilter: 'blur(20px)',
-                borderColor: 'rgba(17,24,39,0.08)',
+                borderColor: 'transparent',
                 boxShadow: SHADOWS.level2
               }}
             >
@@ -1682,7 +1682,7 @@ export default function CourseDetails() {
 
                 {/* Course Details */}
                 <div className="space-y-4">
-                  <h4 className="text-xs font-black uppercase tracking-wider border-b pb-3" style={{ color: TOKENS.slateText, borderColor: 'rgba(17,24,39,0.08)' }}>
+                  <h4 className="text-xs font-black uppercase tracking-wider border-b pb-3" style={{ color: TOKENS.slateText, borderColor: 'transparent' }}>
                     {t("courseDetailsTitle", "Course Details")}
                   </h4>
                   <ul className="space-y-4">
@@ -1701,7 +1701,7 @@ export default function CourseDetails() {
                 </div>
 
                 {/* Who is this course for */}
-                <div className="space-y-4 pt-4 border-t" style={{ borderColor: 'rgba(17,24,39,0.08)' }}>
+                <div className="space-y-4 pt-4 border-t" style={{ borderColor: 'transparent' }}>
                   <h4 className="text-xs font-black uppercase tracking-wider" style={{ color: TOKENS.slateText }}>
                     {t("whoIsThisFor", "Who is this course for")}
                   </h4>
@@ -1723,7 +1723,7 @@ export default function CourseDetails() {
                 </div>
 
                 {/* What you'll get out of this */}
-                <div className="space-y-4 pt-4 border-t" style={{ borderColor: 'rgba(17,24,39,0.08)' }}>
+                <div className="space-y-4 pt-4 border-t" style={{ borderColor: 'transparent' }}>
                   <h4 className="text-xs font-black uppercase tracking-wider" style={{ color: TOKENS.slateText }}>
                     {t("whatYouWillGet", "What you'll get out of this")}
                   </h4>

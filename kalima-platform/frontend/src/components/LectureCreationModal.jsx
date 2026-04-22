@@ -56,8 +56,8 @@ const TOKENS = {
   radius: { card: "rounded-xl", section: "rounded-2xl", modal: "rounded-[2rem]", full: "rounded-full" },
   spacing: { tight: "gap-3", default: "gap-4", section: "gap-6", loose: "gap-8" },
   surface: {
-    card: "bg-white border border-slate-200 shadow-sm",
-    highlighted: "bg-slate-50 border border-slate-200",
+    card: "bg-white shadow-sm",
+    highlighted: "bg-slate-50",
     summary: "bg-amber-50/30 border border-amber-200/60",
     gradient: "bg-gradient-to-br from-white to-primary/5",
   },

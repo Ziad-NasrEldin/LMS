@@ -288,14 +288,16 @@ const PromoCodeGenerator = () => {
         background: TOKENS.neutralCloud, 
         boxShadow: SHADOWS.level1, 
         borderRadius: "2rem",
-        border: "1px solid rgba(17,24,39,0.05)"
+        border: "1px solid transparent"
       }}
     >
       <div className="flex items-center gap-3 mb-8 border-b pb-4" style={{ borderColor: "rgba(17,24,39,0.1)" }}>
         <div className="p-3 rounded-2xl" style={{ background: "rgba(77,179,194,0.1)" }}>
           <Ticket className="w-8 h-8" style={{ color: TOKENS.deepTeal }} />
         </div>
-        <h2 className="text-2xl font-extrabold" style={{ color: TOKENS.deepTeal }}>{t("generatePromoCodes")}</h2>
+        <h2 className="text-2xl font-extrabold" style={{ color: TOKENS.deepTeal }}>
+          {t("admin.generatePromoCodes", "إنشاء أكواد ترويجية")}
+        </h2>
       </div>
 
       {error && (
@@ -314,7 +316,7 @@ const PromoCodeGenerator = () => {
   
       <form onSubmit={handleSubmit} className="mb-8">
         <div className="grid grid-cols-1 xl:grid-cols-12 gap-3 md:gap-4 mb-4">
-          <div className="flex flex-col gap-1 xl:col-span-3 rounded-2xl border p-3 bg-white/70" style={{ borderColor: "rgba(17,24,39,0.08)" }}>
+          <div className="flex flex-col gap-1 xl:col-span-3 rounded-2xl p-3 bg-white/70" style={{ borderColor: "transparent" }}>
             <label className="flex flex-col gap-1 pt-0 pb-1">
               <span className="text-xs font-medium">{t("form.amountAfter")}</span>
             </label>
@@ -332,7 +334,7 @@ const PromoCodeGenerator = () => {
             </span>
           </div>
   
-          <div className="flex flex-col gap-1 xl:col-span-3 rounded-2xl border p-3 bg-white/70" style={{ borderColor: "rgba(17,24,39,0.08)" }}>
+          <div className="flex flex-col gap-1 xl:col-span-3 rounded-2xl p-3 bg-white/70" style={{ borderColor: "transparent" }}>
             <label className="flex flex-col gap-1 pt-0 pb-1">
               <span className="text-xs font-medium">{t("form.amountBefore")}</span>
             </label>
@@ -351,7 +353,7 @@ const PromoCodeGenerator = () => {
             </span>
           </div>
   
-          <div className="flex flex-col gap-1 xl:col-span-3 rounded-2xl border p-3 bg-white/70" style={{ borderColor: "rgba(17,24,39,0.08)" }}>
+          <div className="flex flex-col gap-1 xl:col-span-3 rounded-2xl p-3 bg-white/70" style={{ borderColor: "transparent" }}>
             <label className="flex flex-col gap-1 pt-0 pb-1">
               <span className="text-xs font-medium">{t("form.numCodes")}</span>
             </label>
@@ -367,7 +369,7 @@ const PromoCodeGenerator = () => {
             />
           </div>
   
-          <div className="flex flex-col gap-1 xl:col-span-3 rounded-2xl border p-3 bg-white/70" style={{ borderColor: "rgba(17,24,39,0.08)" }}>
+          <div className="flex flex-col gap-1 xl:col-span-3 rounded-2xl p-3 bg-white/70" style={{ borderColor: "transparent" }}>
             <label className="flex flex-col gap-1 pt-0 pb-1">
               <span className="text-xs font-medium">{t("form.lecturer")}</span>
             </label>
@@ -386,7 +388,7 @@ const PromoCodeGenerator = () => {
             </DSSelect>
           </div>
   
-          <div className="flex flex-col gap-1 xl:col-span-3 rounded-2xl border p-3 bg-white/70" style={{ borderColor: "rgba(17,24,39,0.08)" }}>
+          <div className="flex flex-col gap-1 xl:col-span-3 rounded-2xl p-3 bg-white/70" style={{ borderColor: "transparent" }}>
             <label className="flex flex-col gap-1 pt-0 pb-1">
               <span className="text-xs font-medium">{t("form.codeType")}</span>
             </label>
@@ -401,7 +403,7 @@ const PromoCodeGenerator = () => {
             </DSSelect>
           </div>
   
-          <div className="flex flex-col gap-1 xl:col-span-3 rounded-2xl border p-3 bg-white/70" style={{ borderColor: "rgba(17,24,39,0.08)" }}>
+          <div className="flex flex-col gap-1 xl:col-span-3 rounded-2xl p-3 bg-white/70" style={{ borderColor: "transparent" }}>
             <label className="flex flex-col gap-1 pt-0 pb-1">
               <span className="text-xs font-medium">{t("form.expiryDate")}</span>
             </label>
@@ -414,7 +416,7 @@ const PromoCodeGenerator = () => {
             />
           </div>
 
-          <div className="flex flex-col gap-1 xl:col-span-3 rounded-2xl border p-3 bg-white/70" style={{ borderColor: "rgba(17,24,39,0.08)" }}>
+          <div className="flex flex-col gap-1 xl:col-span-3 rounded-2xl p-3 bg-white/70" style={{ borderColor: "transparent" }}>
             <label className="flex flex-col gap-1 pt-0 pb-1">
               <span className="text-xs font-medium">{t("form.qrCodes")}</span>
             </label>

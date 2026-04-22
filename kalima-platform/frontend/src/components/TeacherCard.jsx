@@ -15,9 +15,9 @@ function TeacherCard({ teacher, isRTL }) {
 
   return (
     <motion.div
-      className="h-full overflow-hidden rounded-[1.4rem] border bg-white transition-all duration-300 hover:-translate-y-[2px]"
+      className="h-full overflow-hidden rounded-[1.4rem] bg-white transition-all duration-300 hover:-translate-y-[2px]"
       whileHover={{ scale: 1.05 }}
-      style={{ borderColor: "rgba(17,24,39,0.08)", boxShadow: SHADOWS.level1 }}
+      style={{ borderColor: "transparent", boxShadow: SHADOWS.level1 }}
     >
       <div className="relative">
         <img

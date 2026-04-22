@@ -204,6 +204,8 @@
     "fieldRequired": "{{field}} is required",
     "fieldInvalid": "{{field}} is invalid",
     "fieldMustBeDifferent": "{{field}} must be different",
+    "fieldMustBeString": "{{field}} must be a string",
+    "fieldMustBeNumber": "{{field}} must be a number",
     "fieldMustBeArray": "{{field}} must be an array",
     "maxLengthExceeded": "{{field}} cannot exceed {{max}} characters",
     "minLengthRequired": "{{field}} must be at least {{min}} characters",

@@ -196,7 +196,7 @@ const ExamConfigSection = ({
       </div>
 
        {isCreatingNewExamConfig ? (
-         <div className="space-y-4 mb-4 p-4 border border-slate-200 rounded-lg">
+         <div className="space-y-4 mb-4 p-4 rounded-lg">
            <h4 className="font-medium">{t("examConfig.newConfiguration", `New ${configType.charAt(0).toUpperCase() + configType.slice(1)} Configuration`)}</h4>
 
            <Input 

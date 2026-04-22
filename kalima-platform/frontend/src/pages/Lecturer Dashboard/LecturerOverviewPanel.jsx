@@ -577,7 +577,7 @@ export default function LecturerOverviewPanel() {
 
   if (loading) {
     return (
-      <section className="rounded-[1.5rem] bg-white border border-slate-200 p-6 mb-10">
+      <section className="rounded-[1.5rem] bg-white p-6 mb-10">
         <div className="flex items-center justify-center h-36">
           <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
         </div>
@@ -586,7 +586,7 @@ export default function LecturerOverviewPanel() {
   }
   
   return (
-    <section className="rounded-[1.5rem] bg-white border border-slate-200 p-5 md:p-6 mb-10">
+    <section className="rounded-[1.5rem] bg-white p-5 md:p-6 mb-10">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
         <div>
           <h2 className="text-2xl md:text-3xl font-bold text-primary">
@@ -608,7 +608,7 @@ export default function LecturerOverviewPanel() {
          </Link>
       </div>
 
-       <form onSubmit={handleApplyFilters} className="mb-6 rounded-2xl border border-slate-200 bg-slate-100/50 p-4">
+       <form onSubmit={handleApplyFilters} className="mb-6 rounded-2xl bg-slate-100/50 p-4">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <h3 className="text-lg font-bold">{t("analyticsFilters", { defaultValue: isRTL ? "مرشحات التحليلات" : "Analytics Filters" })}</h3>
@@ -692,7 +692,7 @@ export default function LecturerOverviewPanel() {
         </div>
       )}
 
-       <div className="mb-6 rounded-2xl border border-slate-200 bg-slate-100/50 p-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+       <div className="mb-6 rounded-2xl bg-slate-100/50 p-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <label className="flex items-center gap-3 cursor-pointer">
           <input
             type="checkbox"
@@ -775,7 +775,7 @@ export default function LecturerOverviewPanel() {
       </div>
 
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-2 mb-8">
-        <div className="rounded-2xl border border-slate-200 bg-slate-100/50 p-4">
+        <div className="rounded-2xl bg-slate-100/50 p-4">
           <div className="mb-4 flex items-center gap-2">
             <BarChart3 className="w-4 h-4 text-primary" />
             <h3 className="font-semibold">
@@ -809,7 +809,7 @@ export default function LecturerOverviewPanel() {
           )}
         </div>
 
-                 <div className="rounded-2xl border border-slate-200 bg-slate-100/50 p-4">
+                 <div className="rounded-2xl bg-slate-100/50 p-4">
           <div className="mb-4 flex items-center gap-2">
             <PieChart className="w-4 h-4 text-primary" />
             <h3 className="font-semibold">
@@ -844,7 +844,7 @@ export default function LecturerOverviewPanel() {
         </div>
       </div>
 
-       <div className="rounded-2xl border border-slate-200 overflow-hidden mb-8">
+       <div className="rounded-2xl overflow-hidden mb-8">
          <div className="px-4 py-3 bg-slate-100 flex items-center gap-2">
           <ListOrdered className="w-4 h-4 text-primary" />
           <h3 className="font-semibold">
@@ -1004,7 +1004,7 @@ export default function LecturerOverviewPanel() {
         </div>
       </div>
 
-        <div className="rounded-2xl border border-slate-200 overflow-hidden mt-8">
+        <div className="rounded-2xl overflow-hidden mt-8">
          <div className="px-4 py-3 bg-slate-100 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <Users className="w-4 h-4 text-primary" />

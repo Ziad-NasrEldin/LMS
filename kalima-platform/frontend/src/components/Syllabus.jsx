@@ -109,7 +109,7 @@ const Syllabus = memo(function Syllabus({
 
   if (loading) {
     return (
-      <div className="rounded-2xl overflow-hidden border border-gray-100 bg-white shadow-sm">
+      <div className="rounded-2xl overflow-hidden bg-white shadow-sm">
         <div className="p-8 flex flex-col items-center justify-center gap-4">
           <div className="w-10 h-10 border-4 border-t-transparent rounded-full animate-spin" style={{ borderColor: tokens.deepTeal }} />
           <p className="text-sm font-medium" style={{ color: tokens.slateText }}>
@@ -140,7 +140,7 @@ const Syllabus = memo(function Syllabus({
 
   if (!hierarchy || !hierarchy.children || hierarchy.children.length === 0) {
     return (
-      <div className="rounded-2xl overflow-hidden border border-gray-100 bg-white shadow-sm">
+      <div className="rounded-2xl overflow-hidden bg-white shadow-sm">
         <div className="flex flex-col items-center justify-center py-16 px-8 text-center">
           <div
             className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4"
@@ -178,7 +178,7 @@ const Syllabus = memo(function Syllabus({
       <div
         className="rounded-2xl overflow-hidden"
         style={{
-          border: "1.5px solid rgba(17,24,39,0.08)",
+          border: "1.5px solid transparent",
           background: "white",
           boxShadow: "0 1px 3px 0 rgba(0, 0, 0, 0.05)",
         }}

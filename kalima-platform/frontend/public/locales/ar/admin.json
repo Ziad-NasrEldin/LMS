@@ -103,7 +103,10 @@
     "selectStageFirst": "اختر المرحلة أولاً",
     "selectGradeLevel": "اختر الصف الدراسي",
     "selectHobby": "اختر الهواية",
-    "selectParentRelation": "اختر الصلة"
+    "selectParentRelation": "اختر الصلة",
+    "selectSubject": "اختر المادة",
+    "selectLevel": "اختر المستوي",
+    "selectTeachesAtType": "اختر مكان التدريس"
   },
   "invites": {
       "invite": "دعوة",
@@ -498,5 +501,43 @@
     "edit": "تعديل",
     "cancel": "إلغاء",
     "whatsapp": "إرسال رسالة واتساب"
+  },
+  "parentRelations": {
+    "mother": "أم",
+    "father": "أب",
+    "other": "أخرى"
+  },
+  "buttons": {
+    "addAnotherParentPhone": "إضافة رقم هاتف آخر",
+    "removeParentPhone": "إزالة"
+  },
+  "fields": {
+    "stage": "المرحلة",
+    "level": "الصف الدراسي",
+    "grade": "الصف",
+    "sequencedIdOptional": "الرقم التسلسلي (اختياري)",
+    "hobby": "الهواية",
+    "faction": "الفصيل",
+    "school": "المدرسة",
+    "parentPhoneNumber": "رقم هاتف ولي الأمر",
+    "parentPhoneNumber2": "رقم هاتف إضافي",
+    "parentPhoneRelation": "صلة ولي الأمر",
+    "government": "المحافظة",
+    "administrationZone": "المنطقة الإدارية",
+    "views": "المشاهدات",
+    "subject": "المادة",
+    "teachesAtType": "مكان التدريس",
+    "centers": "المراكز",
+    "expertise": "التخصص",
+    "bio": "النبذة",
+    "assignedLecturer": "المحاضر المassigned",
+    "selectGovernment": "اختر المحافظة",
+    "selectAdministrationZone": "اختر المنطقة الإدارية",
+    "loadingZones": "جاري التحميل...",
+    "selectStage": "اختر المرحلة",
+    "selectGradeLevel": "اختر الصف الدراسي",
+    "selectHobby": "اختر الهواية",
+    "phoneNumber": "رقم الهاتف",
+    "profession": "المهنة"
   }
 }

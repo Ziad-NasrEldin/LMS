@@ -550,10 +550,10 @@ function PersonalInfoSection() {
       <section>
         <SectionHeader title={personalInfo.title} />
         <div
-          className="rounded-3xl border p-4 md:p-5"
+          className="rounded-3xl p-4 md:p-5"
           style={{
             background: "rgba(255,255,255,0.75)",
-            borderColor: "rgba(17,24,39,0.08)",
+            borderColor: "transparent",
             boxShadow: SHADOWS.level1,
           }}
         >
@@ -570,10 +570,10 @@ function PersonalInfoSection() {
       <section>
         <SectionHeader title={personalInfo.title} />
         <div
-          className="rounded-3xl border p-4 md:p-5"
+          className="rounded-3xl p-4 md:p-5"
           style={{
             background: "rgba(255,255,255,0.75)",
-            borderColor: "rgba(17,24,39,0.08)",
+            borderColor: "transparent",
             boxShadow: SHADOWS.level1,
           }}
         >
@@ -659,10 +659,10 @@ function PersonalInfoSection() {
     <section>
       <SectionHeader title={personalInfo.title} />
       <div
-        className="rounded-3xl border p-4 md:p-5"
+        className="rounded-3xl p-4 md:p-5"
         style={{
           background: "rgba(255,255,255,0.75)",
-          borderColor: "rgba(17,24,39,0.08)",
+          borderColor: "transparent",
           boxShadow: SHADOWS.level1,
         }}
       >

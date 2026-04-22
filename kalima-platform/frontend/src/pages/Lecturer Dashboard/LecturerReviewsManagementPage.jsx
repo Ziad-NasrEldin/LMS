@@ -166,8 +166,8 @@ export default function LecturerReviewsManagementPage() {
         <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 md:px-8 lg:px-10">
           {/* Header */}
           <div
-            className="rounded-[2rem] border px-5 py-6 md:px-8 md:py-7 mb-8"
-            style={{ background: "white", borderColor: "rgba(17,24,39,0.08)" }}
+            className="rounded-[2rem] px-5 py-6 md:px-8 md:py-7 mb-8"
+            style={{ background: "white", borderColor: "transparent" }}
           >
             <div className="flex items-center gap-3 mb-2">
               <div
@@ -190,8 +190,8 @@ export default function LecturerReviewsManagementPage() {
 
           {/* Filters and Search */}
           <div
-            className="rounded-[1.5rem] border px-4 py-4 mb-6"
-            style={{ background: "white", borderColor: "rgba(17,24,39,0.08)" }}
+            className="rounded-[1.5rem] px-4 py-4 mb-6"
+            style={{ background: "white", borderColor: "transparent" }}
           >
             <div className="flex flex-col md:flex-row gap-4">
               {/* Search */}
@@ -237,8 +237,8 @@ export default function LecturerReviewsManagementPage() {
             <ErrorAlert message={error} onRetry={fetchReviews} />
           ) : filteredReviews.length === 0 ? (
             <div
-              className="rounded-[1.5rem] border px-8 py-12 text-center"
-              style={{ background: "white", borderColor: "rgba(17,24,39,0.08)" }}
+              className="rounded-[1.5rem] px-8 py-12 text-center"
+              style={{ background: "white", borderColor: "transparent" }}
             >
               <MessageSquare
                 className="h-12 w-12 mx-auto mb-4"
@@ -256,8 +256,8 @@ export default function LecturerReviewsManagementPage() {
               {filteredReviews.map((review) => (
                 <div
                   key={review._id}
-                  className="rounded-[1.5rem] border px-5 py-5"
-                  style={{ background: "white", borderColor: "rgba(17,24,39,0.08)" }}
+                  className="rounded-[1.5rem] px-5 py-5"
+                  style={{ background: "white", borderColor: "transparent" }}
                 >
                   <div className="flex flex-col md:flex-row gap-4">
                     {/* Left: Student Info */}
@@ -383,8 +383,8 @@ export default function LecturerReviewsManagementPage() {
           {selectedReview && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
               <div
-                className="w-full max-w-lg rounded-[1.5rem] border p-6"
-                style={{ background: "white", borderColor: "rgba(17,24,39,0.08)" }}
+                className="w-full max-w-lg rounded-[1.5rem] p-6"
+                style={{ background: "white", borderColor: "transparent" }}
               >
                 <h3
                   className="text-xl font-bold mb-4"
