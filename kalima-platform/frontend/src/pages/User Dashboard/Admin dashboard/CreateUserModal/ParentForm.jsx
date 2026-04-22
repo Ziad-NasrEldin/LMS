@@ -1,7 +1,16 @@
 "use client"
 
-import { getLevelOptionLabel } from "../../../../utils/levelHierarchy"
+import { useState } from "react"
+import { getLevelOptionLabel, getGradeOptionsForStage, getStageDisplayName, STAGE_KEYS } from "../../../../utils/levelHierarchy"
 import DSSelect from "../../../../components/DSSelect"
+import Button from "../../../../components/ui/Button"
+import { Trash2, Plus } from "lucide-react"
+
+const EMPTY_STAGE_OPTIONS = STAGE_KEYS.map((stageKey) => ({
+  value: stageKey,
+  label: stageKey,
+  raw: { name: stageKey, kind: "stage" },
+}))
 
 const ParentForm = ({
   userData,
@@ -39,6 +48,43 @@ const ParentForm = ({
     : gradeOptionsFromGrades.length
       ? gradeOptionsFromGrades
       : fallbackLevelOptions
+
+  const stageOptions = levelHierarchy?.stageOptions?.length
+    ? levelHierarchy.stageOptions
+    : EMPTY_STAGE_OPTIONS.map((stage) => ({
+        ...stage,
+        label: getStageDisplayName(stage.value, isRTL ? "ar" : "en"),
+      }))
+
+  const [childProfiles, setChildProfiles] = useState(
+    Array.isArray(userData.childProfiles) && userData.childProfiles.length > 0
+      ? userData.childProfiles
+      : []
+  )
+
+  const addChildProfile = () => {
+    setChildProfiles((prev) => [...prev, { stage: "", level: "", sequenceId: "" }])
+  }
+
+  const removeChildProfile = (index) => {
+    setChildProfiles((prev) => prev.filter((_, i) => i !== index))
+    handleChange({ target: { name: "childProfiles", value: childProfiles.filter((_, i) => i !== index) } })
+  }
+
+  const handleChildFieldChange = (index, field, value) => {
+    setChildProfiles((prev) => {
+      const updated = prev.map((profile, i) => {
+        if (i !== index) return profile
+        const updatedProfile = { ...profile, [field]: value }
+        if (field === "stage") {
+          updatedProfile.level = ""
+        }
+        return updatedProfile
+      })
+      handleChange({ target: { name: "childProfiles", value: updated } })
+      return updated
+    })
+  }
 
   const toEnglishDigits = (str) => String(str || "").replace(/[٠-٩]/g, (d) => "٠١٢٣٤٥٦٧٨٩".indexOf(d)).replace(/[^\d]/g, "")
 
@@ -122,6 +168,139 @@ const ParentForm = ({
           </DSSelect>
           {fieldErrors.level && <p className="text-sm text-error">{fieldErrors.level}</p>}
         </div>
+      </div>
+
+      {/* Children Section */}
+      <div className="mt-2">
+        <div className="flex items-center justify-between mb-3">
+          <label className="text-sm font-bold" style={{ color: "#1F2937" }}>
+            {t("fields.children") || "Children"}
+          </label>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="gap-1"
+            onClick={addChildProfile}
+          >
+            <Plus size={14} />
+            {t("buttons.addChild") || "Add Child"}
+          </Button>
+        </div>
+
+        {childProfiles.length === 0 && (
+          <p className="text-xs italic" style={{ color: "rgba(17,24,39,0.5)" }}>
+            {t("placeholders.noChildrenAdded") || "No children added yet. Click \"Add Child\" to add a student."}
+          </p>
+        )}
+
+        {childProfiles.map((child, index) => {
+          const childGradeOptions = child.stage
+            ? getGradeOptionsForStage(levelHierarchy, child.stage)
+            : []
+
+          return (
+            <div
+              key={index}
+              className="rounded-2xl border p-4 mb-3"
+              style={{ borderColor: "rgba(17,24,39,0.1)", backgroundColor: "rgba(17,24,39,0.02)" }}
+            >
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-sm font-semibold" style={{ color: "#1F2937" }}>
+                  {t("fields.child") || "Child"} {index + 1}
+                </span>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="xs"
+                  className="gap-1 text-red-600"
+                  onClick={() => removeChildProfile(index)}
+                >
+                  <Trash2 size={14} />
+                  {t("buttons.remove") || "Remove"}
+                </Button>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="form-control">
+                  <div className="flex flex-col gap-1">
+                    <label className="label py-0">
+                      <span className="label-text text-sm font-bold" style={{ color: "#1F2937" }}>
+                        {t("fields.stage") || "Stage"}
+                      </span>
+                    </label>
+                    <DSSelect
+                      name={`childStage_${index}`}
+                      className="select w-full rounded-xl"
+                      style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
+                      value={child.stage || ""}
+                      onChange={(e) => handleChildFieldChange(index, "stage", e.target.value)}
+                      required
+                    >
+                      <option value="">{t("placeholders.selectStage") || "Select stage"}</option>
+                      {stageOptions.map((stage) => (
+                        <option key={stage.value} value={stage.value}>
+                          {stage.label || getStageDisplayName(stage.value, isRTL ? "ar" : "en")}
+                        </option>
+                      ))}
+                    </DSSelect>
+                  </div>
+                </div>
+
+                <div className="form-control">
+                  <div className="flex flex-col gap-1">
+                    <label className="label py-0">
+                      <span className="label-text text-sm font-bold" style={{ color: "#1F2937" }}>
+                        {t("fields.level") || "Level"}
+                      </span>
+                    </label>
+                    <DSSelect
+                      name={`childLevel_${index}`}
+                      className="select w-full rounded-xl"
+                      style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
+                      value={child.level || ""}
+                      onChange={(e) => handleChildFieldChange(index, "level", e.target.value)}
+                      disabled={!child.stage}
+                      required
+                    >
+                      <option value="">
+                        {!child.stage
+                          ? t("placeholders.selectStageFirst") || "Select stage first"
+                          : t("placeholders.selectGradeLevel") || "Select grade"}
+                      </option>
+                      {childGradeOptions.map((grade) => (
+                        <option key={grade.value || grade._id} value={grade.value || grade._id}>
+                          {grade.label || grade.displayName || grade.name}
+                        </option>
+                      ))}
+                    </DSSelect>
+                  </div>
+                </div>
+              </div>
+
+              <div className="form-control mt-2">
+                <div className="flex flex-col gap-1">
+                  <label className="label py-0">
+                    <span className="label-text text-sm font-bold" style={{ color: "#1F2937" }}>
+                      {t("fields.studentId") || "Student ID (optional)"}
+                    </span>
+                  </label>
+                  <input
+                    type="text"
+                    name={`childSequenceId_${index}`}
+                    className="input w-full rounded-xl"
+                    style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: "rgba(17,24,39,0.1)", color: "#1F2937" }}
+                    value={child.sequenceId || ""}
+                    onChange={(e) => handleChildFieldChange(index, "sequenceId", e.target.value)}
+                    placeholder={t("placeholders.studentId") || "Enter student ID"}
+                  />
+                </div>
+              </div>
+            </div>
+          )
+        })}
+
+        {fieldErrors.childProfiles && <p className="text-sm text-error">{fieldErrors.childProfiles}</p>}
       </div>
 
       <div className="form-control">

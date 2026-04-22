@@ -150,6 +150,8 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
     centers: [],
     socialMedia: [],
     profilePic: null,
+    // Parent-specific fields
+    childProfiles: [],
   }
 
   const [userData, setUserData] = useState(initialUserState)
@@ -278,13 +280,14 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
     setUserData((prev) => ({
       ...prev,
       role,
-      stage: "",
+      stage: role === "teacher" ? [] : "",
       level: role === "teacher" ? [] : "",
       parentPhoneNumber: "",
       parentPhoneRelation: "",
       parentPhoneNumber2: "",
       parentPhoneRelation2: "",
       hasAdditionalParentPhone: false,
+      childProfiles: [],
     }))
   }
 
@@ -368,6 +371,17 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
       if (!userData.administrationZone) {
         return t("validation.administrationZoneRequired")
       }
+      if (Array.isArray(userData.childProfiles) && userData.childProfiles.length > 0) {
+        for (let i = 0; i < userData.childProfiles.length; i++) {
+          const child = userData.childProfiles[i]
+          if (!child.stage) {
+            return t("validation.childStageRequired") || `Child ${i + 1}: Stage is required`
+          }
+          if (!child.level) {
+            return t("validation.childLevelRequired") || `Child ${i + 1}: Level is required`
+          }
+        }
+      }
     }
 
     if (userData.role === "lecturer") {
@@ -395,11 +409,16 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
       if (!userData.subject) {
         return t("validation.subjectRequired")
       }
+      const teacherStages = Array.isArray(userData.stage) ? userData.stage : userData.stage ? [userData.stage] : []
+      if (teacherStages.length === 0) {
+        return t("validation.stageRequired") || "At least one stage is required"
+      }
       if (!Array.isArray(userData.level) || userData.level.length === 0) {
         return t("validation.levelRequired")
       }
       const validStageIds = new Set((levelHierarchy?.stageOptions || []).map((option) => option.value))
-      const hasInvalidLevel = userData.level.some((value) => !validStageIds.has(value))
+      const validGradeIds = new Set((levelHierarchy?.grades || []).map((g) => g._id || g.value))
+      const hasInvalidLevel = userData.level.some((value) => !validGradeIds.has(value))
       if (hasInvalidLevel) {
         return t("validation.invalidTeacherLevelSelection")
       }
@@ -480,6 +499,15 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
           profession: data.profession?.trim() || undefined,
           government: data.government || undefined,
           administrationZone: data.administrationZone || undefined,
+          childProfiles: Array.isArray(data.childProfiles) && data.childProfiles.length > 0
+            ? data.childProfiles
+                .filter((cp) => cp.stage && cp.level)
+                .map((cp) => ({
+                  stage: cp.stage,
+                  level: cp.level,
+                  ...(cp.sequenceId ? { sequenceId: cp.sequenceId } : {}),
+                }))
+            : undefined,
         }
 
       case "lecturer":
@@ -504,6 +532,7 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
           ...commonFields,
           phoneNumber: data.phoneNumber || undefined,
           phoneNumber2: data.phoneNumber2 || undefined,
+          stage: Array.isArray(data.stage) ? data.stage : data.stage ? [data.stage] : [],
           subject: data.subject || undefined,
           level: Array.isArray(data.level) ? data.level : data.level ? [data.level] : [],
           teachesAtType: data.teachesAtType || undefined,

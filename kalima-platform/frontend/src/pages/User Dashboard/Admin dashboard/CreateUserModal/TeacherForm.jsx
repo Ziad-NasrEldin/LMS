@@ -30,12 +30,20 @@ const TeacherForm = ({
   const [selectedLevels, setSelectedLevels] = useState(
     Array.isArray(userData.level) ? userData.level : userData.level ? [userData.level] : [],
   )
+  const [selectedStages, setSelectedStages] = useState(
+    Array.isArray(userData.stage) ? userData.stage : userData.stage ? [userData.stage] : [],
+  )
   const [selectedCenters, setSelectedCenters] = useState(Array.isArray(userData.centers) ? userData.centers : [])
 
   useEffect(() => {
     const levelsArray = Array.isArray(userData.level) ? userData.level : userData.level ? [userData.level] : []
     setSelectedLevels(levelsArray)
   }, [userData.level])
+
+  useEffect(() => {
+    const stagesArray = Array.isArray(userData.stage) ? userData.stage : userData.stage ? [userData.stage] : []
+    setSelectedStages(stagesArray)
+  }, [userData.stage])
 
   useEffect(() => {
     setSelectedCenters(Array.isArray(userData.centers) ? userData.centers : [])
@@ -46,6 +54,32 @@ const TeacherForm = ({
     const cleaned = value.replace(/[^0-9+]/g, "")
     handleChange({
       target: { name, value: cleaned },
+    })
+  }
+
+  const addStage = (stageValue) => {
+    if (stageValue && !selectedStages.includes(stageValue)) {
+      const newStages = [...selectedStages, stageValue]
+      setSelectedStages(newStages)
+      handleChange({
+        target: { name: "stage", value: newStages },
+      })
+    }
+  }
+
+  const removeStage = (stageValue) => {
+    const newStages = selectedStages.filter((s) => s !== stageValue)
+    setSelectedStages(newStages)
+    const removedLevelIds = levelOptions
+      .filter((level) => level.stageKey === stageValue)
+      .map((level) => level.value)
+    const newLevels = selectedLevels.filter((id) => !removedLevelIds.includes(id))
+    setSelectedLevels(newLevels)
+    handleChange({
+      target: { name: "stage", value: newStages },
+    })
+    handleChange({
+      target: { name: "level", value: newLevels },
     })
   }
 
@@ -116,8 +150,8 @@ const TeacherForm = ({
 
   const levelOptions = flattenLevels(levelHierarchy)
   const stageOptions = Array.isArray(levelHierarchy?.stageOptions) ? levelHierarchy.stageOptions : EMPTY_STAGE_OPTIONS
-  const filteredLevelOptions = userData.stage
-    ? levelOptions.filter((level) => level.stageKey === userData.stage)
+  const filteredLevelOptions = selectedStages.length > 0
+    ? levelOptions.filter((level) => selectedStages.includes(level.stageKey))
     : levelOptions
 
   return (
@@ -302,9 +336,9 @@ const TeacherForm = ({
                 ? t("fields.loadingZones")
                 : t("fields.selectAdministrationZone")}
             </option>
-            {administrationZones?.map((zone) => (
-              <option key={zone._id} value={zone.name}>
-                {isRTL ? zone.nameAr || zone.name : zone.name}
+            {administrationZones?.map((zone, index) => (
+              <option key={zone._id || index} value={zone.name || zone}>
+                {zone.nameAr ? (isRTL ? zone.nameAr : zone.name) : (zone.name || zone)}
               </option>
             ))}
           </DSSelect>
@@ -316,33 +350,46 @@ const TeacherForm = ({
         <div className="flex flex-col gap-2">
           <label className="block mb-1">
             <span className="text-sm font-bold" style={{ color: "#1F2937" }}>
-              {t("fields.stage") || "Stage"}
+              {t("fields.stages") || "Stages"}
             </span>
           </label>
           <DSSelect
-            name="stage"
+            name="stageSelect"
             className="select w-full rounded-xl"
             style={{ backgroundColor: "rgba(17,24,39,0.03)", borderColor: fieldErrors.stage ? "#DC2626" : "rgba(17,24,39,0.1)", color: "#1F2937" }}
-            value={userData.stage || ""}
+            value=""
             onChange={(e) => {
-              handleChange(e)
-              setSelectedLevels([])
-              handleChange({ target: { name: "level", value: [] } })
+              if (e.target.value) {
+                addStage(e.target.value)
+              }
             }}
-            required
           >
-            <option value="">{t("placeholders.selectStage") || "Select Stage"}</option>
-            {stageOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label || getStageDisplayName(option.value, isRTL ? "ar" : "en")}
-              </option>
-            ))}
+            <option value="">{t("placeholders.selectStages") || "Select stage to add"}</option>
+            {stageOptions
+              .filter((option) => !selectedStages.includes(option.value))
+              .map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label || getStageDisplayName(option.value, isRTL ? "ar" : "en")}
+                </option>
+              ))}
           </DSSelect>
           {fieldErrors.stage && <p className="text-sm text-error">{fieldErrors.stage}</p>}
+          {selectedStages.length > 0 && (
+            <div className="flex flex-wrap gap-2 mt-2">
+              {selectedStages.map((stageKey) => (
+                <Badge key={stageKey} variant="secondary" className="gap-2">
+                  {stageOptions.find((opt) => opt.value === stageKey)?.label || getStageDisplayName(stageKey, isRTL ? "ar" : "en")}
+                  <Button type="button" variant="ghost" size="xs" className="p-0 h-auto min-w-0" onClick={() => removeStage(stageKey)}>
+                    ×
+                  </Button>
+                </Badge>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
-      {userData.stage && (
+      {selectedStages.length > 0 && (
         <div className="mb-4">
           <div className="flex flex-col gap-2">
             <label className="block mb-1">

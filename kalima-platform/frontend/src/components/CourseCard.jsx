@@ -53,7 +53,7 @@ export const CourseCard = ({
       className="group relative h-full overflow-hidden rounded-2xl bg-white transition-all duration-500 ease-out"
       dir={isRTL ? "rtl" : "ltr"}
       style={{ 
-        borderColor: "rgba(17,24,39,0.06)",
+        borderColor: "transparent",
         boxShadow: isHovered 
           ? "0 25px 50px -12px rgba(14, 85, 99, 0.25), 0 12px 24px -8px rgba(14, 85, 99, 0.15)" 
           : "0 4px 20px rgba(0, 0, 0, 0.08)",
@@ -96,10 +96,10 @@ export const CourseCard = ({
       </figure>
 
       {/* Content Section */}
-      <div className="p-5">
+      <div className="p-5 min-w-0">
         {/* Title */}
         <h2 
-          className="mb-3 text-lg font-bold leading-tight transition-colors duration-300 group-hover:text-[#0E5563]"
+          className="mb-3 text-lg font-bold leading-tight break-words line-clamp-2 transition-colors duration-300 group-hover:text-[#0E5563]"
           style={{ color: TOKENS.inkText }}
         >
           {title || t("titleFallback")}

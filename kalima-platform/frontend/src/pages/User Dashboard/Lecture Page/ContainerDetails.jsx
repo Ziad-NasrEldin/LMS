@@ -572,7 +572,7 @@ const ContainerDetailsPage = () => {
           )}
 
           <div className="mb-8">
-            <h1 className="mb-2 text-2xl font-bold sm:text-3xl" style={{ color: TOKENS.inkText }}>{container.name}</h1>
+            <h1 className="mb-2 text-2xl font-bold break-words sm:text-3xl" style={{ color: TOKENS.inkText }}>{container.name}</h1>
             <div className="flex flex-wrap items-center gap-3 text-sm sm:gap-4 sm:text-base" style={{ color: TOKENS.slateText }}>
               <span className="flex items-center gap-2 rounded-full border px-3 py-1.5" style={{ borderColor: "rgba(17,24,39,0.12)", background: "#FFFFFF" }}>
                 <FiFolder className="text-lg" />

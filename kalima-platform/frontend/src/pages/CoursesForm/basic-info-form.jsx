@@ -171,20 +171,20 @@ function BasicInfoForm({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.2 }}
-        className="rounded-[1.4rem] border p-4 shadow-md"
-        style={{ borderColor: "rgba(17,24,39,0.08)", background: "rgba(255,255,255,0.9)" }}
+        className="rounded-[1.4rem] p-4 shadow-md"
+        style={{ borderColor: "transparent", background: "rgba(255,255,255,0.9)" }}
       >
         <div className="mb-2">
           <h2 className="text-base font-bold mb-3 text-primary">
             {isEditMode ? (isRTL ? "تعديل أساسيات الكورس" : "Edit course basics") : (isRTL ? "أساسيات الكورس" : "Course basics")}
           </h2>
           <div className="mb-4 rounded-xl border p-3" style={{ borderColor: "rgba(20,106,120,0.14)", background: "rgba(188,231,236,0.18)" }}>
-            <div className="flex items-center justify-between gap-3">
-              <div>
+            <div className="flex items-center justify-between gap-3 min-w-0">
+              <div className="min-w-0">
                 <p className="text-xs font-semibold uppercase tracking-[0.16em]" style={{ color: "rgba(17,24,39,0.6)" }}>
                   {isRTL ? "معاينة حية" : "Live preview"}
                 </p>
-                <h3 className="mt-1 text-base font-bold" style={{ color: "rgba(17,24,39,0.92)" }}>
+                <h3 className="mt-1 text-base font-bold break-words line-clamp-2" style={{ color: "rgba(17,24,39,0.92)" }}>
                   {courseSnapshot?.title || (isRTL ? "اسم الكورس سيظهر هنا" : "Course title will appear here")}
                 </h3>
               </div>
