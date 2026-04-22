@@ -102,6 +102,7 @@
     "enterLevel": "أدخل المرحلة",
     "enterCenterName": "أدخل اسم المركز",
     "selectStages": "اختر مرحلة لإضافتها",
+    "selectLevels": "اختر المستوى لإضافته",
     "noChildrenAdded": "لم يتم إضافة أبناء بعد. اضغط \"إضافة ابن\" لإضافة طالب.",
     "studentId": "أدخل الرقم التسلسلي للطالب"
   },
@@ -117,6 +118,11 @@
   "gender": {
     "male": "ذكر",
     "female": "أنثى"
+  },
+  "options": {
+    "center": "مركز",
+    "school": "مدرسة",
+    "both": "كلاهما"
   },
   "parentRelations": {
     "mother": "الأم",
