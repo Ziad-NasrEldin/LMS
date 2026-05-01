@@ -33,6 +33,10 @@ const {
   normalizeSheetTabName,
 } = require("../utils/assessmentSheetTabs")
 const {
+  detectMatchingResponseTab,
+  getPublishedFormDetails,
+} = require("../utils/formSheetValidation")
+const {
   resolveLimitedLectureCreateFields,
   resolveLimitedLectureUpdateFields,
 } = require("../utils/limitedLectureAvailability")
@@ -216,7 +220,13 @@ const ensureManagedAssessmentConfig = async ({
   const normalizedFormUrl = normalizePublicFormUrl(formUrl, assessmentLabel)
   const existingId = toObjectIdOrNull(existingConfigId)
   const defaultPassingThreshold = passingThreshold !== undefined ? Number(passingThreshold) : 60
-  const writableSheets = configureGoogleSheets({ readOnly: false })
+  let writableSheets
+
+  try {
+    writableSheets = configureGoogleSheets({ readOnly: false })
+  } catch (_error) {
+    throw new AppError("Google Sheets integration is not configured correctly on the server", 500)
+  }
 
   let configDoc = null
   if (existingId) {
@@ -238,12 +248,24 @@ const ensureManagedAssessmentConfig = async ({
     excludeConfigId: configDoc?._id || null,
     session,
   })
+  const publishedFormDetails = await getPublishedFormDetails({
+    formUrl: normalizedFormUrl,
+    expectedSheetId: MASTER_ASSESSMENT_SHEET_ID,
+  })
+  const matchedResponseTab = publishedFormDetails.validationSkipped
+    ? null
+    : await detectMatchingResponseTab({
+      sheetId: MASTER_ASSESSMENT_SHEET_ID,
+      claimedTabNames,
+      responseSamples: publishedFormDetails.responseSamples,
+    })
   const ensuredSheetTab = await ensureAssessmentSheetTab({
     sheets: writableSheets,
     sheetId: MASTER_ASSESSMENT_SHEET_ID,
     desiredTabName,
     currentTabName: configDoc?.googleSheetTabName || null,
     claimedTabNames,
+    preferredFallbackTitle: matchedResponseTab,
     preferNewestUnclaimed: !configDoc,
     createIfMissing: false,
   })

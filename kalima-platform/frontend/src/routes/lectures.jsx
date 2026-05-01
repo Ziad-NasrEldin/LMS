@@ -283,12 +283,7 @@ export const createLecture = async (lectureData) => {
     return response.data
   } catch (error) {
     console.error("Error details:", error)
-    // Return a structured error object instead of a string
-    return {
-      status: "error",
-      message: translateErrorMessage(`Error creating lecture: ${error.message}`),
-      error,
-    }
+    return normalizeApiError(error, "Failed to create lecture")
   }
 }
 
@@ -308,11 +303,7 @@ export const updateLecture = async (lectureId, lectureData) => {
 
     return response.data
   } catch (error) {
-    return {
-      status: "error",
-      message: translateErrorMessage(`Error updating lecture: ${error.message}`),
-      error,
-    }
+    return normalizeApiError(error, "Failed to update lecture")
   }
 }
 

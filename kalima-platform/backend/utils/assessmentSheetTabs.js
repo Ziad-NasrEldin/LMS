@@ -120,6 +120,7 @@ const ensureAssessmentSheetTab = async ({
   desiredTabName,
   currentTabName = null,
   claimedTabNames = [],
+  preferredFallbackTitle = null,
   preferNewestUnclaimed = false,
   createIfMissing = false,
 }) => {
@@ -160,6 +161,26 @@ const ensureAssessmentSheetTab = async ({
   }
 
   const unclaimedTabs = getUnclaimedFormResponseTabs({ tabs, claimedTabNames });
+  const preferredFallback = normalizeSheetTabName(preferredFallbackTitle);
+  if (preferredFallback) {
+    const preferredTab = unclaimedTabs.find((tab) => tab.title === preferredFallback);
+    if (preferredTab) {
+      await renameSpreadsheetTab({
+        sheets,
+        sheetId,
+        sourceSheetId: preferredTab.sheetId,
+        nextTitle: normalizedDesired,
+      });
+
+      return {
+        title: normalizedDesired,
+        previousTitle: preferredTab.title,
+        action: "renamed-preferred-fallback",
+        tabs,
+      };
+    }
+  }
+
   if (unclaimedTabs.length === 1 || (preferNewestUnclaimed && unclaimedTabs.length > 0)) {
     const fallbackTab = preferNewestUnclaimed
       ? unclaimedTabs[0]

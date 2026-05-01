@@ -177,8 +177,6 @@ const EditUserModal = ({ isOpen, onClose, user, onUserUpdated }) => {
     subject: [],
     views: "",
     children: [],
-    // Parent-specific fields
-    phoneNumber: "",
     profession: "",
     // Teacher-specific fields
     teachesAtType: "",
@@ -266,8 +264,6 @@ const EditUserModal = ({ isOpen, onClose, user, onUserUpdated }) => {
         subject: subjectArray,
         views: user.views || "",
         children: user.children || [],
-        // Parent-specific fields
-        phoneNumber: user.phoneNumber || "",
         profession: user.profession || "",
         // Teacher-specific fields
         teachesAtType: user.teachesAtType || "",

@@ -682,47 +682,7 @@ const LectureCreationModal = ({
                        required
                      />
                    </FormField>
-                   <FormField label={t("fields.description")} fullWidth>
-                     <Textarea
-                       placeholder={t("placeholders.enterDescription")}
-                       className={`min-h-32 w-full ${TOKENS.radius.section}`}
-                       value={formData.description}
-                       onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
-                     />
-                   </FormField>
-                   <FormField label={t("fields.price")}>
-                     <Input
-                       type="number"
-                       placeholder={t("placeholders.enterPrice")}
-                       className={`w-full ${TOKENS.radius.section}`}
-                       value={formData.price}
-                       onChange={(e) => setFormData((prev) => ({ ...prev, price: e.target.value }))}
-                       min="0"
-                       required
-                     />
-                   </FormField>
-                   <FormField label={t("fields.numberOfViews")}>
-                     <Input
-                       type="number"
-                       placeholder={t("placeholders.enterNumberOfViews")}
-                       className={`w-full ${TOKENS.radius.section}`}
-                       value={formData.numberOfViews}
-                       onChange={(e) => setFormData((prev) => ({ ...prev, numberOfViews: e.target.value }))}
-                       min="0"
-                       required
-                     />
-                   </FormField>
-                   <FormField label={t("fields.videoURL")} fullWidth>
-                      <Input
-                        type="url"
-                        placeholder={t("placeholders.enterVideoLink")}
-                        className={`w-full ${TOKENS.radius.section}`}
-                        value={formData.videoLink}
-                        onChange={(e) => setFormData((prev) => ({ ...prev, videoLink: e.target.value }))}
-                        required
-                      />
-                    </FormField>
-                    <div className="md:col-span-2">
+                     <div className="md:col-span-2">
                       <ToggleCard
                         title={isRTL ? "محاضرة بمدة إتاحة محدودة" : "Limited lecture availability"}
                         enabled={formData.limitedAvailabilityEnabled}
@@ -799,65 +759,34 @@ const LectureCreationModal = ({
                     {usesSelectableParent && (
                       <>
                         <FormField label={t("fields.course")}>
-                      <DSSelect
-                        className={`border border-slate-200 w-full ${TOKENS.radius.section}`}
-                        value={metadata.courseId}
-                        onChange={(e) => setMetadata((prev) => ({ ...prev, courseId: e.target.value }))}
-                        required
-                      >
-                        <option value="">{t("placeholders.selectCourse")}</option>
-                        {lecturerCourseOptions.map((course) => (
-                          <option key={course.value} value={course.value}>{course.label}</option>
-                        ))}
-                      </DSSelect>
-                    </FormField>
-                    <FormField label={t("fields.container")}>
-                      <DSSelect
-                          className={`border border-slate-200 w-full ${TOKENS.radius.section}`}
-
-                        value={metadata.parentContainerId}
-                        onChange={(e) => setMetadata((prev) => ({ ...prev, parentContainerId: e.target.value }))}
-                        required
-                        disabled={!metadata.courseId}
-                      >
-                        <option value="">{t("placeholders.selectContainer")}</option>
-                        {(lecturerContainerOptionsByCourse[String(metadata.courseId)] || []).map((container) => (
-                          <option key={container.value} value={container.value}>{container.label}</option>
-                        ))}
-                      </DSSelect>
-                    </FormField>
-                    <FormField label={t("fields.container")}>
-                      <DSSelect
-                          className={`border border-slate-200 w-full ${TOKENS.radius.section}`}
-
-                        value={metadata.parentContainerId}
-                        onChange={(e) => setMetadata((prev) => ({ ...prev, parentContainerId: e.target.value }))}
-                        required
-                        disabled={!metadata.courseId}
-                      >
-                        <option value="">{t("placeholders.selectContainer")}</option>
-                        {(lecturerContainerOptionsByCourse[String(metadata.courseId)] || []).map((container) => (
-                          <option key={container.value} value={container.value}>{container.label}</option>
-                        ))}
-                      </DSSelect>
-                    </FormField>
-
+                          <DSSelect
+                            className={`border border-slate-200 w-full ${TOKENS.radius.section}`}
+                            value={metadata.courseId}
+                            onChange={(e) => setMetadata((prev) => ({ ...prev, courseId: e.target.value }))}
+                            required
+                          >
+                            <option value="">{t("placeholders.selectCourse")}</option>
+                            {lecturerCourseOptions.map((course) => (
+                              <option key={course.value} value={course.value}>{course.label}</option>
+                            ))}
+                          </DSSelect>
+                        </FormField>
                         <FormField label={t("fields.container")}>
-                      <DSSelect
-                        className={`border border-slate-200 w-full ${TOKENS.radius.section}`}
-                        value={metadata.parentContainerId}
-                        onChange={(e) => setMetadata((prev) => ({ ...prev, parentContainerId: e.target.value }))}
-                        required
-                        disabled={!metadata.courseId}
-                      >
-                        <option value="">{t("placeholders.selectContainer")}</option>
-                        {(lecturerContainerOptionsByCourse[String(metadata.courseId)] || []).map((container) => (
-                          <option key={container.value} value={container.value}>{container.label}</option>
-                        ))}
-                      </DSSelect>
-                    </FormField>
-                    </>
-                  )}
+                          <DSSelect
+                            className={`border border-slate-200 w-full ${TOKENS.radius.section}`}
+                            value={metadata.parentContainerId}
+                            onChange={(e) => setMetadata((prev) => ({ ...prev, parentContainerId: e.target.value }))}
+                            required
+                            disabled={!metadata.courseId}
+                          >
+                            <option value="">{t("placeholders.selectContainer")}</option>
+                            {(lecturerContainerOptionsByCourse[String(metadata.courseId)] || []).map((container) => (
+                              <option key={container.value} value={container.value}>{container.label}</option>
+                            ))}
+                          </DSSelect>
+                        </FormField>
+                      </>
+                    )}
 
 
 
@@ -981,73 +910,6 @@ const LectureCreationModal = ({
                       </p>
                     </Card>
 
-                    <Card variant="highlighted">
-                      <div className={`flex items-start justify-between ${TOKENS.spacing.tight}`}>
-                        <div>
-                          <h5 className={TOKENS.typography.cardTitle}>{t("attachments.googleFormTitle", "Google Form link")}</h5>
-                          <p className={TOKENS.typography.hint}>
-                            {t("attachments.googleFormHelper", "Use one Google Form link for the after-lecture exam or homework.")}
-                          </p>
-                        </div>
-                        <Badge>
-                          {attachments.selectedLinkType === "homeworks"
-                            ? t("attachments.homeworkType", "Homework")
-                            : t("attachments.examType", "Exam")}
-                        </Badge>
-                      </div>
-
-                      <div className={`mt-4 grid ${TOKENS.spacing.tight} sm:grid-cols-[180px_minmax(0,1fr)] items-center`}>
-                        <FormField label={t("attachments.formType", "Form type")} className="px-0 pt-0">
-                        <DSSelect
-                          className={`border border-slate-200 w-full ${TOKENS.radius.section}`}
-                          value={attachments.selectedLinkType}
-                          onChange={(e) => handleFormLinkTypeChange(e.target.value)}
-                        >
-
-                         <option value="homeworks">{t("attachments.homeworkType", "Homework")}</option>
-                         <option value="exams">{t("attachments.examType", "Exam")}</option>
-                       </DSSelect>
-                        </FormField>
-
-                        <FormField label={t("attachments.formUrl", "Google Form URL")} className="px-0 pt-0">
-                          <InputWithIcon icon={FiLink}>
-                                <Input
-                                  type="url"
-                                  className={`border border-slate-200 w-full ${TOKENS.radius.section} pr-12`}
-                                  placeholder={t("attachments.formUrlPlaceholder", "Paste the Google Form link here")}
-                                  value={attachments.activeLinkValue}
-                                  onChange={(e) => handleFormLinkChange(e.target.value)}
-                                />
-
-                          </InputWithIcon>
-                          <span className={`mt-2 ${TOKENS.typography.hint}`}>
-                            {t("attachments.formUrlHint", "Switch the form type if the link is for homework instead of exam, or vice versa.")}
-                          </span>
-                        </FormField>
-                      </div>
-
-                      {attachmentStats.existingLinks.length > 0 && (
-                        <Card className="mt-4">
-                          <p className={`${TOKENS.typography.meta} mb-3 text-slate-900/50`}>
-                            {t("attachments.savedLinks", "Saved links")}
-                          </p>
-                          <ul className={`${TOKENS.spacing.tight} flex flex-col`}>
-                            {attachmentStats.existingLinks.map((link) => (
-                              <li key={link.key} className={`flex flex-col ${TOKENS.spacing.tight} ${TOKENS.radius.card} bg-slate-100 px-3 py-2`}>
-                                <div className="flex items-center justify-between">
-                                  <span className="font-medium text-slate-900">{link.label}</span>
-                                  <Badge variant="neutral">{link.label}</Badge>
-                                </div>
-                                <a href={link.url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 break-all text-xs text-primary hover:underline">
-                                  <FiLink className="h-3 w-3" />
-                                  {link.url}
-                                </a>
-                              </li>
-                            ))}
-                          </ul>
-                        </Card>
-                      )}
-                    </Card>
                   </div>
                 </section>
               </div>
