@@ -7,11 +7,8 @@ const {
   MASTER_ASSESSMENT_SHEET_ID,
   MASTER_ASSESSMENT_IDENTIFIER_COLUMN,
   MASTER_ASSESSMENT_SCORE_COLUMN,
-  MASTER_ASSESSMENT_RAW_TAB,
   extractGoogleSheetId,
 } = require("../config/masterAssessmentConfig");
-
-const DEFAULT_MASTER_SHEET_TAB = MASTER_ASSESSMENT_RAW_TAB;
 
 const normalizeSheetTabName = (value) => {
   if (value === undefined || value === null) {
@@ -19,7 +16,7 @@ const normalizeSheetTabName = (value) => {
   }
 
   const normalizedValue = String(value).trim();
-  return normalizedValue || DEFAULT_MASTER_SHEET_TAB;
+  return normalizedValue || undefined;
 };
 
 const normalizeSheetId = (value) => {

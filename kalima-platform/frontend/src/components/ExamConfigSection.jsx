@@ -33,7 +33,7 @@ const ExamConfigSection = ({
     type: configType, // Set the type based on the prop
     description: "",
     googleSheetId: fixedMasterSheetId,
-    googleSheetTabName: "RAW_SUBMISSIONS",
+    googleSheetTabName: "",
     formUrl: "",
     studentIdentifierColumn: "Email Address",
     scoreColumn: "Score",
@@ -261,14 +261,14 @@ const ExamConfigSection = ({
           )}
 
            <Input 
-             label={t("examConfig.googleSheetTabName", "Google Sheet Tab Name")}
-             type="text"
-             placeholder="RAW_SUBMISSIONS"
-             value={newExamConfig.googleSheetTabName}
-             onChange={(e) => handleInputChange("googleSheetTabName", e.target.value)}
-             key={`sheet-tab-input-${configType}`}
-             helperText={t("examConfig.googleSheetTabHelp", "Defaults to RAW_SUBMISSIONS for master-sheet mode.")}
-           />
+              label={t("examConfig.googleSheetTabName", "Google Sheet Tab Name")}
+              type="text"
+              placeholder={t("examConfig.googleSheetTabPlaceholder", "Auto-detected from linked Google Form")}
+              value={newExamConfig.googleSheetTabName}
+              onChange={(e) => handleInputChange("googleSheetTabName", e.target.value)}
+              key={`sheet-tab-input-${configType}`}
+              helperText={t("examConfig.googleSheetTabHelp", "Optional override. The system now resolves and stores the real linked response tab.")}
+            />
 
            <Input 
              label={t("examConfig.formUrl", "Form URL")}

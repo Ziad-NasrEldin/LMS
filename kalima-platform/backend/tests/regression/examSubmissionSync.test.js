@@ -156,7 +156,56 @@ test("getExamResultsFromSheet falls back to the Google Forms response tab", asyn
     assert.equal(result.score, 10);
     assert.equal(result.maxScore, 10);
     assert.equal(result.sheetTabName, "Form_Responses");
-    assert.deepEqual(calls.slice(0, 3), ["test 2-exam", "RAW_SUBMISSIONS", "Form_Responses"]);
+    assert.deepEqual(calls.slice(0, 2), ["test 2-exam", "Form_Responses"]);
+  } finally {
+    restorePatches();
+  }
+});
+
+test("getExamResultsFromSheet does not inject RAW_SUBMISSIONS when only legacy response tabs exist", async () => {
+  try {
+    const calls = [];
+    googleApiConfig.configureGoogleSheets = () => ({
+      spreadsheets: {
+        get: async () => ({
+          data: {
+            sheets: [
+              { properties: { title: "Form Responses 21", index: 0 } },
+            ],
+          },
+        }),
+        values: {
+          get: async ({ range }) => {
+            calls.push(range);
+
+            if (range === "Form Responses 21") {
+              return {
+                data: {
+                  values: [
+                    ["Timestamp", "Email Address", "Untitled Question", "Score"],
+                    ["4/1/2026 4:54:29", "student@example.com", "Option 1", "10 / 10"],
+                  ],
+                },
+              };
+            }
+
+            throw new Error(`Unable to parse range: ${range}`);
+          },
+        },
+      },
+    });
+
+    const result = await examSubmissionSync.getExamResultsFromSheet({
+      sheetId: "master-sheet-id",
+      sheetTabName: "biology-exam",
+      studentIdentifier: "student@example.com",
+      studentEmail: "student@example.com",
+      assessmentType: "exam",
+    });
+
+    assert.equal(result.found, true);
+    assert.equal(result.sheetTabName, "Form Responses 21");
+    assert.ok(!calls.includes("RAW_SUBMISSIONS"));
   } finally {
     restorePatches();
   }

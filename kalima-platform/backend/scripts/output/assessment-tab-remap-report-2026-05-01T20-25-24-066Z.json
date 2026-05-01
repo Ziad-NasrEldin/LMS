@@ -1,0 +1,86 @@
+{
+  "generatedAt": "2026-05-01T20:25:25.622Z",
+  "currentSheetId": "189NUlSjOHhHZoRYfwYpjUPANepov8E73msaQDvH71vQ",
+  "renamed": [
+    {
+      "ordinal": 1,
+      "sourceTab": "Form Responses 1",
+      "configId": "69cc2f53e8a18324e64d0e70",
+      "totalRefs": 1,
+      "lectureName": "Smoke Test Config Lecture",
+      "desiredTab": "smoke-test-config-lecture-exam",
+      "existingTab": null
+    },
+    {
+      "ordinal": 2,
+      "sourceTab": "Form Responses 2",
+      "configId": "69cc2f86e8a18324e64d0e77",
+      "totalRefs": 1,
+      "lectureName": "Lecture",
+      "desiredTab": "lecture-exam",
+      "existingTab": null
+    },
+    {
+      "ordinal": 7,
+      "sourceTab": "Form Responses 7",
+      "configId": "69cc823c9c6990300e80b44e",
+      "totalRefs": 1,
+      "lectureName": "test 2",
+      "desiredTab": "test-2-exam",
+      "existingTab": "test-2-exam"
+    },
+    {
+      "ordinal": 8,
+      "sourceTab": "Form Responses 8",
+      "configId": "69cc823c9c6990300e80b451",
+      "totalRefs": 1,
+      "lectureName": "test 2",
+      "desiredTab": "test-2-homework",
+      "existingTab": "test-2-homework"
+    },
+    {
+      "ordinal": 9,
+      "sourceTab": "Form Responses 9",
+      "configId": "69cc9053e6dfb7de2f42d338",
+      "totalRefs": 1,
+      "lectureName": "a",
+      "desiredTab": "a-exam",
+      "existingTab": "a-exam"
+    },
+    {
+      "ordinal": 10,
+      "sourceTab": "Form Responses 10",
+      "configId": "69cc9053e6dfb7de2f42d33b",
+      "totalRefs": 1,
+      "lectureName": "a",
+      "desiredTab": "a-homework",
+      "existingTab": "a-homework"
+    },
+    {
+      "ordinal": 11,
+      "sourceTab": "Form Responses 11",
+      "configId": "69cd33be31b01a8604022c9d",
+      "totalRefs": 1,
+      "lectureName": "tes",
+      "desiredTab": "tes-exam",
+      "existingTab": "tes-exam"
+    },
+    {
+      "ordinal": 12,
+      "sourceTab": "Form Responses 12",
+      "configId": "69cd33be31b01a8604022ca0",
+      "totalRefs": 1,
+      "lectureName": "tes",
+      "desiredTab": "tes-homework",
+      "existingTab": "tes-homework"
+    }
+  ],
+  "deletedConfigIds": [
+    "69cc2f88e8a18324e64d0e7c",
+    "69cc2f8ee8a18324e64d0e81",
+    "69cc2f98e8a18324e64d0e86",
+    "69cc2fa1e8a18324e64d0e8b"
+  ],
+  "deletedCount": 4,
+  "backupPath": "scripts\\output\\assessment-tab-remap-backup-2026-05-01T20-25-24-066Z.json"
+}

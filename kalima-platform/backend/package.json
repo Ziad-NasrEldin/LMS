@@ -14,7 +14,8 @@
     "migrate:levels-hierarchy": "node scripts/migrateLevelsHierarchy.js",
     "migrate:lecture-access": "node scripts/reconcileStudentLectureAccess.js",
     "migrate:lecture-access:apply": "node scripts/reconcileStudentLectureAccess.js --apply",
-    "reconcile:exam-submissions": "node scripts/reconcileExamSubmissions.js"
+    "reconcile:exam-submissions": "node scripts/reconcileExamSubmissions.js",
+    "repair:assessment-tabs": "node scripts/repairAssessmentSheetTabs.js"
   },
   "keywords": [],
   "author": "",

@@ -30,7 +30,7 @@ const lecturerExamConfigSchema = new mongoose.Schema(
     googleSheetTabName: {
       type: String,
       trim: true,
-      default: "RAW_SUBMISSIONS",
+      default: null,
     },
     studentIdentifierColumn: {
       type: String,

@@ -4,6 +4,12 @@ const StudentExamSubmission = require("../models/studentExamSubmissionModel");
 const LecturerExamConfig = require("../models/ExamConfigModel");
 const googleApiConfig = require("../config/googleApiConfig");
 const {
+  ensureAssessmentSheetTab,
+  isLegacyFormResponsesTab,
+  listSpreadsheetTabs,
+  normalizeSheetTabName,
+} = require("./assessmentSheetTabs");
+const {
   MASTER_ASSESSMENT_IDENTIFIER_COLUMN,
   MASTER_ASSESSMENT_SCORE_COLUMN,
   MASTER_ASSESSMENT_RAW_TAB,
@@ -28,8 +34,6 @@ const buildLegacyFormResponsesTabs = (maxNumberedTabs = 20) => {
 };
 
 const LEGACY_FORM_RESPONSES_TABS = buildLegacyFormResponsesTabs();
-const FORM_RESPONSES_TAB_PATTERN = /^Form Responses(?: \d+)?$/i;
-const FORM_RESPONSES_UNDERSCORE_TAB_PATTERN = /^Form_Responses(?: \d+)?$/i;
 
 const normalizeString = (value) => String(value ?? "").trim();
 
@@ -38,11 +42,6 @@ const normalizeAssessmentType = (value) => {
   if (normalized === "exam") return "exam";
   if (normalized === "homework") return "homework";
   return null;
-};
-
-const normalizeSheetTabName = (value) => {
-  const normalized = normalizeString(value);
-  return normalized || null;
 };
 
 const normalizeHeader = (value) => normalizeString(value).toLowerCase();
@@ -157,8 +156,6 @@ const buildSheetTabCandidates = (configuredTabName, fallbackSheetTabName, fallba
     normalizeSheetTabName(configuredTabName),
     normalizeSheetTabName(fallbackSheetTabName),
     ...(Array.isArray(fallbackSheetTabNames) ? fallbackSheetTabNames.map(normalizeSheetTabName) : []),
-    DEFAULT_MASTER_SHEET_RAW_TAB,
-    ...LEGACY_FORM_RESPONSES_TABS,
   ];
 
   return [...new Set(candidates.filter(Boolean))];
@@ -168,46 +165,55 @@ const buildTabLookupSet = (tabNames = []) =>
   new Set(tabNames.map(normalizeSheetTabName).filter(Boolean));
 
 const detectDynamicFormResponseTabs = async (sheets, sheetId, existingTabNames = []) => {
-  if (!sheetId || typeof sheets?.spreadsheets?.get !== "function") {
-    return [];
-  }
-
   try {
-    const response = await sheets.spreadsheets.get({
-      spreadsheetId: sheetId,
-      fields: "sheets(properties(title,index))",
-    });
-
     const existingTabs = buildTabLookupSet(existingTabNames);
+    const spreadsheetTabs = await listSpreadsheetTabs({ sheets, sheetId });
 
-    return (response?.data?.sheets || [])
-      .map((sheetMeta) => {
-        const title = normalizeSheetTabName(sheetMeta?.properties?.title);
-        const index = Number(sheetMeta?.properties?.index);
-
-        return {
-          title,
-          index: Number.isFinite(index) ? index : Number.MAX_SAFE_INTEGER,
-        };
-      })
-      .filter(({ title }) => {
-        if (!title || existingTabs.has(title)) return false;
-
-        return (
-          FORM_RESPONSES_TAB_PATTERN.test(title) ||
-          FORM_RESPONSES_UNDERSCORE_TAB_PATTERN.test(title)
-        );
-      })
-      .sort((left, right) => {
-        if (left.index !== right.index) {
-          return left.index - right.index;
-        }
-        return left.title.localeCompare(right.title);
-      })
-      .map(({ title }) => title);
+    return spreadsheetTabs
+      .filter((tab) => isLegacyFormResponsesTab(tab.title) && !existingTabs.has(tab.title))
+      .map((tab) => tab.title);
   } catch (error) {
     return [];
   }
+};
+
+const buildOrderedSheetTabCandidates = async ({ sheets, sheetId, configuredCandidates }) => {
+  const normalizedConfiguredCandidates = [
+    ...new Set(configuredCandidates.map(normalizeSheetTabName).filter(Boolean)),
+  ];
+  const spreadsheetTabs = await listSpreadsheetTabs({ sheets, sheetId }).catch(() => []);
+  const discoveredTitles = spreadsheetTabs.map((tab) => tab.title);
+  const discoveredFormResponseTabs = await detectDynamicFormResponseTabs(
+    sheets,
+    sheetId,
+    normalizedConfiguredCandidates
+  );
+  const existingTitles = buildTabLookupSet(normalizedConfiguredCandidates);
+
+  const maybeRawTab = discoveredTitles.find(
+    (title) => title === DEFAULT_MASTER_SHEET_RAW_TAB && !existingTitles.has(title)
+  );
+  if (maybeRawTab) {
+    normalizedConfiguredCandidates.push(maybeRawTab);
+    existingTitles.add(maybeRawTab);
+  }
+
+  for (const title of discoveredFormResponseTabs) {
+    if (!existingTitles.has(title)) {
+      normalizedConfiguredCandidates.push(title);
+      existingTitles.add(title);
+    }
+  }
+
+  for (const title of LEGACY_FORM_RESPONSES_TABS) {
+    const normalizedTitle = normalizeSheetTabName(title);
+    if (normalizedTitle && !existingTitles.has(normalizedTitle)) {
+      normalizedConfiguredCandidates.push(normalizedTitle);
+      existingTitles.add(normalizedTitle);
+    }
+  }
+
+  return normalizedConfiguredCandidates;
 };
 
 const getExamResultsFromSheet = async (
@@ -246,17 +252,17 @@ const getExamResultsFromSheet = async (
     return { found: false, error: "Google Sheet ID is required" };
   }
 
-  if (sheetTabCandidates.length === 0) {
-    return { found: false, error: "Google Sheet tab name is required" };
-  }
-
   const sheets = googleApiConfig.configureGoogleSheets();
-  const dynamicFormResponseTabs = await detectDynamicFormResponseTabs(
+  const allSheetTabCandidates = await buildOrderedSheetTabCandidates({
     sheets,
     sheetId,
-    sheetTabCandidates
-  );
-  const allSheetTabCandidates = [...sheetTabCandidates, ...dynamicFormResponseTabs];
+    configuredCandidates: sheetTabCandidates,
+  });
+
+  if (allSheetTabCandidates.length === 0) {
+    return { found: false, error: "No candidate sheet tabs were found" };
+  }
+
   let lastError = null;
 
   for (const sheetTabName of allSheetTabCandidates) {
@@ -380,6 +386,7 @@ const getExamResultsFromSheet = async (
           studentRow: selectedRow.row,
           fetchTime: new Date().toISOString(),
           sheetTabName,
+          usedLegacyTabName: isLegacyFormResponsesTab(sheetTabName),
         };
       }
 
@@ -450,6 +457,7 @@ const getExamResultsFromSheet = async (
         studentRow: selectedRow.row,
         fetchTime: new Date().toISOString(),
         sheetTabName,
+        usedLegacyTabName: isLegacyFormResponsesTab(sheetTabName),
       };
     } catch (error) {
       if (isMissingRangeError(error)) {
@@ -633,6 +641,7 @@ const processAssessmentSubmissionFromSheet = async ({
     configDoc.defaultPassingThreshold,
     DEFAULT_PASSING_THRESHOLD
   );
+  const desiredTabName = normalizeSheetTabName(configDoc.googleSheetTabName);
 
   const configuredTabName =
     normalizeSheetTabName(configDoc.googleSheetTabName) || DEFAULT_MASTER_SHEET_RAW_TAB;
@@ -708,6 +717,34 @@ const processAssessmentSubmissionFromSheet = async ({
       syncSource: null,
       syncStatus: null,
     });
+  }
+
+  if (desiredTabName && sheetResult.sheetTabName !== desiredTabName) {
+    const writableSheets = googleApiConfig.configureGoogleSheets({ readOnly: false });
+    const claimedConfigs = await LecturerExamConfig.find({
+      googleSheetId: configDoc.googleSheetId,
+      _id: { $ne: configDoc._id },
+    })
+      .select("googleSheetTabName")
+      .lean();
+
+    const ensuredTab = await ensureAssessmentSheetTab({
+      sheets: writableSheets,
+      sheetId: configDoc.googleSheetId,
+      desiredTabName,
+      currentTabName: sheetResult.sheetTabName,
+      claimedTabNames: claimedConfigs.map((config) => config.googleSheetTabName),
+      preferNewestUnclaimed: false,
+      createIfMissing: false,
+    });
+
+    if (ensuredTab.action !== "missing") {
+      sheetResult.sheetTabName = ensuredTab.title;
+      if (configDoc.googleSheetTabName !== ensuredTab.title) {
+        configDoc.googleSheetTabName = ensuredTab.title;
+        await configDoc.save();
+      }
+    }
   }
 
   const thresholdComparableScore = calculateThresholdComparableScore(

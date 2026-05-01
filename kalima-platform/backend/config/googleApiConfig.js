@@ -1,6 +1,9 @@
 const { google } = require('googleapis');
 
-const configureGoogleSheets = () => {
+const READONLY_SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly'];
+const READWRITE_SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];
+
+const configureGoogleSheets = ({ readOnly = true } = {}) => {
   try {
     const clientEmail = String(process.env.GOOGLE_CLIENT_EMAIL || "").trim();
     const privateKey = String(process.env.GOOGLE_PRIVATE_KEY || "").trim();
@@ -17,7 +20,7 @@ const configureGoogleSheets = () => {
       null,
       // Replace escaped newlines with actual newlines in the private key
       privateKey.replace(/\\n/g, '\n'),
-      ['https://www.googleapis.com/auth/spreadsheets.readonly']
+      readOnly ? READONLY_SCOPES : READWRITE_SCOPES
     );
 
     // Create and return the Google Sheets API client
@@ -29,4 +32,8 @@ const configureGoogleSheets = () => {
   }
 };
 
-module.exports = { configureGoogleSheets };
+module.exports = {
+  configureGoogleSheets,
+  READONLY_SCOPES,
+  READWRITE_SCOPES,
+};

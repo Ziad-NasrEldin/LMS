@@ -6,6 +6,7 @@ const QueryFeatures = require("../utils/queryFeatures")
 const Level = require("../models/levelModel")
 const Subject = require("../models/subjectModel")
 const Lecturer = require("../models/lecturerModel")
+const Student = require("../models/studentModel")
 const Attachment = require("../models/attachmentModel")
 const Lecture = require("../models/LectureModel")
 const LecturerExamConfig = require("../models/ExamConfigModel")
@@ -25,7 +26,12 @@ const {
 } = require("../utils/lectureAccessResolver")
 const { normalizeExternalUrl } = require("../utils/urlValidation")
 const { fetchYouTubeDuration } = require("../utils/youtubeDuration")
-const { processAssessmentSubmissionFromSheet } = require("../utils/examSubmissionSync")
+const examSubmissionSync = require("../utils/examSubmissionSync")
+const { configureGoogleSheets } = require("../config/googleApiConfig")
+const {
+  ensureAssessmentSheetTab,
+  normalizeSheetTabName,
+} = require("../utils/assessmentSheetTabs")
 const {
   resolveLimitedLectureCreateFields,
   resolveLimitedLectureUpdateFields,
@@ -141,6 +147,26 @@ const buildAssessmentTabBase = (lectureName, assessmentType) => {
   return `${sanitizeTabSegment(lectureName)}-${suffix}`
 }
 
+const getClaimedAssessmentTabNames = async ({ sheetId, excludeConfigId = null, session }) => {
+  const query = {
+    googleSheetId: sheetId,
+    googleSheetTabName: { $ne: null },
+  }
+
+  if (excludeConfigId) {
+    query._id = { $ne: excludeConfigId }
+  }
+
+  const configs = await LecturerExamConfig.find(query)
+    .select("googleSheetTabName")
+    .session(session)
+    .lean()
+
+  return configs
+    .map((config) => normalizeSheetTabName(config.googleSheetTabName))
+    .filter(Boolean)
+}
+
 const resolveUniqueAssessmentTabName = async ({
   sheetId,
   baseName,
@@ -190,6 +216,7 @@ const ensureManagedAssessmentConfig = async ({
   const normalizedFormUrl = normalizePublicFormUrl(formUrl, assessmentLabel)
   const existingId = toObjectIdOrNull(existingConfigId)
   const defaultPassingThreshold = passingThreshold !== undefined ? Number(passingThreshold) : 60
+  const writableSheets = configureGoogleSheets({ readOnly: false })
 
   let configDoc = null
   if (existingId) {
@@ -200,13 +227,35 @@ const ensureManagedAssessmentConfig = async ({
     }).session(session)
   }
 
-  if (!configDoc) {
-    const tabName = await resolveUniqueAssessmentTabName({
-      sheetId: MASTER_ASSESSMENT_SHEET_ID,
-      baseName: buildAssessmentTabBase(lectureName, assessmentType),
-      session,
-    })
+  const desiredTabName = await resolveUniqueAssessmentTabName({
+    sheetId: MASTER_ASSESSMENT_SHEET_ID,
+    baseName: buildAssessmentTabBase(lectureName, assessmentType),
+    excludeConfigId: configDoc?._id || null,
+    session,
+  })
+  const claimedTabNames = await getClaimedAssessmentTabNames({
+    sheetId: MASTER_ASSESSMENT_SHEET_ID,
+    excludeConfigId: configDoc?._id || null,
+    session,
+  })
+  const ensuredSheetTab = await ensureAssessmentSheetTab({
+    sheets: writableSheets,
+    sheetId: MASTER_ASSESSMENT_SHEET_ID,
+    desiredTabName,
+    currentTabName: configDoc?.googleSheetTabName || null,
+    claimedTabNames,
+    preferNewestUnclaimed: !configDoc,
+    createIfMissing: false,
+  })
 
+  if (ensuredSheetTab.action === "missing") {
+    throw new AppError(
+      `Unable to bind ${assessmentLabel.toLowerCase()} form responses to a sheet tab. Link the Google Form to the master sheet, then retry.`,
+      400
+    )
+  }
+
+  if (!configDoc) {
     const createdConfig = await LecturerExamConfig.create(
       [
         {
@@ -215,7 +264,7 @@ const ensureManagedAssessmentConfig = async ({
           type: assessmentType,
           description: `${assessmentLabel} configuration for ${lectureName}`,
           googleSheetId: MASTER_ASSESSMENT_SHEET_ID,
-          googleSheetTabName: tabName,
+          googleSheetTabName: ensuredSheetTab.title,
           formUrl: normalizedFormUrl,
           studentIdentifierColumn: MASTER_ASSESSMENT_IDENTIFIER_COLUMN,
           scoreColumn: MASTER_ASSESSMENT_SCORE_COLUMN,
@@ -233,17 +282,9 @@ const ensureManagedAssessmentConfig = async ({
   configDoc.googleSheetId = MASTER_ASSESSMENT_SHEET_ID
   configDoc.studentIdentifierColumn = MASTER_ASSESSMENT_IDENTIFIER_COLUMN
   configDoc.scoreColumn = MASTER_ASSESSMENT_SCORE_COLUMN
+  configDoc.googleSheetTabName = ensuredSheetTab.title
   if (configDoc.defaultPassingThreshold === undefined || configDoc.defaultPassingThreshold === null) {
     configDoc.defaultPassingThreshold = defaultPassingThreshold
-  }
-
-  if (!configDoc.googleSheetTabName) {
-    configDoc.googleSheetTabName = await resolveUniqueAssessmentTabName({
-      sheetId: MASTER_ASSESSMENT_SHEET_ID,
-      baseName: buildAssessmentTabBase(lectureName, assessmentType),
-      excludeConfigId: configDoc._id,
-      session,
-    })
   }
 
   await configDoc.save({ session })
@@ -423,11 +464,18 @@ exports.recheckAssessmentAccess = catchAsync(async (req, res, next) => {
   };
 
   for (const studentId of studentIds) {
-    const studentIdentifier = user.email || user.name;
+    const studentDoc = await Student.findById(studentId)
+      .select("email phoneNumber sequencedId name")
+      .lean();
+    const studentIdentifier =
+      studentDoc?.email ||
+      studentDoc?.phoneNumber ||
+      (studentDoc?.sequencedId != null ? String(studentDoc.sequencedId) : null) ||
+      studentId.toString();
 
     if (lecture.requiresExam && lecture.examConfig) {
       try {
-        const examResult = await processAssessmentSubmissionFromSheet({
+        const examResult = await examSubmissionSync.processAssessmentSubmissionFromSheet({
           lecture,
           lectureId,
           studentId,
@@ -454,7 +502,7 @@ exports.recheckAssessmentAccess = catchAsync(async (req, res, next) => {
 
     if (lecture.requiresHomework && lecture.homeworkConfig) {
       try {
-        const homeworkResult = await processAssessmentSubmissionFromSheet({
+        const homeworkResult = await examSubmissionSync.processAssessmentSubmissionFromSheet({
           lecture,
           lectureId,
           studentId,
