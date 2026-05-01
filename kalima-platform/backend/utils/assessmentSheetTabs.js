@@ -1,5 +1,24 @@
 const AppError = require("./appError");
 
+const extractGoogleApiMessage = (error) => {
+  return (
+    error?.response?.data?.error?.message ||
+    error?.response?.data?.message ||
+    error?.message ||
+    null
+  );
+};
+
+const wrapSheetApiError = (error, fallbackMessage, statusCode = 500) => {
+  if (error?.isOperational) {
+    return error;
+  }
+
+  const apiMessage = extractGoogleApiMessage(error);
+  const message = apiMessage ? `${fallbackMessage}: ${apiMessage}` : fallbackMessage;
+  return new AppError(message, statusCode);
+};
+
 const FORM_RESPONSES_TAB_PATTERN = /^Form Responses(?: \d+)?$/i;
 const FORM_RESPONSES_UNDERSCORE_TAB_PATTERN = /^Form_Responses(?: \d+)?$/i;
 
@@ -23,10 +42,18 @@ const listSpreadsheetTabs = async ({ sheets, sheetId }) => {
     return [];
   }
 
-  const response = await sheets.spreadsheets.get({
-    spreadsheetId: sheetId,
-    fields: "sheets(properties(sheetId,title,index))",
-  });
+  let response;
+  try {
+    response = await sheets.spreadsheets.get({
+      spreadsheetId: sheetId,
+      fields: "sheets(properties(sheetId,title,index))",
+    });
+  } catch (error) {
+    throw wrapSheetApiError(
+      error,
+      "Unable to read tabs from the master assessment sheet. Verify the configured spreadsheet ID and service-account access"
+    );
+  }
 
   return (response?.data?.sheets || [])
     .map((sheetMeta) => {
@@ -70,22 +97,29 @@ const renameSpreadsheetTab = async ({ sheets, sheetId, sourceSheetId, nextTitle 
     throw new AppError("Spreadsheet tab could not be resolved for rename", 500);
   }
 
-  await sheets.spreadsheets.batchUpdate({
-    spreadsheetId: sheetId,
-    requestBody: {
-      requests: [
-        {
-          updateSheetProperties: {
-            properties: {
-              sheetId: Number(sourceSheetId),
-              title: normalizedTitle,
+  try {
+    await sheets.spreadsheets.batchUpdate({
+      spreadsheetId: sheetId,
+      requestBody: {
+        requests: [
+          {
+            updateSheetProperties: {
+              properties: {
+                sheetId: Number(sourceSheetId),
+                title: normalizedTitle,
+              },
+              fields: "title",
             },
-            fields: "title",
           },
-        },
-      ],
-    },
-  });
+        ],
+      },
+    });
+  } catch (error) {
+    throw wrapSheetApiError(
+      error,
+      "Unable to rename the response tab in the master assessment sheet. The service account likely needs Editor access"
+    );
+  }
 
   return normalizedTitle;
 };
@@ -96,20 +130,27 @@ const addSpreadsheetTab = async ({ sheets, sheetId, title }) => {
     throw new AppError("Spreadsheet tab name is required", 400);
   }
 
-  await sheets.spreadsheets.batchUpdate({
-    spreadsheetId: sheetId,
-    requestBody: {
-      requests: [
-        {
-          addSheet: {
-            properties: {
-              title: normalizedTitle,
+  try {
+    await sheets.spreadsheets.batchUpdate({
+      spreadsheetId: sheetId,
+      requestBody: {
+        requests: [
+          {
+            addSheet: {
+              properties: {
+                title: normalizedTitle,
+              },
             },
           },
-        },
-      ],
-    },
-  });
+        ],
+      },
+    });
+  } catch (error) {
+    throw wrapSheetApiError(
+      error,
+      "Unable to create a new response tab in the master assessment sheet. The service account likely needs Editor access"
+    );
+  }
 
   return normalizedTitle;
 };

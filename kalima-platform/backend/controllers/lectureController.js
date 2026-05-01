@@ -209,108 +209,120 @@ const ensureManagedAssessmentConfig = async ({
   existingConfigId = null,
   session,
 }) => {
-  if (!MASTER_ASSESSMENT_SHEET_ID) {
+  const assessmentLabel = assessmentType === "homework" ? "Homework" : "Exam"
+
+  try {
+    if (!MASTER_ASSESSMENT_SHEET_ID) {
+      throw new AppError(
+        "Master assessment sheet is not configured on the server",
+        500
+      )
+    }
+
+    const normalizedFormUrl = normalizePublicFormUrl(formUrl, assessmentLabel)
+    const existingId = toObjectIdOrNull(existingConfigId)
+    const defaultPassingThreshold = passingThreshold !== undefined ? Number(passingThreshold) : 60
+    let writableSheets
+
+    try {
+      writableSheets = configureGoogleSheets({ readOnly: false })
+    } catch (_error) {
+      throw new AppError("Google Sheets integration is not configured correctly on the server", 500)
+    }
+
+    let configDoc = null
+    if (existingId) {
+      configDoc = await LecturerExamConfig.findOne({
+        _id: existingId,
+        lecturer: lecturerId,
+        type: assessmentType,
+      }).session(session)
+    }
+
+    const desiredTabName = await resolveUniqueAssessmentTabName({
+      sheetId: MASTER_ASSESSMENT_SHEET_ID,
+      baseName: buildAssessmentTabBase(lectureName, assessmentType),
+      excludeConfigId: configDoc?._id || null,
+      session,
+    })
+    const claimedTabNames = await getClaimedAssessmentTabNames({
+      sheetId: MASTER_ASSESSMENT_SHEET_ID,
+      excludeConfigId: configDoc?._id || null,
+      session,
+    })
+    const publishedFormDetails = await getPublishedFormDetails({
+      formUrl: normalizedFormUrl,
+      expectedSheetId: MASTER_ASSESSMENT_SHEET_ID,
+    })
+    const matchedResponseTab = publishedFormDetails.validationSkipped
+      ? null
+      : await detectMatchingResponseTab({
+        sheetId: MASTER_ASSESSMENT_SHEET_ID,
+        claimedTabNames,
+        responseSamples: publishedFormDetails.responseSamples,
+      })
+    const ensuredSheetTab = await ensureAssessmentSheetTab({
+      sheets: writableSheets,
+      sheetId: MASTER_ASSESSMENT_SHEET_ID,
+      desiredTabName,
+      currentTabName: configDoc?.googleSheetTabName || null,
+      claimedTabNames,
+      preferredFallbackTitle: matchedResponseTab,
+      preferNewestUnclaimed: !configDoc,
+      createIfMissing: false,
+    })
+
+    if (ensuredSheetTab.action === "missing") {
+      throw new AppError(
+        `Unable to bind ${assessmentLabel.toLowerCase()} form responses to a sheet tab. Link the Google Form to the master sheet, then retry.`,
+        400
+      )
+    }
+
+    if (!configDoc) {
+      const createdConfig = await LecturerExamConfig.create(
+        [
+          {
+            lecturer: lecturerId,
+            name: `${lectureName} ${assessmentLabel}`,
+            type: assessmentType,
+            description: `${assessmentLabel} configuration for ${lectureName}`,
+            googleSheetId: MASTER_ASSESSMENT_SHEET_ID,
+            googleSheetTabName: ensuredSheetTab.title,
+            formUrl: normalizedFormUrl,
+            studentIdentifierColumn: MASTER_ASSESSMENT_IDENTIFIER_COLUMN,
+            scoreColumn: MASTER_ASSESSMENT_SCORE_COLUMN,
+            defaultPassingThreshold,
+            isActive: true,
+          },
+        ],
+        { session },
+      )
+
+      return createdConfig[0]
+    }
+
+    configDoc.formUrl = normalizedFormUrl
+    configDoc.googleSheetId = MASTER_ASSESSMENT_SHEET_ID
+    configDoc.studentIdentifierColumn = MASTER_ASSESSMENT_IDENTIFIER_COLUMN
+    configDoc.scoreColumn = MASTER_ASSESSMENT_SCORE_COLUMN
+    configDoc.googleSheetTabName = ensuredSheetTab.title
+    if (configDoc.defaultPassingThreshold === undefined || configDoc.defaultPassingThreshold === null) {
+      configDoc.defaultPassingThreshold = defaultPassingThreshold
+    }
+
+    await configDoc.save({ session })
+    return configDoc
+  } catch (error) {
+    if (error?.isOperational) {
+      throw error
+    }
+
     throw new AppError(
-      "Master assessment sheet is not configured on the server",
+      `Failed to prepare ${assessmentLabel.toLowerCase()} configuration: ${error.message || "Unknown error"}`,
       500
     )
   }
-
-  const assessmentLabel = assessmentType === "homework" ? "Homework" : "Exam"
-  const normalizedFormUrl = normalizePublicFormUrl(formUrl, assessmentLabel)
-  const existingId = toObjectIdOrNull(existingConfigId)
-  const defaultPassingThreshold = passingThreshold !== undefined ? Number(passingThreshold) : 60
-  let writableSheets
-
-  try {
-    writableSheets = configureGoogleSheets({ readOnly: false })
-  } catch (_error) {
-    throw new AppError("Google Sheets integration is not configured correctly on the server", 500)
-  }
-
-  let configDoc = null
-  if (existingId) {
-    configDoc = await LecturerExamConfig.findOne({
-      _id: existingId,
-      lecturer: lecturerId,
-      type: assessmentType,
-    }).session(session)
-  }
-
-  const desiredTabName = await resolveUniqueAssessmentTabName({
-    sheetId: MASTER_ASSESSMENT_SHEET_ID,
-    baseName: buildAssessmentTabBase(lectureName, assessmentType),
-    excludeConfigId: configDoc?._id || null,
-    session,
-  })
-  const claimedTabNames = await getClaimedAssessmentTabNames({
-    sheetId: MASTER_ASSESSMENT_SHEET_ID,
-    excludeConfigId: configDoc?._id || null,
-    session,
-  })
-  const publishedFormDetails = await getPublishedFormDetails({
-    formUrl: normalizedFormUrl,
-    expectedSheetId: MASTER_ASSESSMENT_SHEET_ID,
-  })
-  const matchedResponseTab = publishedFormDetails.validationSkipped
-    ? null
-    : await detectMatchingResponseTab({
-      sheetId: MASTER_ASSESSMENT_SHEET_ID,
-      claimedTabNames,
-      responseSamples: publishedFormDetails.responseSamples,
-    })
-  const ensuredSheetTab = await ensureAssessmentSheetTab({
-    sheets: writableSheets,
-    sheetId: MASTER_ASSESSMENT_SHEET_ID,
-    desiredTabName,
-    currentTabName: configDoc?.googleSheetTabName || null,
-    claimedTabNames,
-    preferredFallbackTitle: matchedResponseTab,
-    preferNewestUnclaimed: !configDoc,
-    createIfMissing: false,
-  })
-
-  if (ensuredSheetTab.action === "missing") {
-    throw new AppError(
-      `Unable to bind ${assessmentLabel.toLowerCase()} form responses to a sheet tab. Link the Google Form to the master sheet, then retry.`,
-      400
-    )
-  }
-
-  if (!configDoc) {
-    const createdConfig = await LecturerExamConfig.create(
-      [
-        {
-          lecturer: lecturerId,
-          name: `${lectureName} ${assessmentLabel}`,
-          type: assessmentType,
-          description: `${assessmentLabel} configuration for ${lectureName}`,
-          googleSheetId: MASTER_ASSESSMENT_SHEET_ID,
-          googleSheetTabName: ensuredSheetTab.title,
-          formUrl: normalizedFormUrl,
-          studentIdentifierColumn: MASTER_ASSESSMENT_IDENTIFIER_COLUMN,
-          scoreColumn: MASTER_ASSESSMENT_SCORE_COLUMN,
-          defaultPassingThreshold,
-          isActive: true,
-        },
-      ],
-      { session },
-    )
-
-    return createdConfig[0]
-  }
-
-  configDoc.formUrl = normalizedFormUrl
-  configDoc.googleSheetId = MASTER_ASSESSMENT_SHEET_ID
-  configDoc.studentIdentifierColumn = MASTER_ASSESSMENT_IDENTIFIER_COLUMN
-  configDoc.scoreColumn = MASTER_ASSESSMENT_SCORE_COLUMN
-  configDoc.googleSheetTabName = ensuredSheetTab.title
-  if (configDoc.defaultPassingThreshold === undefined || configDoc.defaultPassingThreshold === null) {
-    configDoc.defaultPassingThreshold = defaultPassingThreshold
-  }
-
-  await configDoc.save({ session })
-  return configDoc
 }
 
 const deleteFile = (filePath) => {

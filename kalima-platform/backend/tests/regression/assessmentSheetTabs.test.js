@@ -78,3 +78,26 @@ test("ensureAssessmentSheetTab can claim newest unclaimed Form Responses tab", a
     2
   );
 });
+
+test("ensureAssessmentSheetTab surfaces readable sheet access errors", async () => {
+  const sheets = {
+    spreadsheets: {
+      get: async () => {
+        const error = new Error("The caller does not have permission");
+        error.response = { data: { error: { message: "The caller does not have permission" } } };
+        throw error;
+      },
+    },
+  };
+
+  await assert.rejects(
+    ensureAssessmentSheetTab({
+      sheets,
+      sheetId: "sheet-1",
+      desiredTabName: "biology-exam",
+      currentTabName: null,
+      claimedTabNames: [],
+    }),
+    /Unable to read tabs from the master assessment sheet\. Verify the configured spreadsheet ID and service-account access: The caller does not have permission/
+  );
+});
