@@ -8,9 +8,25 @@ const FORMS_READONLY_SCOPES = [
   'https://www.googleapis.com/auth/forms.responses.readonly',
 ];
 
+const normalizeGooglePrivateKey = (rawValue) => {
+  let normalized = String(rawValue || "").trim();
+
+  if (
+    (normalized.startsWith('"') && normalized.endsWith('"')) ||
+    (normalized.startsWith("'") && normalized.endsWith("'"))
+  ) {
+    normalized = normalized.slice(1, -1);
+  }
+
+  return normalized
+    .replace(/\\r/g, '')
+    .replace(/\\n/g, '\n')
+    .trim();
+};
+
 const createGoogleJwt = (scopes) => {
   const clientEmail = String(process.env.GOOGLE_CLIENT_EMAIL || "").trim();
-  const privateKey = String(process.env.GOOGLE_PRIVATE_KEY || "").trim();
+  const privateKey = normalizeGooglePrivateKey(process.env.GOOGLE_PRIVATE_KEY);
 
   if (!clientEmail || !privateKey) {
     throw new Error(
@@ -53,6 +69,7 @@ module.exports = {
   createGoogleJwt,
   configureGoogleSheets,
   configureGoogleForms,
+  normalizeGooglePrivateKey,
   READONLY_SCOPES,
   READWRITE_SCOPES,
   FORMS_READONLY_SCOPES,
