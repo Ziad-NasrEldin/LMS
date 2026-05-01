@@ -25,25 +25,13 @@ const findHeaderIndex = (headers, target) => {
   return headers.findIndex((header) => normalizeHeader(header) === normalizedTarget);
 };
 
-const isRecoverableFormAccessError = (error) => {
-  const statusCode = Number(
-    error?.code || error?.status || error?.response?.status || error?.statusCode
-  );
-  const message = String(error?.message || "").toLowerCase();
-
-  if ([401, 403].includes(statusCode)) {
-    return true;
-  }
-
-  return [
-    "google service account credentials are not configured",
-    "insufficient authentication",
-    "insufficient permission",
-    "permission denied",
-    "forbidden",
-    "the caller does not have permission",
-  ].some((needle) => message.includes(needle));
-};
+const buildSkippedValidationResult = (formId) => ({
+  formId,
+  linkedSheetId: null,
+  responderUri: null,
+  responseSamples: [],
+  validationSkipped: true,
+});
 
 const getPublishedFormDetails = async ({ formUrl, expectedSheetId }) => {
   const formId = extractGoogleFormId(formUrl);
@@ -55,20 +43,8 @@ const getPublishedFormDetails = async ({ formUrl, expectedSheetId }) => {
   try {
     forms = googleApiConfig.configureGoogleForms();
   } catch (error) {
-    if (isRecoverableFormAccessError(error)) {
-      return {
-        formId,
-        linkedSheetId: null,
-        responderUri: null,
-        responseSamples: [],
-        validationSkipped: true,
-      };
-    }
-
-    throw new AppError(
-      "Google Forms integration is not configured correctly on the server.",
-      500
-    );
+    console.warn("Skipping Google Form inspection because Google Forms client could not be configured:", error?.message || error);
+    return buildSkippedValidationResult(formId);
   }
 
   let form;
@@ -76,20 +52,8 @@ const getPublishedFormDetails = async ({ formUrl, expectedSheetId }) => {
     const response = await forms.forms.get({ formId });
     form = response.data;
   } catch (error) {
-    if (isRecoverableFormAccessError(error)) {
-      return {
-        formId,
-        linkedSheetId: null,
-        responderUri: null,
-        responseSamples: [],
-        validationSkipped: true,
-      };
-    }
-
-    throw new AppError(
-      "Unable to inspect the Google Form. Share the form with the configured service account before linking it in Fekra.",
-      400
-    );
+    console.warn("Skipping Google Form inspection because form metadata could not be read:", error?.message || error);
+    return buildSkippedValidationResult(formId);
   }
 
   if (!form?.linkedSheetId) {

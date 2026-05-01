@@ -75,6 +75,24 @@ test("getPublishedFormDetails skips hard failure when form access is unavailable
   }
 });
 
+test("getPublishedFormDetails skips hard failure when Google Forms client is unavailable", async () => {
+  try {
+    googleApiConfig.configureGoogleForms = () => {
+      throw new Error("Google service account credentials are not configured");
+    };
+
+    const result = await formSheetValidation.getPublishedFormDetails({
+      formUrl: "https://docs.google.com/forms/d/e/test/viewform",
+      expectedSheetId: "master-sheet-id",
+    });
+
+    assert.equal(result.validationSkipped, true);
+    assert.equal(result.linkedSheetId, null);
+  } finally {
+    restorePatches();
+  }
+});
+
 test("detectMatchingResponseTab matches a form response sample to the correct response tab", async () => {
   try {
     googleApiConfig.configureGoogleSheets = () => ({
