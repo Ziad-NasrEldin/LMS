@@ -292,6 +292,16 @@ const hasPassedAssessment = async (studentId, lectureId, assessmentType) => {
   return Boolean(submission);
 };
 
+const hasAnyPassedAssessment = async (studentIds, lectureId, assessmentType) => {
+  const passedResults = await Promise.all(
+    studentIds.map((studentId) =>
+      hasPassedAssessment(studentId, lectureId, assessmentType)
+    )
+  );
+
+  return passedResults.some(Boolean);
+};
+
 exports.createStudentLectureAccess = catchAsync(async (req, res, next) => {
   const { student, lecture } = req.body;
 
@@ -659,15 +669,19 @@ exports.checkLectureAccess = catchAsync(async (req, res, next) => {
       const childrenIds = await getParentChildrenIds(userId);
       
       if (lecture.requiresExam) {
-        results.exam.passed = await Promise.any(
-          childrenIds.map(childId => hasPassedAssessment(childId, lectureId, "exam"))
-        ).catch(() => false);
+        results.exam.passed = await hasAnyPassedAssessment(
+          childrenIds,
+          lectureId,
+          "exam"
+        );
       }
 
       if (lecture.requiresHomework) {
-        results.homework.passed = await Promise.any(
-          childrenIds.map(childId => hasPassedAssessment(childId, lectureId, "homework"))
-        ).catch(() => false);
+        results.homework.passed = await hasAnyPassedAssessment(
+          childrenIds,
+          lectureId,
+          "homework"
+        );
       }
     } else {
       if (lecture.requiresExam) {

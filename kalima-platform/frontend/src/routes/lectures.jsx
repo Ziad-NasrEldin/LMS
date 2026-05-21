@@ -3,7 +3,7 @@ import { getToken, isLoggedIn } from "./auth-services"
 import { normalizeApiError, normalizeApiErrorWithEmpty404 } from "../utils/apiError"
 import { translateErrorMessage } from "../utils/errorTranslator"
 
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = import.meta.env.VITE_API_URL || "/api/v1";
 
 const authHeaders = (extraHeaders = {}) => ({
   Authorization: `Bearer ${getToken()}`,
@@ -19,9 +19,10 @@ const authConfig = ({ withCredentials = true, headers = {}, ...rest } = {}) => (
 export const loadLecturePage = async (lectureId) => {
   try {
     const response = await axios.get(`${API_URL}/lectures/load-page/${lectureId}`, authConfig());
+    const payload = response.data?.data || response.data
     return {
       success: true,
-      data: response.data.data,
+      data: payload,
     };
   } catch (error) {
     return normalizeApiError(error, "Failed to load lecture page data");
@@ -35,9 +36,10 @@ export const recheckAssessmentAccess = async (lectureId) => {
       {},
       authConfig()
     );
+    const payload = response.data?.data || response.data
     return {
       success: true,
-      data: response.data.data,
+      data: payload,
     };
   } catch (error) {
     return normalizeApiError(error, "Failed to recheck assessment access");

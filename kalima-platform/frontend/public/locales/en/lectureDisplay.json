@@ -60,6 +60,8 @@
   "accessVerificationHint": "After submitting, wait a moment for sync, then click Recheck Access.",
   "statusPassed": "Passed",
   "statusPending": "Pending",
+  "statusFailed": "Failed",
+  "assessmentSyncFailed": "Could not sync this assessment. Please try again.",
   "examPassedSuccessfully": "Exam passed successfully!",
   "score": "Score",
   "passDate": "Pass date",

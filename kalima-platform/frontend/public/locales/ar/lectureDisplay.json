@@ -61,6 +61,8 @@
   "accessVerificationHint": "بعد الإرسال، انتظر قليلًا حتى تتم المزامنة ثم اضغط إعادة التحقق من الوصول.",
   "statusPassed": "تم الاجتياز",
   "statusPending": "قيد الانتظار",
+  "statusFailed": "لم يتم الاجتياز",
+  "assessmentSyncFailed": "تعذر مزامنة هذا التقييم. حاول مرة أخرى.",
   "examPassedSuccessfully": "تم اجتياز الامتحان بنجاح!",
   "score": "الدرجة",
   "passDate": "تاريخ الاجتياز",

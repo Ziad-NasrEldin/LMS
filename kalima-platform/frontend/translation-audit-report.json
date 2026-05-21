@@ -4,19 +4,19 @@
     "namespaceCountAr": 33,
     "missingArNamespacesCount": 0,
     "missingEnNamespacesCount": 0,
-    "missingUsedKeysInEnCount": 144,
-    "missingUsedKeysInArCount": 124
+    "missingUsedKeysInEnCount": 68,
+    "missingUsedKeysInArCount": 60
   },
   "missingArNamespaces": [],
   "missingEnNamespaces": [],
   "byNamespace": {
     "admin": {
-      "enCount": 417,
-      "arCount": 417,
+      "enCount": 408,
+      "arCount": 408,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": [
-        "admin.auditlog.idDisplay"
+        "auditlog.idDisplay"
       ]
     },
     "admin-signedLecturers": {
@@ -61,30 +61,17 @@
       ]
     },
     "common": {
-      "enCount": 353,
-      "arCount": 353,
+      "enCount": 404,
+      "arCount": 404,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": []
     },
     "courseDetails": {
-      "enCount": 239,
+      "enCount": 251,
       "arCount": 251,
       "missingInAr": [],
-      "missingInEn": [
-        "syllabus.loading",
-        "syllabus.collapseAll",
-        "syllabus.expandAll",
-        "syllabus.title",
-        "errors.accessRestricted",
-        "errors.error",
-        "loginPrompt",
-        "loginPrompt.title",
-        "loginPrompt.message",
-        "loginPrompt.loginButton",
-        "loginPrompt.registerButton",
-        "loginPrompt.cancel"
-      ],
+      "missingInEn": [],
       "suspiciousSame": [
         "details.lecturesCount"
       ]
@@ -152,10 +139,11 @@
       ]
     },
     "createUser": {
-      "enCount": 229,
-      "arCount": 228,
+      "enCount": 246,
+      "arCount": 244,
       "missingInAr": [
-        "placeholders.phoneNumber2"
+        "placeholders.phoneNumber2",
+        "placeholders.selectTeachingType"
       ],
       "missingInEn": [],
       "suspiciousSame": []
@@ -232,8 +220,8 @@
       "suspiciousSame": []
     },
     "lectureDisplay": {
-      "enCount": 178,
-      "arCount": 179,
+      "enCount": 218,
+      "arCount": 219,
       "missingInAr": [],
       "missingInEn": [
         "emailCopied"
@@ -255,8 +243,8 @@
       "suspiciousSame": []
     },
     "lecturesPage": {
-      "enCount": 213,
-      "arCount": 214,
+      "enCount": 216,
+      "arCount": 217,
       "missingInAr": [],
       "missingInEn": [
         "containerDetails.buttons.backToDashboard"
@@ -298,8 +286,8 @@
       "suspiciousSame": []
     },
     "register": {
-      "enCount": 368,
-      "arCount": 392,
+      "enCount": 373,
+      "arCount": 397,
       "missingInAr": [
         "form.unknownUser",
         "form.remove"
@@ -335,8 +323,8 @@
       "suspiciousSame": []
     },
     "settings": {
-      "enCount": 103,
-      "arCount": 103,
+      "enCount": 109,
+      "arCount": 109,
       "missingInAr": [],
       "missingInEn": [],
       "suspiciousSame": []
@@ -364,490 +352,10 @@
       "fn": "tCommon"
     },
     {
-      "file": "pages/User Dashboard/Lecture Page/LectureDisplay.jsx",
-      "ns": "lectureDisplay",
-      "key": "noEmailFound",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Lecture Page/LectureDisplay.jsx",
-      "ns": "lectureDisplay",
-      "key": "emailCopied",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Lecture Page/LectureDisplay.jsx",
-      "ns": "lectureDisplay",
-      "key": "pleaseWait",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Lecture Page/LectureDisplay.jsx",
-      "ns": "lectureDisplay",
-      "key": "lectureDisplay",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Lecture Page/LectureDisplay.jsx",
-      "ns": "lectureDisplay",
-      "key": "googleForms",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Lecture Page/LectureDisplay.jsx",
-      "ns": "lectureDisplay",
-      "key": "lectureDisplay",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Lecture Page/LectureDisplay.jsx",
-      "ns": "lectureDisplay",
-      "key": "lectureDisplayDescription",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Lecture Page/LectureDisplay.jsx",
-      "ns": "lectureDisplay",
-      "key": "viewLecture",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Lecture Page/LectureDisplay.jsx",
-      "ns": "lectureDisplay",
-      "key": "community",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Lecture Page/LectureDisplay.jsx",
-      "ns": "lectureDisplay",
-      "key": "googleForms",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Lecture Page/LectureDisplay.jsx",
-      "ns": "lectureDisplay",
-      "key": "openExamGoogleForm",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Lecture Page/LectureDisplay.jsx",
-      "ns": "lectureDisplay",
-      "key": "openExamForm",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Lecture Page/LectureDisplay.jsx",
-      "ns": "lectureDisplay",
-      "key": "openHomeworkGoogleForm",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Lecture Page/LectureDisplay.jsx",
-      "ns": "lectureDisplay",
-      "key": "openHomeworkForm",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Lecture Page/LectureDisplay.jsx",
-      "ns": "lectureDisplay",
-      "key": "uploadedOn",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Lecture Page/LectureDisplay.jsx",
-      "ns": "lectureDisplay",
-      "key": "noAttachmentsAvailable",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Lecture Page/LectureDisplay.jsx",
-      "ns": "lectureDisplay",
-      "key": "uploadAttachments",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Lecture Page/LectureDisplay.jsx",
-      "ns": "lectureDisplay",
-      "key": "attachmentsUploadHint",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/signed-lecturers.jsx",
-      "ns": "admin-signedLecturers",
-      "key": "errors.fetchFailed",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/signed-lecturers.jsx",
-      "ns": "admin-signedLecturers",
-      "key": "errors.fetchFailed",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/signed-lecturers.jsx",
-      "ns": "admin-signedLecturers",
-      "key": "search.placeholder",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/home/PromoCodesGenerator.jsx",
-      "ns": "admin",
-      "key": "admin.codesGenerated",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/home/PromoCodesGenerator.jsx",
-      "ns": "admin",
-      "key": "admin.codesGenerated",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/home/PromoCodesGenerator.jsx",
-      "ns": "admin",
-      "key": "admin.downloadSuccess",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/home/PromoCodesGenerator.jsx",
-      "ns": "admin",
-      "key": "admin.downloadFailed",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/home/PromoCodesGenerator.jsx",
-      "ns": "admin",
-      "key": "admin.form.count",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/home/PromoCodesGenerator.jsx",
-      "ns": "admin",
-      "key": "admin.form.allLecturers",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/home/PromoCodesGenerator.jsx",
-      "ns": "admin",
-      "key": "admin.form.type",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/home/PromoCodesGenerator.jsx",
-      "ns": "admin",
-      "key": "admin.form.points",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/home/PromoCodesGenerator.jsx",
-      "ns": "admin",
-      "key": "admin.form.expiryDate",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/home/PromoCodesGenerator.jsx",
-      "ns": "admin",
-      "key": "admin.form.qrCodes",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/home/PromoCodesGenerator.jsx",
-      "ns": "admin",
-      "key": "admin.exporting",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/home/PromoCodesGenerator.jsx",
-      "ns": "admin",
-      "key": "admin.copied",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/home/PromoCodesGenerator.jsx",
-      "ns": "admin",
-      "key": "admin.code",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/home/PromoCodesGenerator.jsx",
-      "ns": "admin",
-      "key": "admin.value",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/home/PromoCodesGenerator.jsx",
-      "ns": "admin",
-      "key": "admin.copied",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
-      "ns": "admin",
-      "key": "admin.export.userSerial",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
-      "ns": "admin",
-      "key": "admin.export.promoPoints",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
-      "ns": "admin",
-      "key": "admin.export.referredBy",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
-      "ns": "admin",
-      "key": "admin.export.updatedAt",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
-      "ns": "admin",
-      "key": "admin.export.noData",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
-      "ns": "admin",
-      "key": "admin.export.xlsxFormat",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "fields.male",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "fields.female",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "fields.studentInfo",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "fields.stage",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "fields.level",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "placeholders.selectStage",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "fields.level",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "placeholders.selectStageFirst",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "placeholders.selectGradeLevel",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "fields.sequencedIdOptional",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "fields.hobby",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "fields.hobbies",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "placeholders.selectHobby",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "fields.faction",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "fields.school",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "fields.parentPhoneNumber",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "placeholders.selectParentRelation",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "buttons.addAnotherParentPhone",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "fields.parentPhoneNumber2",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "buttons.removeParentPhone",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "placeholders.selectParentRelation",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "fields.government",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "fields.selectGovernment",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "fields.administrationZone",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "fields.loadingZones",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "fields.selectAdministrationZone",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "fields.lecturerInfo",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "fields.expertise",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "fields.subject",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "fields.bio",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "fields.assistantInfo",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "fields.assignedLecturer",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "fields.selectLecturer",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "fields.government",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "fields.selectGovernment",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "fields.administrationZone",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "fields.selectAdministrationZone",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "parentRelations.${relation}",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "parentRelations.${relation}",
-      "fn": "t"
+      "file": "pages/CourseDetails.jsx",
+      "ns": "common",
+      "key": "errors.purchaseProcessError",
+      "fn": "tCommon"
     },
     {
       "file": "pages/signup/StudentRegistration.jsx",
@@ -904,431 +412,39 @@
       "fn": "t"
     },
     {
-      "file": "pages/Lecturer Dashboard/CourseGrid.jsx",
-      "ns": "lecturerDashboard",
-      "key": "imageUnavailable",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
-      "ns": "lecturerDashboard",
-      "key": "generatedAt",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
-      "ns": "lecturerDashboard",
-      "key": "yes",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
-      "ns": "lecturerDashboard",
-      "key": "no",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
-      "ns": "lecturerDashboard",
-      "key": "field",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
-      "ns": "lecturerDashboard",
-      "key": "value",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
-      "ns": "lecturerDashboard",
-      "key": "contentId",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
-      "ns": "lecturerDashboard",
-      "key": "promoId",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
-      "ns": "lecturerDashboard",
-      "key": "code",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
-      "ns": "lecturerDashboard",
-      "key": "studentId",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
-      "ns": "lecturerDashboard",
-      "key": "lectureId",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
-      "ns": "lecturerDashboard",
-      "key": "lastViewEventAt",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
-      "ns": "lecturerDashboard",
-      "key": "summarySheet",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
-      "ns": "lecturerDashboard",
-      "key": "purchasesByContent",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
-      "ns": "lecturerDashboard",
-      "key": "promoCodes",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
-      "ns": "lecturerDashboard",
-      "key": "section",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
-      "ns": "lecturerDashboard",
-      "key": "field",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
-      "ns": "lecturerDashboard",
-      "key": "value",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
-      "ns": "lecturerDashboard",
-      "key": "contentId",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
-      "ns": "lecturerDashboard",
-      "key": "promoId",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
-      "ns": "lecturerDashboard",
-      "key": "code",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
-      "ns": "lecturerDashboard",
-      "key": "studentId",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
-      "ns": "lecturerDashboard",
-      "key": "lectureId",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
-      "ns": "lecturerDashboard",
-      "key": "lastViewEventAt",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
-      "ns": "lecturerDashboard",
-      "key": "summary",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
-      "ns": "lecturerDashboard",
-      "key": "purchasesByContent",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
-      "ns": "lecturerDashboard",
-      "key": "promoCodes",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
-      "ns": "lecturerDashboard",
-      "key": "exportSuccess",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
-      "ns": "lecturerDashboard",
-      "key": "exportData",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
-      "ns": "lecturerDashboard",
-      "key": "exportXlsx",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
-      "ns": "lecturerDashboard",
-      "key": "purchaseBreakdown",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
-      "ns": "lecturerDashboard",
-      "key": "promoCodes",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
-      "ns": "lecturerDashboard",
-      "key": "redeemed",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
-      "ns": "lecturerDashboard",
-      "key": "available",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/LecturerPromoCodesPage.jsx",
-      "ns": "lecturerDashboard",
-      "key": "promoCodes",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/LecturerPromoCodesPage.jsx",
-      "ns": "lecturerDashboard",
-      "key": "redeemed",
-      "fn": "t"
-    },
-    {
-      "file": "pages/Lecturer Dashboard/LecturerPromoCodesPage.jsx",
-      "ns": "lecturerDashboard",
-      "key": "available",
-      "fn": "t"
-    },
-    {
-      "file": "components/ExamConfigSection.jsx",
+      "file": "pages/User Dashboard/Lecture Page/ContainerPage.jsx",
       "ns": "lecturesPage",
-      "key": "examConfig.googleSheetFixedHelp",
+      "key": "containersPage.buttons.edit",
       "fn": "t"
     },
     {
-      "file": "components/ExamConfigSection.jsx",
+      "file": "pages/User Dashboard/Lecture Page/ContainerPage.jsx",
       "ns": "lecturesPage",
-      "key": "examConfig.googleSheetTabName",
+      "key": "containersPage.buttons.delete",
       "fn": "t"
     },
     {
-      "file": "components/ExamConfigSection.jsx",
+      "file": "pages/User Dashboard/Lecture Page/DetailedLectureViewing.jsx",
+      "ns": "lectureDisplay",
+      "key": "failedToSubmitFeedback",
+      "fn": "t"
+    },
+    {
+      "file": "pages/User Dashboard/Lecture Page/LecturesPage.jsx",
       "ns": "lecturesPage",
-      "key": "examConfig.googleSheetTabHelp",
+      "key": "lecturesPage.buttons.hideFilters",
       "fn": "t"
     },
     {
-      "file": "components/LoginPromptModal.jsx",
-      "ns": "courseDetails",
-      "key": "loginPrompt.title",
+      "file": "pages/User Dashboard/Lecture Page/LecturesPage.jsx",
+      "ns": "lecturesPage",
+      "key": "lecturesPage.buttons.showFilters",
       "fn": "t"
     },
     {
-      "file": "components/LoginPromptModal.jsx",
-      "ns": "courseDetails",
-      "key": "loginPrompt.message",
-      "fn": "t"
-    },
-    {
-      "file": "components/LoginPromptModal.jsx",
-      "ns": "courseDetails",
-      "key": "loginPrompt.loginButton",
-      "fn": "t"
-    },
-    {
-      "file": "components/LoginPromptModal.jsx",
-      "ns": "courseDetails",
-      "key": "loginPrompt.registerButton",
-      "fn": "t"
-    },
-    {
-      "file": "components/LoginPromptModal.jsx",
-      "ns": "courseDetails",
-      "key": "loginPrompt.cancel",
-      "fn": "t"
-    },
-    {
-      "file": "components/navbar.jsx",
-      "ns": "common",
-      "key": "closeMenu",
-      "fn": "t"
-    },
-    {
-      "file": "components/navbar.jsx",
-      "ns": "common",
-      "key": "openMenu",
-      "fn": "t"
-    },
-    {
-      "file": "components/Syllabus.jsx",
-      "ns": "courseDetails",
-      "key": "errors.accessRestricted",
-      "fn": "t"
-    },
-    {
-      "file": "components/Syllabus.jsx",
-      "ns": "courseDetails",
-      "key": "syllabus.loading",
-      "fn": "t"
-    },
-    {
-      "file": "components/Syllabus.jsx",
-      "ns": "courseDetails",
-      "key": "errors.error",
-      "fn": "t"
-    },
-    {
-      "file": "components/Syllabus.jsx",
-      "ns": "courseDetails",
-      "key": "syllabus.title",
-      "fn": "t"
-    },
-    {
-      "file": "components/Syllabus.jsx",
-      "ns": "courseDetails",
-      "key": "syllabus.collapseAll",
-      "fn": "t"
-    },
-    {
-      "file": "components/Syllabus.jsx",
-      "ns": "courseDetails",
-      "key": "syllabus.expandAll",
-      "fn": "t"
-    }
-  ],
-  "missingUsedInAr": [
-    {
-      "file": "pages/CourseDetails.jsx",
-      "ns": "common",
-      "key": "purchase.purchaseSuccess",
-      "fn": "tCommon"
-    },
-    {
-      "file": "pages/User Dashboard/Lecture Page/LectureDisplay.jsx",
-      "ns": "lectureDisplay",
-      "key": "noEmailFound",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Lecture Page/LectureDisplay.jsx",
-      "ns": "lectureDisplay",
-      "key": "pleaseWait",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Lecture Page/LectureDisplay.jsx",
-      "ns": "lectureDisplay",
-      "key": "lectureDisplay",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Lecture Page/LectureDisplay.jsx",
-      "ns": "lectureDisplay",
-      "key": "googleForms",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Lecture Page/LectureDisplay.jsx",
-      "ns": "lectureDisplay",
-      "key": "lectureDisplay",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Lecture Page/LectureDisplay.jsx",
-      "ns": "lectureDisplay",
-      "key": "lectureDisplayDescription",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Lecture Page/LectureDisplay.jsx",
-      "ns": "lectureDisplay",
-      "key": "viewLecture",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Lecture Page/LectureDisplay.jsx",
-      "ns": "lectureDisplay",
-      "key": "community",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Lecture Page/LectureDisplay.jsx",
-      "ns": "lectureDisplay",
-      "key": "googleForms",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Lecture Page/LectureDisplay.jsx",
-      "ns": "lectureDisplay",
-      "key": "openExamGoogleForm",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Lecture Page/LectureDisplay.jsx",
-      "ns": "lectureDisplay",
-      "key": "openExamForm",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Lecture Page/LectureDisplay.jsx",
-      "ns": "lectureDisplay",
-      "key": "openHomeworkGoogleForm",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Lecture Page/LectureDisplay.jsx",
-      "ns": "lectureDisplay",
-      "key": "openHomeworkForm",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Lecture Page/LectureDisplay.jsx",
-      "ns": "lectureDisplay",
-      "key": "uploadedOn",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Lecture Page/LectureDisplay.jsx",
-      "ns": "lectureDisplay",
-      "key": "noAttachmentsAvailable",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Lecture Page/LectureDisplay.jsx",
-      "ns": "lectureDisplay",
-      "key": "uploadAttachments",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Lecture Page/LectureDisplay.jsx",
-      "ns": "lectureDisplay",
-      "key": "attachmentsUploadHint",
+      "file": "pages/User Dashboard/Lecture Page/LecturesPage.jsx",
+      "ns": "lecturesPage",
+      "key": "lecturesPage.filters.activeFilters",
       "fn": "t"
     },
     {
@@ -1352,367 +468,31 @@
     {
       "file": "pages/User Dashboard/Admin dashboard/home/PromoCodesGenerator.jsx",
       "ns": "admin",
-      "key": "admin.codesGenerated",
+      "key": "errors.fetchLecturers",
       "fn": "t"
     },
     {
       "file": "pages/User Dashboard/Admin dashboard/home/PromoCodesGenerator.jsx",
       "ns": "admin",
-      "key": "admin.codesGenerated",
+      "key": "errors.fetchLecturers",
       "fn": "t"
     },
     {
       "file": "pages/User Dashboard/Admin dashboard/home/PromoCodesGenerator.jsx",
       "ns": "admin",
-      "key": "admin.downloadSuccess",
+      "key": "exporting",
       "fn": "t"
     },
     {
-      "file": "pages/User Dashboard/Admin dashboard/home/PromoCodesGenerator.jsx",
+      "file": "pages/User Dashboard/Admin dashboard/home/hero.jsx",
       "ns": "admin",
-      "key": "admin.downloadFailed",
+      "key": "admin.errors.fetchUsers",
       "fn": "t"
     },
     {
-      "file": "pages/User Dashboard/Admin dashboard/home/PromoCodesGenerator.jsx",
+      "file": "pages/User Dashboard/Admin dashboard/home/hero.jsx",
       "ns": "admin",
-      "key": "admin.form.count",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/home/PromoCodesGenerator.jsx",
-      "ns": "admin",
-      "key": "admin.form.allLecturers",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/home/PromoCodesGenerator.jsx",
-      "ns": "admin",
-      "key": "admin.form.type",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/home/PromoCodesGenerator.jsx",
-      "ns": "admin",
-      "key": "admin.form.points",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/home/PromoCodesGenerator.jsx",
-      "ns": "admin",
-      "key": "admin.form.expiryDate",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/home/PromoCodesGenerator.jsx",
-      "ns": "admin",
-      "key": "admin.form.qrCodes",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/home/PromoCodesGenerator.jsx",
-      "ns": "admin",
-      "key": "admin.exporting",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/home/PromoCodesGenerator.jsx",
-      "ns": "admin",
-      "key": "admin.copied",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/home/PromoCodesGenerator.jsx",
-      "ns": "admin",
-      "key": "admin.code",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/home/PromoCodesGenerator.jsx",
-      "ns": "admin",
-      "key": "admin.value",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/home/PromoCodesGenerator.jsx",
-      "ns": "admin",
-      "key": "admin.copied",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
-      "ns": "admin",
-      "key": "admin.export.userSerial",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
-      "ns": "admin",
-      "key": "admin.export.promoPoints",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
-      "ns": "admin",
-      "key": "admin.export.referredBy",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
-      "ns": "admin",
-      "key": "admin.export.updatedAt",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
-      "ns": "admin",
-      "key": "admin.export.noData",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/home/userManageTable.jsx",
-      "ns": "admin",
-      "key": "admin.export.xlsxFormat",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "fields.male",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "fields.female",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "fields.studentInfo",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "fields.stage",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "fields.level",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "placeholders.selectStage",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "fields.level",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "placeholders.selectStageFirst",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "placeholders.selectGradeLevel",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "fields.sequencedIdOptional",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "fields.hobby",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "fields.hobbies",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "placeholders.selectHobby",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "fields.faction",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "fields.school",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "fields.parentPhoneNumber",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "placeholders.selectParentRelation",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "buttons.addAnotherParentPhone",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "fields.parentPhoneNumber2",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "buttons.removeParentPhone",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "placeholders.selectParentRelation",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "fields.government",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "fields.selectGovernment",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "fields.administrationZone",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "fields.loadingZones",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "fields.selectAdministrationZone",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "fields.lecturerInfo",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "fields.expertise",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "fields.subject",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "fields.bio",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "fields.assistantInfo",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "fields.assignedLecturer",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "fields.selectLecturer",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "fields.government",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "fields.selectGovernment",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "fields.administrationZone",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "fields.selectAdministrationZone",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "parentRelations.${relation}",
-      "fn": "t"
-    },
-    {
-      "file": "pages/User Dashboard/Admin dashboard/CreateUserModal/EditUserModal.jsx",
-      "ns": "admin",
-      "key": "parentRelations.${relation}",
-      "fn": "t"
-    },
-    {
-      "file": "pages/signup/StudentRegistration.jsx",
-      "ns": "register",
-      "key": "registrationSuccess",
+      "key": "admin.errors.fetchUsers",
       "fn": "t"
     },
     {
@@ -1947,6 +727,374 @@
       "file": "components/ExamConfigSection.jsx",
       "ns": "lecturesPage",
       "key": "examConfig.googleSheetTabName",
+      "fn": "t"
+    },
+    {
+      "file": "components/ExamConfigSection.jsx",
+      "ns": "lecturesPage",
+      "key": "examConfig.googleSheetTabPlaceholder",
+      "fn": "t"
+    },
+    {
+      "file": "components/ExamConfigSection.jsx",
+      "ns": "lecturesPage",
+      "key": "examConfig.googleSheetTabHelp",
+      "fn": "t"
+    },
+    {
+      "file": "components/navbar.jsx",
+      "ns": "common",
+      "key": "closeMenu",
+      "fn": "t"
+    },
+    {
+      "file": "components/navbar.jsx",
+      "ns": "common",
+      "key": "openMenu",
+      "fn": "t"
+    }
+  ],
+  "missingUsedInAr": [
+    {
+      "file": "pages/CourseDetails.jsx",
+      "ns": "common",
+      "key": "purchase.purchaseSuccess",
+      "fn": "tCommon"
+    },
+    {
+      "file": "pages/CourseDetails.jsx",
+      "ns": "common",
+      "key": "errors.purchaseProcessError",
+      "fn": "tCommon"
+    },
+    {
+      "file": "pages/signup/StudentRegistration.jsx",
+      "ns": "register",
+      "key": "registrationSuccess",
+      "fn": "t"
+    },
+    {
+      "file": "pages/User Dashboard/Lecture Page/ContainerPage.jsx",
+      "ns": "lecturesPage",
+      "key": "containersPage.buttons.edit",
+      "fn": "t"
+    },
+    {
+      "file": "pages/User Dashboard/Lecture Page/ContainerPage.jsx",
+      "ns": "lecturesPage",
+      "key": "containersPage.buttons.delete",
+      "fn": "t"
+    },
+    {
+      "file": "pages/User Dashboard/Lecture Page/DetailedLectureViewing.jsx",
+      "ns": "lectureDisplay",
+      "key": "failedToSubmitFeedback",
+      "fn": "t"
+    },
+    {
+      "file": "pages/User Dashboard/Lecture Page/LecturesPage.jsx",
+      "ns": "lecturesPage",
+      "key": "lecturesPage.buttons.hideFilters",
+      "fn": "t"
+    },
+    {
+      "file": "pages/User Dashboard/Lecture Page/LecturesPage.jsx",
+      "ns": "lecturesPage",
+      "key": "lecturesPage.buttons.showFilters",
+      "fn": "t"
+    },
+    {
+      "file": "pages/User Dashboard/Lecture Page/LecturesPage.jsx",
+      "ns": "lecturesPage",
+      "key": "lecturesPage.filters.activeFilters",
+      "fn": "t"
+    },
+    {
+      "file": "pages/User Dashboard/Admin dashboard/signed-lecturers.jsx",
+      "ns": "admin-signedLecturers",
+      "key": "errors.fetchFailed",
+      "fn": "t"
+    },
+    {
+      "file": "pages/User Dashboard/Admin dashboard/signed-lecturers.jsx",
+      "ns": "admin-signedLecturers",
+      "key": "errors.fetchFailed",
+      "fn": "t"
+    },
+    {
+      "file": "pages/User Dashboard/Admin dashboard/signed-lecturers.jsx",
+      "ns": "admin-signedLecturers",
+      "key": "search.placeholder",
+      "fn": "t"
+    },
+    {
+      "file": "pages/User Dashboard/Admin dashboard/home/PromoCodesGenerator.jsx",
+      "ns": "admin",
+      "key": "errors.fetchLecturers",
+      "fn": "t"
+    },
+    {
+      "file": "pages/User Dashboard/Admin dashboard/home/PromoCodesGenerator.jsx",
+      "ns": "admin",
+      "key": "errors.fetchLecturers",
+      "fn": "t"
+    },
+    {
+      "file": "pages/User Dashboard/Admin dashboard/home/PromoCodesGenerator.jsx",
+      "ns": "admin",
+      "key": "exporting",
+      "fn": "t"
+    },
+    {
+      "file": "pages/User Dashboard/Admin dashboard/home/hero.jsx",
+      "ns": "admin",
+      "key": "admin.errors.fetchUsers",
+      "fn": "t"
+    },
+    {
+      "file": "pages/User Dashboard/Admin dashboard/home/hero.jsx",
+      "ns": "admin",
+      "key": "admin.errors.fetchUsers",
+      "fn": "t"
+    },
+    {
+      "file": "pages/Lecturer Dashboard/CourseGrid.jsx",
+      "ns": "lecturerDashboard",
+      "key": "imageUnavailable",
+      "fn": "t"
+    },
+    {
+      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
+      "ns": "lecturerDashboard",
+      "key": "generatedAt",
+      "fn": "t"
+    },
+    {
+      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
+      "ns": "lecturerDashboard",
+      "key": "yes",
+      "fn": "t"
+    },
+    {
+      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
+      "ns": "lecturerDashboard",
+      "key": "no",
+      "fn": "t"
+    },
+    {
+      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
+      "ns": "lecturerDashboard",
+      "key": "field",
+      "fn": "t"
+    },
+    {
+      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
+      "ns": "lecturerDashboard",
+      "key": "value",
+      "fn": "t"
+    },
+    {
+      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
+      "ns": "lecturerDashboard",
+      "key": "contentId",
+      "fn": "t"
+    },
+    {
+      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
+      "ns": "lecturerDashboard",
+      "key": "promoId",
+      "fn": "t"
+    },
+    {
+      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
+      "ns": "lecturerDashboard",
+      "key": "code",
+      "fn": "t"
+    },
+    {
+      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
+      "ns": "lecturerDashboard",
+      "key": "studentId",
+      "fn": "t"
+    },
+    {
+      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
+      "ns": "lecturerDashboard",
+      "key": "lectureId",
+      "fn": "t"
+    },
+    {
+      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
+      "ns": "lecturerDashboard",
+      "key": "lastViewEventAt",
+      "fn": "t"
+    },
+    {
+      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
+      "ns": "lecturerDashboard",
+      "key": "summarySheet",
+      "fn": "t"
+    },
+    {
+      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
+      "ns": "lecturerDashboard",
+      "key": "purchasesByContent",
+      "fn": "t"
+    },
+    {
+      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
+      "ns": "lecturerDashboard",
+      "key": "promoCodes",
+      "fn": "t"
+    },
+    {
+      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
+      "ns": "lecturerDashboard",
+      "key": "section",
+      "fn": "t"
+    },
+    {
+      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
+      "ns": "lecturerDashboard",
+      "key": "field",
+      "fn": "t"
+    },
+    {
+      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
+      "ns": "lecturerDashboard",
+      "key": "value",
+      "fn": "t"
+    },
+    {
+      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
+      "ns": "lecturerDashboard",
+      "key": "contentId",
+      "fn": "t"
+    },
+    {
+      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
+      "ns": "lecturerDashboard",
+      "key": "promoId",
+      "fn": "t"
+    },
+    {
+      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
+      "ns": "lecturerDashboard",
+      "key": "code",
+      "fn": "t"
+    },
+    {
+      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
+      "ns": "lecturerDashboard",
+      "key": "studentId",
+      "fn": "t"
+    },
+    {
+      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
+      "ns": "lecturerDashboard",
+      "key": "lectureId",
+      "fn": "t"
+    },
+    {
+      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
+      "ns": "lecturerDashboard",
+      "key": "lastViewEventAt",
+      "fn": "t"
+    },
+    {
+      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
+      "ns": "lecturerDashboard",
+      "key": "summary",
+      "fn": "t"
+    },
+    {
+      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
+      "ns": "lecturerDashboard",
+      "key": "purchasesByContent",
+      "fn": "t"
+    },
+    {
+      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
+      "ns": "lecturerDashboard",
+      "key": "promoCodes",
+      "fn": "t"
+    },
+    {
+      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
+      "ns": "lecturerDashboard",
+      "key": "exportSuccess",
+      "fn": "t"
+    },
+    {
+      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
+      "ns": "lecturerDashboard",
+      "key": "exportData",
+      "fn": "t"
+    },
+    {
+      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
+      "ns": "lecturerDashboard",
+      "key": "exportXlsx",
+      "fn": "t"
+    },
+    {
+      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
+      "ns": "lecturerDashboard",
+      "key": "purchaseBreakdown",
+      "fn": "t"
+    },
+    {
+      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
+      "ns": "lecturerDashboard",
+      "key": "promoCodes",
+      "fn": "t"
+    },
+    {
+      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
+      "ns": "lecturerDashboard",
+      "key": "redeemed",
+      "fn": "t"
+    },
+    {
+      "file": "pages/Lecturer Dashboard/LecturerOverviewPanel.jsx",
+      "ns": "lecturerDashboard",
+      "key": "available",
+      "fn": "t"
+    },
+    {
+      "file": "pages/Lecturer Dashboard/LecturerPromoCodesPage.jsx",
+      "ns": "lecturerDashboard",
+      "key": "promoCodes",
+      "fn": "t"
+    },
+    {
+      "file": "pages/Lecturer Dashboard/LecturerPromoCodesPage.jsx",
+      "ns": "lecturerDashboard",
+      "key": "redeemed",
+      "fn": "t"
+    },
+    {
+      "file": "pages/Lecturer Dashboard/LecturerPromoCodesPage.jsx",
+      "ns": "lecturerDashboard",
+      "key": "available",
+      "fn": "t"
+    },
+    {
+      "file": "components/ExamConfigSection.jsx",
+      "ns": "lecturesPage",
+      "key": "examConfig.googleSheetFixedHelp",
+      "fn": "t"
+    },
+    {
+      "file": "components/ExamConfigSection.jsx",
+      "ns": "lecturesPage",
+      "key": "examConfig.googleSheetTabName",
+      "fn": "t"
+    },
+    {
+      "file": "components/ExamConfigSection.jsx",
+      "ns": "lecturesPage",
+      "key": "examConfig.googleSheetTabPlaceholder",
       "fn": "t"
     },
     {

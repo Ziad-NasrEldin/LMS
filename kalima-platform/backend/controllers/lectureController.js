@@ -325,6 +325,104 @@ const ensureManagedAssessmentConfig = async ({
   }
 }
 
+const ASSESSMENT_RESPONSE_URL_KEYS = {
+  exam: "examUrl",
+  homework: "homeworkUrl",
+}
+
+const getAssessmentLabel = (assessmentType) =>
+  assessmentType === "homework" ? "Homework" : "Exam"
+
+const getLatestAssessmentSubmission = async ({ studentId, lectureId, assessmentType }) => {
+  let query = StudentExamSubmission.findOne({
+    student: studentId,
+    lecture: lectureId,
+    type: assessmentType,
+  })
+
+  if (query && typeof query.sort === "function") {
+    query = query.sort({ verifiedAt: -1, updatedAt: -1 })
+  }
+
+  if (query && typeof query.lean === "function") {
+    return query.lean()
+  }
+
+  return query
+}
+
+const resolveSubmissionStatus = (submission) => {
+  if (!submission) return "pending"
+  if (submission.passed) return "passed"
+  if (submission.syncStatus === "pending") return "pending"
+  return "failed"
+}
+
+const enrichRequirementWithSubmission = (requirement, submission) => {
+  if (!requirement) return requirement
+
+  return {
+    ...requirement,
+    passed: Boolean(submission?.passed),
+    status: resolveSubmissionStatus(submission),
+    submission: submission || null,
+    score: submission?.score ?? null,
+    maxScore: submission?.maxScore ?? null,
+    requiredScore: requirement.passingThreshold ?? submission?.passingThreshold ?? null,
+    error: submission?.syncError || null,
+  }
+}
+
+const normalizeAssessmentResult = ({ lecture, assessmentType, syncResult = null, error = null }) => {
+  const requirements = buildLectureRequirements(lecture)
+  const requirement = requirements?.[assessmentType] || null
+  const responseUrlKey = ASSESSMENT_RESPONSE_URL_KEYS[assessmentType]
+  const submission = syncResult?.submission || null
+  const status =
+    syncResult?.status ||
+    (error ? "failed" : resolveSubmissionStatus(submission))
+
+  return {
+    passed: Boolean(syncResult?.passed || submission?.passed),
+    status,
+    score: submission?.score ?? null,
+    maxScore: submission?.maxScore ?? null,
+    requiredScore:
+      syncResult?.requiredScore ??
+      requirement?.passingThreshold ??
+      submission?.passingThreshold ??
+      null,
+    url: syncResult?.[responseUrlKey] || syncResult?.url || requirement?.url || null,
+    error: error?.message || syncResult?.error || null,
+    submission,
+  }
+}
+
+const rankAssessmentResult = (result) => {
+  if (!result) return 0
+  if (result.passed) return 5
+  if (result.status === "failed" && result.score !== null && result.score !== undefined) return 4
+  if (result.status === "failed") return 3
+  if (result.status === "pending") return 2
+  if (result.status === "not_found") return 1
+  return 0
+}
+
+const mergeAssessmentResult = (currentResult, nextResult) => {
+  if (!currentResult) return nextResult
+  if (!nextResult) return currentResult
+  return rankAssessmentResult(nextResult) > rankAssessmentResult(currentResult)
+    ? nextResult
+    : currentResult
+}
+
+const buildConfigurationMissingResult = (lecture, assessmentType) =>
+  normalizeAssessmentResult({
+    lecture,
+    assessmentType,
+    error: new Error(`${getAssessmentLabel(assessmentType)} configuration is missing`),
+  })
+
 const deleteFile = (filePath) => {
   if (filePath && fs.existsSync(filePath)) {
     fs.unlinkSync(filePath)
@@ -404,22 +502,20 @@ exports.loadLecturePage = catchAsync(async (req, res, next) => {
     // Check requirements
     requirements = buildLectureRequirements(lecture);
     if (lecture.requiresExam) {
-      const examPassed = await StudentExamSubmission.findOne({
-        student: user._id,
-        lecture: lectureId,
-        type: "exam",
-        passed: true,
-      }).lean();
-      requirements.exam.passed = !!examPassed;
+      const examSubmission = await getLatestAssessmentSubmission({
+        studentId: user._id,
+        lectureId,
+        assessmentType: "exam",
+      });
+      requirements.exam = enrichRequirementWithSubmission(requirements.exam, examSubmission);
     }
     if (lecture.requiresHomework) {
-      const hwPassed = await StudentExamSubmission.findOne({
-        student: user._id,
-        lecture: lectureId,
-        type: "homework",
-        passed: true,
-      }).lean();
-      requirements.homework.passed = !!hwPassed;
+      const homeworkSubmission = await getLatestAssessmentSubmission({
+        studentId: user._id,
+        lectureId,
+        assessmentType: "homework",
+      });
+      requirements.homework = enrichRequirementWithSubmission(requirements.homework, homeworkSubmission);
     }
   }
 
@@ -507,63 +603,82 @@ exports.recheckAssessmentAccess = catchAsync(async (req, res, next) => {
       (studentDoc?.sequencedId != null ? String(studentDoc.sequencedId) : null) ||
       studentId.toString();
 
-    if (lecture.requiresExam && lecture.examConfig) {
-      try {
-        const examResult = await examSubmissionSync.processAssessmentSubmissionFromSheet({
-          lecture,
-          lectureId,
-          studentId,
-          studentIdentifier,
-          assessmentType: "exam",
-          syncSource: "manual-recheck",
-          upsertPendingOnMissing: true,
-        });
+    if (lecture.requiresExam) {
+      if (!lecture.examConfig) {
+        results.exam = mergeAssessmentResult(
+          results.exam,
+          buildConfigurationMissingResult(lecture, "exam")
+        );
+      } else {
+        try {
+          const examResult = await examSubmissionSync.processAssessmentSubmissionFromSheet({
+            lecture,
+            lectureId,
+            studentId,
+            studentIdentifier,
+            assessmentType: "exam",
+            syncSource: "manual",
+            syncReference: "manual-recheck",
+            upsertPendingOnMissing: true,
+          });
 
-        if (examResult) {
-          results.exam = {
-            passed: examResult.passed,
-            status: examResult.status,
-            score: examResult.submission?.score,
-            maxScore: examResult.submission?.maxScore,
-            requiredScore: examResult.requiredScore,
-            url: examResult.examUrl,
-          };
+          results.exam = mergeAssessmentResult(
+            results.exam,
+            normalizeAssessmentResult({ lecture, assessmentType: "exam", syncResult: examResult })
+          );
+        } catch (error) {
+          results.exam = mergeAssessmentResult(
+            results.exam,
+            normalizeAssessmentResult({ lecture, assessmentType: "exam", error })
+          );
+          results.errors.push({ assessment: "exam", error: error.message });
         }
-      } catch (error) {
-        results.errors.push({ assessment: "exam", error: error.message });
       }
     }
 
-    if (lecture.requiresHomework && lecture.homeworkConfig) {
-      try {
-        const homeworkResult = await examSubmissionSync.processAssessmentSubmissionFromSheet({
-          lecture,
-          lectureId,
-          studentId,
-          studentIdentifier,
-          assessmentType: "homework",
-          syncSource: "manual-recheck",
-          upsertPendingOnMissing: true,
-        });
+    if (lecture.requiresHomework) {
+      if (!lecture.homeworkConfig) {
+        results.homework = mergeAssessmentResult(
+          results.homework,
+          buildConfigurationMissingResult(lecture, "homework")
+        );
+      } else {
+        try {
+          const homeworkResult = await examSubmissionSync.processAssessmentSubmissionFromSheet({
+            lecture,
+            lectureId,
+            studentId,
+            studentIdentifier,
+            assessmentType: "homework",
+            syncSource: "manual",
+            syncReference: "manual-recheck",
+            upsertPendingOnMissing: true,
+          });
 
-        if (homeworkResult) {
-          results.homework = {
-            passed: homeworkResult.passed,
-            status: homeworkResult.status,
-            score: homeworkResult.submission?.score,
-            maxScore: homeworkResult.submission?.maxScore,
-            requiredScore: homeworkResult.requiredScore,
-            url: homeworkResult.homeworkUrl,
-          };
+          results.homework = mergeAssessmentResult(
+            results.homework,
+            normalizeAssessmentResult({ lecture, assessmentType: "homework", syncResult: homeworkResult })
+          );
+        } catch (error) {
+          results.homework = mergeAssessmentResult(
+            results.homework,
+            normalizeAssessmentResult({ lecture, assessmentType: "homework", error })
+          );
+          results.errors.push({ assessment: "homework", error: error.message });
         }
-      } catch (error) {
-        results.errors.push({ assessment: "homework", error: error.message });
       }
     }
   }
 
-  const examPassed = results.exam?.passed ?? true;
-  const homeworkPassed = results.homework?.passed ?? true;
+  if (lecture.requiresExam && !results.exam) {
+    results.exam = normalizeAssessmentResult({ lecture, assessmentType: "exam" });
+  }
+  if (lecture.requiresHomework && !results.homework) {
+    results.homework = normalizeAssessmentResult({ lecture, assessmentType: "homework" });
+  }
+
+  const examPassed = lecture.requiresExam ? results.exam?.passed === true : true;
+  const homeworkPassed = lecture.requiresHomework ? results.homework?.passed === true : true;
   const allPassed = (!lecture.requiresExam || examPassed) && (!lecture.requiresHomework || homeworkPassed);
 
   res.status(200).json({
@@ -696,6 +811,12 @@ exports.createLecture = catchAsync(async (req, res, next) => {
               session,
             })
             resolvedExamConfigId = existingExamConfig._id
+          } else {
+            if (thumbnailPath) deleteFile(thumbnailPath)
+            throw new AppError(
+              "Master assessment sheet is not configured on the server. Select an existing exam configuration or configure the master sheet before creating an exam-gated lecture.",
+              500
+            )
           }
         } else if (examConfig) {
           const existingExamConfig = await validateLectureConfig({
@@ -736,6 +857,12 @@ exports.createLecture = catchAsync(async (req, res, next) => {
               session,
             })
             resolvedHomeworkConfigId = existingHomeworkConfig._id
+          } else {
+            if (thumbnailPath) deleteFile(thumbnailPath)
+            throw new AppError(
+              "Master assessment sheet is not configured on the server. Select an existing homework configuration or configure the master sheet before creating a homework-gated lecture.",
+              500
+            )
           }
         } else if (homeworkConfig) {
           const existingHomeworkConfig = await validateLectureConfig({
@@ -1127,8 +1254,18 @@ exports.updatelectures = catchAsync(async (req, res, next) => {
 
       const normalizedExamConfig = examConfig === "" ? null : examConfig
       const normalizedHomeworkConfig = homeworkConfig === "" ? null : homeworkConfig
-      const normalizedExamFormUrl = examFormUrl === "" ? null : examFormUrl
-      const normalizedHomeworkFormUrl = homeworkFormUrl === "" ? null : homeworkFormUrl
+      const normalizedExamFormUrl =
+        examFormUrl === ""
+          ? null
+          : examFormUrl === undefined
+            ? undefined
+            : normalizePublicFormUrl(examFormUrl, "Exam")
+      const normalizedHomeworkFormUrl =
+        homeworkFormUrl === ""
+          ? null
+          : homeworkFormUrl === undefined
+            ? undefined
+            : normalizePublicFormUrl(homeworkFormUrl, "Homework")
       const nextRequiresExam =
         requiresExam !== undefined ? parseBoolean(requiresExam) : currentLecture.requiresExam
       const nextRequiresHomework =
@@ -1163,7 +1300,24 @@ exports.updatelectures = catchAsync(async (req, res, next) => {
 
             obj.examConfig = managedExamConfig._id
           } else {
-            obj.examConfig = null
+            const fallbackExamConfig = nextExamConfig || currentLecture.examConfig
+            if (!fallbackExamConfig) {
+              if (req.file && req.file.path) {
+                deleteFile(req.file.path)
+              }
+              throw new AppError(
+                "Master assessment sheet is not configured on the server. Select an existing exam configuration or configure the master sheet before updating the exam form URL.",
+                500
+              )
+            }
+
+            const validatedExamConfig = await validateLectureConfig({
+              configId: fallbackExamConfig,
+              expectedType: "exam",
+              lecturerId: currentLecture.createdBy,
+              session,
+            })
+            obj.examConfig = validatedExamConfig._id
           }
         } else if (nextExamConfig) {
           const validatedExamConfig = await validateLectureConfig({
@@ -1209,7 +1363,24 @@ exports.updatelectures = catchAsync(async (req, res, next) => {
 
             obj.homeworkConfig = managedHomeworkConfig._id
           } else {
-            obj.homeworkConfig = null
+            const fallbackHomeworkConfig = nextHomeworkConfig || currentLecture.homeworkConfig
+            if (!fallbackHomeworkConfig) {
+              if (req.file && req.file.path) {
+                deleteFile(req.file.path)
+              }
+              throw new AppError(
+                "Master assessment sheet is not configured on the server. Select an existing homework configuration or configure the master sheet before updating the homework form URL.",
+                500
+              )
+            }
+
+            const validatedHomeworkConfig = await validateLectureConfig({
+              configId: fallbackHomeworkConfig,
+              expectedType: "homework",
+              lecturerId: currentLecture.createdBy,
+              session,
+            })
+            obj.homeworkConfig = validatedHomeworkConfig._id
           }
         } else if (nextHomeworkConfig) {
           const validatedHomeworkConfig = await validateLectureConfig({

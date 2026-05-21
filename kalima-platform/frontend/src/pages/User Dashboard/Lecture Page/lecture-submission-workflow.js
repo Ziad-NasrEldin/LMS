@@ -2,9 +2,22 @@ import { pickFirstUrl, findFirstAttachmentLinkUrl } from "./lectureDisplay.utils
 
 const LEGACY_ATTACHMENT_GROUPS = ["pdfsandimages", "homeworks", "exams", "booklets"]
 
+const createEmptyAssessment = () => ({
+  required: false,
+  verified: false,
+  data: null,
+  submission: null,
+  url: "",
+  status: "pending",
+  score: null,
+  maxScore: null,
+  requiredScore: null,
+  error: null,
+})
+
 export const createEmptyAssessments = () => ({
-  exam: { required: false, verified: false, data: null, submission: null, url: "" },
-  homework: { required: false, verified: false, data: null, submission: null, url: "" },
+  exam: createEmptyAssessment(),
+  homework: createEmptyAssessment(),
 })
 
 export const createEmptyAttachmentGroups = () => ({
@@ -22,26 +35,64 @@ export const flattenLectureAttachments = (attachmentGroups = {}) =>
     })),
   )
 
+const mapRequirementToAssessment = (requirement, responseUrlKey) => {
+  if (!requirement) {
+    return createEmptyAssessment()
+  }
+
+  const submission = requirement.submission || null
+  const status =
+    requirement.status ||
+    (requirement.passed || submission?.passed ? "passed" : "pending")
+  const url = pickFirstUrl(
+    requirement[responseUrlKey],
+    requirement.url,
+    requirement.data?.[responseUrlKey],
+    requirement.data?.url,
+  )
+  const requiredScore =
+    requirement.requiredScore ??
+    requirement.passingThreshold ??
+    requirement.data?.requiredScore ??
+    requirement.data?.passingThreshold ??
+    submission?.passingThreshold ??
+    null
+  const score = requirement.score ?? submission?.score ?? null
+  const maxScore = requirement.maxScore ?? submission?.maxScore ?? null
+  const error = requirement.error || submission?.syncError || null
+
+  return {
+    required: Boolean(requirement.required),
+    verified: Boolean(requirement.passed || submission?.passed),
+    data: {
+      ...(requirement.data || {}),
+      [responseUrlKey]: pickFirstUrl(requirement.data?.[responseUrlKey], url),
+      url,
+      passingThreshold: requiredScore,
+      requiredScore,
+      status,
+      score,
+      maxScore,
+      error,
+    },
+    submission,
+    url: url || "",
+    status,
+    score,
+    maxScore,
+    requiredScore,
+    error,
+  }
+}
+
 export const mapRequirementsToAssessments = (requirements) => {
   if (!requirements) {
     return createEmptyAssessments()
   }
 
   return {
-    exam: {
-      required: Boolean(requirements.exam?.required),
-      verified: Boolean(requirements.exam?.passed),
-      data: requirements.exam?.data || null,
-      submission: requirements.exam?.submission || null,
-      url: requirements.exam?.url || "",
-    },
-    homework: {
-      required: Boolean(requirements.homework?.required),
-      verified: Boolean(requirements.homework?.passed),
-      data: requirements.homework?.data || null,
-      submission: requirements.homework?.submission || null,
-      url: requirements.homework?.url || "",
-    },
+    exam: mapRequirementToAssessment(requirements.exam, "examUrl"),
+    homework: mapRequirementToAssessment(requirements.homework, "homeworkUrl"),
   }
 }
 
@@ -77,7 +128,7 @@ export const resolveAssessmentFormUrls = ({ lecture, attachments, assessments })
 }
 
 export const normalizeLecturePageData = (result, lectureId) => {
-  const payload = result?.data || {}
+  const payload = result?.data?.data || result?.data || result || {}
   const attachments = payload.attachments || createEmptyAttachmentGroups()
   const assessments = mapRequirementsToAssessments(payload.requirements)
   const accessData = payload.accessData || null

@@ -98,6 +98,22 @@ const exactMessages = new Map([
   ["This course is restricted to parents with children in the same grade level only", () => t("errors.parentSameGradeRestriction")],
   ["This lecture is no longer available for purchase", () => t("errors.limitedLectureExpired")],
   ["Type must be either 'exam' or 'homework'", () => t("errors.invalidAssessmentType")],
+  [
+    "Master assessment sheet is not configured on the server. Select an existing exam configuration or configure the master sheet before creating an exam-gated lecture.",
+    () => t("errors.masterAssessmentSheetMissingExamCreate"),
+  ],
+  [
+    "Master assessment sheet is not configured on the server. Select an existing homework configuration or configure the master sheet before creating a homework-gated lecture.",
+    () => t("errors.masterAssessmentSheetMissingHomeworkCreate"),
+  ],
+  [
+    "Master assessment sheet is not configured on the server. Select an existing exam configuration or configure the master sheet before updating the exam form URL.",
+    () => t("errors.masterAssessmentSheetMissingExamUpdate"),
+  ],
+  [
+    "Master assessment sheet is not configured on the server. Select an existing homework configuration or configure the master sheet before updating the homework form URL.",
+    () => t("errors.masterAssessmentSheetMissingHomeworkUpdate"),
+  ],
   ["Container has no children to calculate duration from.", () => t("errors.containerDurationChildrenMissing")],
   ["Please log in as a lecturer or assistant to access your containers.", () => t("errors.containersAccessRoleRequired")],
   ["Failed to fetch user data", () => t("errors.userDataFetchFailed")],

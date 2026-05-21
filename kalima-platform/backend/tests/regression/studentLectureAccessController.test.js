@@ -5,10 +5,12 @@ const studentLectureAccessController = require("../../controllers/studentLecture
 const Lecture = require("../../models/LectureModel")
 const StudentExamSubmission = require("../../models/studentExamSubmissionModel")
 const Purchase = require("../../models/purchaseModel")
+const Parent = require("../../models/parentModel")
 
 const originalLectureFindById = Lecture.findById
 const originalSubmissionFindOne = StudentExamSubmission.findOne
 const originalPurchaseFindOne = Purchase.findOne
+const originalParentFindById = Parent.findById
 
 const makeLectureQuery = (lectureDoc) => ({
   select() {
@@ -25,13 +27,26 @@ const makeLectureQuery = (lectureDoc) => ({
   },
 })
 
-const runCheckLectureAccess = ({ lectureDoc, examSubmission = null, homeworkSubmission = null }) => {
+const runCheckLectureAccess = ({
+  lectureDoc,
+  examSubmission = null,
+  homeworkSubmission = null,
+  submissionResolver = null,
+  user = { _id: "student-1" },
+  parentDoc = null,
+}) => {
   Lecture.findById = () => makeLectureQuery(lectureDoc)
   StudentExamSubmission.findOne = async (query) => {
+    if (submissionResolver) return submissionResolver(query)
     if (query.type === "exam") return examSubmission
     if (query.type === "homework") return homeworkSubmission
     return null
   }
+  Parent.findById = () => ({
+    lean() {
+      return Promise.resolve(parentDoc)
+    },
+  })
   Purchase.findOne = () => ({
     select() {
       return this
@@ -44,7 +59,7 @@ const runCheckLectureAccess = ({ lectureDoc, examSubmission = null, homeworkSubm
   return new Promise((resolve, reject) => {
     const req = {
       params: { lectureId: "lecture-1" },
-      user: { _id: "student-1" },
+      user,
     }
 
     const res = {
@@ -73,6 +88,7 @@ const restoreModelMethods = () => {
   Lecture.findById = originalLectureFindById
   StudentExamSubmission.findOne = originalSubmissionFindOne
   Purchase.findOne = originalPurchaseFindOne
+  Parent.findById = originalParentFindById
 }
 
 test("checkLectureAccess returns restricted when required exam is not passed", async () => {
@@ -199,6 +215,54 @@ test("checkLectureAccess returns success when lecture has no exam or homework re
     assert.equal(result.statusCode, 200)
     assert.equal(result.payload.status, "success")
     assert.equal(result.payload.data.hasAccess, true)
+  } finally {
+    restoreModelMethods()
+  }
+})
+
+test("checkLectureAccess grants parent access when any child passed the required exam", async () => {
+  try {
+    const result = await runCheckLectureAccess({
+      lectureDoc: {
+        _id: "lecture-1",
+        requiresExam: true,
+        requiresHomework: false,
+        examConfig: { formUrl: "https://forms.google.com/exam" },
+      },
+      user: { _id: "parent-1", role: "Parent" },
+      parentDoc: { children: ["child-1", "child-2"] },
+      submissionResolver: (query) =>
+        query.type === "exam" && query.student === "child-2"
+          ? { _id: "exam-sub-2", passed: true }
+          : null,
+    })
+
+    assert.equal(result.statusCode, 200)
+    assert.equal(result.payload.status, "success")
+    assert.equal(result.payload.data.hasAccess, true)
+    assert.equal(result.payload.data.requiresExam, true)
+  } finally {
+    restoreModelMethods()
+  }
+})
+
+test("checkLectureAccess keeps parent restricted when no child passed the required exam", async () => {
+  try {
+    const result = await runCheckLectureAccess({
+      lectureDoc: {
+        _id: "lecture-1",
+        requiresExam: true,
+        requiresHomework: false,
+        examConfig: { formUrl: "https://forms.google.com/exam" },
+      },
+      user: { _id: "parent-1", role: "Parent" },
+      parentDoc: { children: ["child-1", "child-2"] },
+      submissionResolver: () => null,
+    })
+
+    assert.equal(result.statusCode, 200)
+    assert.equal(result.payload.status, "restricted")
+    assert.equal(result.payload.data.exam.passed, false)
   } finally {
     restoreModelMethods()
   }

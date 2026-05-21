@@ -270,7 +270,7 @@ const getExamResultsFromSheet = async (
       const response = await sheets.spreadsheets.values.get({
         spreadsheetId: sheetId,
         range: sheetTabName,
-        valueRenderOption: "UNFORMATTED_VALUE",
+        valueRenderOption: "FORMATTED_VALUE",
         dateTimeRenderOption: "FORMATTED_STRING",
       });
 
@@ -461,7 +461,7 @@ const getExamResultsFromSheet = async (
       };
     } catch (error) {
       if (isMissingRangeError(error)) {
-        lastError = `Configured tab '${sheetTabName}' was not found in this spreadsheet`;
+        lastError = lastError || `Configured tab '${sheetTabName}' was not found in this spreadsheet`;
         continue;
       }
 
@@ -562,13 +562,6 @@ const buildAssessmentResult = ({
   syncStatus: syncStatus || submission?.syncStatus || null,
 });
 
-const getExistingSubmissionStatus = (submission) => {
-  if (!submission) return null;
-  if (submission.passed) return "already_passed";
-  if (submission.syncStatus === "pending") return "pending";
-  return "failed";
-};
-
 const processAssessmentSubmissionFromSheet = async ({
   lecture,
   lectureId,
@@ -590,7 +583,7 @@ const processAssessmentSubmissionFromSheet = async ({
     type: assessmentType,
   });
 
-  if (existingSubmission?.passed) {
+  if (existingSubmission?.passed && existingSubmission.maxScore != null) {
     const configDoc = await resolveAssessmentConfigDoc(lecture, assessmentType);
     const resolvedUrl =
       resolveAssessmentConfigUrl(lecture, assessmentType) ||
@@ -662,16 +655,33 @@ const processAssessmentSubmissionFromSheet = async ({
 
   if (!sheetResult.found) {
     if (existingSubmission) {
+      const pendingSubmission = await upsertAssessmentSubmission({
+        studentId,
+        lectureId,
+        assessmentType,
+        configId: configDoc._id,
+        score: null,
+        maxScore: null,
+        passingThreshold,
+        passed: false,
+        syncStatus: "pending",
+        syncSource,
+        syncReference,
+        syncError: sheetResult.error || "Submission is still pending",
+        submittedAt: existingSubmission.submittedAt || new Date(),
+        verifiedAt: new Date(),
+      });
+
       return buildAssessmentResult({
         assessmentType,
-        submission: existingSubmission,
-        status: getExistingSubmissionStatus(existingSubmission) || "failed",
+        submission: pendingSubmission,
+        status: "pending",
         requiredScore: passingThreshold,
         url: resolvedUrl,
         responseUrlKey: assessmentType === "exam" ? "examUrl" : "homeworkUrl",
-        error: sheetResult.error || existingSubmission.syncError || null,
-        syncSource: existingSubmission.syncSource || syncSource,
-        syncStatus: existingSubmission.syncStatus || null,
+        error: sheetResult.error || "Submission is still pending",
+        syncSource,
+        syncStatus: "pending",
       });
     }
 

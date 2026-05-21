@@ -295,6 +295,10 @@
     "lectureLinkRequired": "Please enter a lecture link",
     "examFormUrlRequired": "Please provide an exam form URL",
     "homeworkFormUrlRequired": "Please provide a homework form URL",
+    "masterAssessmentSheetMissingExamCreate": "Master assessment sheet is not configured. Select an existing exam configuration or configure the master sheet before creating an exam-gated lecture.",
+    "masterAssessmentSheetMissingHomeworkCreate": "Master assessment sheet is not configured. Select an existing homework configuration or configure the master sheet before creating a homework-gated lecture.",
+    "masterAssessmentSheetMissingExamUpdate": "Master assessment sheet is not configured. Select an existing exam configuration or configure the master sheet before updating the exam form URL.",
+    "masterAssessmentSheetMissingHomeworkUpdate": "Master assessment sheet is not configured. Select an existing homework configuration or configure the master sheet before updating the homework form URL.",
     "invalidPublicUrl": "Please provide a valid public HTTP/HTTPS URL",
     "imageDimensionsRequired": "Image dimensions must be exactly {{dimensions}}",
     "passwordChangeRouteHint": "This route cannot update passwords. Please use /update/password"

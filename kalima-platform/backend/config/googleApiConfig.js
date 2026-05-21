@@ -1,3 +1,12 @@
+const bufferModule = require('buffer');
+
+if (!bufferModule.SlowBuffer) {
+  if (typeof Buffer.prototype.equal !== 'function') {
+    Buffer.prototype.equal = Buffer.prototype.equals;
+  }
+  bufferModule.SlowBuffer = Buffer;
+}
+
 const { google } = require('googleapis');
 
 const READONLY_SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly'];

@@ -77,9 +77,18 @@ const ContainersPage = () => {
           return
         }
 
-        const { userInfo, containers = [] } = result.data.data
-        setUserRole(userInfo.role)
-        setAllContainers(containers)
+        const dashboardData = result.data?.data || result.data || {}
+        const userInfo = dashboardData.userInfo || {}
+        const purchasedContainers = Array.isArray(dashboardData.containers) ? dashboardData.containers : []
+        const resolvedRole = userInfo.role || getCachedUserSummary()?.role || "Student"
+
+        if (!dashboardData.userInfo && !Array.isArray(dashboardData.containers)) {
+          setError(translateErrorMessage("Failed to load data"))
+          return
+        }
+
+        setUserRole(resolvedRole)
+        setAllContainers(purchasedContainers)
       } catch (err) {
         setError(translateErrorMessage(err?.message || "Failed to load data. Please try again later."));
         console.error("Error:", err);
@@ -160,6 +169,8 @@ const ContainersPage = () => {
     return Array.from({ length: end - normalizedStart + 1 }, (_, index) => normalizedStart + index);
   };
 
+  const normalizedUserRole = String(userRole || "").toLowerCase();
+
   if (loading) {
     return (
       <div
@@ -233,10 +244,10 @@ className="rounded-[2rem] p-4 sm:p-6 lg:p-8"
           }}
         >
           <h1 className="mb-2 text-2xl font-bold sm:text-3xl" style={{ color: TOKENS.inkText }}>
-            {userRole === 'Lecturer' ? t('containersPage.headers.lecturerCourses') : t('containersPage.headers.studentCourses')}
+            {normalizedUserRole === 'lecturer' ? t('containersPage.headers.lecturerCourses') : t('containersPage.headers.studentCourses')}
           </h1>
           <p className="mb-5 text-sm leading-6 sm:mb-6 sm:text-base" style={{ color: TOKENS.slateText }}>
-            {userRole === 'Lecturer' ? t('containersPage.descriptions.lecturer') : t('containersPage.descriptions.student')}
+            {normalizedUserRole === 'lecturer' ? t('containersPage.descriptions.lecturer') : t('containersPage.descriptions.student')}
           </p>
 
           {/* Items per page selector */}
@@ -303,13 +314,13 @@ className="rounded-[2rem] p-4 sm:p-6 lg:p-8"
                     </div>
                   </div>
   
-                  {userRole === 'Lecturer' && (
+                  {normalizedUserRole === 'lecturer' && (
                     <p className="text-sm" style={{ color: TOKENS.slateText }}>
                       {t('containersPage.labels.price', { price: container.price })}
                     </p>
                   )}
   
-                  {userRole === 'Student' && container.lecturer && (
+                  {normalizedUserRole === 'student' && container.lecturer && (
                     <p className="text-sm" style={{ color: TOKENS.slateText }}>
                       {t('containersPage.labels.lecturer')}: {typeof container.lecturer === 'string'
                         ? container.lecturer
@@ -317,14 +328,14 @@ className="rounded-[2rem] p-4 sm:p-6 lg:p-8"
                     </p>
                   )}
   
-                  {userRole === 'Student' && container.purchasedAt && (
+                  {normalizedUserRole === 'student' && container.purchasedAt && (
                     <p className="text-sm" style={{ color: TOKENS.slateText }}>
                       {t('containersPage.labels.purchaseDate')}: {new Date(container.purchasedAt).toLocaleDateString(i18n.language)}
                     </p>
                   )}
   
                   <div className={`flex flex-wrap gap-2 mt-4 ${isRTL ? "justify-start" : "justify-end"}`}>
-                    {userRole === 'Lecturer' ? (
+                    {normalizedUserRole === 'lecturer' ? (
                       <>
                         <Button
                           type="button"
@@ -395,7 +406,7 @@ className="rounded-[2rem] p-4 sm:p-6 lg:p-8"
               }}
             >
               <span>
-                {userRole === 'Lecturer'
+                {normalizedUserRole === 'lecturer'
                   ? t('containersPage.emptyStates.lecturer')
                   : t('containersPage.emptyStates.student')}
               </span>

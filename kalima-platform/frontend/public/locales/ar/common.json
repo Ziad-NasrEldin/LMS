@@ -295,6 +295,10 @@
     "lectureLinkRequired": "يرجى إدخال رابط المحاضرة",
     "examFormUrlRequired": "يرجى إدخال رابط امتحان",
     "homeworkFormUrlRequired": "يرجى إدخال رابط واجب",
+    "masterAssessmentSheetMissingExamCreate": "لم يتم إعداد ملف التقييمات الرئيسي. اختر إعداد اختبار موجودًا أو اضبط الملف الرئيسي قبل إنشاء محاضرة مقفلة باختبار.",
+    "masterAssessmentSheetMissingHomeworkCreate": "لم يتم إعداد ملف التقييمات الرئيسي. اختر إعداد واجب موجودًا أو اضبط الملف الرئيسي قبل إنشاء محاضرة مقفلة بواجب.",
+    "masterAssessmentSheetMissingExamUpdate": "لم يتم إعداد ملف التقييمات الرئيسي. اختر إعداد اختبار موجودًا أو اضبط الملف الرئيسي قبل تحديث رابط نموذج الاختبار.",
+    "masterAssessmentSheetMissingHomeworkUpdate": "لم يتم إعداد ملف التقييمات الرئيسي. اختر إعداد واجب موجودًا أو اضبط الملف الرئيسي قبل تحديث رابط نموذج الواجب.",
     "invalidPublicUrl": "يرجى تقديم رابط عام صالح يبدأ بـ HTTP أو HTTPS",
     "imageDimensionsRequired": "يجب أن تكون أبعاد الصورة {{dimensions}} بالضبط",
     "passwordChangeRouteHint": "لا يمكن لهذا المسار تحديث كلمات المرور. يرجى استخدام ‎/update/password‎"

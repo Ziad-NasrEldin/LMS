@@ -72,6 +72,41 @@ import "@vidstack/react/player/styles/default/layouts/video.css";
 
 const DEFAULT_LECTURE_ATTACHMENT_TYPE = "pdfsandimages";
 
+const getAssessmentStatus = (assessment) => {
+  if (assessment?.verified || assessment?.passed || assessment?.status === "passed") return "passed"
+  if (assessment?.status === "failed" || assessment?.status === "sync_error") return "failed"
+  return assessment?.status || "pending"
+}
+
+const getAssessmentBadgeVariant = (assessment) => {
+  const status = getAssessmentStatus(assessment)
+  if (status === "passed") return "success"
+  if (status === "failed") return "error"
+  return "accent"
+}
+
+const getAssessmentStatusLabel = (assessment, t) => {
+  const status = getAssessmentStatus(assessment)
+  if (status === "passed") return t("statusPassed", "Passed")
+  if (status === "failed") return t("statusFailed", "Failed")
+  return t("statusPending", "Pending")
+}
+
+const formatAssessmentValue = (value, t) =>
+  value === undefined || value === null || value === ""
+    ? t("notAvailable", "Not available")
+    : value
+
+const getAssessmentScore = (assessment) => ({
+  score: assessment?.score ?? assessment?.submission?.score ?? null,
+  maxScore: assessment?.maxScore ?? assessment?.submission?.maxScore ?? null,
+})
+
+const hasAssessmentScore = (assessment) => {
+  const { score, maxScore } = getAssessmentScore(assessment)
+  return score !== null || maxScore !== null
+}
+
 const LectureDisplay = () => {
   const { t, i18n } = useTranslation("lectureDisplay");
   const isRTL = i18n.language === "ar";
@@ -272,18 +307,19 @@ const LectureDisplay = () => {
 
         // 1. Set Lecture & User Info
         setLecture(lecture);
-        setUserRole(user.role);
-        setUserId(user.id);
-        setUserEmail(user.email || "");
-        setStudentFullName(user.name || user.fullName || "");
-        setStudentSequenceId(user.sequenceId || user.studentId || "");
+        const normalizedUser = user || {}
+        setUserRole(normalizedUser.role || "");
+        setUserId(normalizedUser.id || "");
+        setUserEmail(normalizedUser.email || "");
+        setStudentFullName(normalizedUser.name || normalizedUser.fullName || "");
+        setStudentSequenceId(normalizedUser.sequenceId || normalizedUser.studentId || "");
 
         // 2. Set Attachments
         setAttachments(attachments);
         setAllAttachments(pageData.allAttachments);
 
         // 3. Set Access & Views (Student Only)
-        if (user.role === "Student") {
+        if (normalizedUser.role === "Student") {
           if (accessData) {
             setStudentLectureAccessId(accessData._id);
             setRemainingViews(accessData.remainingViews);
@@ -303,7 +339,12 @@ const LectureDisplay = () => {
         setError(translateErrorMessage(result.error || t("failedToLoadLecture"), t));
       }
     } catch (err) {
-      setError(t("failedToLoadLectureTryAgain"));
+      const detail = err?.message || String(err || "")
+      setError(
+        detail
+          ? `${t("failedToLoadLectureTryAgain")} (${detail})`
+          : t("failedToLoadLectureTryAgain")
+      );
       console.error("Error loading page data:", err);
     } finally {
       if (showLoader) {
@@ -323,22 +364,52 @@ const LectureDisplay = () => {
     
     const syncResult = await recheckAssessmentAccess(lectureId);
     
-    if (syncResult.success && syncResult.data?.hasAccess) {
+    const resultData = syncResult.data || {}
+    const recheckExamPassed = !resultData.requiresExam || resultData.results?.exam?.passed === true
+    const recheckHomeworkPassed = !resultData.requiresHomework || resultData.results?.homework?.passed === true
+
+    if (syncResult.success && resultData.hasAccess === true && recheckExamPassed && recheckHomeworkPassed) {
       toast.success(t("accessGranted") || "Access granted!");
     } else if (syncResult.success) {
-      const examStatus = syncResult.data?.results?.exam;
-      const homeworkStatus = syncResult.data?.results?.homework;
-      
-      if (examStatus?.status === "not_found" || examStatus?.status === "pending") {
-        toast.error(t("examNotFound") || "Exam submission not found. Make sure you submitted the exam using your account email.");
-      } else if (examStatus?.status === "failed") {
-        toast.error(t("examFailed") || `Exam not passed. Score: ${examStatus.score}/${examStatus.maxScore}. Required: ${examStatus.requiredScore}`);
+      const showAssessmentToast = (assessmentType, assessmentResult) => {
+        if (!assessmentResult || assessmentResult.passed === true) return false
+
+        if (assessmentResult.error) {
+          toast.error(assessmentResult.error || t("assessmentSyncFailed", "Could not sync this assessment. Please try again."))
+          return true
+        }
+
+        if (assessmentResult.status === "not_found" || assessmentResult.status === "pending") {
+          toast.error(
+            assessmentType === "homework"
+              ? t("homeworkNotFound") || "Homework submission not found."
+              : t("examNotFound") || "Exam submission not found. Make sure you submitted the exam using your account email."
+          )
+          return true
+        }
+
+        if (assessmentResult.status === "failed" || assessmentResult.passed === false) {
+          const messageKey = assessmentType === "homework" ? "homeworkFailed" : "examFailed"
+          toast.error(t(messageKey, {
+            score: formatAssessmentValue(assessmentResult.score, t),
+            maxScore: formatAssessmentValue(assessmentResult.maxScore, t),
+            requiredScore: formatAssessmentValue(assessmentResult.requiredScore, t),
+          }))
+          return true
+        }
+
+        return false
       }
-      
-      if (homeworkStatus?.status === "not_found" || homeworkStatus?.status === "pending") {
-        toast.error(t("homeworkNotFound") || "Homework submission not found.");
-      } else if (homeworkStatus?.status === "failed") {
-        toast.error(t("homeworkFailed") || `Homework not passed. Score: ${homeworkStatus.score}/${homeworkStatus.maxScore}. Required: ${homeworkStatus.requiredScore}`);
+
+      const showedExamToast = resultData.requiresExam
+        ? showAssessmentToast("exam", resultData.results?.exam)
+        : false
+      const showedHomeworkToast = resultData.requiresHomework
+        ? showAssessmentToast("homework", resultData.results?.homework)
+        : false
+
+      if (!showedExamToast && !showedHomeworkToast) {
+        toast.error(t("recheckFailed") || "Failed to recheck access");
       }
     } else {
       toast.error(syncResult.error || t("recheckFailed") || "Failed to recheck access");
@@ -958,13 +1029,23 @@ const LectureDisplay = () => {
       const requirementCards = [
         assessments.exam.required && {
           key: "exam", title: t("examInfo"), subtitle: t("examRequiredDescription"),
-          passed: assessments.exam.verified, threshold: assessments.exam.data?.passingThreshold,
+          passed: assessments.exam.verified,
+          status: assessments.exam.status,
+          threshold: assessments.exam.requiredScore ?? assessments.exam.data?.requiredScore ?? assessments.exam.data?.passingThreshold,
+          score: assessments.exam.score,
+          maxScore: assessments.exam.maxScore,
+          error: assessments.exam.error,
           actionUrl: resolvedExamFormUrl, actionLabel: t("startExam"),
         },
         assessments.homework.required && {
           key: "homework", title: t("homeworkInfo", "Homework Information"),
           subtitle: t("homeworkRequiredDescription", "Complete homework to access this lecture."),
-          passed: assessments.homework.verified, threshold: assessments.homework.data?.passingThreshold,
+          passed: assessments.homework.verified,
+          status: assessments.homework.status,
+          threshold: assessments.homework.requiredScore ?? assessments.homework.data?.requiredScore ?? assessments.homework.data?.passingThreshold,
+          score: assessments.homework.score,
+          maxScore: assessments.homework.maxScore,
+          error: assessments.homework.error,
           actionUrl: resolvedHomeworkFormUrl, actionLabel: t("startHomework", "Start Homework"),
         },
       ].filter(Boolean);
@@ -1055,20 +1136,28 @@ const LectureDisplay = () => {
                 >
                      <div className="mb-2 flex items-start justify-between gap-3">
                        <h3 className="text-lg font-bold text-neutral">{item.title}</h3>
-                       <Badge variant={item.passed ? "success" : "warning"}>
-                         {item.passed
-                           ? t("statusPassed", "Passed")
-                           : t("statusPending", "Pending")}
-                       </Badge>
-                     </div>
+                       <Badge variant={getAssessmentBadgeVariant(item)}>
+                          {getAssessmentStatusLabel(item, t)}
+                        </Badge>
+                      </div>
   
                    <p className="mb-3 text-sm text-neutral/70">{item.subtitle}</p>
   
-                   {item.threshold !== undefined && item.threshold !== null && (
-                     <p className="mb-3 text-sm font-medium text-neutral">
-                       {t("requiredPassingScore")}: {item.threshold}
-                     </p>
-                   )}
+                    {item.threshold !== undefined && item.threshold !== null && (
+                      <p className="mb-3 text-sm font-medium text-neutral">
+                        {t("requiredPassingScore")}: {item.threshold}
+                      </p>
+                    )}
+                    {(item.score !== undefined && item.score !== null) || (item.maxScore !== undefined && item.maxScore !== null) ? (
+                      <p className="mb-3 text-sm font-medium text-neutral">
+                        {t("score")}: {formatAssessmentValue(item.score, t)}/{formatAssessmentValue(item.maxScore, t)}
+                      </p>
+                    ) : null}
+                    {item.error && (
+                      <p className="mb-3 rounded-xl bg-error/10 px-3 py-2 text-sm font-medium text-error">
+                        {t("assessmentSyncFailed", "Could not sync this assessment. Please try again.")}: {item.error}
+                      </p>
+                    )}
   
 <div className="mt-2 flex flex-wrap gap-2">
                        {!item.passed && item.actionUrl && (
@@ -1314,15 +1403,20 @@ const LectureDisplay = () => {
                     <FiAward className="h-5 w-5 text-success" />
                     {t("examInfo")}
                   </div>
-                  <Badge variant={assessments.exam.verified ? "success" : "warning"}>
-                    {assessments.exam.verified ? t("statusPassed", "Passed") : t("statusPending", "Pending")}
+                  <Badge variant={getAssessmentBadgeVariant(assessments.exam)}>
+                    {getAssessmentStatusLabel(assessments.exam, t)}
                   </Badge>
                 </div>
-                {assessments.exam.submission && (
+                {hasAssessmentScore(assessments.exam) && (
                   <div className="text-sm text-neutral/80">
-                    <span>{t("score")}: {assessments.exam.submission.score}/{assessments.exam.submission.maxScore}</span>
+                    <span>{t("score")}: {formatAssessmentValue(getAssessmentScore(assessments.exam).score, t)}/{formatAssessmentValue(getAssessmentScore(assessments.exam).maxScore, t)}</span>
                     <span className="mx-2">|</span>
-                    <span>{t("passDate")}: {formatDate(assessments.exam.submission.verifiedAt)}</span>
+                    <span>{t("passDate")}: {formatDate(assessments.exam.submission?.verifiedAt)}</span>
+                  </div>
+                )}
+                {assessments.exam.error && (
+                  <div className="mt-2 text-sm font-medium text-error">
+                    {t("assessmentSyncFailed", "Could not sync this assessment. Please try again.")}: {assessments.exam.error}
                   </div>
                 )}
               </div>
@@ -1334,15 +1428,20 @@ const LectureDisplay = () => {
                     <FiCheck className="h-5 w-5 text-info" />
                     {t("homeworkInfo", "Homework Information")}
                   </div>
-                  <Badge variant={assessments.homework.verified ? "success" : "warning"}>
-                    {assessments.homework.verified ? t("statusPassed", "Passed") : t("statusPending", "Pending")}
+                  <Badge variant={getAssessmentBadgeVariant(assessments.homework)}>
+                    {getAssessmentStatusLabel(assessments.homework, t)}
                   </Badge>
                 </div>
-                {assessments.homework.submission && (
+                {hasAssessmentScore(assessments.homework) && (
                   <div className="text-sm text-neutral/80">
-                    <span>{t("score")}: {assessments.homework.submission.score}/{assessments.homework.submission.maxScore}</span>
+                    <span>{t("score")}: {formatAssessmentValue(getAssessmentScore(assessments.homework).score, t)}/{formatAssessmentValue(getAssessmentScore(assessments.homework).maxScore, t)}</span>
                     <span className="mx-2">|</span>
-                    <span>{t("passDate")}: {formatDate(assessments.homework.submission.verifiedAt)}</span>
+                    <span>{t("passDate")}: {formatDate(assessments.homework.submission?.verifiedAt)}</span>
+                  </div>
+                )}
+                {assessments.homework.error && (
+                  <div className="mt-2 text-sm font-medium text-error">
+                    {t("assessmentSyncFailed", "Could not sync this assessment. Please try again.")}: {assessments.homework.error}
                   </div>
                 )}
               </div>
@@ -2147,4 +2246,3 @@ const LectureDisplay = () => {
 
 
   export default LectureDisplay;
-
