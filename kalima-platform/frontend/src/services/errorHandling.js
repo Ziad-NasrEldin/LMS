@@ -4,7 +4,7 @@ import { translateErrorMessage } from '../utils/errorTranslator';
 const SESSION_REVOKED_MESSAGE = "Session has been replaced by a newer login. Please login again.";
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL
+  baseURL: import.meta.env.VITE_API_URL || "/api/v1"
 });
 
 // Flag to prevent multiple session revoked redirects
