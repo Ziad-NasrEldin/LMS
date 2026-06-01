@@ -1,7 +1,8 @@
+import { API_BASE_URL } from "../utils/apiBase";
 import axios from "axios";
 import { getToken, isLoggedIn } from "./auth-services";
 import { normalizeApiError, normalizeApiErrorWithEmpty404 } from "../utils/apiError";
-const API_URL = import.meta.env.VITE_API_URL
+const API_URL = API_BASE_URL
 export const AssistantService = {
   // Fetch all assistants
   getAssistants: async () => {

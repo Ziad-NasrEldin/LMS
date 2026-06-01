@@ -1,5 +1,6 @@
 "use client"
 
+import { API_BASE_URL } from "../utils/apiBase"
 import { useState, useEffect, useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import { useParams, useNavigate, useLocation } from "react-router-dom"
@@ -146,7 +147,7 @@ async function collectAllVideoIds(containerIds, collected = new Set()) {
   
   const results = await Promise.all(
     idsToFetch.map(id => 
-      fetch(`${import.meta.env.VITE_API_URL}/containers/${id}`, { credentials: 'include' })
+      fetch(`${API_BASE_URL}/containers/${id}`, { credentials: 'include' })
         .then(r => r.ok ? r.json() : null)
         .then(r => r?.data || null)
         .catch(() => null)

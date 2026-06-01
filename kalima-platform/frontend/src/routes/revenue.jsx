@@ -1,9 +1,10 @@
+import { API_BASE_URL } from "../utils/apiBase";
 // src/routes/revenue.js
 import axios from "axios";
 import { getToken } from "./auth-services";
 import { normalizeApiError } from "../utils/apiError";
 
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = API_BASE_URL;
 
 /**
  * Fetch overall revenue summary

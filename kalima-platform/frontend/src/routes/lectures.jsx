@@ -1,9 +1,10 @@
+import { API_BASE_URL } from "../utils/apiBase";
 import axios from "axios"
 import { getToken, isLoggedIn } from "./auth-services"
 import { normalizeApiError, normalizeApiErrorWithEmpty404 } from "../utils/apiError"
 import { translateErrorMessage } from "../utils/errorTranslator"
 
-const API_URL = import.meta.env.VITE_API_URL || "/api/v1";
+const API_URL = API_BASE_URL;
 
 const authHeaders = (extraHeaders = {}) => ({
   Authorization: `Bearer ${getToken()}`,

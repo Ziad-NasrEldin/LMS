@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../utils/apiBase";
 import axios from "axios"
 import { getToken } from "./auth-services"
 import { normalizeApiError } from "../utils/apiError"
@@ -16,7 +17,7 @@ export const getAllStudentLectureAccess = async (lectureId, limit = 100) => {
     }
 
     const response = await axios.get(
-      `${import.meta.env.VITE_API_URL}/student-lecture-access/lecture/${lectureId}`,
+      `${API_BASE_URL}/student-lecture-access/lecture/${lectureId}`,
       {
         params: { limit },
         headers: {
@@ -51,7 +52,7 @@ export const getStudentLectureAccessByLectureId = async (lectureId) => {
     }
 
     const response = await axios.get(
-      `${import.meta.env.VITE_API_URL}/student-lecture-access/lecture/${lectureId}`,
+      `${API_BASE_URL}/student-lecture-access/lecture/${lectureId}`,
       {
         headers: {
           Authorization: `Bearer ${getToken()}`,
@@ -79,7 +80,7 @@ export const updateStudentLectureAccess = async (accessId, data) => {
     }
 
     const response = await axios.patch(
-      `${import.meta.env.VITE_API_URL}/student-lecture-access/${accessId}`,
+      `${API_BASE_URL}/student-lecture-access/${accessId}`,
       data,
       {
         headers: {
@@ -116,7 +117,7 @@ export const accountStudentLecturePlayStart = async (accessId, eventId, purchase
     }
 
     const response = await axios.post(
-      `${import.meta.env.VITE_API_URL}/student-lecture-access/${accessId}/play-start`,
+      `${API_BASE_URL}/student-lecture-access/${accessId}/play-start`,
       payload,
       {
         headers: {
@@ -155,10 +156,10 @@ export const checkStudentLectureAccess = async (studentId, lectureId, purchaseId
     let apiUrl;
     if (isStandaloneLecture) {
       // Use standalone lecture endpoint
-      apiUrl = `${import.meta.env.VITE_API_URL}/lectures/student/${studentId}/lecture/${lectureId}/purchase/${purchaseId}`;
+      apiUrl = `${API_BASE_URL}/lectures/student/${studentId}/lecture/${lectureId}/purchase/${purchaseId}`;
     } else {
       // Use container-based lecture endpoint
-      apiUrl = `${import.meta.env.VITE_API_URL}/containers/student/${studentId}/container/${lectureId}/purchase/${purchaseId}`;
+      apiUrl = `${API_BASE_URL}/containers/student/${studentId}/container/${lectureId}/purchase/${purchaseId}`;
     }
 
     const response = await axios.get(apiUrl, {

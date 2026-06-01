@@ -1,8 +1,9 @@
+import { API_BASE_URL } from "../utils/apiBase";
 import axios from "axios";
 import { getToken } from "./auth-services";
 import { getAuthHeader } from "./fetch-users";
 
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = API_BASE_URL;
 
 export const extractExamConfigs = (payload) => {
   if (!payload) return [];

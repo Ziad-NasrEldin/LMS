@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../utils/apiBase";
 import axios from "axios";
 import { getToken } from "../routes/auth-services";
 import { normalizeApiError } from "../utils/apiError";
@@ -8,7 +9,7 @@ import { normalizeApiError } from "../utils/apiError";
  *          - On success: { success: true, data: response.data }
  *          - On failure: { success: false, error: errorMessage }
  */
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = API_BASE_URL;
 export const getChildrenData = async () => {
   try {
     const response = await axios.get(`${API_URL}/users/me/children`, {

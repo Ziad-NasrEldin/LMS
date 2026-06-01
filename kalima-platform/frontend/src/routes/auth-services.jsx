@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../utils/apiBase";
 import axios from "axios"
 import { jwtDecode } from "jwt-decode"
 import api from "../services/errorHandling"
@@ -11,7 +12,7 @@ import {
   getRefreshState,
 } from "./tokenRefreshServices"
 
-const API_URL = import.meta.env.VITE_API_URL || "/api/v1"
+const API_URL = API_BASE_URL
 const TOKEN_KEY = "accessToken"
 const IMPERSONATION_STORAGE_KEY = "impersonationSession"
 

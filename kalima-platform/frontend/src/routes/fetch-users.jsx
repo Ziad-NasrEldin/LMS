@@ -1,10 +1,8 @@
+import { API_BASE_URL } from "../utils/apiBase";
 import axios from "axios";
 import { normalizeApiError, normalizeApiErrorWithEmpty404 } from "../utils/apiError";
 
-const rawApiUrl = (import.meta.env.VITE_API_URL || "").replace(/\/+$/, "");
-const API_URL = /\/api\/v1$/i.test(rawApiUrl)
-  ? rawApiUrl
-  : `${rawApiUrl || ""}/api/v1`;
+const API_URL = API_BASE_URL;
 
 export const getAuthHeader = () => {
   const token = localStorage.getItem("accessToken");

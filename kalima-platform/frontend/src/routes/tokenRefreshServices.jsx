@@ -1,6 +1,7 @@
+import { API_BASE_URL } from "../utils/apiBase";
 import axios from "axios"
 
-const API_URL = import.meta.env.VITE_API_URL || "/api/v1"
+const API_URL = API_BASE_URL
 const REFRESH_THRESHOLD_SECONDS = 60 // 1 minute before expiry
 const CHECK_INTERVAL_MS = 60000 // Check every 60 seconds
 

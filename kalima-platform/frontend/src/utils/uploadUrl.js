@@ -1,15 +1,6 @@
+import { BACKEND_BASE_URL } from "./apiBase";
 export const resolveBackendBaseUrl = () => {
-  const apiUrl = import.meta.env.VITE_API_URL || "";
-
-  if (/^https?:\/\//i.test(apiUrl)) {
-    return apiUrl.replace(/\/api\/v1\/?$/i, "").replace(/\/+$/, "");
-  }
-
-  if (typeof window !== "undefined") {
-    return window.location.origin;
-  }
-
-  return "";
+  return BACKEND_BASE_URL;
 };
 
 export const resolveUploadUrl = (filePath, fallbackFolder = "product_thumbnails") => {

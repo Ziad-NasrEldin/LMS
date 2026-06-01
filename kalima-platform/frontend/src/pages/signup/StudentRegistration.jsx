@@ -1,5 +1,6 @@
 "use client"
 
+import { API_BASE_URL } from "../../utils/apiBase"
 import { useState, useEffect } from "react"
 import { useTranslation } from "react-i18next"
 import Step1 from "./step1"
@@ -24,7 +25,7 @@ import {
 } from "../../utils/phoneNumber"
 import { STUDENT_HOBBIES, normalizeStudentHobby } from "../../constants/studentHobbies"
 import { mapSignupApiError } from "./signupApiError"
-const apiUrl = import.meta.env.VITE_API_URL
+const apiUrl = API_BASE_URL
 const TOKENS = designTokens.colors
 const SHADOWS = designTokens.shadows
 const GRADIENTS = designTokens.gradients

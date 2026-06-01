@@ -1,11 +1,9 @@
+import { API_BASE_URL } from "../utils/apiBase";
 import axios from "axios"
 import { getToken } from "./auth-services"
 import { normalizeApiError } from "../utils/apiError"
 
-const rawApiUrl = (import.meta.env.VITE_API_URL || "").replace(/\/+$/, "")
-const API_URL = /\/api\/v1$/i.test(rawApiUrl)
-  ? rawApiUrl
-  : `${rawApiUrl || ""}/api/v1`
+const API_URL = API_BASE_URL;
 
 
 

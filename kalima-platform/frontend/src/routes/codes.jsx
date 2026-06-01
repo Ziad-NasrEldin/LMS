@@ -1,10 +1,11 @@
+import { API_BASE_URL } from "../utils/apiBase";
 import axios from "axios";
 import { getToken } from "./auth-services"; // Adjust the path based on your project structure
 import { getAuthHeader } from "./fetch-users"; // Adjust the path based on your project structure
 import { normalizeApiError, normalizeApiErrorWithEmpty404 } from "../utils/apiError";
 import { translateErrorMessage } from "../utils/errorTranslator";
 
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = API_BASE_URL;
 
 /**
  * Redeems a promo code by sending a POST request to the server.

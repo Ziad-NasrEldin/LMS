@@ -1,8 +1,9 @@
+import { API_BASE_URL } from "../utils/apiBase";
 import axios from "axios";
 import i18n from "../components/i18n";
 import { normalizeApiError } from "../utils/apiError";
 import { buildLevelHierarchy, normalizeLocale } from "../utils/levelHierarchy";
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = API_BASE_URL;
 
 // Helper function to get auth headers
 const getAuthHeader = () => {
