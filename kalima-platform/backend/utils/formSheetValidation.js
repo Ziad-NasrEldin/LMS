@@ -12,6 +12,42 @@ const extractGoogleFormId = (formUrl) => {
   }
 };
 
+const isGoogleFormsShortUrl = (formUrl) => {
+  try {
+    const parsedUrl = new URL(String(formUrl || "").trim());
+    return parsedUrl.hostname.toLowerCase() === "forms.gle";
+  } catch (_error) {
+    return false;
+  }
+};
+
+const resolveGoogleFormsShortUrl = async (formUrl) => {
+  if (!isGoogleFormsShortUrl(formUrl) || typeof fetch !== "function") {
+    return formUrl;
+  }
+
+  const requestOptions = {
+    method: "GET",
+    redirect: "manual",
+  };
+
+  if (typeof AbortSignal !== "undefined" && typeof AbortSignal.timeout === "function") {
+    requestOptions.signal = AbortSignal.timeout(5000);
+  }
+
+  try {
+    const response = await fetch(formUrl, requestOptions);
+    const redirectLocation = response?.headers?.get?.("location");
+    if (redirectLocation) {
+      return new URL(redirectLocation, formUrl).toString();
+    }
+    return response?.url || formUrl;
+  } catch (error) {
+    console.warn("Unable to resolve Google Forms short URL before validation:", error?.message || error);
+    return formUrl;
+  }
+};
+
 const normalizeDateValue = (value) => {
   if (!value) return null;
   const parsed = new Date(value);
@@ -34,7 +70,8 @@ const buildSkippedValidationResult = (formId) => ({
 });
 
 const getPublishedFormDetails = async ({ formUrl, expectedSheetId }) => {
-  const formId = extractGoogleFormId(formUrl);
+  const resolvedFormUrl = await resolveGoogleFormsShortUrl(formUrl);
+  const formId = extractGoogleFormId(resolvedFormUrl);
   if (!formId) {
     throw new AppError("Unable to extract a Google Form ID from the provided URL", 400);
   }

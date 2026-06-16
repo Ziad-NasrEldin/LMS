@@ -47,6 +47,54 @@ test("getPublishedFormDetails validates linked master sheet id", async () => {
   }
 });
 
+test("getPublishedFormDetails resolves forms.gle links before extracting the form id", async () => {
+  const originalFetch = global.fetch;
+
+  try {
+    global.fetch = async (url, options) => {
+      assert.equal(url, "https://forms.gle/CLZGMqhJgH4L3m7T7");
+      assert.equal(options.redirect, "manual");
+      return {
+        headers: {
+          get: (name) =>
+            name.toLowerCase() === "location"
+              ? "https://docs.google.com/forms/d/e/short-form-id/viewform?usp=sf_link"
+              : null,
+        },
+        url: "https://forms.gle/CLZGMqhJgH4L3m7T7",
+      };
+    };
+
+    googleApiConfig.configureGoogleForms = () => ({
+      forms: {
+        get: async ({ formId }) => {
+          assert.equal(formId, "short-form-id");
+          return {
+            data: {
+              linkedSheetId: "master-sheet-id",
+              responderUri: "https://docs.google.com/forms/d/e/short-form-id/viewform",
+            },
+          };
+        },
+        responses: {
+          list: async () => ({ data: { responses: [] } }),
+        },
+      },
+    });
+
+    const result = await formSheetValidation.getPublishedFormDetails({
+      formUrl: "https://forms.gle/CLZGMqhJgH4L3m7T7",
+      expectedSheetId: "master-sheet-id",
+    });
+
+    assert.equal(result.formId, "short-form-id");
+    assert.equal(result.linkedSheetId, "master-sheet-id");
+  } finally {
+    global.fetch = originalFetch;
+    restorePatches();
+  }
+});
+
 test("getPublishedFormDetails skips hard failure when form access is unavailable", async () => {
   try {
     googleApiConfig.configureGoogleForms = () => ({
