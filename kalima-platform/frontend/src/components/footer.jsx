@@ -66,7 +66,7 @@ export default function Footer() {
 
               {[
 
-                { icon: Facebook, href: "https://www.facebook.com/profile.php?id=61590412059674", color: "hover:text-blue-600" },
+                { icon: Facebook, href: "https://www.facebook.com/share/18rPCa6Hs7/", color: "hover:text-blue-600" },
 
                 { icon: Music2, href: "https://www.tiktok.com/@fekra.academy2?_r=1&_t=ZS-97ICHQXtpf3", color: "hover:text-slate-950" },
 
