@@ -35,6 +35,20 @@ const buildFallbackTabName = (config) => {
   return buildAssessmentTabBase(baseName, config.type);
 };
 
+const buildUniqueTabName = (baseName, reservedNames) => {
+  let candidate = baseName;
+  let counter = 2;
+
+  while (reservedNames.has(candidate)) {
+    const suffix = `-${counter}`;
+    candidate = `${baseName.slice(0, 100 - suffix.length)}${suffix}`;
+    counter += 1;
+  }
+
+  reservedNames.add(candidate);
+  return candidate;
+};
+
 const run = async () => {
   if (!process.env.DATABASE_URI) {
     throw new Error("DATABASE_URI is required");
@@ -70,11 +84,22 @@ const run = async () => {
     items: [],
   };
 
+  const reservedCanonicalTabsBySheet = new Map();
+
   for (const config of configs) {
+    const sheetKey = String(config.googleSheetId || "");
+    if (!reservedCanonicalTabsBySheet.has(sheetKey)) {
+      reservedCanonicalTabsBySheet.set(sheetKey, new Set());
+    }
+
     const currentTabName = normalizeSheetTabName(config.googleSheetTabName);
     const canonicalTabName = buildFallbackTabName(config);
+    const uniqueCanonicalTabName = buildUniqueTabName(
+      canonicalTabName,
+      reservedCanonicalTabsBySheet.get(sheetKey)
+    );
     const desiredTabName = alignCanonical || !currentTabName || isLegacyFormResponsesTab(currentTabName)
-      ? canonicalTabName
+      ? uniqueCanonicalTabName
       : currentTabName;
 
     const claimedConfigs = configs.filter(
