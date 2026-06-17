@@ -1503,13 +1503,14 @@ const LectureDisplay = () => {
         ) : youtubeVideoId ? (
 
           <div
-            className="relative mb-4 overflow-hidden"
+            className="lecture-player-card relative mb-4 overflow-hidden"
             ref={videoContainerRef}
             style={{ ...shellStyle, background: "rgba(255,255,255,0.78)" }}
           >
-            <div className="relative">
+            <div className="lecture-player-frame relative mx-auto w-full">
               <MediaPlayer
                 ref={playerRef}
+                className="h-full w-full"
                 title={lecture?.name}
                 src={`youtube/${youtubeVideoId}`}
                 poster={lecture?.thumbnailLink || ""}
