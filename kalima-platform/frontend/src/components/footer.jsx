@@ -66,15 +66,13 @@ export default function Footer() {
 
               {[
 
-                { icon: Facebook, href: "https://www.facebook.com/profile.php?id=61590412059674", color: "hover:text-blue-600" },
+                { icon: Facebook, href: "https://www.facebook.com/share/18rPCa6Hs7/", color: "hover:text-blue-600" },
 
-                { icon: Instagram, href: "#", color: "hover:text-pink-600" },
+                { icon: Music2, href: "https://www.tiktok.com/@fekra.academy2?_r=1&_t=ZS-97ICHQXtpf3", color: "hover:text-slate-950" },
 
-                { icon: Youtube, href: "https://www.youtube.com/@kalima1", color: "hover:text-red-500" },
+                { icon: Instagram, href: "https://www.instagram.com/fekraacademy11?igsh=ZmpwMTducWtwdjJo", color: "hover:text-pink-600" },
 
-                { icon: Twitter, href: "#", color: "hover:text-blue-400" },
-
-                { icon: Music2, href: "#", color: "hover:text-black" },
+                { icon: Youtube, href: "https://youtube.com/@fekraacademy1?si=S1-Jo6HfimxcD08Z", color: "hover:text-red-600" },
 
               ].map((Social, idx) => (
 
@@ -174,7 +172,7 @@ export default function Footer() {
 
                 <Phone className="mt-1 h-5 w-5 shrink-0" style={{ color: TOKENS.warmMango }} />
 
-                <span>01027314148</span>
+                <a href="tel:01029689950" className="transition-colors hover:text-slate-900">01029689950</a>
 
               </li>
 
