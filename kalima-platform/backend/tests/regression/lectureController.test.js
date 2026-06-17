@@ -7,12 +7,16 @@ const Container = require("../../models/containerModel");
 const Attachment = require("../../models/attachmentModel");
 const StudentLectureAccess = require("../../models/studentLectureAccessModel");
 const StudentExamSubmission = require("../../models/studentExamSubmissionModel");
+const Purchase = require("../../models/purchaseModel");
 
 const originalLectureFindById = Lecture.findById;
 const originalContainerFindOne = Container.findOne;
+const originalContainerFindById = Container.findById;
 const originalAttachmentFind = Attachment.find;
 const originalStudentLectureAccessFindOne = StudentLectureAccess.findOne;
+const originalStudentLectureAccessFindOneAndUpdate = StudentLectureAccess.findOneAndUpdate;
 const originalStudentExamSubmissionFindOne = StudentExamSubmission.findOne;
+const originalPurchaseFind = Purchase.find;
 
 const makePopulatedDocQuery = (doc) => ({
   populate() {
@@ -44,9 +48,12 @@ const makeHomeworkQuery = (result) => ({
 const restoreModelMethods = () => {
   Lecture.findById = originalLectureFindById;
   Container.findOne = originalContainerFindOne;
+  Container.findById = originalContainerFindById;
   Attachment.find = originalAttachmentFind;
   StudentLectureAccess.findOne = originalStudentLectureAccessFindOne;
+  StudentLectureAccess.findOneAndUpdate = originalStudentLectureAccessFindOneAndUpdate;
   StudentExamSubmission.findOne = originalStudentExamSubmissionFindOne;
+  Purchase.find = originalPurchaseFind;
 };
 
 test("loadLecturePage returns attachment-shaped homework submissions for privileged users", async () => {
@@ -224,6 +231,111 @@ test("loadLecturePage enriches student assessment requirements with latest submi
     assert.equal(examRequirement.error, "Score is below threshold");
     assert.equal(examRequirement.url, "https://forms.google.com/exam");
     assert.equal(examRequirement.submission._id, "exam-submission-1");
+  } finally {
+    restoreModelMethods();
+  }
+});
+
+test("loadLecturePage creates a student access record from an entitled purchase when no access row exists", async () => {
+  try {
+    const lectureId = "507f1f77bcf86cd799439011";
+    const studentId = "507f1f77bcf86cd799439012";
+    const parentContainerId = "507f1f77bcf86cd799439013";
+    const accessDoc = {
+      _id: "access-from-purchase",
+      remainingViews: 4,
+      lastAccessed: new Date("2026-01-03T00:00:00.000Z"),
+    };
+    const lectureDoc = {
+      _id: lectureId,
+      name: "Purchased lecture",
+      numberOfViews: 4,
+      parent: parentContainerId,
+      requiresExam: false,
+      requiresHomework: false,
+      createdBy: { name: "Lecturer" },
+      subject: { name: "Math" },
+      level: { name: "Level 1" },
+    };
+
+    Lecture.findById = () => makePopulatedDocQuery(lectureDoc);
+    Container.findOne = () => makePopulatedDocQuery(null);
+    Container.findById = () => ({
+      select() {
+        return this;
+      },
+      lean() {
+        return Promise.resolve({ _id: parentContainerId, parent: null });
+      },
+    });
+    Attachment.find = () => makeLeanQuery([]);
+    StudentExamSubmission.findOne = () => ({
+      sort() {
+        return this;
+      },
+      lean() {
+        return Promise.resolve(null);
+      },
+    });
+    StudentLectureAccess.findOne = () => ({
+      lean() {
+        return Promise.resolve(null);
+      },
+    });
+    StudentLectureAccess.findOneAndUpdate = (filter, update) => {
+      assert.equal(String(filter.student), studentId);
+      assert.equal(String(filter.lecture), lectureId);
+      assert.equal(update.$setOnInsert.remainingViews, 4);
+      return Promise.resolve(accessDoc);
+    };
+    Purchase.find = (query) => ({
+      select() {
+        return this;
+      },
+      lean() {
+        assert.equal(String(query.student), studentId);
+        return Promise.resolve([
+          {
+            type: "containerPurchase",
+            student: studentId,
+            container: parentContainerId,
+          },
+        ]);
+      },
+    });
+
+    const result = await new Promise((resolve, reject) => {
+      const req = {
+        params: { lectureId },
+        user: {
+          _id: studentId,
+          role: "Student",
+          email: "student@example.com",
+          name: "Student Name",
+        },
+      };
+      const res = {
+        statusCode: 200,
+        status(code) {
+          this.statusCode = code;
+          return this;
+        },
+        json(payload) {
+          resolve({ statusCode: this.statusCode, payload });
+          return this;
+        },
+      };
+
+      lectureController.loadLecturePage(req, res, (error) => {
+        if (error) {
+          reject(error);
+        }
+      });
+    });
+
+    assert.equal(result.statusCode, 200);
+    assert.equal(result.payload.data.accessData._id, accessDoc._id);
+    assert.equal(result.payload.data.accessData.remainingViews, 4);
   } finally {
     restoreModelMethods();
   }

@@ -22,6 +22,7 @@ const {
   resolveAccessibleLectureTarget,
   sanitizeLectureForAccess,
   serializeStudentLectureAccess,
+  studentHasLectureEntitlement,
   upsertStudentLectureAccess,
 } = require("../utils/lectureAccessResolver")
 const { normalizeExternalUrl } = require("../utils/urlValidation")
@@ -488,16 +489,10 @@ exports.loadLecturePage = catchAsync(async (req, res, next) => {
 
   if (user.role === "Student") {
     // Check access record
-    const access = await StudentLectureAccess.findOne({
+    let access = await StudentLectureAccess.findOne({
       student: user._id,
       lecture: lectureId,
     }).lean();
-
-    accessData = access ? {
-      _id: access._id,
-      remainingViews: access.remainingViews,
-      lastAccessed: access.lastAccessed,
-    } : null;
 
     // Check requirements
     requirements = buildLectureRequirements(lecture);
@@ -517,6 +512,19 @@ exports.loadLecturePage = catchAsync(async (req, res, next) => {
       });
       requirements.homework = enrichRequirementWithSubmission(requirements.homework, homeworkSubmission);
     }
+
+    const requirementsSatisfied =
+      (!lecture.requiresExam || requirements.exam?.passed === true) &&
+      (!lecture.requiresHomework || requirements.homework?.passed === true);
+
+    if (!access && requirementsSatisfied) {
+      const hasEntitlement = await studentHasLectureEntitlement(user._id, lecture);
+      if (hasEntitlement) {
+        access = await upsertStudentLectureAccess(user._id, lecture);
+      }
+    }
+
+    accessData = serializeStudentLectureAccess(access);
   }
 
   // 4. Privileged homework fetch
