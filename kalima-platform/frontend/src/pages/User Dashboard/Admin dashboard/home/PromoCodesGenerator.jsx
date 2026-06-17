@@ -181,19 +181,73 @@ const PromoCodeGenerator = () => {
     }
   }
 
+  const validateTemplateDimensions = (file) =>
+    new Promise((resolve, reject) => {
+      const img = new Image()
+      const objectUrl = URL.createObjectURL(file)
+
+      img.onload = () => {
+        const isValid = img.naturalWidth === PROMO_TEMPLATE_WIDTH && img.naturalHeight === PROMO_TEMPLATE_HEIGHT
+        URL.revokeObjectURL(objectUrl)
+
+        if (!isValid) {
+          reject(
+            new Error(
+              t("template.invalidDimensions", {
+                width: PROMO_TEMPLATE_WIDTH,
+                height: PROMO_TEMPLATE_HEIGHT,
+              })
+            )
+          )
+          return
+        }
+
+        resolve()
+      }
+
+      img.onerror = () => {
+        URL.revokeObjectURL(objectUrl)
+        reject(new Error(t("template.invalidImage")))
+      }
+
+      img.src = objectUrl
+    })
+
   const handleTemplateUpload = async (e) => {
     const file = e.target.files?.[0]
     if (!file) return
 
-    setTemplateUploading(true)
     setTemplateError("")
     setTemplateSuccess("")
 
+    if (!file.type || !file.type.startsWith("image/")) {
+      const message = t("template.imageOnly")
+      setTemplateError(message)
+      toast.error(message)
+      e.target.value = ""
+      return
+    }
+
+    try {
+      await validateTemplateDimensions(file)
+    } catch (err) {
+      const translatedError = translateErrorMessage(err.message, t)
+      setTemplateError(translatedError)
+      toast.error(translatedError)
+      e.target.value = ""
+      return
+    }
+
+    setTemplateUploading(true)
+
     try {
       const result = await uploadPromoCodeTemplate(file)
-      if (result.success) {
+      if (result.success && result.data) {
         setTemplateSuccess(t("template.uploadSuccess"))
-        setPromoTemplates(prev => [...prev, result.data])
+        setPromoTemplates(prev => {
+          const withoutDuplicate = prev.filter(template => template.id !== result.data.id)
+          return [result.data, ...withoutDuplicate]
+        })
         setSelectedTemplateUrl(result.data.url)
         toast.success(t("template.uploadSuccess"))
       } else {
@@ -203,8 +257,10 @@ const PromoCodeGenerator = () => {
       }
     } catch (err) {
       setTemplateError(t("template.uploadFailed"))
+      toast.error(t("template.uploadFailed"))
     } finally {
       setTemplateUploading(false)
+      e.target.value = ""
     }
   }
 
@@ -240,39 +296,202 @@ const PromoCodeGenerator = () => {
     }
   }
 
+  const getPrintableTemplateUrl = () => {
+    const resolvedUrl = new URL(selectedTemplateUrl, window.location.origin)
+
+    if (resolvedUrl.hostname === window.location.hostname) {
+      resolvedUrl.protocol = window.location.protocol
+    }
+
+    return resolvedUrl.toString()
+  }
+
   const printQRCodes = () => {
-    const printContent = qrCodeUrls
-      .map((url, index) => {
-        const code = generatedCodes[index]
-        return `
-          <div style="page-break-inside: avoid; margin-bottom: 20px; text-align: center;">
-            <img src="${url}" alt="QR Code" style="width: 150px; height: 150px;" />
-            <p style="font-family: monospace; margin-top: 5px;">${code.code}</p>
-          </div>
-        `
-      })
-      .join("")
+    if (!generatedCodes.length || !qrCodeUrls.length) return
 
     const printWindow = window.open("", "_blank")
-    printWindow.document.write(`
+    if (!printWindow) {
+      const message = t("printPopupBlocked", { defaultValue: "Please allow pop-ups to print QR codes" })
+      toast.error(message)
+      return
+    }
+
+    const templateImage = getPrintableTemplateUrl()
+    const printContent = `
+      <!DOCTYPE html>
       <html>
         <head>
           <title>${t("printQrCodes")}</title>
           <style>
-            body { font-family: Arial, sans-serif; display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; }
+            @page {
+              size: A4;
+              margin: 0;
+            }
+            body {
+              margin: 0;
+              font-family: Arial, sans-serif;
+            }
+            .print-container {
+              display: grid;
+              grid-template-columns: repeat(3, 9cm);
+              grid-auto-rows: 4.75cm;
+              width: 100%;
+            }
+            .qr-item {
+              position: relative;
+              width: 9cm;
+              height: 4.75cm;
+              page-break-inside: avoid;
+              overflow: hidden;
+            }
+            .template-image {
+              position: absolute;
+              inset: 0;
+              width: 100%;
+              height: 100%;
+              object-fit: cover;
+              z-index: 1;
+            }
+            .code-number {
+              position: absolute;
+              top: 3%;
+              left: 2%;
+              font-size: 14px;
+              font-weight: bold;
+              color: #fff;
+              z-index: 2;
+            }
+            .qr-code {
+              position: absolute;
+              top: 35%;
+              left: 7%;
+              width: 50px;
+              height: 50px;
+              z-index: 2;
+            }
+            .qr-code img {
+              width: 100%;
+              height: 100%;
+              object-fit: contain;
+            }
+            .code-value {
+              position: absolute;
+              top: 12%;
+              left: 11%;
+              font-size: 11px;
+              font-weight: bold;
+              color: #000;
+              width: 40%;
+              text-align: left;
+              z-index: 2;
+            }
+            .amount-stack {
+              position: absolute;
+              top: 9%;
+              left: 6.8%;
+              width: 15%;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              z-index: 2;
+            }
+            .amount-before {
+              position: relative;
+              font-size: 10px;
+              font-weight: 700;
+              color: #111;
+              line-height: 1.1;
+              text-decoration: line-through;
+              text-decoration-thickness: 1.5px;
+              text-decoration-color: #c51616;
+            }
+            .amount-before::after {
+              content: "";
+              position: absolute;
+              left: -4%;
+              right: -4%;
+              top: 52%;
+              border-top: 1.5px solid rgba(197, 22, 22, 0.8);
+              transform: rotate(-2deg);
+            }
+            .amount-after {
+              margin-top: 4px;
+              font-size: 14px;
+              font-weight: 800;
+              color: #000;
+              line-height: 1;
+              letter-spacing: 0.2px;
+            }
+            .promo-code {
+              position: absolute;
+              bottom: 13%;
+              right: 30%;
+              font-size: 16px;
+              font-weight: 700;
+              color: #000;
+              width: 40%;
+              text-align: center;
+              word-break: break-all;
+              z-index: 2;
+            }
           </style>
         </head>
-        <body>${printContent}</body>
+        <body>
+          <div class="print-container">
+            ${generatedCodes.map((code, index) => {
+              const hasAmountBefore = Number(formData.amountBefore) > 0
+              const amountBeforeDisplay = hasAmountBefore ? Number(formData.amountBefore) : null
+              const amountAfterDisplay = code.pointsAmount || formData.pointsAmount
+
+              return `
+                <div class="qr-item">
+                  <img class="template-image" src="${templateImage}" alt="" />
+                  <div class="code-number">#${index + 1}</div>
+                  <div class="qr-code">
+                    <img src="${qrCodeUrls[index]}" alt="QR Code" />
+                  </div>
+                  ${hasAmountBefore
+                    ? `<div class="amount-stack">
+                        <div class="amount-before">${amountBeforeDisplay}</div>
+                        <div class="amount-after">${amountAfterDisplay}</div>
+                      </div>`
+                    : `<div class="code-value">${amountAfterDisplay}</div>`
+                  }
+                  <div class="promo-code">${code.code}</div>
+                </div>
+              `
+            }).join("")}
+          </div>
+          <script>
+            window.onload = function() {
+              Promise.all(
+                Array.from(document.querySelectorAll('img')).map(function(img) {
+                  return img.complete
+                    ? Promise.resolve()
+                    : new Promise(function(resolve) {
+                        img.onload = resolve;
+                        img.onerror = resolve;
+                      });
+                })
+              ).then(function() {
+                return new Promise(function(resolve) { setTimeout(resolve, 500); });
+              }).then(function() {
+                window.print();
+              });
+            };
+          </script>
+        </body>
       </html>
-    `)
+    `
+
+    printWindow.document.write(printContent)
     printWindow.document.close()
-    printWindow.print()
   }
 
   const templateOptions = [
     {
       id: "default",
-      name: "Default Template",
+      name: t("template.defaultOption"),
       url: DEFAULT_PROMO_TEMPLATE_URL,
       width: PROMO_TEMPLATE_WIDTH,
       height: PROMO_TEMPLATE_HEIGHT,
@@ -460,39 +679,58 @@ const PromoCodeGenerator = () => {
             <h3 className="text-lg font-bold">{t("generatedCodes")}</h3>
             {generateQrCodes && qrCodeUrls.length > 0 && (
               <div className="flex flex-col gap-2 sm:items-end">
-                <div className="flex flex-col gap-1">
-                  <label className="flex flex-col gap-1 py-0">
-                    <span className="text-xs"> {t("template.selectorLabel")}</span>
-                  </label>
-                  <DSSelect
-                    className="select-bordered select-sm min-w-[220px]"
-                    value={selectedTemplateUrl}
-                    onChange={(e) => {
-                      setSelectedTemplateUrl(e.target.value)
-                      setTemplateError("")
-                      setTemplateSuccess("")
-                    }}
-                    disabled={templateLoading}
-                  >
-                    {templateOptions.map((template) => (
-                      <option key={template.id} value={template.url}>
-                        {template.name}
-                      </option>
-                    ))}
-                  </DSSelect>
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-end">
+                  <div className="flex flex-col gap-1">
+                    <label className="flex flex-col gap-1 py-0">
+                      <span className="text-xs">{t("template.selectorLabel")}</span>
+                    </label>
+                    <DSSelect
+                      className="select-bordered select-sm min-w-[220px]"
+                      value={selectedTemplateUrl}
+                      onChange={(e) => {
+                        setSelectedTemplateUrl(e.target.value)
+                        setTemplateError("")
+                        setTemplateSuccess("")
+                      }}
+                      disabled={templateLoading}
+                    >
+                      {templateOptions.map((template) => (
+                        <option key={template.id} value={template.url}>
+                          {template.name}
+                        </option>
+                      ))}
+                    </DSSelect>
+                  </div>
+
+                  <div className="flex flex-col gap-1">
+                    <label className="flex flex-col gap-1 py-0">
+                      <span className="text-xs">{t("template.uploadLabel")}</span>
+                    </label>
+                    <input
+                      type="file"
+                      accept="image/png,image/jpeg,image/jpg,image/webp"
+                      className="block min-w-[220px] max-w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs text-slate-700 file:mr-3 file:rounded-lg file:border-0 file:bg-slate-100 file:px-3 file:py-1 file:text-xs file:font-semibold file:text-slate-700"
+                      onChange={handleTemplateUpload}
+                      disabled={templateUploading}
+                    />
+                  </div>
                 </div>
               </div>
             )}
           </div>
 
-            <p className="text-xs text-slate-600">
-            {t("template.requiredDimensions", {
-              width: PROMO_TEMPLATE_WIDTH,
-              height: PROMO_TEMPLATE_HEIGHT,
-            })}
-          </p>
-          {templateError && <p className="text-xs text-red-500">{templateError}</p>}
-          {templateSuccess && <p className="text-xs text-green-500">{templateSuccess}</p>}
+          {generateQrCodes && qrCodeUrls.length > 0 && (
+            <div className="mb-3 flex flex-col gap-1 sm:items-end">
+              <p className="text-xs text-slate-600">
+                {t("template.requiredDimensions", {
+                  width: PROMO_TEMPLATE_WIDTH,
+                  height: PROMO_TEMPLATE_HEIGHT,
+                })}
+              </p>
+              {templateError && <p className="text-xs text-red-500">{templateError}</p>}
+              {templateSuccess && <p className="text-xs text-green-500">{templateSuccess}</p>}
+            </div>
+          )}
 
           <div className="flex flex-wrap gap-2">
             <Button size="sm" variant="outline" onClick={printQRCodes}>
