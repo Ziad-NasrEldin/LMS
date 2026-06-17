@@ -12,6 +12,7 @@ const {
   listSpreadsheetTabs,
   normalizeSheetTabName,
   buildAssessmentTabBase,
+  getUnclaimedFormResponseTabs,
 } = require("../utils/assessmentSheetTabs");
 
 const argSet = new Set(process.argv.slice(2));
@@ -112,6 +113,47 @@ const run = async () => {
         type: config.type,
         desiredTabName,
         status: "healthy",
+      });
+      continue;
+    }
+
+    if (!applyChanges) {
+      const currentTab = currentTabName
+        ? spreadsheetTabs.find((tab) => tab.title === currentTabName)
+        : null;
+      const unclaimedTabs = getUnclaimedFormResponseTabs({
+        tabs: spreadsheetTabs,
+        claimedTabNames,
+      });
+      const fallbackTab = currentTab
+        ? null
+        : (preferLatest ? unclaimedTabs[0] : unclaimedTabs.length === 1 ? unclaimedTabs[0] : null);
+
+      if (!currentTab && !fallbackTab) {
+        report.summary.unresolved += 1;
+        report.items.push({
+          configId: String(config._id),
+          name: config.name,
+          type: config.type,
+          desiredTabName,
+          currentTabName,
+          status: "unresolved",
+          reason: "No resolvable linked response tab found",
+          unclaimedTabs: unclaimedTabs.map((tab) => tab.title),
+        });
+        continue;
+      }
+
+      report.summary.repaired += 1;
+      report.items.push({
+        configId: String(config._id),
+        name: config.name,
+        type: config.type,
+        desiredTabName,
+        currentTabName,
+        status: "repair-preview",
+        action: currentTab ? "renamed-current" : "renamed-fallback",
+        previousTitle: currentTab?.title || fallbackTab?.title || null,
       });
       continue;
     }
