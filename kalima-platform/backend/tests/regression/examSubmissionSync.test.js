@@ -162,6 +162,45 @@ test("getExamResultsFromSheet falls back to the Google Forms response tab", asyn
   }
 });
 
+test("getExamResultsFromSheet matches legacy form rows by studentEmail when saved identifier is not email", async () => {
+  try {
+    googleApiConfig.configureGoogleSheets = () => ({
+      spreadsheets: {
+        values: {
+          get: async ({ range }) => {
+            assert.equal(range, "Form_Responses");
+            return {
+              data: {
+                values: [
+                  ["Timestamp", "Email Address", "Untitled Question", "Score"],
+                  ["4/1/2026 4:54:29", "child@example.com", "Option 1", "10 / 10"],
+                ],
+              },
+            };
+          },
+        },
+      },
+    });
+
+    const result = await examSubmissionSync.getExamResultsFromSheet({
+      sheetId: "master-sheet-id",
+      sheetTabName: "Form_Responses",
+      studentIdentifier: "42",
+      studentEmail: "child@example.com",
+      studentIdentifierColumn: "Email Address",
+      scoreColumn: "Score",
+      passingThreshold: 60,
+    });
+
+    assert.equal(result.found, true);
+    assert.equal(result.score, 10);
+    assert.equal(result.maxScore, 10);
+    assert.equal(result.sheetTabName, "Form_Responses");
+  } finally {
+    restorePatches();
+  }
+});
+
 test("getExamResultsFromSheet does not inject RAW_SUBMISSIONS when only legacy response tabs exist", async () => {
   try {
     const calls = [];

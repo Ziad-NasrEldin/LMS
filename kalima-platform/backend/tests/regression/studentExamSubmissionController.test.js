@@ -32,7 +32,13 @@ const runVerifyExamSubmission = ({
   Lecture.findById = () => makeLectureQuery(lectureDoc);
   examSubmissionSync.processAssessmentSubmissionFromSheet = async ({
     assessmentType,
-  }) => processResultByType[assessmentType] || null;
+    studentEmail: capturedStudentEmail,
+  }) => {
+    if (processResultByType.__captureStudentEmail) {
+      processResultByType.__captureStudentEmail(capturedStudentEmail);
+    }
+    return processResultByType[assessmentType] || null;
+  };
 
   return new Promise((resolve, reject) => {
     const req = {

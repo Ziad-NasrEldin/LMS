@@ -405,11 +405,15 @@ const getExamResultsFromSheet = async (
       }
 
       const comparableIdentifier = toComparableLower(studentIdentifier);
+      const comparableEmail = toComparableLower(studentEmail);
       const studentRows = dataRows
         .map((row, rowIndex) => ({ row, rowIndex }))
         .filter(({ row }) => {
           const rowIdentifier = toComparableLower(row[identifierColIndex]);
-          return rowIdentifier && rowIdentifier === comparableIdentifier;
+          return Boolean(rowIdentifier) && (
+            rowIdentifier === comparableIdentifier ||
+            (Boolean(comparableEmail) && rowIdentifier === comparableEmail)
+          );
         });
 
       if (studentRows.length === 0) {
@@ -567,6 +571,7 @@ const processAssessmentSubmissionFromSheet = async ({
   lectureId,
   studentId,
   studentIdentifier,
+  studentEmail = null,
   assessmentType,
   syncSource = "sheet",
   syncReference = null,
@@ -642,9 +647,9 @@ const processAssessmentSubmissionFromSheet = async ({
     sheetId: configDoc.googleSheetId,
     sheetTabName: configuredTabName,
     studentIdentifier,
-    studentEmail: normalizeString(studentIdentifier).includes("@")
+    studentEmail: studentEmail || (normalizeString(studentIdentifier).includes("@")
       ? studentIdentifier
-      : null,
+      : null),
     studentIdentifierColumn: MASTER_ASSESSMENT_IDENTIFIER_COLUMN,
     scoreColumn: MASTER_ASSESSMENT_SCORE_COLUMN,
     assessmentType,

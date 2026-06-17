@@ -109,8 +109,8 @@ test("recheckAssessmentAccess uses child identifier and manual sync source for p
         email: "parent@example.com",
         name: "Parent Name",
       },
-      syncImpl: async ({ studentIdentifier, syncSource, syncReference }) => {
-        capturedCalls.push({ studentIdentifier, syncSource, syncReference });
+      syncImpl: async ({ studentIdentifier, studentEmail, syncSource, syncReference }) => {
+        capturedCalls.push({ studentIdentifier, studentEmail, syncSource, syncReference });
         return {
           passed: true,
           status: "passed",
@@ -125,6 +125,7 @@ test("recheckAssessmentAccess uses child identifier and manual sync source for p
     assert.deepEqual(capturedCalls, [
       {
         studentIdentifier: "child@example.com",
+        studentEmail: "child@example.com",
         syncSource: "manual",
         syncReference: "manual-recheck",
       },

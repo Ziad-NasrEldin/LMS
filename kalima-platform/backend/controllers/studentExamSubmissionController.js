@@ -47,6 +47,7 @@ exports.verifyExamSubmission = catchAsync(async (req, res, next) => {
         lectureId,
         studentId,
         studentIdentifier,
+        studentEmail: req.user.email || null,
         assessmentType,
         syncSource: "sheet",
       });
