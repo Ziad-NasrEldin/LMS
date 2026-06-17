@@ -19,6 +19,43 @@ const { normalizeExternalUrl } = require("../utils/urlValidation");
 
 const ADMIN_ROLES = ["Admin", "SubAdmin", "Moderator"];
 
+const normalizeDownloadFilename = (fileName) => {
+  const fallback = "attachment";
+  if (typeof fileName !== "string") {
+    return fallback;
+  }
+
+  const withoutPath = fileName.split(/[\/]/).pop().trim();
+  return withoutPath || fallback;
+};
+
+const escapeContentDispositionFilename = (fileName) =>
+  fileName.replace(/["\\\r\n]/g, "_");
+
+const buildContentDisposition = (fileName) => {
+  const normalizedFileName = normalizeDownloadFilename(fileName);
+  const asciiFallback = escapeContentDispositionFilename(
+    normalizedFileName.replace(/[^ -~]/g, "_")
+  );
+  const encodedFileName = encodeURIComponent(normalizedFileName).replace(/['()]/g, (char) =>
+    `%${char.charCodeAt(0).toString(16).toUpperCase()}`
+  );
+
+  return `attachment; filename="${asciiFallback}"; filename*=UTF-8''${encodedFileName}`;
+};
+
+const setDownloadFilenameHeaders = (res, fileName) => {
+  const normalizedFileName = normalizeDownloadFilename(fileName);
+  res.setHeader("Content-Disposition", buildContentDisposition(normalizedFileName));
+  res.setHeader("X-Download-Filename", encodeURIComponent(normalizedFileName));
+};
+
+exports._test = {
+  buildContentDisposition,
+  normalizeDownloadFilename,
+  setDownloadFilenameHeaders,
+};
+
 const canManageLectureAttachments = async (user, lecture) => {
   if (!user || !lecture) {
     return false;
@@ -137,10 +174,7 @@ exports.getAttachmentFile = catchAsync(async (req, res, next) => {
   });
 
   res.setHeader("Content-Type", attachment.fileType);
-  res.setHeader(
-    "Content-Disposition",
-    `attachment; filename="${attachment.fileName}"`
-  );
+  setDownloadFilenameHeaders(res, attachment.fileName);
 
   file.data.pipe(res);
 

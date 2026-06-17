@@ -233,6 +233,46 @@ export const deleteLecture = async (lectureId) => {
 }
 
 
+const getHeader = (headers, name) => {
+  if (!headers) return "";
+  return headers[name] || headers[name.toLowerCase()] || headers[name.toUpperCase()] || "";
+};
+
+const decodeFilenameValue = (value) => {
+  if (!value) return "";
+  const cleanedValue = value.trim().replace(/^"|"$/g, "");
+  try {
+    return decodeURIComponent(cleanedValue);
+  } catch (_error) {
+    return cleanedValue;
+  }
+};
+
+const getFilenameFromContentDisposition = (contentDisposition) => {
+  if (!contentDisposition) return "";
+
+  const filenameStarMatch = contentDisposition.match(/filename\*=UTF-8''([^;]+)/i);
+  if (filenameStarMatch?.[1]) {
+    return decodeFilenameValue(filenameStarMatch[1]);
+  }
+
+  const filenameMatch = contentDisposition.match(/filename="([^"]+)"|filename=([^;]+)/i);
+  return decodeFilenameValue(filenameMatch?.[1] || filenameMatch?.[2] || "");
+};
+
+const getAttachmentDownloadFilename = (response, attachmentId) => {
+  const encodedHeaderName = getHeader(response?.headers, "x-download-filename");
+  const headerName = decodeFilenameValue(encodedHeaderName);
+  if (headerName) return headerName;
+
+  const dispositionName = getFilenameFromContentDisposition(
+    getHeader(response?.headers, "content-disposition")
+  );
+  if (dispositionName) return dispositionName;
+
+  return `attachment_${attachmentId}`;
+};
+
 export const downloadAttachmentById = async (attachmentId) => {
   try {
     const token = getToken();
@@ -252,7 +292,7 @@ export const downloadAttachmentById = async (attachmentId) => {
     const url = window.URL.createObjectURL(new Blob([response.data]));
     const link = document.createElement("a");
     link.href = url;
-    link.setAttribute("download", `attachment_${attachmentId}.pdf`); // Default filename
+    link.setAttribute("download", getAttachmentDownloadFilename(response, attachmentId));
     document.body.appendChild(link);
     link.click();
     link.remove();
