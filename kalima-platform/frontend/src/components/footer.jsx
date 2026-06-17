@@ -66,7 +66,7 @@ export default function Footer() {
 
               {[
 
-                { icon: Facebook, href: "https://www.facebook.com/kalima010", color: "hover:text-blue-600" },
+                { icon: Facebook, href: "https://www.facebook.com/profile.php?id=61590412059674", color: "hover:text-blue-600" },
 
                 { icon: Instagram, href: "#", color: "hover:text-pink-600" },
 
