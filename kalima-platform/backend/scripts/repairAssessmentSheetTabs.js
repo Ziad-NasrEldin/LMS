@@ -106,6 +106,27 @@ const run = async () => {
     }
 
     if (spreadsheetTabs.some((tab) => tab.title === desiredTabName)) {
+      if (currentTabName && currentTabName !== desiredTabName) {
+        if (applyChanges) {
+          await LecturerExamConfig.findByIdAndUpdate(config._id, {
+            googleSheetTabName: desiredTabName,
+          });
+        }
+
+        report.summary.repaired += 1;
+        report.items.push({
+          configId: String(config._id),
+          name: config.name,
+          type: config.type,
+          desiredTabName,
+          currentTabName,
+          status: applyChanges ? "repaired" : "repair-preview",
+          action: "updated-config-tab-name",
+          previousTitle: currentTabName,
+        });
+        continue;
+      }
+
       report.summary.healthy += 1;
       report.items.push({
         configId: String(config._id),
