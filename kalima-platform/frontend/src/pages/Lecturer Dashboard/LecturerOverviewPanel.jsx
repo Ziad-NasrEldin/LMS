@@ -52,6 +52,19 @@ const safeDate = (value) => {
 const formatNumber = (value, locale) =>
   new Intl.NumberFormat(locale || "en").format(Number(value || 0));
 
+const getRedeemerName = (code, fallback) => {
+  const redeemer = code?.redeemedBy;
+  if (!redeemer) return fallback;
+  if (typeof redeemer === "string") return redeemer;
+  return redeemer.name || redeemer.userSerial || redeemer.sequencedId || fallback;
+};
+
+const getRedeemerMeta = (code) => {
+  const redeemer = code?.redeemedBy;
+  if (!redeemer || typeof redeemer === "string") return "";
+  return redeemer.userSerial || redeemer.sequencedId || "";
+};
+
 export default function LecturerOverviewPanel() {
   const { t, i18n } = useTranslation("lecturerDashboard");
   const isRTL = i18n.language === "ar";
@@ -221,6 +234,13 @@ export default function LecturerOverviewPanel() {
         code: "WELCOME25",
         pointsAmount: 250,
         isRedeemed: true,
+        redeemedBy: {
+          id: "sample-student-1",
+          name: isRTL ? "محمد أحمد" : "Mohamed Ahmed",
+          sequencedId: "1000000",
+          userSerial: "ST001",
+          role: "Student",
+        },
         redeemedAt: new Date().toISOString(),
         createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
       },
@@ -233,7 +253,7 @@ export default function LecturerOverviewPanel() {
         createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
       },
     ],
-    []
+    [isRTL]
   );
 
   const usesPlaceholderPromoCodes = forceDemoData;
@@ -432,6 +452,10 @@ export default function LecturerOverviewPanel() {
       redeemed: code.isRedeemed
         ? t("yes", { defaultValue: isRTL ? "نعم" : "Yes" })
         : t("no", { defaultValue: isRTL ? "لا" : "No" }),
+      redeemedBy: code.isRedeemed
+        ? getRedeemerName(code, t("unknown", { defaultValue: isRTL ? "غير معروف" : "Unknown" }))
+        : "-",
+      redeemedById: code.redeemedBy?.id || code.redeemedBy?._id || "",
       createdAt: formatDateTimeForExport(code.createdAt, exportLocale),
       redeemedAt: formatDateTimeForExport(code.redeemedAt, exportLocale),
     }));
@@ -478,6 +502,8 @@ export default function LecturerOverviewPanel() {
         { key: "code", label: t("code", { defaultValue: isRTL ? "الكود" : "Code" }) },
         { key: "amount", label: t("amount", { defaultValue: isRTL ? "القيمة" : "Amount" }) },
         { key: "redeemed", label: t("status", { defaultValue: isRTL ? "الحالة" : "Status" }) },
+        { key: "redeemedBy", label: t("redeemedBy", { defaultValue: isRTL ? "استخدمه" : "Redeemed by" }) },
+        { key: "redeemedById", label: t("studentId", { defaultValue: isRTL ? "معرف الطالب" : "Student ID" }) },
         { key: "createdAt", label: t("createdAt", { defaultValue: isRTL ? "تاريخ الإنشاء" : "Created at" }) },
         { key: "redeemedAt", label: t("redeemedAt", { defaultValue: isRTL ? "تاريخ الاستخدام" : "Redeemed at" }) },
       ];
@@ -534,6 +560,8 @@ export default function LecturerOverviewPanel() {
           { key: "code", label: t("code", { defaultValue: isRTL ? "الكود" : "Code" }) },
           { key: "amount", label: t("amount", { defaultValue: isRTL ? "القيمة" : "Amount" }) },
           { key: "redeemed", label: t("status", { defaultValue: isRTL ? "الحالة" : "Status" }) },
+          { key: "redeemedBy", label: t("redeemedBy", { defaultValue: isRTL ? "استخدمه" : "Redeemed by" }) },
+          { key: "redeemedById", label: t("studentId", { defaultValue: isRTL ? "معرف الطالب" : "Student ID" }) },
           { key: "createdAt", label: t("createdAt", { defaultValue: isRTL ? "تاريخ الإنشاء" : "Created at" }) },
           { key: "redeemedAt", label: t("redeemedAt", { defaultValue: isRTL ? "تاريخ الاستخدام" : "Redeemed at" }) },
           { key: "studentId", label: t("studentId", { defaultValue: isRTL ? "معرف الطالب" : "Student ID" }) },
@@ -957,14 +985,27 @@ export default function LecturerOverviewPanel() {
           {effectivePromoCodes.length ? (
             <ul className="divide-y divide-base-300">
               {paginatedPromoCodes.map((code) => (
-                <li key={code.id} className="p-4 flex items-center justify-between gap-4">
+                <li key={code.id} className="p-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
                   <div>
                     <p className="font-semibold tracking-widest">{code.code}</p>
                     <p className="text-sm text-slate-600">
                       {formatNumber(code.pointsAmount, i18n.language)} {t("currency", { defaultValue: isRTL ? "جنيه" : "EGP" })}
                     </p>
                   </div>
-                  <div className="text-right">
+                  <div className="sm:text-center">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                      {t("redeemedBy", { defaultValue: isRTL ? "استخدمه" : "Redeemed by" })}
+                    </p>
+                    <p className="text-sm font-semibold text-slate-800">
+                      {code.isRedeemed
+                        ? getRedeemerName(code, t("unknown", { defaultValue: isRTL ? "غير معروف" : "Unknown" }))
+                        : "-"}
+                    </p>
+                    {code.isRedeemed && getRedeemerMeta(code) ? (
+                      <p className="text-xs text-slate-500">{getRedeemerMeta(code)}</p>
+                    ) : null}
+                  </div>
+                  <div className={isRTL ? "text-right sm:text-left" : "text-left sm:text-right"}>
                     <p className="text-sm font-semibold">
                       {code.isRedeemed
                         ? t("redeemed", { defaultValue: isRTL ? "مستخدم" : "Redeemed" })

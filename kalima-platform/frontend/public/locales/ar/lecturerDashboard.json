@@ -54,6 +54,7 @@
   "searchLinkedStudents": "ابحث باسم الطالب أو المحاضرة...",
   "amount": "القيمة",
   "status": "الحالة",
+  "redeemedBy": "استخدمه",
   "createdAt": "تاريخ الإنشاء",
   "redeemedAt": "تاريخ الاستخدام",
   "studentName": "الطالب",

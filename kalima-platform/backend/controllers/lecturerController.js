@@ -272,7 +272,8 @@ exports.getMyAnalytics = catchAsync(async (req, res, next) => {
                 type: "specific",
                 ...(Object.keys(codeCreatedFilter).length > 0 ? codeCreatedFilter : {}),
             })
-                .select("code pointsAmount isRedeemed redeemedAt createdAt")
+                .select("code pointsAmount isRedeemed redeemedBy redeemedAt createdAt")
+                .populate("redeemedBy", "name sequencedId userSerial role")
                 .lean(),
             Code.find({
                 lecturerId,
@@ -280,7 +281,8 @@ exports.getMyAnalytics = catchAsync(async (req, res, next) => {
                 isRedeemed: true,
                 ...(Object.keys(codeRedeemedFilter).length > 0 ? codeRedeemedFilter : {}),
             })
-                .select("code pointsAmount isRedeemed redeemedAt createdAt")
+                .select("code pointsAmount isRedeemed redeemedBy redeemedAt createdAt")
+                .populate("redeemedBy", "name sequencedId userSerial role")
                 .lean(),
         ]);
 
@@ -423,6 +425,15 @@ exports.getMyAnalytics = catchAsync(async (req, res, next) => {
                 code: code.code,
                 pointsAmount: code.pointsAmount,
                 isRedeemed: code.isRedeemed,
+                redeemedBy: code.redeemedBy
+                    ? {
+                        id: String(code.redeemedBy._id || code.redeemedBy),
+                        name: code.redeemedBy.name || null,
+                        sequencedId: code.redeemedBy.sequencedId || null,
+                        userSerial: code.redeemedBy.userSerial || null,
+                        role: code.redeemedBy.role || null,
+                    }
+                    : null,
                 redeemedAt: code.redeemedAt,
                 createdAt: code.createdAt,
             })),
