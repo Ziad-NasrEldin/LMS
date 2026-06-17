@@ -324,8 +324,11 @@ const PromoCodeGenerator = () => {
           <title>${t("printQrCodes")}</title>
           <style>
             @page {
-              size: A4;
-              margin: 0;
+              size: A4 landscape;
+              margin: 6mm;
+            }
+            * {
+              box-sizing: border-box;
             }
             body {
               margin: 0;
@@ -333,15 +336,19 @@ const PromoCodeGenerator = () => {
             }
             .print-container {
               display: grid;
-              grid-template-columns: repeat(3, 9cm);
-              grid-auto-rows: 4.75cm;
+              grid-template-columns: repeat(2, ${PROMO_TEMPLATE_WIDTH}px);
+              grid-auto-rows: ${PROMO_TEMPLATE_HEIGHT}px;
+              gap: 10px;
+              align-items: start;
+              justify-content: start;
               width: 100%;
             }
             .qr-item {
               position: relative;
-              width: 9cm;
-              height: 4.75cm;
+              width: ${PROMO_TEMPLATE_WIDTH}px;
+              height: ${PROMO_TEMPLATE_HEIGHT}px;
               page-break-inside: avoid;
+              break-inside: avoid;
               overflow: hidden;
             }
             .template-image {
@@ -349,7 +356,8 @@ const PromoCodeGenerator = () => {
               inset: 0;
               width: 100%;
               height: 100%;
-              object-fit: cover;
+              object-fit: fill;
+              display: block;
               z-index: 1;
             }
             .code-number {
