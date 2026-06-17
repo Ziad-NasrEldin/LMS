@@ -17,6 +17,7 @@ const {
 const argSet = new Set(process.argv.slice(2));
 const applyChanges = argSet.has("--apply");
 const preferLatest = argSet.has("--prefer-latest");
+const alignCanonical = argSet.has("--align-canonical");
 
 const ensureOutputDir = (outputDir) => {
   if (!fs.existsSync(outputDir)) {
@@ -56,6 +57,7 @@ const run = async () => {
     generatedAt: now.toISOString(),
     applyChanges,
     preferLatest,
+    alignCanonical,
     summary: {
       total: configs.length,
       healthy: 0,
@@ -69,9 +71,10 @@ const run = async () => {
 
   for (const config of configs) {
     const currentTabName = normalizeSheetTabName(config.googleSheetTabName);
-    const desiredTabName = currentTabName && !isLegacyFormResponsesTab(currentTabName)
-      ? currentTabName
-      : buildFallbackTabName(config);
+    const canonicalTabName = buildFallbackTabName(config);
+    const desiredTabName = alignCanonical || !currentTabName || isLegacyFormResponsesTab(currentTabName)
+      ? canonicalTabName
+      : currentTabName;
 
     const claimedConfigs = configs.filter(
       (candidate) =>
