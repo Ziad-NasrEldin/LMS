@@ -31,11 +31,13 @@ const examSubmissionSync = require("../utils/examSubmissionSync")
 const { configureGoogleSheets } = require("../config/googleApiConfig")
 const {
   ensureAssessmentSheetTab,
+  buildAssessmentTabBase,
   normalizeSheetTabName,
 } = require("../utils/assessmentSheetTabs")
 const {
-  detectMatchingResponseTab,
   getPublishedFormDetails,
+  assertPublishedFormValidationAvailable,
+  detectMatchingResponseTab,
 } = require("../utils/formSheetValidation")
 const {
   resolveLimitedLectureCreateFields,
@@ -129,27 +131,11 @@ const normalizePublicFormUrl = (rawUrl, assessmentLabel) => {
   return normalizedUrl
 }
 
-const sanitizeTabSegment = (value) => {
-  const normalizedValue = String(value || "")
-    .toLowerCase()
-    .trim()
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-
-  return normalizedValue || "lecture"
-}
-
 const toObjectIdOrNull = (value) => {
   if (!value) return null
   const idValue = typeof value === "object" && value._id ? value._id : value
   if (!mongoose.Types.ObjectId.isValid(idValue)) return null
   return new mongoose.Types.ObjectId(idValue)
-}
-
-const buildAssessmentTabBase = (lectureName, assessmentType) => {
-  const suffix = assessmentType === "homework" ? "homework" : "exam"
-  return `${sanitizeTabSegment(lectureName)}-${suffix}`
 }
 
 const getClaimedAssessmentTabNames = async ({ sheetId, excludeConfigId = null, session }) => {
@@ -255,13 +241,12 @@ const ensureManagedAssessmentConfig = async ({
       formUrl: normalizedFormUrl,
       expectedSheetId: MASTER_ASSESSMENT_SHEET_ID,
     })
-    const matchedResponseTab = publishedFormDetails.validationSkipped
-      ? null
-      : await detectMatchingResponseTab({
-        sheetId: MASTER_ASSESSMENT_SHEET_ID,
-        claimedTabNames,
-        responseSamples: publishedFormDetails.responseSamples,
-      })
+    assertPublishedFormValidationAvailable(publishedFormDetails, assessmentLabel)
+    const matchedResponseTab = await detectMatchingResponseTab({
+      sheetId: MASTER_ASSESSMENT_SHEET_ID,
+      claimedTabNames,
+      responseSamples: publishedFormDetails.responseSamples,
+    })
     const ensuredSheetTab = await ensureAssessmentSheetTab({
       sheets: writableSheets,
       sheetId: MASTER_ASSESSMENT_SHEET_ID,

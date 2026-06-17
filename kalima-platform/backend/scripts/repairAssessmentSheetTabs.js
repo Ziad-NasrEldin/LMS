@@ -11,6 +11,7 @@ const {
   isLegacyFormResponsesTab,
   listSpreadsheetTabs,
   normalizeSheetTabName,
+  buildAssessmentTabBase,
 } = require("../utils/assessmentSheetTabs");
 
 const argSet = new Set(process.argv.slice(2));
@@ -23,24 +24,13 @@ const ensureOutputDir = (outputDir) => {
   }
 };
 
-const sanitizeTabSegment = (value) => {
-  const normalizedValue = String(value || "")
-    .toLowerCase()
-    .trim()
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-
-  return normalizedValue || "lecture";
-};
-
 const buildFallbackTabName = (config) => {
   const suffix = config.type === "homework" ? "homework" : "exam";
   const baseName = config.name
     ? config.name.replace(new RegExp(`\\s+${suffix}$`, "i"), "")
     : `lecture-${suffix}`;
 
-  return `${sanitizeTabSegment(baseName)}-${suffix}`.slice(0, 100);
+  return buildAssessmentTabBase(baseName, config.type);
 };
 
 const run = async () => {

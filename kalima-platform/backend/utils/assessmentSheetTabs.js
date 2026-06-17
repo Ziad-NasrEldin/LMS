@@ -27,6 +27,23 @@ const normalizeSheetTabName = (value) => {
   return normalized || null;
 };
 
+const sanitizeTabSegment = (value) => {
+  const normalizedValue = String(value || "")
+    .normalize("NFKC")
+    .trim()
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[\\/?*[\]:]+/g, "-")
+    .replace(/[^\p{Letter}\p{Number}]+/gu, "-")
+    .replace(/^-+|-+$/g, "");
+
+  return normalizedValue || "lecture";
+};
+
+const buildAssessmentTabBase = (lectureName, assessmentType) => {
+  const suffix = assessmentType === "homework" ? "homework" : "exam";
+  return `${sanitizeTabSegment(lectureName)}-${suffix}`.slice(0, 100);
+};
+
 const isLegacyFormResponsesTab = (value) => {
   const normalized = normalizeSheetTabName(value);
   if (!normalized) return false;
@@ -263,6 +280,8 @@ module.exports = {
   FORM_RESPONSES_TAB_PATTERN,
   FORM_RESPONSES_UNDERSCORE_TAB_PATTERN,
   normalizeSheetTabName,
+  sanitizeTabSegment,
+  buildAssessmentTabBase,
   isLegacyFormResponsesTab,
   listSpreadsheetTabs,
   getUnclaimedFormResponseTabs,

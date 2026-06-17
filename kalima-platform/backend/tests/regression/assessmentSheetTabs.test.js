@@ -2,8 +2,18 @@ const test = require("node:test");
 const assert = require("node:assert/strict");
 
 const {
+  buildAssessmentTabBase,
   ensureAssessmentSheetTab,
 } = require("../../utils/assessmentSheetTabs");
+
+test("buildAssessmentTabBase preserves Arabic lecture names instead of falling back to lecture-exam", () => {
+  assert.equal(buildAssessmentTabBase("سس", "exam"), "سس-exam");
+  assert.equal(buildAssessmentTabBase("محاضرة", "homework"), "محاضرة-homework");
+});
+
+test("buildAssessmentTabBase keeps Google Sheets-safe characters out while preserving Unicode letters", () => {
+  assert.equal(buildAssessmentTabBase("  سس / اختبار [1]  ", "exam"), "سس-اختبار-1-exam");
+});
 
 test("ensureAssessmentSheetTab renames the current linked tab to the desired lecture tab", async () => {
   const requests = [];

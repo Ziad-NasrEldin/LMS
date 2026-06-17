@@ -69,6 +69,18 @@ const buildSkippedValidationResult = (formId) => ({
   validationSkipped: true,
 });
 
+const assertPublishedFormValidationAvailable = (publishedFormDetails, assessmentLabel = "Assessment") => {
+  if (!publishedFormDetails?.validationSkipped) {
+    return;
+  }
+
+  const normalizedLabel = String(assessmentLabel || "assessment").trim().toLowerCase();
+  throw new AppError(
+    `Cannot bind ${normalizedLabel} form responses because Google Forms validation is unavailable. Enable the Google Forms API and ensure the service account can read the form before linking it to a lecture.`,
+    500
+  );
+};
+
 const getPublishedFormDetails = async ({ formUrl, expectedSheetId }) => {
   const resolvedFormUrl = await resolveGoogleFormsShortUrl(formUrl);
   const formId = extractGoogleFormId(resolvedFormUrl);
@@ -215,5 +227,6 @@ const detectMatchingResponseTab = async ({
 module.exports = {
   extractGoogleFormId,
   getPublishedFormDetails,
+  assertPublishedFormValidationAvailable,
   detectMatchingResponseTab,
 };

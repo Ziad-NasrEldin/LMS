@@ -141,6 +141,16 @@ test("getPublishedFormDetails skips hard failure when Google Forms client is una
   }
 });
 
+test("assertPublishedFormValidationAvailable rejects skipped validation before binding a response tab", () => {
+  assert.throws(
+    () => formSheetValidation.assertPublishedFormValidationAvailable(
+      { validationSkipped: true },
+      "Exam"
+    ),
+    /Cannot bind exam form responses because Google Forms validation is unavailable/
+  );
+});
+
 test("detectMatchingResponseTab matches a form response sample to the correct response tab", async () => {
   try {
     googleApiConfig.configureGoogleSheets = () => ({
