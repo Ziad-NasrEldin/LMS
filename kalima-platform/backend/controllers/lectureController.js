@@ -35,11 +35,6 @@ const {
   normalizeSheetTabName,
 } = require("../utils/assessmentSheetTabs")
 const {
-  getPublishedFormDetails,
-  assertPublishedFormValidationAvailable,
-  detectMatchingResponseTab,
-} = require("../utils/formSheetValidation")
-const {
   resolveLimitedLectureCreateFields,
   resolveLimitedLectureUpdateFields,
 } = require("../utils/limitedLectureAvailability")
@@ -237,16 +232,10 @@ const ensureManagedAssessmentConfig = async ({
       excludeConfigId: configDoc?._id || null,
       session,
     })
-    const publishedFormDetails = await getPublishedFormDetails({
-      formUrl: normalizedFormUrl,
-      expectedSheetId: MASTER_ASSESSMENT_SHEET_ID,
-    })
-    assertPublishedFormValidationAvailable(publishedFormDetails, assessmentLabel)
-    const matchedResponseTab = await detectMatchingResponseTab({
-      sheetId: MASTER_ASSESSMENT_SHEET_ID,
-      claimedTabNames,
-      responseSamples: publishedFormDetails.responseSamples,
-    })
+    // The Google Form URL is intentionally only a student-facing link.
+    // FECRA's assessment workflow is Sheets-only: the backend reads/renames
+    // the master Google Sheet tab and never requires Google Forms API access.
+    const matchedResponseTab = null
     const ensuredSheetTab = await ensureAssessmentSheetTab({
       sheets: writableSheets,
       sheetId: MASTER_ASSESSMENT_SHEET_ID,

@@ -241,7 +241,7 @@ const ensureAssessmentSheetTab = async ({
 
   if (unclaimedTabs.length === 1 || (preferNewestUnclaimed && unclaimedTabs.length > 0)) {
     const fallbackTab = preferNewestUnclaimed
-      ? unclaimedTabs[0]
+      ? unclaimedTabs[unclaimedTabs.length - 1]
       : unclaimedTabs[0];
 
     await renameSpreadsheetTab({

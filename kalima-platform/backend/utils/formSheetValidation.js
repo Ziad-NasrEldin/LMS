@@ -70,15 +70,10 @@ const buildSkippedValidationResult = (formId) => ({
 });
 
 const assertPublishedFormValidationAvailable = (publishedFormDetails, assessmentLabel = "Assessment") => {
-  if (!publishedFormDetails?.validationSkipped) {
-    return;
-  }
-
-  const normalizedLabel = String(assessmentLabel || "assessment").trim().toLowerCase();
-  throw new AppError(
-    `Cannot bind ${normalizedLabel} form responses because Google Forms validation is unavailable. Enable the Google Forms API and ensure the service account can read the form before linking it to a lecture.`,
-    500
-  );
+  // Backwards-compatible no-op: FECRA intentionally supports a Sheets-only
+  // assessment workflow where the Google Form URL is just the student-facing
+  // link and the backend never requires Google Forms API access.
+  return publishedFormDetails;
 };
 
 const getPublishedFormDetails = async ({ formUrl, expectedSheetId }) => {

@@ -141,13 +141,12 @@ test("getPublishedFormDetails skips hard failure when Google Forms client is una
   }
 });
 
-test("assertPublishedFormValidationAvailable rejects skipped validation before binding a response tab", () => {
-  assert.throws(
-    () => formSheetValidation.assertPublishedFormValidationAvailable(
-      { validationSkipped: true },
-      "Exam"
-    ),
-    /Cannot bind exam form responses because Google Forms validation is unavailable/
+test("assertPublishedFormValidationAvailable allows Sheets-only binding when form validation is skipped", () => {
+  const skippedDetails = { validationSkipped: true, linkedSheetId: null };
+
+  assert.equal(
+    formSheetValidation.assertPublishedFormValidationAvailable(skippedDetails, "Exam"),
+    skippedDetails
   );
 });
 

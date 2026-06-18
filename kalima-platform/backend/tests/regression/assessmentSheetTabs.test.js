@@ -89,6 +89,38 @@ test("ensureAssessmentSheetTab can claim newest unclaimed Form Responses tab", a
   );
 });
 
+test("ensureAssessmentSheetTab prefers the last unclaimed response tab in Sheets-only mode", async () => {
+  const requests = [];
+  const sheets = {
+    spreadsheets: {
+      get: async () => ({
+        data: {
+          sheets: [
+            { properties: { sheetId: 1, title: "Form Responses 1", index: 0 } },
+            { properties: { sheetId: 2, title: "Form Responses 2", index: 1 } },
+          ],
+        },
+      }),
+      batchUpdate: async ({ requestBody }) => {
+        requests.push(requestBody.requests);
+        return {};
+      },
+    },
+  };
+
+  const result = await ensureAssessmentSheetTab({
+    sheets,
+    sheetId: "sheet-1",
+    desiredTabName: "arabic-exam",
+    currentTabName: null,
+    claimedTabNames: [],
+    preferNewestUnclaimed: true,
+  });
+
+  assert.equal(result.previousTitle, "Form Responses 2");
+  assert.equal(requests[0][0].updateSheetProperties.properties.sheetId, 2);
+});
+
 test("ensureAssessmentSheetTab surfaces readable sheet access errors", async () => {
   const sheets = {
     spreadsheets: {
