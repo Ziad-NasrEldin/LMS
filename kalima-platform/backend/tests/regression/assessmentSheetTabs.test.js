@@ -121,6 +121,40 @@ test("ensureAssessmentSheetTab prefers the last unclaimed response tab in Sheets
   assert.equal(requests[0][0].updateSheetProperties.properties.sheetId, 2);
 });
 
+test("ensureAssessmentSheetTab creates the desired managed tab when allowed and no response tab exists", async () => {
+  const requests = [];
+  const sheets = {
+    spreadsheets: {
+      get: async () => ({
+        data: {
+          sheets: [
+            { properties: { sheetId: 1, title: "Existing Config", index: 0 } },
+          ],
+        },
+      }),
+      batchUpdate: async ({ requestBody }) => {
+        requests.push(requestBody.requests);
+        return {};
+      },
+    },
+  };
+
+  const result = await ensureAssessmentSheetTab({
+    sheets,
+    sheetId: "sheet-1",
+    desiredTabName: "new-lecture-exam",
+    currentTabName: null,
+    claimedTabNames: [],
+    preferNewestUnclaimed: true,
+    createIfMissing: true,
+  });
+
+  assert.equal(result.title, "new-lecture-exam");
+  assert.equal(result.action, "created");
+  assert.equal(requests.length, 1);
+  assert.equal(requests[0][0].addSheet.properties.title, "new-lecture-exam");
+});
+
 test("ensureAssessmentSheetTab surfaces readable sheet access errors", async () => {
   const sheets = {
     spreadsheets: {

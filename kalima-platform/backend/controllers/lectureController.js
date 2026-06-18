@@ -244,7 +244,11 @@ const ensureManagedAssessmentConfig = async ({
       claimedTabNames,
       preferredFallbackTitle: matchedResponseTab,
       preferNewestUnclaimed: !configDoc,
-      createIfMissing: false,
+      // Lecture quick-create only asks for the student-facing Google Form URL.
+      // Do not block lecture creation when the master Sheet has no fresh
+      // "Form Responses" tab yet; create the managed tab now so the exam/homework
+      // config can exist and later sheet-sync/recheck can read from it.
+      createIfMissing: true,
     })
 
     if (ensuredSheetTab.action === "missing") {
