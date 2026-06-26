@@ -2130,9 +2130,24 @@ const LectureDisplay = () => {
                       ref={fileInputRef}
                       onChange={handleFileSelect}
                       multiple
-                      className="block w-full text-sm text-neutral file:mr-4 file:rounded-full file:border-0 file:px-4 file:py-2 file:text-sm file:font-semibold"
-                      style={{ color: TOKENS.slateText }}
+                      className="sr-only"
+                      aria-label={t("chooseFiles")}
                     />
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        onClick={() => fileInputRef.current?.click()}
+                        className="w-full sm:w-auto"
+                      >
+                        {t("chooseFiles")}
+                      </Button>
+                      <span className="text-sm" style={{ color: TOKENS.slateText }}>
+                        {uploadingFiles.length > 0
+                          ? t("selectedFilesCount", { count: uploadingFiles.length })
+                          : t("noFilesSelected")}
+                      </span>
+                    </div>
                  </div>
   
                  {uploadingFiles.length > 0 && (
