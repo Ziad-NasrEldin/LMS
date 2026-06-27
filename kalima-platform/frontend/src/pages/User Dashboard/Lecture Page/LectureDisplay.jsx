@@ -1550,7 +1550,7 @@ const LectureDisplay = () => {
             </div>
 
             {/* Enhanced custom progress bar */}
-            <div className="p-4" style={{ background: "rgba(241,243,246,0.75)", borderTop: `1px solid ${TOKENS.borderSubtle}` }}>
+            <div className="p-4" dir="ltr" style={{ background: "rgba(241,243,246,0.75)", borderTop: `1px solid ${TOKENS.borderSubtle}` }}>
               <div className="flex flex-col space-y-2">
                 {/* Video info */}
                  <div className="flex flex-wrap justify-between items-center gap-2 mb-2">
@@ -1665,7 +1665,7 @@ const LectureDisplay = () => {
             </div>
 
             {/* Video stats and info */}
-            <div className="rounded-b-lg p-4" style={{ background: "rgba(241,243,246,0.92)", borderTop: `1px solid ${TOKENS.borderSubtle}` }}>
+              <div className="rounded-b-lg p-4" dir="ltr" style={{ background: "rgba(241,243,246,0.92)", borderTop: `1px solid ${TOKENS.borderSubtle}` }}>
               <div className="flex flex-wrap justify-between items-center">
                  <div className="flex items-center gap-2">
                    <Badge variant="primary">
