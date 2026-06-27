@@ -1842,7 +1842,11 @@ const LectureDisplay = () => {
               </div>
 ) : (
               <div className="rounded-xl px-4 py-6 text-sm" style={{ color: TOKENS.slateText, background: "rgba(241,243,246,0.55)" }}>
-                {t("noAttachmentsAvailable")}
+                {t("noAttachmentsAvailable", {
+                  defaultValue: isRTL
+                    ? "لا توجد مرفقات مرفوعة لهذه المحاضرة حتى الآن."
+                    : "No uploaded attachments are available for this lecture yet.",
+                })}
               </div>
             )}
           </Card>

@@ -21,7 +21,7 @@ i18n
     backend: {
       loadPath: '/locales/{{lng}}/{{ns}}.json', 
     },
-    ns: ['common', 'home', 'privacyPolicy', 'register', 'createUser', 'admin'],
+    ns: ['common', 'home', 'privacyPolicy', 'register', 'createUser', 'admin', 'lectureDisplay'],
   });
 
 export default i18n;
