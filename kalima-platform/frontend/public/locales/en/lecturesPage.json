@@ -213,11 +213,11 @@
   },
   "attachments": {
     "uploadTitle": "Lecture files",
-    "uploadHelper": "Upload PDFs, PowerPoints, documents, images, or any other lecture files here.",
+    "uploadHelper": "Upload any files that belong to this lecture. They will appear in the unified Attachments section.",
     "fileCount": "files",
     "savedFiles": "Saved files",
     "openFile": "Open file",
-    "uploadHint": "This box is for lecture resources only. The files are unified on the lecture page.",
+    "uploadHint": "Upload any files that belong to this lecture. They will appear in the unified Attachments section.",
     "googleFormTitle": "Google Form link",
     "googleFormHelper": "Use one Google Form link for the after-lecture exam or homework.",
     "homeworkType": "Homework",
