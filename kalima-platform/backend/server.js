@@ -1,4 +1,11 @@
 require("dotenv").config();
+const Sentry = require("@sentry/node");
+
+Sentry.init({
+  dsn: process.env.SENTRY_DSN || "https://62f0d2de8712f1ce30e244e7e3d3be98@o4511636173488128.ingest.de.sentry.io/4511636192165968",
+  environment: process.env.NODE_ENV || "development",
+  tracesSampleRate: Number(process.env.SENTRY_TRACES_SAMPLE_RATE || "0.1"),
+});
 
 const parentRoutes = require("./routes/parentRoutes");
 const mongoSanitize = require("express-mongo-sanitize");
@@ -108,4 +115,5 @@ mongoose.connection.on("error", (err) => {
   console.log(err);
 });
 
+Sentry.setupExpressErrorHandler(app);
 app.use(errorHandler);

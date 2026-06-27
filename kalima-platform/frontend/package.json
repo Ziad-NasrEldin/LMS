@@ -8,6 +8,7 @@
     "@capacitor/core": "^7.2.0",
     "@headlessui/react": "^2.2.9",
     "@phosphor-icons/react": "^2.1.10",
+    "@sentry/react": "^10.62.0",
     "@tailwindcss/postcss": "^4.1.4",
     "@tailwindcss/vite": "^4.1.4",
     "@vidstack/react": "^1.12.13",
