@@ -1842,7 +1842,7 @@ const LectureDisplay = () => {
               </div>
 ) : (
               <div className="rounded-xl px-4 py-6 text-sm" style={{ color: TOKENS.slateText, background: "rgba(241,243,246,0.55)" }}>
-                {t("noAttachmentsAvailable", "No uploaded attachments are available for this lecture yet.")}
+                {t("noAttachmentsAvailable")}
               </div>
             )}
           </Card>
@@ -1872,14 +1872,29 @@ const LectureDisplay = () => {
                     </h3>
 
                     <div className="mb-4">
-                         <input
-                           type="file"
-                           ref={homeworkFileInputRef}
-                           onChange={handleHomeworkFileSelect}
-                           multiple
-                            className="block w-full text-sm text-neutral file:mr-4 file:rounded-full file:border-0 file:px-4 file:py-2 file:text-sm file:font-semibold"
-                            style={{ color: TOKENS.slateText }}
+                      <input
+                        type="file"
+                        ref={homeworkFileInputRef}
+                        onChange={handleHomeworkFileSelect}
+                        multiple
+                        className="sr-only"
+                        aria-label={t("chooseFiles")}
                       />
+                      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                        <Button
+                          type="button"
+                          variant="secondary"
+                          onClick={() => homeworkFileInputRef.current?.click()}
+                          className="w-full sm:w-auto"
+                        >
+                          {t("chooseFiles")}
+                        </Button>
+                        <span className="text-sm" style={{ color: TOKENS.slateText }}>
+                          {homeworkFiles.length > 0
+                            ? t("selectedFilesCount", { count: homeworkFiles.length })
+                            : t("noFilesSelected")}
+                        </span>
+                      </div>
                     </div>
 
                     {homeworkFiles.length > 0 && (
