@@ -63,10 +63,6 @@ import Tabs from "../../../components/ui/Tabs";
 
 // Vidstack imports
 import { MediaPlayer, MediaProvider, Poster } from "@vidstack/react";
-import {
-  DefaultVideoLayout,
-  defaultLayoutIcons,
-} from "@vidstack/react/player/layouts/default";
 import "@vidstack/react/player/styles/default/theme.css";
 import "@vidstack/react/player/styles/default/layouts/video.css";
 
@@ -700,20 +696,32 @@ const LectureDisplay = () => {
       setPlaybackRate(player.playbackRate)
     }
 
+    const getFullscreenElement = () =>
+      document.fullscreenElement ||
+      document.webkitFullscreenElement ||
+      document.msFullscreenElement ||
+      null
+
     const handleFullscreenChange = () => {
       const player = playerRef.current
       if (!player) return
 
-      setIsFullscreen(document.fullscreenElement !== null)
+      setIsFullscreen(getFullscreenElement() !== null)
     }
 
     // Custom controls handlers
+    const handlePlayerPromiseError = (error) => {
+      const message = String(error?.message || error || "").toLowerCase()
+      if (message.includes("provider destroyed")) return
+      console.error("Vidstack player action failed:", error)
+    }
+
     const togglePlay = () => {
       const player = playerRef.current
       if (!player) return
 
       if (player.paused) {
-        player.play()
+        Promise.resolve(player.play()).catch(handlePlayerPromiseError)
       } else {
         player.pause()
       }
@@ -741,14 +749,29 @@ const LectureDisplay = () => {
     }
 
     const toggleFullscreen = () => {
-      if (!videoContainerRef.current) return
+      const container = videoContainerRef.current
+      if (!container) return
 
-      if (!document.fullscreenElement) {
-        videoContainerRef.current.requestFullscreen().catch((err) => {
+      if (!getFullscreenElement()) {
+        const requestFullscreen =
+          container.requestFullscreen ||
+          container.webkitRequestFullscreen ||
+          container.msRequestFullscreen
+        if (typeof requestFullscreen !== "function") return
+
+        Promise.resolve(requestFullscreen.call(container)).catch((err) => {
           console.error(`Error attempting to enable fullscreen: ${err.message}`)
         })
       } else {
-        document.exitFullscreen()
+        const exitFullscreen =
+          document.exitFullscreen ||
+          document.webkitExitFullscreen ||
+          document.msExitFullscreen
+        if (typeof exitFullscreen !== "function") return
+
+        Promise.resolve(exitFullscreen.call(document)).catch((err) => {
+          console.error(`Error attempting to exit fullscreen: ${err.message}`)
+        })
       }
     }
 
@@ -1535,7 +1558,6 @@ const LectureDisplay = () => {
                     />
                   )}
                 </MediaProvider>
-                <DefaultVideoLayout icons={defaultLayoutIcons} thumbnails={lecture?.videoThumbnailsVTT || null} />
               </MediaPlayer>
               {userRole === "Student" && studentFullName && (
                 <div className="lecture-video-watermark" aria-hidden="true">

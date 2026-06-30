@@ -51,6 +51,34 @@ const validatePassword = (password) => {
 
 const isNonEmpty = (value) => String(value || "").trim().length > 0;
 
+const mapDuplicateSignupError = (error) => {
+  if (error?.code !== 11000) return null;
+  const duplicateFields = Object.keys(error.keyPattern || error.keyValue || {});
+  const duplicateField = duplicateFields[0];
+
+  if (duplicateField === "email") return createSignupError("SIGNUP_EMAIL_ALREADY_EXISTS");
+  if (duplicateField === "phoneNumber") return createSignupError("SIGNUP_PHONE_ALREADY_EXISTS");
+  if (duplicateField === "phoneNumber2") return createSignupError("SIGNUP_PHONE2_DUPLICATE");
+
+  return createSignupError("SIGNUP_FIELD_CONFLICT", {
+    field: duplicateField,
+    details: { field: duplicateField, value: duplicateField ? error.keyValue?.[duplicateField] : undefined },
+    message: duplicateField
+      ? `${duplicateField} is already in use.`
+      : "A unique signup field already exists.",
+  });
+};
+
+const sendSignupError = (res, error) =>
+  res.status(error.statusCode || 400).json({
+    status: error.status,
+    code: error.code,
+    field: error.field,
+    message: error.message,
+    errors: error.errors,
+    details: error.details,
+  });
+
 const registerNewUser = catchAsync(async (req, res, next) => {
   const {
     role,
@@ -222,7 +250,8 @@ const registerNewUser = catchAsync(async (req, res, next) => {
   }
 
   let user;
-  switch (normalizedRole) {
+  try {
+    switch (normalizedRole) {
     case "teacher": {
       if (!newUser.phoneNumber2) {
         delete newUser.phoneNumber2;
@@ -475,6 +504,11 @@ const registerNewUser = catchAsync(async (req, res, next) => {
       break;
     default:
       return next(createSignupError("SIGNUP_INVALID_ROLE"));
+    }
+  } catch (error) {
+    const signupDuplicateError = mapDuplicateSignupError(error);
+    if (signupDuplicateError) return sendSignupError(res, signupDuplicateError);
+    return next(error);
   }
 
   if (!user) {
