@@ -57,6 +57,32 @@ const checkDoc = async (Model, id, session) => {
   return doc;
 };
 
+const parseBoolean = (value) => {
+  if (typeof value === "boolean") {
+    return value;
+  }
+
+  if (typeof value === "string") {
+    const trimmed = value.trim().toLowerCase();
+    if (trimmed === "true" || trimmed === "1" || trimmed === "yes") {
+      return true;
+    }
+    if (trimmed === "false" || trimmed === "0" || trimmed === "no" || trimmed === "") {
+      return false;
+    }
+  }
+
+  if (value === 1) {
+    return true;
+  }
+
+  if (value === 0) {
+    return false;
+  }
+
+  return Boolean(value);
+};
+
 const withSession = (query, session) => (session ? query.session(session) : query);
 
 const deleteLocalFile = (filePath) => {
@@ -236,6 +262,11 @@ exports.createContainer = catchAsync(async (req, res, next) => {
       sameGradeOnly,
     } = req.body;
 
+    const parsedTeacherAllowed =
+      teacherAllowed !== undefined ? parseBoolean(teacherAllowed) : undefined;
+    const parsedSameGradeOnly =
+      sameGradeOnly !== undefined ? parseBoolean(sameGradeOnly) : false;
+
     // Check required documents exist
     const levelDoc = await checkDoc(Level, level, session);
     const subjectDoc = await checkDoc(Subject, subject, session);
@@ -262,13 +293,13 @@ exports.createContainer = catchAsync(async (req, res, next) => {
       type,
       price: price || 0,
       level,
-      teacherAllowed,
+      teacherAllowed: parsedTeacherAllowed,
       subject,
       parent,
       createdBy: createdBy || req.user._id,
       description: type === "course" ? description : undefined,
       goal: type === "course" ? goal : undefined,
-      sameGradeOnly: type === "course" ? Boolean(sameGradeOnly) : undefined,
+      sameGradeOnly: type === "course" ? parsedSameGradeOnly : undefined,
     };
 
     // Add image data if an image was uploaded
@@ -828,11 +859,11 @@ exports.updateContainer = catchAsync(async (req, res, next) => {
     let unsetObj = {};
 
     if (teacherAllowed !== undefined) {
-      obj.teacherAllowed = teacherAllowed === true || teacherAllowed === "true";
+      obj.teacherAllowed = parseBoolean(teacherAllowed);
     }
 
     if (sameGradeOnly !== undefined) {
-      obj.sameGradeOnly = sameGradeOnly === true || sameGradeOnly === "true";
+      obj.sameGradeOnly = parseBoolean(sameGradeOnly);
     }
 
     if (type === "course") {
