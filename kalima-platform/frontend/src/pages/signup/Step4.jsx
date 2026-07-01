@@ -3,10 +3,12 @@ import { Link } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import { resolveLevelDisplayName } from "../../utils/levelHierarchy"
 
-const ReviewItem = ({ label, value }) => (
-  <div>
-      <p className="text-sm text-slate-600">{label}</p>
-    <p className="font-medium">{value || "-"}</p>
+const ReviewItem = ({ label, value, className = "" }) => (
+  <div className={`min-w-0 ${className}`}>
+    <p className="text-xs font-medium leading-4 text-slate-500 sm:text-sm">{label}</p>
+    <p className="break-words text-sm font-semibold leading-5 text-slate-900 [overflow-wrap:anywhere] sm:text-base">
+      {value || "-"}
+    </p>
   </div>
 )
 
@@ -75,10 +77,10 @@ export default function Step4({ formData, t, hobbiesList = [], levelHierarchy })
   const parentChildProfiles = Array.isArray(formData.childProfiles) ? formData.childProfiles : []
 
   return (
-    <div className="space-y-6">
-      <div className="rounded-lg bg-slate-100 p-6">
-        <h3 className="mb-4 text-lg font-semibold">{t("review.title")}</h3>
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+    <div className="space-y-3 sm:space-y-4">
+      <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3 sm:p-6">
+        <h3 className="mb-2.5 text-base font-bold text-slate-900 sm:mb-3 sm:text-lg">{t("review.title")}</h3>
+        <div className="grid grid-cols-2 gap-x-2.5 gap-y-2.5 md:gap-x-4 md:gap-y-3.5">
           <ReviewItem label={t("form.role")} value={t(`role.${formData.role}`)} />
           <ReviewItem label={t("form.fullName")} value={formData.fullName} />
           <ReviewItem label={t("form.gender")} value={t(`gender.${formData.gender}`)} />
@@ -117,7 +119,7 @@ export default function Step4({ formData, t, hobbiesList = [], levelHierarchy })
                   />
                 </>
               )}
-              <ReviewItem label={t("form.hobbies")} value={formatStudentHobbies()} />
+              <ReviewItem className="col-span-2 sm:col-span-1" label={t("form.hobbies")} value={formatStudentHobbies()} />
             </>
           )}
 
@@ -166,38 +168,40 @@ export default function Step4({ formData, t, hobbiesList = [], levelHierarchy })
                 value={String(formData.childCount || parentChildProfiles.length || 0)}
               />
               <div className="col-span-2">
-                <p className="text-sm text-slate-600">
+                <p className="text-xs font-medium leading-4 text-slate-500 sm:text-sm">
                   {t("form.childrenEducationDetails", {
                     defaultValue: isRTL ? "بيانات الأبناء الدراسية" : "Children education details",
                   })}
                 </p>
-                <div className="mt-2 space-y-3">
+                <div className="mt-1.5 space-y-1.5 sm:mt-2 sm:space-y-2">
                   {parentChildProfiles.length > 0 ? (
                     parentChildProfiles.map((profile, index) => (
-                      <div key={`review-child-${index}`} className="rounded-xl border border-slate-200 bg-white p-3">
-                        <p className="font-medium">
+                      <div key={`review-child-${index}`} className="rounded-xl border border-slate-200 bg-white p-2 sm:p-3">
+                        <p className="text-sm font-semibold leading-5 text-slate-900 sm:text-base">
                           {t("form.childCardTitle", {
                             count: index + 1,
                             defaultValue: isRTL ? `الابن ${index + 1}` : `Child ${index + 1}`,
                           })}
                         </p>
-                        <p className="text-sm text-slate-600">
-                          {t("form.stage", { defaultValue: isRTL ? "المرحلة" : "Stage" })}: {getLevelName(profile.stage)}
-                        </p>
-                        <p className="text-sm text-slate-600">
-                          {t("form.level", { defaultValue: isRTL ? "الصف الدراسي" : "Grade level" })}: {getLevelName(profile.level)}
-                        </p>
-                        {profile.sequenceId && (
-                          <p className="text-sm text-slate-600">
-                            {t("form.childSequenceId", {
-                              defaultValue: isRTL ? "رقم تسلسل الابن" : "Child sequence ID",
-                            })}: {profile.sequenceId}
+                        <div className="mt-1 grid grid-cols-2 gap-x-2 gap-y-1 text-xs leading-4 text-slate-600 sm:text-sm">
+                          <p className="min-w-0 break-words [overflow-wrap:anywhere]">
+                            {t("form.stage", { defaultValue: isRTL ? "المرحلة" : "Stage" })}: {getLevelName(profile.stage)}
                           </p>
-                        )}
+                          <p className="min-w-0 break-words [overflow-wrap:anywhere]">
+                            {t("form.level", { defaultValue: isRTL ? "الصف الدراسي" : "Grade level" })}: {getLevelName(profile.level)}
+                          </p>
+                          {profile.sequenceId && (
+                            <p className="col-span-2 min-w-0 break-words [overflow-wrap:anywhere]">
+                              {t("form.childSequenceId", {
+                                defaultValue: isRTL ? "رقم تسلسل الابن" : "Child sequence ID",
+                              })}: {profile.sequenceId}
+                            </p>
+                          )}
+                        </div>
                       </div>
                     ))
                   ) : (
-                    <p className="font-medium">-</p>
+                    <p className="text-sm font-semibold text-slate-900">-</p>
                   )}
                 </div>
               </div>
@@ -205,7 +209,7 @@ export default function Step4({ formData, t, hobbiesList = [], levelHierarchy })
           )}
         </div>
 
-        <p className="mt-10 font-bold">
+        <p className="mt-4 text-sm font-bold leading-6 text-slate-900 sm:mt-6 sm:text-base">
           {t("review.privacyAgreementPrefix", "By signing up, you agree to our")}{" "}
           <span className="text-blue-600 underline">
             <Link to="/privacy-policy">{t("review.privacyPolicy", "Privacy Policy")}</Link>

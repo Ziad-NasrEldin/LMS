@@ -22,6 +22,9 @@ export default function StepParent({
   const stageOptions = levelHierarchy?.stageOptions || []
   const childProfiles = Array.isArray(formData.childProfiles) ? formData.childProfiles : []
   const childCount = formData.childCount || childProfiles.length || 1
+  const fieldClass = "flex min-w-0 flex-col gap-1"
+  const labelClass = "text-sm font-semibold text-slate-900"
+  const selectClass = "h-11 rounded-xl text-sm sm:h-12 sm:text-base"
 
   const getChildError = (index, field) => {
     if (!errors?.childProfiles || typeof errors.childProfiles !== "object") return ""
@@ -29,13 +32,13 @@ export default function StepParent({
   }
 
   return (
-    <div className="space-y-5">
-      <p className="text-lg font-semibold">{t("form.parentDetails")}</p>
+    <div className="space-y-4">
+      <p className="text-lg font-bold text-slate-900">{t("form.parentDetails")}</p>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <div className="flex flex-col gap-1">
-          <label className="block mb-1">
-            <span className="text-xs">{t("form.email")}</span>
+      <div className="grid grid-cols-2 gap-3 sm:gap-4">
+        <div className={fieldClass}>
+          <label>
+            <span className={labelClass}>{t("form.email")}</span>
           </label>
           <Input
             type="email"
@@ -49,9 +52,9 @@ export default function StepParent({
           {errors.email && <span className="text-error text-sm mt-1">{t(`validation.${errors.email}`)}</span>}
         </div>
 
-        <div className="flex flex-col gap-1">
-          <label className="block mb-1">
-            <span className="text-xs">{t("form.profession")}</span>
+        <div className={fieldClass}>
+          <label>
+            <span className={labelClass}>{t("form.profession")}</span>
           </label>
           <Input
             type="text"
@@ -67,10 +70,10 @@ export default function StepParent({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <div className="flex flex-col gap-1">
-          <label className="block mb-1">
-            <span className="text-xs">{t("form.password")}</span>
+      <div className="grid grid-cols-2 gap-3 sm:gap-4">
+        <div className={fieldClass}>
+          <label>
+            <span className={labelClass}>{t("form.password")}</span>
           </label>
           <Input
             type="password"
@@ -85,9 +88,9 @@ export default function StepParent({
           )}
         </div>
 
-        <div className="flex flex-col gap-1">
-          <label className="block mb-1">
-            <span className="text-xs">{t("form.confirmPassword")}</span>
+        <div className={fieldClass}>
+          <label>
+            <span className={labelClass}>{t("form.confirmPassword")}</span>
           </label>
           <Input
             type="password"
@@ -103,15 +106,15 @@ export default function StepParent({
         </div>
       </div>
 
-      <div className="rounded-2xl bg-white p-4">
-        <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-          <div>
-            <p className="text-lg font-semibold">
+      <div className="rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-4">
+        <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+          <div className="min-w-0">
+            <p className="text-lg font-bold text-slate-900">
               {t("form.childrenEducationDetails", {
                 defaultValue: isRTL ? "بيانات الأبناء الدراسية" : "Children education details",
               })}
             </p>
-            <p className="text-sm text-slate-600">
+            <p className="mt-0.5 text-sm leading-5 text-slate-600">
               {t("form.childrenEducationDetailsHelp", {
                 defaultValue: isRTL
                   ? "حدد المرحلة والصف الدراسي لكل ابن. يمكن إضافة رقم التسلسل إذا كان متاحًا."
@@ -120,9 +123,9 @@ export default function StepParent({
             </p>
           </div>
 
-          <div className="flex flex-col gap-1 md:min-w-[180px]">
-            <label className="block mb-1">
-              <span className="text-xs">
+          <div className="flex min-w-0 flex-col gap-1 md:min-w-[180px]">
+            <label>
+              <span className={labelClass}>
                 {t("form.childCount", {
                   defaultValue: isRTL ? "عدد الأبناء" : "Number of children",
                 })}
@@ -131,7 +134,7 @@ export default function StepParent({
             <DSSelect
               value={String(childCount)}
               onChange={(event) => handleParentChildCountChange(event.target.value)}
-              className={isRTL ? "text-right" : "text-left"}
+              className={`${selectClass} ${isRTL ? "text-right" : "text-left"}`}
             >
               {CHILD_COUNT_OPTIONS.map((count) => (
                 <option key={count} value={count}>
@@ -146,7 +149,7 @@ export default function StepParent({
           <span className="text-error text-sm mt-3 block">{t(`validation.${errors.childProfiles}`)}</span>
         )}
 
-        <div className="mt-4 space-y-4">
+        <div className="mt-3 space-y-3">
           {childProfiles.map((profile, index) => {
             const gradeOptions = profile?.stage
               ? getGradeOptionsForStage(levelHierarchy, profile.stage)
@@ -155,9 +158,9 @@ export default function StepParent({
             return (
               <div
                 key={`child-profile-${index}`}
-                className="rounded-2xl bg-slate-50/70 p-4"
+                className="rounded-2xl border border-slate-200 bg-slate-50/70 p-3.5 sm:p-4"
               >
-                <div className="mb-3 flex items-center justify-between">
+                <div className="mb-2 flex items-center justify-between">
                   <h4 className="font-semibold text-slate-900">
                     {t("form.childCardTitle", {
                       count: index + 1,
@@ -166,10 +169,10 @@ export default function StepParent({
                   </h4>
                 </div>
 
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                  <div className="flex flex-col gap-1">
-                    <label className="block mb-1">
-                      <span className="text-xs">
+                <div className="grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-4">
+                  <div className={fieldClass}>
+                    <label>
+                      <span className={labelClass}>
                         {t("form.stage", { defaultValue: isRTL ? "المرحلة" : "Stage" })}
                       </span>
                     </label>
@@ -178,7 +181,7 @@ export default function StepParent({
                       onChange={(event) =>
                         handleParentChildProfileChange(index, "stage", event.target.value)
                       }
-                      className={`${isRTL ? "text-right" : "text-left"} ${
+                      className={`${selectClass} ${isRTL ? "text-right" : "text-left"} ${
                         getChildError(index, "stage") ? "border-error animate-shake" : ""
                       }`}
                     >
@@ -206,9 +209,9 @@ export default function StepParent({
                     )}
                   </div>
 
-                  <div className="flex flex-col gap-1">
-                    <label className="block mb-1">
-                      <span className="text-xs">
+                  <div className={fieldClass}>
+                    <label>
+                      <span className={labelClass}>
                         {t("form.selectGradeLevel", {
                           defaultValue: isRTL ? "الصف الدراسي" : "Grade level",
                         })}
@@ -219,7 +222,7 @@ export default function StepParent({
                       onChange={(event) =>
                         handleParentChildProfileChange(index, "level", event.target.value)
                       }
-                      className={`${isRTL ? "text-right" : "text-left"} ${
+                      className={`${selectClass} ${isRTL ? "text-right" : "text-left"} ${
                         getChildError(index, "level") ? "border-error animate-shake" : ""
                       }`}
                       disabled={!profile?.stage}
@@ -246,9 +249,9 @@ export default function StepParent({
                     )}
                   </div>
 
-                  <div className="flex flex-col gap-1">
-                    <label className="block mb-1">
-                      <span className="text-xs">
+                  <div className={fieldClass}>
+                    <label>
+                      <span className={labelClass}>
                         {t("form.childSequenceId", {
                           defaultValue: isRTL ? "رقم تسلسل الابن" : "Child sequence ID",
                         })}

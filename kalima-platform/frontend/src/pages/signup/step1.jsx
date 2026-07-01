@@ -16,16 +16,19 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
   const isRTL = i18n.language === "ar";
 
   const stageOptions = levelHierarchy?.stageOptions || [];
-  const fieldClass = "w-full rounded-xl text-base";
+  const fieldClass = "w-full rounded-xl text-sm sm:text-base";
   const inputClass = `input ${fieldClass}`;
   const selectClass = `select ${fieldClass}`;
-  const exactHeight = { minHeight: '48px', boxSizing: 'border-box' };
+  const exactHeight = { minHeight: '44px', boxSizing: 'border-box' };
+  const pairedFieldsClass = "grid grid-cols-2 gap-3 sm:gap-4";
+  const fieldStackClass = "flex min-w-0 flex-col gap-1";
+  const fieldLabelClass = "text-sm font-semibold leading-5";
   
   // Section header component
   const SectionHeader = ({ title, subtitle }) => (
-    <div className="mb-4 mt-6 first:mt-0">
+    <div className="mb-3 mt-5 first:mt-0">
       <h4 className="text-sm font-bold text-[#0E5563] uppercase tracking-wider">{title}</h4>
-      {subtitle && <p className="mt-1 text-xs text-slate-600">{subtitle}</p>}
+      {subtitle && <p className="mt-0.5 text-xs leading-5 text-slate-600">{subtitle}</p>}
     </div>
   );
 
@@ -120,7 +123,7 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
   }
 
   return (
-      <div className="space-y-5">
+      <div className="space-y-4">
         {/* Section: Basic Info */}
         <SectionHeader 
           title={t("form.personalDetails")} 
@@ -147,9 +150,9 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
         </div>
 
         {/* Row 2: Gender + Phone - 2 columns */}
-        <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'start' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem', width: '48%' }}>
-            <label style={{ fontSize: '0.875rem', fontWeight: 600, minHeight: '1.5rem' }}>{t("form.gender")}</label>
+        <div className={pairedFieldsClass}>
+          <div className={fieldStackClass}>
+            <label className={fieldLabelClass}>{t("form.gender")}</label>
             <DSSelect
               name="gender"
               className={`${selectClass} ${errors.gender ? "select-error" : ""}`}
@@ -164,8 +167,8 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
             </DSSelect>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem', width: '48%' }}>
-            <label style={{ fontSize: '0.875rem', fontWeight: 600, minHeight: '1.5rem' }}>{t("form.phoneNumber")}</label>
+          <div className={fieldStackClass}>
+            <label className={fieldLabelClass}>{t("form.phoneNumber")}</label>
                <Input
                  type="text"
                  name="phoneNumber"
@@ -183,29 +186,25 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
               <span className="text-error text-sm mt-1">{t(`validation.${errors.phoneNumber}`)}</span>
             )}
           </div>
+
+          {role === "teacher" && (
+            <div className={fieldStackClass}>
+              <label className={fieldLabelClass}>{t("form.phoneNumber2")}</label>
+              <Input
+                type="text"
+                name="phoneNumber2"
+                value={formData.phoneNumber2}
+                onChange={handleInputChange}
+                className="text-sm sm:text-base"
+                style={exactHeight}
+                inputMode="tel"
+                dir="ltr"
+                autoComplete="tel"
+                placeholder={t("form.phonePlaceholder", "01xxxxxxxxx")}
+              />
+            </div>
+          )}
         </div>
-
-        {/* Teacher second phone */}
-        {role === "teacher" && (
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text">{t("form.phoneNumber2")}</span>
-              <span className="label-text-alt text-xs text-slate-400">{t("form.optional")}</span>
-            </label>
-             <Input
-               type="text"
-               name="phoneNumber2"
-               value={formData.phoneNumber2}
-               onChange={handleInputChange}
-               className=""
-               inputMode="tel"
-               dir="ltr"
-               autoComplete="tel"
-               placeholder={t("form.phonePlaceholder", "01xxxxxxxxx")}
-             />
-          </div>
-        )}
-
         {/* Section: Location */}
         <SectionHeader 
           title={t("form.location")} 
@@ -213,9 +212,9 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
         />
         
         {/* Row 3: Government + Administration Zone - 2 columns */}
-        <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'start' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem', width: '48%' }}>
-            <label style={{ fontSize: '0.875rem', fontWeight: 600, minHeight: '1.5rem' }}>{t("form.government", { defaultValue: isRTL ? "المحافظة" : "Government" })}</label>
+        <div className={pairedFieldsClass}>
+          <div className={fieldStackClass}>
+            <label className={fieldLabelClass}>{t("form.government", { defaultValue: isRTL ? "المحافظة" : "Government" })}</label>
             <DSSelect
               name="government"
               className={`${selectClass} ${errors.government ? "select-error" : ""}`}
@@ -237,8 +236,8 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
             )}
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
-            <label style={{ fontSize: '0.875rem', fontWeight: 600, minHeight: '1.5rem' }}>{t("form.administrationZone", { defaultValue: isRTL ? "الإدارة التعليمية" : "Administration Zone" })}</label>
+          <div className={fieldStackClass}>
+            <label className={fieldLabelClass}>{t("form.administrationZone", { defaultValue: isRTL ? "الإدارة التعليمية" : "Administration Zone" })}</label>
             <DSSelect
               disabled={!formData.government || zonesLoading}
               name="administrationZone"
@@ -272,9 +271,9 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
               subtitle={t("form.educationSubtitle", "Select your academic stage and grade")}
             />
             
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem', alignItems: 'start' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
-                <label style={{ fontSize: '0.875rem', fontWeight: 600, minHeight: '1.5rem' }}>{t("form.stage", { defaultValue: isRTL ? "المرحلة" : "Stage" })}</label>
+            <div className={pairedFieldsClass}>
+              <div className={fieldStackClass}>
+                <label className={fieldLabelClass}>{t("form.stage", { defaultValue: isRTL ? "المرحلة" : "Stage" })}</label>
                 <DSSelect
                   name="stage"
                   className={`${selectClass} ${errors.stage ? "select-error" : ""}`}
@@ -305,8 +304,8 @@ export default function Step1({ formData, handleInputChange, t, errors, role, le
                 )}
               </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
-                <label style={{ fontSize: '0.875rem', fontWeight: 600, minHeight: '1.5rem' }}>{t("form.level", { defaultValue: isRTL ? "المستوى التعليمي" : "Learning Level" })}</label>
+              <div className={fieldStackClass}>
+                <label className={fieldLabelClass}>{t("form.level", { defaultValue: isRTL ? "المستوى التعليمي" : "Learning Level" })}</label>
                 <DSSelect
                   name="level"
                   className={`${selectClass} ${errors.level ? "select-error" : ""}`}

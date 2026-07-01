@@ -760,12 +760,12 @@ export default function StudentRegistration() {
 
   return (
     <div
-      className="min-h-screen pt-24 px-3 pb-8 sm:px-6 lg:px-8"
+      className="min-h-screen px-3 pb-6 pt-20 sm:px-6 sm:pt-24 lg:px-8"
       dir={isRTL ? "rtl" : "ltr"}
       style={{ background: TOKENS.creamSurface }}
     >
       <div className="pointer-events-none fixed inset-0 -z-10 opacity-45" style={{ background: GRADIENTS.pageAtmosphere }} />
-      <div className="mx-auto mb-6 flex w-full max-w-6xl items-center justify-between">
+      <div className="mx-auto mb-3 flex w-full max-w-6xl flex-col gap-1.5 sm:mb-6 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-xl font-extrabold sm:text-2xl" style={{ color: TOKENS.deepTeal }}>Fekra</h1>
           <p className="text-sm text-slate-900/70">
             {t("alreadyHaveAccount", "Already have an account?")} {" "}
@@ -776,7 +776,7 @@ export default function StudentRegistration() {
       </div>
 
       <div
-        className="mx-auto w-full max-w-6xl overflow-hidden rounded-[1.5rem] border bg-white"
+        className="mx-auto w-full max-w-6xl overflow-hidden rounded-[1rem] border bg-white sm:rounded-[1.5rem]"
         style={{
           borderColor: "rgba(17,24,39,0.08)",
           boxShadow: SHADOWS.level2,
@@ -784,7 +784,7 @@ export default function StudentRegistration() {
       >
         <div className="grid min-h-[auto] lg:min-h-[760px] lg:grid-cols-[1fr_1.2fr]">
           {/* Left Side - Dynamic: Hero on step 1, Form fields on other steps */}
-          <section className="relative overflow-hidden p-6 lg:p-8 bg-white" style={{ background: GRADIENTS.appPanel }}>
+          <section className="relative hidden overflow-hidden bg-white p-4 sm:p-6 lg:block lg:p-8" style={{ background: GRADIENTS.appPanel }}>
             <div className="absolute -left-12 top-6 h-48 w-48 rounded-full bg-secondary/20 blur-3xl" />
             <div className="absolute bottom-12 right-8 h-44 w-44 rounded-full bg-primary/15 blur-3xl" />
 
@@ -792,13 +792,13 @@ export default function StudentRegistration() {
               {currentStep === 1 ? (
                 /* Hero content on first step */
                 <>
-                   <h2 className="text-4xl font-black leading-[1.04] text-slate-900 xl:text-5xl">
+                   <h2 className="text-2xl font-black leading-[1.08] text-slate-900 sm:text-4xl xl:text-5xl">
                     {t("signupHeroStart", "Start your")}
                     <br />
                     <span style={{ color: TOKENS.deepTeal }}>{t("signupHeroMiddle", "learning")}</span>{" "}
                     {t("signupHeroEnd", "journey today.")}
                   </h2>
-                  <p className="mt-4 text-base xl:text-lg" style={{ color: TOKENS.slateText }}>
+                  <p className="mt-2 max-w-[64ch] text-sm leading-6 sm:mt-4 sm:text-base xl:text-lg" style={{ color: TOKENS.slateText }}>
                     {t(
                       "signupHeroSub",
                       "Join thousands of students and educators in a playful, structured learning environment designed for growth.",
@@ -871,10 +871,10 @@ export default function StudentRegistration() {
           </section>
 
           {/* Right Side - Form */}
-           <section className="flex flex-col p-4 sm:p-6 lg:p-8 bg-white">
-            <div className="flex-1 overflow-hidden flex flex-col">
+           <section className="flex min-w-0 flex-col bg-white p-4 sm:p-6 lg:p-8">
+            <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
               {/* Header */}
-              <div className="mb-4">
+              <div className="mb-3">
                  <h3 className="text-xl font-extrabold text-slate-900 sm:text-2xl">
                   {currentStep === 1 ? t("createAccount", "Create Account") : t("stepTitle", { step: currentStep })}
                 </h3>
@@ -888,7 +888,7 @@ export default function StudentRegistration() {
 
               {/* Role Selector - Only on step 1 */}
               {currentStep === 1 && (
-                <div className="mb-5">
+                <div className="mb-4">
                    <p className="text-xs font-bold uppercase tracking-widest text-slate-900/60 mb-2">
                     {t("iAmA", "I am a")}
                   </p>
@@ -898,7 +898,7 @@ export default function StudentRegistration() {
                          key={itemRole}
                          type="button"
                          onClick={() => handleRoleSelect(itemRole)}
-                         className={`h-11 rounded-xl border-2 text-xs transition-all sm:h-12 sm:text-sm ${
+                         className={`min-h-11 min-w-0 rounded-xl border-2 px-2 text-xs leading-tight [white-space:normal] transition-all sm:min-h-12 sm:px-4 sm:text-sm ${
                            formData.role === itemRole
                              ? "border-transparent"
                              : "bg-white border-[#0E5563]/30 text-[#0E5563] hover:bg-[#0E5563]/5"
@@ -929,48 +929,25 @@ export default function StudentRegistration() {
                )}
 
               {/* Form Content - Full height scrollable */}
-              <div className="flex-1 overflow-y-auto custom-scrollbar pr-2">
+              <div className="min-w-0 flex-1 overflow-y-auto custom-scrollbar pe-1 sm:pe-2">
                 {renderStepContent()}
               </div>
 
 {/* Navigation */}
-                <div className="mt-4 pt-4 border-t border-slate-200" style={{minHeight: '60px'}}>
-                  <div className="flex items-center justify-between gap-3 w-full">
+                <div className="mt-3 border-t border-slate-200 pt-3">
+                  <div className="grid w-full grid-cols-2 gap-3">
                     <button
                       onClick={() => setCurrentStep((prev) => prev - 1)}
                       disabled={currentStep === 1}
                       type="button"
-                      style={{
-                        height: '40px',
-                        paddingLeft: '24px',
-                        paddingRight: '24px',
-                        fontSize: '14px',
-                        fontWeight: 600,
-                        borderRadius: '8px',
-                        border: '2px solid #64748b',
-                        backgroundColor: 'white',
-                        color: '#334155',
-                        cursor: currentStep === 1 ? 'not-allowed' : 'pointer',
-                        opacity: currentStep === 1 ? 0.5 : 1,
-                      }}
+                      className="min-h-11 rounded-xl border-2 border-slate-300 bg-white px-4 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-100 hover:border-slate-400 disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       {t('buttons.previous')}
                     </button>
                     <button
                       onClick={handleNext}
                       type="button"
-                      style={{
-                        height: '40px',
-                        paddingLeft: '24px',
-                        paddingRight: '24px',
-                        fontSize: '14px',
-                        fontWeight: 600,
-                        borderRadius: '8px',
-                        border: 'none',
-                        backgroundColor: '#0E5563',
-                        color: 'white',
-                        cursor: 'pointer',
-                      }}
+                      className="min-h-11 rounded-xl bg-[#0E5563] px-4 text-sm font-semibold text-white transition-colors hover:bg-[#0A424C]"
                     >
                       {currentStep === totalSteps[formData.role] ? t('buttons.submit') : t('buttons.next')}
                     </button>

@@ -1,4 +1,3 @@
-import Button from "../../components/ui/Button"
 export default function NavigationButtons({ 
   currentStep, 
   handlePrev, 
@@ -14,7 +13,7 @@ export default function NavigationButtons({
       onClick={handlePrev}
       disabled={currentStep === 1 || isLoading}
       type="button"
-      className="h-10 px-6 text-sm font-semibold rounded-lg border-2 border-slate-300 text-slate-700 hover:bg-slate-100 hover:border-slate-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+      className="min-h-11 rounded-xl border-2 border-slate-300 bg-white px-4 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-100 hover:border-slate-400 disabled:cursor-not-allowed disabled:opacity-50"
     >
       {t('buttons.previous')}
     </button>
@@ -24,7 +23,7 @@ export default function NavigationButtons({
     <button
       onClick={handleNext}
       type="button"
-      className="h-10 px-6 text-sm font-semibold rounded-lg bg-[#0E5563] text-white hover:bg-[#0a4250] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+      className="min-h-11 rounded-xl bg-[#0E5563] px-4 text-sm font-semibold text-white transition-colors hover:bg-[#0a4250] disabled:cursor-not-allowed disabled:opacity-50"
       disabled={isLoading}
     >
       {isLoading ? '...' : currentStep === totalSteps[role] ? t('buttons.submit') : t('buttons.next')}
@@ -32,7 +31,7 @@ export default function NavigationButtons({
   )
 
   return (
-    <div className="flex items-center justify-between gap-3 w-full">
+    <div className="grid w-full grid-cols-2 gap-3">
       {isRTL ? (
         <>
           {nextOrSubmitButton}

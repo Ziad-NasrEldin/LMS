@@ -16,10 +16,12 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, le
   const { i18n } = useTranslation()
   const isRTL = i18n.language === "ar"
   const stageOptions = levelHierarchy?.stageOptions || []
-  const fieldClass = "h-12 min-h-12 w-full rounded-xl text-base"
+  const fieldClass = "h-11 min-h-11 w-full rounded-xl text-sm sm:h-12 sm:min-h-12 sm:text-base"
   const inputClass = `border border-slate-200 ${fieldClass}`
   const selectClass = `border border-slate-200 ${fieldClass} ps-4 pe-10`
-  const actionButtonClass = "border border-slate-200 h-12 min-h-12 w-12 rounded-xl p-0 text-lg leading-none flex items-center justify-center"
+  const fieldWrapperClass = "flex min-w-0 flex-col gap-1"
+  const labelClass = "text-sm font-semibold text-slate-900"
+  const actionButtonClass = "border border-slate-200 h-11 min-h-11 w-11 shrink-0 rounded-xl p-0 text-lg leading-none flex items-center justify-center bg-white hover:bg-slate-50 sm:h-12 sm:min-h-12 sm:w-12"
   
   useEffect(() => {
     const fetchSubjects = async () => {
@@ -40,15 +42,15 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, le
   }
 
   return (
-    <div className="space-y-3">
-      <p className="text-xl sm:text-2xl font-semibold mb-2">
+    <div className="space-y-4">
+      <p className="text-lg font-bold text-slate-900 sm:text-xl">
         {t("form.accountDetails", { defaultValue: isRTL ? "تفاصيل الحساب" : "Account Details" })}
       </p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
-      <div className="flex flex-col gap-1 sm:col-span-2">
-        <div className="flex flex-col gap-1">
-          <label className="flex flex-col gap-1 py-1">
-            <span className="text-xs">{t("form.email")}</span>
+      <div className="grid grid-cols-2 gap-3 sm:gap-4">
+      <div className="min-w-0 sm:col-span-2">
+        <div className={fieldWrapperClass}>
+          <label>
+            <span className={labelClass}>{t("form.email")}</span>
           </label>
           <Input
             type="email"
@@ -61,11 +63,11 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, le
           {errors.email && <span className="text-red-500 text-sm mt-1">{t(`validation.${errors.email}`)}</span>}
         </div>
       </div>
-      <div className="grid gap-4 sm:grid-cols-2 sm:col-span-2 sm:gap-6">
-        <div className="flex flex-col gap-1">
-          <div className="flex flex-col gap-1">
-            <label className="flex flex-col gap-1 py-1">
-              <span className="text-xs">{t("form.password")}</span>
+      <div className="grid min-w-0 grid-cols-2 gap-3 sm:col-span-2 sm:gap-4">
+        <div className={fieldWrapperClass}>
+          <div className={fieldWrapperClass}>
+            <label>
+              <span className={labelClass}>{t("form.password")}</span>
             </label>
             <div className="relative">
               <Input
@@ -78,7 +80,7 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, le
               />
               <button
                 type="button"
-                  className={`absolute top-1/2 ${i18n.language === "ar" ? "right-3" : "left-3"} z-10 -translate-y-1/2 text-slate-600`}
+                  className={`absolute top-1/2 ${i18n.language === "ar" ? "right-3" : "left-3"} z-10 min-h-10 min-w-10 -translate-y-1/2 text-slate-600`}
                 onClick={() => setShowPassword((prev) => !prev)}
                 tabIndex={-1}
               >
@@ -89,10 +91,10 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, le
           </div>
         </div>
   
-        <div className="flex flex-col gap-1 relative">
-          <div className="flex flex-col gap-1">
-            <label className="flex flex-col gap-1 py-1">
-              <span className="text-xs">{t("form.confirmPassword")}</span>
+        <div className={`${fieldWrapperClass} relative`}>
+          <div className={fieldWrapperClass}>
+            <label>
+              <span className={labelClass}>{t("form.confirmPassword")}</span>
             </label>
             <div className="relative">
               <Input
@@ -105,7 +107,7 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, le
               />
               <button
                 type="button"
-                  className={`absolute top-1/2 ${i18n.language === "ar" ? "right-3" : "left-3"} z-10 -translate-y-1/2 text-slate-600`}
+                  className={`absolute top-1/2 ${i18n.language === "ar" ? "right-3" : "left-3"} z-10 min-h-10 min-w-10 -translate-y-1/2 text-slate-600`}
                 onClick={() => setShowConfirmPassword((prev) => !prev)}
                 tabIndex={-1}
               >
@@ -119,10 +121,10 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, le
         </div>
       </div>
       {/* Level Selection */}
-      <div className="flex flex-col gap-1 sm:col-span-2">
-        <div className="flex flex-col gap-1">
-          <label className="flex flex-col gap-1 py-1">
-            <span className="text-xs">
+      <div className="min-w-0 sm:col-span-2">
+        <div className={fieldWrapperClass}>
+          <label>
+            <span className={labelClass}>
               {t("form.stage", {
                 defaultValue: t("form.level", { defaultValue: isRTL ? "المرحلة" : "Stage" }),
               })}
@@ -139,9 +141,9 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, le
               })}
             </div>
           ) : (
-            <div className="flex flex-wrap gap-x-4 gap-y-2">
+            <div className="grid grid-cols-2 gap-2">
               {stageOptions.map((levelOption) => (
-                <label key={levelOption.value} className="flex cursor-pointer items-center gap-2">
+                <label key={levelOption.value} className="flex min-h-11 cursor-pointer items-center gap-3 rounded-xl border border-slate-200 bg-white px-3 py-2">
                   <input
                     type="checkbox"
                     className="rounded border-slate-300"
@@ -162,7 +164,7 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, le
                       handleInputChange({ target: { name: "level", value: updatedLevels } })
                     }}
                   />
-                  <span>{levelOption.label}</span>
+                  <span className="text-sm font-semibold text-slate-900">{levelOption.label}</span>
                 </label>
               ))}
             </div>
@@ -172,10 +174,10 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, le
       </div>
 
       {/* Teaches At Type */}
-      <div className="flex flex-col gap-1">
-        <div className="flex flex-col gap-1">
-          <label className="flex flex-col gap-1 py-1">
-            <span className="text-xs">
+      <div className={fieldWrapperClass}>
+        <div className={fieldWrapperClass}>
+          <label>
+            <span className={labelClass}>
               {t("form.teachesAtType", { defaultValue: isRTL ? "أين تدرس؟" : "Teaches At" })}
             </span>
           </label>
@@ -207,16 +209,16 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, le
   
       {/* Centers - Show if teachesAtType is Center or Both */}
       {(formData.teachesAtType === "Center" || formData.teachesAtType === "Both") && (
-        <div className="flex flex-col gap-1">
-          <div className="flex flex-col gap-1">
-            <label className="flex flex-col gap-1 py-1">
-              <span className="text-xs">
+        <div className={fieldWrapperClass}>
+          <div className={fieldWrapperClass}>
+            <label>
+              <span className={labelClass}>
                 {t("form.centers", { defaultValue: isRTL ? "المراكز" : "Centers" })}
               </span>
             </label>
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col gap-2">
               {(formData.centers || [""]).map((center, index) => (
-                <div key={index} className="flex w-full gap-2">
+                <div key={index} className="flex w-full min-w-0 gap-2">
                   <Input
                     type="text"
                     className={`${inputClass} flex-1 ${errors.centers?.[index] ? "border-red-500 animate-shake" : ""}`}
@@ -269,10 +271,10 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, le
   
       {/* School - Show if teachesAtType is School or Both */}
       {(formData.teachesAtType === "School" || formData.teachesAtType === "Both") && (
-        <div className="flex flex-col gap-1">
-          <div className="flex flex-col gap-1">
-            <label className="flex flex-col gap-1 py-1">
-              <span className="text-xs">
+        <div className={fieldWrapperClass}>
+          <div className={fieldWrapperClass}>
+            <label>
+              <span className={labelClass}>
                 {t("form.school", { defaultValue: isRTL ? "المدرسة" : "School" })}
               </span>
             </label>
@@ -297,18 +299,18 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, le
       )}
 
       {/* Social Media */}
-        <div className="flex flex-col gap-1 sm:col-span-2">
-          <div className="flex flex-col gap-1">
-            <label className="flex flex-col gap-1 py-1">
-            <span className="text-xs">
+        <div className="min-w-0 sm:col-span-2">
+          <div className={fieldWrapperClass}>
+            <label>
+            <span className={labelClass}>
               {t("form.socialMedia", { defaultValue: isRTL ? "وسائل التواصل الاجتماعي" : "Social Media" })}
             </span>
           </label>
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col gap-2">
             {(formData.socialMedia || [{ platform: "", account: "" }]).map((social, index) => (
               <div
                 key={index}
-                className="grid grid-cols-1 gap-2 sm:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)_3rem] sm:items-center"
+                className="grid min-w-0 grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)_2.75rem] gap-2 sm:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)_3rem] sm:items-center"
               >
                 <DSSelect
                   className={`${selectClass} ${errors.socialMedia?.[index]?.platform ? "border-red-500 animate-shake" : ""}`}
@@ -341,7 +343,7 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, le
                 </DSSelect>
                 <Input
                   type="text"
-                  className={`${inputClass} placeholder:text-slate-900/65 ${errors.socialMedia?.[index]?.account ? "border-red-500 animate-shake" : ""}`}
+                  className={`${inputClass} min-w-0 placeholder:text-slate-900/65 ${errors.socialMedia?.[index]?.account ? "border-red-500 animate-shake" : ""}`}
                   value={social.account || ""}
                   onChange={(e) => {
                     const newSocialMedia = [...(formData.socialMedia || [{ platform: "", account: "" }])]
@@ -386,10 +388,10 @@ export default function StepTeacher({ formData, handleInputChange, t, errors, le
         </div>
       </div>
       {/* Subject Input */}
-        <div className="flex flex-col gap-1 sm:col-span-2">
-          <div className="flex flex-col gap-1">
-            <label className="flex flex-col gap-1 py-1">
-            <span className="text-xs">
+        <div className="min-w-0 sm:col-span-2">
+          <div className={fieldWrapperClass}>
+            <label>
+            <span className={labelClass}>
               {t("form.subject", { defaultValue: isRTL ? "المادة" : "Subject" })}
             </span>
           </label>
